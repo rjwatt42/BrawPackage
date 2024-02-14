@@ -88,8 +88,8 @@ r2ci<-function(r,n,s=0){
   }
 }
 
-res2llr<-function(result,method=STMethod) {
-  r2llr(result$rIV,result$nval,result$df1,method,result$evidence$llr,result$evidence$prior)
+res2llr<-function(analysis,method=STMethod) {
+  r2llr(analysis$rIV,analysis$nval,analysis$df1,method,analysis$evidence$llr,analysis$evidence$prior)
 }
 
 r2llr<-function(r,n,df1,method=STMethod,llr=list(e1=c(),e2=0),world=NULL) {
@@ -340,10 +340,10 @@ convert2Interval<-function(var) {
 generalAnalysis<-function(allData,InteractionOn,withins,ssqType="Type3",caseOrder="Alphabetic") {
   
   if (ncol(allData)<3) {
-    result$rIV<-NA
-    result$pIV<-NA
-    result$rpIV<-NA
-    return(result)
+    analysis$rIV<-NA
+    analysis$pIV<-NA
+    analysis$rpIV<-NA
+    return(analysis)
   }
   
   no_ivs<-ncol(allData)-2
@@ -366,16 +366,16 @@ generalAnalysis<-function(allData,InteractionOn,withins,ssqType="Type3",caseOrde
   }
   
   # MAKE MAIN DATA STORAGE
-  resultRawData<-data.frame(allData)
-  names(resultRawData)<-c("participant","dv",paste0("iv",1:no_ivs))
+  analysisRawData<-data.frame(allData)
+  names(analysisRawData)<-c("participant","dv",paste0("iv",1:no_ivs))
   
   #MAKE NORM DATA STORAGE
   # centre variables on zero
   # this helps with the interaction term
-  resultNormData<-resultRawData
+  analysisNormData<-analysisRawData
   for (i in 0:no_ivs) {
-    if (!is.factor(resultNormData[[i+2]]))  
-      resultNormData[[i+2]]=(resultNormData[[i+2]]-mean(resultNormData[[i+2]],na.rm=TRUE))
+    if (!is.factor(analysisNormData[[i+2]]))  
+      analysisNormData[[i+2]]=(analysisNormData[[i+2]]-mean(analysisNormData[[i+2]],na.rm=TRUE))
   }
   
   # CREATE FORMULA
@@ -410,17 +410,17 @@ generalAnalysis<-function(allData,InteractionOn,withins,ssqType="Type3",caseOrde
   # get linear model and anova
   if (catVars[1]) {
     if (doingWithin) {
-      lmRaw<-glmer(formula=as.formula(formula),data=resultRawData,family="binomial")
-      lmRawC<-glmer(formula=as.formula(formula),data=resultRawData,family="binomial",contrasts=contrasts)
+      lmRaw<-glmer(formula=as.formula(formula),data=analysisRawData,family="binomial")
+      lmRawC<-glmer(formula=as.formula(formula),data=analysisRawData,family="binomial",contrasts=contrasts)
       # lmNorm to calculate effect sizes
-      lmNorm<-glmer(formula=as.formula(formula),data=resultNormData,family="binomial")
-      lmNormC<-glmer(formula=as.formula(formula),data=resultNormData,family="binomial",contrasts=contrasts)
+      lmNorm<-glmer(formula=as.formula(formula),data=analysisNormData,family="binomial")
+      lmNormC<-glmer(formula=as.formula(formula),data=analysisNormData,family="binomial",contrasts=contrasts)
       testMethod<-"Chisq"
     } else {
-      lmRaw<-glm(formula=as.formula(formula),data=resultRawData,family="binomial")
-      lmRawC<-glm(formula=as.formula(formula),data=resultRawData,family="binomial",contrasts=contrasts)
-      lmNorm<-glm(formula=as.formula(formula),data=resultNormData,family="binomial")
-      lmNormC<-glm(formula=as.formula(formula),data=resultNormData,family="binomial",contrasts=contrasts)
+      lmRaw<-glm(formula=as.formula(formula),data=analysisRawData,family="binomial")
+      lmRawC<-glm(formula=as.formula(formula),data=analysisRawData,family="binomial",contrasts=contrasts)
+      lmNorm<-glm(formula=as.formula(formula),data=analysisNormData,family="binomial")
+      lmNormC<-glm(formula=as.formula(formula),data=analysisNormData,family="binomial",contrasts=contrasts)
       testMethod<-"F"
     }
     pcol=3;prow=2
@@ -428,18 +428,18 @@ generalAnalysis<-function(allData,InteractionOn,withins,ssqType="Type3",caseOrde
   } else { # Interval DV
     # lmRaw to report model
     if (doingWithin) {
-      # print(cor(resultRawData[1:42,4],resultRawData[43:84,4]))
-      lmRaw<-lmer(formula=as.formula(formula),data=resultRawData)
-      lmRawC<-lmer(formula=as.formula(formula),data=resultRawData,contrasts=contrasts)
+      # print(cor(analysisRawData[1:42,4],analysisRawData[43:84,4]))
+      lmRaw<-lmer(formula=as.formula(formula),data=analysisRawData)
+      lmRawC<-lmer(formula=as.formula(formula),data=analysisRawData,contrasts=contrasts)
       # lmNorm to calculate effect sizes
-      lmNorm<-lmer(formula=as.formula(formula),data=resultNormData)
-      lmNormC<-lmer(formula=as.formula(formula),data=resultNormData,contrasts=contrasts)
+      lmNorm<-lmer(formula=as.formula(formula),data=analysisNormData)
+      lmNormC<-lmer(formula=as.formula(formula),data=analysisNormData,contrasts=contrasts)
     } else {
-      lmRaw<-lm(formula=as.formula(formula),data=resultRawData)
-      lmRawC<-lm(formula=as.formula(formula),data=resultRawData,contrasts=contrasts)
+      lmRaw<-lm(formula=as.formula(formula),data=analysisRawData)
+      lmRawC<-lm(formula=as.formula(formula),data=analysisRawData,contrasts=contrasts)
       # lmNorm to calculate effect sizes
-      lmNorm<-lm(formula=as.formula(formula),data=resultNormData)
-      lmNormC<-lm(formula=as.formula(formula),data=resultNormData,contrasts=contrasts)
+      lmNorm<-lm(formula=as.formula(formula),data=analysisNormData)
+      lmNormC<-lm(formula=as.formula(formula),data=analysisNormData,contrasts=contrasts)
     }
     testMethod<-"F"
     pcol=4;prow=2;
@@ -510,22 +510,22 @@ generalAnalysis<-function(allData,InteractionOn,withins,ssqType="Type3",caseOrde
   ))
 }
 
-analyseSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),sample=makeSample()){
+makeAnalysis<-function(hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),sample=makeSample()){
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV
   effect<-hypothesis$effect
-  result<-sample
+  analysis<-sample
   
   switch (evidence$Transform,
-          "Log"={allData<-data.frame(result$participant,log(result$dv))},
-          "Exp"={allData<-data.frame(result$participant,exp(result$dv))},
-          "None"={allData<-data.frame(result$participant,result$dv)}
+          "Log"={allData<-data.frame(analysis$participant,log(analysis$dv))},
+          "Exp"={allData<-data.frame(analysis$participant,exp(analysis$dv))},
+          "None"={allData<-data.frame(analysis$participant,analysis$dv)}
   )
-  if (!all(result$iv==result$iv[1])) 
-    allData<-cbind(allData,result$iv)
-  if (!is.null(IV2) && !all(result$iv2==result$iv2[1]))
-    allData<-cbind(allData,result$iv2)
+  if (!all(analysis$iv==analysis$iv[1])) 
+    allData<-cbind(allData,analysis$iv)
+  if (!is.null(IV2) && !all(analysis$iv2==analysis$iv2[1]))
+    allData<-cbind(allData,analysis$iv2)
   no_ivs<-ncol(allData)-2
   n<-nrow(allData)
 
@@ -536,48 +536,48 @@ analyseSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),evidence
 # MOVE RESULTS OUT TO BRAWSTATS  
   r_use<-anResult$r.direct
   p_use<-anResult$p.direct
-  result$rIV<-r_use[1]
-  result$pIV<-p_use[1]
-  result$rIVCI<-r2ci(result$rIV,n)
-  result$pIVCI<-r2p(result$rIVCI,n,anResult$df[1])
-  if (result$rIV>0 && result$rIVCI[1]<0 && result$rIVCI[2]>0) result$pIVCI[1]<-1
-  if (result$rIV<0 && result$rIVCI[1]<0 && result$rIVCI[2]>0) result$pIVCI[2]<-1
-  result$rpIV<-result$effectRho
+  analysis$rIV<-r_use[1]
+  analysis$pIV<-p_use[1]
+  analysis$rIVCI<-r2ci(analysis$rIV,n)
+  analysis$pIVCI<-r2p(analysis$rIVCI,n,anResult$df[1])
+  if (analysis$rIV>0 && analysis$rIVCI[1]<0 && analysis$rIVCI[2]>0) analysis$pIVCI[1]<-1
+  if (analysis$rIV<0 && analysis$rIVCI[1]<0 && analysis$rIVCI[2]>0) analysis$pIVCI[2]<-1
+  analysis$rpIV<-analysis$effectRho
   
   if (no_ivs==2) {
-    result$rIV2<-r_use[2]
-    result$pIV2<-p_use[2]
-    result$rIV2CI<-r2ci(result$rIV2,n)
-    result$pIV2CI<-r2p(result$rIV2CI,n,anResult$df[2])
-    if (result$rIV2>0 && result$rIV2CI[1]<0 && result$rIV2CI[2]>0) result$pIV2CI[1]<-1
-    if (result$rIV2<0 && result$rIV2CI[1]<0 && result$rIV2CI[2]>0) result$pIV2CI[2]<-1
+    analysis$rIV2<-r_use[2]
+    analysis$pIV2<-p_use[2]
+    analysis$rIV2CI<-r2ci(analysis$rIV2,n)
+    analysis$pIV2CI<-r2p(analysis$rIV2CI,n,anResult$df[2])
+    if (analysis$rIV2>0 && analysis$rIV2CI[1]<0 && analysis$rIV2CI[2]>0) analysis$pIV2CI[1]<-1
+    if (analysis$rIV2<0 && analysis$rIV2CI[1]<0 && analysis$rIV2CI[2]>0) analysis$pIV2CI[2]<-1
     
     #  interaction term
     if (evidence$rInteractionOn==1) {
-      result$rIVIV2DV<-r_use[3]
-      result$pIVIV2DV<-p_use[3]
-      result$rIVIV2CI<-r2ci(result$rIVIV2DV,n)
-      result$pIVIV2CI<-r2p(result$rIVIV2CI,n,anResult$df[3])
-      if (result$rIVIV2DV>0 && result$rIVIV2CI[1]<0 && result$rIVIV2CI[2]>0) result$pIVIV2CI[1]<-1
-      if (result$rIVIV2DV<0 && result$rIVIV2CI[1]<0 && result$rIVIV2CI[2]>0) result$pIVIV2CI[2]<-1
+      analysis$rIVIV2DV<-r_use[3]
+      analysis$pIVIV2DV<-p_use[3]
+      analysis$rIVIV2CI<-r2ci(analysis$rIVIV2DV,n)
+      analysis$pIVIV2CI<-r2p(analysis$rIVIV2CI,n,anResult$df[3])
+      if (analysis$rIVIV2DV>0 && analysis$rIVIV2CI[1]<0 && analysis$rIVIV2CI[2]>0) analysis$pIVIV2CI[1]<-1
+      if (analysis$rIVIV2DV<0 && analysis$rIVIV2CI[1]<0 && analysis$rIVIV2CI[2]>0) analysis$pIVIV2CI[2]<-1
     } else {
-      result$rIVIV2DV<-NA
-      result$pIVIV2DV<-NA
-      result$rIVIV2CI<-NA
-      result$pIVIV2CI<-NA
+      analysis$rIVIV2DV<-NA
+      analysis$pIVIV2DV<-NA
+      analysis$rIVIV2CI<-NA
+      analysis$pIVIV2CI<-NA
     }
   }
-  result$rIVIV2<-0
+  analysis$rIVIV2<-0
   
-  result$rFull<-anResult$r.full
-  result$rFullse<-r2se(result$rFull,n)
-  result$rFullCI<-r2ci(result$rFull,n)
-  result$wFull<-rn2w(result$rFull,n)
-  result$wFulln80<-rw2n(result$rFull,0.8)
+  analysis$rFull<-anResult$r.full
+  analysis$rFullse<-r2se(analysis$rFull,n)
+  analysis$rFullCI<-r2ci(analysis$rFull,n)
+  analysis$wFull<-rn2w(analysis$rFull,n)
+  analysis$wFulln80<-rw2n(analysis$rFull,0.8)
   
-  iv1<-result$iv
-  iv2<-result$iv2
-  dv<-result$dv
+  iv1<-analysis$iv
+  iv2<-analysis$iv2
+  dv<-analysis$dv
   # prepare the output to look like Jamovi
   if (any(class(anResult$lmRaw)[1]==c("lmerMod","glmerMod"))) {
     # we need to sort this to match Jamovi etc
@@ -599,7 +599,7 @@ analyseSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),evidence
     anRaw[,1]<-NA
     anRaw[1,2]<-0 # intercept df
     if ((IV$deploy=="Within") && (no_ivs>1 && IV2$deploy=="Within")) {
-      z1<-summary(aov(dv~iv1*iv2+Error(participant/(iv1*iv2)),resultRawData))
+      z1<-summary(aov(dv~iv1*iv2+Error(participant/(iv1*iv2)),analysisRawData))
       F<-c(0,
            z1$'Error: participant:iv1'[[1]]$'F value'[1],
            z1$'Error: participant:iv2'[[1]]$'F value'[1],
@@ -636,13 +636,13 @@ analyseSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),evidence
               an_name<-"Pearson Correlation"
               t_name<-"r"
               df<-paste("(",format(anRaw$Df[nrow(anRaw)]),")",sep="")
-              tval<-result$rIV
+              tval<-analysis$rIV
             },
             "Ordinal Interval"={
               an_name<-"Pearson Correlation"
               t_name<-"r"
               df<-paste("(",format(anRaw$Df[nrow(anRaw)]),")",sep="")
-              tval<-result$rIV
+              tval<-analysis$rIV
             },
             "Categorical Interval"={
               if (IV$ncats==2){
@@ -651,23 +651,23 @@ analyseSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),evidence
                   tv<-t.test(dv~iv1,paired=TRUE,var.equal=!evidence$Welch)
                   tval<-tv$statistic
                   df<-paste("(",format(anRaw$Df[nrow(anRaw)]),")",sep="")
-                  result$pIV<-tv$p.value
+                  analysis$pIV<-tv$p.value
                 } else {
                   an_name<-"t-test: Independent Samples"
                   if (any(c(sum(iv1==levels(iv1)[1]),sum(iv1==levels(iv1)[2]))<3))
                   {             
                     tval<-0
-                    result$pIV<-1
+                    analysis$pIV<-1
                     df<-paste("(",format(anRaw$Df[nrow(anRaw)]),")",sep="")
                   } else {
                   tv<-t.test(dv~iv1,var.equal=!evidence$Welch)
                   tval<-tv$statistic
-                  result$pIV<-tv$p.value
+                  analysis$pIV<-tv$p.value
                   df<-paste("(",format(tv$parameter),")",sep="")
                   }
                 }
                 t_name<-"t"
-                # tval<-sqrt(anRaw$`F value`[2])*sign(result$rIV)
+                # tval<-sqrt(anRaw$`F value`[2])*sign(analysis$rIV)
               } else {
                 if (IV$type=="Categorical" && design$sIV1Use=="Within"){
                   an_name<-"One-Way ANOVA: Repeated Measures"
@@ -676,15 +676,15 @@ analyseSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),evidence
                 }
                 t_name<-"F"
                 if (evidence$Welch) {
-                  tv<-oneway.test(dv~iv1, data = resultRawData, var.equal = FALSE)
+                  tv<-oneway.test(dv~iv1, data = analysisRawData, var.equal = FALSE)
                   tval<-tv$statistic
                   df<-paste("(",format(tv$parameter[1]),",",format(tv$parameter[2],digits=3),")",sep="")
-                  result$pIV<-tv$p.value
+                  analysis$pIV<-tv$p.value
                 } else {
                   tval<-anRaw$`F value`[2]
                   if (is.null(tval)) {tval<-anRaw$F[2]}
                   df<-paste("(",format(anRaw$Df[2]),",",format(anRaw$Df[3]),")",sep="")
-                  result$pIV<-anRaw$"Pr(>F)"[2]
+                  analysis$pIV<-anRaw$"Pr(>F)"[2]
                 }
               }
             },
@@ -696,7 +696,7 @@ analyseSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),evidence
               tv<-cor.test(iv1, dv, method="spearman")
               options(op)
               tval<-tv$estimate
-              result$pIV<-tv$p.value
+              analysis$pIV<-tv$p.value
             },
             "Ordinal Ordinal"={
               an_name<-"Spearman Correlation"
@@ -706,7 +706,7 @@ analyseSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),evidence
               tv<-cor.test(iv1, dv, method="spearman")
               options(op)
               tval<-tv$estimate
-              result$pIV<-tv$p.value
+              analysis$pIV<-tv$p.value
             },
             "Categorical Ordinal"={
               if (IV$ncats==2){
@@ -718,7 +718,7 @@ analyseSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),evidence
                   tv<-wilcox.test(dv~iv1,paired=TRUE,exact=FALSE)
                   options(op)
                   tval<-tv$statistic
-                  result$pIV<-tv$p.value
+                  analysis$pIV<-tv$p.value
                 } else {
                   an_name<-"Mann Whitney U test: Independent Samples"
                   df<-paste("(",format(anRaw$Df[nrow(anRaw)]),")")
@@ -727,7 +727,7 @@ analyseSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),evidence
                   tv<-wilcox.test(dv~iv1,exact=FALSE)
                   options(op)
                   tval<-tv$statistic
-                  result$pIV<-tv$p.value
+                  analysis$pIV<-tv$p.value
                 }
               } else {
                 if (IV$type=="Categorical" && design$sIV1Use=="Within"){
@@ -737,7 +737,7 @@ analyseSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),evidence
                   options(op)
                   t_name='chi2'
                   tval<-tv$statistic
-                  result$pIV<-tv$p.value
+                  analysis$pIV<-tv$p.value
                 } else {
                   an_name<-"Kruskal Wallis Test: Independent Measures"
                   op <- options(warn = (-1))
@@ -745,7 +745,7 @@ analyseSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),evidence
                   options(op)
                   t_name='chi2'
                   tval<-tv$statistic
-                  result$pIV<-tv$p.value
+                  analysis$pIV<-tv$p.value
                 }
                 df<-paste("(",format(anRaw$Df[2]),",n=",format(length(dv)),")",sep="")
               }
@@ -755,7 +755,7 @@ analyseSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),evidence
               t_name<-"chi2"
               df<-paste("(",format(anRaw$Df[2]),",","n=",format(lmNormC$df.null+1),")",sep="")
               tval<-lmRaw$null.deviance-lmRaw$deviance
-              result$pIV<-1-pchisq(tval,1) # noCases-1
+              analysis$pIV<-1-pchisq(tval,1) # noCases-1
               
             },
             "Ordinal Categorical"={
@@ -763,7 +763,7 @@ analyseSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),evidence
               t_name<-"chi2"
               df<-paste("(",format(anRaw$Df[2]),",","n=",format(lmNormC$df.null+1),")",sep="")
               tval<-lmRaw$null.deviance-lmRaw$deviance
-              result$pIV<-1-pchisq(tval,1) # noCases-1
+              analysis$pIV<-1-pchisq(tval,1) # noCases-1
             },
             "Categorical Categorical"={
               an_name<-"Chi-square test of independence"
@@ -771,21 +771,21 @@ analyseSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),evidence
               print(c(lmRaw$null.deviance,lmRaw$deviance))
               
               chiResult<-chisq.test(iv1,dv,correct = FALSE)
-              df<-paste("(",format(chiResult$parameter),",","n=",format(length(result$participant)),")",sep="")
+              df<-paste("(",format(chiResult$parameter),",","n=",format(length(analysis$participant)),")",sep="")
               
               nhold<-c()
               for (ini in 1:DV$ncats) {
-                nhold<-c(nhold,sum(as.numeric(result$dv)==ini))
+                nhold<-c(nhold,sum(as.numeric(analysis$dv)==ini))
               }
               ncorrection<-(max(nhold)/min(nhold))
-              result$rIV<-sqrt(unname(chiResult$statistic/n/ncorrection))*sign(result$rIV)
-              result$pIV<-chiResult$p.value
-              result$rFull<-result$rIV
-              result$rFullse<-r2se(result$rFull,n)
+              analysis$rIV<-sqrt(unname(chiResult$statistic/n/ncorrection))*sign(analysis$rIV)
+              analysis$pIV<-chiResult$p.value
+              analysis$rFull<-analysis$rIV
+              analysis$rFullse<-r2se(analysis$rFull,n)
               tval<-chiResult$statistic
             }
     )
-    if (is.na(result$pIV)) {result$pIV<-1}
+    if (is.na(analysis$pIV)) {analysis$pIV<-1}
   } else {
     switch (DV$type,
             "Interval"={
@@ -809,60 +809,60 @@ analyseSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),evidence
     )
     df<-anResult$df
     
-    result$r=list(direct=anResult$r.direct,unique=anResult$r.unique,total=anResult$r.total)
-    result$rse=list(direct=r2se(anResult$r.direct,n),unique=r2se(anResult$r.unique,n),total=r2se(anResult$r.total,n))
-    result$p=list(direct=anResult$p.direct,unique=anResult$p.unique,total=anResult$p.total)
+    analysis$r=list(direct=anResult$r.direct,unique=anResult$r.unique,total=anResult$r.total)
+    analysis$rse=list(direct=r2se(anResult$r.direct,n),unique=r2se(anResult$r.unique,n),total=r2se(anResult$r.total,n))
+    analysis$p=list(direct=anResult$p.direct,unique=anResult$p.unique,total=anResult$p.total)
   }
   
-  # adding fields to existing result
-  result$rawModel<-anResult$lmRaw
-  result$normModel<-anResult$lmNorm
-  result$rawModelC<-anResult$lmRawC
-  result$normModelC<-anResult$lmNormC
+  # adding fields to existing analysis
+  analysis$rawModel<-anResult$lmRaw
+  analysis$normModel<-anResult$lmNorm
+  analysis$rawModelC<-anResult$lmRawC
+  analysis$normModelC<-anResult$lmNormC
   
-  result$rawAnova<-anResult$anRaw
-  result$normAnova<-anResult$anNorm
-  result$rawAnovaC<-anResult$anRawC
-  result$normAnovaC<-anResult$anNormC
-  result$nval<-n
+  analysis$rawAnova<-anResult$anRaw
+  analysis$normAnova<-anResult$anNorm
+  analysis$rawAnovaC<-anResult$anRawC
+  analysis$normAnovaC<-anResult$anNormC
+  analysis$nval<-n
   if (IV$type=="Categorical") {
-    result$df1<-IV$ncats-1
+    analysis$df1<-IV$ncats-1
   } else {
-    result$df1<-1
+    analysis$df1<-1
   }
   if (no_ivs>1) {
     if (IV2$type=="Categorical") {
-      result$df2<-IV2$ncats-1
+      analysis$df2<-IV2$ncats-1
     } else {
-      result$df2<-1
+      analysis$df2<-1
     }
   } else {
-    result$df2<-0
+    analysis$df2<-0
   }
-  result$df12<-result$df1*result$df2
+  analysis$df12<-analysis$df1*analysis$df2
   
-  result$model<-result$rawModel
-  result$anova<-result$rawAnovaC
+  analysis$model<-analysis$rawModel
+  analysis$anova<-analysis$rawAnovaC
   
-  result$an_name<-an_name
-  result$test_name<-t_name
-  result$df<-df
-  result$test_val<-tval
+  analysis$an_name<-an_name
+  analysis$test_name<-t_name
+  analysis$df<-df
+  analysis$test_val<-tval
   
-  result$effect<-effect
-  result$design<-design
-  result$evidence<-evidence
+  analysis$effect<-effect
+  analysis$design<-design
+  analysis$evidence<-evidence
   
-  # result$ResultHistory<-ResultHistory
+  # analysis$ResultHistory<-ResultHistory
   
-  result$Heteroscedasticity<-0
-  result
+  analysis$Heteroscedasticity<-0
+  analysis
   
 }
 
 runSimulation<-function(hypothesis,design,evidence,sig_only=FALSE,onlyAnalysis=FALSE,oldResult=NULL) {
     if (onlyAnalysis && !is.null(oldResult)) {
-    res<-analyseSample(hypothesis,design,evidence,oldResult)
+    res<-makeAnalysis(hypothesis,design,evidence,oldResult)
     return(res)
   }
   
@@ -871,7 +871,7 @@ runSimulation<-function(hypothesis,design,evidence,sig_only=FALSE,onlyAnalysis=F
   while (1==1) {
     if (!evidence$shortHand) {
       # sample<-makeSample(IV,IV2,DV,effect,design)
-      # res<-analyseSample(IV,IV2,DV,effect,design,evidence,sample)
+      # res<-makeAnalysis(IV,IV2,DV,effect,design,evidence,sample)
       res<-getSample(hypothesis,design,evidence)
     } else {
       res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
@@ -897,7 +897,7 @@ runSimulation<-function(hypothesis,design,evidence,sig_only=FALSE,onlyAnalysis=F
   while (sig_only && !isSignificant(STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
     if (!evidence$shortHand) {
       # sample<-makeSample(IV,IV2,DV,effect,design)
-      # res<-analyseSample(IV,IV2,DV,effect,design,evidence,sample)
+      # res<-makeAnalysis(IV,IV2,DV,effect,design,evidence,sample)
       res<-getSample(hypothesis,design,evidence)
     } else {
       res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
@@ -919,7 +919,7 @@ runSimulation<-function(hypothesis,design,evidence,sig_only=FALSE,onlyAnalysis=F
 getSample<-function(hypothesis,design,evidence) {
   if (!evidence$shortHand) {
     sample<-makeSample(hypothesis,design)
-    res<-analyseSample(hypothesis,design,evidence,sample)
+    res<-makeAnalysis(hypothesis,design,evidence,sample)
   } else {
     res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
   }

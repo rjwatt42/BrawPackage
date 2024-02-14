@@ -61,6 +61,7 @@ lrRange<<-10
 #########################
 # display choices
 
+autoShow<<-TRUE
 RZ<<-"r"
 
 z_range<<-1.5

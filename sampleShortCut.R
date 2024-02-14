@@ -1,5 +1,5 @@
 
-sampleShortCut<-function(hypothesis,design,evidence,nsims,appendData,oldResult=c(),sigOnly=FALSE) {
+sampleShortCut<-function(hypothesis,design,evidence,nsims,appendData,oldanalysis=c(),sigOnly=FALSE) {
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV
@@ -102,17 +102,17 @@ sampleShortCut<-function(hypothesis,design,evidence,nsims,appendData,oldResult=c
     p_effects=c(p_effects,ps)
     n_effects=c(n_effects,ns)
   }
-  if (appendData && !isempty(oldResult)) {
-    result<-list(rIV=rbind(matrix(r_effects[1:nsims],ncol=1),oldResult$rIV),
-                 rpIV=rbind(matrix(r_effects[1:nsims],ncol=1),oldResult$rpIV),
-                 nval=rbind(matrix(n_effects[1:nsims],ncol=1),oldResult$nval),
-                 df1=rbind(matrix(rep(df1,nsims),ncol=1),oldResult$df1),
-                 pIV=rbind(matrix(p_effects[1:nsims],ncol=1),oldResult$pIV),
-                 dv=rbind(matrix(rep(0,nsims),ncol=1),oldResult$dv)
+  if (appendData && !isempty(oldanalysis)) {
+    analysis<-list(rIV=rbind(matrix(r_effects[1:nsims],ncol=1),oldanalysis$rIV),
+                 rpIV=rbind(matrix(r_effects[1:nsims],ncol=1),oldanalysis$rpIV),
+                 nval=rbind(matrix(n_effects[1:nsims],ncol=1),oldanalysis$nval),
+                 df1=rbind(matrix(rep(df1,nsims),ncol=1),oldanalysis$df1),
+                 pIV=rbind(matrix(p_effects[1:nsims],ncol=1),oldanalysis$pIV),
+                 dv=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$dv)
                  )
     
   } else {
-  result<-list(rIV=matrix(r_effects[1:nsims],ncol=1),
+  analysis<-list(rIV=matrix(r_effects[1:nsims],ncol=1),
                rpIV=matrix(rp_effects[1:nsims],ncol=1),
                nval=matrix(n_effects[1:nsims],ncol=1),
                df1=matrix(rep(df1,nsims),ncol=1),
@@ -120,10 +120,10 @@ sampleShortCut<-function(hypothesis,design,evidence,nsims,appendData,oldResult=c
                dv=rep(0,nsims)
                )
   }
-  result$participant<-1:length(result$rIV)
-  result$effect<-effect
-  result$design<-design
-  result$evidence<-evidence
-  result
+  analysis$participant<-1:length(analysis$rIV)
+  analysis$effect<-effect
+  analysis$design<-design
+  analysis$evidence<-evidence
+  analysis
 }
 

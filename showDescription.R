@@ -1,4 +1,4 @@
-plotPoints<-function(g,IV,DV,result,colindex=1,off=0){
+plotPoints<-function(g,IV,DV,analysis,colindex=1,off=0){
 
   showRawData<-TRUE
   if (colindex==1)
@@ -13,8 +13,8 @@ plotPoints<-function(g,IV,DV,result,colindex=1,off=0){
           barwidth=0.5
           }
 
-  x<-result$ivplot
-  y<-result$dvplot
+  x<-analysis$ivplot
+  y<-analysis$dvplot
   
   hypothesisType=paste(IV$type,DV$type,sep=" ")
   
@@ -81,8 +81,8 @@ plotPoints<-function(g,IV,DV,result,colindex=1,off=0){
           },
           
           "Interval Categorical"={
-            bin_breaks<-c(-Inf,seq(-1,1,length.out=varNPoints-1)*fullRange*sd(result$iv)+mean(result$iv),Inf)
-            dens2<-hist(result$iv,breaks=bin_breaks,freq=TRUE,plot=FALSE,warn.unused = FALSE)
+            bin_breaks<-c(-Inf,seq(-1,1,length.out=varNPoints-1)*fullRange*sd(analysis$iv)+mean(analysis$iv),Inf)
+            dens2<-hist(analysis$iv,breaks=bin_breaks,freq=TRUE,plot=FALSE,warn.unused = FALSE)
             bins=dens2$mids
             full_x<-c()
             full_y<-c()
@@ -91,7 +91,7 @@ plotPoints<-function(g,IV,DV,result,colindex=1,off=0){
             for (i2 in 1:DV$ncats){
               xv<-c()
               yv<-c()
-              dens1<-hist(result$iv[result$dv==DV$cases[i2]],breaks=bin_breaks,freq=TRUE,plot=FALSE,warn.unused = FALSE)
+              dens1<-hist(analysis$iv[analysis$dv==DV$cases[i2]],breaks=bin_breaks,freq=TRUE,plot=FALSE,warn.unused = FALSE)
               densities<-dens1$counts/dens2$counts
               for (i in 1:(length(dens1$counts)-1)){
                 y<-dens1$counts[i]
@@ -125,8 +125,8 @@ plotPoints<-function(g,IV,DV,result,colindex=1,off=0){
           
           
           "Ordinal Categorical"={
-            bin_breaks<-c(-Inf,seq(-1,1,length.out=varNPoints-1)*fullRange*sd(result$iv)+mean(result$iv),Inf)
-            dens2<-hist(result$iv,breaks=bin_breaks,freq=TRUE,plot=FALSE,warn.unused = FALSE)
+            bin_breaks<-c(-Inf,seq(-1,1,length.out=varNPoints-1)*fullRange*sd(analysis$iv)+mean(analysis$iv),Inf)
+            dens2<-hist(analysis$iv,breaks=bin_breaks,freq=TRUE,plot=FALSE,warn.unused = FALSE)
             bins=dens2$mids
             full_x<-c()
             full_y<-c()
@@ -135,7 +135,7 @@ plotPoints<-function(g,IV,DV,result,colindex=1,off=0){
             for (i2 in 1:DV$ncats){
               xv<-c()
               yv<-c()
-              dens1<-hist(result$iv[result$dv==DV$cases[i2]],breaks=bin_breaks,freq=TRUE,plot=FALSE,warn.unused = FALSE)
+              dens1<-hist(analysis$iv[analysis$dv==DV$cases[i2]],breaks=bin_breaks,freq=TRUE,plot=FALSE,warn.unused = FALSE)
               densities<-dens1$counts/dens2$counts
               for (i in 1:(length(dens1$counts)-1)){
                 y<-dens1$counts[i]
@@ -169,8 +169,8 @@ plotPoints<-function(g,IV,DV,result,colindex=1,off=0){
           
           "Categorical Categorical"={
             b<-(1:IV$ncats)-1
-            xv<-as.numeric(result$iv)
-            yv<-as.numeric(result$dv)
+            xv<-as.numeric(analysis$iv)
+            yv<-as.numeric(analysis$dv)
             
             pp<-matrix(NA,DV$ncats,IV$ncats)
             for (i1 in 1:IV$ncats) {
@@ -200,122 +200,122 @@ plotPoints<-function(g,IV,DV,result,colindex=1,off=0){
  g  
 }
 
-plotCatInterDescription<-function(result,g=NULL){
+plotCatInterDescription<-function(analysis,g=NULL){
   plotDescriptionCols <<- c()
   cols<-c()
-  for (i in 1:result$IV2$ncats){
-    off<-(i-1)/(result$IV2$ncats-1)
+  for (i in 1:analysis$IV2$ncats){
+    off<-(i-1)/(analysis$IV2$ncats-1)
     col<- col2rgb(plotcolours$descriptionC1)*(1-off)+col2rgb(plotcolours$descriptionC2)*off
     cols<- c(cols,rgb(col[1]/255,col[2]/255,col[3]/255))
   }
-  names(cols)<-result$IV2$cases
+  names(cols)<-analysis$IV2$cases
   cols<-as.list(cols)
   plotDescriptionCols <<- cols
   
-  Ivals<-result$iv
-  Dvals<-result$dv
-  rho<-result$rIV+seq(-1,1,length.out=result$IV2$ncats)*result$rIVIV2DV
+  Ivals<-analysis$iv
+  Dvals<-analysis$dv
+  rho<-analysis$rIV+seq(-1,1,length.out=analysis$IV2$ncats)*analysis$rIVIV2DV
   
   if (is.null(g)) {
     g<-ggplot()
     }
-  for (i in 1:result$IV2$ncats){
-    use<-result$iv2==result$IV2$cases[i]
+  for (i in 1:analysis$IV2$ncats){
+    use<-analysis$iv2==analysis$IV2$cases[i]
     
-    result1<-result
-    result1$iv<-result$iv[use]
-    result1$dv<-result$dv[use]
-    result1$ivplot<-result$ivplot[use]
-    result1$dvplot<-result$dvplot[use]
-    result1$rIV<-rho[i]
+    analysis1<-analysis
+    analysis1$iv<-analysis$iv[use]
+    analysis1$dv<-analysis$dv[use]
+    analysis1$ivplot<-analysis$ivplot[use]
+    analysis1$dvplot<-analysis$dvplot[use]
+    analysis1$rIV<-rho[i]
     
-    result1$IV$vals<-Ivals[use]
-    result1$DV$vals<-Dvals[use] 
+    analysis1$IV$vals<-Ivals[use]
+    analysis1$DV$vals<-Dvals[use] 
     if (is.numeric(Ivals)) {
-    result1$IV$mu<-mean(Ivals[use],na.rm=TRUE)
-    result1$IV$sd<-sd(Ivals[use],na.rm=TRUE)
+    analysis1$IV$mu<-mean(Ivals[use],na.rm=TRUE)
+    analysis1$IV$sd<-sd(Ivals[use],na.rm=TRUE)
     }
     if (is.numeric(Dvals)) {
-    result1$DV$mu<-mean(Dvals[use],na.rm=TRUE)
-    result1$DV$sd<-sd(Dvals[use],na.rm=TRUE)
+    analysis1$DV$mu<-mean(Dvals[use],na.rm=TRUE)
+    analysis1$DV$sd<-sd(Dvals[use],na.rm=TRUE)
     }
-    g<-plotPoints(g,result$IV,result$DV,result1,i+1,(i-1)/(result$IV2$ncats-1))
-    g<-plotPrediction(result1$IV,NULL,result1$DV,result1,result$design,2+(i-1)/(IV2$ncats-1),g,theme=plotTheme)
+    g<-plotPoints(g,analysis$IV,analysis$DV,analysis1,i+1,(i-1)/(analysis$IV2$ncats-1))
+    g<-plotPrediction(analysis1$IV,NULL,analysis1$DV,analysis1,analysis$design,2+(i-1)/(IV2$ncats-1),g,theme=plotTheme)
   }
   
-  g<-g+scale_fill_manual(name=result$IV2$name,values=plotDescriptionCols)
+  g<-g+scale_fill_manual(name=analysis$IV2$name,values=plotDescriptionCols)
   g
 }
 
-plotParInterDescription<-function(result,g=NULL){
+plotParInterDescription<-function(analysis,g=NULL){
   col<-c( plotcolours$descriptionC1, plotcolours$descriptionC2)
-  names(col)<-c(paste(result$IV2$name,"<median",sep=""), paste(result$IV2$name,">median",sep=""))
+  names(col)<-c(paste(analysis$IV2$name,"<median",sep=""), paste(analysis$IV2$name,">median",sep=""))
   col<-as.list(col)
   plotDescriptionCols <<- col
   
-  Ivals<-result$IV$vals
-  Dvals<-result$DV$vals
-  rho<-result$rIV+seq(-1,1,length.out=2)*result$rIVIV2DV
+  Ivals<-analysis$IV$vals
+  Dvals<-analysis$DV$vals
+  rho<-analysis$rIV+seq(-1,1,length.out=2)*analysis$rIVIV2DV
   
   if (is.null(g)) {
     g<-ggplot()
   }
   for (i in 1:2){
     switch (i,
-            use<-result$iv2<median(result$iv2),
-            use<-result$iv2>=median(result$iv2)
+            use<-analysis$iv2<median(analysis$iv2),
+            use<-analysis$iv2>=median(analysis$iv2)
     )
-    result1<-result
-    result1$iv<-result$iv[use]
-    result1$dv<-result$dv[use]
-    result1$ivplot<-result$ivplot[use]
-    result1$dvplot<-result$dvplot[use]
-    result1$rIV<-rho[i]
+    analysis1<-analysis
+    analysis1$iv<-analysis$iv[use]
+    analysis1$dv<-analysis$dv[use]
+    analysis1$ivplot<-analysis$ivplot[use]
+    analysis1$dvplot<-analysis$dvplot[use]
+    analysis1$rIV<-rho[i]
     
-    result1$IV$vals<-Ivals[use]
-    result1$DV$vals<-Dvals[use]
-    result1$DV$mu<-mean(result$dv[use],na.rm=TRUE)
-    g<-plotPoints(g,result1$IV,result1$DV,result1,i+1,(i-1)/(2-1)*0.25)
-    g<-plotPrediction(result1$IV,NULL,result1$DV,result1,result$design,i+1,g,theme=plotTheme)
+    analysis1$IV$vals<-Ivals[use]
+    analysis1$DV$vals<-Dvals[use]
+    analysis1$DV$mu<-mean(analysis$dv[use],na.rm=TRUE)
+    g<-plotPoints(g,analysis1$IV,analysis1$DV,analysis1,i+1,(i-1)/(2-1)*0.25)
+    g<-plotPrediction(analysis1$IV,NULL,analysis1$DV,analysis1,analysis$design,i+1,g,theme=plotTheme)
   }
   
-  g<-g+scale_fill_manual(name=result$IV2$name,values=plotDescriptionCols)
+  g<-g+scale_fill_manual(name=analysis$IV2$name,values=plotDescriptionCols)
   g
 }
 
-plotParDescription<-function(result,g) {
+plotParDescription<-function(analysis,g) {
   
-  g<-plotPoints(g,result$IV,result$DV,result,1)
-  g<-plotPrediction(result$IV,result$IV2,result$DV,result,result$design,1,g,theme=plotTheme)
+  g<-plotPoints(g,analysis$IV,analysis$DV,analysis,1)
+  g<-plotPrediction(analysis$IV,analysis$IV2,analysis$DV,analysis,analysis$design,1,g,theme=plotTheme)
   g
 }
 
-plotCatDescription<-function(result,g) {
+plotCatDescription<-function(analysis,g) {
 
-  g<-plotPrediction(result$IV,result$IV2,result$DV,result,result$design,1,g,theme=plotTheme)
-  g<-plotPoints(g,result$IV,result$DV,result,1)
+  g<-plotPrediction(analysis$IV,analysis$IV2,analysis$DV,analysis,analysis$design,1,g,theme=plotTheme)
+  g<-plotPoints(g,analysis$IV,analysis$DV,analysis,1)
   
   if (!doLegendBars && doLegendPoints) {
-    g<-g+scale_fill_manual(name=result$DV$name,values=CatCatcols,labels=result$DV$cases)
+    g<-g+scale_fill_manual(name=analysis$DV$name,values=CatCatcols,labels=analysis$DV$cases)
   }
   
   g
 }
 
-showDescription<-function(result=analyseSample()) {
+showDescription<-function(analysis=makeAnalysis()) {
 
   g<-ggplot()
-  if (is.null(result$IV2)){
-    switch (result$DV$type,
-            "Interval"=g<-plotParDescription(result,g),
-            "Ordinal"=g<-plotParDescription(result,g),
-            "Categorical"=g<-plotCatDescription(result,g)
+  if (is.null(analysis$IV2)){
+    switch (analysis$DV$type,
+            "Interval"=g<-plotParDescription(analysis,g),
+            "Ordinal"=g<-plotParDescription(analysis,g),
+            "Categorical"=g<-plotCatDescription(analysis,g)
     )
   } else{
-    switch (result$IV2$type,
-            "Interval"=g<-plotParInterDescription(result,g),
-            "Ordinal"=g<-plotParInterDescription(result,g),
-            "Categorical"=g<-plotCatInterDescription(result,g)
+    switch (analysis$IV2$type,
+            "Interval"=g<-plotParInterDescription(analysis,g),
+            "Ordinal"=g<-plotParInterDescription(analysis,g),
+            "Categorical"=g<-plotCatInterDescription(analysis,g)
     )
   }
   g

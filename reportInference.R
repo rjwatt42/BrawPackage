@@ -1,24 +1,24 @@
-reportInference<-function(result){
-  IV<-result$IV
-  IV2<-result$IV2
-  DV<-result$DV
-  effect<-result$effect
+reportInference<-function(analysis){
+  IV<-analysis$IV
+  IV2<-analysis$IV2
+  DV<-analysis$DV
+  effect<-analysis$effect
   
   switch (evidence$analysisType,
           "Anova"= {
             switch (evidence$dataType,
-                    "Norm"={anova<-result$normAnova},
-                    "Raw"={anova<-result$rawAnova},
-                    "NormC"={anova<-result$normAnovaC},
-                    "RawC"={anova<-result$rawAnovaC}
+                    "Norm"={anova<-analysis$normAnova},
+                    "Raw"={anova<-analysis$rawAnova},
+                    "NormC"={anova<-analysis$normAnovaC},
+                    "RawC"={anova<-analysis$rawAnovaC}
             )
           },
           "Model"= {
             switch (evidence$dataType,
-                    "Norm"={anova<-result$normModel},
-                    "Raw"={anova<-result$rawModel},
-                    "NormC"={anova<-result$normModelC},
-                    "RawC"={anova<-result$rawModelC}
+                    "Norm"={anova<-analysis$normModel},
+                    "Raw"={anova<-analysis$rawModel},
+                    "NormC"={anova<-analysis$normModelC},
+                    "RawC"={anova<-analysis$rawModelC}
             )
             anova<-data.frame(summary(anova)$coefficients)
           }
@@ -26,7 +26,7 @@ reportInference<-function(result){
   nc<-length(anova)+1
   if (nc<5) nc<-5
   
-  an_name<-result$an_name
+  an_name<-analysis$an_name
     outputText<-rep("",nc*2)
     outputText[1]<-paste("\b",an_name,sep="")
     if (!is.null(IV2)) {
@@ -34,32 +34,32 @@ reportInference<-function(result){
     }
     
     if (is.null(IV2)){
-      pval<-result$pIV
+      pval<-analysis$pIV
       if (pval>=0.0001) {
         pvalText<-paste("p = ",format(pval,digits=report_precision),sep="")
       } else {
         pvalText<-"p < 0.0001"
       }
       
-      t_name<-result$test_name
-      df<-result$df
-      tval<-result$test_val
+      t_name<-analysis$test_name
+      df<-analysis$df
+      tval<-analysis$test_val
       
-      n<-result$nval
+      n<-analysis$nval
       f1<-" "
       f2<-" "
       if (STMethod=="sLLR") {
-        result$sIV<-res2llr(result,"sLLR")
+        analysis$sIV<-res2llr(analysis,"sLLR")
         f1<-"\bllr"
-        f2<-paste("s=",format(result$sIV,digits=report_precision),sep="")
+        f2<-paste("s=",format(analysis$sIV,digits=report_precision),sep="")
       }
       if (STMethod=="dLLR") {
-        if (!result$evidence$prior$worldOn) {
-          result$evidence$prior<-list(worldOn=TRUE,populationPDF="Single",populationPDFk=result$rIV,populationRZ="r",populationNullp=0.5)
+        if (!analysis$evidence$prior$worldOn) {
+          analysis$evidence$prior<-list(worldOn=TRUE,populationPDF="Single",populationPDFk=analysis$rIV,populationRZ="r",populationNullp=0.5)
         }
-        result$dIV<-res2llr(result,"dLLR")
+        analysis$dIV<-res2llr(analysis,"dLLR")
         f1<-"\bllr"
-        f2<-paste("d=",format(result$dIV,digits=report_precision),sep="")
+        f2<-paste("d=",format(analysis$dIV,digits=report_precision),sep="")
       }
 
       outputText<-c(outputText,"\btest-statistic","\b(df) ","\bvalue   ","\bp",f1,rep("",nc-5))
@@ -75,9 +75,9 @@ reportInference<-function(result){
       vn<-rownames(anova)[i]
       if (vn!="(Intercept)") {
         if (vn=="NULL") vn<-"Total"
-        if (vn=="iv1"){vn<-paste("",result$IVs$name,sep="")}
-        if (vn=="iv2"){vn<-paste("",result$IV2s$name,sep="")}
-        if (vn=="iv1:iv2"){vn<-paste("",result$IVs$name,":",result$IV2s$name,sep="")}
+        if (vn=="iv1"){vn<-paste("",analysis$IVs$name,sep="")}
+        if (vn=="iv2"){vn<-paste("",analysis$IV2s$name,sep="")}
+        if (vn=="iv1:iv2"){vn<-paste("",analysis$IVs$name,":",analysis$IV2s$name,sep="")}
         if (vn=="Residuals"){vn<-"Error"}
         if (vn=="Total"){
           vn<-"\bTotal"
@@ -107,8 +107,8 @@ reportInference<-function(result){
 
     outputText<-c(outputText,"\bPower(w)", "\bObserved","\bActual",rep("",nc-3))   
     if (is.na(effect$rIV)) {effect$rIV<-0}
-    outputText<-c(outputText," ",format(rn2w(result$rIV,result$nval),digits=3),
-                                 format(rn2w(effect$rIV,result$nval),digits=3),
+    outputText<-c(outputText," ",format(rn2w(analysis$rIV,analysis$nval),digits=3),
+                                 format(rn2w(effect$rIV,analysis$nval),digits=3),
                   rep("",nc-3))
     
     nr=length(outputText)/nc

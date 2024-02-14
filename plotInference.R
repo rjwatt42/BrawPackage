@@ -1,79 +1,79 @@
 nscaleLog=FALSE
 maxnPlot=200
 
-trimResult<-function(result) {
+trimanalysis<-function(analysis) {
   
-  use<-(!is.na(result$rIV))
+  use<-(!is.na(analysis$rIV))
   
-  result$rpIV=result$rpIV[use]
-  result$rIV=result$rIV[use]
-  result$pIV=result$pIV[use]
-  result$roIV=result$roIV[use]
-  result$poIV=result$poIV[use]
-  result$nval=result$nval[use]
-  result$df1=result$df1[use]
+  analysis$rpIV=analysis$rpIV[use]
+  analysis$rIV=analysis$rIV[use]
+  analysis$pIV=analysis$pIV[use]
+  analysis$roIV=analysis$roIV[use]
+  analysis$poIV=analysis$poIV[use]
+  analysis$nval=analysis$nval[use]
+  analysis$df1=analysis$df1[use]
   
-  if (!is.null(result$IV2)) {
-    result$rIV2=result$rIV2[use]
-    result$pIV2=result$pIV2[use]
-    result$rIVIV2DV=result$rIVIV2DV[use]
-    result$rIVIV2DV=result$rIVIV2DV[use]
-    result$r$direct=result$r$direct[use,]
-    result$r$unique=result$r$unique[use,]
-    result$r$total=result$r$total[use,]
-    result$p$direct=result$p$direct[use,]
-    result$p$unique=result$p$unique[use,]
-    result$p$total=result$p$total[use,]
+  if (!is.null(analysis$IV2)) {
+    analysis$rIV2=analysis$rIV2[use]
+    analysis$pIV2=analysis$pIV2[use]
+    analysis$rIVIV2DV=analysis$rIVIV2DV[use]
+    analysis$rIVIV2DV=analysis$rIVIV2DV[use]
+    analysis$r$direct=analysis$r$direct[use,]
+    analysis$r$unique=analysis$r$unique[use,]
+    analysis$r$total=analysis$r$total[use,]
+    analysis$p$direct=analysis$p$direct[use,]
+    analysis$p$unique=analysis$p$unique[use,]
+    analysis$p$total=analysis$p$total[use,]
   }
   
-  result
+  analysis
 }
 
-plotInference<-function(result,disp="r",orientation="vert",showType="direct"){
+plotInference<-function(analysis,disp="r",orientation="vert",showType="direct"){
   if (length(disp)==2) {
-    return(plot2Inference(result,disp[1],disp[2]))
+    return(plot2Inference(analysis,disp[1],disp[2]))
   } 
-  result<-trimResult(result)
+  analysis<-trimanalysis(analysis)
   
   switch (disp,
-          "r"= {g<-r_plot(result,disp,orientation=orientation,showType=showType)},
-          "rp"={g<-r_plot(result,disp,orientation=orientation,showType=showType)},
-          "r1"={g<-r_plot(result,disp,orientation=orientation,showType=showType)},
-          "ra"= {g<-r_plot(result,disp,orientation=orientation,showType=showType)},
-          "ci1"={g<-r_plot(result,disp,orientation=orientation,showType=showType)},
-          "ci2"={g<-r_plot(result,disp,orientation=orientation,showType=showType)},
-          "t"= {g<-r_plot(result,disp,orientation=orientation,showType=showType)},
+          "r"= {g<-r_plot(analysis,disp,orientation=orientation,showType=showType)},
+          "rp"={g<-r_plot(analysis,disp,orientation=orientation,showType=showType)},
+          "r1"={g<-r_plot(analysis,disp,orientation=orientation,showType=showType)},
+          "ra"= {g<-r_plot(analysis,disp,orientation=orientation,showType=showType)},
+          "ci1"={g<-r_plot(analysis,disp,orientation=orientation,showType=showType)},
+          "ci2"={g<-r_plot(analysis,disp,orientation=orientation,showType=showType)},
+          "t"= {g<-r_plot(analysis,disp,orientation=orientation,showType=showType)},
           
-          "p"= {g<-p_plot(result,disp,orientation=orientation,showType=showType)},
-          "p1"= {g<-p_plot(result,disp,orientation=orientation,showType=showType)},
+          "p"= {g<-p_plot(analysis,disp,orientation=orientation,showType=showType)},
+          "p1"= {g<-p_plot(analysis,disp,orientation=orientation,showType=showType)},
           
-          "log(lrs)"={g<-l_plot(result,disp,orientation=orientation)},
-          "log(lrd)"={g<-l_plot(result,disp,orientation=orientation)},
+          "log(lrs)"={g<-l_plot(analysis,disp,orientation=orientation)},
+          "log(lrd)"={g<-l_plot(analysis,disp,orientation=orientation)},
           
-          "w"= {g<-w_plot(result,disp,orientation=orientation)},
-          "wp"={g<-w_plot(result,disp,orientation=orientation)},
+          "w"= {g<-w_plot(analysis,disp,orientation=orientation)},
+          "wp"={g<-w_plot(analysis,disp,orientation=orientation)},
           
-          "nw"={g<-n_plot(result,disp,orientation=orientation)},
-          "n"= {g<-n_plot(result,disp,orientation=orientation)},
+          "nw"={g<-n_plot(analysis,disp,orientation=orientation)},
+          "n"= {g<-n_plot(analysis,disp,orientation=orientation)},
           
-          "e1"={g<-e1_plot(result,orientation=orientation)},
-          "e2"={g<-e2_plot(result,orientation=orientation)}
+          "e1"={g<-e1_plot(analysis,orientation=orientation)},
+          "e2"={g<-e2_plot(analysis,orientation=orientation)}
   )
-  g+ggtitle(result$an_name)
+  g+ggtitle(analysis$an_name)
 }
 
 
-plot2Inference<-function(result,disp1,disp2,metaPlot=FALSE){
+plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
     
-  r<-result$effect$rIV
-  if (!is.null(result$IV2)){
-    r<-c(r,result$effect$rIV2,result$effect$rIVIV2DV)
+  r<-analysis$effect$rIV
+  if (!is.null(analysis$IV2)){
+    r<-c(r,analysis$effect$rIV2,analysis$effect$rIVIV2DV)
   }
   
-  pvals<-result$pIV
-  rvals<-result$rIV
-  nvals<-result$nval
-  df1vals<-result$df1
+  pvals<-analysis$pIV
+  rvals<-analysis$rIV
+  nvals<-analysis$nval
+  df1vals<-analysis$df1
 
   rlim<-c(-1,1)
   if (RZ=="z")  {
@@ -86,12 +86,12 @@ plot2Inference<-function(result,disp1,disp2,metaPlot=FALSE){
   disp2_use<-disp2
   switch (disp1,
           "p"={
-            d1<-result$pIV
+            d1<-analysis$pIV
             if (pPlotScale=="log10"){xsc<-1}
             xlim<-c(0,1)
           },
           "r"={
-            d1<-result$rIV
+            d1<-analysis$rIV
             if (RZ=="z") {
               d1<-atanh(d1)
               disp1_use<-zsLabel
@@ -101,12 +101,12 @@ plot2Inference<-function(result,disp1,disp2,metaPlot=FALSE){
             xlim<-rlim
           },
           "log(lrs)"={
-            d1<-res2llr(result,"sLLR")
+            d1<-res2llr(analysis,"sLLR")
             xlim<-c(-0.1, lrRange)
             disp1_use<-bquote(log[e](lr[s]))
           },
           "log(lrd)"={
-            d1<-res2llr(result,"dLLR")
+            d1<-res2llr(analysis,"dLLR")
             if (any(d1<0)) {
               ylim<-c(-lrRange, lrRange)
             } else {
@@ -115,23 +115,23 @@ plot2Inference<-function(result,disp1,disp2,metaPlot=FALSE){
             disp1_use<-bquote(log[e](lr[d]))
           },
           "w"={
-            d1<-result$rIV
-            d1<-rn2w(d1,result$nval)
+            d1<-analysis$rIV
+            d1<-rn2w(d1,analysis$nval)
             if (wPlotScale=="log10"){ xsc<-1}
             xlim<-c(0,1)
           },
           "wp"={
-            d1<-result$rp
-            d1<-rn2w(d1,result$nval)
+            d1<-analysis$rp
+            d1<-rn2w(d1,analysis$nval)
             if (wPlotScale=="log10"){ xsc<-1}
             xlim<-c(0,1)
           },
           "nw"={
-            d1<-rw2n(result$rIV,0.8,result$design$sReplTails)
+            d1<-rw2n(analysis$rIV,0.8,analysis$design$sReplTails)
             xlim<-c(1, max(d1)*1.1)
           },
           "rp"={
-            d1<-result$rpIV
+            d1<-analysis$rpIV
             if (RZ=="z") {
               d1<-atanh(d1)
               disp1_use<-zpLabel
@@ -141,7 +141,7 @@ plot2Inference<-function(result,disp1,disp2,metaPlot=FALSE){
             xlim<-rlim
           },
           "r1"={
-            d1<-result$roIV
+            d1<-analysis$roIV
             disp1_use<-bquote(r[1])
             if (RZ=="z") {
               d1<-atanh(d1)
@@ -150,7 +150,7 @@ plot2Inference<-function(result,disp1,disp2,metaPlot=FALSE){
             xlim<-rlim
           },
           "ra"={
-            d1<-result$rIVa
+            d1<-analysis$rIVa
             disp1_use<-bquote(r[1])
             if (RZ=="z") {
               d1<-atanh(d1)
@@ -161,17 +161,17 @@ plot2Inference<-function(result,disp1,disp2,metaPlot=FALSE){
             xlim<-rlim
           },
           "p1"={
-            d1<-result$poIV
+            d1<-analysis$poIV
             if (pPlotScale=="log10"){xsc<-1}
             xlim<-c(0, 1)
             disp1_use<-bquote(p[1])
           },
           "n"={
-            d1<-result$nval
+            d1<-analysis$nval
             xlim<-c(1, 200*1.1)
           },
           "t"={
-            d1<-result$tval
+            d1<-analysis$tval
             xlim<-c(-5,5)
           }
   )
@@ -179,14 +179,14 @@ plot2Inference<-function(result,disp1,disp2,metaPlot=FALSE){
   ysc<-0
   switch (disp2,
           "p"={
-            d2<-result$pIV
+            d2<-analysis$pIV
             if (pPlotScale=="log10"){
               ysc<-1
               }
             ylim<-c(0,1)
           },
           "r"={
-            d2<-result$rIV
+            d2<-analysis$rIV
             if (RZ=="z") {
               d2<-atanh(d2)
               disp2_use<-zsLabel
@@ -196,7 +196,7 @@ plot2Inference<-function(result,disp1,disp2,metaPlot=FALSE){
             ylim<-rlim
           },
           "ra"={
-            d2<-result$rIVa
+            d2<-analysis$rIVa
             disp2_use<-bquote(r[1])
             if (RZ=="z") {
               d2<-atanh(d2)
@@ -207,7 +207,7 @@ plot2Inference<-function(result,disp1,disp2,metaPlot=FALSE){
             ylim<-rlim
           },
           "r1"={
-            d2<-result$roIV
+            d2<-analysis$roIV
             disp2_use<-bquote(r[1])
             if (RZ=="z") {
               d2<-atanh(d2)
@@ -218,7 +218,7 @@ plot2Inference<-function(result,disp1,disp2,metaPlot=FALSE){
             ylim<-rlim
           },
           "p1"={
-            d2<-result$poIV
+            d2<-analysis$poIV
             if (pPlotScale=="log10"){
               ysc<-1
             }
@@ -226,7 +226,7 @@ plot2Inference<-function(result,disp1,disp2,metaPlot=FALSE){
             disp2_use<-bquote(p[1])
           },
           "rp"={
-            d2<-result$rpIV
+            d2<-analysis$rpIV
             if (RZ=="z") {
               d2<-atanh(d2)
               disp2_use<-zpLabel
@@ -236,7 +236,7 @@ plot2Inference<-function(result,disp1,disp2,metaPlot=FALSE){
             ylim<-rlim
           },
           "n"={
-            d2<-result$nval
+            d2<-analysis$nval
             ylim<-c(1, 200*1.1)
             if (nscaleLog) {
               ysc<-2
@@ -244,12 +244,12 @@ plot2Inference<-function(result,disp1,disp2,metaPlot=FALSE){
             }
           },
           "w"={
-            d2<-rn2w(result$rIV,result$nval)
+            d2<-rn2w(analysis$rIV,analysis$nval)
             if (wPlotScale=="log10"){ ysc<-1}
             ylim<-c(0,1)
           },
           "wp"={
-            d2<-rn2w(result$rp,result$nval)
+            d2<-rn2w(analysis$rp,analysis$nval)
             if (wPlotScale=="log10"){ ysc<-1}
             ylim<-c(0,1)
           },
@@ -258,7 +258,7 @@ plot2Inference<-function(result,disp1,disp2,metaPlot=FALSE){
             disp2_use<-bquote(log[e](lr[s]))
           },
           "log(lrd)"={
-            d2<-res2llr(result,"dLLR")
+            d2<-res2llr(analysis,"dLLR")
             if (any(d2<0)) {
               ylim<-c(-lrRange, lrRange)
             } else {
@@ -267,11 +267,11 @@ plot2Inference<-function(result,disp1,disp2,metaPlot=FALSE){
             disp2_use<-bquote(log[e](lr[d]))
           },
           "nw"={
-            d2<-rw2n(result$rIV,0.8,result$design$sReplTails)
+            d2<-rw2n(analysis$rIV,0.8,analysis$design$sReplTails)
             ylim<-c(1, max(d1)*1.1)
           },
           "R"={
-            d2<-result$rpIV
+            d2<-analysis$rpIV
             if (RZ=="z") {
               d2<-atanh(d2)
               disp2<-"Z"
@@ -279,7 +279,7 @@ plot2Inference<-function(result,disp1,disp2,metaPlot=FALSE){
             ylim<-rlim
           },
           "t"={
-            d2<-result$tval
+            d2<-analysis$tval
             ylim<-c(-5,5)
           }
   )
@@ -304,7 +304,7 @@ plot2Inference<-function(result,disp1,disp2,metaPlot=FALSE){
   
   if (disp1=="r" && disp2=="p") {
     rs<-seq(-r_range,r_range,length.out=51)
-    ps<-r2p(rs,result$nval[1])
+    ps<-r2p(rs,analysis$nval[1])
     if (pPlotScale=="log10")  ps<-log10(ps)
     g<-g+geom_line(data=data.frame(x=rs,y=ps),aes(x=x,y=y),col="white")
   }
@@ -328,14 +328,14 @@ plot2Inference<-function(result,disp1,disp2,metaPlot=FALSE){
     c2=plotcolours$descriptionC
   }
   if (length(d1)<200) {
-    use<-!isSignificant(STMethod,pvals,rvals,nvals,df1vals,result$evidence)
+    use<-!isSignificant(STMethod,pvals,rvals,nvals,df1vals,analysis$evidence)
     pts1=pts[use,]
     g<-g+geom_point(data=pts1,aes(x=x, y=y),shape=shapes$study, colour = "black", fill = c2, size = dotSize)
     pts2=pts[!use,]
     g<-g+geom_point(data=pts2,aes(x=x, y=y),shape=shapes$study, colour = "black", fill = c1, size = dotSize)
   } else {
     if (length(d1)<=10000) {
-      use<-!isSignificant(STMethod,pvals,rvals,nvals,df1vals,result$evidence)
+      use<-!isSignificant(STMethod,pvals,rvals,nvals,df1vals,analysis$evidence)
       pts1=pts[use,]
       g<-g+geom_point(data=pts1,aes(x=x, y=y),shape=shapes$study, colour = c2, fill = c2, size = dotSize/4)
       pts2=pts[!use,]
@@ -364,5 +364,5 @@ plot2Inference<-function(result,disp1,disp2,metaPlot=FALSE){
   }
   
   g<-g+xlab(disp1_use)+ylab(disp2_use)
-  g+ggtitle(result$an_name)
+  g+ggtitle(analysis$an_name)
 }

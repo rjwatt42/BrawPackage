@@ -8,13 +8,13 @@ makeWorld<-function(worldOn=FALSE,populationPDF="Single",populationPDFk=0.2,popu
 }
 
 # PREDICTION & DESIGN & EVIDENCE
-makeEffect<-function(rIV=0,rIV2=0,rIVIV2=0,rIVIV2DV=0,Heteroscedasticity=0,
+makeEffect<-function(rIV=0.3,rIV2=0,rIVIV2=0,rIVIV2DV=0,Heteroscedasticity=0,
                      ResidDistr="normal",world=NA){
 
   if (is.na(world))
     world<-list(worldOn=FALSE,populationPDF="Single",populationPDFk=rIV,populationRZ="r",populationNullp=0,worldAbs=FALSE)
 
-  effect<-list(rIV=0,rIV2=0,rIVIV2=0,rIVIV2DV=0,
+  effect<-list(rIV=rIV,rIV2=rIV2,rIVIV2=rIVIV2,rIVIV2DV=rIVIV2DV,
                Heteroscedasticity=Heteroscedasticity,ResidDistr=ResidDistr,
                world=world
   )

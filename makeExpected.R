@@ -11,7 +11,7 @@ mergeExpected<-function(r1,r2) {
     nval=rbind(r1$nval,r2$nval),
     df1=rbind(r1$df1,r2$df1)
   )
-  if (!is.null(IV2)) {
+  if (!is.null(r1$rIV2)) {
     newResult<-c(newResult,list(
       rIV2=rbind(r1$rIV2,r2$rIV2),
       pIV2=rbind(r1$pIV2,r2$pIV2),
@@ -48,38 +48,37 @@ resetExpected<-function(nsims=0,expectedResult=NULL){
     p=list(direct=bm,unique=bm,total=bm)
   )
   )
-  newNullResult<-newResult
-  
+
   if (!is.null(expectedResult)) {
     newResult<-mergeExpected(expectedResult$result,newResult)
-    newNullResult<-mergeExpected(expectedResult$nullresult,newNullResult)
     count<-expectedResult$count
-    nullcount<-expectedResult$nullcount
   } else {
     count<-0
-    nullcount<-0
   }
 
   list(result=newResult,
-       nullresult=newNullResult,
        count=count,
-       nullcount=nullcount,
        nsims=nsims+count)
 }
 
 
-makeExpected <- function(nsims,hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),expectedResult=NULL) {
+makeExpected <- function(nsims,hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),expectedResult=NULL,doingNull=FALSE) {
   
+  if (doingNull && !hypothesis$effect$world$worldOn) {
+    hypothesis$effect$world$worldOn<-TRUE
+    hypothesis$effect$world$populationNullp<-0.5
+  }
   expectedResult<-c(list(hypothesis=hypothesis,
                          design=design,
                          evidence=evidence),
                     resetExpected(nsims,expectedResult)
   )
   
-  min_ns<-floor(log10(expectedResult$nsims/100))
+  min_ns<-floor(log10(nsims/100))
+  min_ns<-max(0,min_ns)
   ns<-10^min_ns
-  n_cycles<-ceil(expectedResult$nsims/ns)
-  
+  n_cycles<-ceil(nsims/ns)
+
   if (ns>0) {
     for (ci in 1:n_cycles) {
       newCount<-expectedResult$count+ns
@@ -88,27 +87,7 @@ makeExpected <- function(nsims,hypothesis=makeHypothesis(),design=makeDesign(),e
     }
   }
   
-    # wind up
-    if (hypothesis$effect$world$worldOn && is.element(expected$type,c("NHSTErrors","FDR"))){
-      nulls<-expectedResult$result$rpIV==0
-      expectedResult$nullresult$rpIV<-expectedResult$result$rpIV[nulls]
-      expectedResult$nullresult$roIV<-expectedResult$result$roIV[nulls]
-      expectedResult$nullresult$rIV<-expectedResult$result$rIV[nulls]
-      expectedResult$nullresult$pIV<-expectedResult$result$pIV[nulls]
-      expectedResult$nullresult$nval<-expectedResult$result$nval[nulls]
-      expectedResult$nullresult$df1<-expectedResult$result$df1[nulls]
-      
-      expectedResult$result$rpIV<-expectedResult$result$rpIV[!nulls]
-      expectedResult$result$roIV<-expectedResult$result$roIV[!nulls]
-      expectedResult$result$rIV<-expectedResult$result$rIV[!nulls]
-      expectedResult$result$pIV<-expectedResult$result$pIV[!nulls]
-      expectedResult$result$nval<-expectedResult$result$nval[!nulls]
-      expectedResult$result$df1<-expectedResult$result$df1[!nulls]
-      
-      expectedResult$count<-sum(!is.na(expectedResult$result$rIV))
-      expectedResult$nullcount<-sum(!is.na(expectedResult$nullresult$rIV))
-    }
-
+  if (autoShow) print(showExpected(expectedResult,type="Basic"))
   return(expectedResult)
 }
 
