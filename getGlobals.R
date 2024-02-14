@@ -86,7 +86,9 @@ simData<<-TRUE
 points_threshold<<-50 # for displaying expected results
 wPlotScale<<-"log10"
 pPlotScale<<-"log10"
-nPlotScale<<-"log10"
+nPlotScale<<-"linear"
+showTheory<<-TRUE
+showTheoryHQ<<-FALSE
 
 useSignificanceCols<<-TRUE
 showInteractionOnly<<-TRUE

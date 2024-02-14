@@ -29,23 +29,23 @@ trimResult<-function(result) {
   result
 }
 
-drawInference<-function(result,disp="r",orientation="vert"){
+plotInference<-function(result,disp="r",orientation="vert",showType="direct"){
   if (length(disp)==2) {
-    return(draw2Inference(result,disp[1],disp[2]))
+    return(plot2Inference(result,disp[1],disp[2]))
   } 
   result<-trimResult(result)
   
   switch (disp,
-          "r"= {g<-r_plot(result,disp,orientation=orientation)},
-          "rp"={g<-r_plot(result,disp,orientation=orientation)},
-          "r1"={g<-r_plot(result,disp,orientation=orientation)},
-          "ra"= {g<-r_plot(result,disp,orientation=orientation)},
-          "ci1"={g<-r_plot(result,disp,orientation=orientation)},
-          "ci2"={g<-r_plot(result,disp,orientation=orientation)},
-          "t"= {g<-r_plot(result,disp,orientation=orientation)},
+          "r"= {g<-r_plot(result,disp,orientation=orientation,showType=showType)},
+          "rp"={g<-r_plot(result,disp,orientation=orientation,showType=showType)},
+          "r1"={g<-r_plot(result,disp,orientation=orientation,showType=showType)},
+          "ra"= {g<-r_plot(result,disp,orientation=orientation,showType=showType)},
+          "ci1"={g<-r_plot(result,disp,orientation=orientation,showType=showType)},
+          "ci2"={g<-r_plot(result,disp,orientation=orientation,showType=showType)},
+          "t"= {g<-r_plot(result,disp,orientation=orientation,showType=showType)},
           
-          "p"= {g<-p_plot(result,disp,orientation=orientation)},
-          "p1"= {g<-p_plot(result,disp,orientation=orientation)},
+          "p"= {g<-p_plot(result,disp,orientation=orientation,showType=showType)},
+          "p1"= {g<-p_plot(result,disp,orientation=orientation,showType=showType)},
           
           "log(lrs)"={g<-l_plot(result,disp,orientation=orientation)},
           "log(lrd)"={g<-l_plot(result,disp,orientation=orientation)},
@@ -63,7 +63,7 @@ drawInference<-function(result,disp="r",orientation="vert"){
 }
 
 
-draw2Inference<-function(result,disp1,disp2,metaPlot=FALSE){
+plot2Inference<-function(result,disp1,disp2,metaPlot=FALSE){
     
   r<-result$effect$rIV
   if (!is.null(result$IV2)){

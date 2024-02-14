@@ -129,7 +129,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
   if (replication$sReplicationOn) {
     if (replication$sReplVarAlpha) alphaSig<<-oldalpha*replication$sReplAlpha
     while (replication$sReplSigOnly=="Yes" && !isSignificant(STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
-      if (!shortHand) {
+      if (!evidence$shortHand) {
         sample<-makeSample(hypothesis,design)
         res<-analyseSample(hypothesis,design,evidence,sample)
       } else {
@@ -174,7 +174,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
         }
       }
 
-      if (!shortHand) {
+      if (!evidence$shortHand) {
         sample<-makeSample(hypothesis,design1)
         res<-analyseSample(hypothesis,design1,evidence,sample)
       } else {

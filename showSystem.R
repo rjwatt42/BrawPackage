@@ -4,7 +4,7 @@
 # population diagram
 # prediction diagram
 
-drawHypothesis<-function(hypothesis) {
+showHypothesis<-function(hypothesis) {
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV
@@ -20,16 +20,16 @@ drawHypothesis<-function(hypothesis) {
   switch (no_ivs,
           {
             g<-PlotNULL+
-              annotation_custom(grob=ggplotGrob(drawVariable(IV)),xmin=xmin,xmax=xmax,ymin=6,ymax=10)+
-              annotation_custom(grob=ggplotGrob(drawVariable(DV)),xmin=xmin,xmax=xmax,ymin=0,ymax=4)
+              annotation_custom(grob=ggplotGrob(showVariable(IV)),xmin=xmin,xmax=xmax,ymin=6,ymax=10)+
+              annotation_custom(grob=ggplotGrob(showVariable(DV)),xmin=xmin,xmax=xmax,ymin=0,ymax=4)
             # arrow
             g<-g+annotation_custom(grob=ggplotGrob(drawEffectES(effect$rIV,1)),xmin=xmin,xmax=xmax,ymin=3.5,ymax=6)
           },
           {
             g<-PlotNULL+
-              annotation_custom(grob=ggplotGrob(drawVariable(IV)), xmin=0,  xmax=4,  ymin=6, ymax=9)+
-              annotation_custom(grob=ggplotGrob(drawVariable(IV2)),xmin=6,  xmax=10, ymin=6, ymax=9)+
-              annotation_custom(grob=ggplotGrob(drawVariable(DV)), xmin=3,  xmax=7,  ymin=0.5, ymax=3.5)
+              annotation_custom(grob=ggplotGrob(showVariable(IV)), xmin=0,  xmax=4,  ymin=6, ymax=9)+
+              annotation_custom(grob=ggplotGrob(showVariable(IV2)),xmin=6,  xmax=10, ymin=6, ymax=9)+
+              annotation_custom(grob=ggplotGrob(showVariable(DV)), xmin=3,  xmax=7,  ymin=0.5, ymax=3.5)
             # arrows
             g<-g+annotation_custom(grob=ggplotGrob(drawEffectES(effect$rIV,2)),xmin=1.5,xmax=5.5,ymin=3, ymax=7)+
               annotation_custom(grob=ggplotGrob(drawEffectES(effect$rIV2,3)),xmin=4.5,xmax=8.5,ymin=3, ymax=7)+
@@ -40,7 +40,7 @@ drawHypothesis<-function(hypothesis) {
   g
 }
 
-drawWorld<-function(world) {
+showWorld<-function(world) {
 # world diagram
 
   PlotNULL<-ggplot()+plotBlankTheme+theme(plot.margin=margin(0,-0.1,0,0,"cm"))+
@@ -78,7 +78,7 @@ drawWorld<-function(world) {
   g
 }
 
-drawDesign<-function(design) {
+showDesign<-function(design) {
   if (design$sNRand) {
     nbin<-seq(minN,maxRandN*design$sN,length.out=worldNPoints)
     # nbin<-5+seq(0,qgamma(0.99,shape=design$sNRandK,scale=(design$sN-5)/design$sNRandK),length.out=101)
@@ -103,7 +103,7 @@ drawDesign<-function(design) {
 }
 
 # population diagram
-drawPopulation <- function(hypothesis) {
+showPopulation <- function(hypothesis) {
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV
@@ -133,7 +133,7 @@ drawPopulation <- function(hypothesis) {
 }
 
 # prediction diagram
-drawPrediction <- function(hypothesis,design){
+showPrediction <- function(hypothesis,design){
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV
@@ -142,11 +142,7 @@ drawPrediction <- function(hypothesis,design){
   if (is.null(IV2)) no_ivs<-1 else no_ivs<-2
 
   switch (no_ivs,
-          { if(effect$world$worldOn) {
-            g<-drawWorldSampling(effect,design,sigOnly=evidence$sigOnly)
-          } else {
-            g<-plotPrediction(IV,IV2,DV,effect,design)
-            }
+          {  g<-plotPrediction(IV,IV2,DV,effect,design)
           },
           {
             if (evidence$rInteractionOn==FALSE){

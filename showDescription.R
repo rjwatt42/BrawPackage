@@ -1,6 +1,6 @@
 plotPoints<-function(g,IV,DV,result,colindex=1,off=0){
 
-  showRawData<-(allScatter=="all")
+  showRawData<-TRUE
   if (colindex==1)
           {  col<- plotcolours$descriptionC
           alphaPoints<-0.95
@@ -302,7 +302,7 @@ plotCatDescription<-function(result,g) {
   g
 }
 
-drawDescription<-function(result) {
+showDescription<-function(result) {
 
   g<-ggplot()
   if (is.null(result$IV2)){

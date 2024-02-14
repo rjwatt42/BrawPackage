@@ -22,7 +22,7 @@ makeEffect<-function(rIV=0,rIV2=0,rIVIV2=0,rIVIV2DV=0,Heteroscedasticity=0,
   effect
 }
 
-makeHypothesis<-function(IV,IV2=NULL,DV,effect) {
+makeHypothesis<-function(IV=makeVariable("IV"),IV2=NULL,DV=makeVariable("DV"),effect=makeEffect()) {
   hypothesis<-list(IV=IV,IV2=IV2,DV=DV,effect=effect)
 }
 
@@ -34,7 +34,7 @@ makeReplication<-function(sReplicationOn=FALSE,sReplPowerOn=TRUE,sReplPower=0.8,
   replication<-list(sReplicationOn=sReplicationOn,
                     sReplPowerOn=sReplPowerOn,sReplPower=sReplPower,
                     sReplSigOnly=sReplSigOnly,
-                    sReplType=sReplType,sReplRepeats=sReplRepeats,sReplBudget=sNBudget,
+                    sReplType=sReplType,sReplRepeats=sReplRepeats,sReplBudget=sReplBudget,
                     sReplCorrection=sReplCorrection,sReplTails=sReplTails,
                     sReplKeep=sReplKeep,
                     sReplVarAlpha=sReplVarAlpha,sReplAlpha=sReplAlpha)
@@ -61,7 +61,7 @@ makeDesign<-function(sN=42, sMethod="Random" ,sNRand=FALSE,sNRandK=2,
                sRangeOn=sRangeOn, sIVRange=sIVRange, sDVRange=sDVRange, 
                sDependence=sDependence, sOutliers=sOutliers, sClustering=sClustering,
                sCheating=sCheating,sCheatingLimit=sCheatingLimit,sCheatingAmount=sCheatingAmount,sCheatingBudget=sCheatingBudget,
-               sReplication<-sReplication,
+               sReplication=sReplication,
                sN_Strata=sN_Strata, sR_Strata=sR_Strata,
                sNClu_Cluster=sNClu_Cluster, sRClu_Cluster=sRClu_Cluster,
                sNClu_Convenience=sNClu_Convenience, sRClu_Convenience=sRClu_Convenience, sNCont_Convenience=sNCont_Convenience, sRCont_Convenience=sRCont_Convenience, sRSpread_Convenience=sRSpread_Convenience,
@@ -72,25 +72,19 @@ makeDesign<-function(sN=42, sMethod="Random" ,sNRand=FALSE,sNRandK=2,
 }
 
 makeEvidence<-function(rInteractionOn=TRUE,rInteractionOnly=TRUE,ssqType="Type3",dataType="Raw",analysisType="Anova",
-                       caseOrder="Alphabetic",allScatter="all",showType="direct",showTheory=FALSE,HQ=FALSE,
-                       pScale="log10",wScale="linear",nScale="linear",sigOnly=FALSE,logDensity=FALSE,
-                       shortHand=FALSE,
+                       caseOrder="Alphabetic",shortHand=FALSE,sigOnly=FALSE,
                        llr=list(e1=c(),e2=0),
-                       Welch=FALSE,
-                       Transform="None",
+                       Welch=FALSE,Transform="None",
                        usePrior="world",
                        prior=list(worldOn=FALSE,populationPDF="Uniform",
                                   populationPDFk=0,populationRZ="r",
                                   populationNullp=0)){
   
-  evidence<-list(rInteractionOn=rInteractionOn,rInteractionOnly=rInteractionOnly,
-                 showType=showType,showTheory=showTheory,HQ=HQ,
-                 sigOnly=sigOnly,logDensity=logDensity, allScatter=allScatter,
-                 ssqType=ssqType,
+  evidence<-list(rInteractionOn=rInteractionOn,rInteractionOnly=rInteractionOnly,ssqType=ssqType,
+                 caseOrder=caseOrder,shortHand=shortHand,sigOnly=sigOnly,
                  llr=llr,
-                 caseOrder=caseOrder,Welch=Welch,Transform=Transform,
+                 Welch=Welch,Transform=Transform,
                  dataType=dataType,analysisType=analysisType,
-                 pScale=pScale,wScale=wScale,nScale=nScale,
                  usePrior=usePrior,
                  prior=prior
   )

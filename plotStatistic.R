@@ -75,7 +75,7 @@ plotLimits<-function(xlim,ylim,orientation) {
          }
   )
 }
-varLine<-function(intercept=NULL,linetype,color,linewidth,orientation){
+varLine<-function(intercept=NULL,linetype="solid",color,linewidth,orientation){
   switch(orientation,
          "vert"={
            geom_hline(yintercept=intercept,linetype=linetype, color=color, linewidth=linewidth)
@@ -370,12 +370,10 @@ expected_hist<-function(vals,svals,valType){
           "n"= { # ns is small
             target<-get_lowerEdge(vals,svals)
             bins<-getBins(vals,svals,target,NULL,10000)
-            print(bins[2]-bins[1])
             if (is.integer(vals)) {
               bins<-unique(floor(bins))
               binStep<-max(floor(median(diff(bins))),1)
               bins<-seq(bins[1],bins[length(bins)],binStep)
-              print(binStep)
             }
           },
           
@@ -502,7 +500,7 @@ expected_plot<-function(g,pts,expType=NULL,result=NULL,IV=NULL,DV=NULL,i=1,scale
     }
     xoff<-pts$x[1]
     if (orientation=="vert") {
-      simAlpha<-1
+      simAlpha<-0.8
     } else {
       simAlpha<-0.7
     }
@@ -522,7 +520,7 @@ expected_plot<-function(g,pts,expType=NULL,result=NULL,IV=NULL,DV=NULL,i=1,scale
 }
 
 
-r_plot<-function(result,expType="r",logScale=FALSE,otherresult=NULL,orientation="vert"){
+r_plot<-function(result,expType="r",logScale=FALSE,otherresult=NULL,orientation="vert",showType="direct"){
 
   r<-result$effect$rIV
   if (!is.null(result$IV2)){
@@ -676,7 +674,13 @@ r_plot<-function(result,expType="r",logScale=FALSE,otherresult=NULL,orientation=
   # make theory
   if (!all(is.na(result$rIV))) { theoryAlpha<-0.5} else {theoryAlpha<-1}
   for (i in 1:length(xoff)){
-    if (result$evidence$showTheory) {
+    if (showTheory) {
+      if (!result$effect$world$worldOn) {
+        result$effect$world$populationPDF<-"Single"
+        result$effect$world$populationRZ<-"r"
+        result$effect$world$populationPDFk<-result$effect$rIV
+        result$effect$world$populationNullp<-0
+      }
       if (orientation=="horz") {
         distMax<-0.8
       } else {
@@ -684,14 +688,14 @@ r_plot<-function(result,expType="r",logScale=FALSE,otherresult=NULL,orientation=
       }
       if (is.element(expType,c("p","e1","e2","p1"))) {
         if (logScale) {
-          yv<-seq(log10(min_p),0,length.out=201)
+          yv<-seq(0,log10(min_p),length.out=201)
           yvUse<-10^yv
         }else{
-          yv<-seq(0,1,length.out=201)
+          yv<-seq(1,0,length.out=201)
           yvUse<-yv
         }
-        xd<-fullRSamplingDist(yvUse,result$effect$world,result$design,"p",logScale=logScale,sigOnly=sigOnly,HQ=evidence$HQ)
-        xdsig<-fullRSamplingDist(yvUse,result$effect$world,result$design,"p",logScale=logScale,sigOnly=TRUE,HQ=evidence$HQ)
+        xd<-fullRSamplingDist(yvUse,result$effect$world,result$design,"p",logScale=logScale,sigOnly=FALSE,HQ=showTheoryHQ)
+        xdsig<-fullRSamplingDist(yvUse,result$effect$world,result$design,"p",logScale=logScale,sigOnly=TRUE,HQ=showTheoryHQ)
       } else {
         npt<-101
       switch(expType,
@@ -700,8 +704,8 @@ r_plot<-function(result,expType="r",logScale=FALSE,otherresult=NULL,orientation=
                  zvals<-seq(-1,1,length.out=npt*2)*z_range*2
                  rvals<-tanh(zvals)
                  # rvals<-seq(-1,1,length.out=npt)*0.99
-                 xd<-fullRSamplingDist(rvals,result$effect$world,result$design,"r",logScale=logScale,sigOnly=FALSE,HQ=evidence$HQ)
-                 xdsig<-fullRSamplingDist(rvals,result$effect$world,result$design,"r",logScale=logScale,sigOnly=TRUE,HQ=evidence$HQ)
+                 xd<-fullRSamplingDist(rvals,result$effect$world,result$design,"r",logScale=logScale,sigOnly=FALSE,HQ=showTheoryHQ)
+                 xdsig<-fullRSamplingDist(rvals,result$effect$world,result$design,"r",logScale=logScale,sigOnly=TRUE,HQ=showTheoryHQ)
                  xd<-rdens2zdens(xd,rvals)
                  xdsig<-rdens2zdens(xdsig,rvals)
                  yv<-atanh(rvals)
@@ -711,22 +715,22 @@ r_plot<-function(result,expType="r",logScale=FALSE,otherresult=NULL,orientation=
                  xdsig<-xdsig[use]
                } else {
                  rvals<-seq(-1,1,length.out=npt)*0.99
-                 xd<-fullRSamplingDist(rvals,result$effect$world,result$design,"r",logScale=logScale,sigOnly=FALSE,HQ=evidence$HQ)
-                 xdsig<-fullRSamplingDist(rvals,result$effect$world,result$design,"r",logScale=logScale,sigOnly=TRUE,HQ=evidence$HQ)
+                 xd<-fullRSamplingDist(rvals,result$effect$world,result$design,"r",logScale=logScale,sigOnly=FALSE,HQ=showTheoryHQ)
+                 xdsig<-fullRSamplingDist(rvals,result$effect$world,result$design,"r",logScale=logScale,sigOnly=TRUE,HQ=showTheoryHQ)
                  yv<-rvals
                }
              },
              "ra"={
                if (RZ=="z") {
                  yv<-seq(-1,1,length.out=npt)*z_range
-                 xd<-fullRSamplingDist(tanh(yv),result$effect$world,result$design,"r",logScale=logScale,sigOnly=FALSE,HQ=evidence$HQ)
-                 xdsig<-fullRSamplingDist(tanh(yv),result$effect$world,result$design,"r",logScale=logScale,sigOnly=TRUE,HQ=evidence$HQ)
+                 xd<-fullRSamplingDist(tanh(yv),result$effect$world,result$design,"r",logScale=logScale,sigOnly=FALSE,HQ=showTheoryHQ)
+                 xdsig<-fullRSamplingDist(tanh(yv),result$effect$world,result$design,"r",logScale=logScale,sigOnly=TRUE,HQ=showTheoryHQ)
                  xd<-rdens2zdens(xd,tanh(yv))
                  xdsig<-rdens2zdens(xdsig,tanh(yv))
                } else {
                  yv<-seq(-1,1,length.out=npt)*0.99
-                 xd<-fullRSamplingDist(yv,result$effect$world,result$design,"r",logScale=logScale,sigOnly=FALSE,HQ=evidence$HQ)
-                 xdsig<-fullRSamplingDist(yv,result$effect$world,result$design,"r",logScale=logScale,sigOnly=TRUE,HQ=evidence$HQ)
+                 xd<-fullRSamplingDist(yv,result$effect$world,result$design,"r",logScale=logScale,sigOnly=FALSE,HQ=showTheoryHQ)
+                 xdsig<-fullRSamplingDist(yv,result$effect$world,result$design,"r",logScale=logScale,sigOnly=TRUE,HQ=showTheoryHQ)
                }
              },
              "ci1"={
@@ -799,8 +803,8 @@ r_plot<-function(result,expType="r",logScale=FALSE,otherresult=NULL,orientation=
       xd[is.na(xd)]<-0
       theoryGain<-1/max(xd)*distMax
       xd<-xd*theoryGain
-      histGain<<-sum(xd*c(0,diff(yv)))
-      histGainrange<<-c(yv[1],yv[length(yv)])
+      histGain<<-abs(sum(xd*c(0,diff(yv))))
+      histGainrange<<-sort(c(yv[1],yv[length(yv)]))
       ptsp<-data.frame(x=c(xd,-rev(xd))+xoff[i],y=c(yv,rev(yv)))
       g<-g+dataPolygon(data=ptsp,colour=NA,fill="white",alpha=theoryAlpha, orientation=orientation)
       if (is.element(expType,c("r","n","p"))) {
@@ -814,7 +818,7 @@ r_plot<-function(result,expType="r",logScale=FALSE,otherresult=NULL,orientation=
         g<-g+dataPath(data=ptsp,colour="black",linewidth=0.5, orientation=orientation)
       }
     } else {
-      histGain<-NA
+      histGain<<-NA
     }
 
     # then the samples
@@ -831,7 +835,7 @@ r_plot<-function(result,expType="r",logScale=FALSE,otherresult=NULL,orientation=
         nvals<-nvals[resSig]
         resSig<-resSig[resSig]
       }
-      if (result$showType=="all") {
+      if (showType=="all") {
         ysc<-1/3
         rvals<-(rvals+1)*ysc*0.9+rem(i-1,3)*ysc*2-1
       }
@@ -971,14 +975,14 @@ r_plot<-function(result,expType="r",logScale=FALSE,otherresult=NULL,orientation=
               {g<-g+annotate("text",x=xoff[i],y=ylim[2]+diff(ylim)/16,label="Interaction",color="white",size=3)}
       )
 
-  if (result$showType=="all") {
+  if (showType=="all") {
     for (i in 1:3) {
       g<-g+varLine(intercept=(-1+1)*ysc*0.9+(i-1)*ysc*2-1, color="black", linewidth=1,orientation=orientation)
       g<-g+varLine(intercept=(0.0+1)*ysc*0.9+(i-1)*ysc*2-1, linetype="dotted", color="black", linewidth=0.5,orientation=orientation)
       g<-g+varLine(intercept=(1+1)*ysc*0.9+(i-1)*ysc*2-1, color="black", linewidth=1,orientation=orientation)
     }
     g<-g+plotLimits(xlim = c(min(xoff),max(xoff))+c(-1,1), ylim = ylim+c(0,diff(ylim)/16),orientation=orientation)+
-      varScale(breaks=(c(-1,0,1,-1,0,1,-1,0,1)+1)*ysc*0.9+(c(1,1,1,2,2,2,3,3,3)-1)*ysc*2-1,labels=c(-1,0,1,-1,0,1,-1,0,1))
+      varScale(breaks=(c(-1,0,1,-1,0,1,-1,0,1)+1)*ysc*0.9+(c(1,1,1,2,2,2,3,3,3)-1)*ysc*2-1,labels=c(-1,0,1,-1,0,1,-1,0,1),orientation = orientation)
   } else {
     g<-g+varLine(intercept=0.0, linetype="dotted", color="black", linewidth=0.5,orientation=orientation)+
       plotLimits(xlim = c(min(xoff),max(xoff))+c(-1,1), ylim = ylim+c(0,diff(ylim)/16),orientation=orientation)
@@ -996,9 +1000,9 @@ l_plot<-function(result,ptype=NULL,otherresult=NULL,orientation="vert"){
   g
 }
 
-p_plot<-function(result,ptype="p",otherresult=NULL,PlotScale=pPlotScale,orientation="vert"){
+p_plot<-function(result,ptype="p",otherresult=NULL,PlotScale=pPlotScale,orientation="vert",showType="direct"){
 
-  g<-r_plot(result,ptype,PlotScale=="log10",otherresult,orientation=orientation)
+  g<-r_plot(result,ptype,PlotScale=="log10",otherresult,orientation=orientation,showType=showType)
   
   if (is.element(ptype,c("p","p1"))) {
   if (PlotScale=="log10") {

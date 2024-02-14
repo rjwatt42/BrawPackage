@@ -280,120 +280,55 @@ appendList <- function (x1, x2)
   x1
 }
 
-
-multipleAnalysis<-function(IV,IV2,DV,effect,design,evidence,n_sims=1,appendData=FALSE, earlierResult=c(),sigOnly=FALSE){
-
-  rho<-effect$rIV
-  rho2<-effect$rIV2
+multipleAnalysis<-function(hypothesis,n_sims=1,newResult=c(),sigOnly=FALSE){
   
-  pvals=c()
-  rvals=c()
-  nvals=c()
-  df1vals<-c()
+  rho<-hypothesis$effect$rIV
+  rho2<-hypothesis$effect$rIV2
+  
   if (length(rho)<n_sims) {rho<-rep(rho,n_sims)}
-  if (!is.null(IV2)) {
+  if (!is.null(hypothesis$IV2)) {
     if (length(rho2)<n_sims) {rho2<-rep(rho2,n_sims)}
   }
-
-  nterms<-0
-  if (IV$type=="Categorical") {nterms<-nterms+IV$ncats-1} else {nterms<-nterms+1}
-  if (!is.null(IV2)) {
-    if (IV2$type=="Categorical") {nterms<-nterms+IV2$ncats-1} else {nterms<-nterms+1}
-  }
-
-    if (appendData) {
-    mainResult<-earlierResult
-  } else {
-    mainResult<-list(rpIV=c(),roIV=c(),rIV=c(),pIV=c(),rIVa=c(),
-                   rIV2=c(),pIV2=c(),rIVIV2DV=c(),pIVIV2DV=c(),
-                   nval=c(),df1=c(),
-                   r=list(direct=c(),unique=c(),total=c(),coefficients=c()),
-                   p=list(direct=c(),unique=c(),total=c()),
-                   showType=design$showType)
-  }
   
+  offset<-sum(!is.na(newResult$rIV))
   for (i in 1:n_sims){
-    effect$rIV<-rho[i]
-    if (!is.null(IV2)) {effect$rIV2<-rho2[i]}
+    hypothesis$effect$rIV<-rho[i]
+    if (!is.null(hypothesis$IV2)) {effect$rIV2<-rho2[i]}
     
-    res<-runSimulation(IV,IV2,DV,effect,design,evidence,sigOnly)
+    res<-runSimulation(hypothesis,design,evidence,sigOnly)
+    
     if (is.na(res$rIV)) {
       res$rIV<-0
       res$pIV<-1
       res$nval<-0
     }
-    newResult<-list(rpIV=res$rpIV,roIV=res$roIV,rIV=res$rIV,pIV=res$pIV,poIV=res$poIV,rIVa=res$rIVa,
-                    rIV2=res$rIV2,pIV2=res$pIV2,rIVIV2DV=res$rIVIV2DV,pIVIV2DV=res$pIVIV2DV,
-                    dvMean=mean(res$dv,na.rm=TRUE),dvSD=sd(res$dv,na.rm=TRUE),
-                    dvSkew=skewness(res$dv,na.rm=TRUE),dvKurtosis=kurtosis(res$dv,na.rm=TRUE)+3,
-                    nval=res$nval,df1=res$df1,test_val=res$test_val,
-                    r=list(direct=res$r$direct,unique=res$r$unique,total=res$r$total,coefficients=res$r$coefficients),
-                    p=list(direct=res$p$direct,unique=res$p$unique,total=res$p$total),
-                    ResultHistory=res$ResultHistory,
-                    showType=design$showType
-                    )
-    
-
-   if (any(class(res$rawModel)[1]==c("lmerMod","glmerMod"))) {
-      coeffs<-colMeans(coef(res$rawModel)$participant)
-    } else {
-      coeffs<-res$rawModel$coefficients
-    }
-    newResult$r$coefficients<-as.double(coeffs[2:length(coeffs)])
-    # mainResult<-appendList(mainResult,newResult)
-    
-    mainResult$rpIV<-rbind(mainResult$rpIV,newResult$rpIV)
-    mainResult$rIV<-rbind(mainResult$rIV,newResult$rIV)
-    mainResult$roIV<-rbind(mainResult$roIV,newResult$roIV)
-    mainResult$rIVa<-rbind(mainResult$rIVa,newResult$rIVa)
-    mainResult$pIV<-rbind(mainResult$pIV,newResult$pIV)
-    mainResult$poIV<-rbind(mainResult$poIV,newResult$poIV)
-    mainResult$nval<-rbind(mainResult$nval,newResult$nval)
-    mainResult$df1<-rbind(mainResult$df1,newResult$df1)
-    mainResult$test_val<-rbind(mainResult$test_val,newResult$test_val)
-    mainResult$dvMean<-rbind(mainResult$dvMean,newResult$dvMean)
-    mainResult$dvSD<-rbind(mainResult$dvSD,newResult$dvSD)
-    mainResult$dvSkew<-rbind(mainResult$dvSkew,newResult$dvSkew)
-    mainResult$dvKurtosis<-rbind(mainResult$dvKurtosis,newResult$dvKurtosis)
-    
-    if (!is.null(IV2)){
-      mainResult$rIV2<-rbind(mainResult$rIV2,newResult$rIV2)
-      mainResult$pIV2<-rbind(mainResult$pIV2,newResult$pIV2)
-      mainResult$rIVIV2DV<-rbind(mainResult$rIVIV2DV,newResult$rIVIV2DV)
-      mainResult$pIVIV2DV<-rbind(mainResult$pIVIV2DV,newResult$pIVIV2DV)
-
-      mainResult$r$direct<-rbind(mainResult$r$direct,newResult$r$direct)
-      mainResult$r$unique<-rbind(mainResult$r$unique,newResult$r$unique)
-      mainResult$r$total<-rbind(mainResult$r$total,newResult$r$total)
-      mainResult$r$coefficients<-rbind(mainResult$r$coefficients,newResult$r$coefficients)
-
-      mainResult$p$direct<-rbind(mainResult$p$direct,newResult$p$direct)
-      mainResult$p$unique<-rbind(mainResult$p$unique,newResult$p$unique)
-      mainResult$p$total<-rbind(mainResult$p$total,newResult$p$total)
-
-    } else {
-      mainResult$rIV2<-rbind(mainResult$rIV2,NA)
-      mainResult$pIV2<-rbind(mainResult$pIV2,NA)
-      mainResult$rIVIV2DV<-rbind(mainResult$rIVIV2DV,NA)
-      mainResult$pIVIV2DV<-rbind(mainResult$pIVIV2DV,NA)
-
-      mainResult$r$direct<-rbind(mainResult$r$direct,newResult$rIV)
-      mainResult$r$unique<-rbind(mainResult$r$unique,newResult$rIV)
-      mainResult$r$total<-rbind(mainResult$r$total,newResult$rIV)
-      mainResult$r$coefficients<-rbind(mainResult$r$coefficients,newResult$r$coefficients)
-
-      mainResult$p$direct<-rbind(mainResult$p$direct,newResult$pIV)
-      mainResult$p$unique<-rbind(mainResult$p$unique,newResult$pIV)
-      mainResult$p$total<-rbind(mainResult$p$total,newResult$pIV)
-
+    j<-i+offset
+    newResult$rpIV[j]<-res$rpIV
+    newResult$rIV[j]<-res$rIV
+    newResult$pIV[j]<-res$pIV
+    newResult$roIV[j]<-res$roIV
+    newResult$poIV[j]<-res$poIV
+    newResult$nval[j]<-res$nval
+    newResult$df1[j]<-res$df1
+    if (!is.null(hypothesis$IV2)) {
+      newResult$rIV2[j]<-res$rIV2
+      newResult$pIV2[j]<-res$pIV2
+      newResult$rIVIV2DV[j]<-res$rIVIV2DV
+      newResult$pIVIV2DV[j]<-res$pIVIV2DV
+      
+      newResult$r$direct[j,]<-res$r$direct
+      newResult$r$unique[j,]<-res$r$unique
+      newResult$r$total[j,]<-res$r$total
+      newResult$p$direct[j,]<-res$p$direct
+      newResult$p$unique[j,]<-res$p$unique
+      newResult$p$total[j,]<-res$p$total
     }
   }
-  mainResult$showType<-evidence$showType
-  mainResult$effect<-effect
-  mainResult$design<-design
-  mainResult$evidence<-evidence
-  
-  mainResult
+
+  newResult$effect<-effect
+  newResult$design<-design
+  newResult$evidence<-evidence
+  newResult
 }
 
 convert2Interval<-function(var) {
@@ -919,7 +854,6 @@ analyseSample<-function(hypothesis,design,evidence,result){
   
   # result$ResultHistory<-ResultHistory
   
-  result$showType<-evidence$showType
   result$Heteroscedasticity<-0
   result
   
@@ -934,10 +868,10 @@ runSimulation<-function(hypothesis,design,evidence,sig_only=FALSE,onlyAnalysis=F
   ntrials<-0
   p_min<-1
   while (1==1) {
-    if (!shortHand) {
+    if (!evidence$shortHand) {
       # sample<-makeSample(IV,IV2,DV,effect,design)
       # res<-analyseSample(IV,IV2,DV,effect,design,evidence,sample)
-      res<-getSample(hypothesis,design)
+      res<-getSample(hypothesis,design,evidence)
     } else {
       res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
     }
@@ -960,10 +894,10 @@ runSimulation<-function(hypothesis,design,evidence,sig_only=FALSE,onlyAnalysis=F
   
   # sig only
   while (sig_only && !isSignificant(STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
-    if (!shortHand) {
+    if (!evidence$shortHand) {
       # sample<-makeSample(IV,IV2,DV,effect,design)
       # res<-analyseSample(IV,IV2,DV,effect,design,evidence,sample)
-      res<-getSample(hypothesis,design)
+      res<-getSample(hypothesis,design,evidence)
     } else {
       res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
     }
@@ -981,8 +915,8 @@ runSimulation<-function(hypothesis,design,evidence,sig_only=FALSE,onlyAnalysis=F
   
 }
 
-getSample<-function(hypothesis,design) {
-  if (!shortHand) {
+getSample<-function(hypothesis,design,evidence) {
+  if (!evidence$shortHand) {
     sample<-makeSample(hypothesis,design)
     res<-analyseSample(hypothesis,design,evidence,sample)
   } else {

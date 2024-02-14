@@ -3,7 +3,6 @@ outlierValue=4
 dependenceVal=0.1
 clusterVal=0.25
 hsyConstant=1
-make_debug=FALSE
 
 
 makeSampleVals<-function(n,mn,sdv,MV,distr="normal"){
@@ -479,8 +478,6 @@ makeSample<-function(hypothesis,design){
                  }
                }
         )
-        
-        if (make_debug) {print(cor(ivr,iv2r))}
       } else {
         rho2<-0
         rho12<-0
