@@ -1,4 +1,4 @@
-showSample<-function(result){
+showSample<-function(result=makeSample()){
   IV<-result$IV
   IV2<-result$IV2
   DV<-result$DV

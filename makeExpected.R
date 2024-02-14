@@ -68,7 +68,7 @@ resetExpected<-function(nsims=0,expectedResult=NULL){
 }
 
 
-makeExpected <- function(nsims,hypothesis,design,evidence,expectedResult=NULL) {
+makeExpected <- function(nsims,hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),expectedResult=NULL) {
   
   expectedResult<-c(list(hypothesis=hypothesis,
                          design=design,
@@ -83,13 +83,13 @@ makeExpected <- function(nsims,hypothesis,design,evidence,expectedResult=NULL) {
   if (ns>0) {
     for (ci in 1:n_cycles) {
       newCount<-expectedResult$count+ns
-      expectedResult$result<-multipleAnalysis(hypothesis,ns,expectedResult$result,sigOnly=evidence$sigOnly)
+      expectedResult$result<-multipleAnalysis(ns,hypothesis,design,evidence,expectedResult$result)
       expectedResult$count<-newCount
     }
   }
   
     # wind up
-    if (effect$world$worldOn && is.element(expected$type,c("NHSTErrors","FDR"))){
+    if (hypothesis$effect$world$worldOn && is.element(expected$type,c("NHSTErrors","FDR"))){
       nulls<-expectedResult$result$rpIV==0
       expectedResult$nullresult$rpIV<-expectedResult$result$rpIV[nulls]
       expectedResult$nullresult$roIV<-expectedResult$result$roIV[nulls]

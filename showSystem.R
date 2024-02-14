@@ -4,7 +4,7 @@
 # population diagram
 # prediction diagram
 
-showHypothesis<-function(hypothesis) {
+showHypothesis<-function(hypothesis=makeHypothesis()) {
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV
@@ -40,7 +40,7 @@ showHypothesis<-function(hypothesis) {
   g
 }
 
-showWorld<-function(world) {
+showWorld<-function(world=makeWorld()) {
 # world diagram
 
   PlotNULL<-ggplot()+plotBlankTheme+theme(plot.margin=margin(0,-0.1,0,0,"cm"))+
@@ -78,7 +78,7 @@ showWorld<-function(world) {
   g
 }
 
-showDesign<-function(design) {
+showDesign<-function(design=makeDesign()) {
   if (design$sNRand) {
     nbin<-seq(minN,maxRandN*design$sN,length.out=worldNPoints)
     # nbin<-5+seq(0,qgamma(0.99,shape=design$sNRandK,scale=(design$sN-5)/design$sNRandK),length.out=101)
@@ -103,7 +103,7 @@ showDesign<-function(design) {
 }
 
 # population diagram
-showPopulation <- function(hypothesis) {
+showPopulation <- function(hypothesis=makeHypothesis()) {
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV
@@ -133,7 +133,7 @@ showPopulation <- function(hypothesis) {
 }
 
 # prediction diagram
-showPrediction <- function(hypothesis,design){
+showPrediction <- function(hypothesis=makeHypothesis(),design=makeDesign()){
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV

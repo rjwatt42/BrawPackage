@@ -302,7 +302,7 @@ plotCatDescription<-function(result,g) {
   g
 }
 
-showDescription<-function(result) {
+showDescription<-function(result=analyseSample()) {
 
   g<-ggplot()
   if (is.null(result$IV2)){

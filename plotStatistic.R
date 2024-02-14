@@ -854,7 +854,7 @@ r_plot<-function(result,expType="r",logScale=FALSE,otherresult=NULL,orientation=
       g<-expected_plot(g,pts,expType,result,IV,DV,i,orientation=orientation)
     
     if (is.element(expType,c("p","e1","e2","e1d","e2d"))) {
-      if (effect$world$worldOn && is.element(expType,c("e1","e2","e1d","e2d"))) {
+      if (result$effect$world$worldOn && is.element(expType,c("e1","e2","e1d","e2d"))) {
         n<-length(pvals)
         if (!is.null(otherresult)) n<-n+length(otherresult$pIV)
         switch (expType,

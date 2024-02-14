@@ -280,7 +280,7 @@ appendList <- function (x1, x2)
   x1
 }
 
-multipleAnalysis<-function(hypothesis,n_sims=1,newResult=c(),sigOnly=FALSE){
+multipleAnalysis<-function(n_sims=1,hypothesis,design,evidence,newResult=c()){
   
   rho<-hypothesis$effect$rIV
   rho2<-hypothesis$effect$rIV2
@@ -293,9 +293,9 @@ multipleAnalysis<-function(hypothesis,n_sims=1,newResult=c(),sigOnly=FALSE){
   offset<-sum(!is.na(newResult$rIV))
   for (i in 1:n_sims){
     hypothesis$effect$rIV<-rho[i]
-    if (!is.null(hypothesis$IV2)) {effect$rIV2<-rho2[i]}
+    if (!is.null(hypothesis$IV2)) {hypothesis$effect$rIV2<-rho2[i]}
     
-    res<-runSimulation(hypothesis,design,evidence,sigOnly)
+    res<-runSimulation(hypothesis,design,evidence,evidence$sigOnly)
     
     if (is.na(res$rIV)) {
       res$rIV<-0
@@ -325,7 +325,7 @@ multipleAnalysis<-function(hypothesis,n_sims=1,newResult=c(),sigOnly=FALSE){
     }
   }
 
-  newResult$effect<-effect
+  newResult$effect<-hypothesis$effect
   newResult$design<-design
   newResult$evidence<-evidence
   newResult
@@ -510,11 +510,12 @@ generalAnalysis<-function(allData,InteractionOn,withins,ssqType="Type3",caseOrde
   ))
 }
 
-analyseSample<-function(hypothesis,design,evidence,result){
+analyseSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),sample=makeSample()){
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV
   effect<-hypothesis$effect
+  result<-sample
   
   switch (evidence$Transform,
           "Log"={allData<-data.frame(result$participant,log(result$dv))},

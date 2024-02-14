@@ -116,9 +116,9 @@ makeVariable<-function(name,type="Interval",
   var
 }
 
-getVariables<-function() {
+getVariable<-function(name) {
   
-defaultVars<-list(
+defaultVars<-rbind(
   makeVariable(name="IV",type="Interval",mu=0,sd=1,ncats=2,cases="C1,C2"),
   makeVariable(name="IV2",type="Interval",mu=0,sd=1,ncats=2,cases="D1,D2"),
   makeVariable(name="DV",type="Interval",mu=0,sd=1,ncats=2,cases="E1,E2"),
@@ -142,26 +142,12 @@ defaultVars<-list(
   makeVariable(name="BirthOrder",type="Categorical",ncats=4,cases="first,middle,last,only",proportions="1,0.4,0.6,0.2")
 )
 
-variablesLocal<-data.frame(defaultVars[[1]])
-for (i in 2:length(defaultVars)){
-  variablesLocal<-rbind(variablesLocal,defaultVars[[i]])
-}
-if (switches$startBlank) {
-  variablesLocal[1,]$type="empty"
-  variablesLocal[3,]$type="empty"
-}
-variables<<-variablesLocal
+variablesLocal<-matrix(defaultVars,nrow=18)
 
-defaultVariables<<-variables
-variablesHeld<<-"Simulations"
-
-
-emptyVariable<<-makeVariable(name="none")
-
-# make basic variables    
-IV<<-variables[1,]
-IV2<<-emptyVariable
-DV<<-variables[3,]
-MV<<-IV
+use<-which(variablesLocal[,1]==name)
+if (isempty(use)) return(NULL)
+theVariable<-variablesLocal[use,]
+names(theVariable)<-names(makeVariable(" "))
+return(theVariable)
 }
 

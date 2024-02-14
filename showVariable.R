@@ -111,7 +111,7 @@ drawInterval<-function(var){
     coord_cartesian(xlim = xlim, ylim = c(0, 1.2))
 }
 
-showVariable<-function(var){
+showVariable<-function(var=makeVariable()){
   switch(var$type,
          "Interval"={drawInterval(var)},
          "Ordinal"={drawOrdinal(var)},

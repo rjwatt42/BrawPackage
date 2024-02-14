@@ -3,20 +3,13 @@
 # source("https://github.com/rjwatt42/BrawStats/raw/main/packages.R")
 # suppressPackageStartupMessages
 
-list.of.packages<-c("shiny","shinyWidgets","shinyjs","shinyBS",
-                    "ggplot2","tidyr","tools",
+list.of.packages<-c("ggplot2","tidyr","tools",
                     "mnormt","lme4","MuMIn",
                     "readxl","writexl","car","stringi","stringr","clipr","SuppDists","e1071","pracma",
-                    "htmlwidgets","NlcOptim"
+                    "NlcOptim"
 )
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)>0) install.packages(new.packages,repos="http://cran.fhcrc.org")
-
-library(shiny)
-library(shinyWidgets)
-library(shinyjs)     # hide/show/enable/disable elements
-library(shinyBS)     # bsModal()
-library(htmlwidgets) # for window size
 
 library(ggplot2)
 library(tidyr)
