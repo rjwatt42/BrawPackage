@@ -22,7 +22,7 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
            )
     while (!isSignificant(BrawOpts$STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence) && ntrials<limit) {
       sample<-makeSample(hypothesis,design)
-      result<-makeAnalysis(hypothesis,design,evidence,sample)
+      result<-makeAnalysis(evidence,sample)
       switch(design$sCheatingLimit,
              "Fixed"={ntrials<-ntrials+1},
              "Budget"={ntrials<-ntrials+result$nval}
@@ -53,7 +53,7 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
         sample1$iv<-sample1$iv[use]
         sample1$dv<-sample1$dv[use]
         design$sN<-length(sample1$iv)
-        result1<-makeAnalysis(hypothesis,design,evidence,sample1)
+        result1<-makeAnalysis(evidence,sample1)
         ps<-c(ps,result1$pIV)
       }
       switch(design$sCheating,
@@ -72,7 +72,7 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
                sample$dvplot[change]<-sample2$dvplot[ntrials+1]
              }
       )
-      result<-makeAnalysis(hypothesis,design,evidence,sample)
+      result<-makeAnalysis(evidence,sample)
       ntrials<-ntrials+1
     }
     return(result)
@@ -88,7 +88,7 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
       sample$dvplot<-c(sample$dvplot,sample2$dvplot[ntrials+(1:changeAmount)])
       design$sN<-design$sN+(1:changeAmount)
       
-      result<-makeAnalysis(hypothesis,design,evidence,sample)
+      result<-makeAnalysis(evidence,sample)
       ntrials<-ntrials+changeAmount
     }
     return(result)
@@ -107,11 +107,11 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
         sample1$iv<-sample1$iv[use]
         sample1$dv<-sample1$dv[use]
 
-        result1<-makeAnalysis(hypothesis,design,evidence,sample1)
+        result1<-makeAnalysis(evidence,sample1)
         ps<-c(ps,result1$pIV)
       }
       
-      result<-makeAnalysis(hypothesis,design,evidence,sample)
+      result<-makeAnalysis(evidence,sample)
       ntrials<-ntrials+1
     }
     return(result)
@@ -131,7 +131,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
     while (replication$sReplSigOnly=="Yes" && !isSignificant(BrawOpts$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
       if (!evidence$shortHand) {
         sample<-makeSample(hypothesis,design)
-        res<-makeAnalysis(hypothesis,design,evidence,sample)
+        res<-makeAnalysis(evidence,sample)
       } else {
         res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
       }
@@ -176,7 +176,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
 
       if (!evidence$shortHand) {
         sample<-makeSample(hypothesis,design1)
-        res<-makeAnalysis(hypothesis,design1,evidence,sample)
+        res<-makeAnalysis(evidence,sample)
       } else {
         res<-sampleShortCut(hypothesis,design1,evidence,1,FALSE)
       }

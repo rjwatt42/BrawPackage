@@ -14,7 +14,7 @@ getDesign(name,...)
 makeEvidence()
 
 makeSample(hypothesis,design)
-makeAnalysis(hypothesis,design,evidence,sample)
+makeAnalysis(evidence,sample)
 
 showSample(sample)
 reportSample(sample)

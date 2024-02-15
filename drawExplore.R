@@ -23,26 +23,35 @@ drawNHSTLabel<-function(lb1,lb1xy,xoff,col1) {
   }
   if (sum(col2rgb(col1))>128*3) col<-"black" else col<-"white"
   geom_label(data=lb1xy,aes(x=x+xoff,y=y),label=lb1,
-             hjust=-0.2,vjust=0.5,size=labelSize,colour=col,fill=col1,parse=mathlabel)
+             hjust=-0.2,vjust=0.5,size=BrawOpts$labelSize,colour=col,fill=col1,parse=mathlabel)
 }
 
-drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
-  oldAlpha<-alphaSig
+drawExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE,
+                      Explore_whichShow="All",Explore_typeShow="All",
+                      ExploreFull_ylim=TRUE,ExploreAny_ylim=FALSE){
+  explore<-exploreResult$explore
+  hypothesis<-explore$hypothesis
+  effect<-hypothesis$effect
+  evidence<-explore$evidence
   
-  vals<-exploreResult$result$vals
-  if (is.character(vals[1]) || is.element(explore$Explore_type,c("IVcats","IVlevels","DVcats","DVlevels","Repeats","sig_only"))){
+  result<-exploreResult$result
+  
+  oldAlpha<-BrawOpts$alphaSig
+  
+  vals<-exploreResult$vals
+  if (is.character(vals[1]) || is.element(explore$type,c("IVcats","IVlevels","DVcats","DVlevels","Repeats","sig_only"))){
     if (is.character(vals[1]))  vals<-((1:length(vals))-1)/(length(vals)-1)
     doLine=FALSE
   } else {doLine=TRUE}
   
-  if (explore$Explore_type=="pNull" && pPlus) vals<-1-vals
+  if (explore$type=="pNull" && pPlus) vals<-1-vals
   
   g<-ggplot()
   ybreaks=c()
   ylabels=c()
   secondY<-NULL
   ylim<-c()
-  switch (explore$Explore_show,
+  switch (Explore_show,
           "EffectSize"={
             ylim<-c(-1,1)
             ylabel<-bquote(bold(r['s']))
@@ -96,7 +105,7 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
           "p(sig)"={
             doBudget<-FALSE
             ylabel<-pSigLabel
-            if (explore$Explore_ylog) {
+            if (Explore_ylog) {
               ylim<-c(0.001,1)
             } else {
               ylim<-c(0,1)
@@ -105,11 +114,11 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
           "n(sig)"={
             doBudget<-1
             ylabel<-bquote(bold(n[.('sig')]))
-            explore$Explore_show<-"p(sig)"
+            Explore_show<-"p(sig)"
             ylim<-c(0,100)
           },
           "FDR"={
-            if (explore$Explore_ylog) {
+            if (Explore_ylog) {
               ylim<-c(0.001,1)
             } else {
               ylim<-c(0,1)
@@ -123,14 +132,14 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
             } else {
               ylabel<-"Type I"
               secondY<-"Type II"
-              g<-g+theme(axis.title.y.left = element_text(color=plotcolours$infer_sigNull),axis.title.y.right = element_text(color=plotcolours$infer_nsNonNull))
+              g<-g+theme(axis.title.y.left = element_text(color=BrawOpts$plotColours$infer_sigNull),axis.title.y.right = element_text(color=plotColours$infer_nsNonNull))
             }
           },
           "FDR;FMR"={
             ylim<-c(0,1)
             ylabel<-"False Discovery"
             secondY<-"False Miss"
-              g<-g+theme(axis.title.y.left = element_text(color=plotcolours$fdr),axis.title.y.right = element_text(color=plotcolours$fmr))
+              g<-g+theme(axis.title.y.left = element_text(color=BrawOpts$plotColours$fdr),axis.title.y.right = element_text(color=plotColours$fmr))
           },
           "log(lrs)"={
             ylim<-c(-0.1,10)
@@ -165,7 +174,7 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
             ylabel<-"p(PDF)"
           },
           "S"={
-            ylim<-c(min(exploreResult$result$Ss),max(exploreResult$result$Ss))
+            ylim<-c(min(result$Ss),max(result$Ss))
             ylabel<-"S"
           },
           "mean(IV)"={ylabel<-"mean(IV)"},
@@ -178,8 +187,8 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
           "kurtosis(DV)"={ylabel<-"kurtosis(DV)"}
   )
 
-  if (!is.null(IV2) && is.element(explore$Explore_show,c("EffectSize","EffectSizeA","p","w","p(sig)"))) {
-    switch (explore$Explore_show,
+  if (!is.null(hypothesis$IV2) && is.element(Explore_show,c("EffectSize","EffectSizeA","p","w","p(sig)"))) {
+    switch (Explore_show,
             "EffectSize"={use_cols<<-c(hsv(0.1,1,1),hsv(0.1+0.075,1,1),hsv(0.1+0.15,1,1))},
             "EffectSizeA"={use_cols<<-c(hsv(0.1,1,1),hsv(0.1+0.075,1,1),hsv(0.1+0.15,1,1))},
             "p"=         {use_cols<-c(hsv(0,1,1),hsv(0+0.075,1,1),hsv(0+0.15,1,1))},
@@ -188,7 +197,7 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
     )
     names(use_cols)<-c("direct","unique","total")
     all_cols<<-use_cols
-    g<-g+scale_fill_manual(name=explore$Explore_whichShow,values=all_cols)
+    g<-g+scale_fill_manual(name=Explore_whichShow,values=all_cols)
     use_col_names<-TRUE
   } else {
     all_cols<-c()
@@ -199,20 +208,22 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
   ni_max1<-1
   ni_max2<-1
   multi="none"
-  if (explore$Explore_typeShow=="all") { # all of direct/unique/total
-    markersize<-4
-    ni_max1<-3
-    multi<-"allTypes"
-  } 
-  if (explore$Explore_whichShow=="All") { # all of main1 main2 interaction
-    markersize<-4
-    ni_max2<-3
-    multi<-"allEffects"
-  } else {
-    if (explore$Explore_whichShow=="Mains") { 
-      markersize<-6
-      ni_max2<-2
-      multi<-"mainEffects"
+  if (!is.null(hypothesis$IV2)) {
+    if (Explore_typeShow=="All") { # all of direct/unique/total
+      markersize<-4
+      ni_max1<-3
+      multi<-"allTypes"
+    } 
+    if (Explore_whichShow=="All") { # all of main1 main2 interaction
+      markersize<-4
+      ni_max2<-3
+      multi<-"allEffects"
+    } else {
+      if (Explore_whichShow=="Mains") { 
+        markersize<-6
+        ni_max2<-2
+        multi<-"mainEffects"
+      }
     }
   }
   
@@ -220,56 +231,55 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
     for (ni2 in 1:ni_max2){
       if (ni_max1>1) {
       switch (ni1,
-            {explore$Explore_typeShow<-"direct"},
-            {explore$Explore_typeShow<-"unique"},
-            {explore$Explore_typeShow<-"total"})
+            {Explore_typeShow<-"direct"},
+            {Explore_typeShow<-"unique"},
+            {Explore_typeShow<-"total"})
       } 
       if (ni_max2>1) {
       switch (ni2,
-              {explore$Explore_whichShow<-"Main 1"},
-              {explore$Explore_whichShow<-"Main 2"},
-              {explore$Explore_whichShow<-"Interaction"})
+              {Explore_whichShow<-"Main 1"},
+              {Explore_whichShow<-"Main 2"},
+              {Explore_whichShow<-"Interaction"})
       }
 
     extra_y_label<-""
-    if (is.null(IV2)){
-      rVals<-exploreResult$result$rIVs
-      pVals<-exploreResult$result$pIVs
+    if (is.null(hypothesis$IV2)){
+      rVals<-result$rval
+      pVals<-result$pval
     } else {
-      switch (explore$Explore_whichShow,
+      switch (Explore_whichShow,
               "Main 1"={
-                rVals<-exploreResult$result$r1[[explore$Explore_typeShow]]
-                pVals<-exploreResult$result$p1[[explore$Explore_typeShow]]
-                extra_y_label<-paste("Main Effect 1:",explore$Explore_typeShow)
+                rVals<-result$r1[[Explore_typeShow]]
+                pVals<-result$p1[[Explore_typeShow]]
+                extra_y_label<-paste("Main Effect 1:",Explore_typeShow)
               },
               "Main 2"={
-                rVals<-exploreResult$result$r2[[explore$Explore_typeShow]]
-                pVals<-exploreResult$result$p2[[explore$Explore_typeShow]]
-                extra_y_label<-paste("Main Effect 2:",explore$Explore_typeShow)
+                rVals<-result$r2[[Explore_typeShow]]
+                pVals<-result$p2[[Explore_typeShow]]
+                extra_y_label<-paste("Main Effect 2:",Explore_typeShow)
               },
               "Interaction"={
-                rVals<-exploreResult$result$r3[[explore$Explore_typeShow]]
-                pVals<-exploreResult$result$p3[[explore$Explore_typeShow]]
-                extra_y_label<-paste("Interaction:",explore$Explore_typeShow)
+                rVals<-result$r3[[Explore_typeShow]]
+                pVals<-result$p3[[Explore_typeShow]]
+                extra_y_label<-paste("Interaction:",Explore_typeShow)
               }
       )
     }
-    rpVals<-exploreResult$result$rpIVs
-    raVals<-exploreResult$result$raIVs
-    nVals<-exploreResult$result$nvals
-    df1Vals<-exploreResult$result$df1vals
+    rpVals<-result$rpval
+    nVals<-result$nval
+    df1Vals<-result$df1
     
-    switch (explore$Explore_show,
+    switch (Explore_show,
             "EffectSize"={
               showVals<-rVals
               if (RZ=="z") {showVals<-atanh(rVals)}
-              if (is.null(IV2)){
+              if (is.null(hypothesis$IV2)){
                 col<-"yellow"
                 colFill<-col
                 lines<-c(0,effect$rIV)
                 if (RZ=="z") {lines<-c(0,atanh(effect$rIV))}
               } else {
-                switch (explore$Explore_whichShow,
+                switch (Explore_whichShow,
                         "Main 1"={
                           lines<-c(0,effect$rIV)
                           if (RZ=="z") {lines<-c(0,atanh(effect$rIV))}
@@ -283,14 +293,14 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
                           if (RZ=="z") {lines<-c(0,atanh(effect$rIVIV2DV))}
                         }
                 )
-                col<-all_cols[[explore$Explore_typeShow]]
-                colFill<-names(all_cols[explore$Explore_typeShow])
+                col<-all_cols[[Explore_typeShow]]
+                colFill<-names(all_cols[Explore_typeShow])
               }
             },
             "EffectSizeA"={
               showVals<-raVals
               if (RZ=="z") {showVals<-atanh(raVals)}
-              if (is.null(IV2)){
+              if (is.null(hypothesis$IV2)){
                 col<-"yellow"
                 colFill<-col
                 lines<-c(0,effect$rIV)
@@ -310,8 +320,8 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
                           if (RZ=="z") {lines<-c(0,atanh(effect$rIVIV2DV))}
                         }
                 )
-                col<-all_cols[[explore$Explore_typeShow]]
-                colFill<-names(all_cols[explore$Explore_typeShow])
+                col<-all_cols[[Explore_typeShow]]
+                colFill<-names(all_cols[Explore_typeShow])
               }
             },
             "p"={
@@ -321,95 +331,95 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
                 showVals<-log10(showVals)
                 lines<-log10(lines)
               }
-              if (is.null(IV2)){
+              if (is.null(hypothesis$IV2)){
                 col<-"red"
                 colFill<-col
               } else {
-                col<-all_cols[[explore$Explore_typeShow]]
-                colFill<-names(all_cols[explore$Explore_typeShow])
+                col<-all_cols[[Explore_typeShow]]
+                colFill<-names(all_cols[Explore_typeShow])
               }
             },
             "t"={
-              showVals<-exploreResult$result$tvals
+              showVals<-result$tval
               lines<-c()
-              if (is.null(IV2)){
+              if (is.null(hypothesis$IV2)){
                 col<-"orange"
                 colFill<-col
               } else {
-                col<-all_cols[[explore$Explore_typeShow]]
-                colFill<-names(all_cols[explore$Explore_typeShow])
+                col<-all_cols[[Explore_typeShow]]
+                colFill<-names(all_cols[Explore_typeShow])
               }
             },
             "w"={
-              showVals<-rn2w(rVals,exploreResult$result$nvals)
+              showVals<-rn2w(rVals,result$nval)
               lines<-c(0.05,0.8)
               if (wPlotScale=="log10"){
                 showVals<-log10(showVals)
                 lines<-log10(lines)
               }
-              if (is.null(IV2)){
+              if (is.null(hypothesis$IV2)){
                 col<-"blue"
                 colFill<-col
               } else {
-                col<-all_cols[[explore$Explore_typeShow]]
-                colFill<-names(all_cols[explore$Explore_typeShow])
+                col<-all_cols[[Explore_typeShow]]
+                colFill<-names(all_cols[Explore_typeShow])
               }
             },
             "SampleSize"={
-              showVals<-exploreResult$result$nvals
+              showVals<-result$nval
               lines<-c(design$sN)
-              if (is.null(IV2)){
+              if (is.null(hypothesis$IV2)){
                 col<-"blue"
                 colFill<-col
               } else {
-                col<-all_cols[[explore$Explore_typeShow]]
-                colFill<-names(all_cols[explore$Explore_typeShow])
+                col<-all_cols[[Explore_typeShow]]
+                colFill<-names(all_cols[Explore_typeShow])
               }
             },
             "likelihood"={
-              showVals<-exploreResult$result$likes
+              showVals<-result$likes
               
               lines<-c()
               col<-"white"
               colFill<-col
             },
             "log(lrs)"={
-              ns<-exploreResult$result$nvals
-              df1<-exploreResult$result$df1
-              showVals<-r2llr(rVals,ns,df1,"sLLR",exploreResult$evidence$llr,exploreResult$evidence$prior)
+              ns<-result$nval
+              df1<-result$df1
+              showVals<-r2llr(rVals,ns,df1,"sLLR",evidence$llr,evidence$prior)
               
               lines<-c()
-              if (is.null(IV2)){
+              if (is.null(hypothesis$IV2)){
                 col<-"yellow"
                 colFill<-col
               } else {
-                col<-all_cols[[explore$Explore_typeShow]]
-                colFill<-names(all_cols[explore$Explore_typeShow])
+                col<-all_cols[[Explore_typeShow]]
+                colFill<-names(all_cols[Explore_typeShow])
               }
             },
             "log(lrd)"={
-              ns<-exploreResult$result$nvals
-              df1<-exploreResult$result$df1
-              showVals<-r2llr(rVals,ns,df1,"dLLR",exploreResult$evidence$llr,exploreResult$evidence$prior)
+              ns<-result$nval
+              df1<-result$df1
+              showVals<-r2llr(rVals,ns,df1,"dLLR",evidence$llr,evidence$prior)
               
               lines<-c()
-              if (is.null(IV2)){
+              if (is.null(hypothesis$IV2)){
                 col<-"yellow"
                 colFill<-col
               } else {
-                col<-all_cols[[explore$Explore_typeShow]]
-                colFill<-names(all_cols[explore$Explore_typeShow])
+                col<-all_cols[[Explore_typeShow]]
+                colFill<-names(all_cols[Explore_typeShow])
               }
             },
             "k"={
-              showVals<-exploreResult$result$ks
+              showVals<-result$k
               
               lines<-c()
               col<-"white"
               colFill<-col
             },
             "pNull"={
-              showVals<-exploreResult$result$pnulls
+              showVals<-result$pnull
               if (pPlus) showVals<-1-showVals
               
               lines<-c()
@@ -417,35 +427,35 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
               colFill<-col
             },
             "S"={
-              showVals<-exploreResult$result$Ss
+              showVals<-result$S
               
               lines<-c()
               col<-"white"
               colFill<-col
             },
             "mean(DV)"={
-              showVals<-exploreResult$result$dvMean
+              showVals<-result$dvMean
               
               lines<-c()
               col<-"yellow"
               colFill<-col
             },
             "sd(DV)"={
-              showVals<-exploreResult$result$dvSD
+              showVals<-result$dvSD
               
               lines<-c()
               col<-"yellow"
               colFill<-col
             },
             "skew(DV)"={
-              showVals<-exploreResult$result$dvSkew
+              showVals<-result$dvSkew
               
               lines<-c()
               col<-"yellow"
               colFill<-col
             },
             "kurtosis(DV)"={
-              showVals<-exploreResult$result$dvKurtosis
+              showVals<-result$dvKurtosis
               
               lines<-c()
               col<-"yellow"
@@ -455,15 +465,15 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
             
             
             "p(sig)"={
-              if (explore$Explore_type=="Alpha") {
-                alphaSig<-exploreResult$result$vals
+              if (explore$type=="Alpha") {
+                BrawOpts$alphaSig<-exploreResult$vals
               }
               if (doBudget) {
                 getStat<-function(x,n) {colMeans(x)*max(n)/colMeans(n)}
               } else {
                 getStat<-function(x,n) {colMeans(x)}
               }
-              ps<-isSignificant(STMethod,pVals,rVals,nVals,df1Vals,exploreResult$evidence,alphaSig)
+              ps<-isSignificant(STMethod,pVals,rVals,nVals,df1Vals,evidence,BrawOpts$alphaSig)
               ps_mn<-getStat(abs(ps),nVals)
               ps1<-colMeans(abs(ps))
               p_se<-sqrt(ps1*(1-ps1)/nrow(pVals))*(ps_mn/ps1)
@@ -475,18 +485,18 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
               y50e<-c()
               y50a<-c()
               lines<-c(0.05,0.8)
-              if (is.null(IV2)){
-                col<-plotcolours$infer_sigC
-                cole<-plotcolours$infer_sigNull
-                cola<-plotcolours$infer_nsNonNull
+              if (is.null(hypothesis$IV2)){
+                col<-BrawOpts$plotColours$infer_sigC
+                cole<-BrawOpts$plotColours$infer_sigNull
+                cola<-BrawOpts$plotColours$infer_nsNonNull
                 colFill<-col
               } else {
-                col<-all_cols[[explore$Explore_typeShow]]
-                colFill<-names(all_cols[explore$Explore_typeShow])
+                col<-all_cols[[Explore_typeShow]]
+                colFill<-names(all_cols[Explore_typeShow])
               }
               
               if (effect$world$worldOn && effect$world$populationNullp>0) {
-                g<-g+scale_fill_manual(name="outcome",values=c(plotcolours$psig,plotcolours$infer_sigC,plotcolours$infer_sigNull))
+                g<-g+scale_fill_manual(name="outcome",values=c(BrawOpts$plotColours$psig,BrawOpts$plotColours$infer_sigC,BrawOpts$plotColours$infer_sigNull))
                 col<-"sig"
                 cole<-"sig|Z0"
                 cola<-"sig|Z+"
@@ -511,12 +521,12 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
               }
             },
             "FDR"={
-              if (explore$Explore_type=="Alpha") {
-                alphaSig<-exploreResult$result$vals
+              if (explore$type=="Alpha") {
+                BrawOpts$alphaSig<-exploreResult$vals
               }
               
-              sigs<-isSignificant(STMethod,pVals,rVals,nVals,df1Vals,exploreResult$evidence,alphaSig)
-              nulls<-exploreResult$result$rpIVs==0
+              sigs<-isSignificant(STMethod,pVals,rVals,nVals,df1Vals,evidence,BrawOpts$alphaSig)
+              nulls<-result$rpval==0
               if (STMethod=="NHST") {
                 p1<-colSums(sigs & nulls)/colSums(sigs)
               } else {
@@ -532,16 +542,16 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
               y50[is.na(y50)]<-0
               y50e<-c()
               
-              col<-plotcolours$fdr
+              col<-BrawOpts$plotColours$fdr
               colFill<-col
             },            
             "p(llrs)"={
-              ns<-exploreResult$result$nvals
-              df1<-exploreResult$result$df1
-              if (explore$Explore_type=="Alpha") {
-                alphaSig<-exploreResult$result$vals
+              ns<-result$nval
+              df1<-result$df1
+              if (explore$type=="Alpha") {
+                BrawOpts$alphaSig<-exploreResult$vals
               }
-              p<-mean(isSignificant("sLLR",pvals,rvals,nvals,df1Vals,exploreResult$evidence,alphaSig),na.rm=TRUE)
+              p<-mean(isSignificant("sLLR",pvals,rvals,nvals,df1Vals,evidence,BrawOpts$alphaSig),na.rm=TRUE)
               p_se<-sqrt(p*(1-p)/nrow(pVals))
               y50<-p
               y75<-p+p_se*qnorm(0.75)
@@ -549,21 +559,21 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
               y62<-p+p_se*qnorm(0.625)
               y38<-p+p_se*qnorm(0.375)
               lines<-c(0.05,0.8)
-              if (is.null(IV2)){
+              if (is.null(hypothesis$IV2)){
                 col<-"white"
                 colFill<-col
               } else {
-                col<-all_cols[[explore$Explore_typeShow]]
-                colFill<-names(all_cols[explore$Explore_typeShow])
+                col<-all_cols[[Explore_typeShow]]
+                colFill<-names(all_cols[Explore_typeShow])
               }
             },
             "p(llrd)"={
-              ns<-exploreResult$result$nvals
-              df1<-exploreResult$result$df1
-              if (explore$Explore_type=="Alpha") {
-                alphaSig<-exploreResult$result$vals
+              ns<-result$nval
+              df1<-result$df1
+              if (explore$type=="Alpha") {
+                BrawOpts$alphaSig<-exploreResult$vals
               }
-              p<-mean(isSignificant("dLLR",pvals,rvals,nvals,df1Vals,exploreResult$evidence,alphaSig),na.rm=TRUE)
+              p<-mean(isSignificant("dLLR",pvals,rvals,nvals,df1Vals,evidence,BrawOpts$alphaSig),na.rm=TRUE)
               p_se<-sqrt(p*(1-p)/nrow(pVals))
               y50<-p
               y75<-p+p_se*qnorm(0.75)
@@ -576,16 +586,16 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
                 col<-"white"
                 colFill<-col
               } else {
-                col<-all_cols[[explore$Explore_typeShow]]
-                colFill<-names(all_cols[explore$Explore_typeShow])
+                col<-all_cols[[Explore_typeShow]]
+                colFill<-names(all_cols[Explore_typeShow])
               }
             },
             
             
             
             "NHSTErrors"={
-              if (explore$Explore_type=="Alpha") {
-                alphaSig<-exploreResult$result$vals
+              if (explore$type=="Alpha") {
+                BrawOpts$alphaSig<-exploreResult$vals
               }
               if (!effect$world$worldOn) {
                 pVals<-rbind(pVals,exploreResult$nullresult$pIVs)
@@ -594,7 +604,7 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
                 df1Vals<-rbind(df1Vals,exploreResult$nullresult$df1)
                 rpVals<-rbind(rpVals,exploreResult$nullresult$rpIVs)
               }
-              sigs<-isSignificant(STMethod,pVals,rVals,nVals,df1Vals,exploreResult$evidence,alphaSig)
+              sigs<-isSignificant(STMethod,pVals,rVals,nVals,df1Vals,evidence,BrawOpts$alphaSig)
               nulls<-rpVals==0
               if (STMethod=="NHST") {
                 d<-sigs+1
@@ -611,10 +621,10 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
               lines<-c(0.05)
             },
             "FDR;FMR"={
-              if (explore$Explore_type=="Alpha") {
-                alphaSig<-exploreResult$result$vals
+              if (explore$type=="Alpha") {
+                BrawOpts$alphaSig<-exploreResult$vals
               }
-              sigs<-isSignificant(STMethod,pVals,rVals,nVals,df1Vals,exploreResult$evidence,alphaSig)
+              sigs<-isSignificant(STMethod,pVals,rVals,nVals,df1Vals,evidence,BrawOpts$alphaSig)
               nulls<-rpVals==0
               
               if (STMethod=="NHST") {
@@ -631,12 +641,12 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
               isigNonNulls<-colSums( sigs & d<0 & !nulls)/sumsig 
               isigNulls<-   0 
               sigNulls<-    colSums( sigs & d>0 & nulls)/sumsig
-              nsigNulls<-   colSums(!sigs & abs(d)<alphaSig  &    nulls)/sumnsig
+              nsigNulls<-   colSums(!sigs & abs(d)<BrawOpts$alphaSig  &    nulls)/sumnsig
 
               lines<-c(0.05)
             },      
             "PDF"={
-              showVals<-exploreResult$result$dists
+              showVals<-result$dists
               ySingle<-colMeans(showVals=="Single")
               yGauss<-colMeans(showVals=="Gauss")
               yExp<-colMeans(showVals=="Exp")
@@ -655,16 +665,17 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
             }
     )
     
-    vals_offset<-0
+    valsOffset<-0
     valsRange<-1
+    vals<-exploreResult$vals
     if (vals[1]<0) valsRange<-2
     if (multi=="allEffects" || multi=="mainEffects") {
-      vals_offset<-(ni2-1)*(valsRange*valsGap)
+      valsOffset<-(ni2-1)*(valsRange*valsGap)
     }
     xscale<-FALSE
     xmargin<-1
     
-    if (exploreResult$Explore_type=="EffectSize") {
+    if (explore$type=="EffectSize") {
       if (RZ=="z") {
         vals<-atanh(vals)
         xLabel<-zpLabel
@@ -674,16 +685,16 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
     }
     
     # draw the basic line and point data
-    if (is.element(explore$Explore_show,c("EffectSize","EffectSizeA","p","w","t","likelihood","SampleSize",
+    if (is.element(Explore_show,c("EffectSize","EffectSizeA","p","w","t","likelihood","SampleSize",
                                           "log(lrs)","log(lrd)",
                                           "k","S","pNull",
                                           "mean(DV)","sd(DV)","skew(DV)","kurtosis(DV)"))) {
-      quants<-explore$Explore_quants/2
-      y75<-apply( showVals , 2 , quantile , probs = 0.50+quants , na.rm = TRUE ,names<-FALSE)
-      y62<-apply( showVals , 2 , quantile , probs = 0.50+quants/2 , na.rm = TRUE ,names<-FALSE)
-      y50<-apply( showVals , 2 , quantile , probs = 0.50 , na.rm = TRUE ,names<-FALSE)
-      y38<-apply( showVals , 2 , quantile , probs = 0.50-quants/2 , na.rm = TRUE ,names<-FALSE)
-      y25<-apply( showVals , 2 , quantile , probs = 0.50-quants , na.rm = TRUE ,names<-FALSE)
+      quants<-0.25
+      y75<-apply( showVals , 2 , quantile , probs = 0.50+quants , na.rm = TRUE ,names=FALSE)
+      y62<-apply( showVals , 2 , quantile , probs = 0.50+quants/2 , na.rm = TRUE ,names=FALSE)
+      y50<-apply( showVals , 2 , quantile , probs = 0.50 , na.rm = TRUE ,names=FALSE)
+      y38<-apply( showVals , 2 , quantile , probs = 0.50-quants/2 , na.rm = TRUE ,names=FALSE)
+      y25<-apply( showVals , 2 , quantile , probs = 0.50-quants , na.rm = TRUE ,names=FALSE)
       y75[y75>ylim[2]]<-ylim[2]
       y62[y62>ylim[2]]<-ylim[2]
       y38[y38>ylim[2]]<-ylim[2]
@@ -695,17 +706,17 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
       y25[y25<ylim[1]]<-ylim[1]
       y50[y50<ylim[1]]<-NA
       
-      pts1<-data.frame(vals=vals+vals_offset,y25=y25,y38=y38,y50=y50,y62=y62,y75=y75)
+      pts1<-data.frame(vals=vals+valsOffset,y25=y25,y38=y38,y50=y50,y62=y62,y75=y75)
       if (doLine) {
-        pts1f<-data.frame(x=c(vals,rev(vals))+vals_offset,y=c(y25,rev(y75)))
-        pts2f<-data.frame(x=c(vals,rev(vals))+vals_offset,y=c(y38,rev(y62)))
+        pts1f<-data.frame(x=c(vals,rev(vals))+valsOffset,y=c(y25,rev(y75)))
+        pts2f<-data.frame(x=c(vals,rev(vals))+valsOffset,y=c(y38,rev(y62)))
         if (ni_max2==1 || !no_se_multiple) {
           g<-g+geom_polygon(data=pts1f,aes(x=x,y=y),fill=col,alpha=0.2)
           g<-g+geom_polygon(data=pts2f,aes(x=x,y=y),fill=col,alpha=0.4)
         }
         g<-g+geom_line(data=pts1,aes(x=vals,y=y50),color="black")
       } else{
-        switch(explore$Explore_show,
+        switch(Explore_show,
                "EffectSize"={expType<-"r"},
                "EffectSizeA"={expType<-"ra"},
                "p"={expType<-"p"},
@@ -716,35 +727,35 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
                "log(lrd)"={expType<-"log(lrd)"},
                expType=NULL
                )
-        if (is.element(explore$Explore_show,c("EffectSize","EffectSizeA","p","w","t","SampleSize"))){
-          sigVals<-isSignificant(STMethod,pVals,rVals,nVals,df1Vals,exploreResult$evidence,alphaSig)
+        if (is.element(Explore_show,c("EffectSize","EffectSizeA","p","w","t","SampleSize"))){
+          sigVals<-isSignificant(STMethod,pVals,rVals,nVals,df1Vals,evidence,BrawOpts$alphaSig)
           col<-"white"
         } else {
           sigVals<-!is.na(showVals)
         }
         for (i in 1:length(vals))
           g<-expected_plot(g,
-                           data.frame(x=vals[i]+vals_offset,y1=showVals[,i],y2=sigVals[,i]),
+                           data.frame(x=vals[i]+valsOffset,y1=showVals[,i],y2=sigVals[,i]),
                            expType=expType,scale=2.25/(length(vals)+1),col=col)
         if (ni_max2==1 || !no_se_multiple){
           g<-g+geom_errorbar(data=pts1,aes(x=vals,ymin=y25,ymax=y75,width=0.35/length(vals)))
         }
       }
       if (use_col_names){
-        pts1<-data.frame(x=vals+vals_offset,y=y50,fill=explore$Explore_typeShow)
-        g<-g+geom_point(data=pts1,aes(x=x,y=y,fill=fill),shape=shapes$parameter, colour = "black", size = markersize)
+        pts1<-data.frame(x=vals+valsOffset,y=y50,fill=Explore_typeShow)
+        g<-g+geom_point(data=pts1,aes(x=x,y=y,fill=fill),shape=brawOpts$plotShapes$parameter, colour = "black", size = markersize)
       } else {
-        g<-g+geom_point(data=pts1,aes(x=vals,y=y50),shape=shapes$parameter, colour = "black",fill=col, size = markersize)
+        g<-g+geom_point(data=pts1,aes(x=vals,y=y50),shape=brawOpts$plotShapes$parameter, colour = "black",fill=col, size = markersize)
       }
     } # end of line and point
 
     # p(sig) and FDR
-    if (is.element(explore$Explore_show,c("p(sig)","FDR"))) {
+    if (is.element(Explore_show,c("p(sig)","FDR"))) {
       if (isempty(y50e)) {
-        pts1<-data.frame(vals=vals+vals_offset,y50=y50)
+        pts1<-data.frame(vals=vals+valsOffset,y50=y50)
         if (doLine) {
-          pts1f<-data.frame(x=c(vals,rev(vals))+vals_offset,y=c(y25,rev(y75)))
-          pts2f<-data.frame(x=c(vals,rev(vals))+vals_offset,y=c(y38,rev(y62)))
+          pts1f<-data.frame(x=c(vals,rev(vals))+valsOffset,y=c(y25,rev(y75)))
+          pts2f<-data.frame(x=c(vals,rev(vals))+valsOffset,y=c(y38,rev(y62)))
           if (ni_max2==1 || !no_se_multiple) {
             g<-g+geom_polygon(data=pts1f,aes(x=x,y=y),fill=col,alpha=0.5)
             g<-g+geom_polygon(data=pts2f,aes(x=x,y=y),fill=col,alpha=0.45)
@@ -756,16 +767,16 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
           }
         }
         if (use_col_names){
-          pts1<-data.frame(x=vals+vals_offset,y=y50,fill=explore$Explore_typeShow)
-          g<-g+geom_point(data=pts1,aes(x=x,y=y,fill=fill),shape=shapes$parameter, colour = "black", size = markersize)
+          pts1<-data.frame(x=vals+valsOffset,y=y50,fill=Explore_typeShow)
+          g<-g+geom_point(data=pts1,aes(x=x,y=y,fill=fill),shape=brawOpts$plotShapes$parameter, colour = "black", size = markersize)
         } else {
-          g<-g+geom_point(data=pts1,aes(x=vals,y=y50),shape=shapes$parameter, fill=col,colour = "black",size = markersize)
+          g<-g+geom_point(data=pts1,aes(x=vals,y=y50),shape=brawOpts$plotShapes$parameter, fill=col,colour = "black",size = markersize)
         }
       } else {
-        pts1<-data.frame(vals=vals+vals_offset,y50=y50,fill=col)
+        pts1<-data.frame(vals=vals+valsOffset,y50=y50,fill=col)
         if (doLine) {
-          pts1f<-data.frame(x=c(vals,rev(vals))+vals_offset,y=c(y25,rev(y75)),fill=col)
-          pts2f<-data.frame(x=c(vals,rev(vals))+vals_offset,y=c(y38,rev(y62)),fill=col)
+          pts1f<-data.frame(x=c(vals,rev(vals))+valsOffset,y=c(y25,rev(y75)),fill=col)
+          pts2f<-data.frame(x=c(vals,rev(vals))+valsOffset,y=c(y38,rev(y62)),fill=col)
           if (ni_max2==1 || !no_se_multiple) {
             g<-g+geom_polygon(data=pts1f,aes(x=x,y=y,fill=fill),alpha=0.5)
             g<-g+geom_polygon(data=pts2f,aes(x=x,y=y,fill=fill),alpha=0.45)
@@ -777,16 +788,16 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
           }
         }
         if (use_col_names){
-          pts1<-data.frame(x=vals+vals_offset,y=y50,fill=explore$Explore_typeShow)
-          g<-g+geom_point(data=pts1,aes(x=x,y=y,fill=fill),shape=shapes$parameter, colour = "black", size = markersize)
+          pts1<-data.frame(x=vals+valsOffset,y=y50,fill=Explore_typeShow)
+          g<-g+geom_point(data=pts1,aes(x=x,y=y,fill=fill),shape=brawOpts$plotShapes$parameter, colour = "black", size = markersize)
         } else {
-          g<-g+geom_point(data=pts1,aes(x=vals,y=y50,fill=fill),shape=shapes$parameter, colour = "black",size = markersize)
+          g<-g+geom_point(data=pts1,aes(x=vals,y=y50,fill=fill),shape=brawOpts$plotShapes$parameter, colour = "black",size = markersize)
         }
         if (!isempty(y50e)) {
-          pts1<-data.frame(vals=vals+vals_offset,y50=y50e,fill=cole)
+          pts1<-data.frame(vals=vals+valsOffset,y50=y50e,fill=cole)
           if (doLine) {
-            pts1f<-data.frame(x=c(vals,rev(vals))+vals_offset,y=c(y25e,rev(y75e)),fill=cole)
-            pts2f<-data.frame(x=c(vals,rev(vals))+vals_offset,y=c(y38e,rev(y62e)),fill=cole)
+            pts1f<-data.frame(x=c(vals,rev(vals))+valsOffset,y=c(y25e,rev(y75e)),fill=cole)
+            pts2f<-data.frame(x=c(vals,rev(vals))+valsOffset,y=c(y38e,rev(y62e)),fill=cole)
             if (ni_max2==1 || !no_se_multiple) {
               g<-g+geom_polygon(data=pts1f,aes(x=x,y=y,fill=fill),alpha=0.5)
               g<-g+geom_polygon(data=pts2f,aes(x=x,y=y,fill=fill),alpha=0.45)
@@ -798,17 +809,17 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
             }
           }
           if (use_col_names){
-            pts1<-data.frame(x=vals+vals_offset,y=y50e,fill=explore$Explore_typeShow)
-            g<-g+geom_point(data=pts1,aes(x=x,y=y,fill=fill),shape=shapes$parameter, colour = "black", size = markersize)
+            pts1<-data.frame(x=vals+valsOffset,y=y50e,fill=Explore_typeShow)
+            g<-g+geom_point(data=pts1,aes(x=x,y=y,fill=fill),shape=brawOpts$plotShapes$parameter, colour = "black", size = markersize)
           } else {
-            g<-g+geom_point(data=pts1,aes(x=vals,y=y50,fill=fill),shape=shapes$parameter, colour = "black", size = markersize)
+            g<-g+geom_point(data=pts1,aes(x=vals,y=y50,fill=fill),shape=brawOpts$plotShapes$parameter, colour = "black", size = markersize)
           }
         }
         if (!isempty(y50a)) {
-          pts1<-data.frame(vals=vals+vals_offset,y50=y50a,fill=cola)
+          pts1<-data.frame(vals=vals+valsOffset,y50=y50a,fill=cola)
           if (doLine) {
-            pts1f<-data.frame(x=c(vals,rev(vals))+vals_offset,y=c(y25a,rev(y75a)),fill=cola)
-            pts2f<-data.frame(x=c(vals,rev(vals))+vals_offset,y=c(y38a,rev(y62a)),fill=cola)
+            pts1f<-data.frame(x=c(vals,rev(vals))+valsOffset,y=c(y25a,rev(y75a)),fill=cola)
+            pts2f<-data.frame(x=c(vals,rev(vals))+valsOffset,y=c(y38a,rev(y62a)),fill=cola)
             if (ni_max2==1 || !no_se_multiple) {
               g<-g+geom_polygon(data=pts1f,aes(x=x,y=y,fill=fill),alpha=0.5)
               g<-g+geom_polygon(data=pts2f,aes(x=x,y=y,fill=fill),alpha=0.45)
@@ -820,10 +831,10 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
             }
           }
           if (use_col_names){
-            pts1<-data.frame(x=vals+vals_offset,y=y50a,fill=explore$Explore_typeShow)
-            g<-g+geom_point(data=pts1,aes(x=x,y=y,fill=fill),shape=shapes$parameter, colour = "black", size = markersize)
+            pts1<-data.frame(x=vals+valsOffset,y=y50a,fill=Explore_typeShow)
+            g<-g+geom_point(data=pts1,aes(x=x,y=y,fill=fill),shape=brawOpts$plotShapes$parameter, colour = "black", size = markersize)
           } else {
-            g<-g+geom_point(data=pts1,aes(x=vals,y=y50,fill=fill),shape=shapes$parameter, colour = "black", size = markersize)
+            g<-g+geom_point(data=pts1,aes(x=vals,y=y50,fill=fill),shape=brawOpts$plotShapes$parameter, colour = "black", size = markersize)
           }
         }
         
@@ -832,7 +843,7 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
     }
     
     # now the NHST and FDR filled areas
-    if (explore$Explore_show=="FDR;FMR" || explore$Explore_show=="NHSTErrors") {
+    if (Explore_show=="FDR;FMR" || Explore_show=="NHSTErrors") {
       endI<-length(vals)
       # if (!effect$world$worldOn) {
       #   nsigNonNulls<-nsigNonNulls*2
@@ -843,34 +854,34 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
       #   isigNulls<-0
       # }
       
-      if (explore$Explore_show=="NHSTErrors") {
+      if (Explore_show=="NHSTErrors") {
         ytop<-1-nsigNonNulls*0
         yn<-0.5
         
-        col0<-plotcolours$infer_isigNonNull
+        col0<-BrawOpts$plotColours$infer_isigNonNull
         lb0<-nonNullNegative
         switch (STMethod,
-                "NHST"={col1<-plotcolours$infer_nsNonNull},
-                "sLLR"={col1<-plotcolours$infer_nsNonNull},
-                "dLLR"={col1<-plotcolours$infer_nsdNonNull})
+                "NHST"={col1<-BrawOpts$plotColours$infer_nsNonNull},
+                "sLLR"={col1<-BrawOpts$plotColours$infer_nsNonNull},
+                "dLLR"={col1<-BrawOpts$plotColours$infer_nsdNonNull})
         lb1<-nonNullNS
-        col2<-plotcolours$infer_sigNonNull
+        col2<-BrawOpts$plotColours$infer_sigNonNull
         lb2<-nonNullPositive
-        col3<-plotcolours$infer_isigNull
+        col3<-BrawOpts$plotColours$infer_isigNull
         lb3<-nullNegative
         switch (STMethod,
-                "NHST"={col4<-plotcolours$infer_nsNull},
-                "sLLR"={col4<-plotcolours$infer_nsNull},
-                "dLLR"={col4<-plotcolours$infer_nsdNull})
+                "NHST"={col4<-BrawOpts$plotColours$infer_nsNull},
+                "sLLR"={col4<-BrawOpts$plotColours$infer_nsNull},
+                "dLLR"={col4<-BrawOpts$plotColours$infer_nsdNull})
         lb4<-nullNS
-        col5<-plotcolours$infer_sigNull
+        col5<-BrawOpts$plotColours$infer_sigNull
         lb5<-nullPositive
         
         # error Z+
         if (any(isigNonNulls!=0)) {
           ybottom<-ytop-isigNonNulls
           ybottom[ybottom<0]<-0
-          pts0<-data.frame(x=c(vals,rev(vals))+vals_offset,y=c(ybottom,rev(ytop)))
+          pts0<-data.frame(x=c(vals,rev(vals))+valsOffset,y=c(ybottom,rev(ytop)))
           lb0xy<-data.frame(x=max(vals),y=1-yn/10)
           yn<-yn+1
           ytop<-ybottom
@@ -880,7 +891,7 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
         if (any(nsigNonNulls!=0)) {
           ybottom<-ytop-nsigNonNulls
           ybottom[ybottom<0]<-0
-          pts1<-data.frame(x=c(vals,rev(vals))+vals_offset,y=c(ybottom,rev(ytop)))
+          pts1<-data.frame(x=c(vals,rev(vals))+valsOffset,y=c(ybottom,rev(ytop)))
           lb1xy<-data.frame(x=max(vals),y=1-yn/10)
           yn<-yn+1
           ytop<-ybottom
@@ -890,7 +901,7 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
         if (any(sigNonNulls!=0)) {
           ybottom<-ytop-sigNonNulls
           ybottom[ybottom<0]<-0
-          pts2<-data.frame(x=c(vals,rev(vals))+vals_offset,y=c(ybottom,rev(ytop)))
+          pts2<-data.frame(x=c(vals,rev(vals))+valsOffset,y=c(ybottom,rev(ytop)))
           lb2xy<-data.frame(x=max(vals),y=1-yn/10)
           yn<-yn+1
           ytop<-ybottom
@@ -901,7 +912,7 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
         if (any(isigNulls!=0)) {
           ybottom<-ytop-isigNulls
           ybottom[ybottom<0]<-0
-          pts3<-data.frame(x=c(vals,rev(vals))+vals_offset,y=c(ybottom,rev(ytop)))
+          pts3<-data.frame(x=c(vals,rev(vals))+valsOffset,y=c(ybottom,rev(ytop)))
           lb3xy<-data.frame(x=max(vals),y=0+yn/10)
           yn<-yn-1
           ytop<-ybottom
@@ -911,7 +922,7 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
         if (any(nsigNulls!=0)) {
           ybottom<-ytop-nsigNulls
           ybottom[ybottom<0]<-0
-          pts4<-data.frame(x=c(vals,rev(vals))+vals_offset,y=c(ybottom,rev(ytop)))
+          pts4<-data.frame(x=c(vals,rev(vals))+valsOffset,y=c(ybottom,rev(ytop)))
           lb4xy<-data.frame(x=max(vals),y=0+yn/10)
           yn<-yn-1
           ytop<-ybottom
@@ -921,7 +932,7 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
         if (any(sigNulls!=0)) {
           ybottom<-ytop-sigNulls
           ybottom[ybottom<0]<-0
-          pts5<-data.frame(x=c(vals,rev(vals))+vals_offset,y=c(ybottom,rev(ytop)))
+          pts5<-data.frame(x=c(vals,rev(vals))+valsOffset,y=c(ybottom,rev(ytop)))
           lb5xy<-data.frame(x=max(vals),y=0+yn/10)
           yn<-yn-1
           ytop<-ybottom
@@ -930,34 +941,34 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
         
       } 
       
-      if (explore$Explore_show=="FDR;FMR") {
+      if (Explore_show=="FDR;FMR") {
         pts0<-NULL
-        col0<-plotcolours$fmr
+        col0<-BrawOpts$plotColours$fmr
         # false misses
-        pts1<-data.frame(x=c(vals,rev(vals))+vals_offset,y=1-c(nsigNonNulls,rep(0,endI)))
-        col1<-plotcolours$fmr
+        pts1<-data.frame(x=c(vals,rev(vals))+valsOffset,y=1-c(nsigNonNulls,rep(0,endI)))
+        col1<-BrawOpts$plotColours$fmr
         lb1<-nonNullNS
         lb1xy<-data.frame(x=max(vals),y=0.9)
         
         pts2<-NULL
         
         if (any(nsigNulls!=0)) {
-          pts3<-data.frame(x=c(vals,rev(vals))+vals_offset,y=1-c(nsigNulls+nsigNonNulls,rev(nsigNonNulls)))
-          col3<-plotcolours$infer_nsNUll
+          pts3<-data.frame(x=c(vals,rev(vals))+valsOffset,y=1-c(nsigNulls+nsigNonNulls,rev(nsigNonNulls)))
+          col3<-BrawOpts$plotColours$infer_nsNUll
           lb3<-nullNS
           lb3xy<-data.frame(x=max(vals),y=0.8)
         } else {pts3<-NULL}
         
         # false hits
-        pts5<-data.frame(x=c(vals,rev(vals))+vals_offset,y=c(isigNonNulls,rev(isigNonNulls+sigNulls)))
-        col5<-plotcolours$fdr
+        pts5<-data.frame(x=c(vals,rev(vals))+valsOffset,y=c(isigNonNulls,rev(isigNonNulls+sigNulls)))
+        col5<-BrawOpts$plotColours$fdr
         lb5<-nullPositive
         lb5xy<-data.frame(x=max(vals),y=0.2)
         
         if (any(isigNonNulls!=0)) {
           # non-null errors
-          pts4<-data.frame(x=c(vals,rev(vals))+vals_offset,y=c(isigNonNulls,rep(0,endI)))
-          col4<-plotcolours$infer_isigNonNull
+          pts4<-data.frame(x=c(vals,rev(vals))+valsOffset,y=c(isigNonNulls,rep(0,endI)))
+          col4<-BrawOpts$plotColours$infer_isigNonNull
           lb4<-nonNullNegative
           lb4xy<-data.frame(x=max(vals),y=0.1)
         } else {pts4<-NULL}
@@ -1014,7 +1025,7 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
         }
       }
 
-      if (explore$Explore_show=="NHSTErrors") {
+      if (Explore_show=="NHSTErrors") {
         if (effect$world$worldOn) {
           if (!NHSTasArea || NHSThalfArea) 
             g<-g+geom_hline(yintercept=effect$world$populationNullp,color="black")
@@ -1037,49 +1048,49 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
       xmargin<-2
     }
     
-    if (explore$Explore_show=="PDF") {
+    if (Explore_show=="PDF") {
         y=rep(0,length(ySingle))
         switch(effect$world$populationPDF,
                "Single"={
-                 pts<-data.frame(x=vals+vals_offset,y=ySingle)
-                 pts1<-data.frame(x=c(vals,rev(vals))+vals_offset,y=c(y,rev(y+ySingle)))
-                 pts2<-data.frame(x=c(vals,rev(vals))+vals_offset,y=c(y+ySingle,rev(y+ySingle+yExp)))
+                 pts<-data.frame(x=vals+valsOffset,y=ySingle)
+                 pts1<-data.frame(x=c(vals,rev(vals))+valsOffset,y=c(y,rev(y+ySingle)))
+                 pts2<-data.frame(x=c(vals,rev(vals))+valsOffset,y=c(y+ySingle,rev(y+ySingle+yExp)))
                },
                "Gauss"={
-                 pts<-data.frame(x=vals+vals_offset,y=yGauss)
-                 pts1<-data.frame(x=c(vals,rev(vals))+vals_offset,y=c(y,rev(y+yGauss)))
-                 pts2<-data.frame(x=c(vals,rev(vals))+vals_offset,y=c(y+yGauss,rev(y+yGauss+yExp)))
+                 pts<-data.frame(x=vals+valsOffset,y=yGauss)
+                 pts1<-data.frame(x=c(vals,rev(vals))+valsOffset,y=c(y,rev(y+yGauss)))
+                 pts2<-data.frame(x=c(vals,rev(vals))+valsOffset,y=c(y+yGauss,rev(y+yGauss+yExp)))
                },
                "Exp"={
-                 pts<-data.frame(x=vals+vals_offset,y=yExp)
-                 pts1<-data.frame(x=c(vals,rev(vals))+vals_offset,y=c(y,rev(y+yExp)))
-                 pts2<-data.frame(x=c(vals,rev(vals))+vals_offset,y=c(y+yExp,rev(y+yExp+yGauss)))
+                 pts<-data.frame(x=vals+valsOffset,y=yExp)
+                 pts1<-data.frame(x=c(vals,rev(vals))+valsOffset,y=c(y,rev(y+yExp)))
+                 pts2<-data.frame(x=c(vals,rev(vals))+valsOffset,y=c(y+yExp,rev(y+yExp+yGauss)))
                })
         g<-g+geom_line(data=pts,aes(x=x,y=y),color="black")
-        g<-g+geom_point(data=pts,aes(x=x,y=y),shape=shapes$parameter,fill=plotcolours$sampleC,size = markersize)
+        g<-g+geom_point(data=pts,aes(x=x,y=y),shape=brawOpts$plotShapes$parameter,fill=BrawOpts$plotColours$sampleC,size = markersize)
       }
     }
     
     # effect size vs effect size line
-    if (is.element(explore$Explore_show,c("EffectSize","Interaction")) && is.element(exploreResult$Explore_type,c("EffectSize","EffectSize1","EffectSize2","Interaction"))){
+    if (is.element(Explore_show,c("EffectSize","Interaction")) && is.element(explore$type,c("EffectSize","EffectSize1","EffectSize2","Interaction"))){
       pts3<-data.frame(x=c(-1,1),y=c(-1,1))
       g<-g+geom_line(data=pts3,aes(x=x,y=y),colour="yellow", linetype="dotted")
     }
     
     # find n80
-    if (explore$Explore_show=="p(sig)" && exploreResult$Explore_type=="SampleSize" && effect$world$populationPDF=="Single"){
+    if (Explore_show=="p(sig)" && explore$type=="SampleSize" && effect$world$populationPDF=="Single"){
       w<-y50
-      n<-exploreResult$result$vals
+      n<-exploreResult$vals
       minrw<-function(r,w,n){sum(abs(w-rn2w(r,n)),na.rm=TRUE)}
       r_est<-optimize(minrw,c(0,0.9),w=w,n=n)
       r_est<-r_est$minimum
       nvals<-seq(min(n),max(n),length.out=101)
       yvals<-rn2w(r_est,nvals)
-      ptsn<-data.frame(x=nvals+vals_offset,y=yvals)
+      ptsn<-data.frame(x=nvals+valsOffset,y=yvals)
       g<-g+geom_line(data=ptsn,aes(x=x,y=y),color="white")
       
       minnw<-function(n,r,w){sum(abs(w-rn2w(r,n)),na.rm=TRUE)}
-      n80<-optimize(minnw,c(10,explore$Explore_nRange),w=0.8,r=r_est)
+      n80<-optimize(minnw,c(explore$min_n,explore$max_n),w=0.8,r=r_est)
       
       if (sum(n<n80$minimum)>=2 && sum(n>n80$minimum)>=2){
         label<-paste("n80 =",format(n80$minimum,digits=2))
@@ -1089,21 +1100,21 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
         if (sum(n>n80$minimum)<2) label<-paste("Unsafe result - increase range")
         # label<-paste("Unsafe result","  r_est =", format(r_est,digits=3))
       }
-      if (ni_max2>1){label<-paste(explore$Explore_typeShow,": ",label,sep="")}
-      lpts<-data.frame(x=min(n)+vals_offset,y=0.8+(ni_max2-1)/10,label=label)
-      g<-g+geom_label(data=lpts,aes(x = x, y = y, label = label), hjust=0, vjust=0, fill = "white",size=labelSize)
+      if (ni_max2>1){label<-paste(Explore_typeShow,": ",label,sep="")}
+      lpts<-data.frame(x=min(n)+valsOffset,y=0.8+(ni_max2-1)/10,label=label)
+      g<-g+geom_label(data=lpts,aes(x = x, y = y, label = label), hjust=0, vjust=0, fill = "white",size=BrawOpts$labelSize)
     }
     
     # find r80
-    if (explore$Explore_show=="p(sig)" && exploreResult$Explore_type=="EffectSize"){
+    if (Explore_show=="p(sig)" && explore$type=="EffectSize"){
       w<-y50
-      r<-exploreResult$result$vals
+      r<-exploreResult$vals
       minrw<-function(r,w,n){sum(abs(w-rn2w(r,n)),na.rm=TRUE)}
       n_est<-optimize(minrw,c(0,100),w=w,r=r)
       n_est<-n_est$minimum
       rvals<-seq(min(r),max(r),length.out=101)
       yvals<-rn2w(rvals,n_est)
-      ptsn<-data.frame(x=rvals+vals_offset,y=yvals)
+      ptsn<-data.frame(x=rvals+valsOffset,y=yvals)
       g<-g+geom_line(data=ptsn,aes(x=x,y=y),color="white")
       
       minnw<-function(n,r,w){sum(abs(w-rn2w(r,n)),na.rm=TRUE)}
@@ -1117,9 +1128,9 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
         if (sum(r>n80$minimum)<2) label<-paste("Unsafe result - increase range")
         # label<-paste("Unsafe result","  r_est =", format(r_est,digits=3))
       }
-      if (ni_max2>1){label<-paste(explore$Explore_typeShow,": ",label,sep="")}
-      lpts<-data.frame(x=0+vals_offset,y=0.8+(ni_max2-1)/10,label=label)
-      g<-g+geom_label(data=lpts,aes(x = x, y = y, label = label), hjust=0, vjust=0, fill = "white",size=labelSize)
+      if (ni_max2>1){label<-paste(Explore_typeShow,": ",label,sep="")}
+      lpts<-data.frame(x=0+valsOffset,y=0.8+(ni_max2-1)/10,label=label)
+      g<-g+geom_label(data=lpts,aes(x = x, y = y, label = label), hjust=0, vjust=0, fill = "white",size=BrawOpts$labelSize)
     }
   }
 
@@ -1130,15 +1141,15 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
               {explore$Explore_whichShow<-"Main 2"},
               {explore$Explore_whichShow<-"Interaction"}
               )
-      if (is.character(exploreResult$result$vals[1])) {
-        vals_offset<-(ni2-1)*valsGap+0.5
+      if (is.character(exploreResult$vals[1])) {
+        valsOffset<-(ni2-1)*valsGap+0.5
       } else {
-        vals_offset<-(ni2-1)*valsGap*2 
+        valsOffset<-(ni2-1)*valsGap*2 
       }
-      td<-data.frame(x=vals_offset,y=ylim[2]-diff(ylim)/6,label=explore$Explore_whichShow)
-      g<-g+geom_label(data=td,aes(x=x, y=y, label=label,hjust=0.5),size=labelSize)
+      td<-data.frame(x=valsOffset,y=ylim[2]-diff(ylim)/6,label=explore$Explore_whichShow)
+      g<-g+geom_label(data=td,aes(x=x, y=y, label=label,hjust=0.5),size=BrawOpts$labelSize)
     }
-    if (is.character(exploreResult$result$vals[1])) {
+    if (is.character(exploreResult$vals[1])) {
       g<-g+geom_vline(aes(xintercept=valsGap*c(1,ni_max2-1)-0.5*(valsGap-1)))
     } else {
       g<-g+geom_vline(aes(xintercept=valsGap*c(1,ni_max2)))
@@ -1150,9 +1161,9 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
       tk<-(0:4)/4
       jk<-valsGap
     }
-    if (is.character(exploreResult$result$vals[1])) {
+    if (is.character(exploreResult$vals[1])) {
       tk<-seq(0,1,length.out=length(vals))
-      g<-g+scale_x_continuous(breaks=c(vals,vals+jk,vals+jk*2),labels=c(exploreResult$result$vals,exploreResult$result$vals,exploreResult$result$vals),limits=c(0,1+jk*2)+c(-1,1)*0.25) +
+      g<-g+scale_x_continuous(breaks=c(vals,vals+jk,vals+jk*2),labels=c(exploreResult$vals,exploreResult$vals,exploreResult$vals),limits=c(0,1+jk*2)+c(-1,1)*0.25) +
         theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
     } else {
       g<-g+scale_x_continuous(breaks=c(tk,tk+jk,tk+jk*2),labels=c(tk,tk,tk),limits=c(tk[1],1+jk*2)+c(-1,1)*0.25)
@@ -1160,10 +1171,10 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
     xscale<-TRUE
   } 
   
-  if ((is.element(exploreResult$Explore_type,c("SampleSize","Repeats","CheatingAmount")) &&
-                 explore$Explore_xlog) 
-      || ((exploreResult$Explore_type=="Alpha") && explore$Explore_xlog)
-      || ((exploreResult$Explore_type=="NoStudies") && explore$Explore_Mxlog)) {
+  if ((is.element(explore$type,c("SampleSize","Repeats","CheatingAmount")) &&
+                 explore$xlog) 
+      || ((explore$type=="Alpha") && explore$xlog)
+      || ((explore$type=="NoStudies") && explore$mx_log)) {
     dx<-(log10(max(vals))-log10(min(vals)))/15
     g<-g+scale_x_log10(limits=c(10^(log10(min(vals))-dx),10^(log10(max(vals))+dx*xmargin)))
     xscale<-TRUE
@@ -1171,26 +1182,26 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
   if (!xscale) {
       if (!doLine) {
         dx<-(vals[2]-vals[1])/1.5
-        g<-g+scale_x_continuous(limits=c(min(vals)-dx,max(vals)+dx*xmargin),breaks=vals,labels=exploreResult$result$vals)
+        g<-g+scale_x_continuous(limits=c(min(vals)-dx,max(vals)+dx*xmargin),breaks=vals,labels=exploreResult$vals)
       } else {
         dx<-(max(vals)-min(vals))/15
         g<-g+scale_x_continuous(limits=c(min(vals)-dx,max(vals)+dx*xmargin))
       }
     }
 
-  if (explore$Explore_ylog) {
+  if (Explore_ylog) {
     ysc<-scale_y_log10
   } else {
     ysc<-scale_y_continuous
   }
-  if (explore$ExploreFull_ylim){
+  if (ExploreFull_ylim){
     ylim<-ylim*1.05
   }
   
-  if (explore$Explore_show=="NHSTErrors" && !effect$world$worldOn) {
+  if (Explore_show=="NHSTErrors" && !effect$world$worldOn) {
     g<-g+scale_y_continuous(breaks=seq(0,1,0.125),labels=format(c(seq(0,0.75,0.25),seq(1,0,-0.25))),limits=c(0,1))
   } else {
-    if (!explore$ExploreAny_ylim) {
+    if (!ExploreAny_ylim) {
       if (!is.null(secondY)) {
         g<-g+ysc(sec.axis=sec_axis(~ 1-.,name=secondY))
       } else {
@@ -1206,7 +1217,7 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
   }
 
   g<-g+ylab(ylabel)
-  switch (exploreResult$Explore_type,
+  switch (explore$type,
           "EffectSize"={g<-g+xlab(xLabel)},
           "EffectSize1"={g<-g+xlab(bquote(MainEffect1:r[p]))},
           "EffectSize2"={g<-g+xlab(bquote(MainEffect2:r[p]))},
@@ -1215,10 +1226,10 @@ drawExplore<-function(IV,IV2,DV,effect,design,explore,exploreResult){
           "pNull"={g<-g+xlab(Plabel)},
           "k"={g<-g+xlab(Llabel)},
           "Alpha"={g<-g+xlab(alphaChar)},
-          g<-g+xlab(exploreResult$Explore_type)
+          g<-g+xlab(explore$type)
   )
-  alphaSig<<-oldAlpha
+  BrawOpts$alphaSig<<-oldAlpha
 
-  g+plotTheme
+  g+BrawOpts$plotTheme
 }
 

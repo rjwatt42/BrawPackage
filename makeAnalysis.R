@@ -415,13 +415,13 @@ generalAnalysis<-function(allData,InteractionOn,withins,ssqType="Type3",caseOrde
       # lmNorm to calculate effect sizes
       lmNorm<-glmer(formula=as.formula(formula),data=analysisNormData,family="binomial")
       lmNormC<-glmer(formula=as.formula(formula),data=analysisNormData,family="binomial",contrasts=contrasts)
-      teBrawOpts$STMethod<-"Chisq"
+      BrawOpts$STMethod<-"Chisq"
     } else {
       lmRaw<-glm(formula=as.formula(formula),data=analysisRawData,family="binomial")
       lmRawC<-glm(formula=as.formula(formula),data=analysisRawData,family="binomial",contrasts=contrasts)
       lmNorm<-glm(formula=as.formula(formula),data=analysisNormData,family="binomial")
       lmNormC<-glm(formula=as.formula(formula),data=analysisNormData,family="binomial",contrasts=contrasts)
-      teBrawOpts$STMethod<-"F"
+      BrawOpts$STMethod<-"F"
     }
     pcol=3;prow=2
     
@@ -441,29 +441,29 @@ generalAnalysis<-function(allData,InteractionOn,withins,ssqType="Type3",caseOrde
       lmNorm<-lm(formula=as.formula(formula),data=analysisNormData)
       lmNormC<-lm(formula=as.formula(formula),data=analysisNormData,contrasts=contrasts)
     }
-    teBrawOpts$STMethod<-"F"
+    BrawOpts$STMethod<-"F"
     pcol=4;prow=2;
   }
   
   #ANOVAS
   switch (ssqType,
           "Type1"={
-            anRaw<-Anova(lmRaw,test=teBrawOpts$STMethod)
-            anRawC<-Anova(lmRawC,test=teBrawOpts$STMethod)
-            anNorm<-Anova(lmNorm,test=teBrawOpts$STMethod)
-            anNormC<-Anova(lmNormC,test=teBrawOpts$STMethod)
+            anRaw<-Anova(lmRaw,test=BrawOpts$STMethod)
+            anRawC<-Anova(lmRawC,test=BrawOpts$STMethod)
+            anNorm<-Anova(lmNorm,test=BrawOpts$STMethod)
+            anNormC<-Anova(lmNormC,test=BrawOpts$STMethod)
           },
           "Type2"={
-            anRaw<-Anova(lmRaw,test=teBrawOpts$STMethod,type=2)
-            anRawC<-Anova(lmRawC,test=teBrawOpts$STMethod,type=2)
-            anNorm<-Anova(lmNorm,test=teBrawOpts$STMethod,type=2)
-            anNormC<-Anova(lmNormC,test=teBrawOpts$STMethod,type=2)
+            anRaw<-Anova(lmRaw,test=BrawOpts$STMethod,type=2)
+            anRawC<-Anova(lmRawC,test=BrawOpts$STMethod,type=2)
+            anNorm<-Anova(lmNorm,test=BrawOpts$STMethod,type=2)
+            anNormC<-Anova(lmNormC,test=BrawOpts$STMethod,type=2)
           },
           "Type3"={
-            anRaw<-Anova(lmRaw,test=teBrawOpts$STMethod,type=3,singular.ok=TRUE)
-            anRawC<-Anova(lmRawC,test=teBrawOpts$STMethod,type=3,singular.ok=TRUE)
-            anNorm<-Anova(lmNorm,test=teBrawOpts$STMethod,type=3,singular.ok=TRUE)
-            anNormC<-Anova(lmNormC,test=teBrawOpts$STMethod,type=3,singular.ok=TRUE)
+            anRaw<-Anova(lmRaw,test=BrawOpts$STMethod,type=3,singular.ok=TRUE)
+            anRawC<-Anova(lmRawC,test=BrawOpts$STMethod,type=3,singular.ok=TRUE)
+            anNorm<-Anova(lmNorm,test=BrawOpts$STMethod,type=3,singular.ok=TRUE)
+            anNormC<-Anova(lmNormC,test=BrawOpts$STMethod,type=3,singular.ok=TRUE)
           }
   )
   
@@ -866,7 +866,7 @@ makeAnalysis<-function(evidence=makeEvidence(),sample=makeSample()){
 
 runSimulation<-function(hypothesis,design,evidence,sig_only=FALSE,onlyAnalysis=FALSE,oldResult=NULL) {
     if (onlyAnalysis && !is.null(oldResult)) {
-    res<-makeAnalysis(hypothesis,design,evidence,oldResult)
+    res<-makeAnalysis(evidence,oldResult)
     return(res)
   }
   
@@ -923,7 +923,7 @@ runSimulation<-function(hypothesis,design,evidence,sig_only=FALSE,onlyAnalysis=F
 getSample<-function(hypothesis,design,evidence) {
   if (!evidence$shortHand) {
     sample<-makeSample(hypothesis,design)
-    res<-makeAnalysis(hypothesis,design,evidence,sample)
+    res<-makeAnalysis(evidence,sample)
   } else {
     res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
   }
