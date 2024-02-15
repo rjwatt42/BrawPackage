@@ -2,7 +2,7 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,off=0){
 
   showRawData<-TRUE
   if (colindex==1)
-          {  col<- plotcolours$descriptionC
+          {  col<- BrawOpts$plotColours$descriptionC
           alphaPoints<-0.95
           xoff=0
           barwidth=1
@@ -18,7 +18,7 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,off=0){
   
   hypothesisType=paste(IV$type,DV$type,sep=" ")
   
-  dotSize<-(plotTheme$axis.title$size)/3
+  dotSize<-(BrawOpts$plotTheme$axis.title$size)/3
   shrinkDots=1
   if (length(x)>100) {
     dotSize<-max(dotSize*sqrt(100/length(x)),2)
@@ -28,19 +28,19 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,off=0){
           "Interval Interval"={
             pts<-data.frame(x=x,y=y);
             if (colindex>=2) {
-              g<-g+geom_point(data=pts,aes(x=x,y=y,fill=names(plotDescriptionCols)[colindex-1]),shape=shapes$data, colour = "black", alpha=alphaPoints, size =dotSize)
+              g<-g+geom_point(data=pts,aes(x=x,y=y,fill=names(plotDescriptionCols)[colindex-1]),shape=BrawOpts$plotShapes$data, colour = "black", alpha=alphaPoints, size =dotSize)
             }
             else
-              g<-g+geom_point(data=pts,aes(x=x,y=y),shape=shapes$data, colour="black", fill=col, alpha=alphaPoints, size =dotSize*shrinkDots)
+              g<-g+geom_point(data=pts,aes(x=x,y=y),shape=BrawOpts$plotShapes$data, colour="black", fill=col, alpha=alphaPoints, size =dotSize*shrinkDots)
           },
           
           "Ordinal Interval"={
             pts<-data.frame(x=x,y=y);
             if (colindex>=2) {
-              g<-g+geom_point(data=pts,aes(x=x,y=y,fill=names(plotDescriptionCols)[colindex-1]),shape=shapes$data, colour = "black", alpha=alphaPoints, size =dotSize)
+              g<-g+geom_point(data=pts,aes(x=x,y=y,fill=names(plotDescriptionCols)[colindex-1]),shape=BrawOpts$plotShapes$data, colour = "black", alpha=alphaPoints, size =dotSize)
             }
             else
-              g<-g+geom_point(data=pts,aes(x=x,y=y),shape=shapes$data, colour="black", fill=col, alpha=alphaPoints, size =dotSize*shrinkDots)
+              g<-g+geom_point(data=pts,aes(x=x,y=y),shape=BrawOpts$plotShapes$data, colour="black", fill=col, alpha=alphaPoints, size =dotSize*shrinkDots)
           },
           
           "Categorical Interval"={
@@ -48,35 +48,35 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,off=0){
             pts<-data.frame(IV=x+xoff,DV=y);
             if (showRawData) {
               if (colindex>=2) 
-                g<-g+geom_point(data=pts,aes(x=IV,y=DV,fill=names(plotDescriptionCols)[colindex-1]),shape=shapes$data, colour = "black", alpha=alphaPoints, size =dotSize)
+                g<-g+geom_point(data=pts,aes(x=IV,y=DV,fill=names(plotDescriptionCols)[colindex-1]),shape=BrawOpts$plotShapes$data, colour = "black", alpha=alphaPoints, size =dotSize)
               else
-                g<-g+geom_point(data=pts,aes(x=IV,y=DV),shape=shapes$data, colour = col, fill=col, alpha=alphaPoints, size =dotSize*shrinkDots)
+                g<-g+geom_point(data=pts,aes(x=IV,y=DV),shape=BrawOpts$plotShapes$data, colour = col, fill=col, alpha=alphaPoints, size =dotSize*shrinkDots)
             }
           },
           
           "Ordinal Ordinal"={
             pts<-data.frame(IV=x,DV=y);
             if (colindex>=2)
-              g<-g+geom_point(data=pts,aes(x=IV,y=DV,fill=names(plotDescriptionCols)[colindex-1]),shape=shapes$data, colour = "black", alpha=alphaPoints, size =dotSize)
+              g<-g+geom_point(data=pts,aes(x=IV,y=DV,fill=names(plotDescriptionCols)[colindex-1]),shape=BrawOpts$plotShapes$data, colour = "black", alpha=alphaPoints, size =dotSize)
             else
-              g<-g+geom_point(data=pts,aes(x=IV,y=DV),shape=shapes$data, colour="black", fill=col, alpha=alphaPoints, size =dotSize*shrinkDots)
+              g<-g+geom_point(data=pts,aes(x=IV,y=DV),shape=BrawOpts$plotShapes$data, colour="black", fill=col, alpha=alphaPoints, size =dotSize*shrinkDots)
           },
           
           "Interval Ordinal"={
             pts<-data.frame(IV=x,DV=y);
             if (colindex>=2)
-              g<-g+geom_point(data=pts,aes(x=IV,y=DV,fill=names(plotDescriptionCols)[colindex-1]),shape=shapes$data, colour = "black", alpha=alphaPoints, size =dotSize)
+              g<-g+geom_point(data=pts,aes(x=IV,y=DV,fill=names(plotDescriptionCols)[colindex-1]),shape=BrawOpts$plotShapes$data, colour = "black", alpha=alphaPoints, size =dotSize)
             else
-              g<-g+geom_point(data=pts,aes(x=IV,y=DV),shape=shapes$data, colour="black", fill=col, alpha=alphaPoints, size =dotSize*shrinkDots)
+              g<-g+geom_point(data=pts,aes(x=IV,y=DV),shape=BrawOpts$plotShapes$data, colour="black", fill=col, alpha=alphaPoints, size =dotSize*shrinkDots)
           },
           
           "Categorical Ordinal"={
             pts<-data.frame(IV=x,DV=y);
             if (showRawData) {
               if (colindex>=2)
-                g<-g+geom_point(data=pts,aes(x=IV,y=DV,fill=names(plotDescriptionCols)[colindex-1]),shape=shapes$data, colour = "black", alpha=alphaPoints, size =dotSize)
+                g<-g+geom_point(data=pts,aes(x=IV,y=DV,fill=names(plotDescriptionCols)[colindex-1]),shape=BrawOpts$plotShapes$data, colour = "black", alpha=alphaPoints, size =dotSize)
               else
-                g<-g+geom_point(data=pts,aes(x=IV,y=DV),shape=shapes$data, colour = "black", fill=col, alpha=alphaPoints, size =dotSize*shrinkDots)
+                g<-g+geom_point(data=pts,aes(x=IV,y=DV),shape=BrawOpts$plotShapes$data, colour = "black", fill=col, alpha=alphaPoints, size =dotSize*shrinkDots)
             }
           },
           
@@ -111,13 +111,13 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,off=0){
             pts<-data.frame(x=full_x,y=full_y,fill=full_f)
             if (showRawData) {
               if (colindex>=2) {
-                # g<-g+geom_point(data=pts,aes(x=x,y=y,fill=names(plotDescriptionCols)[colindex-1]),shape=shapes$data, size =dotSize, alpha=0.95, colour="black")
-                g<-g+geom_point(data=pts,aes(x=full_x,y=full_y),shape=shapes$data, size =dotSize, alpha=alphaPoints, colour="black",fill="white")
+                # g<-g+geom_point(data=pts,aes(x=x,y=y,fill=names(plotDescriptionCols)[colindex-1]),shape=BrawOpts$plotShapes$data, size =dotSize, alpha=0.95, colour="black")
+                g<-g+geom_point(data=pts,aes(x=full_x,y=full_y),shape=BrawOpts$plotShapes$data, size =dotSize, alpha=alphaPoints, colour="black",fill="white")
               } else {
                 if (doLegendPoints) {
-                  g<-g+geom_point(data=pts,aes(x=full_x,y=full_y,fill=factor(full_f)),shape=shapes$data, size =dotSize*shrinkDots, alpha=alphaPoints)
+                  g<-g+geom_point(data=pts,aes(x=full_x,y=full_y,fill=factor(full_f)),shape=BrawOpts$plotShapes$data, size =dotSize*shrinkDots, alpha=alphaPoints)
                 } else {
-                  g<-g+geom_point(data=pts,aes(x=x,y=y),shape=shapes$data, size =dotSize*shrinkDots, alpha=alphaPoints, colour="black",fill=full_c)
+                  g<-g+geom_point(data=pts,aes(x=x,y=y),shape=BrawOpts$plotShapes$data, size =dotSize*shrinkDots, alpha=alphaPoints, colour="black",fill=full_c)
                 }
               }
             }
@@ -155,13 +155,13 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,off=0){
             pts<-data.frame(x=full_x,y=full_y,fill=full_f)
             if (showRawData) {
               if (colindex>=2) {
-                # g<-g+geom_point(data=pts,aes(x=x,y=y,fill=names(plotDescriptionCols)[colindex-1]),shape=shapes$data, size =dotSize, alpha=0.95, colour="black")
-                g<-g+geom_point(data=pts,aes(x=full_x,y=full_y),shape=shapes$data, size =dotSize, alpha=alphaPoints, colour="black",fill="white")
+                # g<-g+geom_point(data=pts,aes(x=x,y=y,fill=names(plotDescriptionCols)[colindex-1]),shape=BrawOpts$plotShapes$data, size =dotSize, alpha=0.95, colour="black")
+                g<-g+geom_point(data=pts,aes(x=full_x,y=full_y),shape=BrawOpts$plotShapes$data, size =dotSize, alpha=alphaPoints, colour="black",fill="white")
               } else {
                 if (doLegendPoints) {
-                  g<-g+geom_point(data=pts,aes(x=full_x,y=full_y,fill=factor(full_f)),shape=shapes$data, size =dotSize*shrinkDots, alpha=alphaPoints)
+                  g<-g+geom_point(data=pts,aes(x=full_x,y=full_y,fill=factor(full_f)),shape=BrawOpts$plotShapes$data, size =dotSize*shrinkDots, alpha=alphaPoints)
                 } else {
-                  g<-g+geom_point(data=pts,aes(x=x,y=y),shape=shapes$data, size =dotSize*shrinkDots, alpha=alphaPoints, colour="black",fill=full_c)
+                  g<-g+geom_point(data=pts,aes(x=x,y=y),shape=BrawOpts$plotShapes$data, size =dotSize*shrinkDots, alpha=alphaPoints, colour="black",fill=full_c)
                 }
               }
             }
@@ -186,12 +186,12 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,off=0){
             pts<-data.frame(x=x+xoff,y=y)
             if (showRawData) {
               if (colindex>=2)
-                g<-g+geom_point(data=pts,aes(x=x,y=y,fill=names(plotDescriptionCols)[colindex-1]),shape=shapes$data, size =dotSize, alpha=alphaPoints, colour="black")
+                g<-g+geom_point(data=pts,aes(x=x,y=y,fill=names(plotDescriptionCols)[colindex-1]),shape=BrawOpts$plotShapes$data, size =dotSize, alpha=alphaPoints, colour="black")
               else
                 if (doLegendPoints) {
-                  g<-g+geom_point(data=pts,aes(x=x,y=y,fill=factor(i2)),shape=shapes$data, size =dotSize*shrinkDots, alpha=alphaPoints, colour="black")
+                  g<-g+geom_point(data=pts,aes(x=x,y=y,fill=factor(i2)),shape=BrawOpts$plotShapes$data, size =dotSize*shrinkDots, alpha=alphaPoints, colour="black")
                 } else {
-                  g<-g+geom_point(data=pts,aes(x=x,y=y),shape=shapes$data, size =dotSize*shrinkDots, colour="black", fill=CatCatcols[i2], alpha=alphaPoints)
+                  g<-g+geom_point(data=pts,aes(x=x,y=y),shape=BrawOpts$plotShapes$data, size =dotSize*shrinkDots, colour="black", fill=CatCatcols[i2], alpha=alphaPoints)
                 }
             }
             }
@@ -205,7 +205,7 @@ plotCatInterDescription<-function(analysis,g=NULL){
   cols<-c()
   for (i in 1:analysis$IV2$ncats){
     off<-(i-1)/(analysis$IV2$ncats-1)
-    col<- col2rgb(plotcolours$descriptionC1)*(1-off)+col2rgb(plotcolours$descriptionC2)*off
+    col<- col2rgb(BrawOpts$plotColours$descriptionC1)*(1-off)+col2rgb(BrawOpts$plotColours$descriptionC2)*off
     cols<- c(cols,rgb(col[1]/255,col[2]/255,col[3]/255))
   }
   names(cols)<-analysis$IV2$cases
@@ -240,7 +240,7 @@ plotCatInterDescription<-function(analysis,g=NULL){
     analysis1$DV$sd<-sd(Dvals[use],na.rm=TRUE)
     }
     g<-plotPoints(g,analysis$IV,analysis$DV,analysis1,i+1,(i-1)/(analysis$IV2$ncats-1))
-    g<-plotPrediction(analysis1$IV,NULL,analysis1$DV,analysis1,analysis$design,2+(i-1)/(IV2$ncats-1),g,theme=plotTheme)
+    g<-plotPrediction(analysis1$IV,NULL,analysis1$DV,analysis1,analysis$design,2+(i-1)/(IV2$ncats-1),g,theme=BrawOpts$plotTheme)
   }
   
   g<-g+scale_fill_manual(name=analysis$IV2$name,values=plotDescriptionCols)
@@ -248,7 +248,7 @@ plotCatInterDescription<-function(analysis,g=NULL){
 }
 
 plotParInterDescription<-function(analysis,g=NULL){
-  col<-c( plotcolours$descriptionC1, plotcolours$descriptionC2)
+  col<-c( BrawOpts$plotColours$descriptionC1, BrawOpts$plotColours$descriptionC2)
   names(col)<-c(paste(analysis$IV2$name,"<median",sep=""), paste(analysis$IV2$name,">median",sep=""))
   col<-as.list(col)
   plotDescriptionCols <<- col
@@ -276,7 +276,7 @@ plotParInterDescription<-function(analysis,g=NULL){
     analysis1$DV$vals<-Dvals[use]
     analysis1$DV$mu<-mean(analysis$dv[use],na.rm=TRUE)
     g<-plotPoints(g,analysis1$IV,analysis1$DV,analysis1,i+1,(i-1)/(2-1)*0.25)
-    g<-plotPrediction(analysis1$IV,NULL,analysis1$DV,analysis1,analysis$design,i+1,g,theme=plotTheme)
+    g<-plotPrediction(analysis1$IV,NULL,analysis1$DV,analysis1,analysis$design,i+1,g,theme=BrawOpts$plotTheme)
   }
   
   g<-g+scale_fill_manual(name=analysis$IV2$name,values=plotDescriptionCols)
@@ -286,13 +286,13 @@ plotParInterDescription<-function(analysis,g=NULL){
 plotParDescription<-function(analysis,g) {
   
   g<-plotPoints(g,analysis$IV,analysis$DV,analysis,1)
-  g<-plotPrediction(analysis$IV,analysis$IV2,analysis$DV,analysis,analysis$design,1,g,theme=plotTheme)
+  g<-plotPrediction(analysis$IV,analysis$IV2,analysis$DV,analysis,analysis$design,1,g,theme=BrawOpts$plotTheme)
   g
 }
 
 plotCatDescription<-function(analysis,g) {
 
-  g<-plotPrediction(analysis$IV,analysis$IV2,analysis$DV,analysis,analysis$design,1,g,theme=plotTheme)
+  g<-plotPrediction(analysis$IV,analysis$IV2,analysis$DV,analysis,analysis$design,1,g,theme=BrawOpts$plotTheme)
   g<-plotPoints(g,analysis$IV,analysis$DV,analysis,1)
   
   if (!doLegendBars && doLegendPoints) {

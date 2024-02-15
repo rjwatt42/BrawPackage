@@ -42,7 +42,7 @@ densLab<-function(label,orientation){
   )
 }
 dataLabel<-function(data,orientation) {
-  geom_label(data=data,aes(x = x, y = y, label=label), hjust=0, vjust=0, fill="white",size=labelSize)
+  geom_label(data=data,aes(x = x, y = y, label=label), hjust=0, vjust=0, fill="white",size=brawOpts$labelSize)
 }
 varScale<-function(breaks,labels,orientation){
   switch(orientation,
@@ -328,33 +328,33 @@ expected_hist<-function(vals,svals,valType){
           
           "p"=  { # ns is large
             if (pPlotScale=="log10") {
-              target<-log10(alphaSig)
+              target<-log10(BrawOpts$alphaSig)
               bins<-getBins(vals,svals,target,log10(min_p),log10(1))
             } else {
-              target<-alphaSig
+              target<-BrawOpts$alphaSig
               bins<-getBins(vals,svals,target,0,1)
               bins<-c(0,bins[bins>0])
             }
           },
             
           "log(lrs)"={
-            target<-alphaLLR
-            bins<-getBins(vals,svals,target*c(-1,1),0,lrRange)
+            target<-BrawOpts$alphaLLR
+            bins<-getBins(vals,svals,target*c(-1,1),0,BrawOpts$lrRange)
           },
           
           "e1d"={
-            target<-alphaLLR
-            bins<-getBins(vals,svals,target*c(-1,1),-lrRange,lrRange)
+            target<-BrawOpts$alphaLLR
+            bins<-getBins(vals,svals,target*c(-1,1),-BrawOpts$lrRange,BrawOpts$lrRange)
           },
           
           "log(lrd)"={
-            target<-alphaLLR
-            bins<-getBins(vals,svals,target*c(-1,1),-lrRange,lrRange)
+            target<-BrawOpts$alphaLLR
+            bins<-getBins(vals,svals,target*c(-1,1),-BrawOpts$lrRange,BrawOpts$lrRange)
           },
           
           "e2d"={
-            target<-alphaLLR
-            bins<-getBins(vals,svals,target*c(-1,1),-lrRange,lrRange)
+            target<-BrawOpts$alphaLLR
+            bins<-getBins(vals,svals,target*c(-1,1),-BrawOpts$lrRange,BrawOpts$lrRange)
           },
           
           "w"=  { # ns is small
@@ -408,59 +408,59 @@ expected_hist<-function(vals,svals,valType){
 
 start_plot<-function(orientation) {
   g<-ggplot()
-  g<-g+theme(legend.position = "none")+plotTheme
+  g<-g+theme(legend.position = "none")+BrawOpts$plotTheme
   g<-g+densScale(breaks=NULL,labels=NULL,orientation=orientation)
   g<-g+densLab(NULL,orientation)
 }
 
 expected_plot<-function(g,pts,expType=NULL,analysis=NULL,IV=NULL,DV=NULL,i=1,scale=1,col="white",orientation="vert"){
-  dotSize<-(plotTheme$axis.title$size)/3*scale
+  dotSize<-(BrawOpts$plotTheme$axis.title$size)/3*scale
   
   if (!is.null(expType)) {
     if (useSignificanceCols){
-      c1=plotcolours$infer_sigC
-      c2=plotcolours$infer_nsigC
+      c1=BrawOpts$plotColours$infer_sigC
+      c2=BrawOpts$plotColours$infer_nsigC
     } else {
-      c1=plotcolours$descriptionC
-      c2=plotcolours$descriptionC
+      c1=BrawOpts$plotColours$descriptionC
+      c2=BrawOpts$plotColours$descriptionC
     }
     if (expType=="e1") {
-      c1=plotcolours$infer_sigNull
-      c2=plotcolours$infer_nsNull
+      c1=BrawOpts$plotColours$infer_sigNull
+      c2=BrawOpts$plotColours$infer_nsNull
     }
     if (expType=="e2") {
-      c1=plotcolours$infer_sigNonNull
-      c2=plotcolours$infer_nsNonNull
+      c1=BrawOpts$plotColours$infer_sigNonNull
+      c2=BrawOpts$plotColours$infer_nsNonNull
     }
     if (expType=="e1d") {
-      c1=plotcolours$infer_sigNull
-      c2=plotcolours$infer_nsdNull
-      c3<-plotcolours$infer_isigNull
+      c1=BrawOpts$plotColours$infer_sigNull
+      c2=BrawOpts$plotColours$infer_nsdNull
+      c3<-BrawOpts$plotColours$infer_isigNull
     }
     if (expType=="e2d") {
-      c1=plotcolours$infer_sigNonNull
-      c2=plotcolours$infer_nsdNonNull
-      c3<-plotcolours$infer_isigNonNull
+      c1=BrawOpts$plotColours$infer_sigNonNull
+      c2=BrawOpts$plotColours$infer_nsdNonNull
+      c3<-BrawOpts$plotColours$infer_isigNonNull
     }
   } else {
     c1=col
     c2=col
   }
   
-  if (length(pts$y1)<=points_threshold) {
+  if (length(pts$y1)<=50) {
     if (!is.null(analysis) && is.element(expType,c("r","p")) && length(pts$y1)==1) {
       switch(i,
              {rCI<-analysis$rIVCI
              pCI<-analysis$pIVCI
-             if (isSignificant(STMethod,analysis$pIV,analysis$rIV,analysis$nval,analysis$df1,analysis$evidence)) {c<-c1} else (c<-c2)
+             if (isSignificant(BrawOpts$STMethod,analysis$pIV,analysis$rIV,analysis$nval,analysis$df1,analysis$evidence)) {c<-c1} else (c<-c2)
              },
              {rCI<-analysis$rIV2CI
              pCI<-analysis$pIV2CI
-             if (isSignificant(STMethod,analysis$pIV2,analysis$rIV2,analysis$nval,analysis$df2,analysis$evidence)) {c<-c1} else (c<-c2)
+             if (isSignificant(BrawOpts$STMethod,analysis$pIV2,analysis$rIV2,analysis$nval,analysis$df2,analysis$evidence)) {c<-c1} else (c<-c2)
              },
              {rCI<-analysis$rIVIV2CI
              pCI<-analysis$pIVIV2CI
-             if (isSignificant(STMethod,analysis$pIVIV2DV,analysis$rIVIV2DV,analysis$nval,analysis$df12,analysis$evidence)) {c<-c1} else (c<-c2)
+             if (isSignificant(BrawOpts$STMethod,analysis$pIVIV2DV,analysis$rIVIV2DV,analysis$nval,analysis$df12,analysis$evidence)) {c<-c1} else (c<-c2)
              }
              )
       if (expType=="r" && !is.null(rCI)){
@@ -484,13 +484,13 @@ expected_plot<-function(g,pts,expType=NULL,analysis=NULL,IV=NULL,DV=NULL,i=1,sca
       co2<-"black"
     }
     pts1=pts[!pts$y2,]
-    g<-g+dataPoint(data=data.frame(x=pts1$x,y=pts1$y1),shape=shapes$study, colour = co2, fill = c2, size = dotSize,orientation=orientation)
+    g<-g+dataPoint(data=data.frame(x=pts1$x,y=pts1$y1),shape=BrawOpts$plotShapes$study, colour = co2, fill = c2, size = dotSize,orientation=orientation)
     pts2=pts[pts$y2,]
-    g<-g+dataPoint(data=data.frame(x=pts2$x,y=pts2$y1),shape=shapes$study, colour = co1, fill = c1, size = dotSize,orientation=orientation)
+    g<-g+dataPoint(data=data.frame(x=pts2$x,y=pts2$y1),shape=BrawOpts$plotShapes$study, colour = co1, fill = c1, size = dotSize,orientation=orientation)
     if (!is.null(expType))
       if (is.element(expType,c("e1d","e2d"))) {
         pts3=pts[pts$y3,]
-        g<-g+dataPoint(data=data.frame(y=pts3$x,x=pts3$y1),shape=shapes$study, colour = co1, fill = c3, size = dotSize,orientation=orientation)
+        g<-g+dataPoint(data=data.frame(y=pts3$x,x=pts3$y1),shape=BrawOpts$plotShapes$study, colour = co1, fill = c3, size = dotSize,orientation=orientation)
       }
     
   } else {
@@ -563,19 +563,19 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
             ylabel<-bquote(p[1])
           },
           "log(lrs)"={
-            ylim<-c(0, lrRange)
+            ylim<-c(0, BrawOpts$lrRange)
             ylabel<-bquote(log[e](lr[s]))
           },
           "log(lrd)"={
-            ylim<-c(-lrRange, lrRange)
+            ylim<-c(-BrawOpts$lrRange, BrawOpts$lrRange)
             ylabel<-bquote(log[e](lr[d]))
           },
           "e1d"={
-            ylim<-c(-lrRange, lrRange)
+            ylim<-c(-BrawOpts$lrRange, BrawOpts$lrRange)
             ylabel<-bquote(log[e](lr[d]))
           },
           "e2d"={
-            ylim<-c(-lrRange, lrRange)
+            ylim<-c(-BrawOpts$lrRange, BrawOpts$lrRange)
             ylabel<-bquote(log[e](lr[d]))
           },
           "w"={
@@ -741,23 +741,23 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
                xd<-fullRSamplingDist(yv,analysis$effect$world,analysis$design,"r",logScale=logScale,sigOnly=sigOnly)
              },
              "w"={
-               yv<-seq(alphaSig*1.01,1/1.01,length.out=npt)
+               yv<-seq(BrawOpts$alphaSig*1.01,1/1.01,length.out=npt)
                xd<-fullRSamplingDist(yv,analysis$effect$world,analysis$design,"w",logScale=logScale,sigOnly=sigOnly)
              },
              "log(lrs)"={
-               yv<-seq(0,lrRange,length.out=npt)
+               yv<-seq(0,BrawOpts$lrRange,length.out=npt)
                xd<-fullRSamplingDist(yv,analysis$effect$world,analysis$design,"log(lrs)",logScale=logScale,sigOnly=sigOnly)
              },
              "log(lrd)"={
-               yv<-seq(-lrRange,lrRange,length.out=npt)
+               yv<-seq(-BrawOpts$lrRange,BrawOpts$lrRange,length.out=npt)
                xd<-fullRSamplingDist(yv,analysis$effect$world,analysis$design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
              },
              "e1d"={
-               yv<-seq(-lrRange,lrRange,length.out=npt)
+               yv<-seq(-BrawOpts$lrRange,BrawOpts$lrRange,length.out=npt)
                xd<-fullRSamplingDist(yv,analysis$effect$world,analysis$design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
              },
              "e2d"={
-               yv<-seq(-lrRange,lrRange,length.out=npt)
+               yv<-seq(-BrawOpts$lrRange,BrawOpts$lrRange,length.out=npt)
                xd<-fullRSamplingDist(yv,analysis$effect$world,analysis$design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
              },
              "nw"={
@@ -794,7 +794,7 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
                xdsig<-xd
              },
              "wp"={
-               yv<-seq(alphaSig*1.01,1/1.01,length.out=npt)
+               yv<-seq(BrawOpts$alphaSig*1.01,1/1.01,length.out=npt)
                xd<-fullRSamplingDist(yv,analysis$effect$world,analysis$design,"wp",logScale=logScale,sigOnly=sigOnly)
              }
       )
@@ -808,10 +808,10 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
       ptsp<-data.frame(x=c(xd,-rev(xd))+xoff[i],y=c(yv,rev(yv)))
       g<-g+dataPolygon(data=ptsp,colour=NA,fill="white",alpha=theoryAlpha, orientation=orientation)
       if (is.element(expType,c("r","n","p"))) {
-        g<-g+dataPolygon(data=ptsp,colour=NA,fill=plotcolours$infer_nsigC,alpha=theoryAlpha, orientation=orientation)
+        g<-g+dataPolygon(data=ptsp,colour=NA,fill=BrawOpts$plotColours$infer_nsigC,alpha=theoryAlpha, orientation=orientation)
         # xdsig[xdsig==0]<-NA
         ptsp1<-data.frame(x=c(xdsig,-rev(xdsig))*theoryGain+xoff[i],y=c(yv,rev(yv)))
-        g<-g+dataPolygon(data=ptsp1,colour=NA,fill=plotcolours$infer_sigC,alpha=theoryAlpha, orientation=orientation)
+        g<-g+dataPolygon(data=ptsp1,colour=NA,fill=BrawOpts$plotColours$infer_sigC,alpha=theoryAlpha, orientation=orientation)
         # g<-g+dataPath(data=ptsp1,colour="black",linewidth=0.1, orientation=orientation)
         g<-g+dataPath(data=ptsp,colour="black",linewidth=0.1, orientation=orientation)
       } else {
@@ -827,7 +827,7 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
       rvals<-data$rs[,i]
       pvals<-data$ps[,i]
       nvals<-data$ns
-      resSig<-isSignificant(STMethod,pvals,rvals,nvals,data$df1,analysis$evidence)
+      resSig<-isSignificant(BrawOpts$STMethod,pvals,rvals,nvals,data$df1,analysis$evidence)
       if (sigOnly) {
         shvals<-shvals[resSig]
         rvals<-rvals[resSig]
@@ -840,7 +840,7 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
         rvals<-(rvals+1)*ysc*0.9+rem(i-1,3)*ysc*2-1
       }
       if (is.element(expType,c("e1d","e2d"))) {
-        d<-res2llr(analysis,STMethod)
+        d<-res2llr(analysis,BrawOpts$STMethod)
         err<-(d<0 & data$rp[,i]!=0) | (d>0 & data$rp[,i]==0)
         resWSig<-resSig & err
         pts<-data.frame(x=rvals*0+xoff[i],y1=shvals,y2=resSig,y3=resWSig,n<-nvals)
@@ -955,7 +955,7 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
       }
       g<-g+dataLabel(data=lpts1,orientation=orientation)
       # if (!is.null(lpts2)) {
-      # g<-g+geom_label(data=lpts2,aes(x = x, y = y, label=label), hjust=0, vjust=0, fill="white",size=labelSize)
+      # g<-g+geom_label(data=lpts2,aes(x = x, y = y, label=label), hjust=0, vjust=0, fill="white",size=brawOpts$labelSize)
       # }
       }
     }
@@ -993,10 +993,10 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
 
 l_plot<-function(analysis,ptype=NULL,otheranalysis=NULL,orientation="vert"){
   g<-r_plot(analysis,ptype,orientation=orientation)
-  sAlpha<-log(dnorm(0)/dnorm(qnorm(1-alphaSig/2)))
-  g<-g+varLine(intercept=sAlpha, linetype="dotted", color=plotcolours$alpha, linewidth=0.5,orientation=orientation)
+  sAlpha<-log(dnorm(0)/dnorm(qnorm(1-BrawOpts$alphaSig/2)))
+  g<-g+varLine(intercept=sAlpha, linetype="dotted", color=BrawOpts$plotColours$alpha, linewidth=0.5,orientation=orientation)
   if (ptype=="log(lrd)")
-  g<-g+varLine(intercept=-sAlpha, linetype="dotted", color=plotcolours$alpha, linewidth=0.5,orientation=orientation)
+  g<-g+varLine(intercept=-sAlpha, linetype="dotted", color=BrawOpts$plotColours$alpha, linewidth=0.5,orientation=orientation)
   g
 }
 
@@ -1006,14 +1006,14 @@ p_plot<-function(analysis,ptype="p",otheranalysis=NULL,PlotScale=pPlotScale,orie
   
   if (is.element(ptype,c("p","p1"))) {
   if (PlotScale=="log10") {
-    g<-g+varLine(intercept=log10(1), linetype="dotted", color=plotcolours$alpha, linewidth=0.5,orientation=orientation)
-    g<-g+varLine(intercept=log10(0.005), linetype="dotted", color=plotcolours$alpha, linewidth=0.5,orientation=orientation)
-    g<-g+varLine(intercept=log10(0.01), linetype="dotted", color=plotcolours$alpha, linewidth=0.5,orientation=orientation)
-    g<-g+varLine(intercept=log10(alphaSig), linetype="dotted", color=plotcolours$alpha, linewidth=0.5,orientation=orientation)
+    g<-g+varLine(intercept=log10(1), linetype="dotted", color=BrawOpts$plotColours$alpha, linewidth=0.5,orientation=orientation)
+    g<-g+varLine(intercept=log10(0.005), linetype="dotted", color=BrawOpts$plotColours$alpha, linewidth=0.5,orientation=orientation)
+    g<-g+varLine(intercept=log10(0.01), linetype="dotted", color=BrawOpts$plotColours$alpha, linewidth=0.5,orientation=orientation)
+    g<-g+varLine(intercept=log10(BrawOpts$alphaSig), linetype="dotted", color=BrawOpts$plotColours$alpha, linewidth=0.5,orientation=orientation)
     g<-g+varScale(breaks=c(-4,-3,-2,-1,0),labels=c(0.0001,0.001,0.01,0.1,1),orientation=orientation)
   } else
   {
-    g<-g+varLine(intercept=log10(alphaSig), linetype="dotted", color=plotcolours$alpha, linewidth=0.5,orientation=orientation)
+    g<-g+varLine(intercept=log10(BrawOpts$alphaSig), linetype="dotted", color=BrawOpts$plotColours$alpha, linewidth=0.5,orientation=orientation)
   }
   }
   g
@@ -1023,13 +1023,13 @@ w_plot<-function(analysis,wtype,orientation="vert"){
   g<-r_plot(analysis,wtype,wPlotScale=="log10",orientation=orientation)
   
   if (wPlotScale=="log10") {
-    g<-g+varLine(intercept=log10(alphaSig), linetype="dotted", color=plotcolours$alpha, linewidth=0.5,orientation=orientation)+
-      varLine(intercept=log10(0.5), linetype="dotted", color=plotcolours$alpha, linewidth=0.5,orientation=orientation)+
-      varLine(intercept=log10(0.8), linetype="dotted", color=plotcolours$alpha, linewidth=0.5,orientation=orientation)
+    g<-g+varLine(intercept=log10(BrawOpts$alphaSig), linetype="dotted", color=BrawOpts$plotColours$alpha, linewidth=0.5,orientation=orientation)+
+      varLine(intercept=log10(0.5), linetype="dotted", color=BrawOpts$plotColours$alpha, linewidth=0.5,orientation=orientation)+
+      varLine(intercept=log10(0.8), linetype="dotted", color=BrawOpts$plotColours$alpha, linewidth=0.5,orientation=orientation)
   } else {
-    g<-g+varLine(intercept=alphaSig, linetype="dotted", color=plotcolours$alpha, linewidth=0.5,orientation=orientation)+
-      varLine(intercept=0.5, linetype="dotted", color=plotcolours$alpha, linewidth=0.5,orientation=orientation)+
-      varLine(intercept=0.8, linetype="dotted", color=plotcolours$alpha, linewidth=0.5,orientation=orientation)
+    g<-g+varLine(intercept=BrawOpts$alphaSig, linetype="dotted", color=BrawOpts$plotColours$alpha, linewidth=0.5,orientation=orientation)+
+      varLine(intercept=0.5, linetype="dotted", color=BrawOpts$plotColours$alpha, linewidth=0.5,orientation=orientation)+
+      varLine(intercept=0.8, linetype="dotted", color=BrawOpts$plotColours$alpha, linewidth=0.5,orientation=orientation)
   }
   g
 }
@@ -1049,7 +1049,7 @@ e2_plot<-function(analysis,nullanalysis=NULL,orientation="vert"){
             lab<-bquote(bold("Non-null:  " ~ z["p"] ~ "~" ~ .(distr) (z/.(lambda))))
           }
   )
-  switch (STMethod,
+  switch (BrawOpts$STMethod,
           "NHST"={
             p_plot(analysis,ptype="e2",otheranalysis=nullanalysis,orientation=orientation)+
               ggtitle(lab)
@@ -1060,8 +1060,8 @@ e2_plot<-function(analysis,nullanalysis=NULL,orientation="vert"){
           },
           "dLLR"={
             g<-p_plot(nullanalysis,ptype="e2d",otheranalysis=nullanalysis,PlotScale="linear",orientation=orientation)
-            g<-g+varLine(intercept=alphaLLR, linetype="dotted", color=plotcolours$alpha, linewidth=0.5,orientation=orientation)
-            g<-g+varLine(intercept=-alphaLLR, linetype="dotted", color=plotcolours$alpha, linewidth=0.5,orientation=orientation)
+            g<-g+varLine(intercept=BrawOpts$alphaLLR, linetype="dotted", color=BrawOpts$plotColours$alpha, linewidth=0.5,orientation=orientation)
+            g<-g+varLine(intercept=-BrawOpts$alphaLLR, linetype="dotted", color=BrawOpts$plotColours$alpha, linewidth=0.5,orientation=orientation)
             g+ggtitle(lab)
           }
   )
@@ -1076,7 +1076,7 @@ e1_plot<-function(nullanalysis,analysis=NULL,orientation="vert"){
             lab<-bquote(bold("Null:  " ~ z["p"] == 0))
           }
   )
-  switch (STMethod,
+  switch (BrawOpts$STMethod,
           "NHST"={
             p_plot(nullanalysis,ptype="e1",otheranalysis=analysis,orientation=orientation)+
               ggtitle(lab)
@@ -1087,8 +1087,8 @@ e1_plot<-function(nullanalysis,analysis=NULL,orientation="vert"){
           },
           "dLLR"={
             g<-p_plot(nullanalysis,ptype="e1d",otheranalysis=analysis,PlotScale="linear",orientation=orientation)
-            g<-g+varLine(intercept=alphaLLR, linetype="dotted", color=plotcolours$alpha, linewidth=0.5,orientation=orientation)
-            g<-g+varLine(intercept=-alphaLLR, linetype="dotted", color=plotcolours$alpha, linewidth=0.5,orientation=orientation)
+            g<-g+varLine(intercept=BrawOpts$alphaLLR, linetype="dotted", color=BrawOpts$plotColours$alpha, linewidth=0.5,orientation=orientation)
+            g<-g+varLine(intercept=-BrawOpts$alphaLLR, linetype="dotted", color=BrawOpts$plotColours$alpha, linewidth=0.5,orientation=orientation)
             g+ggtitle(lab)
           }
   )

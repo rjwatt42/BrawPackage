@@ -1,17 +1,19 @@
-getGlobals<-function() {
+getGlobals<-function(BW=FALSE,fontScale=1) {
 
 ################################
 # graph design
 
-fontScale<<-1
-char3D<<-1.3
-labelSize<<-4*fontScale
+char3D<-1.3
+labelSize<-4*fontScale
 
-graphcoloursBL<<-list(graphC="#BFECFF",graphBack="#999999")
-graphcoloursBW<<-list(graphC="#FFFFFF",graphBack="#FFFFFF")
-graphcolours<<-graphcoloursBL
+if (BW) graphcolours<-list(graphC="#FFFFFF",graphBack="#FFFFFF")
+else    graphcolours<-list(graphC="#BFECFF",graphBack="#999999")
 
-plotcolours<<-list(maineffectES="#FFCC00",covariationES="#FF1100",interactionES="#0011FF",
+# graphcoloursBL<<-list(graphC="#BFECFF",graphBack="#999999")
+# graphcoloursBW<<-list(graphC="#FFFFFF",graphBack="#FFFFFF")
+
+plotColours<-list(graphC=graphcolours$graphC,graphBack=graphcolours$graphBack,
+                  maineffectES="#FFCC00",covariationES="#FF1100",interactionES="#0011FF",
                   sampleC="#FFCC00",descriptionC="#FF9955",
                   descriptionC1="#FF5533",descriptionC2="#CCBB33",
                   infer_sigC="#11CC00",infer_nsigC="#FF4400",infer_none="#AAAAAA",
@@ -20,53 +22,64 @@ plotcolours<<-list(maineffectES="#FFCC00",covariationES="#FF1100",interactionES=
                   psig="#FFAA00",alpha="#44FF22",one="#FF4422",
                   fdr="#227700",fmr="#BB5555")
 
-shapes<<-list(data=21,study=22,parameter=21,meta=24)
-
-report_precision<<-3
-graph_precision<<-2
+plotShapes<-list(data=21,study=22,parameter=21,meta=24)
 
 # graph themes
 
-updateThemes<-function() {
-  mainTheme<<-theme(panel.background = element_rect(fill=graphcolours$graphBack, colour="black"),
+  mainTheme<-theme(panel.background = element_rect(fill=graphcolours$graphBack, colour="black"),
                     panel.grid.major = element_line(linetype="blank"),panel.grid.minor = element_line(linetype="blank"),
                     plot.background = element_rect(fill=graphcolours$graphC, colour=graphcolours$graphC))
-  SMplotTheme<<-theme(plot.title=element_text(size=14,face="bold"),axis.title=element_text(size=16,face="bold"),
+  SMplotTheme<-theme(plot.title=element_text(size=14,face="bold"),axis.title=element_text(size=16,face="bold"),
                       axis.text.x=element_text(size=12),axis.text.y=element_text(size=12))
-  LGplotTheme<<-theme(plot.title=element_text(size=21,face="bold"),axis.title=element_text(size=24,face="bold"),
+  LGplotTheme<-theme(plot.title=element_text(size=21,face="bold"),axis.title=element_text(size=24,face="bold"),
                       axis.text.x=element_text(size=18),axis.text.y=element_text(size=18))
   
-  plotTheme<<-mainTheme+SMplotTheme+theme(plot.margin=margin(1.0,1.5,0.5,0.5,"cm"))
-  reportTheme<<-mainTheme+SMplotTheme+theme(plot.margin=margin(0.15,0.8,0,0.25,"cm"))
-  diagramTheme<<-mainTheme+SMplotTheme+theme(plot.margin=margin(0.15,0.8,0,0.25,"cm"))
+  plotTheme<-mainTheme+SMplotTheme+theme(plot.margin=margin(1.0,1.5,0.5,0.5,"cm"))
+  reportTheme<-mainTheme+SMplotTheme+theme(plot.margin=margin(0.15,0.8,0,0.25,"cm"))
+  diagramTheme<-mainTheme+SMplotTheme+theme(plot.margin=margin(0.15,0.8,0,0.25,"cm"))
+  blankTheme<-mainTheme+theme(panel.background = element_rect(fill=graphcolours$graphC, colour=graphcolours$graphC))
   
-  plotBlankTheme<<-theme(panel.background = element_rect(fill=graphcolours$graphC, colour=graphcolours$graphC),
-                         panel.grid.major = element_line(linetype="blank"),panel.grid.minor = element_line(linetype="blank"),
-                         plot.background = element_rect(fill=graphcolours$graphC, colour=graphcolours$graphC),
-                         axis.title=element_text(size=16,face="bold")
-  )
-  
-  gridTheme<<-theme(plot.margin=margin(0,0,0,0,"cm"))
-}
 
-updateThemes()
+BrawOpts<<-list(
+  plotColours=plotColours,
+  plotShapes=plotShapes,
+  plotTheme=plotTheme,
+  reportTheme=reportTheme,
+  diagramTheme=diagramTheme,
+  blankTheme=blankTheme,
+  labelSize=4,
+  char3D=1.3
+)
+
 
 ##########################
 # NHST constants
-alphaSig<<-0.05
-alphaLLR<<-0.5*qnorm(1-alphaSig/2)^2
-STMethod<<-"NHST"
-lrRange<<-10
+
+alphaSig<-0.05
+alphaLLR<-0.5*qnorm(1-alphaSig/2)^2
+STMethod<-"NHST"
+lrRange<-10
+
+BrawOpts<<-c(BrawOpts,
+              list(alphaSig=alphaSig,
+                   alphaLLR=alphaLLR,
+                   STMethod=STMethod,
+                   lrRange=lrRange)
+)
+  
+
 
 #########################
 # display choices
+
+report_precision<<-3
+graph_precision<<-2
 
 autoShow<<-TRUE
 RZ<<-"r"
 
 z_range<<-1.5
 r_range<<-0.99
-w_range<<-c(0.05,0.99)
 w_range<<-c(0.05,1)
 fullRange<<-3
 nNpoints<<-101
@@ -84,7 +97,6 @@ doLegendBars<<-TRUE
 doLegendPoints<<-FALSE
 simData<<-TRUE
 
-points_threshold<<-50 # for displaying expected results
 wPlotScale<<-"log10"
 pPlotScale<<-"log10"
 nPlotScale<<-"linear"
@@ -94,7 +106,7 @@ showTheoryHQ<<-FALSE
 useSignificanceCols<<-TRUE
 showInteractionOnly<<-TRUE
 
-includeSingle<<-FALSE  # in "All" meta-analysis
+includeSingle<-FALSE  # in "All" meta-analysis
 
 alphaChar<<-'\u03B1'
 

@@ -8,7 +8,7 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
   
   if (design$sCheating=="None") return(result)
   if (design$sCheatingAmount==0) return(result)
-  if (isSignificant(STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence)) return(result)
+  if (isSignificant(BrawOpts$STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence)) return(result)
 
   # fix the hypothesis
   hypothesis$effect$world$worldOn<-FALSE
@@ -20,7 +20,7 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
            "Fixed"={limit<-design$sCheatingAmount},
            "Budget"={limit<-design$sCheatingBudget}
            )
-    while (!isSignificant(STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence) && ntrials<limit) {
+    while (!isSignificant(BrawOpts$STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence) && ntrials<limit) {
       sample<-makeSample(hypothesis,design)
       result<-makeAnalysis(hypothesis,design,evidence,sample)
       switch(design$sCheatingLimit,
@@ -43,7 +43,7 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
 
   if (is.element(design$sCheating,c("Prune","Replace"))) {
     ntrials<-0
-    while (!isSignificant(STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence) && ntrials<design$sCheatingAmount) {
+    while (!isSignificant(BrawOpts$STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence) && ntrials<design$sCheatingAmount) {
       ps<-c()
       for (i in 1:length(sample$iv)) {
         sample1<-sample
@@ -80,7 +80,7 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
   
   if (design$sCheating=="Grow") {
     ntrials<-0
-    while (!isSignificant(STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence) && ntrials<design$sCheatingAmount*changeAmount) {
+    while (!isSignificant(BrawOpts$STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence) && ntrials<design$sCheatingAmount*changeAmount) {
       sample$participant<-c(sample$participant,length(sample$participant)+(1:changeAmount))
       sample$iv<-c(sample$iv,sample2$iv[ntrials+(1:changeAmount)])
       sample$dv<-c(sample$dv,sample2$dv[ntrials+(1:changeAmount)])
@@ -97,7 +97,7 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
   
   if (design$sCheating=="Replace") {
     ntrials<-0
-    while (!isSignificant(STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence) && ntrials<design$sCheatingAmount) {
+    while (!isSignificant(BrawOpts$STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence) && ntrials<design$sCheatingAmount) {
       ps<-c()
       for (i in 1:length(sample$iv)) {
         sample1<-sample
@@ -121,14 +121,14 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
 
 replicateSample<-function(hypothesis,design,evidence,sample,res) {
 
-  oldalpha<-alphaSig
+  oldalpha<-BrawOpts$alphaSig
   res1<-res
   ResultHistory<-list(n=res$nval,df1=res$df1,r=res$rIV,rp=res$rpIV,p=res$pIV)
   replication<-design$sReplication
   
   if (replication$sReplicationOn) {
-    if (replication$sReplVarAlpha) alphaSig<<-oldalpha*replication$sReplAlpha
-    while (replication$sReplSigOnly=="Yes" && !isSignificant(STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
+    if (replication$sReplVarAlpha) BrawOpts$alphaSig<<-oldalpha*replication$sReplAlpha
+    while (replication$sReplSigOnly=="Yes" && !isSignificant(BrawOpts$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
       if (!evidence$shortHand) {
         sample<-makeSample(hypothesis,design)
         res<-makeAnalysis(hypothesis,design,evidence,sample)
@@ -137,7 +137,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
       }
       ResultHistory<-list(n=res$nval,df1=res$df1,r=res$rIV,rp=res$rpIV,p=res$pIV)
     }
-    if (replication$sReplVarAlpha) alphaSig<<-oldalpha/design$sReplAlpha
+    if (replication$sReplVarAlpha) BrawOpts$alphaSig<<-oldalpha/design$sReplAlpha
     
     res1<-res
     resHold<-res
@@ -156,7 +156,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
     }
     if (replication$sReplRepeats>0) {
     for (i in 1:replication$sReplRepeats) {
-      if (replication$sReplKeep=="cautious" && !isSignificant(STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
+      if (replication$sReplKeep=="cautious" && !isSignificant(BrawOpts$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
         break
       }
       # get the relevant sample effect size for the power calc
@@ -205,7 +205,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
     res<-resHold
     
     if (design$sReplKeep=="cautious") {
-      use<-!isSignificant(STMethod,ResultHistory$p,ResultHistory$r,ResultHistory$n,ResultHistory$df1,evidence)
+      use<-!isSignificant(BrawOpts$STMethod,ResultHistory$p,ResultHistory$r,ResultHistory$n,ResultHistory$df1,evidence)
       use[1]<-FALSE
       if (any(use)) {
         use<-which(use)[1]
@@ -226,7 +226,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
     }
     
   }
-  alphaSig<<-oldalpha
+  BrawOpts$alphaSig<<-oldalpha
   
   res$ResultHistory<-ResultHistory
   res$roIV<-res1$rIV

@@ -102,15 +102,15 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
           },
           "log(lrs)"={
             d1<-res2llr(analysis,"sLLR")
-            xlim<-c(-0.1, lrRange)
+            xlim<-c(-0.1, BrawOpts$lrRange)
             disp1_use<-bquote(log[e](lr[s]))
           },
           "log(lrd)"={
             d1<-res2llr(analysis,"dLLR")
             if (any(d1<0)) {
-              ylim<-c(-lrRange, lrRange)
+              ylim<-c(-BrawOpts$lrRange, BrawOpts$lrRange)
             } else {
-              ylim<-c(-0.1, lrRange)
+              ylim<-c(-0.1, BrawOpts$lrRange)
             }
             disp1_use<-bquote(log[e](lr[d]))
           },
@@ -254,15 +254,15 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
             ylim<-c(0,1)
           },
           "log(lrs)"={
-            ylim<-c(-0.1, lrRange)
+            ylim<-c(-0.1, BrawOpts$lrRange)
             disp2_use<-bquote(log[e](lr[s]))
           },
           "log(lrd)"={
             d2<-res2llr(analysis,"dLLR")
             if (any(d2<0)) {
-              ylim<-c(-lrRange, lrRange)
+              ylim<-c(-BrawOpts$lrRange, BrawOpts$lrRange)
             } else {
-              ylim<-c(-0.1, lrRange)
+              ylim<-c(-0.1, BrawOpts$lrRange)
             }
             disp2_use<-bquote(log[e](lr[d]))
           },
@@ -318,36 +318,36 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
   }
   
   dotSize=min(8,max(3.5,sqrt(400/length(d1))))
-  dotSize<-dotSize<-(plotTheme$axis.title$size)/3
+  dotSize<-dotSize<-(BrawOpts$plotTheme$axis.title$size)/3
 
   if (!metaPlot && useSignificanceCols){
-    c1=plotcolours$infer_sigC
-    c2=plotcolours$infer_nsigC
+    c1=BrawOpts$plotColours$infer_sigC
+    c2=BrawOpts$plotColours$infer_nsigC
   } else {
-    c1=plotcolours$descriptionC
-    c2=plotcolours$descriptionC
+    c1=BrawOpts$plotColours$descriptionC
+    c2=BrawOpts$plotColours$descriptionC
   }
   if (length(d1)<200) {
-    use<-!isSignificant(STMethod,pvals,rvals,nvals,df1vals,analysis$evidence)
+    use<-!isSignificant(BrawOpts$STMethod,pvals,rvals,nvals,df1vals,analysis$evidence)
     pts1=pts[use,]
-    g<-g+geom_point(data=pts1,aes(x=x, y=y),shape=shapes$study, colour = "black", fill = c2, size = dotSize)
+    g<-g+geom_point(data=pts1,aes(x=x, y=y),shape=BrawOpts$plotShapes$study, colour = "black", fill = c2, size = dotSize)
     pts2=pts[!use,]
-    g<-g+geom_point(data=pts2,aes(x=x, y=y),shape=shapes$study, colour = "black", fill = c1, size = dotSize)
+    g<-g+geom_point(data=pts2,aes(x=x, y=y),shape=BrawOpts$plotShapes$study, colour = "black", fill = c1, size = dotSize)
   } else {
     if (length(d1)<=10000) {
-      use<-!isSignificant(STMethod,pvals,rvals,nvals,df1vals,analysis$evidence)
+      use<-!isSignificant(BrawOpts$STMethod,pvals,rvals,nvals,df1vals,analysis$evidence)
       pts1=pts[use,]
-      g<-g+geom_point(data=pts1,aes(x=x, y=y),shape=shapes$study, colour = c2, fill = c2, size = dotSize/4)
+      g<-g+geom_point(data=pts1,aes(x=x, y=y),shape=BrawOpts$plotShapes$study, colour = c2, fill = c2, size = dotSize/4)
       pts2=pts[!use,]
-      g<-g+geom_point(data=pts2,aes(x=x, y=y),shape=shapes$study, colour = c1, fill = c1, size = dotSize/4)
+      g<-g+geom_point(data=pts2,aes(x=x, y=y),shape=BrawOpts$plotShapes$study, colour = c1, fill = c1, size = dotSize/4)
     } else {
       use<-d2<=maxnPlot
       pts<-data.frame(x=d1[use],y=d2[use])
       nbins<-diff(ylim)/(2*IQR(d2[use])*length(d2[use])^(-0.33))
-      g<-g+stat_bin2d(data=pts,aes(x=x,y=y),bins=nbins)+scale_fill_gradientn(colours=c(graphcolours$graphBack,plotcolours$descriptionC))
+      g<-g+stat_bin2d(data=pts,aes(x=x,y=y),bins=nbins)+scale_fill_gradientn(colours=c(BrawOpts$plotColours$graphBack,BrawOpts$plotColours$descriptionC))
     }
   }
-  g<-g+theme(legend.position = "none")+plotTheme
+  g<-g+theme(legend.position = "none")+BrawOpts$plotTheme
   if (xsc==0) {
     g<-g+scale_x_continuous(limits = xlim)
   } else {

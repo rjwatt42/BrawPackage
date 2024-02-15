@@ -436,11 +436,11 @@ fullRSamplingDist<-function(vals,world,design,doStat="r",logScale=FALSE,sigOnly=
                 "w"={
                   rp<-seq(0,1,length.out=101)
                   zp<-atanh(rp)
-                  wp<-pnorm(qnorm(alphaSig/2)+zp*sqrt(nvals[ni]-3)) + pnorm(qnorm(alphaSig/2)-zp*sqrt(nvals[ni]-3))
+                  wp<-pnorm(qnorm(BrawOpts$alphaSig/2)+zp*sqrt(nvals[ni]-3)) + pnorm(qnorm(BrawOpts$alphaSig/2)-zp*sqrt(nvals[ni]-3))
                   addition<-rSamplingDistr(rp,rvals[ei],nvals[ni])+
                             rSamplingDistr(-rp,rvals[ei],nvals[ni])
-                  dwz<-dnorm(zp,qnorm(alphaSig/2)/sqrt(nvals[ni]-3),1/sqrt(nvals[ni]-3)) -
-                    dnorm(zp,-qnorm(alphaSig/2)/sqrt(nvals[ni]-3),1/sqrt(nvals[ni]-3))
+                  dwz<-dnorm(zp,qnorm(BrawOpts$alphaSig/2)/sqrt(nvals[ni]-3),1/sqrt(nvals[ni]-3)) -
+                    dnorm(zp,-qnorm(BrawOpts$alphaSig/2)/sqrt(nvals[ni]-3),1/sqrt(nvals[ni]-3))
                   a<-addition[1]
                   addition<-addition/dwz*(1-rp^2)
                   addition[1]<-a
@@ -448,7 +448,7 @@ fullRSamplingDist<-function(vals,world,design,doStat="r",logScale=FALSE,sigOnly=
                   addition<-approx(wp[c(1,use+1)],addition[c(1,use+1)],vals)$y
                 },
                 "nw"={ 
-                  zp<-(qnorm(0.8)-qnorm(alphaSig))/sqrt(vals-3)
+                  zp<-(qnorm(0.8)-qnorm(BrawOpts$alphaSig))/sqrt(vals-3)
                   rp<-tanh(zp)
                   addition<-rSamplingDistr(rp,rvals[ei],nvals[ni])+
                             rSamplingDistr(-rp,rvals[ei],nvals[ni])
@@ -458,10 +458,10 @@ fullRSamplingDist<-function(vals,world,design,doStat="r",logScale=FALSE,sigOnly=
                 "wp"={
                   rp<-seq(0,1,length.out=101)
                   zp<-atanh(rp)
-                  wp<-pnorm(qnorm(alphaSig/2)+zp*sqrt(nvals[ni]-3)) + pnorm(qnorm(alphaSig/2)-zp*sqrt(nvals[ni]-3))
+                  wp<-pnorm(qnorm(BrawOpts$alphaSig/2)+zp*sqrt(nvals[ni]-3)) + pnorm(qnorm(BrawOpts$alphaSig/2)-zp*sqrt(nvals[ni]-3))
                   addition<-fullRPopulationDist(rp,world)
-                  dwz<-dnorm(zp,qnorm(alphaSig/2)/sqrt(nvals[ni]-3),1/sqrt(nvals[ni]-3)) -
-                    dnorm(zp,-qnorm(alphaSig/2)/sqrt(nvals[ni]-3),1/sqrt(nvals[ni]-3))
+                  dwz<-dnorm(zp,qnorm(BrawOpts$alphaSig/2)/sqrt(nvals[ni]-3),1/sqrt(nvals[ni]-3)) -
+                    dnorm(zp,-qnorm(BrawOpts$alphaSig/2)/sqrt(nvals[ni]-3),1/sqrt(nvals[ni]-3))
                   a<-addition[1]
                   addition<-addition/dwz*(1-rp^2)
                   addition[1]<-a
@@ -473,7 +473,7 @@ fullRSamplingDist<-function(vals,world,design,doStat="r",logScale=FALSE,sigOnly=
         addition<-addition*ndens[ni]
         d1<-d1+addition
         if (sigOnly) {
-          critR<-tanh(qnorm(1-alphaSig/2,0,1/sqrt(nvals[ni]-3)))
+          critR<-tanh(qnorm(1-BrawOpts$alphaSig/2,0,1/sqrt(nvals[ni]-3)))
           addition[abs(rp)<critR]<-0
         }
         d<-d+addition

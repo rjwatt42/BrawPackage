@@ -47,7 +47,7 @@ plotParParPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha){
   radius<-qnorm(seq(0.55,0.95,0.1))*1.5
   for (ir in 1:length(radius)) {
     pts<-data.frame(x=x*radius[ir]*IV$sd+IV$mu,y=y*radius[ir]*DV$sd+DV$mu)
-    g<-g+geom_polygon(data=pts,aes(x=x,y=y), fill = plotcolours$sampleC, color=NA, alpha=alpha/(length(radius)-2))
+    g<-g+geom_polygon(data=pts,aes(x=x,y=y), fill = BrawOpts$plotColours$sampleC, color=NA, alpha=alpha/(length(radius)-2))
   }
   return(g+scale_alpha_continuous(range = c(0, 1)))
 }
@@ -75,7 +75,7 @@ plotOrdParPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha){
   pts$y<-pts$y+pts$yoff
   
   g<-ggplot(pts,aes(x=y,y=x))
-  g<-g+geom_polygon(data=pts,aes(x=y,y=x*DV$sd+DV$mu,group=ids,alpha=alpha*value),fill=plotcolours$sampleC,color=NA,show.legend=FALSE)
+  g<-g+geom_polygon(data=pts,aes(x=y,y=x*DV$sd+DV$mu,group=ids,alpha=alpha*value),fill=BrawOpts$plotColours$sampleC,color=NA,show.legend=FALSE)
   g+scale_x_continuous(breaks=b,labels=l)+scale_alpha_continuous(range = c(0, 1))
   
 }
@@ -122,7 +122,7 @@ plotCatParPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha){
   pts$y<-pts$y*pts$value*0.9+pts$yoff
 
   g<-ggplot(pts,aes(x=y,y=x))
-  g<-g+geom_polygon(data=pts,aes(x=y,y=x*DV$sd+DV$mu,group=ids,alpha=alpha*value),fill=plotcolours$sampleC,color=NA,show.legend=FALSE)
+  g<-g+geom_polygon(data=pts,aes(x=y,y=x*DV$sd+DV$mu,group=ids,alpha=alpha*value),fill=BrawOpts$plotColours$sampleC,color=NA,show.legend=FALSE)
   g+scale_x_continuous(breaks=b,labels=l)+scale_alpha_continuous(range = c(0, 1))
   
   #   
@@ -135,7 +135,7 @@ plotCatParPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha){
   #   xshape<-c(-x,rev(x))*pp[id]
   #   pts<-data.frame(x=xshape+b[id],y=yshape*hsy[id]*sdv[id]+muv[id])
   #   g<-g+
-  #     geom_polygon(data=pts,aes(x=x,y=y),fill = plotcolours$sampleC,color=NA,alpha=alpha)
+  #     geom_polygon(data=pts,aes(x=x,y=y),fill = BrawOpts$plotColours$sampleC,color=NA,alpha=alpha)
   # }
   # g+scale_x_continuous(breaks=b,labels=l)
   # 
@@ -163,7 +163,7 @@ plotParOrdPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha){
   pts$y<-pts$y+pts$yoff
   
   g<-ggplot(pts,aes(x=x*IV$sd+IV$mu,y=y))
-  g<-g+geom_polygon(data=pts,aes(x=x*IV$sd+IV$mu,y=y,group=ids,alpha=alpha*value),fill=plotcolours$sampleC,color=NA,show.legend=FALSE)
+  g<-g+geom_polygon(data=pts,aes(x=x*IV$sd+IV$mu,y=y,group=ids,alpha=alpha*value),fill=BrawOpts$plotColours$sampleC,color=NA,show.legend=FALSE)
   g+scale_y_continuous(breaks=b,labels=l)+scale_alpha_continuous(range = c(0, 1))
   
 }
@@ -200,7 +200,7 @@ plotCatOrdPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha){
 
   g<-ggplot()
   g<-g+
-    geom_polygon(data=pts,aes(x=x,y=y,group=ids,alpha=alpha*value),fill = plotcolours$sampleC,colour=NA,show.legend=FALSE)
+    geom_polygon(data=pts,aes(x=x,y=y,group=ids,alpha=alpha*value),fill = BrawOpts$plotColours$sampleC,colour=NA,show.legend=FALSE)
   g+scale_x_continuous(breaks=b1,labels=l1)+scale_y_continuous(breaks=b2,labels=l2)+scale_alpha_continuous(range = c(0, 1))
 }
 
@@ -233,7 +233,7 @@ plotOrdCatPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha){
   
   g<-ggplot()
   g<-g+
-    geom_polygon(data=pts,aes(x=x,y=y,group=ids,alpha=alpha*value),fill = plotcolours$sampleC,colour=NA,show.legend=FALSE)
+    geom_polygon(data=pts,aes(x=x,y=y,group=ids,alpha=alpha*value),fill = BrawOpts$plotColours$sampleC,colour=NA,show.legend=FALSE)
   g+scale_x_continuous(breaks=b1,labels=l1)+scale_y_continuous(breaks=b2,labels=l2)+scale_alpha_continuous(range = c(0, 1))
   
   # 
@@ -247,7 +247,7 @@ plotOrdCatPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha){
   #     # pts<-data.frame(x=x*s[iy,ix]+b1[ix]-xoff, y=y*s[iy,ix]+b2[iy]-yoff)
   #     pts<-data.frame(y=y*pp[ix]*pp2[iy]+b2[iy], x=x*s[ix,iy]+b1[ix])
   #     g<-g+
-  #       geom_polygon(data=pts,aes(x=x,y=y),fill = plotcolours$sampleC,colour=NA,alpha=alpha*pp[ix])
+  #       geom_polygon(data=pts,aes(x=x,y=y),fill = BrawOpts$plotColours$sampleC,colour=NA,alpha=alpha*pp[ix])
   #   }
   # }
   # g+scale_x_continuous(breaks=b1,labels=l1)+scale_y_continuous(breaks=b2,labels=l2)
@@ -273,7 +273,7 @@ plotParCatPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha){
   pts$y<-pts$y*pts$value*0.9+pts$yoff
   
   g<-ggplot(pts,aes(x=x*IV$sd+IV$mu,y=y))
-  g<-g+geom_polygon(data=pts,aes(x=x*IV$sd+IV$mu,y=y,group=ids,alpha=alpha*value),fill=plotcolours$sampleC,color=NA,show.legend=FALSE)
+  g<-g+geom_polygon(data=pts,aes(x=x*IV$sd+IV$mu,y=y,group=ids,alpha=alpha*value),fill=BrawOpts$plotColours$sampleC,color=NA,show.legend=FALSE)
   g+scale_y_continuous(breaks=b,labels=l)+scale_alpha_continuous(range = c(0, 1))
   
   # 
@@ -288,7 +288,7 @@ plotParCatPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha){
   #   yshape<-c(-y,rev(y))*pp[id]
   #   pts<-data.frame(x=xshape*IV$sd+IV$mu,y=yshape+b[id])
   #   g<-g+
-  #     geom_polygon(data=pts,aes(x=x,y=y),fill = plotcolours$sampleC,color=NA,alpha=alpha)
+  #     geom_polygon(data=pts,aes(x=x,y=y),fill = BrawOpts$plotColours$sampleC,color=NA,alpha=alpha)
   # }
   # g+scale_y_continuous(breaks=b,labels=l)
 
@@ -319,7 +319,7 @@ plotCatCatPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha){
       # pts<-data.frame(x=x*s[iy,ix]+b1[ix]-xoff, y=y*s[iy,ix]+b2[iy]-yoff)
       pts<-data.frame(x=x*s[iy,ix]*pp1[ix]*pp2[iy]+b1[ix], y=y*s[iy,ix]*pp1[ix]*pp2[iy]+b2[iy])
       g<-g+
-        geom_polygon(data=pts,aes(x=x,y=y),fill = plotcolours$sampleC,colour=NA,alpha=alpha)
+        geom_polygon(data=pts,aes(x=x,y=y),fill = BrawOpts$plotColours$sampleC,colour=NA,alpha=alpha)
     }
   }
   g+scale_x_continuous(breaks=b1,labels=l1)+scale_y_continuous(breaks=b2,labels=l2)+scale_alpha_continuous(range = c(0, 1))
@@ -345,13 +345,13 @@ plotOrdOrdPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha){
     for (iy in 1:nlevs2) {
       pts<-data.frame(x=x+b1[ix], y=y+b2[iy])
       g<-g+
-        geom_polygon(data=pts,aes(x=x,y=y),fill = plotcolours$sampleC,colour=NA,alpha=alpha*pp1[ix]*pp2[iy])
+        geom_polygon(data=pts,aes(x=x,y=y),fill = BrawOpts$plotColours$sampleC,colour=NA,alpha=alpha*pp1[ix]*pp2[iy])
     }
   }
   g+scale_x_continuous(breaks=b1)+scale_y_continuous(breaks=b2)+scale_alpha_continuous(range = c(0, 1))
 }
 
-plotPopulation<-function(IV,DV,effect,alpha=1,theme=diagramTheme){
+plotPopulation<-function(IV,DV,effect,alpha=1,theme=BrawOpts$diagramTheme){
   rho<-effect$rIV
   if (is.na(rho)) {rho<-0}
   

@@ -9,10 +9,10 @@ showHypothesis<-function(hypothesis=makeHypothesis()) {
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV
   effect<-hypothesis$effect
-  if (is.null(IV) || is.null(DV)) {return(ggplot()+plotBlankTheme)}
+  if (is.null(IV) || is.null(DV)) {return(ggplot()+BrawOpts$blankTheme)}
   if (is.null(IV2)) no_ivs<-1 else no_ivs<-2
     
-  PlotNULL<-ggplot()+plotBlankTheme+theme(plot.margin=margin(0,-0.1,0,0,"cm"))+
+  PlotNULL<-ggplot()+BrawOpts$blankTheme+theme(plot.margin=margin(0,-0.1,0,0,"cm"))+
     scale_x_continuous(limits = c(0,10),labels=NULL,breaks=NULL)+scale_y_continuous(limits = c(0,10),labels=NULL,breaks=NULL)
   
   xmin<-2
@@ -43,7 +43,7 @@ showHypothesis<-function(hypothesis=makeHypothesis()) {
 showWorld<-function(world=makeWorld()) {
 # world diagram
 
-  PlotNULL<-ggplot()+plotBlankTheme+theme(plot.margin=margin(0,-0.1,0,0,"cm"))+
+  PlotNULL<-ggplot()+BrawOpts$blankTheme+theme(plot.margin=margin(0,-0.1,0,0,"cm"))+
     scale_x_continuous(limits = c(0,10),labels=NULL,breaks=NULL)+scale_y_continuous(limits = c(0,10),labels=NULL,breaks=NULL)
 
   switch(RZ,
@@ -66,11 +66,11 @@ showWorld<-function(world=makeWorld()) {
   rdens<-c(0,rdens,0)
   pts=data.frame(x=rx,y=rdens)
   g1<-ggplot(pts,aes(x=x,y=y))
-  g1<-g1+geom_polygon(data=pts,aes(x=x,y=y),fill=plotcolours$descriptionC)+scale_y_continuous(limits = c(0,1.05),labels=NULL,breaks=NULL)
+  g1<-g1+geom_polygon(data=pts,aes(x=x,y=y),fill=BrawOpts$plotColours$descriptionC)+scale_y_continuous(limits = c(0,1.05),labels=NULL,breaks=NULL)
   g1<-g1+geom_line(data=pts,aes(x=x,y=y),color="black",lwd=0.25)
   switch(RZ,
-         "r"={ g1<-g1+labs(x=rpLabel,y="Density")+diagramTheme },
-         "z"={ g1<-g1+labs(x=zpLabel,y="Density")+diagramTheme }
+         "r"={ g1<-g1+labs(x=rpLabel,y="Density")+BrawOpts$diagramTheme },
+         "z"={ g1<-g1+labs(x=zpLabel,y="Density")+BrawOpts$diagramTheme }
          )
 
   g<-g1
@@ -95,9 +95,9 @@ showDesign<-function(design=makeDesign()) {
   
   pts=data.frame(x=x,y=y)
   g<-ggplot(pts,aes(x=x,y=y))
-  g<-g+geom_polygon(data=pts,aes(x=x,y=y),fill=plotcolours$descriptionC)+scale_y_continuous(limits = c(0,1.05),labels=NULL,breaks=NULL)
+  g<-g+geom_polygon(data=pts,aes(x=x,y=y),fill=BrawOpts$plotColours$descriptionC)+scale_y_continuous(limits = c(0,1.05),labels=NULL,breaks=NULL)
   g<-g+geom_line(data=pts,aes(x=x,y=y),color="black",lwd=0.25)
-  g<-g+labs(x="n",y="Density")+diagramTheme
+  g<-g+labs(x="n",y="Density")+BrawOpts$diagramTheme
   
   g  
 }
@@ -108,7 +108,7 @@ showPopulation <- function(hypothesis=makeHypothesis()) {
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV
   effect<-hypothesis$effect
-  if (is.null(IV) || is.null(DV)) {return(ggplot()+plotBlankTheme)}
+  if (is.null(IV) || is.null(DV)) {return(ggplot()+BrawOpts$blankTheme)}
   if (is.null(IV2)) no_ivs<-1 else no_ivs<-2
 
   switch (no_ivs,
@@ -138,7 +138,7 @@ showPrediction <- function(hypothesis=makeHypothesis(),design=makeDesign()){
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV
   effect<-hypothesis$effect
-  if (is.null(IV) || is.null(DV)) {return(ggplot()+plotBlankTheme)}
+  if (is.null(IV) || is.null(DV)) {return(ggplot()+BrawOpts$blankTheme)}
   if (is.null(IV2)) no_ivs<-1 else no_ivs<-2
 
   switch (no_ivs,

@@ -91,7 +91,7 @@ sampleShortCut<-function(hypothesis,design,evidence,nsims,appendData,oldanalysis
     ps<-(1-pnorm(atanh(abs(rs)),0,s1))*2
     
     if (sigOnly) {
-      keep<-isSignificant(STMethod,ps,rs,ns,df1,evidence)
+      keep<-isSignificant(BrawOpts$STMethod,ps,rs,ns,df1,evidence)
       pops<-pops[keep]
       rs<-rs[keep]
       ps<-ps[keep]

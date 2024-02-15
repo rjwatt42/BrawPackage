@@ -4,11 +4,11 @@ plotBaseline<-TRUE
 
 plotParParPrediction<-function(g,IV,DV,rho,n,offset=1){
   if (offset==1) {
-    col<- plotcolours$descriptionC
+    col<- BrawOpts$plotColours$descriptionC
     xoff=0
   } else {
     off=offset-2
-    col<- col2rgb(plotcolours$descriptionC1)*(1-off)+col2rgb(plotcolours$descriptionC2)*off
+    col<- col2rgb(BrawOpts$plotColours$descriptionC1)*(1-off)+col2rgb(BrawOpts$plotColours$descriptionC2)*off
     col<- rgb(col[1]/255,col[2]/255,col[3]/255)
     xoff=-0.25+off*0.5
   }
@@ -39,11 +39,11 @@ plotParParPrediction<-function(g,IV,DV,rho,n,offset=1){
 
 plotCatParPrediction<-function(g,IV,DV,rho,n,offset= 1){
   if (offset==1) {
-    col<- plotcolours$descriptionC
+    col<- BrawOpts$plotColours$descriptionC
     xoff=0
   } else {
     off=offset-2
-    col<- col2rgb(plotcolours$descriptionC1)*(1-off)+col2rgb(plotcolours$descriptionC2)*off
+    col<- col2rgb(BrawOpts$plotColours$descriptionC1)*(1-off)+col2rgb(BrawOpts$plotColours$descriptionC2)*off
     col<- rgb(col[1]/255,col[2]/255,col[3]/255)
     xoff=-0.25+off*0.2
   }
@@ -76,7 +76,7 @@ plotCatParPrediction<-function(g,IV,DV,rho,n,offset= 1){
   g<-g+
     geom_line(data=mn_pts,aes(x=xm,y=ym))+
     geom_errorbar(data=mn_pts,aes(x=xm, ymin=ym-se, ymax=ym+se),width=0.2)+
-    geom_point(data=mn_pts,aes(x=xm,y=ym), shape=shapes$data, colour = "black", fill = col, size = 7)
+    geom_point(data=mn_pts,aes(x=xm,y=ym), shape=BrawOpts$plotShapes$data, colour = "black", fill = col, size = 7)
   if (offset<=2){
     g<-g+scale_x_continuous(breaks=b,labels=l)
   }
@@ -87,11 +87,11 @@ plotCatParPrediction<-function(g,IV,DV,rho,n,offset= 1){
 
 plotParOrdPrediction<-function(g,IV,DV,rho,n,offset=1){
   if (offset==1) {
-  col<- plotcolours$descriptionC
+  col<- BrawOpts$plotColours$descriptionC
   xoff=0
   } else   {
     off=offset-2
-    col<- col2rgb(plotcolours$descriptionC1)*(1-off)+col2rgb(plotcolours$descriptionC2)*off
+    col<- col2rgb(BrawOpts$plotColours$descriptionC1)*(1-off)+col2rgb(BrawOpts$plotColours$descriptionC2)*off
     col<- rgb(col[1]/255,col[2]/255,col[3]/255)
     xoff=-0.25+off*0.5
   }
@@ -117,11 +117,11 @@ plotParOrdPrediction<-function(g,IV,DV,rho,n,offset=1){
 
 plotCatOrdPrediction<-function(g,IV,DV,rho,n,offset= 1){
   if (offset==1) {
-    col<- plotcolours$descriptionC
+    col<- BrawOpts$plotColours$descriptionC
     xoff=0
   } else {
     off=offset-2
-    col<- col2rgb(plotcolours$descriptionC1)*(1-off)+col2rgb(plotcolours$descriptionC2)*off
+    col<- col2rgb(BrawOpts$plotColours$descriptionC1)*(1-off)+col2rgb(BrawOpts$plotColours$descriptionC2)*off
     col<- rgb(col[1]/255,col[2]/255,col[3]/255)
     xoff=-0.25+off*0.5
   }
@@ -150,7 +150,7 @@ plotCatOrdPrediction<-function(g,IV,DV,rho,n,offset= 1){
   g<-g+
     geom_line(data=mn_pts,aes(x=xm,y=ym))+
     geom_errorbar(data=mn_pts,aes(x=xm, ymin=ym-se, ymax=ym+se),width=0.2)+
-    geom_point(data=mn_pts,aes(x=xm,y=ym), shape=shapes$data, colour = "black", fill = col, size = 7)
+    geom_point(data=mn_pts,aes(x=xm,y=ym), shape=BrawOpts$plotShapes$data, colour = "black", fill = col, size = 7)
   if (offset<=2){
     g<-g+scale_x_continuous(breaks=b,labels=l)
   }
@@ -160,12 +160,12 @@ plotCatOrdPrediction<-function(g,IV,DV,rho,n,offset= 1){
 
 plotParCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
   if (offset==1) {
-    col<- plotcolours$descriptionC1
+    col<- BrawOpts$plotColours$descriptionC1
     xoff=0
     barwidth=2/(DV$ncats+1)
   } else {
     off=offset-2
-    col<- col2rgb(plotcolours$descriptionC1)*(1-off)+col2rgb(plotcolours$descriptionC2)*off
+    col<- col2rgb(BrawOpts$plotColours$descriptionC1)*(1-off)+col2rgb(BrawOpts$plotColours$descriptionC2)*off
     col<- rgb(col[1]/255,col[2]/255,col[3]/255)
     xoff=-0.25+off*0.5
     barwidth=0.25
@@ -259,12 +259,12 @@ plotParCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
 
 plotCatCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
   if (offset==1) {
-    col<- plotcolours$descriptionC
+    col<- BrawOpts$plotColours$descriptionC
     xoff=0
     barwidth=2/(DV$ncats+1)
   } else {
     off=offset-2
-    col<- col2rgb(plotcolours$descriptionC1)*(1-off)+col2rgb(plotcolours$descriptionC2)*off
+    col<- col2rgb(BrawOpts$plotColours$descriptionC1)*(1-off)+col2rgb(BrawOpts$plotColours$descriptionC2)*off
     col<- rgb(col[1]/255,col[2]/255,col[3]/255)
     xoff=-0.25+off*0.5
     barwidth=0.5
@@ -323,7 +323,7 @@ plotCatCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
 }
 
 
-plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL,theme=diagramTheme){
+plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL,theme=BrawOpts$diagramTheme){
   
   n<-design$sN
   hypothesisType=paste(IV$type,DV$type,sep=" ")
@@ -338,7 +338,7 @@ plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL,theme=diagramTh
       cols<-c()
       for (i2 in 1:DV$ncats) {
         off<-(i2-1)/(DV$ncats-1)
-        col<-col2rgb(plotcolours$descriptionC1)*off+col2rgb(plotcolours$descriptionC2)*(1-off)
+        col<-col2rgb(BrawOpts$plotColours$descriptionC1)*off+col2rgb(BrawOpts$plotColours$descriptionC2)*(1-off)
         col<- rgb(col[1]/255,col[2]/255,col[3]/255)
         cols<-c(cols,col)
       }
@@ -534,8 +534,8 @@ plotWorldSampling<-function(effect,design,sigOnly=FALSE) {
   g<-g+geom_polygon(data=pts,aes(x=x,y=y),fill="yellow")+scale_y_continuous(limits = c(0,1.05),labels=NULL,breaks=NULL)
   g<-g+geom_line(data=pts,aes(x=x,y=y),color="black",lwd=0.25)
   switch(RZ,
-         "r"={g<-g+labs(x=rsLabel,y="Frequency")+diagramTheme},
-         "z"={g<-g+labs(x=zsLabel,y="Frequency")+diagramTheme}
+         "r"={g<-g+labs(x=rsLabel,y="Frequency")+BrawOpts$diagramTheme},
+         "z"={g<-g+labs(x=zsLabel,y="Frequency")+BrawOpts$diagramTheme}
          )
   g+theme(plot.margin=margin(1.3,0.8,0,0.25,"cm"))
 }

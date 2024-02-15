@@ -48,12 +48,12 @@ reportInference<-function(analysis){
       n<-analysis$nval
       f1<-" "
       f2<-" "
-      if (STMethod=="sLLR") {
+      if (BrawOpts$STMethod=="sLLR") {
         analysis$sIV<-res2llr(analysis,"sLLR")
         f1<-"\bllr"
         f2<-paste("s=",format(analysis$sIV,digits=report_precision),sep="")
       }
-      if (STMethod=="dLLR") {
+      if (BrawOpts$STMethod=="dLLR") {
         if (!analysis$evidence$prior$worldOn) {
           analysis$evidence$prior<-list(worldOn=TRUE,populationPDF="Single",populationPDFk=analysis$rIV,populationRZ="r",populationNullp=0.5)
         }

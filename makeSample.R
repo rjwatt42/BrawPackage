@@ -184,7 +184,7 @@ makeSampleVar<-function(design,n,MV){
   data<-list(ivr=ivr[1:n],dvr_m=dvr_m[1:n],dvr_s=dvr_s[1:n])
 }
 
-makeSample<-function(hypothesis,design){
+makeSample<-function(hypothesis=makeHypothesis(),design=makeDesign()){
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV

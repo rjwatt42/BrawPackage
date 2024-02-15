@@ -1,11 +1,11 @@
 
 reportPlot<-function(outputText,nc,nr){
 
-  bg<-graphcolours$graphC
+  bg<-BrawOpts$plotColours$graphC
   margin=0.5
   colSpace=2.5
   
-  font_size=labelSize
+  font_size=brawOpts$labelSize
   characterWidth=font_size/14
   
   top=max(nr,14)
@@ -78,14 +78,7 @@ reportPlot<-function(outputText,nc,nr){
                                          label.size=NA,label.padding=unit(0,"lines"))
   }
   
-  g<-g+labs(x="  ",y="  ")+reportTheme+theme(legend.position = "none")
-  g<-g+theme(axis.title.x=element_blank(),
-          axis.text.x=element_blank(),
-          axis.ticks.x=element_blank(),
-          axis.title.y=element_blank(),
-          axis.text.y=element_blank(),
-          axis.ticks.y=element_blank(),
-          panel.background = element_rect(fill=graphcolours$graphC, colour=graphcolours$graphC)
-    )
-  g+coord_cartesian(xlim = c(1-margin,edge+margin), ylim = c(1-margin,top+margin))
+  g<-g+labs(x="  ",y="  ")+brawOpts$reportTheme+theme(legend.position = "none")
+  g<-g+coord_cartesian(xlim = c(1-margin,edge+margin), ylim = c(1-margin,top+margin))
+  g+BrawOpts$blankTheme
 }

@@ -88,11 +88,11 @@ r2ci<-function(r,n,s=0){
   }
 }
 
-res2llr<-function(analysis,method=STMethod) {
+res2llr<-function(analysis,method=BrawOpts$STMethod) {
   r2llr(analysis$rIV,analysis$nval,analysis$df1,method,analysis$evidence$llr,analysis$evidence$prior)
 }
 
-r2llr<-function(r,n,df1,method=STMethod,llr=list(e1=c(),e2=0),world=NULL) {
+r2llr<-function(r,n,df1,method=BrawOpts$STMethod,llr=list(e1=c(),e2=0),world=NULL) {
   r<-check_r(r,from="r2llr")
   n<-check_n(n,from="r2llr")
   z<-atanh(r)
@@ -415,13 +415,13 @@ generalAnalysis<-function(allData,InteractionOn,withins,ssqType="Type3",caseOrde
       # lmNorm to calculate effect sizes
       lmNorm<-glmer(formula=as.formula(formula),data=analysisNormData,family="binomial")
       lmNormC<-glmer(formula=as.formula(formula),data=analysisNormData,family="binomial",contrasts=contrasts)
-      testMethod<-"Chisq"
+      teBrawOpts$STMethod<-"Chisq"
     } else {
       lmRaw<-glm(formula=as.formula(formula),data=analysisRawData,family="binomial")
       lmRawC<-glm(formula=as.formula(formula),data=analysisRawData,family="binomial",contrasts=contrasts)
       lmNorm<-glm(formula=as.formula(formula),data=analysisNormData,family="binomial")
       lmNormC<-glm(formula=as.formula(formula),data=analysisNormData,family="binomial",contrasts=contrasts)
-      testMethod<-"F"
+      teBrawOpts$STMethod<-"F"
     }
     pcol=3;prow=2
     
@@ -441,29 +441,29 @@ generalAnalysis<-function(allData,InteractionOn,withins,ssqType="Type3",caseOrde
       lmNorm<-lm(formula=as.formula(formula),data=analysisNormData)
       lmNormC<-lm(formula=as.formula(formula),data=analysisNormData,contrasts=contrasts)
     }
-    testMethod<-"F"
+    teBrawOpts$STMethod<-"F"
     pcol=4;prow=2;
   }
   
   #ANOVAS
   switch (ssqType,
           "Type1"={
-            anRaw<-Anova(lmRaw,test=testMethod)
-            anRawC<-Anova(lmRawC,test=testMethod)
-            anNorm<-Anova(lmNorm,test=testMethod)
-            anNormC<-Anova(lmNormC,test=testMethod)
+            anRaw<-Anova(lmRaw,test=teBrawOpts$STMethod)
+            anRawC<-Anova(lmRawC,test=teBrawOpts$STMethod)
+            anNorm<-Anova(lmNorm,test=teBrawOpts$STMethod)
+            anNormC<-Anova(lmNormC,test=teBrawOpts$STMethod)
           },
           "Type2"={
-            anRaw<-Anova(lmRaw,test=testMethod,type=2)
-            anRawC<-Anova(lmRawC,test=testMethod,type=2)
-            anNorm<-Anova(lmNorm,test=testMethod,type=2)
-            anNormC<-Anova(lmNormC,test=testMethod,type=2)
+            anRaw<-Anova(lmRaw,test=teBrawOpts$STMethod,type=2)
+            anRawC<-Anova(lmRawC,test=teBrawOpts$STMethod,type=2)
+            anNorm<-Anova(lmNorm,test=teBrawOpts$STMethod,type=2)
+            anNormC<-Anova(lmNormC,test=teBrawOpts$STMethod,type=2)
           },
           "Type3"={
-            anRaw<-Anova(lmRaw,test=testMethod,type=3,singular.ok=TRUE)
-            anRawC<-Anova(lmRawC,test=testMethod,type=3,singular.ok=TRUE)
-            anNorm<-Anova(lmNorm,test=testMethod,type=3,singular.ok=TRUE)
-            anNormC<-Anova(lmNormC,test=testMethod,type=3,singular.ok=TRUE)
+            anRaw<-Anova(lmRaw,test=teBrawOpts$STMethod,type=3,singular.ok=TRUE)
+            anRawC<-Anova(lmRawC,test=teBrawOpts$STMethod,type=3,singular.ok=TRUE)
+            anNorm<-Anova(lmNorm,test=teBrawOpts$STMethod,type=3,singular.ok=TRUE)
+            anNormC<-Anova(lmNormC,test=teBrawOpts$STMethod,type=3,singular.ok=TRUE)
           }
   )
   
@@ -510,11 +510,12 @@ generalAnalysis<-function(allData,InteractionOn,withins,ssqType="Type3",caseOrde
   ))
 }
 
-makeAnalysis<-function(hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),sample=makeSample()){
-  IV<-hypothesis$IV
-  IV2<-hypothesis$IV2
-  DV<-hypothesis$DV
-  effect<-hypothesis$effect
+makeAnalysis<-function(evidence=makeEvidence(),sample=makeSample()){
+  design<-sample$design
+  IV<-sample$IV
+  IV2<-sample$IV2
+  DV<-sample$DV
+  effect<-sample$effect
   analysis<-sample
   
   switch (evidence$Transform,
@@ -856,6 +857,9 @@ makeAnalysis<-function(hypothesis=makeHypothesis(),design=makeDesign(),evidence=
   # analysis$ResultHistory<-ResultHistory
   
   analysis$Heteroscedasticity<-0
+  
+  if (autoShow) print(showDescription(analysis))
+  
   analysis
   
 }
@@ -894,7 +898,7 @@ runSimulation<-function(hypothesis,design,evidence,sig_only=FALSE,onlyAnalysis=F
   }
   
   # sig only
-  while (sig_only && !isSignificant(STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
+  while (sig_only && !isSignificant(BrawOpts$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
     if (!evidence$shortHand) {
       # sample<-makeSample(IV,IV2,DV,effect,design)
       # res<-makeAnalysis(IV,IV2,DV,effect,design,evidence,sample)

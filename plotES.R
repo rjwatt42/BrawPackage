@@ -8,35 +8,35 @@ drawEffectES<-function(r,t=1){
           len=0.9
           labelpts<-data.frame(x=0.45,y=0.55)
           ends="last"
-          col=plotcolours$maineffectES},
+          col=BrawOpts$plotColours$maineffectES},
           
           {start=c(-0.4,0.75)
           direction=45
           len=sqrt(2)*0.75
           labelpts<-data.frame(x=-0.25,y=0.375)
           ends="last"
-          col=plotcolours$maineffectES},
+          col=BrawOpts$plotColours$maineffectES},
 
           {start=c(0.4,0.75)
           direction=-45
           len=sqrt(2)*0.75
           labelpts<-data.frame(x=0.25,y=0.375)
           ends="last"
-          col=plotcolours$maineffectES},
+          col=BrawOpts$plotColours$maineffectES},
           
           {start=c(0.7,0.5)
           direction=-90
           len=1.4
           labelpts<-data.frame(x=0,y=0.55)
           ends="both"
-          col=plotcolours$covariationES},
+          col=BrawOpts$plotColours$covariationES},
           
           {start=c(0,0.5)
           direction=0
           len=0.5
           labelpts<-data.frame(x=0,y=0.85)
           ends="join"
-          col=plotcolours$interactionES}
+          col=BrawOpts$plotColours$interactionES}
   )
       d=0.08
     dx=d*cos(45/(180/pi)) 
@@ -72,11 +72,11 @@ drawEffectES<-function(r,t=1){
       lbl=paste("r=",as.character(r),sep="")
     }else{ lbl=as.character(r)
     }
-    g<-g+geom_label(data=labelpts,aes(x = mean(x), y = mean(y), label = lbl), color="black", fill = "white",size=labelSize)
+    g<-g+geom_label(data=labelpts,aes(x = mean(x), y = mean(y), label = lbl), color="black", fill = "white",size=brawOpts$labelSize)
   }
   
   g + 
-    plotTheme+
+    BrawOpts$plotTheme+
     theme(axis.text.y=element_blank(),
           axis.ticks.y=element_blank(),
           axis.text.x=element_blank(),
