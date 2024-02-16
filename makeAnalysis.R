@@ -510,7 +510,7 @@ generalAnalysis<-function(allData,InteractionOn,withins,ssqType="Type3",caseOrde
   ))
 }
 
-makeAnalysis<-function(evidence=makeEvidence(),sample=makeSample()){
+makeAnalysis<-function(evidence=makeEvidence(),sample=makeSample(),autoShow=FALSE){
   design<-sample$design
   IV<-sample$IV
   IV2<-sample$IV2

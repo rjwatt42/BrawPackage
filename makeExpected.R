@@ -62,7 +62,7 @@ resetExpected<-function(nsims=0,expectedResult=NULL){
 }
 
 
-makeExpected <- function(nsims,hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),expectedResult=NULL,doingNull=FALSE) {
+makeExpected <- function(nsims,hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),expectedResult=NULL,doingNull=FALSE,autoShow=FALSE) {
   
   if (doingNull && !hypothesis$effect$world$worldOn) {
     hypothesis$effect$world$worldOn<-TRUE

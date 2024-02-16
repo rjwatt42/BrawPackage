@@ -1,7 +1,5 @@
-getHypothesis<-function(name,hypothesis=NULL) {
+getHypothesis<-function(name,hypothesis=makeHypothesis()) {
   
-  if (is.null(hypothesis))
-    hypothesis<-makeHypothesis()
   switch(name,
          "Psych"={
            hypothesis$effect$world<-list(worldOn=TRUE,
@@ -10,14 +8,13 @@ getHypothesis<-function(name,hypothesis=NULL) {
                                          populationPDFk=0.3,
                                          populationNullp=0.74)
          },
-         {makeWorld()}
+         {hypothesis$effect$world<-lmakeWorld()}
          )
+  return(hypothesis)
 }
 
-getDesign<-function(name,design=NULL) {
+getDesign<-function(name,design=makeDesign()) {
  
-  if (is.null(design))
-    design<-makeDesign()
   switch(name,
          "Psych"={
            design$sN<-52
