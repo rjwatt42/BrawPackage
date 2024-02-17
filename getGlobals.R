@@ -82,7 +82,6 @@ BrawOpts<<-c(BrawOpts,
 report_precision<<-3
 graph_precision<<-2
 
-autoShow<<-TRUE
 RZ<<-"r"
 
 z_range<<-1.5

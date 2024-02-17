@@ -1,7 +1,7 @@
 
-ESplotMargins<-margin(0.0,-0.2,0,-1,"cm")
-
 drawEffectES<-function(r,t=1){
+  ESplotMargins<-margin(0.0,-0.2,0,-1,"cm")
+  
   switch (t,
           {start=c(0,0.95)
           direction=0

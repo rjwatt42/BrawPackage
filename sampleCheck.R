@@ -1,6 +1,7 @@
-changeAmount<-1
 
 cheatSample<-function(hypothesis,design,evidence,sample,result) {
+  changeAmount<-1
+  
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV

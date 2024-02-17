@@ -1,10 +1,4 @@
 
-outlierValue=4
-dependenceVal=0.1
-clusterVal=0.25
-hsyConstant=1
-
-
 makeSampleVals<-function(n,mn,sdv,MV,distr="normal"){
   switch (distr,
           "normal"= {
@@ -500,6 +494,7 @@ makeSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=FA
 
       # non-independence  
       if (design$sDependence>0) {
+        dependenceVal=0.1
         change<-round(n*design$sDependence/2)
         ivr[1:change]<-ivr[change+(1:change)]+rnorm(change,0,1)*dependenceVal
         if (!is.null(IV2)) {
@@ -551,7 +546,7 @@ makeSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=FA
       } 
       
       if (effect$Heteroscedasticity!=0){
-        localVar<- abs(ivr/3)^hsyConstant * sign(ivr)
+        localVar<- abs(ivr/3) * sign(ivr)
         residual<-residual*(1+localVar*effect$Heteroscedasticity)
       }
       
@@ -567,6 +562,7 @@ makeSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=FA
       
       # outliers - as errors
       if (design$sOutliers>0) {
+        outlierValue=4
         change<-round(n*design$sOutliers)
         dvr[1:change]<-sign(dvr[1:change])*outlierValue
       }

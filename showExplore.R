@@ -1,11 +1,3 @@
-no_se_multiple<-TRUE
-multiOverlap<-FALSE
-valsGap<-1.4
-doBudget<-1
-ErrorsWorld<-"1scale"
-# ErrorsWorld<-"2scale"
-all_cols<-c()
-
 drawNHSTBar<-function(i,npts,pts1,bwidth,col1) {
   barx<-c(-1,-1,1,1)*bwidth
   bary<-c(i,npts*2-i+1,npts*2-i+1,i)
@@ -46,6 +38,12 @@ trimExploreResult<-function(result) {
 showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE,
                       Explore_whichShow="All",Explore_typeShow="All",
                       ExploreFull_ylim=TRUE,ExploreAny_ylim=FALSE){
+  all_cols<-c()
+  no_se_multiple<-TRUE
+  valsGap<-1.4
+  doBudget<-TRUE
+  ErrorsWorld<-"1scale"
+  
   explore<-exploreResult$explore
   hypothesis<-explore$hypothesis
   effect<-hypothesis$effect
@@ -129,7 +127,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
             }
           },
           "n(sig)"={
-            doBudget<-1
+            doBudget<-TRUE
             ylabel<-bquote(bold(n[.('sig')]))
             Explore_show<-"p(sig)"
             ylim<-c(0,100)
@@ -614,12 +612,12 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
               if (explore$type=="Alpha") {
                 BrawOpts$alphaSig<-exploreResult$vals
               }
-              if (!effect$world$worldOn) {
-                pVals<-rbind(pVals,exploreResult$nullresult$pIVs)
-                rVals<-rbind(rVals,exploreResult$nullresult$rIVs)
-                nVals<-rbind(nVals,exploreResult$nullresult$nvals)
+              if (!is.null(exploreResult$nullresult)) {
+                pVals<-rbind(pVals,exploreResult$nullresult$pval)
+                rVals<-rbind(rVals,exploreResult$nullresult$rval)
+                nVals<-rbind(nVals,exploreResult$nullresult$nval)
                 df1Vals<-rbind(df1Vals,exploreResult$nullresult$df1)
-                rpVals<-rbind(rpVals,exploreResult$nullresult$rpIVs)
+                rpVals<-rbind(rpVals,exploreResult$nullresult$rpval)
               }
               sigs<-isSignificant(BrawOpts$STMethod,pVals,rVals,nVals,df1Vals,evidence,BrawOpts$alphaSig)
               nulls<-rpVals==0
@@ -628,12 +626,13 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
               } else {
                 d<-r2llr(rVals,nVals,df1Vals,BrawOpts$STMethod,world=effect$world)
               }
-              sigNonNulls<- colSums( sigs & d>0 & !nulls)/nrow(pVals) 
-              nsigNonNulls<-colSums(!sigs &       !nulls)/nrow(pVals) 
-              isigNonNulls<-colSums( sigs & d<0 & !nulls)/nrow(pVals) 
-              isigNulls<-   colSums( sigs & d<0 & nulls)/nrow(pVals) 
-              sigNulls<-    colSums( sigs & d>0 & nulls)/nrow(pVals) 
-              nsigNulls<-   colSums(!sigs &       nulls)/nrow(pVals) 
+              np<-sum(!is.na(pVals[,1]))
+              sigNonNulls<- colSums( sigs & d>0 & !nulls,na.rm=TRUE)/np 
+              nsigNonNulls<-colSums(!sigs &       !nulls,na.rm=TRUE)/np
+              isigNonNulls<-colSums( sigs & d<0 & !nulls,na.rm=TRUE)/np 
+              isigNulls<-   colSums( sigs & d<0 & nulls,na.rm=TRUE)/np 
+              sigNulls<-    colSums( sigs & d>0 & nulls,na.rm=TRUE)/np 
+              nsigNulls<-   colSums(!sigs &       nulls,na.rm=TRUE)/np 
 
               lines<-c(0.05)
             },
@@ -1246,8 +1245,9 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
           "Alpha"={g<-g+xlab(alphaChar)},
           g<-g+xlab(explore$type)
   )
+  g<-g+ggtitle(paste0("Explore: ",format(exploreResult$count)))
   BrawOpts$alphaSig<<-oldAlpha
 
-  g+BrawOpts$plotTheme
+  g+BrawOpts$plotTheme+theme(plot.title=element_text(face='plain', size=8, hjust=1))
 }
 

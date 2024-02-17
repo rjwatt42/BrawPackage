@@ -1,7 +1,7 @@
 
-makeExplore<-function(nsim,hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
-                      type="SampleSize",Explore_npoints=13,exploreResult=NULL,
-                      doingNull=FALSE,autoShow=FALSE,Explore_show="EffectSize",
+makeExplore<-function(nsim,type="SampleSize",hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
+                      Explore_npoints=13,exploreResult=NULL,doingNull=FALSE,
+                      autoShow=FALSE,Explore_show="EffectSize",
                       min_n=10,max_n=250,max_r=0.9,max_anom=1,
                       xlog=FALSE,xabs=FALSE,
                       mx_log=FALSE
@@ -15,20 +15,26 @@ makeExplore<-function(nsim,hypothesis=makeHypothesis(),design=makeDesign(),evide
                 xlog=xlog,xabs=xabs,
                 mx_log=mx_log
   )
-  if (doingNull && !hypothesis$effect$world$worldOn) {
-    hypothesis$effect$world$worldOn<-TRUE
-    hypothesis$effect$world$populationNullp<-0.5
+
+  if (is.null(exploreResult)) {
+    exploreResult<-list(result=NULL,
+                        nullresult=NULL,
+                        count=0,
+                        nullcount=0,
+                        vals=NA,
+                        explore=explore
+    )
   }
   
-  exploreResult <- runExplore(nsim=nsim,explore=explore,exploreResult,autoShow=autoShow,Explore_show=Explore_show)
+  exploreResult <- runExplore(nsim=nsim,exploreResult,doingNull=doingNull,
+                              autoShow=autoShow,Explore_show=Explore_show)
   return(exploreResult)
 }
 
-runExplore <- function(nsim,explore=makeExplore(),exploreResult=NULL,autoShow=FALSE,Explore_show="EffectSize"){
+runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
+                       autoShow=FALSE,Explore_show="EffectSize"){
   
-  if (is.character(explore)) {
-    explore<-makeExplore(type=explore)
-  }
+  explore<-exploreResult$explore
   hypothesis<-explore$hypothesis
   design<-explore$design
   evidence<-explore$evidence
@@ -153,15 +159,8 @@ runExplore <- function(nsim,explore=makeExplore(),exploreResult=NULL,autoShow=FA
   )
   
   n_sims<-nsim
-  if (is.null(exploreResult)) {
-    exploreResult<-list(count=0,
-                        vals=vals,
-                        explore=explore
-                        )
-    } else {
-      exploreResult$vals<-vals
-      exploreResult$explore<-explore
-    }
+  exploreResult$vals<-vals
+  exploreResult$explore<-explore
   
   b<-matrix(NA,nrow=n_sims,ncol=length(vals))
   result<-list(rval=b,rpval=b,pval=b,roval=b,poval=b,nval=b,df1=b,
@@ -169,9 +168,20 @@ runExplore <- function(nsim,explore=makeExplore(),exploreResult=NULL,autoShow=FA
                r2=list(direct=b,unique=b,total=b),
                r3=list(direct=b,unique=b,total=b)
   )
+  if (hypothesis$effect$world$worldOn && hypothesis$effect$world$populationNullp>0) 
+    doingNull<-FALSE
+  if (doingNull) {
+    nullhypothesis<-hypothesis
+    nullhypothesis$effect$rIV<-0
+    nullresult<-result
+  } else nullresult<-NULL
+  
   while (exploreResult$count<n_sims){
-    if (exploreResult$count==0) ns<-1
-    else                        ns<-10^floor(log10(exploreResult$count))
+    if (!autoShow) ns<-n_sims
+    else {
+      if (exploreResult$count==0) ns<-1
+      else                        ns<-10^floor(log10(exploreResult$count))
+    }
     if (exploreResult$count+ns>n_sims) ns<-n_sims-exploreResult$count
     for (ni in 1:ns) {
       ri<-exploreResult$count+ni
@@ -553,11 +563,27 @@ runExplore <- function(nsim,explore=makeExplore(),exploreResult=NULL,autoShow=FA
             result$p3$unique[ri,vi]<-res$p$unique[,3]
             result$p3$total[ri,vi]<-res$p$total[,3]
           }
+          
+          if (doingNull) {
+            res_null<-multipleAnalysis(1,nullhypothesis,design,evidence)
+            
+            nullresult$rval[ri,vi]<-res_null$rIV
+            nullresult$rpval[ri,vi]<-res_null$rpIV
+            nullresult$pval[ri,vi]<-res_null$pIV
+            nullresult$roval[ri,vi]<-res_null$roIV
+            nullresult$poval[ri,vi]<-res_null$poIV
+            nullresult$nval[ri,vi]<-res_null$nval
+            nullresult$df1[ri,vi]<-res_null$df1
+          }
         }
       }
     }
     exploreResult$count<-ri
     exploreResult$result<-result
+    if (doingNull) {
+    exploreResult$nullcount<-ri
+    exploreResult$nullresult<-nullresult
+    }
     if (autoShow) print(showExplore(exploreResult,Explore_show=Explore_show))
   }
   

@@ -1,5 +1,3 @@
-debugHere<-FALSE
-
 
 check_r<-function(r,from=" ") {
   if (!is.numeric(r)) {
