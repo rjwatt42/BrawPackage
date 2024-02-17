@@ -46,6 +46,9 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
   
   oldAlpha<-BrawOpts$alphaSig
   
+  if (hypothesis$effect$world$worldOn && hypothesis$effect$world$populationNullp>0) 
+    doingNull<-FALSE
+  
   npoints<-explore$Explore_npoints
   min_n<-explore$min_n
   max_n<-explore$max_n
@@ -168,20 +171,39 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
                r2=list(direct=b,unique=b,total=b),
                r3=list(direct=b,unique=b,total=b)
   )
-  if (hypothesis$effect$world$worldOn && hypothesis$effect$world$populationNullp>0) 
-    doingNull<-FALSE
   if (doingNull) {
     nullhypothesis<-hypothesis
     nullhypothesis$effect$rIV<-0
     nullresult<-result
   } else nullresult<-NULL
   
+  if (!is.null(exploreResult)) {
+    result$rval<-rbind(exploreResult$result$rval,result$rval)
+    result$rpval<-rbind(exploreResult$result$rpval,result$rpval)
+    result$pval<-rbind(exploreResult$result$pval,result$pval)
+    result$roval<-rbind(exploreResult$result$roval,result$roval)
+    result$poval<-rbind(exploreResult$result$poval,result$poval)
+    result$nval<-rbind(exploreResult$result$nval,result$nval)
+    result$df1<-rbind(exploreResult$result$df1,result$df1)
+    
+    nullresult$rval<-rbind(exploreResult$nullresult$rval,result$rval)
+    nullresult$rpval<-rbind(exploreResult$nullresult$rpval,result$rpval)
+    nullresult$pval<-rbind(exploreResult$nullresult$pval,result$pval)
+    nullresult$roval<-rbind(exploreResult$nullresult$roval,result$roval)
+    nullresult$poval<-rbind(exploreResult$nullresult$poval,result$poval)
+    nullresult$nval<-rbind(exploreResult$nullresult$nval,result$nval)
+    nullresult$df1<-rbind(exploreResult$nullresult$df1,result$df1)
+    
+    n_sims<-exploreResult$count+n_sims
+  }
+
   while (exploreResult$count<n_sims){
     if (!autoShow) ns<-n_sims
     else {
       if (exploreResult$count==0) ns<-1
       else                        ns<-10^floor(log10(exploreResult$count))
     }
+    ns<-min(ns,100)
     if (exploreResult$count+ns>n_sims) ns<-n_sims-exploreResult$count
     for (ni in 1:ns) {
       ri<-exploreResult$count+ni

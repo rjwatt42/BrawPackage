@@ -147,14 +147,14 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
             } else {
               ylabel<-"Type I"
               secondY<-"Type II"
-              g<-g+theme(axis.title.y.left = element_text(color=BrawOpts$plotColours$infer_sigNull),axis.title.y.right = element_text(color=plotColours$infer_nsNonNull))
+              g<-g+theme(axis.title.y.left = element_text(color=BrawOpts$plotColours$infer_sigNull),axis.title.y.right = element_text(color=BrawOpts$plotColours$infer_nsNonNull))
             }
           },
           "FDR;FMR"={
             ylim<-c(0,1)
             ylabel<-"False Discovery"
             secondY<-"False Miss"
-              g<-g+theme(axis.title.y.left = element_text(color=BrawOpts$plotColours$fdr),axis.title.y.right = element_text(color=plotColours$fmr))
+              g<-g+theme(axis.title.y.left = element_text(color=BrawOpts$plotColours$fdr),axis.title.y.right = element_text(color=BrawOpts$plotColours$fmr))
           },
           "log(lrs)"={
             ylim<-c(-0.1,10)

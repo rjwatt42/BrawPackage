@@ -30,3 +30,7 @@ exploreResult<-makeExplore(1000,type="SampleSize",hypothesis = hypothesis1,doing
 
 exploreResult<-makeExplore(1000,type="SampleSize",hypothesis = hypothesis2,design=design2,doingNull=TRUE,
                            autoShow = TRUE, Explore_show="NHSTErrors")
+
+exploreResult<-makeExplore(1000,type="SampleSize",hypothesis = hypothesis2,design=design2,doingNull=TRUE,
+                           min_n=10,max_n=1000,xlog=TRUE,
+                           autoShow = TRUE, Explore_show="NHSTErrors")
