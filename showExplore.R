@@ -26,6 +26,23 @@ drawNHSTLabel<-function(lb1,lb1xy,xoff,col1) {
              hjust=-0.2,vjust=0.5,size=BrawOpts$labelSize,colour=col,fill=col1,parse=mathlabel)
 }
 
+
+trimExploreResult<-function(result) {
+  
+  use<- !is.na(result$rval[,1])
+  nr=sum(use)
+  nc=ncol(result$rval)
+  result$rpval=matrix(result$rpval[use,],nrow=nr,ncol=nc)
+  result$rval=matrix(result$rval[use,],nrow=nr,ncol=nc)
+  result$pval=matrix(result$pval[use,],nrow=nr,ncol=nc)
+  result$roval=matrix(result$roval[use,],nrow=nr,ncol=nc)
+  result$poval=matrix(result$poval[use,],nrow=nr,ncol=nc)
+  result$nval=matrix(result$nval[use,],nrow=nr,ncol=nc)
+  result$df1=matrix(result$df1[use,],nrow=nr,ncol=nc)
+  
+  return(result)
+}
+
 showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE,
                       Explore_whichShow="All",Explore_typeShow="All",
                       ExploreFull_ylim=TRUE,ExploreAny_ylim=FALSE){
@@ -34,7 +51,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
   effect<-hypothesis$effect
   evidence<-explore$evidence
   
-  result<-exploreResult$result
+  result<-trimExploreResult(exploreResult$result)
   
   oldAlpha<-BrawOpts$alphaSig
   
