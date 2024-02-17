@@ -186,13 +186,13 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
     result$nval<-rbind(exploreResult$result$nval,result$nval)
     result$df1<-rbind(exploreResult$result$df1,result$df1)
     
-    nullresult$rval<-rbind(exploreResult$nullresult$rval,result$rval)
-    nullresult$rpval<-rbind(exploreResult$nullresult$rpval,result$rpval)
-    nullresult$pval<-rbind(exploreResult$nullresult$pval,result$pval)
-    nullresult$roval<-rbind(exploreResult$nullresult$roval,result$roval)
-    nullresult$poval<-rbind(exploreResult$nullresult$poval,result$poval)
-    nullresult$nval<-rbind(exploreResult$nullresult$nval,result$nval)
-    nullresult$df1<-rbind(exploreResult$nullresult$df1,result$df1)
+    nullresult$rval<-rbind(exploreResult$nullresult$rval,nullresult$rval)
+    nullresult$rpval<-rbind(exploreResult$nullresult$rpval,nullresult$rpval)
+    nullresult$pval<-rbind(exploreResult$nullresult$pval,nullresult$pval)
+    nullresult$roval<-rbind(exploreResult$nullresult$roval,nullresult$roval)
+    nullresult$poval<-rbind(exploreResult$nullresult$poval,nullresult$poval)
+    nullresult$nval<-rbind(exploreResult$nullresult$nval,nullresult$nval)
+    nullresult$df1<-rbind(exploreResult$nullresult$df1,nullresult$df1)
     
     n_sims<-exploreResult$count+n_sims
   }
