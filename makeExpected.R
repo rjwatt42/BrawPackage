@@ -48,46 +48,62 @@ resetExpected<-function(nsims=0,expectedResult=NULL){
     p=list(direct=bm,unique=bm,total=bm)
   )
   )
+  newNullResult<-newResult
 
   if (!is.null(expectedResult)) {
     newResult<-mergeExpected(expectedResult$result,newResult)
     count<-expectedResult$count
+    newNullResult<-mergeExpected(expectedResult$nullresult,newNullResult)
+    nullcount<-expectedResult$nullcount
   } else {
     count<-0
+    nullcount<-0
   }
 
   list(result=newResult,
+       nullresult=newNullResult,
        count=count,
+       nullcount=nullcount,
        nsims=nsims+count)
 }
 
 
-makeExpected <- function(nsims,hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),expectedResult=NULL,doingNull=FALSE,autoShow=FALSE) {
+makeExpected <- function(nsims,hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),expectedResult=NULL,
+                         doingNull=FALSE,autoShow=FALSE,type="Basic") {
   
-  if (doingNull && !hypothesis$effect$world$worldOn) {
-    hypothesis$effect$world$worldOn<-TRUE
-    hypothesis$effect$world$populationNullp<-0.5
-  }
   expectedResult<-c(list(hypothesis=hypothesis,
                          design=design,
                          evidence=evidence),
                     resetExpected(nsims,expectedResult)
   )
+  if (doingNull && !hypothesis$effect$world$worldOn) {
+    hypothesisNull<-hypothesis
+    hypothesisNull$effect$rIV<-0
+  }
   
-  min_ns<-floor(log10(nsims/100))
-  min_ns<-max(0,min_ns)
-  ns<-10^min_ns
-  n_cycles<-ceil(nsims/ns)
+  if (autoShow) {
+    min_ns<-floor(log10(nsims/100))
+    min_ns<-max(0,min_ns)
+    ns<-10^min_ns
+  } else
+    ns<-nsims
 
-  if (ns>0) {
-    for (ci in 1:n_cycles) {
+  if (nsims>0) {
+    while (expectedResult$count<nsims) {
+      if (expectedResult$count/ns>=10) ns<-ns*10
+      if (expectedResult$count+ns>nsims) ns<-nsims-expectedResult$count
       newCount<-expectedResult$count+ns
       expectedResult$result<-multipleAnalysis(ns,hypothesis,design,evidence,expectedResult$result)
       expectedResult$count<-newCount
+      if (doingNull && !hypothesis$effect$world$worldOn) {
+        newCount<-expectedResult$nullcount+ns
+        expectedResult$nullresult<-multipleAnalysis(ns,hypothesisNull,design,evidence,expectedResult$nullresult)
+        expectedResult$nullcount<-newCount
+      }
+      if (autoShow) print(showExpected(expectedResult,type=type))
     }
   }
   
-  if (autoShow) print(showExpected(expectedResult,type="Basic"))
   return(expectedResult)
 }
 

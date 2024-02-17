@@ -201,26 +201,28 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,off=0){
 }
 
 plotCatInterDescription<-function(analysis,g=NULL){
+  hypothesis<-analysis$hypothesis
+  
   plotDescriptionCols <<- c()
   cols<-c()
-  for (i in 1:analysis$IV2$ncats){
-    off<-(i-1)/(analysis$IV2$ncats-1)
+  for (i in 1:analysis$hypothesis$IV2$ncats){
+    off<-(i-1)/(analysis$hypothesis$IV2$ncats-1)
     col<- col2rgb(BrawOpts$plotColours$descriptionC1)*(1-off)+col2rgb(BrawOpts$plotColours$descriptionC2)*off
     cols<- c(cols,rgb(col[1]/255,col[2]/255,col[3]/255))
   }
-  names(cols)<-analysis$IV2$cases
+  names(cols)<-hypothesis$IV2$cases
   cols<-as.list(cols)
   plotDescriptionCols <<- cols
   
   Ivals<-analysis$iv
   Dvals<-analysis$dv
-  rho<-analysis$rIV+seq(-1,1,length.out=analysis$IV2$ncats)*analysis$rIVIV2DV
+  rho<-analysis$rIV+seq(-1,1,length.out=analysis$hypothesis$IV2$ncats)*analysis$rIVIV2DV
   
   if (is.null(g)) {
     g<-ggplot()
     }
-  for (i in 1:analysis$IV2$ncats){
-    use<-analysis$iv2==analysis$IV2$cases[i]
+  for (i in 1:hypothesis$IV2$ncats){
+    use<-analysis$iv2==hypothesis$IV2$cases[i]
     
     analysis1<-analysis
     analysis1$iv<-analysis$iv[use]
@@ -239,22 +241,22 @@ plotCatInterDescription<-function(analysis,g=NULL){
     analysis1$DV$mu<-mean(Dvals[use],na.rm=TRUE)
     analysis1$DV$sd<-sd(Dvals[use],na.rm=TRUE)
     }
-    g<-plotPoints(g,analysis$IV,analysis$DV,analysis1,i+1,(i-1)/(analysis$IV2$ncats-1))
+    g<-plotPoints(g,analysis$hypothesis$IV,analysis$hypothesis$DV,analysis1,i+1,(i-1)/(analysis$hypothesis$IV2$ncats-1))
     g<-plotPrediction(analysis1$IV,NULL,analysis1$DV,analysis1,analysis$design,2+(i-1)/(IV2$ncats-1),g,theme=BrawOpts$plotTheme)
   }
   
-  g<-g+scale_fill_manual(name=analysis$IV2$name,values=plotDescriptionCols)
+  g<-g+scale_fill_manual(name=analysis$hypothesis$IV2$name,values=plotDescriptionCols)
   g
 }
 
 plotParInterDescription<-function(analysis,g=NULL){
   col<-c( BrawOpts$plotColours$descriptionC1, BrawOpts$plotColours$descriptionC2)
-  names(col)<-c(paste(analysis$IV2$name,"<median",sep=""), paste(analysis$IV2$name,">median",sep=""))
+  names(col)<-c(paste(analysis$hypothesis$IV2$name,"<median",sep=""), paste(analysis$hypothesis$IV2$name,">median",sep=""))
   col<-as.list(col)
   plotDescriptionCols <<- col
   
-  Ivals<-analysis$IV$vals
-  Dvals<-analysis$DV$vals
+  Ivals<-analysis$hypothesis$IV$vals
+  Dvals<-analysis$hypothesis$DV$vals
   rho<-analysis$rIV+seq(-1,1,length.out=2)*analysis$rIVIV2DV
   
   if (is.null(g)) {
@@ -279,24 +281,24 @@ plotParInterDescription<-function(analysis,g=NULL){
     g<-plotPrediction(analysis1$IV,NULL,analysis1$DV,analysis1,analysis$design,i+1,g,theme=BrawOpts$plotTheme)
   }
   
-  g<-g+scale_fill_manual(name=analysis$IV2$name,values=plotDescriptionCols)
+  g<-g+scale_fill_manual(name=analysis$hypothesis$IV2$name,values=plotDescriptionCols)
   g
 }
 
 plotParDescription<-function(analysis,g) {
   
-  g<-plotPoints(g,analysis$IV,analysis$DV,analysis,1)
-  g<-plotPrediction(analysis$IV,analysis$IV2,analysis$DV,analysis,analysis$design,1,g,theme=BrawOpts$plotTheme)
+  g<-plotPoints(g,analysis$hypothesis$IV,analysis$hypothesis$DV,analysis,1)
+  g<-plotPrediction(analysis$hypothesis$IV,analysis$hypothesis$IV2,analysis$hypothesis$DV,analysis,analysis$design,1,g,theme=BrawOpts$plotTheme)
   g
 }
 
 plotCatDescription<-function(analysis,g) {
 
-  g<-plotPrediction(analysis$IV,analysis$IV2,analysis$DV,analysis,analysis$design,1,g,theme=BrawOpts$plotTheme)
-  g<-plotPoints(g,analysis$IV,analysis$DV,analysis,1)
+  g<-plotPrediction(analysis$hypothesis$IV,analysis$hypothesis$IV2,analysis$hypothesis$DV,analysis,analysis$design,1,g,theme=BrawOpts$plotTheme)
+  g<-plotPoints(g,analysis$hypothesis$IV,analysis$hypothesis$DV,analysis,1)
   
   if (!doLegendBars && doLegendPoints) {
-    g<-g+scale_fill_manual(name=analysis$DV$name,values=CatCatcols,labels=analysis$DV$cases)
+    g<-g+scale_fill_manual(name=analysis$hypothesis$DV$name,values=CatCatcols,labels=analysis$hypothesis$DV$cases)
   }
   
   g
@@ -305,14 +307,14 @@ plotCatDescription<-function(analysis,g) {
 showDescription<-function(analysis=makeAnalysis()) {
 
   g<-ggplot()
-  if (is.null(analysis$IV2)){
-    switch (analysis$DV$type,
+  if (is.null(analysis$hypothesis$IV2)){
+    switch (analysis$hypothesis$DV$type,
             "Interval"=g<-plotParDescription(analysis,g),
             "Ordinal"=g<-plotParDescription(analysis,g),
             "Categorical"=g<-plotCatDescription(analysis,g)
     )
   } else{
-    switch (analysis$IV2$type,
+    switch (analysis$hypothesis$IV2$type,
             "Interval"=g<-plotParInterDescription(analysis,g),
             "Ordinal"=g<-plotParInterDescription(analysis,g),
             "Categorical"=g<-plotCatInterDescription(analysis,g)

@@ -35,9 +35,16 @@ plotShapes<-list(data=21,study=22,parameter=21,meta=24)
                       axis.text.x=element_text(size=18),axis.text.y=element_text(size=18))
   
   plotTheme<-mainTheme+SMplotTheme+theme(plot.margin=margin(1.0,1.5,0.5,0.5,"cm"))
-  reportTheme<-mainTheme+SMplotTheme+theme(plot.margin=margin(0.15,0.8,0,0.25,"cm"))
   diagramTheme<-mainTheme+SMplotTheme+theme(plot.margin=margin(0.15,0.8,0,0.25,"cm"))
   blankTheme<-mainTheme+theme(panel.background = element_rect(fill=graphcolours$graphC, colour=graphcolours$graphC))
+  reportTheme<-blankTheme+theme(plot.margin=margin(0.15,0.8,0,0.25,"cm"),
+                                axis.title.x=element_blank(),
+                                axis.text.x=element_blank(),
+                                axis.ticks.x=element_blank(),
+                                axis.title.y=element_blank(),
+                                axis.text.y=element_blank(),
+                                axis.ticks.y=element_blank()
+  )
   
 
 BrawOpts<<-list(

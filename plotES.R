@@ -72,7 +72,7 @@ drawEffectES<-function(r,t=1){
       lbl=paste("r=",as.character(r),sep="")
     }else{ lbl=as.character(r)
     }
-    g<-g+geom_label(data=labelpts,aes(x = mean(x), y = mean(y), label = lbl), color="black", fill = "white",size=brawOpts$labelSize)
+    g<-g+geom_label(data=labelpts,aes(x = mean(x), y = mean(y), label = lbl), color="black", fill = "white",size=BrawOpts$labelSize)
   }
   
   g + 

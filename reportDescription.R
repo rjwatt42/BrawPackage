@@ -111,11 +111,12 @@ makeFormula<-function(IV,IV2,DV,evidence,analysis,an_vars){
 
 
 
-reportDescription<-function(analysis){
-  IV<-analysis$IV
-  IV2<-analysis$IV2
-  DV<-analysis$DV
-  effect<-analysis$effect
+reportDescription<-function(analysis=makeAnalysis()){
+  IV<-analysis$hypothesis$IV
+  IV2<-analysis$hypothesis$IV2
+  DV<-analysis$hypothesis$DV
+  effect<-analysis$hypothesis
+  evidence<-analysis$evidence
   
   if (is.null(IV2)) no_ivs<-1 else no_ivs<-2
   

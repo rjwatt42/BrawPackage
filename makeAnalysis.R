@@ -512,10 +512,11 @@ generalAnalysis<-function(allData,InteractionOn,withins,ssqType="Type3",caseOrde
 
 makeAnalysis<-function(evidence=makeEvidence(),sample=makeSample(),autoShow=FALSE){
   design<-sample$design
-  IV<-sample$IV
-  IV2<-sample$IV2
-  DV<-sample$DV
-  effect<-sample$effect
+  hypothesis<-sample$hypothesis
+  IV<-hypothesis$IV
+  IV2<-hypothesis$IV2
+  DV<-hypothesis$DV
+  effect<-hypothesis$effect
   analysis<-sample
   
   switch (evidence$Transform,
@@ -543,8 +544,8 @@ makeAnalysis<-function(evidence=makeEvidence(),sample=makeSample(),autoShow=FALS
   analysis$pIVCI<-r2p(analysis$rIVCI,n,anResult$df[1])
   if (analysis$rIV>0 && analysis$rIVCI[1]<0 && analysis$rIVCI[2]>0) analysis$pIVCI[1]<-1
   if (analysis$rIV<0 && analysis$rIVCI[1]<0 && analysis$rIVCI[2]>0) analysis$pIVCI[2]<-1
-  analysis$rpIV<-analysis$effectRho
-  
+  analysis$rpIV<-sample$effectRho
+
   if (no_ivs==2) {
     analysis$rIV2<-r_use[2]
     analysis$pIV2<-p_use[2]
@@ -850,7 +851,7 @@ makeAnalysis<-function(evidence=makeEvidence(),sample=makeSample(),autoShow=FALS
   analysis$df<-df
   analysis$test_val<-tval
   
-  analysis$effect<-effect
+  analysis$hypothesis<-hypothesis
   analysis$design<-design
   analysis$evidence<-evidence
   

@@ -26,7 +26,7 @@ drawNHSTLabel<-function(lb1,lb1xy,xoff,col1) {
              hjust=-0.2,vjust=0.5,size=BrawOpts$labelSize,colour=col,fill=col1,parse=mathlabel)
 }
 
-drawExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE,
+showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE,
                       Explore_whichShow="All",Explore_typeShow="All",
                       ExploreFull_ylim=TRUE,ExploreAny_ylim=FALSE){
   explore<-exploreResult$explore
@@ -473,7 +473,7 @@ drawExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
               } else {
                 getStat<-function(x,n) {colMeans(x)}
               }
-              ps<-isSignificant(STMethod,pVals,rVals,nVals,df1Vals,evidence,BrawOpts$alphaSig)
+              ps<-isSignificant(BrawOpts$STMethod,pVals,rVals,nVals,df1Vals,evidence,BrawOpts$alphaSig)
               ps_mn<-getStat(abs(ps),nVals)
               ps1<-colMeans(abs(ps))
               p_se<-sqrt(ps1*(1-ps1)/nrow(pVals))*(ps_mn/ps1)
@@ -525,12 +525,12 @@ drawExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
                 BrawOpts$alphaSig<-exploreResult$vals
               }
               
-              sigs<-isSignificant(STMethod,pVals,rVals,nVals,df1Vals,evidence,BrawOpts$alphaSig)
+              sigs<-isSignificant(BrawOpts$STMethod,pVals,rVals,nVals,df1Vals,evidence,BrawOpts$alphaSig)
               nulls<-result$rpval==0
-              if (STMethod=="NHST") {
+              if (BrawOpts$STMethod=="NHST") {
                 p1<-colSums(sigs & nulls)/colSums(sigs)
               } else {
-                # d<-r2llr(rVals,nVals,df1Vals,STMethod,world=effect$world)
+                # d<-r2llr(rVals,nVals,df1Vals,BrawOpts$STMethod,world=effect$world)
                 p1<-(colSums(sigs & nulls & sigs>0)+colSums(sigs & !nulls & sigs<0))/max(colSums(abs(sigs)),1)
               }
               y50<-p1
@@ -604,12 +604,12 @@ drawExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
                 df1Vals<-rbind(df1Vals,exploreResult$nullresult$df1)
                 rpVals<-rbind(rpVals,exploreResult$nullresult$rpIVs)
               }
-              sigs<-isSignificant(STMethod,pVals,rVals,nVals,df1Vals,evidence,BrawOpts$alphaSig)
+              sigs<-isSignificant(BrawOpts$STMethod,pVals,rVals,nVals,df1Vals,evidence,BrawOpts$alphaSig)
               nulls<-rpVals==0
-              if (STMethod=="NHST") {
+              if (BrawOpts$STMethod=="NHST") {
                 d<-sigs+1
               } else {
-                d<-r2llr(rVals,nVals,df1Vals,STMethod,world=effect$world)
+                d<-r2llr(rVals,nVals,df1Vals,BrawOpts$STMethod,world=effect$world)
               }
               sigNonNulls<- colSums( sigs & d>0 & !nulls)/nrow(pVals) 
               nsigNonNulls<-colSums(!sigs &       !nulls)/nrow(pVals) 
@@ -624,13 +624,13 @@ drawExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
               if (explore$type=="Alpha") {
                 BrawOpts$alphaSig<-exploreResult$vals
               }
-              sigs<-isSignificant(STMethod,pVals,rVals,nVals,df1Vals,evidence,BrawOpts$alphaSig)
+              sigs<-isSignificant(BrawOpts$STMethod,pVals,rVals,nVals,df1Vals,evidence,BrawOpts$alphaSig)
               nulls<-rpVals==0
               
-              if (STMethod=="NHST") {
+              if (BrawOpts$STMethod=="NHST") {
                 d<-sigs+1
               } else {
-                d<-r2llr(rVals,nVals,df1Vals,STMethod,world=effect$world)
+                d<-r2llr(rVals,nVals,df1Vals,BrawOpts$STMethod,world=effect$world)
               }
               sumsig<-colSums(sigs)
               sumsig[sumsig==0]<-1
@@ -728,7 +728,7 @@ drawExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
                expType=NULL
                )
         if (is.element(Explore_show,c("EffectSize","EffectSizeA","p","w","t","SampleSize"))){
-          sigVals<-isSignificant(STMethod,pVals,rVals,nVals,df1Vals,evidence,BrawOpts$alphaSig)
+          sigVals<-isSignificant(BrawOpts$STMethod,pVals,rVals,nVals,df1Vals,evidence,BrawOpts$alphaSig)
           col<-"white"
         } else {
           sigVals<-!is.na(showVals)
@@ -743,9 +743,9 @@ drawExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
       }
       if (use_col_names){
         pts1<-data.frame(x=vals+valsOffset,y=y50,fill=Explore_typeShow)
-        g<-g+geom_point(data=pts1,aes(x=x,y=y,fill=fill),shape=brawOpts$plotShapes$parameter, colour = "black", size = markersize)
+        g<-g+geom_point(data=pts1,aes(x=x,y=y,fill=fill),shape=BrawOpts$plotShapes$parameter, colour = "black", size = markersize)
       } else {
-        g<-g+geom_point(data=pts1,aes(x=vals,y=y50),shape=brawOpts$plotShapes$parameter, colour = "black",fill=col, size = markersize)
+        g<-g+geom_point(data=pts1,aes(x=vals,y=y50),shape=BrawOpts$plotShapes$parameter, colour = "black",fill=col, size = markersize)
       }
     } # end of line and point
 
@@ -768,9 +768,9 @@ drawExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
         }
         if (use_col_names){
           pts1<-data.frame(x=vals+valsOffset,y=y50,fill=Explore_typeShow)
-          g<-g+geom_point(data=pts1,aes(x=x,y=y,fill=fill),shape=brawOpts$plotShapes$parameter, colour = "black", size = markersize)
+          g<-g+geom_point(data=pts1,aes(x=x,y=y,fill=fill),shape=BrawOpts$plotShapes$parameter, colour = "black", size = markersize)
         } else {
-          g<-g+geom_point(data=pts1,aes(x=vals,y=y50),shape=brawOpts$plotShapes$parameter, fill=col,colour = "black",size = markersize)
+          g<-g+geom_point(data=pts1,aes(x=vals,y=y50),shape=BrawOpts$plotShapes$parameter, fill=col,colour = "black",size = markersize)
         }
       } else {
         pts1<-data.frame(vals=vals+valsOffset,y50=y50,fill=col)
@@ -789,9 +789,9 @@ drawExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
         }
         if (use_col_names){
           pts1<-data.frame(x=vals+valsOffset,y=y50,fill=Explore_typeShow)
-          g<-g+geom_point(data=pts1,aes(x=x,y=y,fill=fill),shape=brawOpts$plotShapes$parameter, colour = "black", size = markersize)
+          g<-g+geom_point(data=pts1,aes(x=x,y=y,fill=fill),shape=BrawOpts$plotShapes$parameter, colour = "black", size = markersize)
         } else {
-          g<-g+geom_point(data=pts1,aes(x=vals,y=y50,fill=fill),shape=brawOpts$plotShapes$parameter, colour = "black",size = markersize)
+          g<-g+geom_point(data=pts1,aes(x=vals,y=y50,fill=fill),shape=BrawOpts$plotShapes$parameter, colour = "black",size = markersize)
         }
         if (!isempty(y50e)) {
           pts1<-data.frame(vals=vals+valsOffset,y50=y50e,fill=cole)
@@ -810,9 +810,9 @@ drawExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
           }
           if (use_col_names){
             pts1<-data.frame(x=vals+valsOffset,y=y50e,fill=Explore_typeShow)
-            g<-g+geom_point(data=pts1,aes(x=x,y=y,fill=fill),shape=brawOpts$plotShapes$parameter, colour = "black", size = markersize)
+            g<-g+geom_point(data=pts1,aes(x=x,y=y,fill=fill),shape=BrawOpts$plotShapes$parameter, colour = "black", size = markersize)
           } else {
-            g<-g+geom_point(data=pts1,aes(x=vals,y=y50,fill=fill),shape=brawOpts$plotShapes$parameter, colour = "black", size = markersize)
+            g<-g+geom_point(data=pts1,aes(x=vals,y=y50,fill=fill),shape=BrawOpts$plotShapes$parameter, colour = "black", size = markersize)
           }
         }
         if (!isempty(y50a)) {
@@ -832,9 +832,9 @@ drawExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
           }
           if (use_col_names){
             pts1<-data.frame(x=vals+valsOffset,y=y50a,fill=Explore_typeShow)
-            g<-g+geom_point(data=pts1,aes(x=x,y=y,fill=fill),shape=brawOpts$plotShapes$parameter, colour = "black", size = markersize)
+            g<-g+geom_point(data=pts1,aes(x=x,y=y,fill=fill),shape=BrawOpts$plotShapes$parameter, colour = "black", size = markersize)
           } else {
-            g<-g+geom_point(data=pts1,aes(x=vals,y=y50,fill=fill),shape=brawOpts$plotShapes$parameter, colour = "black", size = markersize)
+            g<-g+geom_point(data=pts1,aes(x=vals,y=y50,fill=fill),shape=BrawOpts$plotShapes$parameter, colour = "black", size = markersize)
           }
         }
         
@@ -860,7 +860,7 @@ drawExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
         
         col0<-BrawOpts$plotColours$infer_isigNonNull
         lb0<-nonNullNegative
-        switch (STMethod,
+        switch (BrawOpts$STMethod,
                 "NHST"={col1<-BrawOpts$plotColours$infer_nsNonNull},
                 "sLLR"={col1<-BrawOpts$plotColours$infer_nsNonNull},
                 "dLLR"={col1<-BrawOpts$plotColours$infer_nsdNonNull})
@@ -869,7 +869,7 @@ drawExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
         lb2<-nonNullPositive
         col3<-BrawOpts$plotColours$infer_isigNull
         lb3<-nullNegative
-        switch (STMethod,
+        switch (BrawOpts$STMethod,
                 "NHST"={col4<-BrawOpts$plotColours$infer_nsNull},
                 "sLLR"={col4<-BrawOpts$plotColours$infer_nsNull},
                 "dLLR"={col4<-BrawOpts$plotColours$infer_nsdNull})
@@ -974,12 +974,13 @@ drawExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
         } else {pts4<-NULL}
       }
       
-      if (explore$Explore_graphStyle=="relevant") {
+      # if (explore$Explore_graphStyle=="relevant") {
+      if (1==1) {
         NHSTasArea<-TRUE
         NHSThalfArea<-TRUE
         pts2<-NULL
         pts3<-NULL
-        if (STMethod!="dLLR") pts4<-NULL
+        if (BrawOpts$STMethod!="dLLR") pts4<-NULL
       } else {
         NHSTasArea<-TRUE
         NHSThalfArea<-FALSE
@@ -1067,7 +1068,7 @@ drawExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
                  pts2<-data.frame(x=c(vals,rev(vals))+valsOffset,y=c(y+yExp,rev(y+yExp+yGauss)))
                })
         g<-g+geom_line(data=pts,aes(x=x,y=y),color="black")
-        g<-g+geom_point(data=pts,aes(x=x,y=y),shape=brawOpts$plotShapes$parameter,fill=BrawOpts$plotColours$sampleC,size = markersize)
+        g<-g+geom_point(data=pts,aes(x=x,y=y),shape=BrawOpts$plotShapes$parameter,fill=BrawOpts$plotColours$sampleC,size = markersize)
       }
     }
     

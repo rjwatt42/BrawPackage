@@ -13,7 +13,7 @@ trimanalysis<-function(analysis) {
   analysis$nval=analysis$nval[use]
   analysis$df1=analysis$df1[use]
   
-  if (!is.null(analysis$IV2)) {
+  if (!is.null(analysis$hypothesis$IV2)) {
     analysis$rIV2=analysis$rIV2[use]
     analysis$pIV2=analysis$pIV2[use]
     analysis$rIVIV2DV=analysis$rIVIV2DV[use]
@@ -29,35 +29,35 @@ trimanalysis<-function(analysis) {
   analysis
 }
 
-plotInference<-function(analysis,disp="r",orientation="vert",showType="direct"){
+plotInference<-function(analysis,disp="r",orientation="vert",showType="direct",showTheory=TRUE){
   if (length(disp)==2) {
     return(plot2Inference(analysis,disp[1],disp[2]))
   } 
   analysis<-trimanalysis(analysis)
   
   switch (disp,
-          "r"= {g<-r_plot(analysis,disp,orientation=orientation,showType=showType)},
-          "rp"={g<-r_plot(analysis,disp,orientation=orientation,showType=showType)},
-          "r1"={g<-r_plot(analysis,disp,orientation=orientation,showType=showType)},
-          "ra"= {g<-r_plot(analysis,disp,orientation=orientation,showType=showType)},
-          "ci1"={g<-r_plot(analysis,disp,orientation=orientation,showType=showType)},
-          "ci2"={g<-r_plot(analysis,disp,orientation=orientation,showType=showType)},
-          "t"= {g<-r_plot(analysis,disp,orientation=orientation,showType=showType)},
+          "r"= {g<-r_plot(analysis,disp,orientation=orientation,showType=showType,showTheory=showTheory)},
+          "rp"={g<-r_plot(analysis,disp,orientation=orientation,showType=showType,showTheory=showTheory)},
+          "r1"={g<-r_plot(analysis,disp,orientation=orientation,showType=showType,showTheory=showTheory)},
+          "ra"= {g<-r_plot(analysis,disp,orientation=orientation,showType=showType,showTheory=showTheory)},
+          "ci1"={g<-r_plot(analysis,disp,orientation=orientation,showType=showType,showTheory=showTheory)},
+          "ci2"={g<-r_plot(analysis,disp,orientation=orientation,showType=showType,showTheory=showTheory)},
+          "t"= {g<-r_plot(analysis,disp,orientation=orientation,showType=showType,showTheory=showTheory)},
           
-          "p"= {g<-p_plot(analysis,disp,orientation=orientation,showType=showType)},
-          "p1"= {g<-p_plot(analysis,disp,orientation=orientation,showType=showType)},
+          "p"= {g<-p_plot(analysis,disp,orientation=orientation,showType=showType,showTheory=showTheory)},
+          "p1"= {g<-p_plot(analysis,disp,orientation=orientation,showType=showType,showTheory=showTheory)},
           
-          "log(lrs)"={g<-l_plot(analysis,disp,orientation=orientation)},
-          "log(lrd)"={g<-l_plot(analysis,disp,orientation=orientation)},
+          "log(lrs)"={g<-l_plot(analysis,disp,orientation=orientation,showTheory=showTheory)},
+          "log(lrd)"={g<-l_plot(analysis,disp,orientation=orientation,showTheory=showTheory)},
           
-          "w"= {g<-w_plot(analysis,disp,orientation=orientation)},
-          "wp"={g<-w_plot(analysis,disp,orientation=orientation)},
+          "w"= {g<-w_plot(analysis,disp,orientation=orientation,showTheory=showTheory)},
+          "wp"={g<-w_plot(analysis,disp,orientation=orientation,showTheory=showTheory)},
           
-          "nw"={g<-n_plot(analysis,disp,orientation=orientation)},
-          "n"= {g<-n_plot(analysis,disp,orientation=orientation)},
+          "nw"={g<-n_plot(analysis,disp,orientation=orientation,showTheory=showTheory)},
+          "n"= {g<-n_plot(analysis,disp,orientation=orientation,showTheory=showTheory)},
           
-          "e1"={g<-e1_plot(analysis,orientation=orientation)},
-          "e2"={g<-e2_plot(analysis,orientation=orientation)}
+          "e1"={g<-e1_plot(analysis,orientation=orientation,showTheory=showTheory)},
+          "e2"={g<-e2_plot(analysis,orientation=orientation,showTheory=showTheory)}
   )
   g+ggtitle(analysis$an_name)
 }
@@ -65,9 +65,9 @@ plotInference<-function(analysis,disp="r",orientation="vert",showType="direct"){
 
 plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
     
-  r<-analysis$effect$rIV
-  if (!is.null(analysis$IV2)){
-    r<-c(r,analysis$effect$rIV2,analysis$effect$rIVIV2DV)
+  r<-analysis$hypothesis$rIV
+  if (!is.null(analysis$hypothesis$IV2)){
+    r<-c(r,analysis$hypothesis$rIV2,analysis$hypothesis$rIVIV2DV)
   }
   
   pvals<-analysis$pIV

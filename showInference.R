@@ -1,6 +1,7 @@
 
 getNulls<-function(analysis) {
-    nulls<-analysis$rpIV==0
+    nonnulls<-which(analysis$rpIV!=0)
+    nulls<-which(analysis$rpIV==0)
     
     nullanalysis<-analysis
     nullanalysis$rpIV<-analysis$rpIV[nulls]
@@ -10,23 +11,25 @@ getNulls<-function(analysis) {
     nullanalysis$nval<-analysis$nval[nulls]
     nullanalysis$df1<-analysis$df1[nulls]
     
-    analysis$rpIV<-analysis$rpIV[!nulls]
-    analysis$roIV<-analysis$roIV[!nulls]
-    analysis$rIV<-analysis$rIV[!nulls]
-    analysis$pIV<-analysis$pIV[!nulls]
-    analysis$nval<-analysis$nval[!nulls]
-    analysis$df1<-analysis$df1[!nulls]
+    analysis$rpIV<-analysis$rpIV[nonnulls]
+    analysis$roIV<-analysis$roIV[nonnulls]
+    analysis$rIV<-analysis$rIV[nonnulls]
+    analysis$pIV<-analysis$pIV[nonnulls]
+    analysis$nval<-analysis$nval[nonnulls]
+    analysis$df1<-analysis$df1[nonnulls]
+    
+    analysis$count<-sum(!is.na(analysis$rIV))
+    analysis$hypothesis$effect$world$populationNullp<-0
     
     nullanalysis$count<-sum(!is.na(nullanalysis$rIV))
-    analysis$count<-sum(!is.na(analysis$rIV))
+    nullanalysis$hypothesis$effect$world$populationNullp<-1
+    
     list(analysis=analysis,nullanalysis=nullanalysis)
   }
 
 showInference<-function(analysis=makeAnalysis(),type="Basic",dimension="1D",orientation="vert",
-                        showType="direct",Theory=showTheory
+                        showType="direct",showTheory=TRUE
 ) {
-  oldshowTheory<-showTheory
-  showTheory<<-Theory
   if (type=="2D") {
     type<-"Basic"
     dimension<-"2D"
@@ -57,20 +60,19 @@ showInference<-function(analysis=makeAnalysis(),type="Basic",dimension="1D",orie
     g2<-NULL
   } else {
     if (type[1]=="e1")
-      g1<-plotInference(analysis2,type[1],showType=showType,orientation=orientation)
+      g1<-plotInference(analysis2,type[1],showType=showType,orientation=orientation,showTheory=showTheory)
     else
-      g1<-plotInference(analysis1,type[1],showType=showType,orientation=orientation)
+      g1<-plotInference(analysis1,type[1],showType=showType,orientation=orientation,showTheory=showTheory)
     if (!is.na(type[2])) {
       if (type[2]=="e1")
-        g2<-plotInference(analysis2,type[2],showType=showType,orientation=orientation)
+        g2<-plotInference(analysis2,type[2],showType=showType,orientation=orientation,showTheory=showTheory)
       else
-        g2<-plotInference(analysis1,type[2],showType=showType,orientation=orientation)
+        g2<-plotInference(analysis1,type[2],showType=showType,orientation=orientation,showTheory=showTheory)
     } else {
       g2<-NULL
     }
   }
-  showTheory<<-oldshowTheory
-  
+
   if (!is.null(g2)) {
     g<-joinPlots(g1,g2)
   } else {

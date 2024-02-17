@@ -1,9 +1,15 @@
-reportExplore<-function(Iv,IV2,DV,effect,design,explore,exploreResult){
+reportExplore<-function(exploreResult,Explore_show="EffectSize",
+                        Explore_whichShow="All",Explore_typeShow="All"
+                        ){
+  explore<-exploreResult$explore
+  hypothesis<-explore$hypothesis
+  effect<-hypothesis$effect
+  
   oldAlpha<-BrawOpts$alphaSig
   max_cols<-8
   
-  vals<-exploreResult$result$vals
-  if (explore$Explore_type=="pNull" && pPlus) vals<-1-vals
+  vals<-exploreResult$vals
+  if (explore$type=="pNull" && pPlus) vals<-1-vals
   
   if (length(vals)>max_cols)  {
     use<-seq(1,length(vals),2)
@@ -12,37 +18,37 @@ reportExplore<-function(Iv,IV2,DV,effect,design,explore,exploreResult){
   }
   nc<-length(use)
 
-  extra_y_label<-explore$Explore_show
+  extra_y_label<-Explore_show
 
-  if (is.null(IV2)){
-    rVals<-exploreResult$result$rIVs
-    raVals<-exploreResult$result$raIVs
-    pVals<-exploreResult$result$pIVs
+  if (is.null(hypothesis$IV2)){
+    rVals<-exploreResult$result$rval
+    raVals<-exploreResult$result$raval
+    pVals<-exploreResult$result$pval
   } else {
-    if (explore$Explore_typeShow=="all") {explore$Explore_typeShow<-"direct"}
-    if (explore$Explore_whichShow=="All") {explore$Explore_whichShow<-"Main 1"}
-    switch (explore$Explore_whichShow,
+    if (Explore_typeShow=="all") {Explore_typeShow<-"direct"}
+    if (Explore_whichShow=="All") {Explore_whichShow<-"Main 1"}
+    switch (Explore_whichShow,
             "Main 1"={
-              rVals<-exploreResult$result$r1[[explore$Explore_typeShow]]
-              pVals<-exploreResult$result$p1[[explore$Explore_typeShow]]
-              extra_y_label<-paste("Main Effect 1:",explore$Explore_typeShow)
+              rVals<-exploreResult$result$r1[[Explore_typeShow]]
+              pVals<-exploreResult$result$p1[[Explore_typeShow]]
+              extra_y_label<-paste("Main Effect 1:",Explore_typeShow)
             },
             "Main 2"={
-              rVals<-exploreResult$result$r2[[explore$Explore_typeShow]]
-              pVals<-exploreResult$result$p2[[explore$Explore_typeShow]]
-              extra_y_label<-paste("Main Effect 2:",explore$Explore_typeShow)
+              rVals<-exploreResult$result$r2[[Explore_typeShow]]
+              pVals<-exploreResult$result$p2[[Explore_typeShow]]
+              extra_y_label<-paste("Main Effect 2:",Explore_typeShow)
             },
             "Interaction"={
-              rVals<-exploreResult$result$r3[[explore$Explore_typeShow]]
-              pVals<-exploreResult$result$p3[[explore$Explore_typeShow]]
-              extra_y_label<-paste("Interaction:",explore$Explore_typeShow)
+              rVals<-exploreResult$result$r3[[Explore_typeShow]]
+              pVals<-exploreResult$result$p3[[Explore_typeShow]]
+              extra_y_label<-paste("Interaction:",Explore_typeShow)
             }
     )
   }
-  nVals<-exploreResult$result$nvals
-  df1Vals<-exploreResult$result$df1vals
+  nVals<-exploreResult$result$nval
+  df1Vals<-exploreResult$result$df1
   
-  switch (explore$Explore_show,
+  switch (Explore_show,
           "EffectSize"={
             showVals<-rVals
             if (RZ=="z") showVals<-atanh(showVals)
@@ -58,14 +64,14 @@ reportExplore<-function(Iv,IV2,DV,effect,design,explore,exploreResult){
             showVals<-exploreResult$result$tvals
           },
           "w"={
-            showVals<-rn2w(rVals,exploreResult$result$nvals)
+            showVals<-rn2w(rVals,exploreResult$result$nval)
           },
           "SampleSize"={
-            showVals<-exploreResult$result$nvals
+            showVals<-exploreResult$result$nval
           },
           "p(sig)"={
-            if (explore$Explore_type=="Alpha") {
-              BrawOpts$alphaSig<-exploreResult$result$vals
+            if (explore$type=="Alpha") {
+              BrawOpts$alphaSig<-exploreResult$vals
             }
             ps<-isSignificant(BrawOpts$STMethod,pVals,rVals,nVals,df1Vals,exploreResult$evidence,BrawOpts$alphaSig)
             if (ncol(ps)>1) {
@@ -76,8 +82,8 @@ reportExplore<-function(Iv,IV2,DV,effect,design,explore,exploreResult){
             y75<-ps+sqrt(ps*(1-ps)/nrow(pVals))
           },
           "n(sig)"={
-            if (explore$Explore_type=="Alpha") {
-              BrawOpts$alphaSig<-exploreResult$result$vals
+            if (explore$type=="Alpha") {
+              BrawOpts$alphaSig<-exploreResult$vals
             }
             ps<-isSignificant(BrawOpts$STMethod,pVals,rVals,nVals,df1Vals,exploreResult$evidence,BrawOpts$alphaSig)
             if (ncol(ps)>1) {
@@ -99,13 +105,13 @@ reportExplore<-function(Iv,IV2,DV,effect,design,explore,exploreResult){
             y25e<-c()
             y75e<-c()
             if (effect$world$worldOn) {
-              for (i in 1:length(exploreResult$result$vals)){
-                if (explore$Explore_type=="Alpha") {
-                  BrawOpts$alphaSig<<-exploreResult$result$vals[i]
+              for (i in 1:length(exploreResult$vals)){
+                if (explore$type=="Alpha") {
+                  BrawOpts$alphaSig<<-exploreResult$vals[i]
                   BrawOpts$alphaLLR<<-0.5*qnorm(1-BrawOpts$alphaSig/2)^2
                 }
                 sigs<-isSignificant(BrawOpts$STMethod,pVals[,i],rVals[,i],nVals[,i],df1Vals[,i],exploreResult$evidence)
-                nulls<-exploreResult$result$rpIVs[,i]==0
+                nulls<-exploreResult$result$rpval[,i]==0
                 p<-sum(!sigs & !nulls,na.rm=TRUE)/length(sigs)
                 y50[i]<-p
                 y75[i]<-p+sqrt(p*(1-p)/length(pVals[,i]))
@@ -116,18 +122,18 @@ reportExplore<-function(Iv,IV2,DV,effect,design,explore,exploreResult){
                 y25e[i]<-p-sqrt(p*(1-p)/length(pVals[,i]))
               }
             } else {
-              for (i in 1:length(exploreResult$result$vals)){
+              for (i in 1:length(exploreResult$vals)){
                 p<-mean(isSignificant(BrawOpts$STMethod,pVals[,i],rVals[,i],nVals[,i],df1Vals[,i],exploreResult$evidence),na.rm=TRUE)
                 y50[i]<-p
                 y75[i]<-p+sqrt(p*(1-p)/length(pVals[,i]))
                 y25[i]<-p-sqrt(p*(1-p)/length(pVals[,i]))
               }
               
-              peVals<-exploreResult$nullresult$pIVs
-              reVals<-exploreResult$nullresult$rIVs
-              neVals<-exploreResult$nullresult$nvals
+              peVals<-exploreResult$nullresult$pval
+              reVals<-exploreResult$nullresult$rval
+              neVals<-exploreResult$nullresult$nval
               df1eVals<-exploreResult$nullresult$df1
-              for (i in 1:length(exploreResult$result$vals)){
+              for (i in 1:length(exploreResult$vals)){
                 p<-mean(isSignificant(BrawOpts$STMethod,peVals[,i],reVals[,i],neVals[,i],df1eVals[,i],exploreResult$evidence),na.rm=TRUE)
                 y50e[i]<-p
                 y75e[i]<-p+sqrt(p*(1-p)/length(peVals[,i]))
@@ -140,22 +146,22 @@ reportExplore<-function(Iv,IV2,DV,effect,design,explore,exploreResult){
             y25<-c()
             y75<-c()
             if (effect$world$worldOn) {
-              for (i in 1:length(exploreResult$result$vals)){
-                if (explore$Explore_type=="Alpha") {
-                  BrawOpts$alphaSig<<-exploreResult$result$vals[i]
+              for (i in 1:length(exploreResult$vals)){
+                if (explore$type=="Alpha") {
+                  BrawOpts$alphaSig<<-exploreResult$vals[i]
                   BrawOpts$alphaLLR<<-0.5*qnorm(1-BrawOpts$alphaSig/2)^2
                 }
                 sigs<-isSignificant(BrawOpts$STMethod,pVals[,i],rVals[,i],nVals[,i],df1Vals[,i],exploreResult$evidence)
-                nulls<-exploreResult$result$rpIVs[,i]==0
+                nulls<-exploreResult$result$rpval[,i]==0
                 p<-sum(sigs & nulls,na.rm=TRUE)/sum(sigs)
                 y50[i]<-p
                 y75[i]<-p+sqrt(p*(1-p)/length(pVals[,i]))
                 y25[i]<-p-sqrt(p*(1-p)/length(pVals[,i]))
               }
             } else {
-              for (i in 1:length(exploreResult$result$vals)){
-                if (explore$Explore_type=="Alpha") {
-                  BrawOpts$alphaSig<<-exploreResult$result$vals[i]
+              for (i in 1:length(exploreResult$vals)){
+                if (explore$type=="Alpha") {
+                  BrawOpts$alphaSig<<-exploreResult$vals[i]
                   BrawOpts$alphaLLR<<-0.5*qnorm(1-BrawOpts$alphaSig/2)^2
                 }
                 p<-mean(isSignificant(BrawOpts$STMethod,pVals[,i],rVals[,i],nVals[,i],df1Vals[,i],exploreResult$evidence),na.rm=TRUE)
@@ -173,13 +179,13 @@ reportExplore<-function(Iv,IV2,DV,effect,design,explore,exploreResult){
             y25e<-c()
             y75e<-c()
             if (effect$world$worldOn) {
-              for (i in 1:length(exploreResult$result$vals)){
-                if (explore$Explore_type=="Alpha") {
-                  BrawOpts$alphaSig<<-exploreResult$result$vals[i]
+              for (i in 1:length(exploreResult$vals)){
+                if (explore$type=="Alpha") {
+                  BrawOpts$alphaSig<<-exploreResult$vals[i]
                   BrawOpts$alphaLLR<<-0.5*qnorm(1-BrawOpts$alphaSig/2)^2
                 }
                 sigs<-isSignificant(BrawOpts$STMethod,pVals[,i],rVals[,i],nVals[,i],df1Vals[,i],exploreResult$evidence)
-                nulls<-exploreResult$result$rpIVs[,i]==0
+                nulls<-exploreResult$result$rpval[,i]==0
                 p<-sum(!sigs & !nulls,na.rm=TRUE)/sum(!nulls)
                 y50[i]<-p
                 y75[i]<-p+sqrt(p*(1-p)/length(pVals[,i]))
@@ -190,9 +196,9 @@ reportExplore<-function(Iv,IV2,DV,effect,design,explore,exploreResult){
                 y25e[i]<-p-sqrt(p*(1-p)/length(pVals[,i]))
               }
             } else {
-              for (i in 1:length(exploreResult$result$vals)){
-                if (explore$Explore_type=="Alpha") {
-                  BrawOpts$alphaSig<<-exploreResult$result$vals[i]
+              for (i in 1:length(exploreResult$vals)){
+                if (explore$type=="Alpha") {
+                  BrawOpts$alphaSig<<-exploreResult$vals[i]
                   BrawOpts$alphaLLR<<-0.5*qnorm(1-BrawOpts$alphaSig/2)^2
                 }
                 p<-mean(isSignificant(BrawOpts$STMethod,pVals[,i],rVals[,i],nVals[,i],df1Vals[,i],exploreResult$evidence),na.rm=TRUE)
@@ -205,9 +211,9 @@ reportExplore<-function(Iv,IV2,DV,effect,design,explore,exploreResult){
               reVals<-exploreResult$nullresult$rIVs
               neVals<-exploreResult$nullresult$nvals
               df1eVals<-exploreResult$nullresult$df1
-              for (i in 1:length(exploreResult$result$vals)){
-                if (explore$Explore_type=="Alpha") {
-                  BrawOpts$alphaSig<<-exploreResult$result$vals[i]
+              for (i in 1:length(exploreResult$vals)){
+                if (explore$type=="Alpha") {
+                  BrawOpts$alphaSig<<-exploreResult$vals[i]
                   BrawOpts$alphaLLR<<-0.5*qnorm(1-BrawOpts$alphaSig/2)^2
                 }
                 p<-mean(isSignificant(BrawOpts$STMethod,peVals[,i],reVals[,i],neVals[,i],df1eVals[,i],exploreResult$evidence),na.rm=TRUE)
@@ -219,27 +225,27 @@ reportExplore<-function(Iv,IV2,DV,effect,design,explore,exploreResult){
             extra_y_label<-"FMR"
           },
           "log(lrs)"={
-            ns<-exploreResult$result$nvals
+            ns<-exploreResult$result$nval
             df1<-exploreResult$result$df1
             showVals<-r2llr(rVals,ns,df1,"sLLR",exploreResult$evidence$llr,exploreResult$evidence$prior)
           },
           "log(lrd)"={
-            ns<-exploreResult$result$nvals
+            ns<-exploreResult$result$nval
             df1<-exploreResult$result$df1
             showVals<-r2llr(rVals,ns,df1,"dLLR",exploreResult$evidence$llr,exploreResult$evidence$prior)
           },
           "k"={
-            showVals<-exploreResult$result$ks
+            showVals<-exploreResult$result$k
           },
           "pNull"={
-            showVals<-exploreResult$result$pnulls
+            showVals<-exploreResult$result$pnull
           },
           "PDF"={
-            showVals<-exploreResult$result$dists==effect$world$populationPDF
+            showVals<-exploreResult$result$dist==effect$world$populationPDF
             y50<-c()
             y25<-c()
             y75<-c()
-            for (i in 1:length(exploreResult$result$vals)){
+            for (i in 1:length(exploreResult$vals)){
               p<-mean(showVals[,i],na.rm=TRUE)
               p_se<-sqrt(p*(1-p)/length(showVals[,i]))
               y50[i]<-p
@@ -248,42 +254,21 @@ reportExplore<-function(Iv,IV2,DV,effect,design,explore,exploreResult){
             }
           },
           "S"={
-            showVals<-exploreResult$result$Ss
+            showVals<-exploreResult$result$S
             y50<-c()
             y25<-c()
             y75<-c()
-          },
-          "mean(DV)"={
-            showVals<-exploreResult$result$dvMean
-            y50<-c()
-            y25<-c()
-            y75<-c()
-          },
-          "sd(DV)"={
-            showVals<-exploreResult$result$dvSD
-            y50<-c()
-            y25<-c()
-            y75<-c()
-          },
-          "skew(DV)"={
-            showVals<-exploreResult$result$dvSkew
-            y50<-c()
-            y25<-c()
-            y75<-c()
-          },
-          "kurtosis(DV)"={
-            showVals<-exploreResult$result$dvKurtosis
           }
           
   )
 
-  if (is.element(explore$Explore_show,c("EffectSize","EffectSizeA","p","w","t","SampleSize","log(lrs)","log(lrd)","k","pNull","S","mean(DV)","sd(DV)","skew(DV)","kurtosis(DV)"))) {
+  if (is.element(Explore_show,c("EffectSize","EffectSizeA","p","w","t","SampleSize","log(lrs)","log(lrd)","k","pNull","S","mean(DV)","sd(DV)","skew(DV)","kurtosis(DV)"))) {
     y75<-c()
     y50<-c()
     y25<-c()
     ymn<-c()
     ysd<-c()
-    for (i in 1:length(exploreResult$result$vals)) {
+    for (i in 1:length(exploreResult$vals)) {
       y75[i]<-quantile(showVals[,i],0.75,na.rm=TRUE)
       y50[i]<-quantile(showVals[,i],0.50,na.rm=TRUE)
       y25[i]<-quantile(showVals[,i],0.25,na.rm=TRUE)
@@ -294,11 +279,11 @@ reportExplore<-function(Iv,IV2,DV,effect,design,explore,exploreResult){
 
   outputText<-rep("",nc+1)
   outputText[1]<-"\bExplore:"
-  outputText[2]<-explore$Explore_type
-  outputText[3]<-paste(" (nsims=",format(nrow(exploreResult$result$rIVs)),")",sep="")
+  outputText[2]<-explore$type
+  outputText[3]<-paste(" (nsims=",format(nrow(exploreResult$result$rval)),")",sep="")
   outputText<-c(outputText,rep("",nc+1))
 
-  if (explore$Explore_show=="NHSTErrors" || explore$Explore_show=="FDR;FMR") {
+  if (Explore_show=="NHSTErrors" || Explore_show=="FDR;FMR") {
     switch (BrawOpts$STMethod,
             "NHST"={outputText<-c(outputText,"NHST")},
             "sLLR"={outputText<-c(outputText,"sLLR")},
@@ -310,10 +295,10 @@ reportExplore<-function(Iv,IV2,DV,effect,design,explore,exploreResult){
   }
   
   outputText<-c(outputText," ")
-  if (explore$Explore_type=="EffectSize" && RZ=="z") {
+  if (explore$type=="EffectSize" && RZ=="z") {
     vals<-atanh(vals)
   }
-  if (explore$Explore_type=="EffectSizeA" && RZ=="z") {
+  if (explore$type=="EffectSizeA" && RZ=="z") {
     vals<-atanh(vals)
   }
   for (i in 1:nc) {
@@ -335,7 +320,7 @@ reportExplore<-function(Iv,IV2,DV,effect,design,explore,exploreResult){
     outputText<-c(outputText,format(y75[use[i]],digits=report_precision))
   }
   
-  if (is.element(explore$Explore_show,c("EffectSize","EffectSizeA","p","w","t","SampleSize","log(lrs)","log(lrd)","k","pNull","S"))) {
+  if (is.element(Explore_show,c("EffectSize","EffectSizeA","p","w","t","SampleSize","log(lrs)","log(lrd)","k","pNull","S"))) {
     outputText<-c(outputText,rep(" ",nc+1))
     outputText<-c(outputText,"!jmean")
     for (i in 1:nc) {
@@ -347,8 +332,8 @@ reportExplore<-function(Iv,IV2,DV,effect,design,explore,exploreResult){
     }
   }    
 
-  if (explore$Explore_show=="NHSTErrors" || explore$Explore_show=="FDR;FMR") {
-    switch(explore$Explore_show,
+  if (Explore_show=="NHSTErrors" || Explore_show=="FDR;FMR") {
+    switch(Explore_show,
            "NHSTErrors"={extra_y_label<-"Type I errors"},
            "FDR;FMR"={extra_y_label<-"FDR"}
     )
@@ -356,23 +341,23 @@ reportExplore<-function(Iv,IV2,DV,effect,design,explore,exploreResult){
       rVals<-exploreResult$nullresult$rIVs
       pVals<-exploreResult$nullresult$pIVs
     } else {
-      if (explore$Explore_typeShow=="all") {explore$Explore_typeShow<-"direct"}
-      if (explore$Explore_whichShow=="All") {explore$Explore_whichShow<-"Main 1"}
-      switch (explore$Explore_whichShow,
+      if (Explore_typeShow=="all") {Explore_typeShow<-"direct"}
+      if (Explore_whichShow=="All") {Explore_whichShow<-"Main 1"}
+      switch (Explore_whichShow,
               "Main 1"={
-                rVals<-exploreResult$result$r1[[explore$Explore_typeShow]]
-                pVals<-exploreResult$result$p1[[explore$Explore_typeShow]]
-                extra_y_label<-paste("Main Effect 1:",explore$Explore_typeShow)
+                rVals<-exploreResult$result$r1[[Explore_typeShow]]
+                pVals<-exploreResult$result$p1[[Explore_typeShow]]
+                extra_y_label<-paste("Main Effect 1:",Explore_typeShow)
               },
               "Main 2"={
-                rVals<-exploreResult$result$r2[[explore$Explore_typeShow]]
-                pVals<-exploreResult$result$p2[[explore$Explore_typeShow]]
-                extra_y_label<-paste("Main Effect 2:",explore$Explore_typeShow)
+                rVals<-exploreResult$result$r2[[Explore_typeShow]]
+                pVals<-exploreResult$result$p2[[Explore_typeShow]]
+                extra_y_label<-paste("Main Effect 2:",Explore_typeShow)
               },
               "Interaction"={
-                rVals<-exploreResult$result$r3[[explore$Explore_typeShow]]
-                pVals<-exploreResult$result$p3[[explore$Explore_typeShow]]
-                extra_y_label<-paste("Interaction:",explore$Explore_typeShow)
+                rVals<-exploreResult$result$r3[[Explore_typeShow]]
+                pVals<-exploreResult$result$p3[[Explore_typeShow]]
+                extra_y_label<-paste("Interaction:",Explore_typeShow)
               }
       )
     }

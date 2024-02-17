@@ -121,7 +121,7 @@ sampleShortCut<-function(hypothesis,design,evidence,nsims,appendData,oldanalysis
                )
   }
   analysis$participant<-1:length(analysis$rIV)
-  analysis$effect<-effect
+  analysis$hypothesis<-effect
   analysis$design<-design
   analysis$evidence<-evidence
   analysis

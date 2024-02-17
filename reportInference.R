@@ -1,8 +1,9 @@
-reportInference<-function(analysis){
-  IV<-analysis$IV
-  IV2<-analysis$IV2
-  DV<-analysis$DV
-  effect<-analysis$effect
+reportInference<-function(analysis=makeAnalysis()){
+  IV<-analysis$hypothesis$IV
+  IV2<-analysis$hypothesis$IV2
+  DV<-analysis$hypothesis$DV
+  effect<-analysis$hypothesis$effect
+  evidence<-analysis$evidence
   
   switch (evidence$analysisType,
           "Anova"= {
@@ -75,9 +76,9 @@ reportInference<-function(analysis){
       vn<-rownames(anova)[i]
       if (vn!="(Intercept)") {
         if (vn=="NULL") vn<-"Total"
-        if (vn=="iv1"){vn<-paste("",analysis$IVs$name,sep="")}
-        if (vn=="iv2"){vn<-paste("",analysis$IV2s$name,sep="")}
-        if (vn=="iv1:iv2"){vn<-paste("",analysis$IVs$name,":",analysis$IV2s$name,sep="")}
+        if (vn=="iv1"){vn<-paste("",analysis$hypothesis$IVs$name,sep="")}
+        if (vn=="iv2"){vn<-paste("",analysis$hypothesis$IV2s$name,sep="")}
+        if (vn=="iv1:iv2"){vn<-paste("",analysis$hypothesis$IVs$name,":",analysis$hypothesis$IV2s$name,sep="")}
         if (vn=="Residuals"){vn<-"Error"}
         if (vn=="Total"){
           vn<-"\bTotal"

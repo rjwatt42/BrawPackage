@@ -5,7 +5,7 @@ reportPlot<-function(outputText,nc,nr){
   margin=0.5
   colSpace=2.5
   
-  font_size=brawOpts$labelSize
+  font_size=BrawOpts$labelSize
   characterWidth=font_size/14
   
   top=max(nr,14)
@@ -78,7 +78,7 @@ reportPlot<-function(outputText,nc,nr){
                                          label.size=NA,label.padding=unit(0,"lines"))
   }
   
-  g<-g+labs(x="  ",y="  ")+brawOpts$reportTheme+theme(legend.position = "none")
+  g<-g+labs(x="  ",y="  ")+BrawOpts$reportTheme+theme(legend.position = "none")
   g<-g+coord_cartesian(xlim = c(1-margin,edge+margin), ylim = c(1-margin,top+margin))
   g+BrawOpts$blankTheme
 }

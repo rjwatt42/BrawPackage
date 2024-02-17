@@ -1,6 +1,7 @@
 
-makeExplore<-function(hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
-                      type="SampleSize",Explore_npoints=13,
+makeExplore<-function(nsim,hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
+                      type="SampleSize",Explore_npoints=13,exploreResult=NULL,
+                      doingNull=FALSE,autoShow=FALSE,Explore_show="EffectSize",
                       min_n=10,max_n=250,max_r=0.9,max_anom=1,
                       xlog=FALSE,xabs=FALSE,
                       mx_log=FALSE
@@ -14,9 +15,16 @@ makeExplore<-function(hypothesis=makeHypothesis(),design=makeDesign(),evidence=m
                 xlog=xlog,xabs=xabs,
                 mx_log=mx_log
   )
+  if (doingNull && !hypothesis$effect$world$worldOn) {
+    hypothesis$effect$world$worldOn<-TRUE
+    hypothesis$effect$world$populationNullp<-0.5
+  }
+  
+  exploreResult <- runExplore(nsim=nsim,explore=explore,exploreResult,autoShow=autoShow,Explore_show=Explore_show)
+  return(exploreResult)
 }
 
-runExplore <- function(nsim,explore=makeExplore(),exploreResult=NULL){
+runExplore <- function(nsim,explore=makeExplore(),exploreResult=NULL,autoShow=FALSE,Explore_show="EffectSize"){
   
   if (is.character(explore)) {
     explore<-makeExplore(type=explore)
@@ -533,14 +541,14 @@ runExplore <- function(nsim,explore=makeExplore(),exploreResult=NULL){
         }
       }
     }
-    
+    exploreResult$result<-result
+    exploreResult$vals<-vals
+    exploreResult$explore<-explore
+    if (autoShow) print(showExplore(exploreResult,Explore_show=Explore_show))
   }
   
   BrawOpts$alphaSig<<-oldAlpha
   BrawOpts$alphaLLR<<-0.5*qnorm(1-BrawOpts$alphaSig/2)^2
   
-  exploreResult$result<-result
-  exploreResult$vals<-vals
-  exploreResult$explore<-explore
   exploreResult
 }

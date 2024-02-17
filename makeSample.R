@@ -812,7 +812,7 @@ makeSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=FA
   
   sample<-list(participant=id, iv=iv,iv2=iv2, dv=dv,ivplot=xplot,iv2plot=x2plot,dvplot=yplot,
                sampleRho=sampleRho,samplePval=samplePval,effectRho=rho,nval=design$sN,
-               IV=IV,IV2=IV2, DV=DV, effect=effect, design=design)
+               hypothesis=hypothesis, effect=effect, design=design)
   if (autoShow) print(showSample(sample))
   sample
 }
