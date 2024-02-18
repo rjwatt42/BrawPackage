@@ -102,23 +102,26 @@ sampleShortCut<-function(hypothesis,design,evidence,nsims,appendData,oldanalysis
     p_effects=c(p_effects,ps)
     n_effects=c(n_effects,ns)
   }
+  ra_effects=r_effects
   if (appendData && !isempty(oldanalysis)) {
     analysis<-list(rIV=rbind(matrix(r_effects[1:nsims],ncol=1),oldanalysis$rIV),
-                 rpIV=rbind(matrix(r_effects[1:nsims],ncol=1),oldanalysis$rpIV),
-                 nval=rbind(matrix(n_effects[1:nsims],ncol=1),oldanalysis$nval),
-                 df1=rbind(matrix(rep(df1,nsims),ncol=1),oldanalysis$df1),
-                 pIV=rbind(matrix(p_effects[1:nsims],ncol=1),oldanalysis$pIV),
-                 dv=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$dv)
-                 )
+                   pIV=rbind(matrix(p_effects[1:nsims],ncol=1),oldanalysis$pIV),
+                   rpIV=rbind(matrix(r_effects[1:nsims],ncol=1),oldanalysis$rpIV),
+                   raIV=rbind(matrix(ra_effects[1:nsims],ncol=1),oldanalysis$raIV),
+                   nval=rbind(matrix(n_effects[1:nsims],ncol=1),oldanalysis$nval),
+                   df1=rbind(matrix(rep(df1,nsims),ncol=1),oldanalysis$df1),
+                   dv=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$dv)
+    )
     
   } else {
   analysis<-list(rIV=matrix(r_effects[1:nsims],ncol=1),
-               rpIV=matrix(rp_effects[1:nsims],ncol=1),
-               nval=matrix(n_effects[1:nsims],ncol=1),
-               df1=matrix(rep(df1,nsims),ncol=1),
-               pIV=matrix(p_effects[1:nsims],ncol=1),
-               dv=rep(0,nsims)
-               )
+                 pIV=matrix(p_effects[1:nsims],ncol=1),
+                 rpIV=matrix(rp_effects[1:nsims],ncol=1),
+                 raIV=matrix(ra_effects[1:nsims],ncol=1),
+                 nval=matrix(n_effects[1:nsims],ncol=1),
+                 df1=matrix(rep(df1,nsims),ncol=1),
+                 dv=rep(0,nsims)
+  )
   }
   analysis$participant<-1:length(analysis$rIV)
   analysis$hypothesis<-effect

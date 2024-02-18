@@ -1,3 +1,4 @@
+source("StartUp.R")
 
 hypothesis1<-makeHypothesis(effect=makeEffect(rIV=0.3))
 expectedResult1<-makeExpected(nsim=1000,hypothesis=hypothesis1,
@@ -19,13 +20,12 @@ evidence2<-makeEvidence(shortHand = TRUE)
 expectedResult5<-makeExpected(nsim=1000,hypothesis=hypothesis2,design=design2,
                               autoShow=TRUE)
 
-
-exploreResult<-makeExplore(1000,type="SampleSize",hypothesis2,design2,evidence2,
+exploreResult6<-makeExplore(1000,type="SampleSize",hypothesis2,design2,evidence2,
                            autoShow = TRUE, Explore_show = "p(sig)")
 
-exploreResult<-makeExplore(1000,type="SampleSize",hypothesis2,design2,doingNull=TRUE,
+exploreResult7<-makeExplore(1000,type="SampleSize",hypothesis2,design2,doingNull=TRUE,
                            autoShow = TRUE, Explore_show="NHSTErrors")
 
-exploreResult<-makeExplore(1000,type="SampleSize",hypothesis2,design2,doingNull=TRUE,
+exploreResult8<-makeExplore(1000,type="SampleSize",hypothesis2,design2,doingNull=TRUE,
                            min_n=10,max_n=1000,xlog=TRUE,
                            autoShow = TRUE, Explore_show="NHSTErrors")

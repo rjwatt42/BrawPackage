@@ -915,13 +915,8 @@ runSimulation<-function(hypothesis,design,evidence,sig_only=FALSE,onlyAnalysis=F
   # res<-cheatSample(IV,IV2,DV,effect,design,evidence,sample,res)
   # Replication?
   res<-replicateSample(hypothesis,design,evidence,sample,res)
-  
-  F<-res$rawAnova$F[[2]]
-  df2<-res$rawAnova$Df[[3]]
-  res$raIV<-sqrt(F/(F+df2))*sign(res$rIV)
-  
+
   res
-  
 }
 
 getSample<-function(hypothesis,design,evidence) {
