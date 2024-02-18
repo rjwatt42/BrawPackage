@@ -3,7 +3,7 @@ abind<-function(a,b) array(c(a, b), dim = c(dim(a)[1], dim(a)[2], dim(a)[3]+dim(
 
 resetExploreResult<-function(n_sims,n_vals,oldResult=NULL) {
   
-  if (nsims>0) {
+  if (n_sims>0) {
     b<-array(NA,c(n_sims,n_vals))
     bm<-array(NA,c(n_sims,n_vals,3))
   } else {
@@ -11,7 +11,7 @@ resetExploreResult<-function(n_sims,n_vals,oldResult=NULL) {
     bm<-NULL
   }
   
-  result<-list(rval=b,rpval=b,pval=b,roval=b,poval=b,nval=b,df1=b,
+  result<-list(rval=b,pval=b,rpval=b,raval=b,roval=b,poval=b,nval=b,df1=b,
                rIV1=b,rIVIV2DV=b,pIV2=b,pIVIV2DV=b,
                r=list(direct=bm,unique=bm,total=bm),
                p=list(direct=bm,unique=bm,total=bm)
@@ -23,8 +23,9 @@ resetExploreResult<-function(n_sims,n_vals,oldResult=NULL) {
 }
 storeExploreResult<-function(result,res,ri,vi) {
   result$rval[ri,vi]<-res$rIV
-  result$rpval[ri,vi]<-res$rpIV
   result$pval[ri,vi]<-res$pIV
+  result$rpval[ri,vi]<-res$rpIV
+  result$raval[ri,vi]<-res$raIV
   result$roval[ri,vi]<-res$roIV
   result$poval[ri,vi]<-res$poIV
   result$nval[ri,vi]<-res$nval
@@ -49,8 +50,9 @@ storeExploreResult<-function(result,res,ri,vi) {
 
 mergeExploreResult<-function(res1,res2) {
   result$rval<-rbind(res1$rval,res2$rval)
-  result$rpval<-rbind(res1$rpval,res2$rpval)
   result$pval<-rbind(res1$pval,res2$pval)
+  result$rpval<-rbind(res1$rpval,res2$rpval)
+  result$raval<-rbind(res1$raval,res2$raval)
   result$roval<-rbind(res1$roval,res2$roval)
   result$poval<-rbind(res1$poval,res2$poval)
   result$nval<-rbind(res1$nval,res2$nval)

@@ -60,9 +60,6 @@ reportExplore<-function(exploreResult,Explore_show="EffectSize",
           "p"={
             showVals<-pVals
           },
-          "t"={
-            showVals<-exploreResult$result$tvals
-          },
           "w"={
             showVals<-rn2w(rVals,exploreResult$result$nval)
           },
@@ -262,7 +259,7 @@ reportExplore<-function(exploreResult,Explore_show="EffectSize",
           
   )
 
-  if (is.element(Explore_show,c("EffectSize","EffectSizeA","p","w","t","SampleSize","log(lrs)","log(lrd)","k","pNull","S","mean(DV)","sd(DV)","skew(DV)","kurtosis(DV)"))) {
+  if (is.element(Explore_show,c("EffectSize","EffectSizeA","p","w","SampleSize","log(lrs)","log(lrd)","k","pNull","S"))) {
     y75<-c()
     y50<-c()
     y25<-c()
@@ -320,7 +317,7 @@ reportExplore<-function(exploreResult,Explore_show="EffectSize",
     outputText<-c(outputText,format(y75[use[i]],digits=report_precision))
   }
   
-  if (is.element(Explore_show,c("EffectSize","EffectSizeA","p","w","t","SampleSize","log(lrs)","log(lrd)","k","pNull","S"))) {
+  if (is.element(Explore_show,c("EffectSize","EffectSizeA","p","w","SampleSize","log(lrs)","log(lrd)","k","pNull","S"))) {
     outputText<-c(outputText,rep(" ",nc+1))
     outputText<-c(outputText,"!jmean")
     for (i in 1:nc) {

@@ -5,9 +5,10 @@ trimanalysis<-function(analysis) {
   
   use<-(!is.na(analysis$rIV))
   
-  analysis$rpIV=analysis$rpIV[use]
   analysis$rIV=analysis$rIV[use]
   analysis$pIV=analysis$pIV[use]
+  analysis$rpIV=analysis$rpIV[use]
+  analysis$raIV=analysis$raIV[use]
   analysis$roIV=analysis$roIV[use]
   analysis$poIV=analysis$poIV[use]
   analysis$nval=analysis$nval[use]
@@ -42,8 +43,7 @@ plotInference<-function(analysis,disp="r",orientation="vert",showType="direct",s
           "ra"= {g<-r_plot(analysis,disp,orientation=orientation,showType=showType,showTheory=showTheory)},
           "ci1"={g<-r_plot(analysis,disp,orientation=orientation,showType=showType,showTheory=showTheory)},
           "ci2"={g<-r_plot(analysis,disp,orientation=orientation,showType=showType,showTheory=showTheory)},
-          "t"= {g<-r_plot(analysis,disp,orientation=orientation,showType=showType,showTheory=showTheory)},
-          
+
           "p"= {g<-p_plot(analysis,disp,orientation=orientation,showType=showType,showTheory=showTheory)},
           "p1"= {g<-p_plot(analysis,disp,orientation=orientation,showType=showType,showTheory=showTheory)},
           
@@ -150,7 +150,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
             xlim<-rlim
           },
           "ra"={
-            d1<-analysis$rIVa
+            d1<-analysis$raIV
             disp1_use<-bquote(r[1])
             if (RZ=="z") {
               d1<-atanh(d1)
@@ -169,10 +169,6 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
           "n"={
             d1<-analysis$nval
             xlim<-c(1, 200*1.1)
-          },
-          "t"={
-            d1<-analysis$tval
-            xlim<-c(-5,5)
           }
   )
   
@@ -196,7 +192,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
             ylim<-rlim
           },
           "ra"={
-            d2<-analysis$rIVa
+            d2<-analysis$raIV
             disp2_use<-bquote(r[1])
             if (RZ=="z") {
               d2<-atanh(d2)
@@ -277,10 +273,6 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
               disp2<-"Z"
             }
             ylim<-rlim
-          },
-          "t"={
-            d2<-analysis$tval
-            ylim<-c(-5,5)
           }
   )
 

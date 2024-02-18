@@ -138,6 +138,7 @@ collectData<-function(analysis) {
   
   if (all(is.na(analysis$rIV2))){
     rs<-cbind(analysis$rIV[use])
+    ra<-cbind(analysis$raIV[use])
     ps<-cbind(analysis$pIV[use])
   } else {
     switch (analysis$showType,
@@ -173,7 +174,7 @@ collectData<-function(analysis) {
     ps[ps<min_p]<-min_p
     po[po<min_p]<-min_p
   }
-  out<-list(rs=rs,ps=ps,ns=ns,df1=df1,rp=rp,ro=ro,po=po)
+  out<-list(rs=rs,ps=ps,ns=ns,df1=df1,rp=rp,ra=ra,ro=ro,po=po)
 }
 
 makeFiddle<-function(y,yd,orientation){
@@ -549,6 +550,11 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
             if (RZ=="z") ylabel<-zsLabel
             else ylabel<-rsLabel 
             },
+          "ra"={
+            ylim<-rlims
+            if (RZ=="z") ylabel<-bquote(z[a])
+            else ylabel<-bquote(r[a])
+          },
           "p"={
             ylim<-c(min_p, 1)
             ylabel<-bquote(p)
@@ -631,6 +637,7 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
     }
     switch (expType,
             "r"={data$sh<-data$rs},
+            "ra"={data$sh<-data$ra},
             "rp"={data$sh<-data$rp},
             "r1"={data$sh<-data$ro},
             "p"={data$sh<-data$ps},
@@ -684,6 +691,27 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
         npt<-101
       switch(expType,
              "r"={
+               if (RZ=="z") {
+                 zvals<-seq(-1,1,length.out=npt*2)*z_range*2
+                 rvals<-tanh(zvals)
+                 # rvals<-seq(-1,1,length.out=npt)*0.99
+                 xd<-fullRSamplingDist(rvals,effect$world,design,"r",logScale=logScale,sigOnly=FALSE,HQ=showTheoryHQ)
+                 xdsig<-fullRSamplingDist(rvals,effect$world,design,"r",logScale=logScale,sigOnly=TRUE,HQ=showTheoryHQ)
+                 xd<-rdens2zdens(xd,rvals)
+                 xdsig<-rdens2zdens(xdsig,rvals)
+                 yv<-atanh(rvals)
+                 use<-abs(zvals)<=z_range
+                 yv<-yv[use]
+                 xd<-xd[use]
+                 xdsig<-xdsig[use]
+               } else {
+                 rvals<-seq(-1,1,length.out=npt)*0.99
+                 xd<-fullRSamplingDist(rvals,effect$world,design,"r",logScale=logScale,sigOnly=FALSE,HQ=showTheoryHQ)
+                 xdsig<-fullRSamplingDist(rvals,effect$world,design,"r",logScale=logScale,sigOnly=TRUE,HQ=showTheoryHQ)
+                 yv<-rvals
+               }
+             },
+             "ra"={
                if (RZ=="z") {
                  zvals<-seq(-1,1,length.out=npt*2)*z_range*2
                  rvals<-tanh(zvals)

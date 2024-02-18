@@ -24,9 +24,10 @@ trimExploreResult<-function(result) {
   use<- !is.na(result$rval[,1])
   nr=sum(use)
   nc=ncol(result$rval)
-  result$rpval=matrix(result$rpval[use,],nrow=nr,ncol=nc)
   result$rval=matrix(result$rval[use,],nrow=nr,ncol=nc)
   result$pval=matrix(result$pval[use,],nrow=nr,ncol=nc)
+  result$rpval=matrix(result$rpval[use,],nrow=nr,ncol=nc)
+  result$raval=matrix(result$raval[use,],nrow=nr,ncol=nc)
   result$roval=matrix(result$roval[use,],nrow=nr,ncol=nc)
   result$poval=matrix(result$poval[use,],nrow=nr,ncol=nc)
   result$nval=matrix(result$nval[use,],nrow=nr,ncol=nc)
@@ -168,17 +169,13 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
             ylim<-c(-10,10)
             ylabel<-bquote(bold(log['e'](lr['d'])))
           },
-          "k"={
-            ylim<-c(-0.01,1.01)
-            ylabel<-Llabel
-          },
           "SampleSize"={
             ylim<-c(minN,maxRandN*design$sN)
             ylabel<-"n"
           },
-          "t"={
-            ylim<-c()
-            ylabel<-"t"
+          "k"={
+            ylim<-c(-0.01,1.01)
+            ylabel<-Llabel
           },
           "pNull"={
             ylim<-c(-0.01,1.01)
@@ -191,15 +188,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
           "S"={
             ylim<-c(min(result$Ss),max(result$Ss))
             ylabel<-"S"
-          },
-          "mean(IV)"={ylabel<-"mean(IV)"},
-          "sd(IV)"={ylabel<-"sd(IV)"},
-          "skew(IV)"={ylabel<-"skew(IV)"},
-          "kurtosis(IV)"={ylabel<-"kurtosis(IV)"},
-          "mean(DV)"={ylabel<-"mean(DV)"},
-          "sd(DV)"={ylabel<-"sd(DV)"},
-          "skew(DV)"={ylabel<-"skew(DV)"},
-          "kurtosis(DV)"={ylabel<-"kurtosis(DV)"}
+          }
   )
 
   if (!is.null(hypothesis$IV2) && is.element(Explore_show,c("EffectSize","EffectSizeA","p","w","p(sig)"))) {
@@ -354,17 +343,6 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
                 colFill<-names(all_cols[Explore_typeShow])
               }
             },
-            "t"={
-              showVals<-result$tval
-              lines<-c()
-              if (is.null(hypothesis$IV2)){
-                col<-"orange"
-                colFill<-col
-              } else {
-                col<-all_cols[[Explore_typeShow]]
-                colFill<-names(all_cols[Explore_typeShow])
-              }
-            },
             "w"={
               showVals<-rn2w(rVals,result$nval)
               lines<-c(0.05,0.8)
@@ -448,37 +426,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
               col<-"white"
               colFill<-col
             },
-            "mean(DV)"={
-              showVals<-result$dvMean
-              
-              lines<-c()
-              col<-"yellow"
-              colFill<-col
-            },
-            "sd(DV)"={
-              showVals<-result$dvSD
-              
-              lines<-c()
-              col<-"yellow"
-              colFill<-col
-            },
-            "skew(DV)"={
-              showVals<-result$dvSkew
-              
-              lines<-c()
-              col<-"yellow"
-              colFill<-col
-            },
-            "kurtosis(DV)"={
-              showVals<-result$dvKurtosis
-              
-              lines<-c()
-              col<-"yellow"
-              colFill<-col
-            },
-            
-            
-            
+
             "p(sig)"={
               if (explore$type=="Alpha") {
                 BrawOpts$alphaSig<-exploreResult$vals
@@ -701,7 +649,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
     }
     
     # draw the basic line and point data
-    if (is.element(Explore_show,c("EffectSize","EffectSizeA","p","w","t","likelihood","SampleSize",
+    if (is.element(Explore_show,c("EffectSize","EffectSizeA","p","w","likelihood","SampleSize",
                                           "log(lrs)","log(lrd)",
                                           "k","S","pNull",
                                           "mean(DV)","sd(DV)","skew(DV)","kurtosis(DV)"))) {
@@ -736,14 +684,13 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
                "EffectSize"={expType<-"r"},
                "EffectSizeA"={expType<-"ra"},
                "p"={expType<-"p"},
-               "t"={expType<-"t"},
                "w"={expType<-"w"},
                "SampleSize"={expType<-"n"},
                "log(lrs)"={expType<-"log(lrs)"},
                "log(lrd)"={expType<-"log(lrd)"},
                expType=NULL
                )
-        if (is.element(Explore_show,c("EffectSize","EffectSizeA","p","w","t","SampleSize"))){
+        if (is.element(Explore_show,c("EffectSize","EffectSizeA","p","w","SampleSize"))){
           sigVals<-isSignificant(BrawOpts$STMethod,pVals,rVals,nVals,df1Vals,evidence,BrawOpts$alphaSig)
           col<-"white"
         } else {

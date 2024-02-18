@@ -183,7 +183,11 @@ reportExpected<-function(expectedResult=makeExpected(100),type="Basic"){
                 "rp"={
                   a<-result$rpIV
                   if (RZ=="z") a<-atanh(a)
-                  },
+                },
+                "ra"={
+                  a<-result$raIV
+                  if (RZ=="z") a<-atanh(a)
+                },
                 "r1"={
                   a<-result$roIV
                   if (RZ=="z") a<-atanh(a)
@@ -203,6 +207,10 @@ reportExpected<-function(expectedResult=makeExpected(100),type="Basic"){
                 },
                 "p"={b<-p},
                 "rp"={
+                  b<-result$rpIV
+                  if (RZ=="z") b<-atanh(b)
+                },
+                "ra"={
                   b<-result$rpIV
                   if (RZ=="z") b<-atanh(b)
                 },

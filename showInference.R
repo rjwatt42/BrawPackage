@@ -4,17 +4,19 @@ getNulls<-function(analysis) {
     nulls<-which(analysis$rpIV==0)
     
     nullanalysis<-analysis
-    nullanalysis$rpIV<-analysis$rpIV[nulls]
-    nullanalysis$roIV<-analysis$roIV[nulls]
     nullanalysis$rIV<-analysis$rIV[nulls]
     nullanalysis$pIV<-analysis$pIV[nulls]
+    nullanalysis$rpIV<-analysis$rpIV[nulls]
+    nullanalysis$raIV<-analysis$raIV[nulls]
+    nullanalysis$roIV<-analysis$roIV[nulls]
     nullanalysis$nval<-analysis$nval[nulls]
     nullanalysis$df1<-analysis$df1[nulls]
     
-    analysis$rpIV<-analysis$rpIV[nonnulls]
-    analysis$roIV<-analysis$roIV[nonnulls]
     analysis$rIV<-analysis$rIV[nonnulls]
     analysis$pIV<-analysis$pIV[nonnulls]
+    analysis$rpIV<-analysis$rpIV[nonnulls]
+    analysis$raIV<-analysis$raIV[nonnulls]
+    analysis$roIV<-analysis$roIV[nonnulls]
     analysis$nval<-analysis$nval[nonnulls]
     analysis$df1<-analysis$df1[nonnulls]
     
@@ -30,7 +32,7 @@ getNulls<-function(analysis) {
 showInference<-function(analysis=makeAnalysis(),type="Basic",dimension="1D",orientation="vert",
                         showType="direct",showTheory=TRUE
 ) {
-  if (type=="2D") {
+  if (type[1]=="2D") {
     type<-"Basic"
     dimension<-"2D"
   }

@@ -301,8 +301,9 @@ multipleAnalysis<-function(n_sims=1,hypothesis,design,evidence,newResult=c()){
       res$nval<-0
     }
     j<-i+offset
-    newResult$rpIV[j]<-res$rpIV
     newResult$rIV[j]<-res$rIV
+    newResult$raIV[j]<-res$raIV
+    newResult$rpIV[j]<-res$rpIV
     newResult$pIV[j]<-res$pIV
     newResult$roIV[j]<-res$roIV
     newResult$poIV[j]<-res$poIV
@@ -856,6 +857,10 @@ makeAnalysis<-function(evidence=makeEvidence(),sample=makeSample(),autoShow=FALS
   # analysis$ResultHistory<-ResultHistory
   
   analysis$Heteroscedasticity<-0
+  F<-analysis$rawAnova$F[[2]]
+  df2<-analysis$rawAnova$Df[[3]]
+  analysis$raIV<-sqrt(F/(F+df2))*sign(analysis$rIV)
+  
   
   if (autoShow) print(showDescription(analysis))
   
@@ -913,7 +918,7 @@ runSimulation<-function(hypothesis,design,evidence,sig_only=FALSE,onlyAnalysis=F
   
   F<-res$rawAnova$F[[2]]
   df2<-res$rawAnova$Df[[3]]
-  res$rIVa<-sqrt(F/(F+df2))*sign(res$rIV)
+  res$raIV<-sqrt(F/(F+df2))*sign(res$rIV)
   
   res
   
