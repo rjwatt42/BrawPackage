@@ -315,12 +315,7 @@ expected_hist<-function(vals,svals,valType){
             target<-get_upperEdge(abs(vals),abs(svals))
             bins<-getBins(vals,svals,target,NULL,NULL,fixed=TRUE)
           },
-          
-          "ra"=  { # ns is small
-            target<-get_upperEdge(abs(vals),abs(svals))
-            bins<-getBins(vals,svals,target,NULL,NULL,fixed=TRUE)
-          },
-          
+
           "rp"=  { # ns is small
             target<-0.3
             bins<-getBins(vals,svals,target,NULL,NULL,fixed=TRUE)
@@ -360,11 +355,6 @@ expected_hist<-function(vals,svals,valType){
           "w"=  { # ns is small
             target<-get_upperEdge(abs(vals),abs(svals))
             bins<-getBins(vals,svals,target,log10(min_p),NULL)
-          },
-          
-          "t"=  { # ns is small
-            target<-0
-            bins<-getBins(vals,svals,target,NULL,NULL)
           },
           
           "n"= { # ns is small
@@ -563,6 +553,15 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
             ylim<-c(min_p, 1)
             ylabel<-bquote(p)
           },
+          "rp"={
+            ylim<-rlims
+            if (RZ=="z") ylabel<-zpLabel
+            else ylabel<-rpLabel 
+          },
+          "r1"={
+            ylim<-rlims
+            ylabel<-bquote(r[1])
+          },
           "p1"={
             ylim<-c(min_p, 1)
             ylabel<-bquote(p[1])
@@ -594,24 +593,6 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
           "n"={
             ylim<-c(1, design$sN*5*1.1)
             ylabel<-"n"
-          },
-          "t"={
-            ylim<-c(-5,5)
-            ylabel<-"t"
-          },
-          "rp"={
-            ylim<-rlims
-            if (RZ=="z") ylabel<-zpLabel
-            else ylabel<-rpLabel 
-          },
-          "ra"={
-            ylim<-rlims
-            if (RZ=="z") ylabel<-zaLabel
-            else ylabel<-raLabel 
-          },
-          "r1"={
-            ylim<-rlims
-            ylabel<-bquote(r[1])
           },
           "wp"={
             ylim<-c(0.01, 1)
@@ -659,7 +640,6 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
             "e1d"={data$sh<-cbind(res2llr(analysis,"dLLR"))},
             "e2d"={data$sh<-cbind(res2llr(analysis,"dLLR"))},
             "n"={data$sh<-data$ns},
-            "t"={data$sh<-data$ts},
             "w"={data$sh<-rn2w(data$rs,data$ns)},
             "wp"={data$sh<-rn2w(data$rp,data$ns)},
             "nw"={data$sh<-rw2n(data$rs,0.8,analysis$design$sReplTails)},
@@ -724,19 +704,6 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
                  yv<-rvals
                }
              },
-             "ra"={
-               if (RZ=="z") {
-                 yv<-seq(-1,1,length.out=npt)*z_range
-                 xd<-fullRSamplingDist(tanh(yv),effect$world,design,"r",logScale=logScale,sigOnly=FALSE,HQ=showTheoryHQ)
-                 xdsig<-fullRSamplingDist(tanh(yv),effect$world,design,"r",logScale=logScale,sigOnly=TRUE,HQ=showTheoryHQ)
-                 xd<-rdens2zdens(xd,tanh(yv))
-                 xdsig<-rdens2zdens(xdsig,tanh(yv))
-               } else {
-                 yv<-seq(-1,1,length.out=npt)*0.99
-                 xd<-fullRSamplingDist(yv,effect$world,design,"r",logScale=logScale,sigOnly=FALSE,HQ=showTheoryHQ)
-                 xdsig<-fullRSamplingDist(yv,effect$world,design,"r",logScale=logScale,sigOnly=TRUE,HQ=showTheoryHQ)
-               }
-             },
              "ci1"={
                yv<-seq(-1,1,length.out=npt)*0.99
                xd<-fullRSamplingDist(yv,effect$world,design,"r",logScale=logScale,sigOnly=sigOnly)
@@ -790,13 +757,6 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
                yv<-ndist$nvals
                xd<-ndist$ndens
                xdsig<-ndist$ndensSig
-             },
-             "t"={
-               yv<-seq(-5,5,length.out=npt)
-               yvUse<-yv
-               xd<-yv*0
-               xd[yv==0]<-1
-               xdsig<-xd
              },
              "wp"={
                yv<-seq(BrawOpts$alphaSig*1.01,1/1.01,length.out=npt)

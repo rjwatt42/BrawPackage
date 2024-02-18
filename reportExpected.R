@@ -74,14 +74,12 @@ reportExpected<-function(expectedResult=makeExpected(100),type="Basic"){
                "r"={par1="z"},
                "rp"={par1="zp"},
                "r1"={par1="z1"},
-               "ra"={par1="za"},
                {par1=par1}
         )
         switch(par2,
                "r"={par2="z"},
                "rp"={par2="zp"},
                "r1"={par2="z1"},
-               "ra"={par2="za"},
                {par2=par2}
         )
       }
@@ -182,11 +180,6 @@ reportExpected<-function(expectedResult=makeExpected(100),type="Basic"){
                   if (RZ=="z") a<-atanh(a)
                 },
                 "p"={a<-p},
-                "log(lrs)"={a<-res2llr(result,"sLLR")},
-                "log(lrd)"={a<-res2llr(result,"dLLR")},
-                "n"={a<-result$nval},
-                "w"={a<-rn2w(r,result$nval)},
-                "nw"={a<-rw2n(r,0.8,result$design$sReplTails)},
                 "rp"={
                   a<-result$rpIV
                   if (RZ=="z") a<-atanh(a)
@@ -195,11 +188,12 @@ reportExpected<-function(expectedResult=makeExpected(100),type="Basic"){
                   a<-result$roIV
                   if (RZ=="z") a<-atanh(a)
                 },
-                "ra"={
-                  a<-result$rIVa
-                  if (RZ=="z") a<-atanh(a)
-                },
                 "p1"={a<-result$poIV},
+                "log(lrs)"={a<-res2llr(result,"sLLR")},
+                "log(lrd)"={a<-res2llr(result,"dLLR")},
+                "n"={a<-result$nval},
+                "w"={a<-rn2w(r,result$nval)},
+                "nw"={a<-rw2n(r,0.8,result$design$sReplTails)},
                 "wp"={a<-rn2w(result$rpIV,result$nval)}
         )
         switch (pars[2],
@@ -208,11 +202,6 @@ reportExpected<-function(expectedResult=makeExpected(100),type="Basic"){
                   if (RZ=="z") b<-atanh(b)
                 },
                 "p"={b<-p},
-                "log(lrs)"={b<-res2llr(result,"sLLR")},
-                "log(lrd)"={b<-res2llr(result,"dLLR")},
-                "n"={b<-result$nval},
-                "w"={b<-rn2w(r,result$nval)},
-                "nw"={b<-rw2n(r,0.8,result$design$sReplTails)},
                 "rp"={
                   b<-result$rpIV
                   if (RZ=="z") b<-atanh(b)
@@ -221,11 +210,12 @@ reportExpected<-function(expectedResult=makeExpected(100),type="Basic"){
                   b<-result$roIV
                   if (RZ=="z") b<-atanh(b)
                 },
-                "ra"={
-                  b<-result$rIVa
-                  if (RZ=="z") b<-atanh(b)
-                },
                 "p1"={b<-result$poIV},
+                "log(lrs)"={b<-res2llr(result,"sLLR")},
+                "log(lrd)"={b<-res2llr(result,"dLLR")},
+                "n"={b<-result$nval},
+                "w"={b<-rn2w(r,result$nval)},
+                "nw"={b<-rw2n(r,0.8,result$design$sReplTails)},
                 "wp"={b<-rn2w(result$rpIV,result$nval)}
         )
       }

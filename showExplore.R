@@ -264,18 +264,18 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
     } else {
       switch (Explore_whichShow,
               "Main 1"={
-                rVals<-result$r1[[Explore_typeShow]]
-                pVals<-result$p1[[Explore_typeShow]]
+                rVals<-result$r[[Explore_typeShow]][,,1]
+                pVals<-result$p[[Explore_typeShow]][,,1]
                 extra_y_label<-paste("Main Effect 1:",Explore_typeShow)
               },
               "Main 2"={
-                rVals<-result$r2[[Explore_typeShow]]
-                pVals<-result$p2[[Explore_typeShow]]
+                rVals<-result$r[[Explore_typeShow]][,,2]
+                pVals<-result$p[[Explore_typeShow]][,,2]
                 extra_y_label<-paste("Main Effect 2:",Explore_typeShow)
               },
               "Interaction"={
-                rVals<-result$r3[[Explore_typeShow]]
-                pVals<-result$p3[[Explore_typeShow]]
+                rVals<-result$r[[Explore_typeShow]][,,3]
+                pVals<-result$p[[Explore_typeShow]][,,3]
                 extra_y_label<-paste("Interaction:",Explore_typeShow)
               }
       )

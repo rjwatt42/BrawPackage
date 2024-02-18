@@ -1,3 +1,71 @@
+abind<-function(a,b) array(c(a, b), dim = c(dim(a)[1], dim(a)[2], dim(a)[3]+dim(b)[3]))
+
+
+resetExploreResult<-function(n_sims,n_vals,oldResult=NULL) {
+  
+  if (nsims>0) {
+    b<-array(NA,c(n_sims,n_vals))
+    bm<-array(NA,c(n_sims,n_vals,3))
+  } else {
+    b<-NULL
+    bm<-NULL
+  }
+  
+  result<-list(rval=b,rpval=b,pval=b,roval=b,poval=b,nval=b,df1=b,
+               rIV1=b,rIVIV2DV=b,pIV2=b,pIVIV2DV=b,
+               r=list(direct=bm,unique=bm,total=bm),
+               p=list(direct=bm,unique=bm,total=bm)
+  )
+  if (!is.null(oldResult)) {
+    result<-mergeExploreResult(oldResult,result)
+  }
+  return(result)
+}
+storeExploreResult<-function(result,res,ri,vi) {
+  result$rval[ri,vi]<-res$rIV
+  result$rpval[ri,vi]<-res$rpIV
+  result$pval[ri,vi]<-res$pIV
+  result$roval[ri,vi]<-res$roIV
+  result$poval[ri,vi]<-res$poIV
+  result$nval[ri,vi]<-res$nval
+  result$df1[ri,vi]<-res$df1
+  
+  if (!is.null(res$rIV2)){
+    result$rIV2[ri,vi]<-res$rIV2
+    result$pIV2[ri,vi]<-res$pIV2
+    result$rIVIV2DV[ri,vi]<-res$rIVIV2DV
+    result$pIVIV2DV[ri,vi]<-res$rIVIV2DV
+    
+    result$r$direct[ri,vi,]<-res$r$direct
+    result$r$unique[ri,vi,]<-res$r$unique
+    result$r$total[ri,vi,]<-res$r$total
+
+    result$p$direct[ri,vi,]<-res$p$direct
+    result$p$unique[ri,vi,]<-res$p$unique
+    result$p$total[ri,vi,]<-res$p$total
+  }
+  return(result)
+}
+
+mergeExploreResult<-function(res1,res2) {
+  result$rval<-rbind(res1$rval,res2$rval)
+  result$rpval<-rbind(res1$rpval,res2$rpval)
+  result$pval<-rbind(res1$pval,res2$pval)
+  result$roval<-rbind(res1$roval,res2$roval)
+  result$poval<-rbind(res1$poval,res2$poval)
+  result$nval<-rbind(res1$nval,res2$nval)
+  result$df1<-rbind(res1$df1,res2$df1)
+  # if (!is.null(res1$r)) {
+    result$r$direct<-abind(res1$r$direct,res2$r$direct)
+    result$r$unique<-abind(res1$r$unique,res2$r$unique)
+    result$r$total<-abind(res1$r$total,res2$r$total)
+
+    result$p$direct<-abind(res1$p$direct,res2$p$direct)
+    result$p$unique<-abind(res1$p$unique,res2$p$unique)
+    result$p$total<-abind(res1$p$total,res2$p$total)
+  # }
+  return(result)
+}
 
 makeExplore<-function(nsim,type="SampleSize",hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
                       Explore_npoints=13,exploreResult=NULL,doingNull=FALSE,
@@ -165,38 +233,15 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
   exploreResult$vals<-vals
   exploreResult$explore<-explore
   
-  b<-matrix(NA,nrow=n_sims,ncol=length(vals))
-  result<-list(rval=b,rpval=b,pval=b,roval=b,poval=b,nval=b,df1=b,
-               r1=list(direct=b,unique=b,total=b),
-               r2=list(direct=b,unique=b,total=b),
-               r3=list(direct=b,unique=b,total=b)
-  )
+  result<-resetExploreResult(n_sims,length(vals),exploreResult$result)
+  
   if (doingNull) {
     nullhypothesis<-hypothesis
     nullhypothesis$effect$rIV<-0
-    nullresult<-result
+    nullresult<-resetExploreResult(n_sims,length(vals),exploreResult$nullresult)
   } else nullresult<-NULL
+  n_sims<-exploreResult$count+n_sims
   
-  if (!is.null(exploreResult)) {
-    result$rval<-rbind(exploreResult$result$rval,result$rval)
-    result$rpval<-rbind(exploreResult$result$rpval,result$rpval)
-    result$pval<-rbind(exploreResult$result$pval,result$pval)
-    result$roval<-rbind(exploreResult$result$roval,result$roval)
-    result$poval<-rbind(exploreResult$result$poval,result$poval)
-    result$nval<-rbind(exploreResult$result$nval,result$nval)
-    result$df1<-rbind(exploreResult$result$df1,result$df1)
-    
-    nullresult$rval<-rbind(exploreResult$nullresult$rval,nullresult$rval)
-    nullresult$rpval<-rbind(exploreResult$nullresult$rpval,nullresult$rpval)
-    nullresult$pval<-rbind(exploreResult$nullresult$pval,nullresult$pval)
-    nullresult$roval<-rbind(exploreResult$nullresult$roval,nullresult$roval)
-    nullresult$poval<-rbind(exploreResult$nullresult$poval,nullresult$poval)
-    nullresult$nval<-rbind(exploreResult$nullresult$nval,nullresult$nval)
-    nullresult$df1<-rbind(exploreResult$nullresult$df1,nullresult$df1)
-    
-    n_sims<-exploreResult$count+n_sims
-  }
-
   while (exploreResult$count<n_sims){
     if (!autoShow) ns<-n_sims
     else {
@@ -538,64 +583,28 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
                   metaAnalysis$meta_psigAnal<-vals[vi]
                 }
         )
+        hypothesis$IV<-IV
+        hypothesis$IV2<-IV2
+        hypothesis$DV<-DV
+        hypothesis$effect<-effect
         
         if (metaExplore) {
           res<-multipleAnalysis(metaAnalysis$nstudies,hypothesis,design,evidence,metaResult$result,sigOnly=metaAnalysis$sig_only)
           metaResult$result<-res
           metaResult<-runMetaAnalysis(metaAnalysis,metaResult)
           
+          result$rval[ri,vi]<-metaResult$bestS
+          result$S[ri,vi]<-metaResult$bestS
           result$k[ri,vi]<-metaResult$bestK
           result$pnull[ri,vi]<-metaResult$bestNull
-          result$S[ri,vi]<-metaResult$bestS
           result$dist[ri,vi]<-metaResult$bestDist
-          result$rval[ri,vi]<-metaResult$bestS
         } else {
           res<-multipleAnalysis(1,hypothesis,design,evidence)
-          
-          result$rval[ri,vi]<-res$rIV
-          result$rpval[ri,vi]<-res$rpIV
-          result$pval[ri,vi]<-res$pIV
-          result$roval[ri,vi]<-res$roIV
-          result$poval[ri,vi]<-res$poIV
-          result$nval[ri,vi]<-res$nval
-          result$df1[ri,vi]<-res$df1
-          
-          if (!is.null(IV2)){
-            result$r1$direct[ri,vi]<-res$r$direct[,1]
-            result$r1$unique[ri,vi]<-res$r$unique[,1]
-            result$r1$total[ri,vi]<-res$r$total[,1]
-            
-            result$r2$direct[ri,vi]<-res$r$direct[,2]
-            result$r2$unique[ri,vi]<-res$r$unique[,2]
-            result$r2$total[ri,vi]<-res$r$total[,2]
-            
-            result$r3$direct[ri,vi]<-res$r$direct[,3]
-            result$r3$unique[ri,vi]<-res$r$unique[,3]
-            result$r3$total[ri,vi]<-res$r$total[,3]
-            
-            result$p1$direct[ri,vi]<-res$p$direct[,1]
-            result$p1$unique[ri,vi]<-res$p$unique[,1]
-            result$p1$total[ri,vi]<-res$p$total[,1]
-            
-            result$p2$direct[ri,vi]<-res$p$direct[,2]
-            result$p2$unique[ri,vi]<-res$p$unique[,2]
-            result$p2$total[ri,vi]<-res$p$total[,2]
-            
-            result$p3$direct[ri,vi]<-res$p$direct[,3]
-            result$p3$unique[ri,vi]<-res$p$unique[,3]
-            result$p3$total[ri,vi]<-res$p$total[,3]
-          }
+          result<-storeExploreResult(result,res,ri,vi)
           
           if (doingNull) {
             res_null<-multipleAnalysis(1,nullhypothesis,design,evidence)
-            
-            nullresult$rval[ri,vi]<-res_null$rIV
-            nullresult$rpval[ri,vi]<-res_null$rpIV
-            nullresult$pval[ri,vi]<-res_null$pIV
-            nullresult$roval[ri,vi]<-res_null$roIV
-            nullresult$poval[ri,vi]<-res_null$poIV
-            nullresult$nval[ri,vi]<-res_null$nval
-            nullresult$df1[ri,vi]<-res_null$df1
+            nullresult<-storeExploreResult(nullresult,res_null,ri,vi)
           }
         }
       }
