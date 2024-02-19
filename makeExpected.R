@@ -69,17 +69,29 @@ resetExpected<-function(nsims=0,expectedResult=NULL){
 }
 
 
-makeExpected <- function(nsims,hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),expectedResult=NULL,
-                         doingNull=FALSE,autoShow=FALSE,type="Basic") {
+makeExpected <- function(nsims=100,expectedResult=NULL,hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
+                         doingNull=FALSE,autoShow=FALSE,showType="Basic") {
   
-  expectedResult<-c(list(hypothesis=hypothesis,
+  if (!is.null(expectedResult)) {
+    hypothesis<-expectedResult$hypothesis
+    design<-expectedResult$design
+    evidence<-expectedResult$evidence
+  }
+  expectedResult<-c(resetExpected(nsims,expectedResult),
+                    list(hypothesis=hypothesis,
                          design=design,
-                         evidence=evidence),
-                    resetExpected(nsims,expectedResult)
+                         evidence=evidence)
   )
+  #
   if (doingNull && !hypothesis$effect$world$worldOn) {
     hypothesisNull<-hypothesis
     hypothesisNull$effect$rIV<-0
+    # catch up - make enough null results to match results
+    if (expectedResult$nullcount<expectedResult$count) {
+      ns<-expectedResult$count-expectedResult$nullcount
+      expectedResult$nullresult<-multipleAnalysis(ns,hypothesisNull,design,evidence,expectedResult$nullresult)
+      expectedResult$nullcount<-expectedResult$nullcount+ns
+    }
   }
   
   if (autoShow) {
@@ -89,20 +101,16 @@ makeExpected <- function(nsims,hypothesis=makeHypothesis(),design=makeDesign(),e
   } else
     ns<-nsims
 
-  if (nsims>0) {
-    while (expectedResult$count<nsims) {
-      if (expectedResult$count/ns>=10) ns<-ns*10
-      if (expectedResult$count+ns>nsims) ns<-nsims-expectedResult$count
-      newCount<-expectedResult$count+ns
-      expectedResult$result<-multipleAnalysis(ns,hypothesis,design,evidence,expectedResult$result)
-      expectedResult$count<-newCount
-      if (doingNull && !hypothesis$effect$world$worldOn) {
-        newCount<-expectedResult$nullcount+ns
-        expectedResult$nullresult<-multipleAnalysis(ns,hypothesisNull,design,evidence,expectedResult$nullresult)
-        expectedResult$nullcount<-newCount
-      }
-      if (autoShow) print(showExpected(expectedResult,type=type))
+  while (expectedResult$count<nsims) {
+    if (expectedResult$count/ns>=10) ns<-ns*10
+    if (expectedResult$count+ns>nsims) ns<-nsims-expectedResult$count
+    expectedResult$result<-multipleAnalysis(ns,hypothesis,design,evidence,expectedResult$result)
+    expectedResult$count<-expectedResult$count+ns
+    if (doingNull && !hypothesis$effect$world$worldOn) {
+      expectedResult$nullresult<-multipleAnalysis(ns,hypothesisNull,design,evidence,expectedResult$nullresult)
+      expectedResult$nullcount<-expectedResult$nullcount+ns
     }
+    if (autoShow) print(showExpected(expectedResult,showType=showType))
   }
   
   return(expectedResult)

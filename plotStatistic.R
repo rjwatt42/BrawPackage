@@ -141,7 +141,7 @@ collectData<-function(analysis) {
     ra<-cbind(analysis$raIV[use])
     ps<-cbind(analysis$pIV[use])
   } else {
-    switch (analysis$showType,
+    switch (analysis$effectType,
             "direct"={
               rs<-rbind(analysis$r$direct[use,])
               ps<-rbind(analysis$p$direct[use,])
@@ -307,8 +307,8 @@ getBins<-function(vals,nsvals,target,minVal,maxVal,fixed=FALSE) {
 expected_hist<-function(vals,svals,valType){
 
   if (is.null(valType)) valType<-"r"
-  if (is.element(valType,c("r1","ci1","ci2"))) valType<-"r"
-  if (is.element(valType,c("e1","e2","p1"))) valType<-"p"
+  if (is.element(valType,c("ro","ci1","ci2"))) valType<-"r"
+  if (is.element(valType,c("e1","e2","po"))) valType<-"p"
   if (is.element(valType,c("wp"))) valType<-"w"
   
   switch (valType,
@@ -317,11 +317,6 @@ expected_hist<-function(vals,svals,valType){
             bins<-getBins(vals,svals,target,NULL,NULL,fixed=TRUE)
           },
 
-          "rp"=  { # ns is small
-            target<-0.3
-            bins<-getBins(vals,svals,target,NULL,NULL,fixed=TRUE)
-          },
-          
           "p"=  { # ns is large
             if (pPlotScale=="log10") {
               target<-log10(BrawOpts$alphaSig)
@@ -333,6 +328,11 @@ expected_hist<-function(vals,svals,valType){
             }
           },
             
+          "rp"=  { # ns is small
+            target<-0.3
+            bins<-getBins(vals,svals,target,NULL,NULL,fixed=TRUE)
+          },
+          
           "log(lrs)"={
             target<-BrawOpts$alphaLLR
             bins<-getBins(vals,svals,target*c(-1,1),0,BrawOpts$lrRange)
@@ -512,7 +512,7 @@ expected_plot<-function(g,pts,expType=NULL,analysis=NULL,IV=NULL,DV=NULL,i=1,sca
 }
 
 
-r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientation="vert",showType="direct",showTheory=TRUE){
+r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientation="vert",effectType="direct",showTheory=TRUE){
 
   hypothesis<-analysis$hypothesis
   effect<-hypothesis$effect
@@ -564,13 +564,13 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
             if (RZ=="z") ylabel<-zpLabel
             else ylabel<-rpLabel 
           },
-          "r1"={
+          "ro"={
             ylim<-rlims
-            ylabel<-bquote(r[1])
+            ylabel<-bquote(r[o])
           },
-          "p1"={
+          "po"={
             ylim<-c(min_p, 1)
-            ylabel<-bquote(p[1])
+            ylabel<-bquote(p[o])
           },
           "log(lrs)"={
             ylim<-c(0, BrawOpts$lrRange)
@@ -639,9 +639,9 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
             "r"={data$sh<-data$rs},
             "ra"={data$sh<-data$ra},
             "rp"={data$sh<-data$rp},
-            "r1"={data$sh<-data$ro},
+            "ro"={data$sh<-data$ro},
             "p"={data$sh<-data$ps},
-            "p1"={data$sh<-data$po},
+            "po"={data$sh<-data$po},
             "log(lrs)"={data$sh<-cbind(res2llr(analysis,"sLLR"))},
             "log(lrd)"={data$sh<-cbind(res2llr(analysis,"dLLR"))},
             "e1d"={data$sh<-cbind(res2llr(analysis,"dLLR"))},
@@ -663,135 +663,117 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
   sigOnly<-evidence$sigOnly
 
   # make theory
+  if (!effect$world$worldOn) {
+    effect$world$worldOn<-TRUE
+    effect$world$populationPDF<-"Single"
+    effect$world$populationRZ<-"r"
+    effect$world$populationPDFk<-effect$rIV
+    effect$world$populationNullp<-0
+  }
+  
   if (!all(is.na(analysis$rIV))) { theoryAlpha<-0.5} else {theoryAlpha<-1}
+  
   for (i in 1:length(xoff)){
     if (showTheory) {
-      if (!effect$world$worldOn) {
-        effect$world$populationPDF<-"Single"
-        effect$world$populationRZ<-"r"
-        effect$world$populationPDFk<-effect$rIV
-        effect$world$populationNullp<-0
-      }
-      if (orientation=="horz") {
-        distMax<-0.8
-      } else {
-        distMax<-0.5
-      }
-      if (is.element(expType,c("p","e1","e2","p1"))) {
+      
+      if (is.element(expType,c("p","e1","e2","po"))) {
+        npt<-201
         if (logScale) {
-          yv<-seq(0,log10(min_p)-1,length.out=201)
+          yv<-seq(0,log10(min_p),length.out=npt)
           yvUse<-10^yv
         }else{
-          yv<-seq(1,0,length.out=201)
+          yv<-seq(1,0,length.out=npt)
           yvUse<-yv
         }
+        oldEffect<-effect
+          if (expType=="e1") effect$world$populationNullp<-1
+          if (expType=="e2") effect$world$populationNullp<-0
         xd<-fullRSamplingDist(yvUse,effect$world,design,"p",logScale=logScale,sigOnly=FALSE,HQ=showTheoryHQ)
         xdsig<-fullRSamplingDist(yvUse,effect$world,design,"p",logScale=logScale,sigOnly=TRUE,HQ=showTheoryHQ)
-      } else {
+        effect<-oldEffect
+      } 
+        
+      if (is.element(expType,c("r","ra","ro","ci1","ci2"))) {
         npt<-101
-      switch(expType,
-             "r"={
-               if (RZ=="z") {
-                 zvals<-seq(-1,1,length.out=npt*2)*z_range*2
-                 rvals<-tanh(zvals)
-                 # rvals<-seq(-1,1,length.out=npt)*0.99
-                 xd<-fullRSamplingDist(rvals,effect$world,design,"r",logScale=logScale,sigOnly=FALSE,HQ=showTheoryHQ)
-                 xdsig<-fullRSamplingDist(rvals,effect$world,design,"r",logScale=logScale,sigOnly=TRUE,HQ=showTheoryHQ)
-                 xd<-rdens2zdens(xd,rvals)
-                 xdsig<-rdens2zdens(xdsig,rvals)
-                 yv<-atanh(rvals)
-                 use<-abs(zvals)<=z_range
-                 yv<-yv[use]
-                 xd<-xd[use]
-                 xdsig<-xdsig[use]
-               } else {
-                 rvals<-seq(-1,1,length.out=npt)*0.99
-                 xd<-fullRSamplingDist(rvals,effect$world,design,"r",logScale=logScale,sigOnly=FALSE,HQ=showTheoryHQ)
-                 xdsig<-fullRSamplingDist(rvals,effect$world,design,"r",logScale=logScale,sigOnly=TRUE,HQ=showTheoryHQ)
-                 yv<-rvals
-               }
-             },
-             "ra"={
-               if (RZ=="z") {
-                 zvals<-seq(-1,1,length.out=npt*2)*z_range*2
-                 rvals<-tanh(zvals)
-                 # rvals<-seq(-1,1,length.out=npt)*0.99
-                 xd<-fullRSamplingDist(rvals,effect$world,design,"r",logScale=logScale,sigOnly=FALSE,HQ=showTheoryHQ)
-                 xdsig<-fullRSamplingDist(rvals,effect$world,design,"r",logScale=logScale,sigOnly=TRUE,HQ=showTheoryHQ)
-                 xd<-rdens2zdens(xd,rvals)
-                 xdsig<-rdens2zdens(xdsig,rvals)
-                 yv<-atanh(rvals)
-                 use<-abs(zvals)<=z_range
-                 yv<-yv[use]
-                 xd<-xd[use]
-                 xdsig<-xdsig[use]
-               } else {
-                 rvals<-seq(-1,1,length.out=npt)*0.99
-                 xd<-fullRSamplingDist(rvals,effect$world,design,"r",logScale=logScale,sigOnly=FALSE,HQ=showTheoryHQ)
-                 xdsig<-fullRSamplingDist(rvals,effect$world,design,"r",logScale=logScale,sigOnly=TRUE,HQ=showTheoryHQ)
-                 yv<-rvals
-               }
-             },
-             "ci1"={
-               yv<-seq(-1,1,length.out=npt)*0.99
-               xd<-fullRSamplingDist(yv,effect$world,design,"r",logScale=logScale,sigOnly=sigOnly)
-             },
-             "ci2"={
-               yv<-seq(-1,1,length.out=npt)*0.99
-               xd<-fullRSamplingDist(yv,effect$world,design,"r",logScale=logScale,sigOnly=sigOnly)
-             },
-             "w"={
-               yv<-seq(BrawOpts$alphaSig*1.01,1/1.01,length.out=npt)
-               xd<-fullRSamplingDist(yv,effect$world,design,"w",logScale=logScale,sigOnly=sigOnly)
-             },
-             "log(lrs)"={
-               yv<-seq(0,BrawOpts$lrRange,length.out=npt)
-               xd<-fullRSamplingDist(yv,effect$world,design,"log(lrs)",logScale=logScale,sigOnly=sigOnly)
-             },
-             "log(lrd)"={
-               yv<-seq(-BrawOpts$lrRange,BrawOpts$lrRange,length.out=npt)
-               xd<-fullRSamplingDist(yv,effect$world,design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
-             },
-             "e1d"={
-               yv<-seq(-BrawOpts$lrRange,BrawOpts$lrRange,length.out=npt)
-               xd<-fullRSamplingDist(yv,effect$world,design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
-             },
-             "e2d"={
-               yv<-seq(-BrawOpts$lrRange,BrawOpts$lrRange,length.out=npt)
-               xd<-fullRSamplingDist(yv,effect$world,design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
-             },
-             "nw"={
-               if (logScale) {
-                 yv<-seq(log10(5),log10(max_nw),length.out=npt)
-                 yvUse<-10^yv
-               }else{
-                 yv<-5+seq(0,max_nw,length.out=npt)
-                 yvUse<-yv
-               }
-               xd<-fullRSamplingDist(yvUse,effect$world,design,"nw",logScale=logScale,sigOnly=sigOnly)
-             },
-             "rp"={
-               if (RZ=="z") {
-                 yv<-seq(-1,1,length.out=npt)*z_range
-                 xd<-fullRPopulationDist(tanh(yv),effect$world)
-                 xd<-rdens2zdens(xd,tanh(yv))
-               } else {
-                 yv<-seq(-1,1,length.out=npt)*0.99
-                 xd<-fullRPopulationDist(yv,effect$world)
-               }
-             },
-             "n"={
-               ndist<-getNDist(analysis$design,effect$world,logScale=logScale,sigOnly=TRUE)
-               yv<-ndist$nvals
-               xd<-ndist$ndens
-               xdsig<-ndist$ndensSig
-             },
-             "wp"={
-               yv<-seq(BrawOpts$alphaSig*1.01,1/1.01,length.out=npt)
-               xd<-fullRSamplingDist(yv,effect$world,design,"wp",logScale=logScale,sigOnly=sigOnly)
-             }
-      )
+        if (RZ=="z") {
+          zvals<-seq(-1,1,length.out=npt*2)*z_range*2
+          rvals<-tanh(zvals)
+          # rvals<-seq(-1,1,length.out=npt)*0.99
+          xd<-fullRSamplingDist(rvals,effect$world,design,"r",logScale=logScale,sigOnly=FALSE,HQ=showTheoryHQ)
+          xdsig<-fullRSamplingDist(rvals,effect$world,design,"r",logScale=logScale,sigOnly=TRUE,HQ=showTheoryHQ)
+          xd<-rdens2zdens(xd,rvals)
+          xdsig<-rdens2zdens(xdsig,rvals)
+          yv<-atanh(rvals)
+          use<-abs(zvals)<=z_range
+          yv<-yv[use]
+          xd<-xd[use]
+          xdsig<-xdsig[use]
+        } else {
+          rvals<-seq(-1,1,length.out=npt)*0.99
+          xd<-fullRSamplingDist(rvals,effect$world,design,"r",logScale=logScale,sigOnly=FALSE,HQ=showTheoryHQ)
+          xdsig<-fullRSamplingDist(rvals,effect$world,design,"r",logScale=logScale,sigOnly=TRUE,HQ=showTheoryHQ)
+          yv<-rvals
+        }
       }
+      
+        npt<-101
+        switch(expType,
+               "rp"={
+                 if (RZ=="z") {
+                   yv<-seq(-1,1,length.out=npt)*z_range
+                   xd<-fullRPopulationDist(tanh(yv),effect$world)
+                   xd<-rdens2zdens(xd,tanh(yv))
+                 } else {
+                   yv<-seq(-1,1,length.out=npt)*0.99
+                   xd<-fullRPopulationDist(yv,effect$world)
+                 }
+               },
+               "n"={
+                 ndist<-getNDist(analysis$design,effect$world,logScale=logScale,sigOnly=TRUE)
+                 yv<-ndist$nvals
+                 xd<-ndist$ndens
+                 xdsig<-ndist$ndensSig
+               },
+               "w"={
+                 yv<-seq(BrawOpts$alphaSig*1.01,1/1.01,length.out=npt)
+                 xd<-fullRSamplingDist(yv,effect$world,design,"w",logScale=logScale,sigOnly=sigOnly)
+               },
+               "log(lrs)"={
+                 yv<-seq(0,BrawOpts$lrRange,length.out=npt)
+                 xd<-fullRSamplingDist(yv,effect$world,design,"log(lrs)",logScale=logScale,sigOnly=sigOnly)
+               },
+               "log(lrd)"={
+                 yv<-seq(-BrawOpts$lrRange,BrawOpts$lrRange,length.out=npt)
+                 xd<-fullRSamplingDist(yv,effect$world,design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
+               },
+               "e1d"={
+                 yv<-seq(-BrawOpts$lrRange,BrawOpts$lrRange,length.out=npt)
+                 xd<-fullRSamplingDist(yv,effect$world,design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
+               },
+               "e2d"={
+                 yv<-seq(-BrawOpts$lrRange,BrawOpts$lrRange,length.out=npt)
+                 xd<-fullRSamplingDist(yv,effect$world,design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
+               },
+               "nw"={
+                 if (logScale) {
+                   yv<-seq(log10(5),log10(max_nw),length.out=npt)
+                   yvUse<-10^yv
+                 }else{
+                   yv<-5+seq(0,max_nw,length.out=npt)
+                   yvUse<-yv
+                 }
+                 xd<-fullRSamplingDist(yvUse,effect$world,design,"nw",logScale=logScale,sigOnly=sigOnly)
+               },
+               "wp"={
+                 yv<-seq(BrawOpts$alphaSig*1.01,1/1.01,length.out=npt)
+                 xd<-fullRSamplingDist(yv,effect$world,design,"wp",logScale=logScale,sigOnly=sigOnly)
+               },
+               { } # do nothing
+        )
+
+      if (orientation=="horz")  distMax<-0.8
+      else distMax<-0.5
+      
       xd[is.na(xd)]<-0
       xdsig[is.na(xdsig)]<-0
       theoryGain<-1/max(xd)*distMax
@@ -828,7 +810,7 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
         nvals<-nvals[resSig]
         resSig<-resSig[resSig]
       }
-      if (showType=="all") {
+      if (effectType=="all") {
         ysc<-1/3
         rvals<-(rvals+1)*ysc*0.9+rem(i-1,3)*ysc*2-1
       }
@@ -854,45 +836,22 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
                 "e1"={
                   ns<-sum(!resSig,na.rm=TRUE)
                   s<-sum(resSig,na.rm=TRUE)
-                  if (n<=10000) {
-                    nstr<-paste0("(",format(ns),"/",format(n),")")
-                    sstr<-paste0("(",format(s),"/",format(n),")")
-                  } else {
-                    nstr<-""
-                    sstr<-""
-                  }
-                  labelPt1<-paste0("p(ns correct) = ",format(ns/n*100,digits=2),"% ",nstr)
-                  labelPt1a<-paste0("p(sig error) = ",format(s/n*100,digits=2),"% ",sstr)
+                  labelPt1<-paste0("p(ns correct) = ",format(ns/n*100,digits=2),"% ")
+                  labelPt1a<-paste0("p(sig error) = ",format(s/n*100,digits=2),"% ")
                 },
                 "e2"={
                   ns<-sum(!resSig,na.rm=TRUE)
                   s<-sum(resSig,na.rm=TRUE)
-                  if (n<=10000) {
-                    nstr<-paste0("(",format(ns),"/",format(n),")")
-                    sstr<-paste0("(",format(s),"/",format(n),")")
-                  } else {
-                    nstr<-""
-                    sstr<-""
-                  }
-                  labelPt1<-paste0("p(ns miss) = ",format(ns/n*100,digits=2),"% ",nstr)
-                  labelPt1a<-paste0("p(sig correct) = ",format(s/n*100,digits=2),"% ",sstr)
+                  labelPt1<-paste0("p(ns miss) = ",format(ns/n*100,digits=2),"% ")
+                  labelPt1a<-paste0("p(sig correct) = ",format(s/n*100,digits=2),"% ")
                 },
                 "e1d"={
                   ns<-sum(!resSig,na.rm=TRUE)
                   s2<-sum(resSig & shvals<0,na.rm=TRUE)
                   s1<-sum(resSig & shvals>0,na.rm=TRUE)
-                  if (n<=10000) {
-                    nstr<-paste0("(",format(ns),"/",format(n),")")
-                    s2str<-paste0("(",format(s2),"/",format(n),")")
-                    s1str<-paste0("(",format(s1),"/",format(n),")")
-                  } else {
-                    nstr<-""
-                    s2str<-""
-                    s1str<-""
-                  }
-                  labelPt1b<-paste0("p(ns) = ",format(ns/n*100,digits=2),"% ",nstr)
-                  labelPt1a<-paste0("p(sig correct) = ",format(s2/n*100,digits=2),"% ",s1str)
-                  labelPt1<-paste0("p(sig error) = ",format(s1/n*100,digits=2),"% ",s1str)
+                  labelPt1b<-paste0("p(ns) = ",format(ns/n*100,digits=2),"% ")
+                  labelPt1a<-paste0("p(sig correct) = ",format(s2/n*100,digits=2),"% ")
+                  labelPt1<-paste0("p(sig error) = ",format(s1/n*100,digits=2),"% ")
                   labelPt1b<-paste0("p(ns) = ",format(ns/n*100,digits=2),"%")
                   labelPt1a<-paste0("p(sig correct) = ",format(s2/n*100,digits=2),"%")
                   labelPt1<-paste0("p(sig error) = ",format(s1/n*100,digits=2),"%")
@@ -901,18 +860,9 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
                   ns<-sum(!resSig,na.rm=TRUE)
                   s2<-sum(resSig & shvals<0,na.rm=TRUE)
                   s1<-sum(resSig & shvals>0,na.rm=TRUE)
-                  if (n<=10000) {
-                    nstr<-paste0("(",format(ns),"/",format(n),")")
-                    s2str<-paste0("(",format(s2),"/",format(n),")")
-                    s1str<-paste0("(",format(s1),"/",format(n),")")
-                  } else {
-                    nstr<-""
-                    s2str<-""
-                    s1str<-""
-                  }
-                  labelPt1b<-paste0("p(ns) = ",format(ns/n*100,digits=2),"% ",nstr)
-                  labelPt1a<-paste0("p(sig error) = ",format(s2/n*100,digits=2),"% ",s2str)
-                  labelPt1<-paste0("p(sig correct) = ",format(s1/n*100,digits=2),"% ",s1str)
+                  labelPt1b<-paste0("p(ns) = ",format(ns/n*100,digits=2),"% ")
+                  labelPt1a<-paste0("p(sig error) = ",format(s2/n*100,digits=2),"% ")
+                  labelPt1<-paste0("p(sig correct) = ",format(s1/n*100,digits=2),"% ")
                   labelPt1b<-paste0("p(ns) = ",format(ns/n*100,digits=2),"%")
                   labelPt1a<-paste0("p(sig error) = ",format(s2/n*100,digits=2),"%")
                   labelPt1<-paste0("p(sig correct) = ",format(s1/n*100,digits=2),"%")
@@ -934,18 +884,10 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
         )
         if (expType=="e2") {
         labelPt2<-paste0(labelPt1,format(mean(!resSig,na.rm=TRUE)*100,digits=graph_precision),"%")
-        labelPt3<-paste0(labelPt2,"  (",format(sum(!resSig,na.rm=TRUE)),"/",format(length(pvals)),")")
       } else {
         labelPt2<-paste0(labelPt1,format(mean(resSig,na.rm=TRUE)*100,digits=graph_precision),"%")
-        labelPt3<-paste0(labelPt2,"  (",format(sum(resSig,na.rm=TRUE)),"/",format(length(pvals)),")")
       }
-      if (length(xoff)>1) {
         lpts1<-data.frame(x = xoff[i]-0.95, y = ylim[2]+diff(ylim)/25,label = labelPt2)
-        # lpts2<-data.frame(x = xoff[i]-0.95, y = ylim[1]-diff(ylim)/25,label = labelPt2)
-      } else {
-        lpts1<-data.frame(x = xoff[i]-0.95, y = ylim[2]+diff(ylim)/25,label = labelPt3)
-        # lpts2<-data.frame(x = xoff[i]-0.95, y = ylim[1]-diff(ylim)/25,label = labelPt3)
-      }
       g<-g+dataLabel(data=lpts1,orientation=orientation)
       # if (!is.null(lpts2)) {
       # g<-g+geom_label(data=lpts2,aes(x = x, y = y, label=label), hjust=0, vjust=0, fill="white",size=BrawOpts$labelSize)
@@ -968,7 +910,7 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
               {g<-g+annotate("text",x=xoff[i],y=ylim[2]+diff(ylim)/16,label="Interaction",color="white",size=3)}
       )
 
-  if (showType=="all") {
+  if (effectType=="all") {
     for (i in 1:3) {
       g<-g+varLine(intercept=(-1+1)*ysc*0.9+(i-1)*ysc*2-1, color="black", linewidth=1,orientation=orientation)
       g<-g+varLine(intercept=(0.0+1)*ysc*0.9+(i-1)*ysc*2-1, linetype="dotted", color="black", linewidth=0.5,orientation=orientation)
@@ -993,11 +935,11 @@ l_plot<-function(analysis,ptype=NULL,otheranalysis=NULL,orientation="vert",showT
   g
 }
 
-p_plot<-function(analysis,ptype="p",otheranalysis=NULL,PlotScale=pPlotScale,orientation="vert",showType="direct",showTheory=TRUE){
+p_plot<-function(analysis,ptype="p",otheranalysis=NULL,PlotScale=pPlotScale,orientation="vert",effectType="direct",showTheory=TRUE){
 
-  g<-r_plot(analysis,ptype,PlotScale=="log10",otheranalysis,orientation=orientation,showType=showType,showTheory=showTheory)
+  g<-r_plot(analysis,ptype,PlotScale=="log10",otheranalysis,orientation=orientation,effectType=effectType,showTheory=showTheory)
   
-  if (is.element(ptype,c("p","p1"))) {
+  if (is.element(ptype,c("p","po"))) {
   if (PlotScale=="log10") {
     g<-g+varLine(intercept=log10(1), linetype="dotted", color=BrawOpts$plotColours$alpha, linewidth=0.5,orientation=orientation)
     g<-g+varLine(intercept=log10(0.005), linetype="dotted", color=BrawOpts$plotColours$alpha, linewidth=0.5,orientation=orientation)
@@ -1032,59 +974,63 @@ n_plot<-function(analysis,ntype,orientation="vert",showTheory=TRUE){
 }
 
 e2_plot<-function(analysis,nullanalysis=NULL,orientation="vert",showTheory=TRUE){
-  distr<-tolower(analysis$hypothesis$world$populationPDF)
-  lambda<-format(analysis$hypothesis$world$populationPDFk,digits=3)
+  distr<-tolower(analysis$hypothesis$effect$world$populationPDF)
+  lambda<-format(analysis$hypothesis$effect$world$populationPDFk,digits=3)
   switch (RZ,
           "r"={
-            lab<-bquote(bold("Non-null:  " ~ r["p"] ~ "~" ~ .(distr) (r/.(lambda))))
+            lab<-bquote(bold(r["p"] ~ "~" ~ .(distr) (r/.(lambda))))
           },
           "z"={
-            lab<-bquote(bold("Non-null:  " ~ z["p"] ~ "~" ~ .(distr) (z/.(lambda))))
+            lab<-bquote(bold(z["p"] ~ "~" ~ .(distr) (z/.(lambda))))
           }
   )
+
   switch (BrawOpts$STMethod,
           "NHST"={
-            p_plot(analysis,ptype="e2",otheranalysis=nullanalysis,orientation=orientation,showTheory=showTheory)+
-              ggtitle(lab)
+            g<-p_plot(analysis,ptype="e2",otheranalysis=nullanalysis,orientation=orientation,showTheory=showTheory)
+            g<-g+ggtitle(lab)+theme(plot.title=element_text(face='bold', size=9, hjust=0))
           },
           "sLLR"={
-            p_plot(analysis,ptype="e2",otheranalysis=nullanalysis,orientation=orientation,showTheory=showTheory)+
-              ggtitle(lab)
+            g<-p_plot(analysis,ptype="e2",otheranalysis=nullanalysis,orientation=orientation,showTheory=showTheory)
+            g<-g+ggtitle(lab)+theme(plot.title=element_text(face='bold', size=9, hjust=0))
           },
           "dLLR"={
             g<-p_plot(nullanalysis,ptype="e2d",otheranalysis=nullanalysis,PlotScale="linear",orientation=orientation,showTheory=showTheory)
             g<-g+varLine(intercept=BrawOpts$alphaLLR, linetype="dotted", color=BrawOpts$plotColours$alpha, linewidth=0.5,orientation=orientation)
             g<-g+varLine(intercept=-BrawOpts$alphaLLR, linetype="dotted", color=BrawOpts$plotColours$alpha, linewidth=0.5,orientation=orientation)
-            g+ggtitle(lab)
+            g<-g+ggtitle(lab)+theme(plot.title=element_text(face='bold', size=9, hjust=0))
           }
   )
+  return(g)
 }
 
 e1_plot<-function(nullanalysis,analysis=NULL,orientation="vert",showTheory=TRUE){
   switch (RZ,
           "r"={
-            lab<-bquote(bold("Null:  " ~ r["p"] == 0))
+            lab<-bquote(bold(r["p"] == 0))
           },
           "z"={
-            lab<-bquote(bold("Null:  " ~ z["p"] == 0))
+            lab<-bquote(bold(z["p"] == 0))
           }
   )
+  
   switch (BrawOpts$STMethod,
           "NHST"={
-            p_plot(nullanalysis,ptype="e1",otheranalysis=analysis,orientation=orientation,showTheory=showTheory)+
-              ggtitle(lab)
+            g<-p_plot(nullanalysis,ptype="e1",otheranalysis=analysis,orientation=orientation,showTheory=showTheory)
+            g<-g+ggtitle(lab)+theme(plot.title=element_text(face='bold', size=9, hjust=0))
           },
           "sLLR"={
-            p_plot(nullanalysis,ptype="e1",otheranalysis=analysis,orientation=orientation,showTheory=showTheory)+
-              ggtitle(lab)
+            g<-p_plot(nullanalysis,ptype="e1",otheranalysis=analysis,orientation=orientation,showTheory=showTheory)+
+              g<-g+ggtitle(lab)+theme(plot.title=element_text(face='bold', size=9, hjust=0))
           },
           "dLLR"={
             g<-p_plot(nullanalysis,ptype="e1d",otheranalysis=analysis,PlotScale="linear",orientation=orientation,showTheory=showTheory)
             g<-g+varLine(intercept=BrawOpts$alphaLLR, linetype="dotted", color=BrawOpts$plotColours$alpha, linewidth=0.5,orientation=orientation)
             g<-g+varLine(intercept=-BrawOpts$alphaLLR, linetype="dotted", color=BrawOpts$plotColours$alpha, linewidth=0.5,orientation=orientation)
-            g+ggtitle(lab)
+            g<-g+ggtitle(lab)+theme(plot.title=element_text(face='bold', size=9, hjust=0))
           }
   )
+  return(g)
 }
 
 

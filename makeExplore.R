@@ -69,40 +69,40 @@ mergeExploreResult<-function(res1,res2) {
   return(result)
 }
 
-makeExplore<-function(nsim,type="SampleSize",hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
-                      Explore_npoints=13,exploreResult=NULL,doingNull=FALSE,
-                      autoShow=FALSE,Explore_show="EffectSize",
+makeExplore<-function(nsim=10,exploreType="SampleSize",hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
+                      exploreNPoints=13,exploreResult=NULL,doingNull=FALSE,
+                      autoShow=FALSE,showType="EffectSize",
                       min_n=10,max_n=250,max_r=0.9,max_anom=1,
                       xlog=FALSE,xabs=FALSE,
                       mx_log=FALSE
 ) {
-  explore<-list(hypothesis=hypothesis,
-                design=design,
-                evidence=evidence,
-                type=type,
-                Explore_npoints=Explore_npoints,
+  explore<-list(exploreType=exploreType,
+                exploreNPoints=exploreNPoints,
                 min_n=min_n,max_n=max_n,max_r=max_r,max_anom=max_anom,
                 xlog=xlog,xabs=xabs,
-                mx_log=mx_log
+                mx_log=mx_log,
+                hypothesis=hypothesis,
+                design=design,
+                evidence=evidence
   )
 
   if (is.null(exploreResult)) {
-    exploreResult<-list(result=NULL,
-                        nullresult=NULL,
-                        count=0,
+    exploreResult<-list(count=0,
+                        result=NULL,
                         nullcount=0,
+                        nullresult=NULL,
                         vals=NA,
                         explore=explore
     )
   }
   
   exploreResult <- runExplore(nsim=nsim,exploreResult,doingNull=doingNull,
-                              autoShow=autoShow,Explore_show=Explore_show)
+                              autoShow=autoShow,showType=showType)
   return(exploreResult)
 }
 
 runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
-                       autoShow=FALSE,Explore_show="EffectSize"){
+                       autoShow=FALSE,showType="EffectSize"){
   
   explore<-exploreResult$explore
   hypothesis<-explore$hypothesis
@@ -119,7 +119,7 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
   if (hypothesis$effect$world$worldOn && hypothesis$effect$world$populationNullp>0) 
     doingNull<-FALSE
   
-  npoints<-explore$Explore_npoints
+  npoints<-explore$exploreNPoints
   min_n<-explore$min_n
   max_n<-explore$max_n
   max_r<-explore$max_r
@@ -131,8 +131,8 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
   if (explore$xabs) {vals<-seq(0,1,length.out=npoints)}
   else              {vals<-seq(-1,1,length.out=npoints)}
   
-  metaExplore<-is.element(explore$type,c("NoStudies","sig_only"))
-  switch (explore$type,
+  metaExplore<-is.element(explore$exploreType,c("NoStudies","sig_only"))
+  switch (explore$exploreType,
           "IVType"={vals<-c("Interval","Ord7","Ord4","Cat2","Cat3")},
           "DVType"={vals<-c("Interval","Ord7","Ord4","Cat2")},
           "IVIV2Type"={vals<-c("IntInt","Cat2Int","Cat3Int","IntCat","Cat2Cat","Cat3Cat")},
@@ -256,7 +256,7 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
       ri<-exploreResult$count+ni
       for (vi in 1:length(vals)){
         
-        switch (explore$type,
+        switch (explore$exploreType,
                 "IVType"={
                   switch (vals[vi],
                           "Cat2"={
@@ -617,7 +617,7 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
     exploreResult$nullcount<-ri
     exploreResult$nullresult<-nullresult
     }
-    if (autoShow) print(showExplore(exploreResult,Explore_show=Explore_show))
+    if (autoShow) print(showExplore(exploreResult,showType=showType))
   }
   
   BrawOpts$alphaSig<<-oldAlpha

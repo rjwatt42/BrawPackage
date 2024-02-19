@@ -1,5 +1,5 @@
 
-reportExpected<-function(expectedResult=makeExpected(100),type="Basic"){
+reportExpected<-function(expectedResult=makeExpected(100),exploreType="Basic"){
   IV<-expectedResult$hypothesis$IV
   IV2<-expectedResult$hypothesis$IV2
   DV<-expectedResult$hypothesis$DV
@@ -7,21 +7,21 @@ reportExpected<-function(expectedResult=makeExpected(100),type="Basic"){
   result<-expectedResult$result
   nullresult<-expectedResult$nullresult
   
-  if (length(type)==1) {
-    switch(type,
+  if (length(exploreType)==1) {
+    switch(exploreType,
            "Basic"=     {pars<-c("r","p")},
            "CILimits"=  {pars<-c("ci1","ci2")},
            "NHSTErrors"={pars<-c("e2","e1")},
            "FDR"=       {pars<-c("e1","e2")},
-           {pars<-c(type,NA)}
+           {pars<-c(exploreType,NA)}
     )
-  } else pars<-type
+  } else pars<-exploreType
   
   if (is.null(IV2) | is.null(result$rIVIV2DV)){nc=3}
   else{
     if (is.na(result$rIVIV2DV[1])) {nc=6} else {nc=9}
   }
-  if (type=="NHSTErrors" || type=="FDR"){nc=4}
+  if (exploreType=="NHSTErrors" || exploreType=="FDR"){nc=4}
   
   # header
   if (sum(!is.na(nullresult$rIV))>0) {
@@ -39,7 +39,7 @@ reportExpected<-function(expectedResult=makeExpected(100),type="Basic"){
     rs<-result$rIV
     ps<-result$pIV
   } else {
-    switch (result$showType,
+    switch (result$effectType,
             "direct"={rs<-result$r$direct
                       ps<-result$p$direct},
             "unique"={rs<-result$r$unique
@@ -62,9 +62,9 @@ reportExpected<-function(expectedResult=makeExpected(100),type="Basic"){
   }
 
   # column labels
-  if (type=="NHSTErrors") {outputText1<-c("!j\bErrors:","\bI","\bII"," ")}
+  if (exploreType=="NHSTErrors") {outputText1<-c("!j\bErrors:","\bI","\bII"," ")}
   else {
-    if (type=="CILimits") {outputText1<-c("   ","lower","upper")}
+    if (exploreType=="CILimits") {outputText1<-c("   ","lower","upper")}
     else {
       outputText1<-
       par1<-pars[1]
@@ -73,13 +73,15 @@ reportExpected<-function(expectedResult=makeExpected(100),type="Basic"){
         switch(par1,
                "r"={par1="z"},
                "rp"={par1="zp"},
-               "r1"={par1="z1"},
+               "ra"={par1="za"},
+               "ro"={par1="zo"},
                {par1=par1}
         )
         switch(par2,
                "r"={par2="z"},
                "rp"={par2="zp"},
-               "r1"={par2="z1"},
+               "ra"={par2="za"},
+               "ro"={par2="zo"},
                {par2=par2}
         )
       }
@@ -88,7 +90,7 @@ reportExpected<-function(expectedResult=makeExpected(100),type="Basic"){
   }
   outputText<-c(outputText,rep(outputText1,nc/3))
 
-  if (type=="NHSTErrors"){
+  if (exploreType=="NHSTErrors"){
     nullSig<-isSignificant(BrawOpts$STMethod,nullresult$pIV,nullresult$rIV,nullresult$nval,nullresult$df1,nullresult$evidence)
     resSig<-isSignificant(BrawOpts$STMethod,result$pIV,result$rIV,result$nval,result$df1,result$evidence)
     if (BrawOpts$STMethod=="dLLR") {
@@ -170,7 +172,7 @@ reportExpected<-function(expectedResult=makeExpected(100),type="Basic"){
       r<-rs[,i]
       p<-ps[,i]
 
-      if (type=="CILimits"){
+      if (exploreType=="CILimits"){
         a<-r2ci(r,result$nval[1],-1)
         b<-r2ci(r,result$nval[1],+1)
       } else {
@@ -188,11 +190,11 @@ reportExpected<-function(expectedResult=makeExpected(100),type="Basic"){
                   a<-result$raIV
                   if (RZ=="z") a<-atanh(a)
                 },
-                "r1"={
+                "ro"={
                   a<-result$roIV
                   if (RZ=="z") a<-atanh(a)
                 },
-                "p1"={a<-result$poIV},
+                "po"={a<-result$poIV},
                 "log(lrs)"={a<-res2llr(result,"sLLR")},
                 "log(lrd)"={a<-res2llr(result,"dLLR")},
                 "n"={a<-result$nval},
@@ -214,11 +216,11 @@ reportExpected<-function(expectedResult=makeExpected(100),type="Basic"){
                   b<-result$rpIV
                   if (RZ=="z") b<-atanh(b)
                 },
-                "r1"={
+                "ro"={
                   b<-result$roIV
                   if (RZ=="z") b<-atanh(b)
                 },
-                "p1"={b<-result$poIV},
+                "po"={b<-result$poIV},
                 "log(lrs)"={b<-res2llr(result,"sLLR")},
                 "log(lrd)"={b<-res2llr(result,"dLLR")},
                 "n"={b<-result$nval},

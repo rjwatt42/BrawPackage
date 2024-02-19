@@ -1,5 +1,5 @@
-reportExplore<-function(exploreResult,Explore_show="EffectSize",
-                        Explore_whichShow="All",Explore_typeShow="All"
+reportExplore<-function(exploreResult,showType="EffectSize",
+                        whichEffect="All",effectType="All"
                         ){
   explore<-exploreResult$explore
   hypothesis<-explore$hypothesis
@@ -9,7 +9,7 @@ reportExplore<-function(exploreResult,Explore_show="EffectSize",
   max_cols<-8
   
   vals<-exploreResult$vals
-  if (explore$type=="pNull" && pPlus) vals<-1-vals
+  if (explore$exploreType=="pNull" && pPlus) vals<-1-vals
   
   if (length(vals)>max_cols)  {
     use<-seq(1,length(vals),2)
@@ -18,37 +18,37 @@ reportExplore<-function(exploreResult,Explore_show="EffectSize",
   }
   nc<-length(use)
 
-  extra_y_label<-Explore_show
+  extra_y_label<-showType
 
   if (is.null(hypothesis$IV2)){
     rVals<-exploreResult$result$rval
     raVals<-exploreResult$result$raval
     pVals<-exploreResult$result$pval
   } else {
-    if (Explore_typeShow=="all") {Explore_typeShow<-"direct"}
-    if (Explore_whichShow=="All") {Explore_whichShow<-"Main 1"}
-    switch (Explore_whichShow,
+    if (effectType=="all") {effectType<-"direct"}
+    if (whichEffect=="All") {whichEffect<-"Main 1"}
+    switch (whichEffect,
             "Main 1"={
-              rVals<-exploreResult$result$r[[Explore_typeShow]][,,1]
-              pVals<-exploreResult$result$p[[Explore_typeShow]][,,1]
-              extra_y_label<-paste("Main Effect 1:",Explore_typeShow)
+              rVals<-exploreResult$result$r[[effectType]][,,1]
+              pVals<-exploreResult$result$p[[effectType]][,,1]
+              extra_y_label<-paste("Main Effect 1:",effectType)
             },
             "Main 2"={
-              rVals<-exploreResult$result$r[[Explore_typeShow]][,,1]
-              pVals<-exploreResult$result$p[[Explore_typeShow]][,,1]
-              extra_y_label<-paste("Main Effect 2:",Explore_typeShow)
+              rVals<-exploreResult$result$r[[effectType]][,,1]
+              pVals<-exploreResult$result$p[[effectType]][,,1]
+              extra_y_label<-paste("Main Effect 2:",effectType)
             },
             "Interaction"={
-              rVals<-exploreResult$result$r[[Explore_typeShow]][,,3]
-              pVals<-exploreResult$result$p[[Explore_typeShow]][,,3]
-              extra_y_label<-paste("Interaction:",Explore_typeShow)
+              rVals<-exploreResult$result$r[[effectType]][,,3]
+              pVals<-exploreResult$result$p[[effectType]][,,3]
+              extra_y_label<-paste("Interaction:",effectType)
             }
     )
   }
   nVals<-exploreResult$result$nval
   df1Vals<-exploreResult$result$df1
   
-  switch (Explore_show,
+  switch (showType,
           "EffectSize"={
             showVals<-rVals
             if (RZ=="z") showVals<-atanh(showVals)
@@ -67,7 +67,7 @@ reportExplore<-function(exploreResult,Explore_show="EffectSize",
             showVals<-exploreResult$result$nval
           },
           "p(sig)"={
-            if (explore$type=="Alpha") {
+            if (explore$exploreType=="Alpha") {
               BrawOpts$alphaSig<-exploreResult$vals
             }
             ps<-isSignificant(BrawOpts$STMethod,pVals,rVals,nVals,df1Vals,exploreResult$evidence,BrawOpts$alphaSig)
@@ -79,7 +79,7 @@ reportExplore<-function(exploreResult,Explore_show="EffectSize",
             y75<-ps+sqrt(ps*(1-ps)/nrow(pVals))
           },
           "n(sig)"={
-            if (explore$type=="Alpha") {
+            if (explore$exploreType=="Alpha") {
               BrawOpts$alphaSig<-exploreResult$vals
             }
             ps<-isSignificant(BrawOpts$STMethod,pVals,rVals,nVals,df1Vals,exploreResult$evidence,BrawOpts$alphaSig)
@@ -103,7 +103,7 @@ reportExplore<-function(exploreResult,Explore_show="EffectSize",
             y75e<-c()
             if (effect$world$worldOn) {
               for (i in 1:length(exploreResult$vals)){
-                if (explore$type=="Alpha") {
+                if (explore$exploreType=="Alpha") {
                   BrawOpts$alphaSig<<-exploreResult$vals[i]
                   BrawOpts$alphaLLR<<-0.5*qnorm(1-BrawOpts$alphaSig/2)^2
                 }
@@ -144,7 +144,7 @@ reportExplore<-function(exploreResult,Explore_show="EffectSize",
             y75<-c()
             if (effect$world$worldOn) {
               for (i in 1:length(exploreResult$vals)){
-                if (explore$type=="Alpha") {
+                if (explore$exploreType=="Alpha") {
                   BrawOpts$alphaSig<<-exploreResult$vals[i]
                   BrawOpts$alphaLLR<<-0.5*qnorm(1-BrawOpts$alphaSig/2)^2
                 }
@@ -157,7 +157,7 @@ reportExplore<-function(exploreResult,Explore_show="EffectSize",
               }
             } else {
               for (i in 1:length(exploreResult$vals)){
-                if (explore$type=="Alpha") {
+                if (explore$exploreType=="Alpha") {
                   BrawOpts$alphaSig<<-exploreResult$vals[i]
                   BrawOpts$alphaLLR<<-0.5*qnorm(1-BrawOpts$alphaSig/2)^2
                 }
@@ -177,7 +177,7 @@ reportExplore<-function(exploreResult,Explore_show="EffectSize",
             y75e<-c()
             if (effect$world$worldOn) {
               for (i in 1:length(exploreResult$vals)){
-                if (explore$type=="Alpha") {
+                if (explore$exploreType=="Alpha") {
                   BrawOpts$alphaSig<<-exploreResult$vals[i]
                   BrawOpts$alphaLLR<<-0.5*qnorm(1-BrawOpts$alphaSig/2)^2
                 }
@@ -194,7 +194,7 @@ reportExplore<-function(exploreResult,Explore_show="EffectSize",
               }
             } else {
               for (i in 1:length(exploreResult$vals)){
-                if (explore$type=="Alpha") {
+                if (explore$exploreType=="Alpha") {
                   BrawOpts$alphaSig<<-exploreResult$vals[i]
                   BrawOpts$alphaLLR<<-0.5*qnorm(1-BrawOpts$alphaSig/2)^2
                 }
@@ -209,7 +209,7 @@ reportExplore<-function(exploreResult,Explore_show="EffectSize",
               neVals<-exploreResult$nullresult$nvals
               df1eVals<-exploreResult$nullresult$df1
               for (i in 1:length(exploreResult$vals)){
-                if (explore$type=="Alpha") {
+                if (explore$exploreType=="Alpha") {
                   BrawOpts$alphaSig<<-exploreResult$vals[i]
                   BrawOpts$alphaLLR<<-0.5*qnorm(1-BrawOpts$alphaSig/2)^2
                 }
@@ -259,7 +259,7 @@ reportExplore<-function(exploreResult,Explore_show="EffectSize",
           
   )
 
-  if (is.element(Explore_show,c("EffectSize","EffectSizeA","p","w","SampleSize","log(lrs)","log(lrd)","k","pNull","S"))) {
+  if (is.element(showType,c("EffectSize","EffectSizeA","p","w","SampleSize","log(lrs)","log(lrd)","k","pNull","S"))) {
     y75<-c()
     y50<-c()
     y25<-c()
@@ -276,11 +276,11 @@ reportExplore<-function(exploreResult,Explore_show="EffectSize",
 
   outputText<-rep("",nc+1)
   outputText[1]<-"\bExplore:"
-  outputText[2]<-explore$type
+  outputText[2]<-explore$exploreType
   outputText[3]<-paste(" (nsims=",format(nrow(exploreResult$result$rval)),")",sep="")
   outputText<-c(outputText,rep("",nc+1))
 
-  if (Explore_show=="NHSTErrors" || Explore_show=="FDR;FMR") {
+  if (showType=="NHSTErrors" || showType=="FDR;FMR") {
     switch (BrawOpts$STMethod,
             "NHST"={outputText<-c(outputText,"NHST")},
             "sLLR"={outputText<-c(outputText,"sLLR")},
@@ -292,10 +292,10 @@ reportExplore<-function(exploreResult,Explore_show="EffectSize",
   }
   
   outputText<-c(outputText," ")
-  if (explore$type=="EffectSize" && RZ=="z") {
+  if (explore$exploreType=="EffectSize" && RZ=="z") {
     vals<-atanh(vals)
   }
-  if (explore$type=="EffectSizeA" && RZ=="z") {
+  if (explore$exploreType=="EffectSizeA" && RZ=="z") {
     vals<-atanh(vals)
   }
   for (i in 1:nc) {
@@ -317,7 +317,7 @@ reportExplore<-function(exploreResult,Explore_show="EffectSize",
     outputText<-c(outputText,format(y75[use[i]],digits=report_precision))
   }
   
-  if (is.element(Explore_show,c("EffectSize","EffectSizeA","p","w","SampleSize","log(lrs)","log(lrd)","k","pNull","S"))) {
+  if (is.element(showType,c("EffectSize","EffectSizeA","p","w","SampleSize","log(lrs)","log(lrd)","k","pNull","S"))) {
     outputText<-c(outputText,rep(" ",nc+1))
     outputText<-c(outputText,"!jmean")
     for (i in 1:nc) {
@@ -329,8 +329,8 @@ reportExplore<-function(exploreResult,Explore_show="EffectSize",
     }
   }    
 
-  if (Explore_show=="NHSTErrors" || Explore_show=="FDR;FMR") {
-    switch(Explore_show,
+  if (showType=="NHSTErrors" || showType=="FDR;FMR") {
+    switch(showType,
            "NHSTErrors"={extra_y_label<-"Type I errors"},
            "FDR;FMR"={extra_y_label<-"FDR"}
     )
@@ -338,23 +338,23 @@ reportExplore<-function(exploreResult,Explore_show="EffectSize",
       rVals<-exploreResult$nullresult$rIVs
       pVals<-exploreResult$nullresult$pIVs
     } else {
-      if (Explore_typeShow=="all") {Explore_typeShow<-"direct"}
-      if (Explore_whichShow=="All") {Explore_whichShow<-"Main 1"}
-      switch (Explore_whichShow,
+      if (effectType=="all") {effectType<-"direct"}
+      if (whichEffect=="All") {whichEffect<-"Main 1"}
+      switch (whichEffect,
               "Main 1"={
-                rVals<-exploreResult$result$r1[[Explore_typeShow]]
-                pVals<-exploreResult$result$p1[[Explore_typeShow]]
-                extra_y_label<-paste("Main Effect 1:",Explore_typeShow)
+                rVals<-exploreResult$result$r1[[effectType]]
+                pVals<-exploreResult$result$p1[[effectType]]
+                extra_y_label<-paste("Main Effect 1:",effectType)
               },
               "Main 2"={
-                rVals<-exploreResult$result$r2[[Explore_typeShow]]
-                pVals<-exploreResult$result$p2[[Explore_typeShow]]
-                extra_y_label<-paste("Main Effect 2:",Explore_typeShow)
+                rVals<-exploreResult$result$r2[[effectType]]
+                pVals<-exploreResult$result$p2[[effectType]]
+                extra_y_label<-paste("Main Effect 2:",effectType)
               },
               "Interaction"={
-                rVals<-exploreResult$result$r3[[Explore_typeShow]]
-                pVals<-exploreResult$result$p3[[Explore_typeShow]]
-                extra_y_label<-paste("Interaction:",Explore_typeShow)
+                rVals<-exploreResult$result$r3[[effectType]]
+                pVals<-exploreResult$result$p3[[effectType]]
+                extra_y_label<-paste("Interaction:",effectType)
               }
       )
     }

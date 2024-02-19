@@ -25,6 +25,6 @@ showInference(analysis)
 reportInference(analysis)
 
 makeExpected(nsims,hypothesis,design,evidence,...)
-showExpected(expectedResult,type,dimension,Theory)
+showExpected(expectedResult,type,dimension,showTheory)
 
 

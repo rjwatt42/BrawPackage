@@ -29,47 +29,47 @@ getNulls<-function(analysis) {
     list(analysis=analysis,nullanalysis=nullanalysis)
   }
 
-showInference<-function(analysis=makeAnalysis(),type="Basic",dimension="1D",orientation="vert",
-                        showType="direct",showTheory=TRUE
+showInference<-function(analysis=makeAnalysis(),showType="Basic",dimension="1D",orientation="vert",
+                        effectType="direct",showTheory=TRUE
 ) {
-  if (type[1]=="2D") {
-    type<-"Basic"
+  if (showType[1]=="2D") {
+    showType<-"Basic"
     dimension<-"2D"
   }
   analysis1<-analysis
   analysis2<-NA
-  if (length(type)==1) {
-    switch(type,
-           "Basic"=     {type<-c("r","p")},
-           "CILimits"=  {type<-c("ci1","ci2")},
+  if (length(showType)==1) {
+    switch(showType,
+           "Basic"=     {showType<-c("r","p")},
+           "CILimits"=  {showType<-c("ci1","ci2")},
            "NHSTErrors"={
-             type<-c("e2","e1")
+             showType<-c("e2","e1")
              r<-getNulls(analysis)
              analysis1<-r$analysis
              analysis2<-r$nullanalysis
              },
            "FDR"=       {
-             type<-c("e1","e2")
+             showType<-c("e1","e2")
              r<-getNulls(analysis)
              analysis2<-r$nullanalysis
              analysis1<-r$analysis
            },
-           {type<-c(type,NA)}
+           {showType<-c(showType,NA)}
     )
   } 
   if (dimension=="2D") {
-    g1<-plot2Inference(analysis,type[1],type[2])
+    g1<-plot2Inference(analysis,showType[1],showType[2])
     g2<-NULL
   } else {
-    if (type[1]=="e1")
-      g1<-plotInference(analysis2,type[1],showType=showType,orientation=orientation,showTheory=showTheory)
+    if (showType[1]=="e1")
+      g1<-plotInference(analysis2,showType[1],effectType=effectType,orientation=orientation,showTheory=showTheory)
     else
-      g1<-plotInference(analysis1,type[1],showType=showType,orientation=orientation,showTheory=showTheory)
-    if (!is.na(type[2])) {
-      if (type[2]=="e1")
-        g2<-plotInference(analysis2,type[2],showType=showType,orientation=orientation,showTheory=showTheory)
+      g1<-plotInference(analysis1,showType[1],effectType=effectType,orientation=orientation,showTheory=showTheory)
+    if (!is.na(showType[2])) {
+      if (showType[2]=="e1")
+        g2<-plotInference(analysis2,showType[2],effectType=effectType,orientation=orientation,showTheory=showTheory)
       else
-        g2<-plotInference(analysis1,type[2],showType=showType,orientation=orientation,showTheory=showTheory)
+        g2<-plotInference(analysis1,showType[2],effectType=effectType,orientation=orientation,showTheory=showTheory)
     } else {
       g2<-NULL
     }

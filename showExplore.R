@@ -36,9 +36,8 @@ trimExploreResult<-function(result) {
   return(result)
 }
 
-showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE,
-                      Explore_whichShow="All",Explore_typeShow="All",
-                      ExploreFull_ylim=TRUE,ExploreAny_ylim=FALSE){
+showExplore<-function(exploreResult,showType="EffectSize",ylog=FALSE,
+                      whichEffect="All",effectType="All"){
   all_cols<-c()
   no_se_multiple<-TRUE
   valsGap<-1.4
@@ -55,19 +54,19 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
   oldAlpha<-BrawOpts$alphaSig
   
   vals<-exploreResult$vals
-  if (is.character(vals[1]) || is.element(explore$type,c("IVcats","IVlevels","DVcats","DVlevels","Repeats","sig_only"))){
+  if (is.character(vals[1]) || is.element(explore$exploreType,c("IVcats","IVlevels","DVcats","DVlevels","Repeats","sig_only"))){
     if (is.character(vals[1]))  vals<-((1:length(vals))-1)/(length(vals)-1)
     doLine=FALSE
   } else {doLine=TRUE}
   
-  if (explore$type=="pNull" && pPlus) vals<-1-vals
+  if (explore$exploreType=="pNull" && pPlus) vals<-1-vals
   
   g<-ggplot()
   ybreaks=c()
   ylabels=c()
   secondY<-NULL
   ylim<-c()
-  switch (Explore_show,
+  switch (showType,
           "EffectSize"={
             ylim<-c(-1,1)
             ylabel<-bquote(bold(r['s']))
@@ -121,7 +120,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
           "p(sig)"={
             doBudget<-FALSE
             ylabel<-pSigLabel
-            if (Explore_ylog) {
+            if (ylog) {
               ylim<-c(0.001,1)
             } else {
               ylim<-c(0,1)
@@ -130,11 +129,11 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
           "n(sig)"={
             doBudget<-TRUE
             ylabel<-bquote(bold(n[.('sig')]))
-            Explore_show<-"p(sig)"
+            showType<-"p(sig)"
             ylim<-c(0,100)
           },
           "FDR"={
-            if (Explore_ylog) {
+            if (ylog) {
               ylim<-c(0.001,1)
             } else {
               ylim<-c(0,1)
@@ -191,8 +190,8 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
           }
   )
 
-  if (!is.null(hypothesis$IV2) && is.element(Explore_show,c("EffectSize","EffectSizeA","p","w","p(sig)"))) {
-    switch (Explore_show,
+  if (!is.null(hypothesis$IV2) && is.element(showType,c("EffectSize","EffectSizeA","p","w","p(sig)"))) {
+    switch (showType,
             "EffectSize"={use_cols<<-c(hsv(0.1,1,1),hsv(0.1+0.075,1,1),hsv(0.1+0.15,1,1))},
             "EffectSizeA"={use_cols<<-c(hsv(0.1,1,1),hsv(0.1+0.075,1,1),hsv(0.1+0.15,1,1))},
             "p"=         {use_cols<-c(hsv(0,1,1),hsv(0+0.075,1,1),hsv(0+0.15,1,1))},
@@ -201,7 +200,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
     )
     names(use_cols)<-c("direct","unique","total")
     all_cols<<-use_cols
-    g<-g+scale_fill_manual(name=Explore_whichShow,values=all_cols)
+    g<-g+scale_fill_manual(name=whichEffect,values=all_cols)
     use_col_names<-TRUE
   } else {
     all_cols<-c()
@@ -213,17 +212,17 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
   ni_max2<-1
   multi="none"
   if (!is.null(hypothesis$IV2)) {
-    if (Explore_typeShow=="All") { # all of direct/unique/total
+    if (effectType=="All") { # all of direct/unique/total
       markersize<-4
       ni_max1<-3
       multi<-"allTypes"
     } 
-    if (Explore_whichShow=="All") { # all of main1 main2 interaction
+    if (whichEffect=="All") { # all of main1 main2 interaction
       markersize<-4
       ni_max2<-3
       multi<-"allEffects"
     } else {
-      if (Explore_whichShow=="Mains") { 
+      if (whichEffect=="Mains") { 
         markersize<-6
         ni_max2<-2
         multi<-"mainEffects"
@@ -235,15 +234,15 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
     for (ni2 in 1:ni_max2){
       if (ni_max1>1) {
       switch (ni1,
-            {Explore_typeShow<-"direct"},
-            {Explore_typeShow<-"unique"},
-            {Explore_typeShow<-"total"})
+            {effectType<-"direct"},
+            {effectType<-"unique"},
+            {effectType<-"total"})
       } 
       if (ni_max2>1) {
       switch (ni2,
-              {Explore_whichShow<-"Main 1"},
-              {Explore_whichShow<-"Main 2"},
-              {Explore_whichShow<-"Interaction"})
+              {whichEffect<-"Main 1"},
+              {whichEffect<-"Main 2"},
+              {whichEffect<-"Interaction"})
       }
 
     extra_y_label<-""
@@ -251,21 +250,21 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
       rVals<-result$rval
       pVals<-result$pval
     } else {
-      switch (Explore_whichShow,
+      switch (whichEffect,
               "Main 1"={
-                rVals<-result$r[[Explore_typeShow]][,,1]
-                pVals<-result$p[[Explore_typeShow]][,,1]
-                extra_y_label<-paste("Main Effect 1:",Explore_typeShow)
+                rVals<-result$r[[effectType]][,,1]
+                pVals<-result$p[[effectType]][,,1]
+                extra_y_label<-paste("Main Effect 1:",effectType)
               },
               "Main 2"={
-                rVals<-result$r[[Explore_typeShow]][,,2]
-                pVals<-result$p[[Explore_typeShow]][,,2]
-                extra_y_label<-paste("Main Effect 2:",Explore_typeShow)
+                rVals<-result$r[[effectType]][,,2]
+                pVals<-result$p[[effectType]][,,2]
+                extra_y_label<-paste("Main Effect 2:",effectType)
               },
               "Interaction"={
-                rVals<-result$r[[Explore_typeShow]][,,3]
-                pVals<-result$p[[Explore_typeShow]][,,3]
-                extra_y_label<-paste("Interaction:",Explore_typeShow)
+                rVals<-result$r[[effectType]][,,3]
+                pVals<-result$p[[effectType]][,,3]
+                extra_y_label<-paste("Interaction:",effectType)
               }
       )
     }
@@ -273,7 +272,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
     nVals<-result$nval
     df1Vals<-result$df1
     
-    switch (Explore_show,
+    switch (showType,
             "EffectSize"={
               showVals<-rVals
               if (RZ=="z") {showVals<-atanh(rVals)}
@@ -283,7 +282,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
                 lines<-c(0,effect$rIV)
                 if (RZ=="z") {lines<-c(0,atanh(effect$rIV))}
               } else {
-                switch (Explore_whichShow,
+                switch (whichEffect,
                         "Main 1"={
                           lines<-c(0,effect$rIV)
                           if (RZ=="z") {lines<-c(0,atanh(effect$rIV))}
@@ -297,8 +296,8 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
                           if (RZ=="z") {lines<-c(0,atanh(effect$rIVIV2DV))}
                         }
                 )
-                col<-all_cols[[Explore_typeShow]]
-                colFill<-names(all_cols[Explore_typeShow])
+                col<-all_cols[[effectType]]
+                colFill<-names(all_cols[effectType])
               }
             },
             "EffectSizeA"={
@@ -310,7 +309,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
                 lines<-c(0,effect$rIV)
                 if (RZ=="z") {lines<-c(0,atanh(effect$rIV))}
               } else {
-                switch (explore$Explore_whichShow,
+                switch (explore$whichEffect,
                         "Main 1"={
                           lines<-c(0,effect$rIV)
                           if (RZ=="z") {lines<-c(0,atanh(effect$rIV))}
@@ -324,8 +323,8 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
                           if (RZ=="z") {lines<-c(0,atanh(effect$rIVIV2DV))}
                         }
                 )
-                col<-all_cols[[Explore_typeShow]]
-                colFill<-names(all_cols[Explore_typeShow])
+                col<-all_cols[[effectType]]
+                colFill<-names(all_cols[effectType])
               }
             },
             "p"={
@@ -339,8 +338,8 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
                 col<-"red"
                 colFill<-col
               } else {
-                col<-all_cols[[Explore_typeShow]]
-                colFill<-names(all_cols[Explore_typeShow])
+                col<-all_cols[[effectType]]
+                colFill<-names(all_cols[effectType])
               }
             },
             "w"={
@@ -354,8 +353,8 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
                 col<-"blue"
                 colFill<-col
               } else {
-                col<-all_cols[[Explore_typeShow]]
-                colFill<-names(all_cols[Explore_typeShow])
+                col<-all_cols[[effectType]]
+                colFill<-names(all_cols[effectType])
               }
             },
             "SampleSize"={
@@ -365,8 +364,8 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
                 col<-"blue"
                 colFill<-col
               } else {
-                col<-all_cols[[Explore_typeShow]]
-                colFill<-names(all_cols[Explore_typeShow])
+                col<-all_cols[[effectType]]
+                colFill<-names(all_cols[effectType])
               }
             },
             "likelihood"={
@@ -386,8 +385,8 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
                 col<-"yellow"
                 colFill<-col
               } else {
-                col<-all_cols[[Explore_typeShow]]
-                colFill<-names(all_cols[Explore_typeShow])
+                col<-all_cols[[effectType]]
+                colFill<-names(all_cols[effectType])
               }
             },
             "log(lrd)"={
@@ -400,8 +399,8 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
                 col<-"yellow"
                 colFill<-col
               } else {
-                col<-all_cols[[Explore_typeShow]]
-                colFill<-names(all_cols[Explore_typeShow])
+                col<-all_cols[[effectType]]
+                colFill<-names(all_cols[effectType])
               }
             },
             "k"={
@@ -428,7 +427,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
             },
 
             "p(sig)"={
-              if (explore$type=="Alpha") {
+              if (explore$exploreType=="Alpha") {
                 BrawOpts$alphaSig<-exploreResult$vals
               }
               if (doBudget) {
@@ -454,8 +453,8 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
                 cola<-BrawOpts$plotColours$infer_nsNonNull
                 colFill<-col
               } else {
-                col<-all_cols[[Explore_typeShow]]
-                colFill<-names(all_cols[Explore_typeShow])
+                col<-all_cols[[effectType]]
+                colFill<-names(all_cols[effectType])
               }
               
               if (effect$world$worldOn && effect$world$populationNullp>0) {
@@ -484,7 +483,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
               }
             },
             "FDR"={
-              if (explore$type=="Alpha") {
+              if (explore$exploreType=="Alpha") {
                 BrawOpts$alphaSig<-exploreResult$vals
               }
               
@@ -511,7 +510,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
             "p(llrs)"={
               ns<-result$nval
               df1<-result$df1
-              if (explore$type=="Alpha") {
+              if (explore$exploreType=="Alpha") {
                 BrawOpts$alphaSig<-exploreResult$vals
               }
               p<-mean(isSignificant("sLLR",pvals,rvals,nvals,df1Vals,evidence,BrawOpts$alphaSig),na.rm=TRUE)
@@ -526,14 +525,14 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
                 col<-"white"
                 colFill<-col
               } else {
-                col<-all_cols[[Explore_typeShow]]
-                colFill<-names(all_cols[Explore_typeShow])
+                col<-all_cols[[effectType]]
+                colFill<-names(all_cols[effectType])
               }
             },
             "p(llrd)"={
               ns<-result$nval
               df1<-result$df1
-              if (explore$type=="Alpha") {
+              if (explore$exploreType=="Alpha") {
                 BrawOpts$alphaSig<-exploreResult$vals
               }
               p<-mean(isSignificant("dLLR",pvals,rvals,nvals,df1Vals,evidence,BrawOpts$alphaSig),na.rm=TRUE)
@@ -549,15 +548,15 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
                 col<-"white"
                 colFill<-col
               } else {
-                col<-all_cols[[Explore_typeShow]]
-                colFill<-names(all_cols[Explore_typeShow])
+                col<-all_cols[[effectType]]
+                colFill<-names(all_cols[effectType])
               }
             },
             
             
             
             "NHSTErrors"={
-              if (explore$type=="Alpha") {
+              if (explore$exploreType=="Alpha") {
                 BrawOpts$alphaSig<-exploreResult$vals
               }
               if (!is.null(exploreResult$nullresult)) {
@@ -585,7 +584,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
               lines<-c(0.05)
             },
             "FDR;FMR"={
-              if (explore$type=="Alpha") {
+              if (explore$exploreType=="Alpha") {
                 BrawOpts$alphaSig<-exploreResult$vals
               }
               sigs<-isSignificant(BrawOpts$STMethod,pVals,rVals,nVals,df1Vals,evidence,BrawOpts$alphaSig)
@@ -639,7 +638,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
     xscale<-FALSE
     xmargin<-1
     
-    if (explore$type=="EffectSize") {
+    if (explore$exploreType=="EffectSize") {
       if (RZ=="z") {
         vals<-atanh(vals)
         xLabel<-zpLabel
@@ -649,7 +648,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
     }
     
     # draw the basic line and point data
-    if (is.element(Explore_show,c("EffectSize","EffectSizeA","p","w","likelihood","SampleSize",
+    if (is.element(showType,c("EffectSize","EffectSizeA","p","w","likelihood","SampleSize",
                                           "log(lrs)","log(lrd)",
                                           "k","S","pNull",
                                           "mean(DV)","sd(DV)","skew(DV)","kurtosis(DV)"))) {
@@ -680,7 +679,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
         }
         g<-g+geom_line(data=pts1,aes(x=vals,y=y50),color="black")
       } else{
-        switch(Explore_show,
+        switch(showType,
                "EffectSize"={expType<-"r"},
                "EffectSizeA"={expType<-"ra"},
                "p"={expType<-"p"},
@@ -690,7 +689,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
                "log(lrd)"={expType<-"log(lrd)"},
                expType=NULL
                )
-        if (is.element(Explore_show,c("EffectSize","EffectSizeA","p","w","SampleSize"))){
+        if (is.element(showType,c("EffectSize","EffectSizeA","p","w","SampleSize"))){
           sigVals<-isSignificant(BrawOpts$STMethod,pVals,rVals,nVals,df1Vals,evidence,BrawOpts$alphaSig)
           col<-"white"
         } else {
@@ -705,7 +704,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
         }
       }
       if (use_col_names){
-        pts1<-data.frame(x=vals+valsOffset,y=y50,fill=Explore_typeShow)
+        pts1<-data.frame(x=vals+valsOffset,y=y50,fill=effectType)
         g<-g+geom_point(data=pts1,aes(x=x,y=y,fill=fill),shape=BrawOpts$plotShapes$parameter, colour = "black", size = markersize)
       } else {
         g<-g+geom_point(data=pts1,aes(x=vals,y=y50),shape=BrawOpts$plotShapes$parameter, colour = "black",fill=col, size = markersize)
@@ -713,7 +712,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
     } # end of line and point
 
     # p(sig) and FDR
-    if (is.element(Explore_show,c("p(sig)","FDR"))) {
+    if (is.element(showType,c("p(sig)","FDR"))) {
       if (isempty(y50e)) {
         pts1<-data.frame(vals=vals+valsOffset,y50=y50)
         if (doLine) {
@@ -730,7 +729,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
           }
         }
         if (use_col_names){
-          pts1<-data.frame(x=vals+valsOffset,y=y50,fill=Explore_typeShow)
+          pts1<-data.frame(x=vals+valsOffset,y=y50,fill=effectType)
           g<-g+geom_point(data=pts1,aes(x=x,y=y,fill=fill),shape=BrawOpts$plotShapes$parameter, colour = "black", size = markersize)
         } else {
           g<-g+geom_point(data=pts1,aes(x=vals,y=y50),shape=BrawOpts$plotShapes$parameter, fill=col,colour = "black",size = markersize)
@@ -751,7 +750,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
           }
         }
         if (use_col_names){
-          pts1<-data.frame(x=vals+valsOffset,y=y50,fill=Explore_typeShow)
+          pts1<-data.frame(x=vals+valsOffset,y=y50,fill=effectType)
           g<-g+geom_point(data=pts1,aes(x=x,y=y,fill=fill),shape=BrawOpts$plotShapes$parameter, colour = "black", size = markersize)
         } else {
           g<-g+geom_point(data=pts1,aes(x=vals,y=y50,fill=fill),shape=BrawOpts$plotShapes$parameter, colour = "black",size = markersize)
@@ -772,7 +771,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
             }
           }
           if (use_col_names){
-            pts1<-data.frame(x=vals+valsOffset,y=y50e,fill=Explore_typeShow)
+            pts1<-data.frame(x=vals+valsOffset,y=y50e,fill=effectType)
             g<-g+geom_point(data=pts1,aes(x=x,y=y,fill=fill),shape=BrawOpts$plotShapes$parameter, colour = "black", size = markersize)
           } else {
             g<-g+geom_point(data=pts1,aes(x=vals,y=y50,fill=fill),shape=BrawOpts$plotShapes$parameter, colour = "black", size = markersize)
@@ -794,7 +793,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
             }
           }
           if (use_col_names){
-            pts1<-data.frame(x=vals+valsOffset,y=y50a,fill=Explore_typeShow)
+            pts1<-data.frame(x=vals+valsOffset,y=y50a,fill=effectType)
             g<-g+geom_point(data=pts1,aes(x=x,y=y,fill=fill),shape=BrawOpts$plotShapes$parameter, colour = "black", size = markersize)
           } else {
             g<-g+geom_point(data=pts1,aes(x=vals,y=y50,fill=fill),shape=BrawOpts$plotShapes$parameter, colour = "black", size = markersize)
@@ -806,7 +805,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
     }
     
     # now the NHST and FDR filled areas
-    if (Explore_show=="FDR;FMR" || Explore_show=="NHSTErrors") {
+    if (showType=="FDR;FMR" || showType=="NHSTErrors") {
       endI<-length(vals)
       # if (!effect$world$worldOn) {
       #   nsigNonNulls<-nsigNonNulls*2
@@ -817,7 +816,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
       #   isigNulls<-0
       # }
       
-      if (Explore_show=="NHSTErrors") {
+      if (showType=="NHSTErrors") {
         ytop<-1-nsigNonNulls*0
         yn<-0.5
         
@@ -904,7 +903,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
         
       } 
       
-      if (Explore_show=="FDR;FMR") {
+      if (showType=="FDR;FMR") {
         pts0<-NULL
         col0<-BrawOpts$plotColours$fmr
         # false misses
@@ -951,7 +950,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
         
       if (doLine) {
         if (NHSTasArea) {
-          # type 2 errors
+          # exploreType 2 errors
           if (!is.null(pts0)) g<-g+geom_polygon(data=pts0,aes(x=x,y=y),fill=col0)
           if (!is.null(pts1)) g<-g+geom_polygon(data=pts1,aes(x=x,y=y),fill=col1)
           if (!is.null(pts2)) g<-g+geom_polygon(data=pts2,aes(x=x,y=y),fill=col2)
@@ -989,7 +988,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
         }
       }
 
-      if (Explore_show=="NHSTErrors") {
+      if (showType=="NHSTErrors") {
         if (effect$world$worldOn) {
           if (!NHSTasArea || NHSThalfArea) 
             g<-g+geom_hline(yintercept=effect$world$populationNullp,color="black")
@@ -1012,7 +1011,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
       xmargin<-2
     }
     
-    if (Explore_show=="PDF") {
+    if (showType=="PDF") {
         y=rep(0,length(ySingle))
         switch(effect$world$populationPDF,
                "Single"={
@@ -1036,13 +1035,13 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
     }
     
     # effect size vs effect size line
-    if (is.element(Explore_show,c("EffectSize","Interaction")) && is.element(explore$type,c("EffectSize","EffectSize1","EffectSize2","Interaction"))){
+    if (is.element(showType,c("EffectSize","Interaction")) && is.element(explore$exploreType,c("EffectSize","EffectSize1","EffectSize2","Interaction"))){
       pts3<-data.frame(x=c(-1,1),y=c(-1,1))
       g<-g+geom_line(data=pts3,aes(x=x,y=y),colour="yellow", linetype="dotted")
     }
     
     # find n80
-    if (Explore_show=="p(sig)" && explore$type=="SampleSize" && effect$world$populationPDF=="Single"){
+    if (showType=="p(sig)" && explore$exploreType=="SampleSize" && effect$world$populationPDF=="Single"){
       w<-y50
       n<-exploreResult$vals
       minrw<-function(r,w,n){sum(abs(w-rn2w(r,n)),na.rm=TRUE)}
@@ -1064,13 +1063,13 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
         if (sum(n>n80$minimum)<2) label<-paste("Unsafe result - increase range")
         # label<-paste("Unsafe result","  r_est =", format(r_est,digits=3))
       }
-      if (ni_max2>1){label<-paste(Explore_typeShow,": ",label,sep="")}
+      if (ni_max2>1){label<-paste(effectType,": ",label,sep="")}
       lpts<-data.frame(x=min(n)+valsOffset,y=0.8+(ni_max2-1)/10,label=label)
       g<-g+geom_label(data=lpts,aes(x = x, y = y, label = label), hjust=0, vjust=0, fill = "white",size=BrawOpts$labelSize)
     }
     
     # find r80
-    if (Explore_show=="p(sig)" && explore$type=="EffectSize"){
+    if (showType=="p(sig)" && explore$exploreType=="EffectSize"){
       w<-y50
       r<-exploreResult$vals
       minrw<-function(r,w,n){sum(abs(w-rn2w(r,n)),na.rm=TRUE)}
@@ -1092,7 +1091,7 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
         if (sum(r>n80$minimum)<2) label<-paste("Unsafe result - increase range")
         # label<-paste("Unsafe result","  r_est =", format(r_est,digits=3))
       }
-      if (ni_max2>1){label<-paste(Explore_typeShow,": ",label,sep="")}
+      if (ni_max2>1){label<-paste(effectType,": ",label,sep="")}
       lpts<-data.frame(x=0+valsOffset,y=0.8+(ni_max2-1)/10,label=label)
       g<-g+geom_label(data=lpts,aes(x = x, y = y, label = label), hjust=0, vjust=0, fill = "white",size=BrawOpts$labelSize)
     }
@@ -1101,16 +1100,16 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
   if (multi=="allEffects" || multi=="mainEffects") {
     for (ni2 in 1:ni_max2) {
       switch (ni2,
-              {explore$Explore_whichShow<-"Main 1"},
-              {explore$Explore_whichShow<-"Main 2"},
-              {explore$Explore_whichShow<-"Interaction"}
+              {explore$whichEffect<-"Main 1"},
+              {explore$whichEffect<-"Main 2"},
+              {explore$whichEffect<-"Interaction"}
               )
       if (is.character(exploreResult$vals[1])) {
         valsOffset<-(ni2-1)*valsGap+0.5
       } else {
         valsOffset<-(ni2-1)*valsGap*2 
       }
-      td<-data.frame(x=valsOffset,y=ylim[2]-diff(ylim)/6,label=explore$Explore_whichShow)
+      td<-data.frame(x=valsOffset,y=ylim[2]-diff(ylim)/6,label=explore$whichEffect)
       g<-g+geom_label(data=td,aes(x=x, y=y, label=label,hjust=0.5),size=BrawOpts$labelSize)
     }
     if (is.character(exploreResult$vals[1])) {
@@ -1135,10 +1134,10 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
     xscale<-TRUE
   } 
   
-  if ((is.element(explore$type,c("SampleSize","Repeats","CheatingAmount")) &&
+  if ((is.element(explore$exploreType,c("SampleSize","Repeats","CheatingAmount")) &&
                  explore$xlog) 
-      || ((explore$type=="Alpha") && explore$xlog)
-      || ((explore$type=="NoStudies") && explore$mx_log)) {
+      || ((explore$exploreType=="Alpha") && explore$xlog)
+      || ((explore$exploreType=="NoStudies") && explore$mx_log)) {
     dx<-(log10(max(vals))-log10(min(vals)))/15
     g<-g+scale_x_log10(limits=c(10^(log10(min(vals))-dx),10^(log10(max(vals))+dx*xmargin)))
     xscale<-TRUE
@@ -1153,35 +1152,24 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
       }
     }
 
-  if (Explore_ylog) {
+  if (ylog) {
     ysc<-scale_y_log10
   } else {
     ysc<-scale_y_continuous
   }
-  if (ExploreFull_ylim){
-    ylim<-ylim*1.05
-  }
-  
-  if (Explore_show=="NHSTErrors" && !effect$world$worldOn) {
+
+  if (showType=="NHSTErrors" && !effect$world$worldOn) {
     g<-g+scale_y_continuous(breaks=seq(0,1,0.125),labels=format(c(seq(0,0.75,0.25),seq(1,0,-0.25))),limits=c(0,1))
   } else {
-    if (!ExploreAny_ylim) {
-      if (!is.null(secondY)) {
-        g<-g+ysc(sec.axis=sec_axis(~ 1-.,name=secondY))
-      } else {
-        g<-g+ysc()
-      }
+    if (!is.null(secondY)) {
+      g<-g+ysc(sec.axis=sec_axis(~ 1-.,name=secondY))
     } else {
-      if (!is.null(secondY)) {
-        g<-g+ysc(limits=ylim,sec.axis=sec_axis(~ 1-.,name=secondY))
-      } else {
-        g<-g+ysc(limits=ylim)
-      }
+      g<-g+ysc()
     }
   }
 
   g<-g+ylab(ylabel)
-  switch (explore$type,
+  switch (explore$exploreType,
           "EffectSize"={g<-g+xlab(xLabel)},
           "EffectSize1"={g<-g+xlab(bquote(MainEffect1:r[p]))},
           "EffectSize2"={g<-g+xlab(bquote(MainEffect2:r[p]))},
@@ -1190,11 +1178,11 @@ showExplore<-function(exploreResult,Explore_show="EffectSize",Explore_ylog=FALSE
           "pNull"={g<-g+xlab(Plabel)},
           "k"={g<-g+xlab(Llabel)},
           "Alpha"={g<-g+xlab(alphaChar)},
-          g<-g+xlab(explore$type)
+          g<-g+xlab(explore$exploreType)
   )
   g<-g+ggtitle(paste0("Explore: ",format(exploreResult$count)))
   BrawOpts$alphaSig<<-oldAlpha
 
-  g+BrawOpts$plotTheme+theme(plot.title=element_text(face='plain', size=8, hjust=1))
+  g+BrawOpts$plotTheme+theme(plot.title=element_text(face='plain', size=8, hjust=0.9))
 }
 

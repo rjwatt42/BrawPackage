@@ -106,8 +106,6 @@ simData<<-TRUE
 wPlotScale<<-"log10"
 pPlotScale<<-"log10"
 nPlotScale<<-"linear"
-showTheory<<-TRUE
-showTheoryHQ<<-FALSE
 
 useSignificanceCols<<-TRUE
 showInteractionOnly<<-TRUE
