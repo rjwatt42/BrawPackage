@@ -80,7 +80,7 @@ r2ci<-function(r,n,s=0){
   z<-atanh(r)
   zci<-qnorm(1-0.05/2)*sqrt(1/(n-3))
   if (s==0){
-    tanh(z+c(-1,1)*zci)
+    cbind(tanh(z-zci),tanh(z+zci))
   } else {
     tanh(z+s*zci)
   }
@@ -472,15 +472,15 @@ generalAnalysis<-function(allData,InteractionOn,withins,ssqType="Type3",caseOrde
   df<-anRaw$Df[n1:n2]
 
   # EFFECT SIZES  
-  r.direct<-model2directeffect(lmNormC)
+  r.direct<-matrix(model2directeffect(lmNormC),nrow=1)
   if (doingWithin) {
     r.unique<-r.direct
     r.total<-r.direct
   } else {
-    r.unique<-model2uniqueeffect(anNormC)*sign(r.direct)
-    r.total<-model2totaleffect(lmNormC)
+    r.unique<-matrix(model2uniqueeffect(anNormC)*sign(r.direct),nrow=1)
+    r.total<-matrix(model2totaleffect(lmNormC),nrow=1)
   }
-  r.full<-model2fulleffect(lmNormC,anNormC)
+  r.full<-matrix(model2fulleffect(lmNormC,anNormC),nrow=1)
   
   p.direct<-r2p(r.direct,n,df)
   p.unique<-r2p(r.unique,n,df)

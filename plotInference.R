@@ -19,12 +19,12 @@ trimanalysis<-function(analysis) {
     analysis$pIV2=analysis$pIV2[use]
     analysis$rIVIV2DV=analysis$rIVIV2DV[use]
     analysis$rIVIV2DV=analysis$rIVIV2DV[use]
-    analysis$r$direct=analysis$r$direct[use,]
-    analysis$r$unique=analysis$r$unique[use,]
-    analysis$r$total=analysis$r$total[use,]
-    analysis$p$direct=analysis$p$direct[use,]
-    analysis$p$unique=analysis$p$unique[use,]
-    analysis$p$total=analysis$p$total[use,]
+    analysis$r$direct=matrix(analysis$r$direct[use,],nrow=sum(use))
+    analysis$r$unique=matrix(analysis$r$unique[use,],nrow=sum(use))
+    analysis$r$total=matrix(analysis$r$total[use,],nrow=sum(use))
+    analysis$p$direct=matrix(analysis$p$direct[use,],nrow=sum(use))
+    analysis$p$unique=matrix(analysis$p$unique[use,],nrow=sum(use))
+    analysis$p$total=matrix(analysis$p$total[use,],nrow=sum(use))
   }
   
   analysis

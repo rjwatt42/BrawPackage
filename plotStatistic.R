@@ -128,7 +128,7 @@ dataPolygon<-function(data,colour,fill,alpha=1, orientation) {
   )
 }
 
-collectData<-function(analysis) {
+collectData<-function(analysis,effectType) {
   use<-(!is.na(analysis$rIV))
   ns<-cbind(analysis$nval[use])
   df1<-cbind(analysis$df1[use])
@@ -141,7 +141,8 @@ collectData<-function(analysis) {
     ra<-cbind(analysis$raIV[use])
     ps<-cbind(analysis$pIV[use])
   } else {
-    switch (analysis$effectType,
+    ra<-cbind(analysis$raIV[use])
+    switch (effectType,
             "direct"={
               rs<-rbind(analysis$r$direct[use,])
               ps<-rbind(analysis$p$direct[use,])
@@ -454,6 +455,7 @@ expected_plot<-function(g,pts,expType=NULL,analysis=NULL,IV=NULL,DV=NULL,i=1,sca
              if (isSignificant(BrawOpts$STMethod,analysis$pIVIV2DV,analysis$rIVIV2DV,analysis$nval,analysis$df12,analysis$evidence)) {c<-c1} else (c<-c2)
              }
              )
+      if (is.null(analysis$hypothesis$IV2)) {
       if (expType=="r" && !is.null(rCI)){
         pts1se<-data.frame(x=pts$x,y=rCI)
         g<-g+dataLine(data=pts1se,arrow=arrow(length=unit(se_arrow,"cm"),ends="both"),colour=c,linewidth=se_size,orientation=orientation)
@@ -461,6 +463,7 @@ expected_plot<-function(g,pts,expType=NULL,analysis=NULL,IV=NULL,DV=NULL,i=1,sca
       if (expType=="p" && !is.null(analysis$pIVCI)){
         pts1se<-data.frame(x=pts$x,y=log10(pCI))
         g<-g+dataLine(data=pts1se,arrow=arrow(length=unit(se_arrow,"cm"),ends="both"),colour=c,linewidth=se_size,orientation=orientation)
+      }
       }
     }
       
@@ -629,7 +632,7 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
   }
   
   if (!all(is.na(analysis$rIV))) {
-    data<-collectData(analysis)
+    data<-collectData(analysis,effectType)
     if (RZ=="z") {
       data$rs<-atanh(data$rs)
       data$rp<-atanh(data$rp)

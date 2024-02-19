@@ -17,7 +17,7 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,off=0){
   y<-analysis$dvplot
   
   hypothesisType=paste(IV$type,DV$type,sep=" ")
-  
+
   dotSize<-(BrawOpts$plotTheme$axis.title$size)/3
   shrinkDots=1
   if (length(x)>100) {
@@ -231,18 +231,18 @@ plotCatInterDescription<-function(analysis,g=NULL){
     analysis1$dvplot<-analysis$dvplot[use]
     analysis1$rIV<-rho[i]
     
-    analysis1$IV$vals<-Ivals[use]
-    analysis1$DV$vals<-Dvals[use] 
+    analysis1$hypothesis$IV$vals<-Ivals[use]
+    analysis1$hypothesis$DV$vals<-Dvals[use] 
     if (is.numeric(Ivals)) {
-    analysis1$IV$mu<-mean(Ivals[use],na.rm=TRUE)
-    analysis1$IV$sd<-sd(Ivals[use],na.rm=TRUE)
+    analysis1$hypothesis$IV$mu<-mean(Ivals[use],na.rm=TRUE)
+    analysis1$hypothesis$IV$sd<-sd(Ivals[use],na.rm=TRUE)
     }
     if (is.numeric(Dvals)) {
-    analysis1$DV$mu<-mean(Dvals[use],na.rm=TRUE)
-    analysis1$DV$sd<-sd(Dvals[use],na.rm=TRUE)
+    analysis1$hypothesis$DV$mu<-mean(Dvals[use],na.rm=TRUE)
+    analysis1$hypothesis$DV$sd<-sd(Dvals[use],na.rm=TRUE)
     }
-    g<-plotPoints(g,analysis$hypothesis$IV,analysis$hypothesis$DV,analysis1,i+1,(i-1)/(analysis$hypothesis$IV2$ncats-1))
-    g<-plotPrediction(analysis1$IV,NULL,analysis1$DV,analysis1,analysis$design,2+(i-1)/(IV2$ncats-1),g,theme=BrawOpts$plotTheme)
+    g<-plotPoints(g,analysis1$hypothesis$IV,analysis1$hypothesis$DV,analysis1,i+1,(i-1)/(analysis$hypothesis$IV2$ncats-1))
+    g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,2+(i-1)/(IV2$ncats-1),g,theme=BrawOpts$plotTheme)
   }
   
   g<-g+scale_fill_manual(name=analysis$hypothesis$IV2$name,values=plotDescriptionCols)
@@ -274,11 +274,11 @@ plotParInterDescription<-function(analysis,g=NULL){
     analysis1$dvplot<-analysis$dvplot[use]
     analysis1$rIV<-rho[i]
     
-    analysis1$IV$vals<-Ivals[use]
-    analysis1$DV$vals<-Dvals[use]
-    analysis1$DV$mu<-mean(analysis$dv[use],na.rm=TRUE)
-    g<-plotPoints(g,analysis1$IV,analysis1$DV,analysis1,i+1,(i-1)/(2-1)*0.25)
-    g<-plotPrediction(analysis1$IV,NULL,analysis1$DV,analysis1,analysis$design,i+1,g,theme=BrawOpts$plotTheme)
+    analysis1$hypothesis$IV$vals<-Ivals[use]
+    analysis1$hypothesis$DV$vals<-Dvals[use]
+    analysis1$hypothesis$DV$mu<-mean(analysis$dv[use],na.rm=TRUE)
+    g<-plotPoints(g,analysis1$hypothesis$IV,analysis1$hypothesis$DV,analysis1,i+1,(i-1)/(2-1)*0.25)
+    g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,i+1,g,theme=BrawOpts$plotTheme)
   }
   
   g<-g+scale_fill_manual(name=analysis$hypothesis$IV2$name,values=plotDescriptionCols)
