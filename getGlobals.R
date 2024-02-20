@@ -88,11 +88,11 @@ z_range<<-1.5
 r_range<<-0.99
 w_range<<-c(0.05,1)
 fullRange<<-3
-nNpoints<<-101
-worldNPoints<<-101
-varNPoints<<-101
+nNpoints<<-201
+worldNPoints<<-201
+varNPoints<<-201
 
-allScatter<<-"all"
+allScatter<<-TRUE
 showMedians<<-FALSE
 minN<<-10
 maxRandN<<-5 # times mean sample size

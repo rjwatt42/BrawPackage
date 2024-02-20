@@ -517,7 +517,7 @@ makeAnalysis<-function(evidence=makeEvidence(),sample=makeSample(),autoShow=FALS
   DV<-hypothesis$DV
   effect<-hypothesis$effect
   analysis<-sample
-  
+
   switch (evidence$Transform,
           "Log"={allData<-data.frame(analysis$participant,log(analysis$dv))},
           "Exp"={allData<-data.frame(analysis$participant,exp(analysis$dv))},

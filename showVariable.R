@@ -5,6 +5,7 @@ drawVar<-function(pts,var){
     ggplot()+geom_label(data=pts,aes(x=x,y=y,label=t),hjust=0.5, vjust=0.5, size=11, fontface="bold",label.size = NA)+
       labs(x="",y="")+
       BrawOpts$diagramTheme+
+      theme(plot.margin=margin(1.15,1.8,1,1.25,"cm"))+
       theme(axis.text.y=element_blank(),
             axis.ticks.y=element_blank(),
             axis.text.x=element_blank(),
@@ -111,12 +112,14 @@ drawInterval<-function(var){
     coord_cartesian(xlim = xlim, ylim = c(0, 1.2))
 }
 
-showVariable<-function(var=makeVariable()){
+showVariable<-function(var=makeVariable(),single=FALSE){
   switch(var$type,
-         "Interval"={drawInterval(var)},
-         "Ordinal"={drawOrdinal(var)},
-         "Categorical"={drawCategorical(var)},
-         "empty"={drawVar(NULL,var)}
+         "Interval"={g<-drawInterval(var)},
+         "Ordinal"={g<-drawOrdinal(var)},
+         "Categorical"={g<-drawCategorical(var)},
+         "empty"={g<-drawVar(NULL,var)}
   )
-  
+  if (single)
+  g+theme(plot.margin=margin(0.5,0.5,0.0,0.0,"cm"))
+  else g
 }

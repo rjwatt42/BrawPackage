@@ -1,6 +1,8 @@
 plotPoints<-function(g,IV,DV,analysis,colindex=1,off=0){
 
-  showRawData<-TRUE
+  if (allScatter) showRawData<-TRUE
+  else showRawData<-FALSE
+  
   if (colindex==1)
           {  col<- BrawOpts$plotColours$descriptionC
           alphaPoints<-0.95
@@ -23,6 +25,7 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,off=0){
   if (length(x)>100) {
     dotSize<-max(dotSize*sqrt(100/length(x)),2)
   }
+  dotSize<-dotSize/2
   
   switch (hypothesisType,
           "Interval Interval"={
@@ -50,7 +53,7 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,off=0){
               if (colindex>=2) 
                 g<-g+geom_point(data=pts,aes(x=IV,y=DV,fill=names(plotDescriptionCols)[colindex-1]),shape=BrawOpts$plotShapes$data, colour = "black", alpha=alphaPoints, size =dotSize)
               else
-                g<-g+geom_point(data=pts,aes(x=IV,y=DV),shape=BrawOpts$plotShapes$data, colour = col, fill=col, alpha=alphaPoints, size =dotSize*shrinkDots)
+                g<-g+geom_point(data=pts,aes(x=IV,y=DV),shape=BrawOpts$plotShapes$data, colour = "black", fill=col, alpha=alphaPoints, size =dotSize*shrinkDots)
             }
           },
           

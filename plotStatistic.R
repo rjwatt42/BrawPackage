@@ -981,10 +981,10 @@ e2_plot<-function(analysis,nullanalysis=NULL,orientation="vert",showTheory=TRUE)
   lambda<-format(analysis$hypothesis$effect$world$populationPDFk,digits=3)
   switch (RZ,
           "r"={
-            lab<-bquote(bold(r["p"] ~ "~" ~ .(distr) (r/.(lambda))))
+            lab<-bquote(bold("Non-null: " ~ r["p"] ~ "~" ~ .(distr) (r/.(lambda))))
           },
           "z"={
-            lab<-bquote(bold(z["p"] ~ "~" ~ .(distr) (z/.(lambda))))
+            lab<-bquote(bold("Non-null: " ~ z["p"] ~ "~" ~ .(distr) (z/.(lambda))))
           }
   )
 
@@ -1010,10 +1010,10 @@ e2_plot<-function(analysis,nullanalysis=NULL,orientation="vert",showTheory=TRUE)
 e1_plot<-function(nullanalysis,analysis=NULL,orientation="vert",showTheory=TRUE){
   switch (RZ,
           "r"={
-            lab<-bquote(bold(r["p"] == 0))
+            lab<-bquote(bold("Null: " ~ r["p"] == 0))
           },
           "z"={
-            lab<-bquote(bold(z["p"] == 0))
+            lab<-bquote(bold("Null: " ~ z["p"] == 0))
           }
   )
   

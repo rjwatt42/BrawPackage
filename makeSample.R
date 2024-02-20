@@ -1,4 +1,10 @@
 
+drawCatPositions<-function(ncats){
+  pbreaks<-seq(0,1,1/(ncats))
+  ebreaks<-exp(-qnorm(pbreaks)^2/2)
+  -1/sqrt(2*pi)*diff(ebreaks)/diff(pbreaks)
+}
+
 makeSampleVals<-function(n,mn,sdv,MV,distr="normal"){
   switch (distr,
           "normal"= {

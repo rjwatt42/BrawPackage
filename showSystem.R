@@ -15,10 +15,10 @@ showHypothesis<-function(hypothesis=makeHypothesis()) {
   PlotNULL<-ggplot()+BrawOpts$blankTheme+theme(plot.margin=margin(0,-0.1,0,0,"cm"))+
     scale_x_continuous(limits = c(0,10),labels=NULL,breaks=NULL)+scale_y_continuous(limits = c(0,10),labels=NULL,breaks=NULL)
   
-  xmin<-2
-  xmax<-8
   switch (no_ivs,
           {
+            xmin<-4
+            xmax<-6
             g<-PlotNULL+
               annotation_custom(grob=ggplotGrob(showVariable(IV)),xmin=xmin,xmax=xmax,ymin=6,ymax=10)+
               annotation_custom(grob=ggplotGrob(showVariable(DV)),xmin=xmin,xmax=xmax,ymin=0,ymax=4)
@@ -26,6 +26,8 @@ showHypothesis<-function(hypothesis=makeHypothesis()) {
             g<-g+annotation_custom(grob=ggplotGrob(drawEffectES(effect$rIV,1)),xmin=xmin,xmax=xmax,ymin=3.5,ymax=6)
           },
           {
+            xmin<-2
+            xmax<-8
             g<-PlotNULL+
               annotation_custom(grob=ggplotGrob(showVariable(IV)), xmin=0,  xmax=4,  ymin=6, ymax=9)+
               annotation_custom(grob=ggplotGrob(showVariable(IV2)),xmin=6,  xmax=10, ymin=6, ymax=9)+

@@ -37,7 +37,7 @@ plotParParPrediction<-function(g,IV,DV,rho,n,offset=1){
   
 }
 
-plotCatParPrediction<-function(g,IV,DV,rho,n,offset= 1){
+plotCatParPrediction<-function(g,IV,DV,rho,n,offset= 1, within=FALSE){
   if (offset==1) {
     col<- BrawOpts$plotColours$descriptionC
     xoff=0
@@ -73,10 +73,16 @@ plotCatParPrediction<-function(g,IV,DV,rho,n,offset= 1){
   
   # se<-se*2
   mn_pts<-data.frame(xm=b+xoff,ym=d,se=se)
+  if (within) {
+    g<-g+geom_line(data=mn_pts,aes(x=xm,y=ym-se/4),colour="white")
+    g<-g+geom_line(data=mn_pts,aes(x=xm,y=ym+se/4),colour="white")
+  } else
+    g<-g+geom_line(data=mn_pts,aes(x=xm,y=ym))
+  
   g<-g+
-    geom_line(data=mn_pts,aes(x=xm,y=ym))+
     geom_errorbar(data=mn_pts,aes(x=xm, ymin=ym-se, ymax=ym+se),width=0.2)+
     geom_point(data=mn_pts,aes(x=xm,y=ym), shape=BrawOpts$plotShapes$data, colour = "black", fill = col, size = 7)
+  
   if (offset<=2){
     g<-g+scale_x_continuous(breaks=b,labels=l)
   }
@@ -115,7 +121,7 @@ plotParOrdPrediction<-function(g,IV,DV,rho,n,offset=1){
   
 }
 
-plotCatOrdPrediction<-function(g,IV,DV,rho,n,offset= 1){
+plotCatOrdPrediction<-function(g,IV,DV,rho,n,offset= 1,within=FALSE){
   if (offset==1) {
     col<- BrawOpts$plotColours$descriptionC
     xoff=0
@@ -147,11 +153,18 @@ plotCatOrdPrediction<-function(g,IV,DV,rho,n,offset= 1){
   se<-rep(DV$sd^2*sqrt(1-rho^2)/sqrt(n/ncats),ncats)
   se<-se*2
   mn_pts<-data.frame(xm=b+xoff,ym=d,se=se)
+  if (within) {
+    g<-g+geom_line(data=mn_pts,aes(x=xm,y=ym-se/4),colour="white")
+    g<-g+geom_line(data=mn_pts,aes(x=xm,y=ym+se/4),colour="white")
+  } else
+    g<-g+geom_line(data=mn_pts,aes(x=xm,y=ym))
+  
   g<-g+
-    geom_line(data=mn_pts,aes(x=xm,y=ym))+
     geom_errorbar(data=mn_pts,aes(x=xm, ymin=ym-se, ymax=ym+se),width=0.2)+
     geom_point(data=mn_pts,aes(x=xm,y=ym), shape=BrawOpts$plotShapes$data, colour = "black", fill = col, size = 7)
-  if (offset<=2){
+  
+
+    if (offset<=2){
     g<-g+scale_x_continuous(breaks=b,labels=l)
   }
   g
@@ -399,7 +412,7 @@ plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL,theme=BrawOpts$
               g<-plotParParPrediction(g,IV,DV,rho,n,offset)
             },
             "Categorical Interval"={
-              g<-plotCatParPrediction(g,IV,DV,rho,n,offset)
+              g<-plotCatParPrediction(g,IV,DV,rho,n,offset,design$sIV1Use=="Within")
             },
             "Interval Ordinal"={
               g<-plotParOrdPrediction(g,IV,DV,rho,n,offset)
@@ -408,7 +421,7 @@ plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL,theme=BrawOpts$
               g<-plotParOrdPrediction(g,IV,DV,rho,n,offset)
             },
             "Categorical Ordinal"={
-              g<-plotCatOrdPrediction(g,IV,DV,rho,n,offset)
+              g<-plotCatOrdPrediction(g,IV,DV,rho,n,offset,design$sIV1Use=="Within")
             },
             "Interval Categorical"={
               g<-plotParCatPrediction(g,IV,DV,rho,n,offset)
@@ -443,7 +456,7 @@ plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL,theme=BrawOpts$
                 g<-plotParParPrediction(g,IV,DV1,rho[i],n,offset)
               },
               "Categorical Interval"={
-                g<-plotCatParPrediction(g,IV,DV1,rho[i],n,offset)
+                g<-plotCatParPrediction(g,IV,DV1,rho[i],n,offset,within=TRUE)
               },
               "Interval Categorical"={
                 g<-plotParCatPrediction(g,IV,DV1,rho[i],n,offset)

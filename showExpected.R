@@ -2,7 +2,7 @@
 
 showExpected<-function(expectedResult=makeExpected(100),showType="Basic",
                        dimension="1D",orientation="vert",
-                       effectType="direct",showTheory=TRUE
+                       effectType="direct",showTheory=FALSE
 ) {
   if (is.numeric(expectedResult)) expectedResult=makeExpected(expectedResult)
   
