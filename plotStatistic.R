@@ -1,12 +1,6 @@
-min_p=0.0001
-truncate_p=FALSE
-min_nw=10
-max_nw=10000
-horiz_scatter=0.5
 
 se_size=0.75
 se_arrow=0.3
-CI=0.95
 
 histGain<-NA
 histGainrange<-c(NA,NA)

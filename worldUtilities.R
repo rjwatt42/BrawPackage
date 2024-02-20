@@ -1,8 +1,6 @@
 
 # below we use (npops-1)/6 as an integer
-npops=12*10+1 # 2*3*4*n+1
-npoints=201
-wDensMethod=2
+npops=20*6+1 # 2*3*4*n+1
 uniformGain=1
 
 zdens2rdens<-function(zdens,rvals){
@@ -92,8 +90,8 @@ zpopDistr<-function(zvals,Population_distr,PopulationRZ,k){
             rdens2zdens(zdens,zvals)
           },
           "Uniform_z"={
-            zdens<-zvals*0+1
-            zdens*uniformGain
+            zdens<-zvals*0+1*uniformGain
+            zdens
           },
           "Exp_r"={
             exp(-abs(tanh(zvals)/k))
@@ -375,7 +373,7 @@ fullRPopulationDist<-function(rvals,world) {
 fullRSamplingDist<-function(vals,world,design,doStat="r",logScale=FALSE,sigOnly=FALSE,HQ=FALSE,separate=FALSE) {
   # sampling distribution from specified populations (pRho)
   if (is.null(vals)) {
-    vals<-seq(-1,1,length=npoints)*r_range
+    vals<-seq(-1,1,length=worldNPoints)*r_range
   }
   
   # distribution of population effect sizes

@@ -1,7 +1,4 @@
 
-plotBars<-TRUE
-plotBaseline<-TRUE
-
 plotParParPrediction<-function(g,IV,DV,rho,n,offset=1){
   if (offset==1) {
     col<- BrawOpts$plotColours$descriptionC
@@ -172,7 +169,11 @@ plotCatOrdPrediction<-function(g,IV,DV,rho,n,offset= 1,within=FALSE){
 }
 
 plotParCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
-  if (offset==1) {
+
+  plotBars<-TRUE
+  plotBaseline<-TRUE
+  
+    if (offset==1) {
     col<- BrawOpts$plotColours$descriptionC1
     xoff=0
     barwidth=2/(DV$ncats+1)
@@ -477,7 +478,10 @@ plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL,theme=BrawOpts$
               g<-g+coord_cartesian(xlim = c(-1,1)*fullRange*IV$sd+IV$mu, ylim = c(-1,1)*fullRange*DV$sd+DV$mu)
             },
             "Categorical Interval"={
-              g<-g+coord_cartesian(xlim = c(0,IV$ncats+1)-1, ylim = c(-1,1)*fullRange*DV$sd+DV$mu)
+              if (allScatter)
+                g<-g+coord_cartesian(xlim = c(0,IV$ncats+1)-1, ylim = c(-1,1)*fullRange*DV$sd+DV$mu)
+              else
+                g<-g+coord_cartesian(xlim = c(0,IV$ncats+1)-1, ylim = c(-1,1)*fullRange*DV$sd/5+DV$mu)
             },
             "Interval Ordinal"={
               g<-g+coord_cartesian(xlim = c(-1,1)*fullRange*IV$sd+IV$mu, ylim = c(0,DV$nlevs+1))

@@ -1,5 +1,3 @@
-nscaleLog=FALSE
-maxnPlot=200
 
 trimanalysis<-function(analysis) {
   

@@ -389,7 +389,8 @@ plotPopulation<-function(IV,DV,effect,alpha=1,theme=BrawOpts$diagramTheme){
                 g<-g+scale_y_continuous(breaks=b1,labels=l1)+scale_x_continuous(breaks=NULL)+coord_cartesian(ylim = c(0,ncats1+1)-1,xlim=c(0,1))
               },
               "Interval"={
-                g<-g+scale_y_continuous()+scale_x_continuous(breaks=NULL)+coord_cartesian(ylim = c(-1,1)*fullRange*DV$sd+DV$mu,xlim=c(0,1))
+                g<-g+scale_y_continuous()+scale_x_continuous(breaks=NULL)
+                g<-g+coord_cartesian(ylim = c(-1,1)*fullRange*DV$sd+DV$mu,xlim=c(0,1))
               }
       )
     }

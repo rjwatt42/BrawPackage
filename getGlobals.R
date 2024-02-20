@@ -91,6 +91,13 @@ fullRange<<-3
 nNpoints<<-201
 worldNPoints<<-201
 varNPoints<<-201
+nscaleLog<<-FALSE
+maxnPlot<<-200
+
+min_p<<-0.0001
+truncate_p<<-FALSE
+min_nw<<-10
+max_nw<<-10000
 
 allScatter<<-TRUE
 showMedians<<-FALSE
