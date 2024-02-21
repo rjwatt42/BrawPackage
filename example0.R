@@ -41,19 +41,113 @@ showHypothesis(hypothesis)
 #
 
 hypothesis<-makeHypothesis(IV=makeVariable("IV","Categorical",ncats=2),IV2=makeVariable("IV2","Categorical",ncats=2),DV=makeVariable("DV","Interval"),
-                           effect=makeEffect(-0.03,0.3,0,0))
+                           effect=makeEffect(-0.2,0.,0,0.3))
 
 showPrediction(hypothesis)
 
 #######################
 #
 
+allScatter<<-FALSE
 hypothesis<-makeHypothesis(IV=getVariable("Smoker?"),
                            IV2=getVariable("Diligence"),
                            DV=getVariable("IQ"),
-                           effect=makeEffect(-0.03,0.3,0,0))
+                           effect=makeEffect(-0.3,0.3,0,0.3))
+showPrediction(hypothesis)
 
+# sample<-makeSample(hypothesis,design)
+# analysis<-makeAnalysis(sample=sample)
+# showDescription(analysis)
+
+#######################
+#
+
+allScatter<<-FALSE
+hypothesis<-makeHypothesis(IV=getVariable("Smoker?"),
+                           IV2=getVariable("Diligence"),
+                           DV=getVariable("IQ"),
+                           effect=makeEffect(0,0.3,0.4,0))
+showHypothesis(hypothesis)
+
+
+#######################
+#
+hypothesis<-makeHypothesis(effect=makeEffect(-0.4))
+showPopulation(hypothesis)
+
+#######################
+#
+hypothesis<-makeHypothesis(IV=makeVariable("IV","Categorical"),
+                           DV=makeVariable("DV","Interval"),
+                           effect=makeEffect(0.4))
+showPrediction(hypothesis)
+
+hypothesis<-makeHypothesis(IV=makeVariable("IV","Interval"),
+                           DV=makeVariable("DV","Interval"),
+                           effect=makeEffect(0.4))
+showPrediction(hypothesis)
+
+hypothesis<-makeHypothesis(IV=makeVariable("IV","Categorical",ncats=3),
+                           DV=makeVariable("DV","Categorical"),
+                           effect=makeEffect(0.4))
+showPrediction(hypothesis)
+
+hypothesis<-makeHypothesis(IV=makeVariable("IV","Interval"),
+                           DV=makeVariable("DV","Categorical"),
+                           effect=makeEffect(0.4))
+showPrediction(hypothesis)
+
+#######################
+#
+
+hypothesis<-makeHypothesis(IV=makeVariable("IV","Interval"),
+                           DV=makeVariable("DV","Interval"),
+                           effect=makeEffect(0.4))
+
+sample<-makeSample(hypothesis,makeDesign(sN=42))
+analysis<-makeAnalysis(sample=sample)
+
+showDescription(analysis)
+
+print(analysis$pIV)
+
+#######################
+#
+
+hypothesis<-makeHypothesis(IV=makeVariable("IV","Categorical"),
+                           DV=makeVariable("DV","Interval"),
+                           effect=makeEffect(0))
+
+sample<-makeSample(hypothesis,makeDesign(sN=42))
+
+showSample(sample)
+
+#######################
+#
+
+hypothesis<-makeHypothesis(IV=makeVariable("IV","Interval"),
+                           DV=makeVariable("DV","Interval",skew=0),
+                           effect=makeEffect(0.2,Heteroscedasticity = 0))
+design<-makeDesign(sN=120,sOutliers = 0)
 sample<-makeSample(hypothesis,design)
 analysis<-makeAnalysis(sample=sample)
+
 showDescription(analysis)
+
+print(analysis$pIV)
+
+#######################
+#
+
+hypothesis<-makeHypothesis(IV=makeVariable("Week","Categorical",ncats=5,cases=1:5),
+                           IV2=makeVariable("UptoDate?","Categorical",cases=c("No","Yes")),
+                           DV=makeVariable("examStress","Interval",skew=0),
+                           effect=makeEffect(-0.2,0,0,-0.2))
+design<-makeDesign(sN=400,sOutliers = 0)
+sample<-makeSample(hypothesis,design)
+analysis<-makeAnalysis(sample=sample)
+
+showDescription(analysis)
+
+print(analysis$pIV)
 

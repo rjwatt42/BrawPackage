@@ -220,7 +220,7 @@ plotCatInterDescription<-function(analysis,g=NULL){
   
   Ivals<-analysis$iv
   Dvals<-analysis$dv
-  rho<-analysis$rIV+seq(-1,1,length.out=analysis$hypothesis$IV2$ncats)*analysis$rIVIV2DV
+  rho<-analysis$rIV+seq(-1,1,length.out=hypothesis$IV2$ncats)*analysis$rIVIV2DV
   
   if (is.null(g)) {
     g<-ggplot()
@@ -245,8 +245,8 @@ plotCatInterDescription<-function(analysis,g=NULL){
     analysis1$hypothesis$DV$mu<-mean(Dvals[use],na.rm=TRUE)
     analysis1$hypothesis$DV$sd<-sd(Dvals[use],na.rm=TRUE)
     }
-    g<-plotPoints(g,analysis1$hypothesis$IV,analysis1$hypothesis$DV,analysis1,i+1,analysis$hypothesis$IV2$ncats)
-    g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,2+(i-1)/(IV2$ncats-1),g,theme=BrawOpts$plotTheme)
+    g<-plotPoints(g,analysis1$hypothesis$IV,analysis1$hypothesis$DV,analysis1,i+1,hypothesis$IV2$ncats)
+    g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,2+(i-1)/(hypothesis$IV2$ncats-1),g,theme=BrawOpts$plotTheme)
   }
   
   # g<-g+scale_fill_manual(name=analysis$hypothesis$IV2$name,values=plotDescriptionCols)
@@ -334,6 +334,8 @@ showDescription<-function(analysis=makeAnalysis()) {
             "Ordinal"=g<-plotParInterDescription(analysis,g),
             "Categorical"=g<-plotCatInterDescription(analysis,g)
     )
+    print(analysis$hypothesis$IV2$cases)
+    g<-g+scale_fill_manual(name=analysis$hypothesis$IV2$name,values=plotDescriptionCols,labels=analysis$hypothesis$IV2$cases)
   }
   g
 }

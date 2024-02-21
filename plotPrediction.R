@@ -39,6 +39,7 @@ plotCatParPrediction<-function(g,IV,DV,rho,n,offset=1, within=FALSE){
   if (offset==1) {
     col<- BrawOpts$plotColours$descriptionC
     xoff=0
+    colindex<-1
   } else {
     colindex=offset
     maxoff<-IV$ncats
@@ -218,7 +219,7 @@ plotParCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
       geom_line(data=pts2,aes(x=x,y=y),colour=col,lwd=2)
   }
   
-  if (plotBars) {
+  if (1==2) {
     if (length(IV$vals)>0)  {
       bin_breaks<-c(-Inf,seq(-1,1,length.out=varNPoints-1)*fullRange*sd(IV$vals)+mean(IV$vals),Inf)
       dens2<-hist(IV$vals,breaks=bin_breaks,freq=TRUE,plot=FALSE,warn.unused = FALSE)
@@ -347,7 +348,6 @@ plotCatCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
 
 
 plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL,theme=BrawOpts$diagramTheme){
-  
   n<-design$sN
   hypothesisType=paste(IV$type,DV$type,sep=" ")
   if (is.null(g))  {
@@ -456,6 +456,21 @@ plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL,theme=BrawOpts$
     )
     rho[is.na(rho)] <- 0
     
+    cols<-c()
+    if (IV2$type=="Categorical") {
+      for (i in 1:IV2$ncats){
+        off<-(i-1)/(IV2$ncats-1)
+        col<- col2rgb(BrawOpts$plotColours$descriptionC1)*(1-off)+col2rgb(BrawOpts$plotColours$descriptionC2)*off
+        cols<- c(cols,rgb(col[1]/255,col[2]/255,col[3]/255))
+      }
+      names(cols)<-IV2$cases
+    } else {
+      cols<-c( BrawOpts$plotColours$descriptionC1, BrawOpts$plotColours$descriptionC2)
+      names(cols)<-c(paste(IV2$name,"<median",sep=""), paste(IV2$name,">median",sep=""))
+    }
+    cols<-as.list(cols)
+    plotDescriptionCols <<- cols
+    
     for (i in 1:length(rho)) {
       offset=2+(i-1)/(length(rho)-1)
       DV1<-DV
@@ -467,24 +482,18 @@ plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL,theme=BrawOpts$
               },
               "Categorical Interval"={
                 g<-plotCatParPrediction(g,IV,DV1,rho[i],n,offset,design$sIV1Use=="Within")
-                if (i==length(rho)) {
-                  g<-g+scale_fill_manual(name=analysis$hypothesis$IV2$name,values=plotDescriptionCols)
-                  # g<-g+coord_cartesian(xlim = c(0,IV$ncats+1)-1)
-                }
               },
               "Interval Categorical"={
                 g<-plotParCatPrediction(g,IV,DV1,rho[i],n,offset)
               },
               "Categorical Categorical"={
                 g<-plotCatCatPrediction(g,IV,DV1,rho[i],n,offset)
-                # if (i==1)
-                #   g<-g+coord_cartesian(xlim = c(0,IV$ncats+1)-1)
               }
       )
     }
   }
   
-  if (offset<=2){
+  if (is.element(offset,c(1,3))){
     switch (hypothesisType,
             "Interval Interval"={
               g<-g+coord_cartesian(xlim = c(-1,1)*fullRange*IV$sd+IV$mu, ylim = c(-1,1)*fullRange*DV$sd+DV$mu)
@@ -496,7 +505,7 @@ plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL,theme=BrawOpts$
               if (allScatter)
                 g<-g+coord_cartesian(xlim = c(0,IV$ncats+1)-1, ylim = c(-1,1)*fullRange*DV$sd+DV$mu)
               else
-                g<-g+coord_cartesian(xlim = c(0,IV$ncats+1)-1, ylim = c(-1,1)*fullRange*DV$sd/5+DV$mu)
+                g<-g+coord_cartesian(xlim = c(0,IV$ncats+1)-1, ylim = c(-1,1)*fullRange*DV$sd/4+DV$mu)
             },
             "Interval Ordinal"={
               g<-g+coord_cartesian(xlim = c(-1,1)*fullRange*IV$sd+IV$mu, ylim = c(0,DV$nlevs+1))
