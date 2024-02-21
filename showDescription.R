@@ -334,8 +334,6 @@ showDescription<-function(analysis=makeAnalysis()) {
             "Ordinal"=g<-plotParInterDescription(analysis,g),
             "Categorical"=g<-plotCatInterDescription(analysis,g)
     )
-    print(analysis$hypothesis$IV2$cases)
-    g<-g+scale_fill_manual(name=analysis$hypothesis$IV2$name,values=plotDescriptionCols,labels=analysis$hypothesis$IV2$cases)
   }
   g
 }

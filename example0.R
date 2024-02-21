@@ -142,8 +142,8 @@ print(analysis$pIV)
 hypothesis<-makeHypothesis(IV=makeVariable("Week","Categorical",ncats=5,cases=1:5),
                            IV2=makeVariable("UptoDate?","Categorical",cases=c("No","Yes")),
                            DV=makeVariable("examStress","Interval",skew=0),
-                           effect=makeEffect(-0.2,0,0,-0.2))
-design<-makeDesign(sN=400,sOutliers = 0)
+                           effect=makeEffect(-0.2,-0.2,0,-0.2))
+design<-makeDesign(sN=4000,sOutliers = 0)
 sample<-makeSample(hypothesis,design)
 analysis<-makeAnalysis(sample=sample)
 

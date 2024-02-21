@@ -56,6 +56,7 @@ plotCatParPrediction<-function(g,IV,DV,rho,n,offset=1, within=FALSE){
   
   if (length(IV$vals)==0){
     d<-rho/sqrt(1-rho^2)/2*xv/(sd(xv)*sqrt(1-1/ncats))
+    d<-d-mean(d)
     d<-d*DV$sd+DV$mu
     se<-rep(DV$sd*sqrt(1-rho^2)/sqrt(n/ncats),ncats)
   } else{
@@ -180,7 +181,7 @@ plotCatOrdPrediction<-function(g,IV,DV,rho,n,offset= 1,within=FALSE){
 
 plotParCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
 
-  plotBars<-TRUE
+  plotBars<-FALSE
   plotBaseline<-TRUE
   
     if (offset==1) {
@@ -219,7 +220,7 @@ plotParCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
       geom_line(data=pts2,aes(x=x,y=y),colour=col,lwd=2)
   }
   
-  if (1==2) {
+  if (plotBars) {
     if (length(IV$vals)>0)  {
       bin_breaks<-c(-Inf,seq(-1,1,length.out=varNPoints-1)*fullRange*sd(IV$vals)+mean(IV$vals),Inf)
       dens2<-hist(IV$vals,breaks=bin_breaks,freq=TRUE,plot=FALSE,warn.unused = FALSE)
@@ -463,7 +464,7 @@ plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL,theme=BrawOpts$
         col<- col2rgb(BrawOpts$plotColours$descriptionC1)*(1-off)+col2rgb(BrawOpts$plotColours$descriptionC2)*off
         cols<- c(cols,rgb(col[1]/255,col[2]/255,col[3]/255))
       }
-      names(cols)<-IV2$cases
+      names(cols)<-analysis$hypothesis$IV2$cases
     } else {
       cols<-c( BrawOpts$plotColours$descriptionC1, BrawOpts$plotColours$descriptionC2)
       names(cols)<-c(paste(IV2$name,"<median",sep=""), paste(IV2$name,">median",sep=""))
@@ -475,7 +476,7 @@ plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL,theme=BrawOpts$
       offset=2+(i-1)/(length(rho)-1)
       DV1<-DV
       DV1$mu<-DV1$mu+(i-mean(1:length(rho)))/(length(rho)-1)*2*effect$rIV2*DV$sd*qnorm(0.75)
-      
+
       switch (hypothesisType,
               "Interval Interval"={
                 g<-plotParParPrediction(g,IV,DV1,rho[i],n,offset)
@@ -490,6 +491,11 @@ plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL,theme=BrawOpts$
                 g<-plotCatCatPrediction(g,IV,DV1,rho[i],n,offset)
               }
       )
+    }
+    if (IV2$type=="Categorical") {
+      g<-g+scale_fill_manual(name=IV2$name,values=plotDescriptionCols)
+    } else {
+      g<-g+scale_fill_manual(name=IV2$name,values=plotDescriptionCols)
     }
   }
   
