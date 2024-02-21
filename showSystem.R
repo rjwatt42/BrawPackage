@@ -135,7 +135,7 @@ showPopulation <- function(hypothesis=makeHypothesis()) {
 }
 
 # prediction diagram
-showPrediction <- function(hypothesis=makeHypothesis(),design=makeDesign()){
+showPrediction <- function(hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence()){
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV
@@ -176,3 +176,42 @@ showPrediction <- function(hypothesis=makeHypothesis(),design=makeDesign()){
   g
 }
 ##################################################################################    
+
+plotWorldSampling<-function(effect,design,sigOnly=FALSE) {
+  g<-ggplot()
+  
+  np<-worldNPoints
+  if (effect$world$worldAbs) np<-worldNPoints*2+1
+  
+  vals<-seq(-1,1,length=np)*r_range
+  if (RZ=="z") {
+    vals<-tanh(seq(-1,1,length=np*2)*z_range*2)
+  }
+  
+  dens<-fullRSamplingDist(vals,effect$world,design,sigOnly=sigOnly) 
+  if (effect$world$worldAbs) {
+    vals<-vals[worldNPoints+(1:worldNPoints)]
+    dens<-dens[worldNPoints+(1:worldNPoints)]
+  }
+  
+  if (RZ=="z") {
+    dens<-rdens2zdens(dens,vals)
+    vals<-atanh(vals)
+    use<-abs(vals)<=z_range
+    dens<-dens[use]
+    vals<-vals[use]
+  }
+  dens<-dens/max(dens)
+  
+  x<-c(vals[1],vals,vals[length(vals)])
+  y<-c(0,dens,0)
+  pts=data.frame(x=x,y=y)
+  g<-g+geom_polygon(data=pts,aes(x=x,y=y),fill="yellow")+scale_y_continuous(limits = c(0,1.05),labels=NULL,breaks=NULL)
+  g<-g+geom_line(data=pts,aes(x=x,y=y),color="black",lwd=0.25)
+  switch(RZ,
+         "r"={g<-g+labs(x=rsLabel,y="Frequency")+BrawOpts$diagramTheme},
+         "z"={g<-g+labs(x=zsLabel,y="Frequency")+BrawOpts$diagramTheme}
+  )
+  g+theme(plot.margin=margin(1.3,0.8,0,0.25,"cm"))
+}
+

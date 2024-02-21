@@ -34,15 +34,19 @@ plotParParPrediction<-function(g,IV,DV,rho,n,offset=1){
   
 }
 
-plotCatParPrediction<-function(g,IV,DV,rho,n,offset= 1, within=FALSE){
+plotCatParPrediction<-function(g,IV,DV,rho,n,offset=1, within=FALSE){
+  
   if (offset==1) {
     col<- BrawOpts$plotColours$descriptionC
     xoff=0
   } else {
-    off=offset-2
-    col<- col2rgb(BrawOpts$plotColours$descriptionC1)*(1-off)+col2rgb(BrawOpts$plotColours$descriptionC2)*off
-    col<- rgb(col[1]/255,col[2]/255,col[3]/255)
-    xoff=-0.25+off*0.2
+    colindex=offset
+    maxoff<-IV$ncats
+    # col <-plotDescriptionCols[[colindex-1]]
+    # col<- col2rgb(BrawOpts$plotColours$descriptionC1)*(1-off)+col2rgb(BrawOpts$plotColours$descriptionC2)*off
+    # col<- rgb(col[1]/255,col[2]/255,col[3]/255)
+    off<-(colindex-2)/(maxoff-1)-0.5
+    xoff=off*0.2
   }
   
   ncats<-IV$ncats
@@ -52,7 +56,7 @@ plotCatParPrediction<-function(g,IV,DV,rho,n,offset= 1, within=FALSE){
   if (length(IV$vals)==0){
     d<-rho/sqrt(1-rho^2)/2*xv/(sd(xv)*sqrt(1-1/ncats))
     d<-d*DV$sd+DV$mu
-    se<-rep(DV$sd^2*sqrt(1-rho^2)/sqrt(n/ncats),ncats)
+    se<-rep(DV$sd*sqrt(1-rho^2)/sqrt(n/ncats),ncats)
   } else{
     x<-IV$vals
     y<-DV$vals
@@ -60,7 +64,7 @@ plotCatParPrediction<-function(g,IV,DV,rho,n,offset= 1, within=FALSE){
     se<-array(0,ncats)
     for (i in 1:ncats){
       d[i]<-mean(y[x==IV$cases[i]])
-      se[i]<-sd(y[x==IV$cases[i]])
+      se[i]<-sd(y[x==IV$cases[i]])/sqrt(n/ncats)
     }
   }
   l<-IV$cases
@@ -77,8 +81,13 @@ plotCatParPrediction<-function(g,IV,DV,rho,n,offset= 1, within=FALSE){
     g<-g+geom_line(data=mn_pts,aes(x=xm,y=ym))
   
   g<-g+
-    geom_errorbar(data=mn_pts,aes(x=xm, ymin=ym-se, ymax=ym+se),width=0.2)+
-    geom_point(data=mn_pts,aes(x=xm,y=ym), shape=BrawOpts$plotShapes$data, colour = "black", fill = col, size = 7)
+    geom_errorbar(data=mn_pts,aes(x=xm, ymin=ym-se, ymax=ym+se),width=0.1)
+  if (colindex>1)
+  g<-g+
+    geom_point(data=mn_pts,aes(x=xm,y=ym,fill=names(plotDescriptionCols)[colindex-1]), shape=BrawOpts$plotShapes$data, colour = "black", size = 7)
+  else
+    g<-g+
+    geom_point(data=mn_pts,aes(x=xm,y=ym), shape=BrawOpts$plotShapes$data, colour = "black", fill=col, size = 7)
   
   if (offset<=2){
     g<-g+scale_x_continuous(breaks=b,labels=l)
@@ -157,7 +166,7 @@ plotCatOrdPrediction<-function(g,IV,DV,rho,n,offset= 1,within=FALSE){
     g<-g+geom_line(data=mn_pts,aes(x=xm,y=ym))
   
   g<-g+
-    geom_errorbar(data=mn_pts,aes(x=xm, ymin=ym-se, ymax=ym+se),width=0.2)+
+    geom_errorbar(data=mn_pts,aes(x=xm, ymin=ym-se, ymax=ym+se),width=0.1)+
     geom_point(data=mn_pts,aes(x=xm,y=ym), shape=BrawOpts$plotShapes$data, colour = "black", fill = col, size = 7)
   
 
@@ -457,19 +466,25 @@ plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL,theme=BrawOpts$
                 g<-plotParParPrediction(g,IV,DV1,rho[i],n,offset)
               },
               "Categorical Interval"={
-                g<-plotCatParPrediction(g,IV,DV1,rho[i],n,offset,within=TRUE)
+                g<-plotCatParPrediction(g,IV,DV1,rho[i],n,offset,design$sIV1Use=="Within")
+                if (i==length(rho)) {
+                  g<-g+scale_fill_manual(name=analysis$hypothesis$IV2$name,values=plotDescriptionCols)
+                  # g<-g+coord_cartesian(xlim = c(0,IV$ncats+1)-1)
+                }
               },
               "Interval Categorical"={
                 g<-plotParCatPrediction(g,IV,DV1,rho[i],n,offset)
               },
               "Categorical Categorical"={
                 g<-plotCatCatPrediction(g,IV,DV1,rho[i],n,offset)
+                # if (i==1)
+                #   g<-g+coord_cartesian(xlim = c(0,IV$ncats+1)-1)
               }
       )
     }
   }
   
-  if (offset<=1){
+  if (offset<=2){
     switch (hypothesisType,
             "Interval Interval"={
               g<-g+coord_cartesian(xlim = c(-1,1)*fullRange*IV$sd+IV$mu, ylim = c(-1,1)*fullRange*DV$sd+DV$mu)
@@ -519,40 +534,3 @@ plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL,theme=BrawOpts$
   
 }
 
-plotWorldSampling<-function(effect,design,sigOnly=FALSE) {
-  g<-ggplot()
-  
-  np<-worldNPoints
-  if (effect$world$worldAbs) np<-worldNPoints*2+1
-
-  vals<-seq(-1,1,length=np)*r_range
-  if (RZ=="z") {
-    vals<-tanh(seq(-1,1,length=np*2)*z_range*2)
-  }
-
-  dens<-fullRSamplingDist(vals,effect$world,design,sigOnly=sigOnly) 
-  if (effect$world$worldAbs) {
-    vals<-vals[worldNPoints+(1:worldNPoints)]
-    dens<-dens[worldNPoints+(1:worldNPoints)]
-  }
-  
-  if (RZ=="z") {
-    dens<-rdens2zdens(dens,vals)
-    vals<-atanh(vals)
-    use<-abs(vals)<=z_range
-    dens<-dens[use]
-    vals<-vals[use]
-  }
-  dens<-dens/max(dens)
-  
-  x<-c(vals[1],vals,vals[length(vals)])
-  y<-c(0,dens,0)
-  pts=data.frame(x=x,y=y)
-  g<-g+geom_polygon(data=pts,aes(x=x,y=y),fill="yellow")+scale_y_continuous(limits = c(0,1.05),labels=NULL,breaks=NULL)
-  g<-g+geom_line(data=pts,aes(x=x,y=y),color="black",lwd=0.25)
-  switch(RZ,
-         "r"={g<-g+labs(x=rsLabel,y="Frequency")+BrawOpts$diagramTheme},
-         "z"={g<-g+labs(x=zsLabel,y="Frequency")+BrawOpts$diagramTheme}
-         )
-  g+theme(plot.margin=margin(1.3,0.8,0,0.25,"cm"))
-}

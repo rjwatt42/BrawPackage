@@ -1,4 +1,4 @@
-plotPoints<-function(g,IV,DV,analysis,colindex=1,off=0){
+plotPoints<-function(g,IV,DV,analysis,colindex=1,maxoff=1){
 
   if (allScatter) showRawData<-TRUE
   else showRawData<-FALSE
@@ -11,7 +11,8 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,off=0){
           } else { 
           col <-plotDescriptionCols[[colindex-1]]
           alphaPoints<-0.95
-          xoff=-0.25+off*0.2
+          off<-(colindex-2)/(maxoff-1)-0.5
+          xoff=off*0.2
           barwidth=0.5
           }
 
@@ -29,20 +30,20 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,off=0){
   
   switch (hypothesisType,
           "Interval Interval"={
-            pts<-data.frame(x=x,y=y);
-            if (colindex>=2) {
-              g<-g+geom_point(data=pts,aes(x=x,y=y,fill=names(plotDescriptionCols)[colindex-1]),shape=BrawOpts$plotShapes$data, colour = "black", alpha=alphaPoints, size =dotSize)
-            }
-            else
+            pts<-data.frame(x=x,y=y)
+            # if (colindex>=2) {
+            #   g<-g+geom_point(data=pts,aes(x=x,y=y,fill=names(plotDescriptionCols)[colindex-1]),shape=BrawOpts$plotShapes$data, colour = "black", alpha=alphaPoints, size =dotSize)
+            # }
+            # else
               g<-g+geom_point(data=pts,aes(x=x,y=y),shape=BrawOpts$plotShapes$data, colour="black", fill=col, alpha=alphaPoints, size =dotSize*shrinkDots)
           },
           
           "Ordinal Interval"={
-            pts<-data.frame(x=x,y=y);
-            if (colindex>=2) {
-              g<-g+geom_point(data=pts,aes(x=x,y=y,fill=names(plotDescriptionCols)[colindex-1]),shape=BrawOpts$plotShapes$data, colour = "black", alpha=alphaPoints, size =dotSize)
-            }
-            else
+            pts<-data.frame(x=x,y=y)
+            # if (colindex>=2) {
+            #   g<-g+geom_point(data=pts,aes(x=x,y=y,fill=names(plotDescriptionCols)[colindex-1]),shape=BrawOpts$plotShapes$data, colour = "black", alpha=alphaPoints, size =dotSize)
+            # }
+            # else
               g<-g+geom_point(data=pts,aes(x=x,y=y),shape=BrawOpts$plotShapes$data, colour="black", fill=col, alpha=alphaPoints, size =dotSize*shrinkDots)
           },
           
@@ -50,18 +51,18 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,off=0){
             pp<-CatProportions(IV)
             pts<-data.frame(IV=x+xoff,DV=y);
             if (showRawData) {
-              if (colindex>=2) 
-                g<-g+geom_point(data=pts,aes(x=IV,y=DV,fill=names(plotDescriptionCols)[colindex-1]),shape=BrawOpts$plotShapes$data, colour = "black", alpha=alphaPoints, size =dotSize)
-              else
+              # if (colindex>=2) 
+              #   g<-g+geom_point(data=pts,aes(x=IV,y=DV,fill=names(plotDescriptionCols)[colindex-1]),shape=BrawOpts$plotShapes$data, colour = "black", alpha=alphaPoints, size =dotSize)
+              # else
                 g<-g+geom_point(data=pts,aes(x=IV,y=DV),shape=BrawOpts$plotShapes$data, colour = "black", fill=col, alpha=alphaPoints, size =dotSize*shrinkDots)
             }
           },
           
           "Ordinal Ordinal"={
             pts<-data.frame(IV=x,DV=y);
-            if (colindex>=2)
-              g<-g+geom_point(data=pts,aes(x=IV,y=DV,fill=names(plotDescriptionCols)[colindex-1]),shape=BrawOpts$plotShapes$data, colour = "black", alpha=alphaPoints, size =dotSize)
-            else
+            # if (colindex>=2)
+            #   g<-g+geom_point(data=pts,aes(x=IV,y=DV,fill=names(plotDescriptionCols)[colindex-1]),shape=BrawOpts$plotShapes$data, colour = "black", alpha=alphaPoints, size =dotSize)
+            # else
               g<-g+geom_point(data=pts,aes(x=IV,y=DV),shape=BrawOpts$plotShapes$data, colour="black", fill=col, alpha=alphaPoints, size =dotSize*shrinkDots)
           },
           
@@ -76,9 +77,9 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,off=0){
           "Categorical Ordinal"={
             pts<-data.frame(IV=x,DV=y);
             if (showRawData) {
-              if (colindex>=2)
-                g<-g+geom_point(data=pts,aes(x=IV,y=DV,fill=names(plotDescriptionCols)[colindex-1]),shape=BrawOpts$plotShapes$data, colour = "black", alpha=alphaPoints, size =dotSize)
-              else
+              # if (colindex>=2)
+              #   g<-g+geom_point(data=pts,aes(x=IV,y=DV,fill=names(plotDescriptionCols)[colindex-1]),shape=BrawOpts$plotShapes$data, colour = "black", alpha=alphaPoints, size =dotSize)
+              # else
                 g<-g+geom_point(data=pts,aes(x=IV,y=DV),shape=BrawOpts$plotShapes$data, colour = "black", fill=col, alpha=alphaPoints, size =dotSize*shrinkDots)
             }
           },
@@ -244,11 +245,11 @@ plotCatInterDescription<-function(analysis,g=NULL){
     analysis1$hypothesis$DV$mu<-mean(Dvals[use],na.rm=TRUE)
     analysis1$hypothesis$DV$sd<-sd(Dvals[use],na.rm=TRUE)
     }
-    g<-plotPoints(g,analysis1$hypothesis$IV,analysis1$hypothesis$DV,analysis1,i+1,(i-1)/(analysis$hypothesis$IV2$ncats-1))
+    g<-plotPoints(g,analysis1$hypothesis$IV,analysis1$hypothesis$DV,analysis1,i+1,analysis$hypothesis$IV2$ncats)
     g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,2+(i-1)/(IV2$ncats-1),g,theme=BrawOpts$plotTheme)
   }
   
-  g<-g+scale_fill_manual(name=analysis$hypothesis$IV2$name,values=plotDescriptionCols)
+  # g<-g+scale_fill_manual(name=analysis$hypothesis$IV2$name,values=plotDescriptionCols)
   g
 }
 
@@ -265,25 +266,36 @@ plotParInterDescription<-function(analysis,g=NULL){
   if (is.null(g)) {
     g<-ggplot()
   }
-  for (i in 1:2){
-    switch (i,
-            use<-analysis$iv2<median(analysis$iv2),
-            use<-analysis$iv2>=median(analysis$iv2)
-    )
-    analysis1<-analysis
-    analysis1$iv<-analysis$iv[use]
-    analysis1$dv<-analysis$dv[use]
-    analysis1$ivplot<-analysis$ivplot[use]
-    analysis1$dvplot<-analysis$dvplot[use]
-    analysis1$rIV<-rho[i]
-    
-    analysis1$hypothesis$IV$vals<-Ivals[use]
-    analysis1$hypothesis$DV$vals<-Dvals[use]
-    analysis1$hypothesis$DV$mu<-mean(analysis$dv[use],na.rm=TRUE)
-    g<-plotPoints(g,analysis1$hypothesis$IV,analysis1$hypothesis$DV,analysis1,i+1,(i-1)/(2-1)*0.25)
-    g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,i+1,g,theme=BrawOpts$plotTheme)
-  }
-  
+  # long-winded but ensures that means are above the raw data
+            use1<-analysis$iv2<median(analysis$iv2)
+        analysis1<-analysis
+        analysis1$iv<-analysis$iv[use1]
+        analysis1$dv<-analysis$dv[use1]
+        analysis1$ivplot<-analysis$ivplot[use1]
+        analysis1$dvplot<-analysis$dvplot[use1]
+        analysis1$rIV<-rho[1]
+        
+        analysis1$hypothesis$IV$vals<-Ivals[use1]
+        analysis1$hypothesis$DV$vals<-Dvals[use1]
+        analysis1$hypothesis$DV$mu<-mean(analysis$dv[use1],na.rm=TRUE)
+        
+            use2<-analysis$iv2>=median(analysis$iv2)
+        analysis2<-analysis
+        analysis2$iv<-analysis$iv[use2]
+        analysis2$dv<-analysis$dv[use2]
+        analysis2$ivplot<-analysis$ivplot[use2]
+        analysis2$dvplot<-analysis$dvplot[use2]
+        analysis2$rIV<-rho[2]
+        
+        analysis2$hypothesis$IV$vals<-Ivals[use2]
+        analysis2$hypothesis$DV$vals<-Dvals[use2]
+        analysis2$hypothesis$DV$mu<-mean(analysis$dv[use2],na.rm=TRUE)
+        
+        g<-plotPoints(g,analysis1$hypothesis$IV,analysis1$hypothesis$DV,analysis1,2,2)
+        g<-plotPoints(g,analysis2$hypothesis$IV,analysis2$hypothesis$DV,analysis2,3,2)
+        g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,2,g,theme=BrawOpts$plotTheme)
+        g<-plotPrediction(analysis2$hypothesis$IV,NULL,analysis2$hypothesis$DV,analysis2,analysis$design,3,g,theme=BrawOpts$plotTheme)
+        
   g<-g+scale_fill_manual(name=analysis$hypothesis$IV2$name,values=plotDescriptionCols)
   g
 }
