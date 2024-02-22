@@ -69,12 +69,12 @@ mergeExploreResult<-function(res1,res2) {
   return(result)
 }
 
-makeExplore<-function(nsim=10,exploreType="SampleSize",hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
-                      exploreNPoints=13,exploreResult=NULL,doingNull=FALSE,
-                      autoShow=FALSE,showType="EffectSize",
+makeExplore<-function(nsim=10,exploreResult=NULL,exploreType="n",
+                      exploreNPoints=13,doingNull=FALSE,
                       min_n=10,max_n=250,max_r=0.9,max_anom=1,
-                      xlog=FALSE,xabs=FALSE,
-                      mx_log=FALSE
+                      xlog=FALSE,xabs=FALSE,mx_log=FALSE,
+                      hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
+                      autoShow=FALSE,showType="r"
 ) {
   explore<-list(exploreType=exploreType,
                 exploreNPoints=exploreNPoints,
@@ -102,7 +102,7 @@ makeExplore<-function(nsim=10,exploreType="SampleSize",hypothesis=makeHypothesis
 }
 
 runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
-                       autoShow=FALSE,showType="EffectSize"){
+                       autoShow=FALSE,showType="r"){
   
   explore<-exploreResult$explore
   hypothesis<-explore$hypothesis
@@ -147,7 +147,7 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
           "DVprop"={vals<-seq(0.2,1,length.out=npoints)},
           "DVskew"={vals<-vals},
           "DVkurtosis"={vals<-seq(0,log10(kurtRange),length.out=npoints)},
-          "EffectSize"={
+          "r"={
             vals<-vals*max_es
             if (RZ=="z") vals<-tanh(vals)
           },
@@ -180,7 +180,7 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
           "k"={vals<-10^seq(-1,-0.1,length.out=npoints)},
           "pNull"={vals<-seq(0,1,length.out=npoints)},
           
-          "SampleSize"={
+          "n"={
             if (xlog){
               vals<-round(10^seq(log10(min_n),log10(max_n),length.out=npoints))
             }else{
@@ -495,7 +495,7 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
                   DV$type<-"Interval"
                   DV$kurtosis<-10^vals[vi]
                 },
-                "EffectSize"={effect$rIV<-vals[vi]},
+                "r"={effect$rIV<-vals[vi]},
                 "EffectSize1"={effect$rIV<-vals[vi]},
                 "EffectSize2"={effect$rIV2<-vals[vi]},
                 "Covariation"={effect$rIVIV2<-vals[vi]},
@@ -517,7 +517,7 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
                 
                 "Heteroscedasticity"={effect$Heteroscedasticity<-vals[vi]},
                 "Transform"={evidence$Transform<-vals[vi]},
-                "SampleSize"={design$sN<-round(vals[vi])},
+                "n"={design$sN<-round(vals[vi])},
                 "Method"={design$sMethod<-vals[vi]},
                 "Usage"={ switch(vals[vi],
                                  "Between"={

@@ -1,6 +1,6 @@
 
 
-showExpected<-function(expectedResult=makeExpected(100),showType="Basic",
+showExpected<-function(expectedResult=makeExpected(),showType="Basic",
                        dimension="1D",orientation="vert",
                        effectType="direct",showTheory=FALSE
 ) {

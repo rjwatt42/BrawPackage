@@ -2,7 +2,8 @@
 # update basic functions
 #
 
-makeWorld<-function(worldOn=FALSE,populationPDF="Single",populationPDFk=0.2,populationRZ="r",populationNullp=0,worldAbs=FALSE) {
+makeWorld<-function(worldOn=FALSE,populationPDF="Single",populationRZ="r",
+                    populationPDFk=0.2,populationNullp=0,worldAbs=FALSE) {
  world<-list(worldOn=worldOn,populationPDF=populationPDF,populationPDFk=populationPDFk,populationRZ=populationRZ,populationNullp=populationNullp,worldAbs=worldAbs)
  world  
 }
@@ -71,14 +72,14 @@ makeDesign<-function(sN=42, sMethod="Random" ,sNRand=FALSE,sNRandK=2,
     design
 }
 
-makeEvidence<-function(rInteractionOn=TRUE,rInteractionOnly=TRUE,ssqType="Type3",dataType="Raw",analysisType="Anova",
-                       caseOrder="Alphabetic",shortHand=FALSE,sigOnly=FALSE,
+makeEvidence<-function(shortHand=FALSE,sigOnly=FALSE,
+                       rInteractionOn=TRUE,rInteractionOnly=TRUE,ssqType="Type3",dataType="Raw",analysisType="Anova",
+                       caseOrder="Alphabetic",
                        llr=list(e1=c(),e2=0),
                        Welch=FALSE,Transform="None",
                        usePrior="world",
-                       prior=list(worldOn=FALSE,populationPDF="Uniform",
-                                  populationPDFk=0,populationRZ="r",
-                                  populationNullp=0)){
+                       prior=makeWorld(TRUE,"Uniform","r")
+                       ){
   
   evidence<-list(rInteractionOn=rInteractionOn,rInteractionOnly=rInteractionOnly,ssqType=ssqType,
                  caseOrder=caseOrder,shortHand=shortHand,sigOnly=sigOnly,

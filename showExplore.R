@@ -36,7 +36,7 @@ trimExploreResult<-function(result) {
   return(result)
 }
 
-showExplore<-function(exploreResult,showType="EffectSize",ylog=FALSE,
+showExplore<-function(exploreResult,showType="r",ylog=FALSE,
                       whichEffect="All",effectType="All"){
   all_cols<-c()
   no_se_multiple<-TRUE
@@ -67,7 +67,7 @@ showExplore<-function(exploreResult,showType="EffectSize",ylog=FALSE,
   secondY<-NULL
   ylim<-c()
   switch (showType,
-          "EffectSize"={
+          "r"={
             ylim<-c(-1,1)
             ylabel<-bquote(bold(r['s']))
             if (RZ=="z") {
@@ -75,15 +75,7 @@ showExplore<-function(exploreResult,showType="EffectSize",ylog=FALSE,
               ylabel<-bquote(bold(z['s']))
             }
           },
-          "EffectSizeA"={
-            ylim<-c(-1,1)
-            ylabel<-bquote(bold(r['a']))
-            if (RZ=="z") {
-              ylim<-c(-1,1)*z_range
-              ylabel<-bquote(bold(z['a']))
-            }
-          },
-          "EffectSize1"={
+          "rA"={
             ylim<-c(-1,1)
             ylabel<-bquote(bold(r['a']))
             if (RZ=="z") {
@@ -168,7 +160,7 @@ showExplore<-function(exploreResult,showType="EffectSize",ylog=FALSE,
             ylim<-c(-10,10)
             ylabel<-bquote(bold(log['e'](lr['d'])))
           },
-          "SampleSize"={
+          "n"={
             ylim<-c(minN,maxRandN*design$sN)
             ylabel<-"n"
           },
@@ -190,10 +182,10 @@ showExplore<-function(exploreResult,showType="EffectSize",ylog=FALSE,
           }
   )
 
-  if (!is.null(hypothesis$IV2) && is.element(showType,c("EffectSize","EffectSizeA","p","w","p(sig)"))) {
+  if (!is.null(hypothesis$IV2) && is.element(showType,c("r","rA","p","w","p(sig)"))) {
     switch (showType,
-            "EffectSize"={use_cols<<-c(hsv(0.1,1,1),hsv(0.1+0.075,1,1),hsv(0.1+0.15,1,1))},
-            "EffectSizeA"={use_cols<<-c(hsv(0.1,1,1),hsv(0.1+0.075,1,1),hsv(0.1+0.15,1,1))},
+            "r"={use_cols<<-c(hsv(0.1,1,1),hsv(0.1+0.075,1,1),hsv(0.1+0.15,1,1))},
+            "rA"={use_cols<<-c(hsv(0.1,1,1),hsv(0.1+0.075,1,1),hsv(0.1+0.15,1,1))},
             "p"=         {use_cols<-c(hsv(0,1,1),hsv(0+0.075,1,1),hsv(0+0.15,1,1))},
             "w"=         {use_cols<-c(hsv(0.65,1,1),hsv(0.65+0.075,1,1),hsv(0.65+0.15,1,1))},
             "p(sig)"=    {use_cols<-c("#FFFFFF","#DDDDDD","#AAAAAA")},
@@ -273,7 +265,7 @@ showExplore<-function(exploreResult,showType="EffectSize",ylog=FALSE,
     df1Vals<-result$df1
     
     switch (showType,
-            "EffectSize"={
+            "r"={
               showVals<-rVals
               if (RZ=="z") {showVals<-atanh(rVals)}
               if (is.null(hypothesis$IV2)){
@@ -300,7 +292,7 @@ showExplore<-function(exploreResult,showType="EffectSize",ylog=FALSE,
                 colFill<-names(all_cols[effectType])
               }
             },
-            "EffectSizeA"={
+            "rA"={
               showVals<-raVals
               if (RZ=="z") {showVals<-atanh(raVals)}
               if (is.null(hypothesis$IV2)){
@@ -357,7 +349,7 @@ showExplore<-function(exploreResult,showType="EffectSize",ylog=FALSE,
                 colFill<-names(all_cols[effectType])
               }
             },
-            "SampleSize"={
+            "n"={
               showVals<-result$nval
               lines<-c(design$sN)
               if (is.null(hypothesis$IV2)){
@@ -638,7 +630,7 @@ showExplore<-function(exploreResult,showType="EffectSize",ylog=FALSE,
     xscale<-FALSE
     xmargin<-1
     
-    if (explore$exploreType=="EffectSize") {
+    if (explore$exploreType=="r") {
       if (RZ=="z") {
         vals<-atanh(vals)
         xLabel<-zpLabel
@@ -648,7 +640,7 @@ showExplore<-function(exploreResult,showType="EffectSize",ylog=FALSE,
     }
     
     # draw the basic line and point data
-    if (is.element(showType,c("EffectSize","EffectSizeA","p","w","likelihood","SampleSize",
+    if (is.element(showType,c("r","rA","p","w","likelihood","n",
                                           "log(lrs)","log(lrd)",
                                           "k","S","pNull",
                                           "mean(DV)","sd(DV)","skew(DV)","kurtosis(DV)"))) {
@@ -680,16 +672,16 @@ showExplore<-function(exploreResult,showType="EffectSize",ylog=FALSE,
         g<-g+geom_line(data=pts1,aes(x=vals,y=y50),color="black")
       } else{
         switch(showType,
-               "EffectSize"={expType<-"r"},
-               "EffectSizeA"={expType<-"ra"},
+               "r"={expType<-"r"},
+               "rA"={expType<-"ra"},
                "p"={expType<-"p"},
                "w"={expType<-"w"},
-               "SampleSize"={expType<-"n"},
+               "n"={expType<-"n"},
                "log(lrs)"={expType<-"log(lrs)"},
                "log(lrd)"={expType<-"log(lrd)"},
                expType=NULL
                )
-        if (is.element(showType,c("EffectSize","EffectSizeA","p","w","SampleSize"))){
+        if (is.element(showType,c("r","rA","p","w","n"))){
           sigVals<-isSignificant(BrawOpts$STMethod,pVals,rVals,nVals,df1Vals,evidence,BrawOpts$alphaSig)
           col<-"white"
         } else {
@@ -1035,13 +1027,13 @@ showExplore<-function(exploreResult,showType="EffectSize",ylog=FALSE,
     }
     
     # effect size vs effect size line
-    if (is.element(showType,c("EffectSize","Interaction")) && is.element(explore$exploreType,c("EffectSize","EffectSize1","EffectSize2","Interaction"))){
+    if (is.element(showType,c("r","Interaction")) && is.element(explore$exploreType,c("r","EffectSize1","EffectSize2","Interaction"))){
       pts3<-data.frame(x=c(-1,1),y=c(-1,1))
       g<-g+geom_line(data=pts3,aes(x=x,y=y),colour="yellow", linetype="dotted")
     }
     
     # find n80
-    if (showType=="p(sig)" && explore$exploreType=="SampleSize" && effect$world$populationPDF=="Single"){
+    if (showType=="p(sig)" && explore$exploreType=="n" && effect$world$populationPDF=="Single"){
       w<-y50
       n<-exploreResult$vals
       minrw<-function(r,w,n){sum(abs(w-rn2w(r,n)),na.rm=TRUE)}
@@ -1069,7 +1061,7 @@ showExplore<-function(exploreResult,showType="EffectSize",ylog=FALSE,
     }
     
     # find r80
-    if (showType=="p(sig)" && explore$exploreType=="EffectSize"){
+    if (showType=="p(sig)" && explore$exploreType=="r"){
       w<-y50
       r<-exploreResult$vals
       minrw<-function(r,w,n){sum(abs(w-rn2w(r,n)),na.rm=TRUE)}
@@ -1134,7 +1126,7 @@ showExplore<-function(exploreResult,showType="EffectSize",ylog=FALSE,
     xscale<-TRUE
   } 
   
-  if ((is.element(explore$exploreType,c("SampleSize","Repeats","CheatingAmount")) &&
+  if ((is.element(explore$exploreType,c("n","Repeats","CheatingAmount")) &&
                  explore$xlog) 
       || ((explore$exploreType=="Alpha") && explore$xlog)
       || ((explore$exploreType=="NoStudies") && explore$mx_log)) {
@@ -1170,7 +1162,7 @@ showExplore<-function(exploreResult,showType="EffectSize",ylog=FALSE,
 
   g<-g+ylab(ylabel)
   switch (explore$exploreType,
-          "EffectSize"={g<-g+xlab(xLabel)},
+          "r"={g<-g+xlab(xLabel)},
           "EffectSize1"={g<-g+xlab(bquote(MainEffect1:r[p]))},
           "EffectSize2"={g<-g+xlab(bquote(MainEffect2:r[p]))},
           "Covariation"={g<-g+xlab(bquote(covariation:r[p]))},

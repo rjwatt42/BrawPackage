@@ -26,18 +26,18 @@ expectedResult3<-makeExpected(nsim=1000,hypothesis=hypothesis2,design=design2,
 ###########################################
 #
 
-exploreResult1<-makeExplore(1000,exploreType="SampleSize",hypothesis = hypothesis1,
+exploreResult1<-makeExplore(1000,exploreType="n",hypothesis = hypothesis1,
                             autoShow = TRUE, showType="p(sig)")
 
-exploreResult2<-makeExplore(1000,exploreType="SampleSize",hypothesis = hypothesis1,doingNull=TRUE,
+exploreResult2<-makeExplore(1000,exploreType="n",hypothesis = hypothesis1,doingNull=TRUE,
                             autoShow = TRUE, showType="NHSTErrors")
 
-exploreResult4<-makeExplore(1000,exploreType="SampleSize",hypothesis2,design2,evidence2,
+exploreResult4<-makeExplore(1000,exploreType="n",hypothesis2,design2,evidence2,
                            autoShow = TRUE, showType = "p(sig)")
 
-exploreResult5<-makeExplore(1000,exploreType="SampleSize",hypothesis2,design2,doingNull=TRUE,
+exploreResult5<-makeExplore(1000,exploreType="n",hypothesis2,design2,doingNull=TRUE,
                            autoShow = TRUE, showType="NHSTErrors")
 
-exploreResult6<-makeExplore(1000,exploreType="SampleSize",hypothesis2,design2,doingNull=TRUE,
+exploreResult6<-makeExplore(1000,exploreType="n",hypothesis2,design2,doingNull=TRUE,
                            min_n=10,max_n=1000,xlog=TRUE,
                            autoShow = TRUE, showType="NHSTErrors")

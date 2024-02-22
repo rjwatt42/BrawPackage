@@ -1,30 +1,128 @@
 source("StartUp.R")
 
-makeVariable(name,type,...)
-getVariable(name,...)
+########################################
+# make structures
 
-makeEffect(rIV,rIV2,rIVIV2,rIVIV2DV,...)
+makeVariable(name,type="Interval",
+                  mu=0,sd=1,skew=0,kurtosis=3,
+                  nlevs=7,iqr=3,median=NULL,discrete="discrete",ordProportions=NA,
+                  ncats=2,cases="C1,C2",proportions="1,1",source="discrete",
+                  deploy="Between",targetDeploys="",process="sim"
+                  )
 
-makeHypothesis(IV,IV2,DV,effect)
-getHypothesis(name,...)
+makeEffect(rIV=0.3,rIV2=0,rIVIV2=0,rIVIV2DV=0,Heteroscedasticity=0,
+                     ResidDistr="normal",world=NA
+                     )
 
-makeDesign(n,method,...)
-getDesign(name,...)
+makeHypothesis(IV=makeVariable("IV"),IV2=NULL,DV=makeVariable("DV"),effect=makeEffect())
 
-makeEvidence()
+makeDesign(sN=42, sMethod="Random" ,sNRand=FALSE,sNRandK=2, 
+                     sIV1Use="Between",sIV2Use="Between", 
+                     sWithinCor=0.5,
+                     sRangeOn=FALSE, sIVRange=c(-3,3), sDVRange=c(-3,3), 
+                     sDependence=0, sOutliers=0, sClustering=0,
+                     sCheating="None",sCheatingLimit="Budget",
+                     sCheatingAmount=5,sCheatingBudget=1000,
+                     sBudgetOn=FALSE,sNBudget=1000,
+                     sReplication=makeReplication(),
+                     sN_Strata=5, sR_Strata=2,
+                     sNClu_Cluster=5,     sRClu_Cluster=0.7,
+                     sNClu_Convenience=1, sRClu_Convenience=0.7, 
+                     sNCont_Convenience=5, sRCont_Convenience=0.7, 
+                     sRSpread_Convenience=0.5,
+                     sNClu_Snowball=2,   sRClu_Snowball=0.7,   sNCont_Snowball=2,
+                     sRCont_Snowball=0.7,    sRSpread_Snowball=0.1
+                     )
 
-makeSample(hypothesis,design)
-makeAnalysis(evidence,sample)
+makeEvidence(shortHand=FALSE,sigOnly=FALSE,
+                       rInteractionOn=TRUE,rInteractionOnly=TRUE,ssqType="Type3",
+                       dataType="Raw",analysisType="Anova",
+                       caseOrder="Alphabetic",
+                       llr=list(e1=c(),e2=0),
+                       Welch=FALSE,Transform="None",
+                       usePrior="world",
+                       prior=makeWorld(TRUE,"Uniform","r"))
 
-showSample(sample)
-reportSample(sample)
+makeWorld<-function(worldOn=FALSE,populationPDF="Single",populationRZ="r",
+                    populationPDFk=0.2,populationNullp=0,worldAbs=FALSE
+                    )
+
+########################################
+# convenience ways to make common structures
+
+variable<-getVariable(name)
+name:  "Psych","Treatment","Treatment?","IQ","Diligence","Perfectionism",
+       "Happiness","Grade","RiskTaking","Interesting","Coffee?","Smoker?",
+       "RiskTaker?","Musician?","StudySubject","BirthOrder"
+       
+hypothesis<-getHypothesis(name,hypothesis=makeHypothesis())
+name:  "Psych","3"
+
+design<-getDesign(name,design=makeDesign())
+name:  "Psych"
+
+########################################
+# single data 
+
+sample<-makeSample(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=FALSE)
+
+showSample(sample=makeSample())
+reportSample(sample=makeSample())
+
+analysis<-makeAnalysis(sample=makeSample(),evidence=makeEvidence(),autoShow=FALSE)
 
 showDescription(analysis)
 reportDescription(analysis)
 showInference(analysis)
 reportInference(analysis)
 
-makeExpected(nsims,hypothesis,design,evidence,...)
-showExpected(expectedResult,type,dimension,showTheory)
+########################################
+# multiple data 
 
+expectedResult<-makeExpected(nsims=100,expectedResult=NULL,
+                             hypothesis=makeHypothesis(),design=makeDesign(),
+                             evidence=makeEvidence(),
+                             doingNull=FALSE,autoShow=FALSE,showType="Basic"
+                             )
+                             
+showExpected(expectedResult=makeExpected(),showType="Basic",
+                       dimension="1D",orientation="vert",
+                       effectType="direct",showTheory=FALSE)
 
+showType:    "Basic","NHSTErrors","FDR","CILimits"
+or 1 or 2:   "r","rp","p","n","ci1","ci2","e1","e2","w","wp","nw"
+             "log(lrs)","log(lrd)"
+             "ro","po"
+dimension:   "1D","2D"
+orientation: "vert","horz"
+effectType:  "All","direct","unique","total"
+
+########################################
+# explore parameters 
+
+exploreResult<-makeExplore(nsim=10,exploreResult=NULL,
+                      exploreType="n",exploreNPoints=13,
+                      min_n=10,max_n=250,max_r=0.9,max_anom=1,
+                      xlog=FALSE,xabs=FALSE,mx_log=FALSE,
+                      hypothesis=makeHypothesis(),design=makeDesign(),
+                      evidence=makeEvidence(),
+                      doingNull=FALSE,
+                      autoShow=FALSE,showType="r"
+                    ) 
+                    
+exploreType: "IVType","IVcats","IVlevels","IVprop","IVskew","IVkurtosis"      
+             "DVType","DVcats","DVlevels","DVprop","DVskew","DVkurtosis"   
+             "r",
+             "n","Method","Usage","WithinCorr","SampleGamma"
+             "Dependence","Outliers","Heteroscedasticity",
+             "IVRange","DVRange","Cheating","CheatingAmount"={
+             "Alpha","Transform"
+
+showExplore(exploreResult,showType="r",ylog=FALSE,
+                      whichEffect="All",effectType="All")
+
+showType:    "r","z","p","w","p(sig)","n","NHSTErrors","FDR",
+              "likelihood","log(lrs)","log(lrd)"
+             
+whichEffect: "All","Mains","Main1","Main2","Interaction"
+effectType:  "All","direct","unique","total"

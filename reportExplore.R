@@ -1,4 +1,4 @@
-reportExplore<-function(exploreResult,showType="EffectSize",
+reportExplore<-function(exploreResult,showType="r",
                         whichEffect="All",effectType="All"
                         ){
   explore<-exploreResult$explore
@@ -49,11 +49,11 @@ reportExplore<-function(exploreResult,showType="EffectSize",
   df1Vals<-exploreResult$result$df1
   
   switch (showType,
-          "EffectSize"={
+          "r"={
             showVals<-rVals
             if (RZ=="z") showVals<-atanh(showVals)
           },
-          "EffectSizeA"={
+          "rA"={
             showVals<-raVals
             if (RZ=="z") showVals<-atanh(showVals)
           },
@@ -63,7 +63,7 @@ reportExplore<-function(exploreResult,showType="EffectSize",
           "w"={
             showVals<-rn2w(rVals,exploreResult$result$nval)
           },
-          "SampleSize"={
+          "n"={
             showVals<-exploreResult$result$nval
           },
           "p(sig)"={
@@ -259,7 +259,7 @@ reportExplore<-function(exploreResult,showType="EffectSize",
           
   )
 
-  if (is.element(showType,c("EffectSize","EffectSizeA","p","w","SampleSize","log(lrs)","log(lrd)","k","pNull","S"))) {
+  if (is.element(showType,c("r","rA","p","w","n","log(lrs)","log(lrd)","k","pNull","S"))) {
     y75<-c()
     y50<-c()
     y25<-c()
@@ -292,10 +292,10 @@ reportExplore<-function(exploreResult,showType="EffectSize",
   }
   
   outputText<-c(outputText," ")
-  if (explore$exploreType=="EffectSize" && RZ=="z") {
+  if (explore$exploreType=="r" && RZ=="z") {
     vals<-atanh(vals)
   }
-  if (explore$exploreType=="EffectSizeA" && RZ=="z") {
+  if (explore$exploreType=="rA" && RZ=="z") {
     vals<-atanh(vals)
   }
   for (i in 1:nc) {
@@ -317,7 +317,7 @@ reportExplore<-function(exploreResult,showType="EffectSize",
     outputText<-c(outputText,format(y75[use[i]],digits=report_precision))
   }
   
-  if (is.element(showType,c("EffectSize","EffectSizeA","p","w","SampleSize","log(lrs)","log(lrd)","k","pNull","S"))) {
+  if (is.element(showType,c("r","rA","p","w","n","log(lrs)","log(lrd)","k","pNull","S"))) {
     outputText<-c(outputText,rep(" ",nc+1))
     outputText<-c(outputText,"!jmean")
     for (i in 1:nc) {
