@@ -38,7 +38,7 @@ reportExplore<-function(exploreResult,showType="r",
               pVals<-exploreResult$result$p[[effectType]][,,1]
               extra_y_label<-paste("Main Effect 2:",effectType)
             },
-            "Interaction"={
+            "rIVIV2DV"={
               rVals<-exploreResult$result$r[[effectType]][,,3]
               pVals<-exploreResult$result$p[[effectType]][,,3]
               extra_y_label<-paste("Interaction:",effectType)
@@ -285,17 +285,14 @@ reportExplore<-function(exploreResult,showType="r",
             "NHST"={outputText<-c(outputText,"NHST")},
             "sLLR"={outputText<-c(outputText,"sLLR")},
             "dLLR"={
-              outputText<-c(outputText,paste0("dLLR",": ","prior=",exploreResult$evidence$usePrior,"(",exploreResult$evidence$prior$populationPDF,")" ))
+              outputText<-c(outputText,paste0("dLLR",": ","prior=","(",exploreResult$evidence$prior$populationPDF,")" ))
             }
             )
     outputText<-c(outputText,rep("",nc))
   }
   
   outputText<-c(outputText," ")
-  if (explore$exploreType=="r" && RZ=="z") {
-    vals<-atanh(vals)
-  }
-  if (explore$exploreType=="rA" && RZ=="z") {
+  if (explore$exploreType=="rIV" && RZ=="z") {
     vals<-atanh(vals)
   }
   for (i in 1:nc) {
@@ -351,7 +348,7 @@ reportExplore<-function(exploreResult,showType="r",
                 pVals<-exploreResult$result$p2[[effectType]]
                 extra_y_label<-paste("Main Effect 2:",effectType)
               },
-              "Interaction"={
+              "rIVIV2DV"={
                 rVals<-exploreResult$result$r3[[effectType]]
                 pVals<-exploreResult$result$p3[[effectType]]
                 extra_y_label<-paste("Interaction:",effectType)

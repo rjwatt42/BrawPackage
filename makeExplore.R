@@ -147,32 +147,24 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
           "DVprop"={vals<-seq(0.2,1,length.out=npoints)},
           "DVskew"={vals<-vals},
           "DVkurtosis"={vals<-seq(0,log10(kurtRange),length.out=npoints)},
-          "r"={
+          "rIV"={
             vals<-vals*max_es
             if (RZ=="z") vals<-tanh(vals)
           },
-          "EffectSize1"={
-            # fullES<-effect$rIV^2+effect$rIV2^2+2*effect$rIV*effect$rIV2*effect$rIVIV2+
-            b<-2*effect$rIV2*effect$rIVIV2
-            c<-effect$rIV2^2+effect$rIVIV2DV^2-max_r
-            r1<- (-b-sqrt(b^2-4*c))/2
-            r2<-(-b+sqrt(b^2-4*c))/2
-            vals<-seq(r1,r2,length.out=npoints)
-          },
-          "EffectSize2"={
+          "rIV2"={
             b<-2*effect$rIV*effect$rIVIV2
             c<-effect$rIV^2+effect$rIVIV2DV^2-max_r
             r1<- (-b-sqrt(b^2-4*c))/2
             r2<-(-b+sqrt(b^2-4*c))/2
             vals<-seq(r1,r2,length.out=npoints)
           },
-          "Covariation"={
+          "rIVIV2"={
             # fullES<-effect$rIV^2+effect$rIV2^2+2*effect$rIV*effect$rIV2*effect$rIVIV2+effect$rIVIV2DV^2
             maxCov<-abs((maxESrange-effect$rIV^2-effect$rIV2^2-effect$rIVIV2DV^2)/(2*effect$rIV*effect$rIV2))
             maxCov<-min(maxCov,max_r)
             vals<-seq(-maxCov,maxCov,length.out=npoints)
           },
-          "Interaction"={
+          "rIVIV2DV"={
             vals<-vals*max_es
           },
           
@@ -495,11 +487,10 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
                   DV$type<-"Interval"
                   DV$kurtosis<-10^vals[vi]
                 },
-                "r"={effect$rIV<-vals[vi]},
-                "EffectSize1"={effect$rIV<-vals[vi]},
-                "EffectSize2"={effect$rIV2<-vals[vi]},
-                "Covariation"={effect$rIVIV2<-vals[vi]},
-                "Interaction"={effect$rIVIV2DV<-vals[vi]},
+                "rIV"={effect$rIV<-vals[vi]},
+                "rIV2"={effect$rIV2<-vals[vi]},
+                "rIVIV2"={effect$rIVIV2<-vals[vi]},
+                "rIVIV2DV"={effect$rIVIV2DV<-vals[vi]},
                 
                 "PDF"={
                   effect$world$worldOn<-TRUE
@@ -564,7 +555,7 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
                   design$sCheating<-vals[vi]
                 },
                 "CheatingAmount"={
-                  design$sCheatingAmount<-vals[vi]
+                  design$sCheatingAttempts<-vals[vi]
                 },
                 
                 "SigOnly"={

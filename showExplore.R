@@ -234,7 +234,7 @@ showExplore<-function(exploreResult,showType="r",ylog=FALSE,
       switch (ni2,
               {whichEffect<-"Main 1"},
               {whichEffect<-"Main 2"},
-              {whichEffect<-"Interaction"})
+              {whichEffect<-"rIVIV2DV"})
       }
 
     extra_y_label<-""
@@ -253,7 +253,7 @@ showExplore<-function(exploreResult,showType="r",ylog=FALSE,
                 pVals<-result$p[[effectType]][,,2]
                 extra_y_label<-paste("Main Effect 2:",effectType)
               },
-              "Interaction"={
+              "rIVIV2DV"={
                 rVals<-result$r[[effectType]][,,3]
                 pVals<-result$p[[effectType]][,,3]
                 extra_y_label<-paste("Interaction:",effectType)
@@ -283,7 +283,7 @@ showExplore<-function(exploreResult,showType="r",ylog=FALSE,
                           lines<-c(0,effect$rIV2)
                           if (RZ=="z") {lines<-c(0,atanh(effect$rIV2))}
                         },
-                        "Interaction"={
+                        "rIVIV2DV"={
                           lines<-c(0,effect$rIVIV2DV)
                           if (RZ=="z") {lines<-c(0,atanh(effect$rIVIV2DV))}
                         }
@@ -310,7 +310,7 @@ showExplore<-function(exploreResult,showType="r",ylog=FALSE,
                           lines<-c(0,effect$rIV2)
                           if (RZ=="z") {lines<-c(0,atanh(effect$rIV2))}
                         },
-                        "Interaction"={
+                        "rIVIV2DV"={
                           lines<-c(0,effect$rIVIV2DV)
                           if (RZ=="z") {lines<-c(0,atanh(effect$rIVIV2DV))}
                         }
@@ -630,7 +630,7 @@ showExplore<-function(exploreResult,showType="r",ylog=FALSE,
     xscale<-FALSE
     xmargin<-1
     
-    if (explore$exploreType=="r") {
+    if (explore$exploreType=="rIV") {
       if (RZ=="z") {
         vals<-atanh(vals)
         xLabel<-zpLabel
@@ -1027,7 +1027,7 @@ showExplore<-function(exploreResult,showType="r",ylog=FALSE,
     }
     
     # effect size vs effect size line
-    if (is.element(showType,c("r","Interaction")) && is.element(explore$exploreType,c("r","EffectSize1","EffectSize2","Interaction"))){
+    if (is.element(showType,c("r","rIVIV2DV")) && is.element(explore$exploreType,c("rIV","rIV2","rIVIV2DV"))){
       pts3<-data.frame(x=c(-1,1),y=c(-1,1))
       g<-g+geom_line(data=pts3,aes(x=x,y=y),colour="yellow", linetype="dotted")
     }
@@ -1061,7 +1061,7 @@ showExplore<-function(exploreResult,showType="r",ylog=FALSE,
     }
     
     # find r80
-    if (showType=="p(sig)" && explore$exploreType=="r"){
+    if (showType=="p(sig)" && explore$exploreType=="rIV"){
       w<-y50
       r<-exploreResult$vals
       minrw<-function(r,w,n){sum(abs(w-rn2w(r,n)),na.rm=TRUE)}
@@ -1094,7 +1094,7 @@ showExplore<-function(exploreResult,showType="r",ylog=FALSE,
       switch (ni2,
               {explore$whichEffect<-"Main 1"},
               {explore$whichEffect<-"Main 2"},
-              {explore$whichEffect<-"Interaction"}
+              {explore$whichEffect<-"rIVIV2DV"}
               )
       if (is.character(exploreResult$vals[1])) {
         valsOffset<-(ni2-1)*valsGap+0.5
@@ -1162,11 +1162,10 @@ showExplore<-function(exploreResult,showType="r",ylog=FALSE,
 
   g<-g+ylab(ylabel)
   switch (explore$exploreType,
-          "r"={g<-g+xlab(xLabel)},
-          "EffectSize1"={g<-g+xlab(bquote(MainEffect1:r[p]))},
-          "EffectSize2"={g<-g+xlab(bquote(MainEffect2:r[p]))},
-          "Covariation"={g<-g+xlab(bquote(covariation:r[p]))},
-          "Interaction"={g<-g+xlab(bquote(interaction:r[p]))},
+          "rIV"={g<-g+xlab(xLabel)},
+          "rIV2"={g<-g+xlab(bquote(MainEffect2:r[p]))},
+          "rIVIV2"={g<-g+xlab(bquote(covariation:r[p]))},
+          "rIVIV2DV"={g<-g+xlab(bquote(interaction:r[p]))},
           "pNull"={g<-g+xlab(Plabel)},
           "k"={g<-g+xlab(Llabel)},
           "Alpha"={g<-g+xlab(alphaChar)},

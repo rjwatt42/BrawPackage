@@ -1,11 +1,11 @@
 
-makeFormula<-function(IV,IV2,DV,evidence,analysis,an_vars){
+makeFormula<-function(IV,IV2,DV,evidence,analysis,an_vars,modelType="Raw"){
 
   assign_string = "<<"  
   when_string = "="
   times_string = "x"
   
-  switch (evidence$dataType,
+  switch (modelType,
           "Norm"={a<-analysis$normModel},
           "Raw"={a<-analysis$rawModel},
           "NormC"={a<-analysis$normModelC},
@@ -111,7 +111,7 @@ makeFormula<-function(IV,IV2,DV,evidence,analysis,an_vars){
 
 
 
-reportDescription<-function(analysis=makeAnalysis()){
+reportDescription<-function(analysis=makeAnalysis(),modelType="Raw"){
   IV<-analysis$hypothesis$IV
   IV2<-analysis$hypothesis$IV2
   DV<-analysis$hypothesis$DV
@@ -170,7 +170,7 @@ reportDescription<-function(analysis=makeAnalysis()){
     an_vars<-sub("iv2",paste(IV2$name,"|",sep=""),an_vars)
   } 
   
-  an_model<-makeFormula(IV,IV2,DV,evidence,analysis,an_vars)
+  an_model<-makeFormula(IV,IV2,DV,evidence,analysis,an_vars,modelType)
   if (nchar(an_model)>80) {
     breaks<-unlist(gregexpr("[+-]",an_model))
     use<-sum(breaks<80)

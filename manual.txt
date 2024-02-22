@@ -9,21 +9,23 @@ makeVariable(name,type="Interval",
                   ncats=2,cases="C1,C2",proportions="1,1",source="discrete",
                   deploy="Between",targetDeploys="",process="sim"
                   )
+type:     "Interval","Ordinal","Categorical"
 
 makeEffect(rIV=0.3,rIV2=0,rIVIV2=0,rIVIV2DV=0,Heteroscedasticity=0,
                      ResidDistr="normal",world=NA
                      )
+ResidDistr:   "normal","skewed","uniform","Cauchy","t(3)"
 
 makeHypothesis(IV=makeVariable("IV"),IV2=NULL,DV=makeVariable("DV"),effect=makeEffect())
 
 makeDesign(sN=42, sMethod="Random" ,sNRand=FALSE,sNRandK=2, 
+                     sBudgetOn=FALSE,sNBudget=1000,
                      sIV1Use="Between",sIV2Use="Between", 
                      sWithinCor=0.5,
                      sRangeOn=FALSE, sIVRange=c(-3,3), sDVRange=c(-3,3), 
                      sDependence=0, sOutliers=0, sClustering=0,
-                     sCheating="None",sCheatingLimit="Budget",
-                     sCheatingAmount=5,sCheatingBudget=1000,
-                     sBudgetOn=FALSE,sNBudget=1000,
+                     sCheating="None",sCheatingLimit="Fixed",
+                     sCheatingAttempts=5,sCheatingBudget=1000,
                      sReplication=makeReplication(),
                      sN_Strata=5, sR_Strata=2,
                      sNClu_Cluster=5,     sRClu_Cluster=0.7,
@@ -33,19 +35,26 @@ makeDesign(sN=42, sMethod="Random" ,sNRand=FALSE,sNRandK=2,
                      sNClu_Snowball=2,   sRClu_Snowball=0.7,   sNCont_Snowball=2,
                      sRCont_Snowball=0.7,    sRSpread_Snowball=0.1
                      )
+sMethod:         "Random","Stratified","Cluster","Convenience","Snowball"
+sIV1Use:         "Between","Within"
+sCheating:       "None","Grow","Prune","Replace","Retry","Add"
+sCheatingLimit:  "Fixed","Budget"
 
 makeEvidence(shortHand=FALSE,sigOnly=FALSE,
                        rInteractionOn=TRUE,rInteractionOnly=TRUE,ssqType="Type3",
-                       dataType="Raw",analysisType="Anova",
                        caseOrder="Alphabetic",
                        llr=list(e1=c(),e2=0),
                        Welch=FALSE,Transform="None",
-                       usePrior="world",
                        prior=makeWorld(TRUE,"Uniform","r"))
+ssqType:     "Type1","Type2","Type3"
+caseOrder:   "Alphabetic","AsFound","Frequency"
+Transform:   "None","Log","Exp"
 
 makeWorld<-function(worldOn=FALSE,populationPDF="Single",populationRZ="r",
                     populationPDFk=0.2,populationNullp=0,worldAbs=FALSE
                     )
+populationPDF:    "Single","Double","Uniform","Gauss","Exp"
+populationRZ:     "r","z"
 
 ########################################
 # convenience ways to make common structures
@@ -72,9 +81,11 @@ reportSample(sample=makeSample())
 analysis<-makeAnalysis(sample=makeSample(),evidence=makeEvidence(),autoShow=FALSE)
 
 showDescription(analysis)
-reportDescription(analysis)
+reportDescription(analysis,modelType="Raw")
 showInference(analysis)
-reportInference(analysis)
+reportInference(analysis,modelType="Raw",analysisType="Anova")
+modelType:    "Norm","Raw","NormC","RawC"
+analysisType: "Anova","Model"
 
 ########################################
 # multiple data 
@@ -112,17 +123,17 @@ exploreResult<-makeExplore(nsim=10,exploreResult=NULL,
                     
 exploreType: "IVType","IVcats","IVlevels","IVprop","IVskew","IVkurtosis"      
              "DVType","DVcats","DVlevels","DVprop","DVskew","DVkurtosis"   
-             "r",
+             "rIV","rIV2","rIVIV2","rIVIV2DV"
              "n","Method","Usage","WithinCorr","SampleGamma"
              "Dependence","Outliers","Heteroscedasticity",
-             "IVRange","DVRange","Cheating","CheatingAmount"={
+             "IVRange","DVRange","Cheating","CheatingAmount"
              "Alpha","Transform"
 
 showExplore(exploreResult,showType="r",ylog=FALSE,
                       whichEffect="All",effectType="All")
 
-showType:    "r","z","p","w","p(sig)","n","NHSTErrors","FDR",
-              "likelihood","log(lrs)","log(lrd)"
+showType:    "r","z","p","w","p(sig)","n","NHSTErrors","FDR","FDR;FMR",
+             "likelihood","log(lrs)","log(lrd)"
              
-whichEffect: "All","Mains","Main1","Main2","Interaction"
+whichEffect: "All","Mains","Main1","Main2","rIVIV2DV"
 effectType:  "All","direct","unique","total"

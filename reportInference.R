@@ -1,13 +1,13 @@
-reportInference<-function(analysis=makeAnalysis()){
+reportInference<-function(analysis=makeAnalysis(),modelType="Raw",analysisType="Anova"){
   IV<-analysis$hypothesis$IV
   IV2<-analysis$hypothesis$IV2
   DV<-analysis$hypothesis$DV
   effect<-analysis$hypothesis$effect
   evidence<-analysis$evidence
   
-  switch (evidence$analysisType,
+  switch (analysisType,
           "Anova"= {
-            switch (evidence$dataType,
+            switch (modelType,
                     "Norm"={anova<-analysis$normAnova},
                     "Raw"={anova<-analysis$rawAnova},
                     "NormC"={anova<-analysis$normAnovaC},
@@ -15,7 +15,7 @@ reportInference<-function(analysis=makeAnalysis()){
             )
           },
           "Model"= {
-            switch (evidence$dataType,
+            switch (modelType,
                     "Norm"={anova<-analysis$normModel},
                     "Raw"={anova<-analysis$rawModel},
                     "NormC"={anova<-analysis$normModelC},
@@ -31,7 +31,7 @@ reportInference<-function(analysis=makeAnalysis()){
     outputText<-rep("",nc*2)
     outputText[1]<-paste("\b",an_name,sep="")
     if (!is.null(IV2)) {
-      outputText[2]<-paste("(",evidence$analysisType,"/",evidence$dataType,")",sep="")
+      outputText[2]<-paste("(",analysisType,"/",modelType,")",sep="")
     }
     
     if (is.null(IV2)){
@@ -69,7 +69,7 @@ reportInference<-function(analysis=makeAnalysis()){
     
     outputText<-c(outputText,rep(" ",nc))
     
-    outputText<-c(outputText,paste0("\b",evidence$analysisType),sub("^","\b",colnames(anova)))
+    outputText<-c(outputText,paste0("\b",analysisType),sub("^","\b",colnames(anova)))
     total_done<-FALSE
     
     for (i in 1:nrow(anova)){
@@ -96,7 +96,7 @@ reportInference<-function(analysis=makeAnalysis()){
         if (ncol(anova)+1<nc) {outputText<-c(outputText,rep("",nc-(ncol(anova)+1)))}
       }
     }
-    if (!total_done && evidence$analysisType=="Anova") {
+    if (!total_done && analysisType=="Anova") {
     ssq<-sum(anova[,1])-anova[1,1]
     if (!is.na(ssq)) {ssq<-format(ssq,digits=report_precision)} else {ssq<-""}
     

@@ -27,27 +27,28 @@ makeHypothesis<-function(IV=makeVariable("IV"),IV2=NULL,DV=makeVariable("DV"),ef
   hypothesis<-list(IV=IV,IV2=IV2,DV=DV,effect=effect)
 }
 
-makeReplication<-function(sReplicationOn=FALSE,sReplPowerOn=TRUE,sReplPower=0.8,sReplTails=2,sReplType="Fixed",
-                          sReplSigOnly="No",sReplRepeats=1,sReplKeep="last",sReplBudget=1000,
+makeReplication<-function(sReplicationOn=FALSE,sReplRepeats=1,sReplKeep="last",
+                          sReplPowerOn=TRUE,sReplPower=0.8,sReplTails=2,
+                          sReplSigOnly="No",
+                          sReplBudgetType="Fixed",sReplBudget=1000,
                           sReplCorrection="None",
-                          sReplVarAlpha=FALSE,sReplAlpha=2) {
+                          sReplVarAlpha=FALSE,sReplAlphaChange=2) {
   
-  replication<-list(sReplicationOn=sReplicationOn,
-                    sReplPowerOn=sReplPowerOn,sReplPower=sReplPower,
+  replication<-list(sReplicationOn=sReplicationOn,sReplRepeats=sReplRepeats,sReplKeep=sReplKeep,
+                    sReplPowerOn=sReplPowerOn,sReplPower=sReplPower,sReplTails=sReplTails,
                     sReplSigOnly=sReplSigOnly,
-                    sReplType=sReplType,sReplRepeats=sReplRepeats,sReplBudget=sReplBudget,
-                    sReplCorrection=sReplCorrection,sReplTails=sReplTails,
-                    sReplKeep=sReplKeep,
-                    sReplVarAlpha=sReplVarAlpha,sReplAlpha=sReplAlpha)
+                    sReplBudgetType=sReplBudgetType,sReplBudget=sReplBudget,
+                    sReplCorrection=sReplCorrection,
+                    sReplVarAlpha=sReplVarAlpha,sReplAlphaChange=sReplAlphaChange)
 }
 
 makeDesign<-function(sN=42, sMethod="Random" ,sNRand=FALSE,sNRandK=2, 
+                     sBudgetOn=FALSE,sNBudget=1000,
                      sIV1Use="Between",sIV2Use="Between", 
                      sWithinCor=0.5,
                      sRangeOn=FALSE, sIVRange=c(-3,3), sDVRange=c(-3,3), 
                      sDependence=0, sOutliers=0, sClustering=0,
-                     sCheating="None",sCheatingLimit="Budget",sCheatingAmount=5,sCheatingBudget=1000,
-                     sBudgetOn=FALSE,sNBudget=1000,
+                     sCheating="None",sCheatingLimit="Fixed",sCheatingAttempts=5,sCheatingBudget=1000,
                      sReplication=makeReplication(),
                      sN_Strata=5, sR_Strata=2,
                      sNClu_Cluster=5,     sRClu_Cluster=0.7,
@@ -61,7 +62,7 @@ makeDesign<-function(sN=42, sMethod="Random" ,sNRand=FALSE,sNRandK=2,
                sWithinCor=sWithinCor,
                sRangeOn=sRangeOn, sIVRange=sIVRange, sDVRange=sDVRange, 
                sDependence=sDependence, sOutliers=sOutliers, sClustering=sClustering,
-               sCheating=sCheating,sCheatingLimit=sCheatingLimit,sCheatingAmount=sCheatingAmount,sCheatingBudget=sCheatingBudget,
+               sCheating=sCheating,sCheatingLimit=sCheatingLimit,sCheatingAttempts=sCheatingAttempts,sCheatingBudget=sCheatingBudget,
                sReplication=sReplication,
                sN_Strata=sN_Strata, sR_Strata=sR_Strata,
                sNClu_Cluster=sNClu_Cluster, sRClu_Cluster=sRClu_Cluster,
@@ -73,11 +74,10 @@ makeDesign<-function(sN=42, sMethod="Random" ,sNRand=FALSE,sNRandK=2,
 }
 
 makeEvidence<-function(shortHand=FALSE,sigOnly=FALSE,
-                       rInteractionOn=TRUE,rInteractionOnly=TRUE,ssqType="Type3",dataType="Raw",analysisType="Anova",
+                       rInteractionOn=TRUE,rInteractionOnly=TRUE,ssqType="Type3",
                        caseOrder="Alphabetic",
                        llr=list(e1=c(),e2=0),
                        Welch=FALSE,Transform="None",
-                       usePrior="world",
                        prior=makeWorld(TRUE,"Uniform","r")
                        ){
   
@@ -85,8 +85,7 @@ makeEvidence<-function(shortHand=FALSE,sigOnly=FALSE,
                  caseOrder=caseOrder,shortHand=shortHand,sigOnly=sigOnly,
                  llr=llr,
                  Welch=Welch,Transform=Transform,
-                 dataType=dataType,analysisType=analysisType,
-                 usePrior=usePrior,
+                 analysisType=analysisType,
                  prior=prior
   )
 
