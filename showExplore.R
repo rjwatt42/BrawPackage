@@ -1162,10 +1162,13 @@ showExplore<-function(exploreResult,showType="r",ylog=FALSE,
 
   g<-g+ylab(ylabel)
   switch (explore$exploreType,
-          "rIV"={g<-g+xlab(xLabel)},
+          "rIV"={
+            if (is.null(hypothesis$IV2))  g<-g+xlab(xLabel)
+            else g<-g+xlab(bquote(MainEffect1:r[p]))
+            },
           "rIV2"={g<-g+xlab(bquote(MainEffect2:r[p]))},
-          "rIVIV2"={g<-g+xlab(bquote(covariation:r[p]))},
-          "rIVIV2DV"={g<-g+xlab(bquote(interaction:r[p]))},
+          "rIVIV2"={g<-g+xlab(bquote(Covariation:r[p]))},
+          "rIVIV2DV"={g<-g+xlab(bquote(Interaction:r[p]))},
           "pNull"={g<-g+xlab(Plabel)},
           "k"={g<-g+xlab(Llabel)},
           "Alpha"={g<-g+xlab(alphaChar)},
