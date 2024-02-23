@@ -37,7 +37,7 @@ trimExploreResult<-function(result) {
 }
 
 #' @export
-showExplore<-function(exploreResult=makeExplore(),showType="r",ylog=FALSE,
+showExplore<-function(exploreResult=makeExplore(autoShow=TRUE),showType="r",ylog=FALSE,
                       whichEffect="All",effectType="All"){
   all_cols<-c()
   no_se_multiple<-TRUE

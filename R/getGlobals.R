@@ -5,7 +5,6 @@ braw.env<-NULL
 }
 
 BrawOpts<-function(BW=FALSE,fontScale=1) {
-  print("OK")
   braw.env <- new.env(parent = emptyenv())
   
   # genuine globals (for now)
