@@ -1,0 +1,19 @@
+Package: BrawPack
+Type: Package
+Title: BrawStats Simulator for Understanding Statistics
+Version: 1.0.0.0
+Imports:
+    ggplot2,
+    tidyr,
+    mnormt,     
+    lme4,       
+    MuMIn,    
+    readxl,  
+    writexl,  
+    car,    
+    stringr,    
+    clipr,      
+    e1071,      
+    pracma,   
+    NlcOptim  
+RoxygenNote: 7.3.1

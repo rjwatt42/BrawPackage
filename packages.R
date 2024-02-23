@@ -13,7 +13,7 @@ if(length(new.packages)>0) install.packages(new.packages,repos="http://cran.r-pr
 
 library(ggplot2)
 library(tidyr)
-library(tools)       # system
+# library(tools)       # system
 
 # library(gridExtra)   # not sure any longer
 library(mnormt)      # pmnorm for logistic
@@ -24,7 +24,6 @@ library(writexl)     # x excel
 library(car)         # Anova type 3 correct
 library(stringr)     # for str_* functions
 library(clipr)       # for clipboard functions
-# library(SuppDists)   # for Johnson distributions
 library(e1071)       # for skewness and kurtosis
 library(pracma)      # for meshgrid & fmincon
 library(NlcOptim)    # for fmincon

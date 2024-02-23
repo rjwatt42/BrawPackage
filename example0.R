@@ -48,7 +48,7 @@ showPrediction(hypothesis)
 #######################
 #
 
-allScatter<<-FALSE
+BrawOpts("set","allScatter",FALSE
 hypothesis<-makeHypothesis(IV=getVariable("Smoker?"),
                            IV2=getVariable("Diligence"),
                            DV=getVariable("IQ"),
@@ -62,7 +62,7 @@ showPrediction(hypothesis)
 #######################
 #
 
-allScatter<<-FALSE
+BrawOpts("set","allScatter",FALSE
 hypothesis<-makeHypothesis(IV=getVariable("Smoker?"),
                            IV2=getVariable("Diligence"),
                            DV=getVariable("IQ"),
