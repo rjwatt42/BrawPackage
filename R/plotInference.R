@@ -165,7 +165,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
             xlim<-c(0,1)
           },
           "nw"={
-            d1<-rw2n(analysis$rIV,0.8,analysis$design$sReplTails)
+            d1<-rw2n(analysis$rIV,0.8,analysis$design$ReplTails)
             xlim<-c(1, max(d1)*1.1)
           }
   )
@@ -261,7 +261,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
             disp2_use<-bquote(log[e](lr[d]))
           },
           "nw"={
-            d2<-rw2n(analysis$rIV,0.8,analysis$design$sReplTails)
+            d2<-rw2n(analysis$rIV,0.8,analysis$design$ReplTails)
             ylim<-c(1, max(d1)*1.1)
           }
   )

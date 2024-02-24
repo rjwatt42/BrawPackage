@@ -2,6 +2,10 @@ iqr<-function(s) {
   diff(quantile(s,c(0.25,0.75)))
 }
 
+#' report a simulated sample
+#' 
+#' @examples
+#' reportSample(sample=makeSample())
 #' @export
 reportSample<-function(sample=makeSample()){
   hypothesis<-sample$hypothesis
@@ -136,7 +140,7 @@ reportSample<-function(sample=makeSample()){
   outputText<-c(outputText,
                 "\bDesign","","","","","","",
                 "Sample Size: ",sample$nval,"","","","","",
-                "Method: ",design$sMethod,"","","","","",
+                "Method: ",design$sMethod$type,"","","","","",
                 "Usage: ",design$sIV1Use,"","","","",""
   )
   

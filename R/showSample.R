@@ -23,6 +23,10 @@ plotSample<-function(IV,DV,effect,ivplot,dvplot) {
   
 }
 
+#' show a simulated sample
+#' 
+#' @examples
+#' showSample(sample=makeSample())
 #' @export
 showSample<-function(sample=makeSample()){
   IV<-sample$hypothesis$IV

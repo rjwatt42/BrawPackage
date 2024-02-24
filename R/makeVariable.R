@@ -53,6 +53,18 @@ r2OrdProportions<-function(rho,ng) {
 }
 ############################################
 #
+#' make a variable
+#' 
+#' @param type  "Interval","Ordinal","Categorical"
+#' @returns a Variable object
+#' @seealso [showVariable(variable=makeVariable("test"))]
+#' @examples
+#' makeVariable(name,type="Interval",
+#'              mu=0,sd=1,skew=0,kurtosis=3,
+#'              nlevs=7,iqr=3,median=NULL,discrete="discrete",ordProportions=NA,
+#'              ncats=2,cases="C1,C2",proportions="1,1",source="discrete",
+#'              deploy="Between",targetDeploys="",process="sim"
+#' )
 #' @export
 makeVariable<-function(name,type="Interval",
                        mu=0,sd=1,skew=0,kurtosis=3,
@@ -118,6 +130,13 @@ makeVariable<-function(name,type="Interval",
   var
 }
 
+#' make a specific variable
+#' 
+#' @param name  "Psych","Treatment","Treatment?","IQ","Diligence","Perfectionism","Happiness","Grade","RiskTaking","Interesting","Coffee?","Smoker?","RiskTaker?","Musician?","StudySubject","BirthOrder"
+#' @returns a Variable structure
+#' @seealso [showVariable(variable=makeVariable("test"))]
+#' @examples
+#' variable<-getVariable(name)
 #' @export
 getVariable<-function(name) {
   

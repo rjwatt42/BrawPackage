@@ -181,7 +181,8 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
               vals<-round(seq(min_n,max_n,length.out=npoints))
             }
           },
-          "Method"={vals<-c("Random","Stratified","Cluster","Convenience","Snowball")},
+          "Method"={vals<-c("Random","Stratified","Cluster","Snowball","Convenience")},
+          "ClusterRad"={vals<-seq(0,1,length.out=npoints)},
           "Usage"={vals<-c("Between","Between2","Within0","Within")},
           "WithinCorr"={vals<-seq(0,0.8,length.out=npoints)},
           "SampleGamma"={vals<-seq(1,10,length.out=npoints)},
@@ -211,7 +212,7 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
           "SigOnly"={vals<-c("Yes","No")},
           "Power"={vals<-seq(0.1,0.9,length.out=npoints)},
           "Repeats" ={
-            if (design$sReplKeep=="median") vals<-seq(0,explore$Explore_nrRange,by=2)
+            if (design$ReplKeep=="median") vals<-seq(0,explore$Explore_nrRange,by=2)
             else vals<-seq(0,explore$Explore_nrRange)
           },
           
@@ -511,7 +512,8 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
                 "Heteroscedasticity"={effect$Heteroscedasticity<-vals[vi]},
                 "Transform"={evidence$Transform<-vals[vi]},
                 "n"={design$sN<-round(vals[vi])},
-                "Method"={design$sMethod<-vals[vi]},
+                "Method"={design$sMethod<-makeSampling(vals[vi])},
+                "ClusterRad"={design$sMethod$Cluster_rad<-vals[vi]},
                 "Usage"={ switch(vals[vi],
                                  "Between"={
                                    design$sIV1Use<-"Between"
@@ -560,13 +562,13 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
                 },
                 
                 "SigOnly"={
-                  design$sReplSigOnly<-vals[vi]
+                  design$ReplSigOnly<-vals[vi]
                 },
                 "Power"={
-                  design$sReplPower<-vals[vi]
+                  design$ReplPower<-vals[vi]
                 },
                 "Repeats"={
-                  design$sReplRepeats<-vals[vi]
+                  design$ReplRepeats<-vals[vi]
                 },
                 
                 "NoStudies"={

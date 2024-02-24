@@ -625,6 +625,7 @@ showExplore<-function(exploreResult=makeExplore(autoShow=TRUE),showType="r",ylog
     valsOffset<-0
     valsRange<-1
     vals<-exploreResult$vals
+    if (!doLine)  vals<-1:length(vals)
     if (vals[1]<0) valsRange<-2
     if (multi=="allEffects" || multi=="mainEffects") {
       valsOffset<-(ni2-1)*(valsRange*valsGap)

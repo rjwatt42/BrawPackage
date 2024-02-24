@@ -650,7 +650,7 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
             "n"={data$sh<-data$ns},
             "w"={data$sh<-rn2w(data$rs,data$ns)},
             "wp"={data$sh<-rn2w(data$rp,data$ns)},
-            "nw"={data$sh<-rw2n(data$rs,0.8,analysis$design$sReplTails)},
+            "nw"={data$sh<-rw2n(data$rs,0.8,analysis$design$ReplTails)},
             "ci1"={data$sh<-r2ci(data$rs,data$ns,-1)},
             "ci2"={data$sh<-r2ci(data$rs,data$ns,+1)},
             "e1"={data$sh<-data$ps},

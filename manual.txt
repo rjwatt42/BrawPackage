@@ -3,21 +3,43 @@ source("StartUp.R")
 ########################################
 # make structures
 
+make a variable object
+
+@param type  "Interval","Ordinal","Categorical"
+@returns a variable structure
+@examples
 makeVariable(name,type="Interval",
                   mu=0,sd=1,skew=0,kurtosis=3,
                   nlevs=7,iqr=3,median=NULL,discrete="discrete",ordProportions=NA,
                   ncats=2,cases="C1,C2",proportions="1,1",source="discrete",
                   deploy="Between",targetDeploys="",process="sim"
                   )
-type:     "Interval","Ordinal","Categorical"
+########################################
 
+make an effect object
+
+@param ResidDistr   "normal","skewed","uniform","Cauchy","t(3)"
+@examples
 makeEffect(rIV=0.3,rIV2=0,rIVIV2=0,rIVIV2DV=0,Heteroscedasticity=0,
                      ResidDistr="normal",world=NA
                      )
-ResidDistr:   "normal","skewed","uniform","Cauchy","t(3)"
 
+########################################
+
+make a hypothesis
+
+@examples
 makeHypothesis(IV=makeVariable("IV"),IV2=NULL,DV=makeVariable("DV"),effect=makeEffect())
 
+########################################
+
+make a design
+
+@param sMethod         "Random","Stratified","Cluster","Convenience","Snowball"
+@param sIV1Use         "Between","Within"
+@param sCheating       "None","Grow","Prune","Replace","Retry","Add"
+@param sCheatingLimit  "Fixed","Budget"
+@examples
 makeDesign(sN=42, sMethod="Random" ,sNRand=FALSE,sNRandK=2, 
                      sBudgetOn=FALSE,sNBudget=1000,
                      sIV1Use="Between",sIV2Use="Between", 
@@ -26,56 +48,83 @@ makeDesign(sN=42, sMethod="Random" ,sNRand=FALSE,sNRandK=2,
                      sDependence=0, sOutliers=0, sClustering=0,
                      sCheating="None",sCheatingLimit="Fixed",
                      sCheatingAttempts=5,sCheatingBudget=1000,
-                     sReplication=makeReplication(),
-                     sN_Strata=5, sR_Strata=2,
-                     sNClu_Cluster=5,     sRClu_Cluster=0.7,
-                     sNClu_Convenience=1, sRClu_Convenience=0.7, 
-                     sNCont_Convenience=5, sRCont_Convenience=0.7, 
-                     sRSpread_Convenience=0.5,
-                     sNClu_Snowball=2,   sRClu_Snowball=0.7,   sNCont_Snowball=2,
-                     sRCont_Snowball=0.7,    sRSpread_Snowball=0.1
+                     Replication=makeReplication(),
+                     sStrata_n=5, sStrata_rRange=2,
+                     sClust_n=5,     sClust_rad=0.7,
+                     sConven_Clust_n=1, sConven_Clust_rad=0.7, 
+                     sConven_Contact_n=5, sConven_Contact_rad=0.7, 
+                     sConven_Contact_spread=0.5,
+                     sSnowball_Clust_n=2,   sSnowball_Clust_rad=0.7,   sSnowball_Cluster_n=2,
+                     sSnowball_Member_rad=0.7,    sSnowball$Contact_rad=0.1
                      )
-sMethod:         "Random","Stratified","Cluster","Convenience","Snowball"
-sIV1Use:         "Between","Within"
-sCheating:       "None","Grow","Prune","Replace","Retry","Add"
-sCheatingLimit:  "Fixed","Budget"
 
+########################################
+
+make an evidence definition
+
+@param ssqType     "Type1","Type2","Type3"
+@param caseOrder   "Alphabetic","AsFound","Frequency"
+@param Transform   "None","Log","Exp"
+@examples
 makeEvidence(shortHand=FALSE,sigOnly=FALSE,
                        rInteractionOn=TRUE,rInteractionOnly=TRUE,ssqType="Type3",
                        caseOrder="Alphabetic",
                        llr=list(e1=c(),e2=0),
                        Welch=FALSE,Transform="None",
                        prior=makeWorld(TRUE,"Uniform","r"))
-ssqType:     "Type1","Type2","Type3"
-caseOrder:   "Alphabetic","AsFound","Frequency"
-Transform:   "None","Log","Exp"
 
+########################################
+
+make a world
+
+@param populationPDF    "Single","Double","Uniform","Gauss","Exp"
+@param populationRZ     "r","z"
+@examples
 makeWorld<-function(worldOn=FALSE,populationPDF="Single",populationRZ="r",
                     populationPDFk=0.2,populationNullp=0,worldAbs=FALSE
                     )
-populationPDF:    "Single","Double","Uniform","Gauss","Exp"
-populationRZ:     "r","z"
 
 ########################################
 # convenience ways to make common structures
 
-variable<-getVariable(name)
-name:  "Psych","Treatment","Treatment?","IQ","Diligence","Perfectionism",
-       "Happiness","Grade","RiskTaking","Interesting","Coffee?","Smoker?",
-       "RiskTaker?","Musician?","StudySubject","BirthOrder"
-       
-hypothesis<-getHypothesis(name,hypothesis=makeHypothesis())
-name:  "Psych","3"
+make a specific variable
 
+@param name  "Psych","Treatment","Treatment?","IQ","Diligence","Perfectionism","Happiness","Grade","RiskTaking","Interesting","Coffee?","Smoker?","RiskTaker?","Musician?","StudySubject","BirthOrder"
+@examples
+variable<-getVariable(name)
+       
+########################################
+
+make a specific hypothesis
+
+@param name  "Psych","3"
+@examples
+hypothesis<-getHypothesis(name,hypothesis=makeHypothesis())
+
+########################################
+
+make a specific design
+
+@param name  "Psych"
+@examples
 design<-getDesign(name,design=makeDesign())
-name:  "Psych"
 
 ########################################
 # single data 
 
+make a simulated sample
+
+@examples
 sample<-makeSample(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=FALSE)
 
+show a simulated sample
+
+@examples
 showSample(sample=makeSample())
+
+report a simulated sample
+
+@examples
 reportSample(sample=makeSample())
 
 analysis<-makeAnalysis(sample=makeSample(),evidence=makeEvidence(),autoShow=FALSE)

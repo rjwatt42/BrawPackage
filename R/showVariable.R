@@ -112,13 +112,19 @@ drawInterval<-function(var){
     coord_cartesian(xlim = xlim, ylim = c(0, 1.2))
 }
 
+#' show a specific variable
+#' 
+#' @param variable object
+#' @returns a ggplot2 object
+#' @examples
+#' variable<-showVariable(variable)
 #' @export
-showVariable<-function(var=makeVariable(),single=FALSE){
-  switch(var$type,
-         "Interval"={g<-drawInterval(var)},
-         "Ordinal"={g<-drawOrdinal(var)},
-         "Categorical"={g<-drawCategorical(var)},
-         "empty"={g<-drawVar(NULL,var)}
+showVariable<-function(variable=makeVariable(),single=FALSE){
+  switch(variable$type,
+         "Interval"={g<-drawInterval(variable)},
+         "Ordinal"={g<-drawOrdinal(variable)},
+         "Categorical"={g<-drawCategorical(variable)},
+         "empty"={g<-drawVar(NULL,variable)}
   )
   if (single)
   g+theme(plot.margin=margin(0.5,0.5,0.0,0.0,"cm"))
