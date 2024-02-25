@@ -88,7 +88,7 @@ makeHypothesis<-function(IV=makeVariable("IV"),IV2=NULL,DV=makeVariable("DV"),ef
 #' @export
 makeSampling<-function(type="Random") {
   switch (type,
-          "Random"={method=list(type="Cluster")},
+          "Random"={method=list(type="Random")},
           "Stratified"={
             method=list(type="Stratified",
                         sStrata_rRange=2,sStrata_n=5

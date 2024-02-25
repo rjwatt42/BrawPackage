@@ -703,7 +703,7 @@ showExplore<-function(exploreResult=makeExplore(autoShow=TRUE),showType="r",ylog
         for (i in 1:length(vals))
           g<-expected_plot(g,
                            data.frame(x=vals[i]+valsOffset,y1=showVals[,i],y2=sigVals[,i]),
-                           expType=expType,scale=2.25/(length(vals)+1),col=col)
+                           expType=expType,scale=0.9,col=col)
         if (ni_max2==1 || !no_se_multiple){
           g<-g+geom_errorbar(data=pts1,aes(x=vals,ymin=y25,ymax=y75,width=0.35/length(vals)))
         }

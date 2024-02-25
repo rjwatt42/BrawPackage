@@ -91,7 +91,7 @@ makeExplore<-function(nsim=10,exploreResult=NULL,exploreType="n",exploreNPoints=
                       min_n=10,max_n=250,max_r=0.9,max_anom=1,
                       xlog=FALSE,xabs=FALSE,mx_log=FALSE,
                       hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
-                      adoingNull=FALSE,utoShow=FALSE,showType="r"
+                      doingNull=FALSE,autoShow=FALSE,showType="r"
 ) {
   explore<-list(exploreType=exploreType,
                 exploreNPoints=exploreNPoints,
