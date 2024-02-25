@@ -4,6 +4,11 @@
 # population diagram
 # prediction diagram
 
+#' show a hypothesis
+#' 
+#' @return ggplot2 object - and printed
+#' @examples
+#' showHypothesis(hypothesis=makeHypothesis())
 #' @export
 showHypothesis<-function(hypothesis=makeHypothesis()) {
   IV<-hypothesis$IV
@@ -43,6 +48,11 @@ showHypothesis<-function(hypothesis=makeHypothesis()) {
   g
 }
 
+#' show a world object
+#' 
+#' @return ggplot2 object - and printed
+#' @examples
+#' showWorld(world=makeWorld())
 #' @export
 showWorld<-function(world=makeWorld()) {
 # world diagram
@@ -82,6 +92,11 @@ showWorld<-function(world=makeWorld()) {
   g
 }
 
+#' show a design object
+#' 
+#' @return ggplot2 object - and printed
+#' @examples
+#' showDesign(design=makeDesign())
 #' @export
 showDesign<-function(design=makeDesign()) {
   if (design$sNRand) {
@@ -108,6 +123,11 @@ showDesign<-function(design=makeDesign()) {
 }
 
 # population diagram
+#' show the population corresponding to a hypothesis object
+#' 
+#' @return ggplot2 object - and printed
+#' @examples
+#' showPopulation(hypothesis=makeHypothesis())
 #' @export
 showPopulation <- function(hypothesis=makeHypothesis()) {
   IV<-hypothesis$IV
@@ -139,6 +159,11 @@ showPopulation <- function(hypothesis=makeHypothesis()) {
 }
 
 # prediction diagram
+#' show the prediction corresponding to a hypothesis & design
+#' 
+#' @return ggplot2 object - and printed
+#' @examples
+#' showPrediction(hypothesis=makeHypothesis()=makeDesign(),evidence=makeEvidence())
 #' @export
 showPrediction <- function(hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence()){
   IV<-hypothesis$IV

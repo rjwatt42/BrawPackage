@@ -319,6 +319,11 @@ plotCatDescription<-function(analysis,g) {
   g
 }
 
+#' show the sample effect-size analysis of a simulated sample
+#' 
+#' @return ggplot2 object - and printed
+#' @examples
+#' showDescription(analysis=makeAnalysis())
 #' @export
 showDescription<-function(analysis=makeAnalysis()) {
 

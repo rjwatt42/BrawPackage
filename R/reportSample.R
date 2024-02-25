@@ -4,6 +4,7 @@ iqr<-function(s) {
 
 #' report a simulated sample
 #' 
+#' @return ggplot2 object - and printed
 #' @examples
 #' reportSample(sample=makeSample())
 #' @export

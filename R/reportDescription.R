@@ -110,6 +110,11 @@ makeFormula<-function(IV,IV2,DV,evidence,analysis,an_vars,modelType="Raw"){
 }
 
 
+#' report a sample effect-size analysis of a simulated sample
+#' 
+#' @return ggplot2 object - and printed
+#' @examples
+#' reportDescription(analysis=makeAnalysis())
 #' @export
 reportDescription<-function(analysis=makeAnalysis(),modelType="Raw"){
   IV<-analysis$hypothesis$IV

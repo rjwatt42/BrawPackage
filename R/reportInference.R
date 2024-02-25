@@ -1,3 +1,10 @@
+#' report population estimates from a simulated sample
+#' 
+#' @param analysisType "Model", "Anova"
+#' @param modelType "Norm", "Raw"
+#' @return ggplot2 object - and printed
+#' @examples
+#' reportInference(analysis=makeAnalysis())
 #' @export
 reportInference<-function(analysis=makeAnalysis(),modelType="Raw",analysisType="Anova"){
   IV<-analysis$hypothesis$IV

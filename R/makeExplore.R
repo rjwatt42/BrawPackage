@@ -69,13 +69,29 @@ mergeExploreResult<-function(res1,res2) {
   return(result)
 }
 
+#' make multiple samples whilst varying a parameter
+#' 
+#' @param exploreType "n","rIV","Heteroscedasticity","rIV2","rIVIV2","rIVIV2DV" \cr
+#'                     "Method","Usage","WithinCorr","ClusterRad","SampleGamma" \cr
+#'                     "Dependence","Outliers","IVRange","DVRange" \cr
+#'                     "Cheating","CheatingAmount" \cr
+#'                     "Alpha","Transform" \cr
+#'                     "Power","SigOnly","Repeats" \cr
+#' @returns exploreResult object
+#' @seealso showExplore() 
+#' @seealso reportExplore()
+#' @examples
+#' exploreResult<-makeExplore(nsims=10,exploreResult=NULL,exploreType="n",exploreNPoints=13,
+#'                              min_n=10,max_n=250,max_r=0.9,max_anom=1,
+#'                              xlog=FALSE,xabs=FALSE,mx_log=FALSE,
+#'                              hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
+#'                              doingNull=FALSE,autoShow=FALSE,showType="Basic")
 #' @export
-makeExplore<-function(nsim=10,exploreResult=NULL,exploreType="n",
-                      exploreNPoints=13,doingNull=FALSE,
+makeExplore<-function(nsim=10,exploreResult=NULL,exploreType="n",exploreNPoints=13,
                       min_n=10,max_n=250,max_r=0.9,max_anom=1,
                       xlog=FALSE,xabs=FALSE,mx_log=FALSE,
                       hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
-                      autoShow=FALSE,showType="r"
+                      adoingNull=FALSE,utoShow=FALSE,showType="r"
 ) {
   explore<-list(exploreType=exploreType,
                 exploreNPoints=exploreNPoints,
@@ -209,7 +225,7 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
             }
           },
           
-          "SigOnly"={vals<-c("Yes","No")},
+          "SigOnly"={vals<-c(FALSE,TRUE)},
           "Power"={vals<-seq(0.1,0.9,length.out=npoints)},
           "Repeats" ={
             if (design$ReplKeep=="median") vals<-seq(0,explore$Explore_nrRange,by=2)

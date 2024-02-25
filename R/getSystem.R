@@ -1,6 +1,7 @@
 #' make a specific hypothesis
 #' 
 #' @param name  "Psych","3"
+#' @returns hypothesis object
 #' @examples
 #' hypothesis<-getHypothesis(name,hypothesis=makeHypothesis())
 #' @export
@@ -25,6 +26,7 @@ getHypothesis<-function(name,hypothesis=makeHypothesis()) {
 #' make a specific design
 #' 
 #' @param name  "Psych"
+#' @returns hypothesis object
 #' @examples
 #' design<-getDesign(name,design=makeDesign())
 #' @export

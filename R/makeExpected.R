@@ -68,6 +68,13 @@ resetExpected<-function(nsims=0,expectedResult=NULL){
        nsims=nsims+count)
 }
 
+#' make multiple samples with analysis
+#' 
+#' @returns expectedResult object
+#' @examples
+#' expectedResult<-makeExpected(nsims=100,expectedResult=NULL,hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
+#'                              doingNull=FALSE,autoShow=FALSE,showType="Basic")
+#' @seealso showExpected() and reportExpected())
 #' @export
 makeExpected <- function(nsims=100,expectedResult=NULL,hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
                          doingNull=FALSE,autoShow=FALSE,showType="Basic") {

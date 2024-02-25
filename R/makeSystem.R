@@ -3,12 +3,12 @@
 #
 
 #' make a world
-#'  an object that specifies the dsitribution of effect sizes
+#'  an object that specifies the distribution of effect sizes
 #' 
 #' @param populationPDF    "Single","Double","Uniform","Gauss","Exp"
 #' @param populationRZ     "r","z"
 #' @returns a world object
-#' @seealso [showWorld(world=makeWorld())]
+#' @seealso showWorld(world=makeWorld())
 #' @examples
 #' makeWorld<-function(worldOn=FALSE,populationPDF="Single",populationRZ="r",
 #'                     populationPDFk=0.2,populationNullp=0,worldAbs=FALSE
@@ -47,7 +47,7 @@ makeEffect<-function(rIV=0.3,rIV2=0,rIVIV2=0,rIVIV2DV=0,Heteroscedasticity=0,
 #' make a hypothesis object
 #' 
 #' @returns a hypothesis object
-#' @seealso [showHypothesis()]
+#' @seealso showHypothesis()
 #' @examples
 #' makeHypothesis(IV=makeVariable("IV"),IV2=NULL,DV=makeVariable("DV"),effect=makeEffect())
 #' @export
@@ -59,21 +59,25 @@ makeHypothesis<-function(IV=makeVariable("IV"),IV2=NULL,DV=makeVariable("DV"),ef
 # Design objects
 
 #' make a sampling method object
+#' 
 #' "Random"
 #'    purely random sample from whole range
 #' "Stratified"
 #'   sampled at specific intervals
+#'   
 #' "Cluster"
 #'   a number of clusters, 
 #'   each cluster having a particular radius within the population
 #'   within each cluster a number of members
 #'   random sampling within each cluster
+#'   
 #' "Snowball"
 #'   a number of clusters,
 #'   each cluster having a particular radius within the population
 #'   within each cluster a number of members
 #'   from each cluster member a chain of contacts
 #'   each contact having a particular radius from their predecessor
+#'   
 #' "Convenience"
 #'   like Snowball but more clusters and shorter chains of contacts
 #' 
@@ -120,6 +124,9 @@ makeSampling<-function(type="Random") {
 }
 #' make a replication object
 #' 
+#' @param ReplKeep         "last", "cautious", "largeN", "smallP", "median"
+#' @param ReplBudgetType "Fixed", "Budget"
+#' @param ReplCorrection "None", "World", "Prior"
 #' @returns a replication object
 #' @examples
 #' makeReplication(ReplicationOn=FALSE,ReplRepeats=1,ReplKeep="last",
@@ -132,7 +139,7 @@ makeSampling<-function(type="Random") {
 #' @export
 makeReplication<-function(ReplicationOn=FALSE,ReplRepeats=1,ReplKeep="last",
                           ReplPowerOn=TRUE,ReplPower=0.8,ReplTails=2,
-                          ReplSigOnly="No",
+                          ReplSigOnly=FALSE,
                           ReplBudgetType="Fixed",ReplBudget=1000,
                           ReplCorrection="None",
                           ReplVarAlpha=FALSE,ReplAlphaChange=2) {

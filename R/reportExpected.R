@@ -1,6 +1,13 @@
 
+#' show the estimated population characteristics from multiple simulated sample
+#' 
+#' @param showType "Basic", "CILimits", "NHSTErrors", "FDR", "FDR:FMR" \cr
+#'        \emph{ or one or two of:} \cr
+#'                   "r","p","ci1","ci2", "rp","n" \cr 
+#'                   "w","wp","nw", ro","po"
+#' @return ggplot2 object - and printed
 #' @export
-reportExpected<-function(expectedResult=makeExpected(100),exploreType="Basic"){
+reportExpected<-function(expectedResult=makeExpected(100),showType="Basic"){
   IV<-expectedResult$hypothesis$IV
   IV2<-expectedResult$hypothesis$IV2
   DV<-expectedResult$hypothesis$DV
@@ -8,21 +15,21 @@ reportExpected<-function(expectedResult=makeExpected(100),exploreType="Basic"){
   result<-expectedResult$result
   nullresult<-expectedResult$nullresult
   
-  if (length(exploreType)==1) {
-    switch(exploreType,
+  if (length(showType)==1) {
+    switch(showType,
            "Basic"=     {pars<-c("r","p")},
            "CILimits"=  {pars<-c("ci1","ci2")},
            "NHSTErrors"={pars<-c("e2","e1")},
            "FDR"=       {pars<-c("e1","e2")},
-           {pars<-c(exploreType,NA)}
+           {pars<-c(showType,NA)}
     )
-  } else pars<-exploreType
+  } else pars<-showType
   
   if (is.null(IV2) | is.null(result$rIVIV2DV)){nc=3}
   else{
     if (is.na(result$rIVIV2DV[1])) {nc=6} else {nc=9}
   }
-  if (exploreType=="NHSTErrors" || exploreType=="FDR"){nc=4}
+  if (showType=="NHSTErrors" || showType=="FDR"){nc=4}
   
   # header
   if (sum(!is.na(nullresult$rIV))>0) {
@@ -63,9 +70,9 @@ reportExpected<-function(expectedResult=makeExpected(100),exploreType="Basic"){
   }
 
   # column labels
-  if (exploreType=="NHSTErrors") {outputText1<-c("!j\bErrors:","\bI","\bII"," ")}
+  if (showType=="NHSTErrors") {outputText1<-c("!j\bErrors:","\bI","\bII"," ")}
   else {
-    if (exploreType=="CILimits") {outputText1<-c("   ","lower","upper")}
+    if (showType=="CILimits") {outputText1<-c("   ","lower","upper")}
     else {
       outputText1<-
       par1<-pars[1]
@@ -91,7 +98,7 @@ reportExpected<-function(expectedResult=makeExpected(100),exploreType="Basic"){
   }
   outputText<-c(outputText,rep(outputText1,nc/3))
 
-  if (exploreType=="NHSTErrors"){
+  if (showType=="NHSTErrors"){
     nullSig<-isSignificant(braw.env$STMethod,nullresult$pIV,nullresult$rIV,nullresult$nval,nullresult$df1,nullresult$evidence)
     resSig<-isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,result$evidence)
     if (braw.env$STMethod=="dLLR") {
@@ -173,7 +180,7 @@ reportExpected<-function(expectedResult=makeExpected(100),exploreType="Basic"){
       r<-rs[,i]
       p<-ps[,i]
 
-      if (exploreType=="CILimits"){
+      if (showType=="CILimits"){
         a<-r2ci(r,result$nval[1],-1)
         b<-r2ci(r,result$nval[1],+1)
       } else {

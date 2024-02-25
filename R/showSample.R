@@ -25,6 +25,7 @@ plotSample<-function(IV,DV,effect,ivplot,dvplot) {
 
 #' show a simulated sample
 #' 
+#' @return ggplot2 object - and printed
 #' @examples
 #' showSample(sample=makeSample())
 #' @export

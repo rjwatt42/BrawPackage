@@ -131,7 +131,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
   
   if (replication$ReplicationOn) {
     if (replication$ReplVarAlpha) braw.env$alphaSig<-oldalpha*replication$ReplAlphaChange
-    while (replication$ReplSigOnly=="Yes" && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
+    while (replication$ReplSigOnly && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
       if (!evidence$shortHand) {
         sample<-makeSample(hypothesis,design)
         res<-makeAnalysis(sample,evidence)

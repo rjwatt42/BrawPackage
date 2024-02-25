@@ -509,6 +509,11 @@ generalAnalysis<-function(allData,InteractionOn,withins,ssqType="Type3",caseOrde
   ))
 }
 
+#' perform an analysis of a sample object
+#' 
+#' @returns analysis object
+#' @examples
+#' analysis<-makeAnalysis(sample=makeSample(),evidence=makeEvidence(),autoShow=FALSE)#' make a multiple samples
 #' @export
 makeAnalysis<-function(sample=makeSample(),evidence=makeEvidence(),autoShow=FALSE){
   design<-sample$design

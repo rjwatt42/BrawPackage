@@ -36,6 +36,16 @@ trimExploreResult<-function(result) {
   return(result)
 }
 
+#' show the estimated population characteristics from varying parameter
+#' 
+#' @param showType        "r","p","n","w", "p(sig)" \cr
+#' "NHSTErrors", "FDR","FDR;FMR"
+#' @return ggplot2 object - and printed
+#' @examples
+#' showExplore(exploreResult=makeExplore(),
+#'                        showType="r",
+#'                        ylog=FALSE,
+#'                        whichEffect="All",effectType="All")
 #' @export
 showExplore<-function(exploreResult=makeExplore(autoShow=TRUE),showType="r",ylog=FALSE,
                       whichEffect="All",effectType="All"){

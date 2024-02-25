@@ -1,4 +1,19 @@
 
+#' show the estimated population characteristics from multiple simulated sample
+#' 
+#' @param showType "Basic", "CILimits", "NHSTErrors", "FDR", "FDR:FMR" \cr
+#'        \emph{ or one or two of:} \cr
+#'         "r","p","ci1","ci2", "rp","n" \cr
+#'          "w","wp","nw", ro","po", 
+#' @param dimension "1D", "2D"
+#' @param orientation "vert", "horz"
+#' @return ggplot2 object - and printed
+#' @examples
+#' showExpected(expectedResult=makeExpected(),
+#'                        showType="Basic",
+#'                        dimension="1D",
+#'                        orientation="vert",
+#'                        effectType="direct",showTheory=FALSE)
 #' @export
 showExpected<-function(expectedResult=makeExpected(),showType="Basic",
                        dimension="1D",orientation="vert",

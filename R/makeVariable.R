@@ -55,29 +55,32 @@ r2OrdProportions<-function(rho,ng) {
 #
 #' make a variable
 #' 
+#' @param name  - a character string 
 #' @param type  "Interval","Ordinal","Categorical"
+#' @param ordSource "discrete", "continuous"
+#' @param catSource "discrete", "continuous"
 #' @returns a Variable object
-#' @seealso [showVariable(variable=makeVariable("test"))]
+#' @seealso showVariable(variable=makeVariable("test"))
+#' @seealso getVariable(name)
 #' @examples
 #' makeVariable(name,type="Interval",
 #'              mu=0,sd=1,skew=0,kurtosis=3,
-#'              nlevs=7,iqr=3,median=NULL,discrete="discrete",ordProportions=NA,
-#'              ncats=2,cases="C1,C2",proportions="1,1",source="discrete",
-#'              deploy="Between",targetDeploys="",process="sim"
-#' )
+#'              nlevs=7,iqr=3,median=NULL,ordProportions=NA,ordSource="discrete",
+#'              ncats=2,cases=c("C1","C2"),proportions=c(1,1),catSource="discrete"
+#'              )
 #' @export
 makeVariable<-function(name,type="Interval",
                        mu=0,sd=1,skew=0,kurtosis=3,
-                       nlevs=7,iqr=3,median=NULL,discrete="discrete",ordProportions=NA,
-                       ncats=2,cases="C1,C2",proportions="1,1",source="discrete",
+                       nlevs=7,iqr=3,median=NULL,ordSource="discrete",ordProportions=NA,
+                       ncats=2,cases=c("C1","C2"),proportions=c(1,1),catSource="discrete",
                        deploy="Between",targetDeploys="",process="sim"){
   
   if (is.null(median)) median<-((1+nlevs)/2)
   
   var<-list(name=name,type=type,
             mu=mu,sd=sd,skew=skew,kurtosis=kurtosis,
-            nlevs=nlevs,iqr=iqr,median=median,discrete=discrete,ordProportions=ordProportions,
-            ncats=ncats,cases=cases,proportions=proportions,source=source,
+            nlevs=nlevs,iqr=iqr,median=median,ordSource=ordSource,ordProportions=ordProportions,
+            ncats=ncats,cases=cases,proportions=proportions,catSource=catSource,
             deploy=deploy,targetDeploys=targetDeploys,
             process=process)
   
@@ -132,9 +135,11 @@ makeVariable<-function(name,type="Interval",
 
 #' make a specific variable
 #' 
-#' @param name  "Psych","Treatment","Treatment?","IQ","Diligence","Perfectionism","Happiness","Grade","RiskTaking","Interesting","Coffee?","Smoker?","RiskTaker?","Musician?","StudySubject","BirthOrder"
+#' @param name  "Psych","Treatment","Treatment?","IQ","Diligence","Perfectionism", \cr
+#'              "Happiness","Grade","RiskTaking","Interesting","Coffee?","Smoker?", \cr
+#'              "RiskTaker?","Musician?","StudySubject","BirthOrder"
 #' @returns a Variable structure
-#' @seealso [showVariable(variable=makeVariable("test"))]
+#' @seealso showVariable(variable=makeVariable("test"))
 #' @examples
 #' variable<-getVariable(name)
 #' @export

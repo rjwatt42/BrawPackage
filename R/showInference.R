@@ -29,6 +29,21 @@ getNulls<-function(analysis) {
     list(analysis=analysis,nullanalysis=nullanalysis)
   }
 
+#' show the estimated population characteristics from a simulated sample
+#' 
+#' @param showType "Basic", "CILimits" \cr
+#'        \emph{ or one or two of:} \cr
+#' "r","p","ci1","ci2", "rp","n"
+#' @param dimension "1D", "2D"
+#' @param orientation "vert", "horz"
+#' @return ggplot2 object - and printed
+#' @examples
+#' showInference(analysis=makeAnalysis(),
+#'               showType="Basic",
+#'               dimension="1D",
+#'               orientation="vert",
+#'               effectType="direct",
+#'               showTheory=TRUE)
 #' @export
 showInference<-function(analysis=makeAnalysis(),showType="Basic",dimension="1D",orientation="vert",
                         effectType="direct",showTheory=TRUE

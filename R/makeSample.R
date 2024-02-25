@@ -125,6 +125,8 @@ makeSampleVar<-function(design,n,MV){
 
 #' make a simulated sample
 #' 
+#' @returns a sample object
+#' @seealso showSample() reportSample()
 #' @examples
 #' sample<-makeSample(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=FALSE)
 #' @export
@@ -373,7 +375,7 @@ makeSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=FA
              "Ordinal"={
              },
              "Categorical"={
-               if (IV$source=="discrete") {
+               if (IV$catSource=="discrete") {
                  ng<-IV$ncats
                  pp<-IV$proportions
                  # pp<-as.numeric(unlist(strsplit(IV$proportions,",")))
@@ -400,7 +402,7 @@ makeSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=FA
                "Ordinal"={
                },
                "Categorical"={
-                 if (IV2$source=="discrete") {
+                 if (IV2$catSource=="discrete") {
                    ng<-IV2$ncats
                    pp<-IV2$proportions
                    if (is.character(pp))
@@ -530,13 +532,13 @@ makeSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=FA
                  breaks<-qnorm(cumsum(proportions)/sum(proportions))
                  vals=ivr*0
                  for (i in 1:ng) {vals=vals+(ivr>breaks[i])}
-                 if (!IV$discrete=="discrete") {
+                 if (!IV$ordSource=="discrete") {
                    vals=vals+runif(length(vals),min=-0.5,max=0.5)
                  }
                  iv<-vals
              },
              "Categorical"={
-               if (IV$source=="Continuous") {
+               if (IV$catSource=="continuous") {
                  ng<-IV$ncats
                  pp<-IV$proportions
                  # pp<-as.numeric(unlist(strsplit(IV$proportions,",")))
@@ -568,13 +570,13 @@ makeSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=FA
                breaks<-qnorm(cumsum(proportions)/sum(proportions))
                vals=iv2r*0
                for (i in 1:ng) {vals=vals+(iv2r>breaks[i])}
-               if (!IV2$discrete=="discrete") {
+               if (!IV2$ordSource=="discrete") {
                  vals=vals+runif(length(vals),min=-0.5,max=0.5)
                }
                iv2<-vals
              },
              "Categorical"={
-               if (IV$source=="Continuous") {
+               if (IV$catSource=="continuous") {
                  ng<-IV2$ncats
                  pp<-IV2$proportions
                  # pp<-as.numeric(unlist(strsplit(IV2$proportions,",")))
@@ -608,7 +610,7 @@ makeSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=FA
                breaks<-qnorm(cumsum(proportions)/sum(proportions))
                vals=dvr*0
                for (i in 1:ng) {vals=vals+(dvr>breaks[i])}
-               if (!DV$discrete=="discrete") {
+               if (!DV$ordSource=="discrete") {
                  vals=vals+runif(length(vals),min=-0.5,max=0.5)
                }
                dv<-vals
@@ -636,7 +638,7 @@ makeSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=FA
              IV<-list(mu=mean(iv),sd=sd(iv),name=IV$name,type=IV$type,vals=iv)
            },
            "Ordinal"={
-             IV<-list(mu=IV$median, sd=IV$iqr/2, name=IV$name,type=IV$type,nlevs=IV$nlevs,median=IV$median,iqr=IV$iqr,discrete=IV$discrete,vals=iv)
+             IV<-list(mu=IV$median, sd=IV$iqr/2, name=IV$name,type=IV$type,nlevs=IV$nlevs,median=IV$median,iqr=IV$iqr,ordSource=IV$ordSource,vals=iv)
            },
            "Categorical"={
              IV<-list(mu=0, sd=1, name=IV$name,type=IV$type,ncats=IV$ncats,cases=IV$cases,proportions=IV$proportions,vals=iv)
@@ -650,7 +652,7 @@ makeSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=FA
              IV2<-list(name=IV2$name,type=IV2$type,mu=mean(iv2),sd=sd(iv2),vals=iv2)
            },
            "Ordinal"={
-             IV2<-list(mu=IV2$median, sd=IV2$iqr/2, name=IV2$name,type=IV2$type,nlevs=IV2$nlevs,median=IV2$median,iqr=IV2$iqr,discrete=IV2$discrete,vals=iv2)
+             IV2<-list(mu=IV2$median, sd=IV2$iqr/2, name=IV2$name,type=IV2$type,nlevs=IV2$nlevs,median=IV2$median,iqr=IV2$iqr,ordSource=IV2$ordSource,vals=iv2)
            },
            "Categorical"={
              IV2<-list(name=IV2$name,type=IV2$type,mu=0, sd=1, ncats=IV2$ncats,cases=IV2$cases,proportions=IV2$proportions,vals=iv2)

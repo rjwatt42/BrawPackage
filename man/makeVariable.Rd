@@ -14,19 +14,28 @@ makeVariable(
   nlevs = 7,
   iqr = 3,
   median = NULL,
-  discrete = "discrete",
+  ordSource = "discrete",
   ordProportions = NA,
   ncats = 2,
-  cases = "C1,C2",
-  proportions = "1,1",
-  source = "discrete",
+  cases = c("C1", "C2"),
+  proportions = c(1, 1),
+  catSource = "discrete",
   deploy = "Between",
   targetDeploys = "",
   process = "sim"
 )
 }
 \arguments{
+\item{name}{- a character string}
+
 \item{type}{"Interval","Ordinal","Categorical"}
+
+\item{ordSource}{"discrete", "continuous"}
+
+\item{catSource}{"discrete", "continuous"}
+}
+\value{
+a Variable object
 }
 \description{
 make a variable
@@ -34,8 +43,12 @@ make a variable
 \examples{
 makeVariable(name,type="Interval",
              mu=0,sd=1,skew=0,kurtosis=3,
-             nlevs=7,iqr=3,median=NULL,discrete="discrete",ordProportions=NA,
-             ncats=2,cases="C1,C2",proportions="1,1",source="discrete",
-             deploy="Between",targetDeploys="",process="sim"
-)
+             nlevs=7,iqr=3,median=NULL,ordProportions=NA,ordSource="discrete",
+             ncats=2,cases=c("C1","C2"),proportions=c(1,1),catSource="discrete"
+             )
+}
+\seealso{
+showVariable(variable=makeVariable("test"))
+
+getVariable(name)
 }

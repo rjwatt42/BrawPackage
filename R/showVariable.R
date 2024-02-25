@@ -112,12 +112,12 @@ drawInterval<-function(var){
     coord_cartesian(xlim = xlim, ylim = c(0, 1.2))
 }
 
-#' show a specific variable
+#' show a variable object
 #' 
-#' @param variable object
+#' @param variable a variable object
 #' @returns a ggplot2 object
 #' @examples
-#' variable<-showVariable(variable)
+#' variable<-showVariable(variable=makeVariable())
 #' @export
 showVariable<-function(variable=makeVariable(),single=FALSE){
   switch(variable$type,

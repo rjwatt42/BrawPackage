@@ -1,3 +1,12 @@
+#' report the estimated population characteristics from varying parameter
+#' 
+#' @param showType        "r","p","n","w", "p(sig)" \cr
+#'                        "NHSTErrors", "FDR","FDR;FMR"
+#' @return ggplot2 object - and printed
+#' @examples
+#' showExplore(exploreResult=makeExplore(),
+#'                        showType="r",
+#'                        whichEffect="All",effectType="All")
 #' @export
 reportExplore<-function(exploreResult,showType="r",
                         whichEffect="All",effectType="All"
