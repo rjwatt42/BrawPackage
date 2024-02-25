@@ -1,6 +1,14 @@
-joinPlots<-function(g1,g2=NULL,g3=NULL,layout=braw.env$layout) {
+joinPlots<-function(g1,g2=NULL,g3=NULL,layout="triangle") {
   
   if (layout=="separate") {
+   
+  # if (is.null(g2)) return(g2)
+  # if (is.null(g3)) return(plot_grid(g1,g2,ncol=2))
+  #                  return(
+  #                    grid.arrange(
+  #                    grid.arrange(g1,g2,ncol=2),
+  #                    g3,nrow=2)
+  #                    )
     g<-list(g1)
     if (!is.null(g2)) g<-c(g,list(g2))
     if (!is.null(g3)) g<-c(g,list(g3))

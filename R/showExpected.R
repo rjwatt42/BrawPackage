@@ -13,11 +13,11 @@
 #'                        showType="Basic",
 #'                        dimension="1D",
 #'                        orientation="vert",
-#'                        effectType="direct",showTheory=FALSE)
+#'                        effectType="direct",showTheory=TRUE)
 #' @export
 showExpected<-function(expectedResult=makeExpected(),showType="Basic",
                        dimension="1D",orientation="vert",
-                       effectType="direct",showTheory=FALSE
+                       effectType="direct",showTheory=TRUE
 ) {
   if (is.numeric(expectedResult)) expectedResult=makeExpected(expectedResult)
   
@@ -45,7 +45,6 @@ showExpected<-function(expectedResult=makeExpected(),showType="Basic",
   g<-showInference(fullResult,showType=showType,dimension=dimension,orientation=orientation,
                 effectType=effectType,showTheory=showTheory
   ) 
-  g<-g+ggtitle(paste0("Expected: ",format(expectedResult$count),"  "))+theme(plot.title=element_text(face='plain', size=8, hjust=0.9))
   g
 }
 

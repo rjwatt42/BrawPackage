@@ -2,16 +2,18 @@
 drawVar<-function(pts,var){
   if (is.null(pts)) {
     pts<-data.frame(x=0,y=0.5,t=var$name)
-    ggplot()+geom_label(data=pts,aes(x=x,y=y,label=t),hjust=0.5, vjust=0.5, size=11, fontface="bold",label.size = NA)+
-      labs(x="",y="")+
+    ggplot()+
+      # geom_label(data=pts,aes(x=x,y=y,label=t),hjust=0.5, vjust=0.5, size=11, fontface="bold",label.size = NA)+
+      labs(x=var$name,y="")+
       braw.env$diagramTheme+
       theme(plot.margin=margin(1.15,1.8,1,1.25,"cm"))+
       theme(axis.text.y=element_blank(),
             axis.ticks.y=element_blank(),
-            axis.text.x=element_blank(),
-            axis.ticks.x=element_blank()
+            axis.title.x=element_text(size=12,face="bold")
+            # axis.text.x=element_blank(),
+            # axis.ticks.x=element_blank()
       )+
-      theme(plot.margin=margin(0.0,-0.2,0,-1,"cm"))+
+      # theme(plot.margin=margin(0.0,-0.2,0,-1,"cm"))+
     coord_cartesian(xlim = c(-1,1), ylim = c(0, 1))
   } else {
   ggplot(pts,aes(x=r,y=dens))+geom_polygon(fill=braw.env$plotColours$sampleC)+
@@ -19,8 +21,9 @@ drawVar<-function(pts,var){
       # geom_line(aes(x=r,y=dens*0),color="black",lwd=0.5)+
       labs(x=var$name,y="")+
       braw.env$diagramTheme+
-      theme(axis.text.y=element_blank(),axis.ticks.y=element_blank())+
-      theme(plot.margin=margin(0.0,-0.2,0,-1,"cm"))
+      theme(panel.spacing=margin(0,0,0,0,"cm"),plot.margin=margin(0,0,0,0,"cm"))+
+    theme(axis.text.y=element_blank(),axis.ticks.y=element_blank(),
+          axis.title.x=element_text(size=12,face="bold"))
     
 }
 }
@@ -127,6 +130,6 @@ showVariable<-function(variable=makeVariable(),single=FALSE){
          "empty"={g<-drawVar(NULL,variable)}
   )
   if (single)
-  g+theme(plot.margin=margin(0.5,0.5,0.0,0.0,"cm"))
-  else g
+  g<-g+theme(plot.margin=margin(0.5,0.5,0.1,0.5,"cm"))
+  g
 }

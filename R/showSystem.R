@@ -18,18 +18,37 @@ showHypothesis<-function(hypothesis=makeHypothesis()) {
   if (is.null(IV) || is.null(DV)) {return(ggplot()+braw.env$blankTheme)}
   if (is.null(IV2)) no_ivs<-1 else no_ivs<-2
     
+  g1<-showVariable(IV)
+  g3<-showVariable(DV)
+  g0<-drawEffectES(effect$rIV,1)+braw.env$blankTheme
+  # switch(no_ivs,
+  #        {g<-grid.arrange(g1,g0,g3,ncol=1)},
+  #        {
+  #          gbl<-ggplot()+braw.env$blankTheme
+  #          g2<-showVariable(IV2)
+  #          g0a<-drawEffectES(effect$rIVIV2,4)+braw.env$blankTheme
+  #          ga<-grid.arrange(g1,g0a,g2,ncol=3,padding=0)
+  #          g0b<-drawEffectES(effect$rIV,2)+braw.env$blankTheme
+  #          g0c<-drawEffectES(effect$rIVIV2DV,5)+braw.env$blankTheme
+  #          g0d<-drawEffectES(effect$rIV2,3)+braw.env$blankTheme
+  #          gb<-grid.arrange(g0b,g0c,g0d,ncol=3,padding=0)
+  #          gc<-grid.arrange(gbl,g3,gbl,ncol=3,padding=0)
+  #          g<-grid.arrange(ga,gb,gc,ncol=1,padding=0)
+  #        })
+  # return(g)
+  # 
   PlotNULL<-ggplot()+braw.env$blankTheme+theme(plot.margin=margin(0,-0.1,0,0,"cm"))+
     scale_x_continuous(limits = c(0,10),labels=NULL,breaks=NULL)+scale_y_continuous(limits = c(0,10),labels=NULL,breaks=NULL)
   
   switch (no_ivs,
           {
-            xmin<-4
-            xmax<-6
+            xmin<-3
+            xmax<-7
             g<-PlotNULL+
-              annotation_custom(grob=ggplotGrob(showVariable(IV)),xmin=xmin,xmax=xmax,ymin=6,ymax=10)+
-              annotation_custom(grob=ggplotGrob(showVariable(DV)),xmin=xmin,xmax=xmax,ymin=0,ymax=4)
+              annotation_custom(grob=ggplotGrob(g1),xmin=xmin,xmax=xmax,ymin=6,ymax=10)+
+              annotation_custom(grob=ggplotGrob(g3),xmin=xmin,xmax=xmax,ymin=0,ymax=4)
             # arrow
-            g<-g+annotation_custom(grob=ggplotGrob(drawEffectES(effect$rIV,1)),xmin=xmin,xmax=xmax,ymin=3.5,ymax=6)
+            g<-g+annotation_custom(grob=ggplotGrob(g0),xmin=xmin,xmax=xmax,ymin=3.5,ymax=6)
           },
           {
             xmin<-2

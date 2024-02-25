@@ -38,7 +38,7 @@ BrawOpts<-function(BW=FALSE,fontScale=1) {
                       fdr="#BBBBBB",fmr="#555555")
   }
   
-  mainTheme<-theme(panel.background = element_rect(fill=plotColours$graphBack, colour="black"),
+  mainTheme<-theme(panel.background = element_rect(fill=plotColours$graphBack, colour=plotColours$graphBack),
                    panel.grid.major = element_line(linetype="blank"),panel.grid.minor = element_line(linetype="blank"),
                    plot.background = element_rect(fill=plotColours$graphC, colour=plotColours$graphC))
   SMplotTheme<-theme(plot.title=element_text(size=14,face="bold"),axis.title=element_text(size=16,face="bold"),
@@ -55,8 +55,8 @@ BrawOpts<-function(BW=FALSE,fontScale=1) {
           braw.env$plotShapes<-list(data=21,study=22,parameter=21,meta=24)
           
           braw.env$plotTheme<-mainTheme+SMplotTheme+theme(plot.margin=margin(1.0,1.5,0.5,0.5,"cm"))
-          braw.env$diagramTheme<-mainTheme+SMplotTheme+theme(plot.margin=margin(0.15,0.8,0,0.25,"cm"))
-          braw.env$blankTheme<-mainTheme+theme(panel.background = element_rect(fill=plotColours$graphC, colour=plotColours$graphC))
+          braw.env$diagramTheme<-mainTheme+SMplotTheme+theme(panel.background = element_rect(fill=plotColours$graphBack, colour=plotColours$graphBack),panel.spacing=margin(0,0,0,0),plot.margin=margin(0.5,0.5,0.3,0.3,"cm"))
+          braw.env$blankTheme<-mainTheme+theme(panel.spacing=margin(0,0,0,0,"cm"),plot.margin=margin(0,0,0,0,"cm"),panel.background = element_rect(fill=plotColours$graphC, colour=plotColours$graphC))
           braw.env$reportTheme<-braw.env$blankTheme+theme(plot.margin=margin(0.15,0.8,0,0.25,"cm"),
                                           axis.title.x=element_blank(),
                                           axis.text.x=element_blank(),

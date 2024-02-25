@@ -91,6 +91,12 @@ showInference<-function(analysis=makeAnalysis(),showType="Basic",dimension="1D",
     }
   }
 
+  if (length(analysis$rIV)>1) {
+    g1<-g1+ggtitle(paste0("Expected: ",format(length(analysis$rIV)),"  "))+theme(plot.title=element_text(face='plain', size=8, hjust=0.9))
+    if (!is.null(g2))
+      g2<-g2+ggtitle(paste0("Expected: ",format(length(analysis$rIV)),"  "))+theme(plot.title=element_text(face='plain', size=8, hjust=0.9))
+  }
+  
   if (!is.null(g2)) {
     g<-joinPlots(g1,g2)
   } else {

@@ -1,7 +1,7 @@
-
+#' export
 drawEffectES<-function(r,t=1){
-  ESplotMargins<-margin(0.0,-0.2,0,-1,"cm")
-  
+
+  xoff<-0
   switch (t,
           {start=c(0,0.95)
           direction=0
@@ -15,14 +15,18 @@ drawEffectES<-function(r,t=1){
           len=sqrt(2)*0.75
           labelpts<-data.frame(x=-0.25,y=0.375)
           ends="last"
-          col=braw.env$plotColours$maineffectES},
+          col=braw.env$plotColours$maineffectES
+          xoff<- -0.45
+          },
 
           {start=c(0.4,0.75)
           direction=-45
           len=sqrt(2)*0.75
           labelpts<-data.frame(x=0.25,y=0.375)
           ends="last"
-          col=braw.env$plotColours$maineffectES},
+          col=braw.env$plotColours$maineffectES
+          xoff<- 0.45
+          },
           
           {start=c(0.7,0.5)
           direction=-90
@@ -57,6 +61,7 @@ drawEffectES<-function(r,t=1){
               fin=0.6
               finx=fin*cos(45/(180/pi))
               finy=fin*sin(45/(180/pi))
+              longSidex<-longSidex
               arrow_x<-cumsum(c(d/2,0,dx,dx,-longSidex,-longSidex,dx,dx,0,-finx,dx,finx,finx,dx,-finx    ))
               arrow_y<-cumsum(c(  0,len-longSidey,-dy,dy,longSidey,-longSidey,-dy,dy,-(len-longSidey),-finy,-dy,finy,-finy,dy,finy))
             }
@@ -65,7 +70,7 @@ drawEffectES<-function(r,t=1){
     y<-arrow_x*sin(direction/(180/pi))-arrow_y*cos(direction/(180/pi))
     pts<-data.frame(x=x+start[1],y=y+start[2])
   g<-ggplot(pts,aes(x=x,y=y))+
-    geom_polygon(color="black",fill=col, lwd=0.5)+coord_fixed(1,xlim=c(-1,1),ylim=c(0,1))
+    geom_polygon(color="black",fill=col, lwd=0.5)#+coord_fixed(1,xlim=c(-1,1),ylim=c(0,1))
   
   if (braw.env$simData) {
     if (t==1){
@@ -75,16 +80,18 @@ drawEffectES<-function(r,t=1){
     g<-g+geom_label(data=labelpts,aes(x = mean(x), y = mean(y), label = lbl), color="black", fill = "white",size=braw.env$labelSize)
   }
   
+  ESplotMargins<-margin(0.0,-0,0,-0,"cm")
+
   g + 
-    braw.env$plotTheme+
+    braw.env$blankTheme+
     theme(axis.text.y=element_blank(),
           axis.ticks.y=element_blank(),
           axis.text.x=element_blank(),
           axis.ticks.x=element_blank())+
-    theme(plot.margin=ESplotMargins)+
-    theme(panel.background = element_rect(fill="transparent", colour="transparent"),
-          plot.background = element_rect(fill="transparent", colour="transparent"))+
-    labs(x="",y="")#+
-    # coord_cartesian(c(-1,1), ylim = c(0, 1))
+    theme(panel.spacing=margin(0,0,0,0,"cm"),plot.margin=ESplotMargins)+
+    # theme(panel.background = element_rect(fill="transparent", colour="transparent"),
+    #       plot.background = element_rect(fill="transparent", colour="transparent"))+
+    labs(x="",y="")+
+    coord_cartesian(c(-1,1)*0.75+xoff, ylim = c(0, 1))
   
 }
