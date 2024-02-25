@@ -110,51 +110,51 @@ reportExpected<-function(expectedResult=makeExpected(100),showType="Basic"){
       resSigC<-(d>0 & resSig)
     }
     if (braw.env$STMethod=="NHST") {
-      e1=paste0(format(mean(nullSig)*100,digits=braw.env$report_precision),"%")
-      e2=paste0(format(mean(!resSig)*100,digits=braw.env$report_precision),"%")
+      e1=paste0(brawFormat(mean(nullSig)*100,digits=braw.env$report_precision),"%")
+      e2=paste0(brawFormat(mean(!resSig)*100,digits=braw.env$report_precision),"%")
     } else {
-      e1=paste0(format(sum(nullSigW)/length(nullSig)*100,digits=braw.env$report_precision),"%")
-      e2=paste0(format(sum(resSigW)/length(resSig)*100,digits=braw.env$report_precision),"%")
+      e1=paste0(brawFormat(sum(nullSigW)/length(nullSig)*100,digits=braw.env$report_precision),"%")
+      e2=paste0(brawFormat(sum(resSigW)/length(resSig)*100,digits=braw.env$report_precision),"%")
     }
     if (result$effect$world$worldOn) {
         nr<-(length(nullresult$pIV)+length(result$pIV))
         if (braw.env$STMethod=="NHST") {
-          e1a<-paste0(format(sum(nullSig)/nr*100,digits=braw.env$report_precision),"%")
-          e2a<-paste0(format(sum(!resSig)/nr*100,digits=braw.env$report_precision),"%")
+          e1a<-paste0(brawFormat(sum(nullSig)/nr*100,digits=braw.env$report_precision),"%")
+          e2a<-paste0(brawFormat(sum(!resSig)/nr*100,digits=braw.env$report_precision),"%")
           outputText<-c(outputText,"!jAll",e1a,e2a," ")
           
-          e1=paste0(format(mean(nullSig)*100,digits=braw.env$report_precision),"%")
-          e2=paste0(format(mean(!resSig)*100,digits=braw.env$report_precision),"%")
+          e1=paste0(brawFormat(mean(nullSig)*100,digits=braw.env$report_precision),"%")
+          e2=paste0(brawFormat(mean(!resSig)*100,digits=braw.env$report_precision),"%")
           outputText<-c(outputText,"!jr=0",e1," "," ")
           outputText<-c(outputText,paste0("!jr","\u2260","0")," ",e2," ")
           
-          e1b=paste0("\b",format((sum(nullSig)+sum(!resSig))/nr*100,digits=braw.env$report_precision),"%")
-          e2b=paste0(format((sum(!nullSig)+sum(resSig))/nr*100,digits=braw.env$report_precision),"%")
-          e1c=paste0("(",format((sum(nullSig)+sum(resSig))/nr*100,digits=braw.env$report_precision),"%)")
-          e2c=paste0("(",format((sum(!nullSig)+sum(!resSig))/nr*100,digits=braw.env$report_precision),"%)")
+          e1b=paste0("\b",brawFormat((sum(nullSig)+sum(!resSig))/nr*100,digits=braw.env$report_precision),"%")
+          e2b=paste0(brawFormat((sum(!nullSig)+sum(resSig))/nr*100,digits=braw.env$report_precision),"%")
+          e1c=paste0("(",brawFormat((sum(nullSig)+sum(resSig))/nr*100,digits=braw.env$report_precision),"%)")
+          e2c=paste0("(",brawFormat((sum(!nullSig)+sum(!resSig))/nr*100,digits=braw.env$report_precision),"%)")
           
-          e1n=paste0("\b",format(sum(nullSig)/(sum(nullSig)+sum(resSig))*100,digits=braw.env$report_precision),"%")
-          e1p=paste0(format(sum(resSig)/(sum(nullSig)+sum(resSig))*100,digits=braw.env$report_precision),"%")
-          e2n=paste0(format(sum(!nullSig)/(sum(!nullSig)+sum(!resSig))*100,digits=braw.env$report_precision),"%")
-          e2p=paste0("\b",format(sum(!resSig)/(sum(!nullSig)+sum(!resSig))*100,digits=braw.env$report_precision),"%")
+          e1n=paste0("\b",brawFormat(sum(nullSig)/(sum(nullSig)+sum(resSig))*100,digits=braw.env$report_precision),"%")
+          e1p=paste0(brawFormat(sum(resSig)/(sum(nullSig)+sum(resSig))*100,digits=braw.env$report_precision),"%")
+          e2n=paste0(brawFormat(sum(!nullSig)/(sum(!nullSig)+sum(!resSig))*100,digits=braw.env$report_precision),"%")
+          e2p=paste0("\b",brawFormat(sum(!resSig)/(sum(!nullSig)+sum(!resSig))*100,digits=braw.env$report_precision),"%")
         } else {
-          e1a<-paste0(format((sum(nullSigW))/nr*100,digits=braw.env$report_precision),"%")
-          e2a<-paste0(format((sum(resSigW))/nr*100,digits=braw.env$report_precision),"%")
+          e1a<-paste0(brawFormat((sum(nullSigW))/nr*100,digits=braw.env$report_precision),"%")
+          e2a<-paste0(brawFormat((sum(resSigW))/nr*100,digits=braw.env$report_precision),"%")
           outputText<-c(outputText,"!jAll",e1a,e2a," ")
           
-          e1=paste0(format(sum(nullSigW)/length(nullSig)*100,digits=braw.env$report_precision),"%")
-          e2=paste0(format(sum(resSigW)/length(resSig)*100,digits=braw.env$report_precision),"%")
+          e1=paste0(brawFormat(sum(nullSigW)/length(nullSig)*100,digits=braw.env$report_precision),"%")
+          e2=paste0(brawFormat(sum(resSigW)/length(resSig)*100,digits=braw.env$report_precision),"%")
           outputText<-c(outputText,"!jr=0",e1," "," ")
           outputText<-c(outputText,paste0("!jr","\u2260","0")," ",e2," ")
 
-          e1b=paste0("\b",format((sum(nullSigW)+sum(resSigW))/nr*100,digits=braw.env$report_precision),"%")
-          e2b=paste0(format((sum(nullSigC)+sum(resSigC))/nr*100,digits=braw.env$report_precision),"%")
-          e1c=paste0("(",format((sum(nullSig)+sum(resSig))/nr*100,digits=braw.env$report_precision),"%)")
+          e1b=paste0("\b",brawFormat((sum(nullSigW)+sum(resSigW))/nr*100,digits=braw.env$report_precision),"%")
+          e2b=paste0(brawFormat((sum(nullSigC)+sum(resSigC))/nr*100,digits=braw.env$report_precision),"%")
+          e1c=paste0("(",brawFormat((sum(nullSig)+sum(resSig))/nr*100,digits=braw.env$report_precision),"%)")
 
-          e1n=paste0("\b",format((sum(nullSigW)+sum(resSigW))/(sum(nullSig)+sum(resSig))*100,digits=braw.env$report_precision),"%")
-          e1p=paste0(format((sum(nullSigC)+sum(resSigC))/(sum(nullSig)+sum(resSig))*100,digits=braw.env$report_precision),"%")
+          e1n=paste0("\b",brawFormat((sum(nullSigW)+sum(resSigW))/(sum(nullSig)+sum(resSig))*100,digits=braw.env$report_precision),"%")
+          e1p=paste0(brawFormat((sum(nullSigC)+sum(resSigC))/(sum(nullSig)+sum(resSig))*100,digits=braw.env$report_precision),"%")
         }
-        # ea=paste0("Combined: ",format((sum(nullSig)+sum(!resSig))/nr*100,digits=braw.env$report_precision),"%")
+        # ea=paste0("Combined: ",brawFormat((sum(nullSig)+sum(!resSig))/nr*100,digits=braw.env$report_precision),"%")
         outputText<-c(outputText," ","","","")
         outputText<-c(outputText,"!j\bOutcomes:","\bFalse","\bValid","")
         
@@ -239,28 +239,28 @@ reportExpected<-function(expectedResult=makeExpected(100),showType="Basic"){
       }
       ot1<-c(ot1,
              "!jmean",
-             format(mean(a,na.rm=TRUE),digits=braw.env$report_precision),
-             format(mean(b,na.rm=TRUE),digits=braw.env$report_precision)
+             brawFormat(mean(a,na.rm=TRUE),digits=braw.env$report_precision),
+             brawFormat(mean(b,na.rm=TRUE),digits=braw.env$report_precision)
       )
       ot2<-c(ot2,
              "!jsd",
-             format(sd(a,na.rm=TRUE),digits=braw.env$report_precision),
-             format(sd(b,na.rm=TRUE),digits=braw.env$report_precision)
+             brawFormat(sd(a,na.rm=TRUE),digits=braw.env$report_precision),
+             brawFormat(sd(b,na.rm=TRUE),digits=braw.env$report_precision)
       )
       ot4<-c(ot4,
              "!jquant75",
-             format(quantile(a,0.75,na.rm=TRUE,names<-FALSE),digits=braw.env$report_precision),
-             format(quantile(b,0.75,na.rm=TRUE,names<-FALSE),digits=braw.env$report_precision)
+             brawFormat(quantile(a,0.75,na.rm=TRUE,names=FALSE),digits=braw.env$report_precision),
+             brawFormat(quantile(b,0.75,na.rm=TRUE,names=FALSE),digits=braw.env$report_precision)
       )
       ot5<-c(ot5,
              "!jmedian",
-             format(quantile(a,0.5,na.rm=TRUE,names<-FALSE),digits=braw.env$report_precision),
-             format(quantile(b,0.5,na.rm=TRUE,names<-FALSE),digits=braw.env$report_precision)
+             brawFormat(quantile(a,0.5,na.rm=TRUE,names=FALSE),digits=braw.env$report_precision),
+             brawFormat(quantile(b,0.5,na.rm=TRUE,names=FALSE),digits=braw.env$report_precision)
       )
       ot6<-c(ot6,
              "!jquant25",
-             format(quantile(a,0.25,na.rm=TRUE,names<-FALSE),digits=braw.env$report_precision),
-             format(quantile(b,0.25,na.rm=TRUE,names<-FALSE),digits=braw.env$report_precision)
+             brawFormat(quantile(a,0.25,na.rm=TRUE,names=FALSE),digits=braw.env$report_precision),
+             brawFormat(quantile(b,0.25,na.rm=TRUE,names=FALSE),digits=braw.env$report_precision)
       )
       if (i>1){
         ot1[length(ot1)-2]<-""
@@ -272,10 +272,10 @@ reportExpected<-function(expectedResult=makeExpected(100),showType="Basic"){
     }
     outputText<-c(outputText,ot1,ot2,rep("  ",nc),ot4,ot5,ot6)
     if (pars[1]=="p") {
-      outputText<-c(outputText,rep("  ",nc),"p(sig)",paste0(format(mean(p<braw.env$alphaSig)*100,digits=braw.env$report_precision),"%"),rep(" ",nc-2))
+      outputText<-c(outputText,rep("  ",nc),"p(sig)",paste0(brawFormat(mean(p<braw.env$alphaSig)*100,digits=braw.env$report_precision),"%"),rep(" ",nc-2))
     }
     if (pars[2]=="p") {
-      outputText<-c(outputText,rep("  ",nc),"p(sig)"," ",paste0(format(mean(p<braw.env$alphaSig)*100,digits=braw.env$report_precision),"%"),rep(" ",nc-3))
+      outputText<-c(outputText,rep("  ",nc),"p(sig)"," ",paste0(brawFormat(mean(p<braw.env$alphaSig)*100,digits=braw.env$report_precision),"%"),rep(" ",nc-3))
     }
   }
   nr<-length(outputText)/nc

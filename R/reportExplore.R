@@ -302,33 +302,33 @@ reportExplore<-function(exploreResult,showType="r",
     vals<-atanh(vals)
   }
   for (i in 1:nc) {
-    outputText<-c(outputText,paste("\b",format(vals[use[i]],digits=braw.env$report_precision),sep=""))
+    outputText<-c(outputText,paste("\b",brawFormat(vals[use[i]],digits=braw.env$report_precision),sep=""))
   }
 
   outputText<-c(outputText,paste0("!j\b", extra_y_label))
   outputText<-c(outputText,rep("",nc))
   outputText<-c(outputText,"!jlower 25%")
   for (i in 1:nc) {
-    outputText<-c(outputText,format(y25[use[i]],digits=braw.env$report_precision))
+    outputText<-c(outputText,brawFormat(y25[use[i]],digits=braw.env$report_precision))
   }
   outputText<-c(outputText,"!j\bmedian")
   for (i in 1:nc) {
-    outputText<-c(outputText,format(y50[use[i]],digits=braw.env$report_precision))
+    outputText<-c(outputText,brawFormat(y50[use[i]],digits=braw.env$report_precision))
   }
   outputText<-c(outputText,"!jupper 25%")
   for (i in 1:nc) {
-    outputText<-c(outputText,format(y75[use[i]],digits=braw.env$report_precision))
+    outputText<-c(outputText,brawFormat(y75[use[i]],digits=braw.env$report_precision))
   }
   
   if (is.element(showType,c("r","rA","p","w","n","log(lrs)","log(lrd)","k","pNull","S"))) {
     outputText<-c(outputText,rep(" ",nc+1))
     outputText<-c(outputText,"!jmean")
     for (i in 1:nc) {
-      outputText<-c(outputText,format(ymn[use[i]],digits=braw.env$report_precision))
+      outputText<-c(outputText,brawFormat(ymn[use[i]],digits=braw.env$report_precision))
     }
     outputText<-c(outputText,"!jsd")
     for (i in 1:nc) {
-      outputText<-c(outputText,format(ysd[use[i]],digits=braw.env$report_precision))
+      outputText<-c(outputText,brawFormat(ysd[use[i]],digits=braw.env$report_precision))
     }
   }    
 
@@ -364,19 +364,19 @@ reportExplore<-function(exploreResult,showType="r",
 
     outputText<-c(outputText,paste("!j\b", extra_y_label))
     for (i in 1:nc) {
-      outputText<-c(outputText,paste("\b",format(vals[use[i]],digits=braw.env$report_precision),sep=""))
+      outputText<-c(outputText,paste("\b",brawFormat(vals[use[i]],digits=braw.env$report_precision),sep=""))
     }
     outputText<-c(outputText,"!jlower 25%")
     for (i in 1:nc) {
-      outputText<-c(outputText,format(y25e[use[i]],digits=braw.env$report_precision))
+      outputText<-c(outputText,brawFormat(y25e[use[i]],digits=braw.env$report_precision))
     }
     outputText<-c(outputText,"!j\bmedian")
     for (i in 1:nc) {
-      outputText<-c(outputText,format(y50e[use[i]],digits=braw.env$report_precision))
+      outputText<-c(outputText,brawFormat(y50e[use[i]],digits=braw.env$report_precision))
     }
     outputText<-c(outputText,"!jupper 25%")
     for (i in 1:nc) {
-      outputText<-c(outputText,format(y75e[use[i]],digits=braw.env$report_precision))
+      outputText<-c(outputText,brawFormat(y75e[use[i]],digits=braw.env$report_precision))
     }
   }
   

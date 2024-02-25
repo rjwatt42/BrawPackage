@@ -341,5 +341,5 @@ showDescription<-function(analysis=makeAnalysis()) {
             "Categorical"=g<-plotCatInterDescription(analysis,g)
     )
   }
-  g
+  joinPlots(g)
 }

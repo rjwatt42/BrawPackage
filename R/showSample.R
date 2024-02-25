@@ -37,6 +37,7 @@ showSample<-function(sample=makeSample()){
   
   if (is.null(IV2)) {
     g<-plotSample(IV,DV,effect,sample$ivplot,sample$dvplot)
+    g<-joinPlots(g)
   } else {
     g1<-plotSample(IV,IV2,effect,sample$ivplot,sample$iv2plot)
     g2<-plotSample(IV,DV,effect,sample$ivplot,sample$dvplot)

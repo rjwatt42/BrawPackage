@@ -1,4 +1,11 @@
-joinPlots<-function(g1,g2=NULL,g3=NULL,layout="triangle") {
+joinPlots<-function(g1,g2=NULL,g3=NULL,layout=braw.env$layout) {
+  
+  if (layout=="separate") {
+    g<-list(g1)
+    if (!is.null(g2)) g<-c(g,list(g2))
+    if (!is.null(g3)) g<-c(g,list(g3))
+    return(g)    
+  }
   
   gridTheme<-theme(plot.margin=margin(-0.3,0,0,0,"cm"))
   

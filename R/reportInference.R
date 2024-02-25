@@ -45,7 +45,7 @@ reportInference<-function(analysis=makeAnalysis(),modelType="Raw",analysisType="
     if (is.null(IV2)){
       pval<-analysis$pIV
       if (pval>=0.0001) {
-        pvalText<-paste("p = ",format(pval,digits=braw.env$report_precision),sep="")
+        pvalText<-paste("p = ",brawFormat(pval,digits=braw.env$report_precision),sep="")
       } else {
         pvalText<-"p < 0.0001"
       }
@@ -60,7 +60,7 @@ reportInference<-function(analysis=makeAnalysis(),modelType="Raw",analysisType="
       if (braw.env$STMethod=="sLLR") {
         analysis$sIV<-res2llr(analysis,"sLLR")
         f1<-"\bllr"
-        f2<-paste("s=",format(analysis$sIV,digits=braw.env$report_precision),sep="")
+        f2<-paste("s=",brawFormat(analysis$sIV,digits=braw.env$report_precision),sep="")
       }
       if (braw.env$STMethod=="dLLR") {
         if (!analysis$evidence$prior$worldOn) {
@@ -68,11 +68,11 @@ reportInference<-function(analysis=makeAnalysis(),modelType="Raw",analysisType="
         }
         analysis$dIV<-res2llr(analysis,"dLLR")
         f1<-"\bllr"
-        f2<-paste("d=",format(analysis$dIV,digits=braw.env$report_precision),sep="")
+        f2<-paste("d=",brawFormat(analysis$dIV,digits=braw.env$report_precision),sep="")
       }
 
       outputText<-c(outputText,"\btest-statistic","\b(df) ","\bvalue   ","\bp",f1,rep("",nc-5))
-      outputText<-c(outputText,t_name,df,format(tval,digits=braw.env$report_precision),pvalText,f2,rep("",nc-5))
+      outputText<-c(outputText,t_name,df,brawFormat(tval,digits=braw.env$report_precision),pvalText,f2,rep("",nc-5))
     }
     
     outputText<-c(outputText,rep(" ",nc))
@@ -98,7 +98,7 @@ reportInference<-function(analysis=makeAnalysis(),modelType="Raw",analysisType="
           if (is.na(anova[i,j])){
             outputText<-c(outputText,"")
           } else {
-            outputText<-c(outputText,format(anova[i,j],digits=braw.env$report_precision))
+            outputText<-c(outputText,brawFormat(anova[i,j],digits=braw.env$report_precision))
           }
         }
         if (ncol(anova)+1<nc) {outputText<-c(outputText,rep("",nc-(ncol(anova)+1)))}
@@ -106,18 +106,18 @@ reportInference<-function(analysis=makeAnalysis(),modelType="Raw",analysisType="
     }
     if (!total_done && analysisType=="Anova") {
     ssq<-sum(anova[,1])-anova[1,1]
-    if (!is.na(ssq)) {ssq<-format(ssq,digits=braw.env$report_precision)} else {ssq<-""}
+    if (!is.na(ssq)) {ssq<-brawFormat(ssq,digits=braw.env$report_precision)} else {ssq<-""}
     
     df<-sum(anova[,2])-anova[1,2]
-    if (!is.na(df)) {df<-format(df,digits=braw.env$report_precision)} else {df<-""}
+    if (!is.na(df)) {df<-brawFormat(df,digits=braw.env$report_precision)} else {df<-""}
     outputText<-c(outputText,"\bTotal",ssq,df,rep("",nc-3))
     }
     outputText<-c(outputText,rep(" ",nc))
 
     outputText<-c(outputText,"\bPower(w)", "\bObserved","\bActual",rep("",nc-3))   
     if (is.na(effect$rIV)) {effect$rIV<-0}
-    outputText<-c(outputText," ",format(rn2w(analysis$rIV,analysis$nval),digits=3),
-                                 format(rn2w(effect$rIV,analysis$nval),digits=3),
+    outputText<-c(outputText," ",brawFormat(rn2w(analysis$rIV,analysis$nval),digits=3),
+                                 brawFormat(rn2w(effect$rIV,analysis$nval),digits=3),
                   rep("",nc-3))
     
     nr=length(outputText)/nc

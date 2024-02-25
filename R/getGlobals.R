@@ -68,6 +68,8 @@ BrawOpts<-function(BW=FALSE,fontScale=1) {
           
           braw.env$labelSize<-4*fontScale
           
+          braw.env$layout<-layout
+          
           ##########################
           # NHST constants
           
