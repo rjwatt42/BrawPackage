@@ -6,7 +6,7 @@ drawVar<-function(pts,var){
       # geom_label(data=pts,aes(x=x,y=y,label=t),hjust=0.5, vjust=0.5, size=11, fontface="bold",label.size = NA)+
       labs(x=var$name,y="")+
       braw.env$diagramTheme+
-      theme(plot.margin=margin(1.15,1.8,1,1.25,"cm"))+
+      # theme(plot.margin=margin(1.15,1.8,1,1.25,"cm"))+
       theme(axis.text.y=element_blank(),
             axis.ticks.y=element_blank(),
             axis.title.x=element_text(size=12,face="bold")
@@ -20,8 +20,8 @@ drawVar<-function(pts,var){
     geom_line(lwd=0.25,color="black")+
       # geom_line(aes(x=r,y=dens*0),color="black",lwd=0.5)+
       labs(x=var$name,y="")+
-      braw.env$diagramTheme+
-      theme(panel.spacing=margin(0,0,0,0,"cm"),plot.margin=margin(0,0,0,0,"cm"))+
+      braw.env$plainDiagramTheme+
+      theme(plot.margin=margin(0,0,0,-0.7,"cm"))+
     theme(axis.text.y=element_blank(),axis.ticks.y=element_blank(),
           axis.title.x=element_text(size=12,face="bold"))
     
@@ -129,7 +129,7 @@ showVariable<-function(variable=makeVariable(),single=FALSE){
          "Categorical"={g<-drawCategorical(variable)},
          "empty"={g<-drawVar(NULL,variable)}
   )
-  if (single)
-  g<-g+theme(plot.margin=margin(0.5,0.5,0.1,0.5,"cm"))
+  # if (single)
+  # g<-g+theme(plot.margin=margin(0.5,0.5,0.1,0.5,"cm"))
   g
 }

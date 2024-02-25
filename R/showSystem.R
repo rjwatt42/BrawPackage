@@ -54,14 +54,14 @@ showHypothesis<-function(hypothesis=makeHypothesis()) {
             xmin<-2
             xmax<-8
             g<-PlotNULL+
-              annotation_custom(grob=ggplotGrob(showVariable(IV)), xmin=0,  xmax=4,  ymin=6, ymax=9)+
-              annotation_custom(grob=ggplotGrob(showVariable(IV2)),xmin=6,  xmax=10, ymin=6, ymax=9)+
-              annotation_custom(grob=ggplotGrob(showVariable(DV)), xmin=3,  xmax=7,  ymin=0.5, ymax=3.5)
+              annotation_custom(grob=ggplotGrob(showVariable(IV)), xmin=0,  xmax=4,  ymin=6, ymax=10)+
+              annotation_custom(grob=ggplotGrob(showVariable(IV2)),xmin=6,  xmax=10, ymin=6, ymax=10)+
+              annotation_custom(grob=ggplotGrob(showVariable(DV)), xmin=3,  xmax=7,  ymin=0, ymax=4)
             # arrows
-            g<-g+annotation_custom(grob=ggplotGrob(drawEffectES(effect$rIV,2)),xmin=1.5,xmax=5.5,ymin=3, ymax=7)+
-              annotation_custom(grob=ggplotGrob(drawEffectES(effect$rIV2,3)),xmin=4.5,xmax=8.5,ymin=3, ymax=7)+
-              annotation_custom(grob=ggplotGrob(drawEffectES(effect$rIVIV2,4)),xmin=3,  xmax=7,  ymin=6, ymax=9)+
-              annotation_custom(grob=ggplotGrob(drawEffectES(effect$rIVIV2DV,5)),xmin=3,  xmax=7,  ymin=3, ymax=7)
+            g<-g+annotation_custom(grob=ggplotGrob(drawEffectES(effect$rIV,2)),xmin=1.5,xmax=3,ymin=3.9, ymax=5.65)+
+              annotation_custom(grob=ggplotGrob(drawEffectES(effect$rIV2,3)),xmin=7,xmax=8.5,ymin=3.9, ymax=5.65)+
+              annotation_custom(grob=ggplotGrob(drawEffectES(effect$rIVIV2,4)),xmin=4.2,  xmax=5.8,  ymin=7, ymax=8.5)+
+              annotation_custom(grob=ggplotGrob(drawEffectES(effect$rIVIV2DV,5)),xmin=4,  xmax=6,  ymin=3.9, ymax=6)
           }
   )
   g

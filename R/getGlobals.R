@@ -56,6 +56,7 @@ BrawOpts<-function(BW=FALSE,fontScale=1) {
           
           braw.env$plotTheme<-mainTheme+SMplotTheme+theme(plot.margin=margin(1.0,1.5,0.5,0.5,"cm"))
           braw.env$diagramTheme<-mainTheme+SMplotTheme+theme(panel.background = element_rect(fill=plotColours$graphBack, colour=plotColours$graphBack),panel.spacing=margin(0,0,0,0),plot.margin=margin(0.5,0.5,0.3,0.3,"cm"))
+          braw.env$plainDiagramTheme<-mainTheme+SMplotTheme+theme(panel.background = element_rect(fill=plotColours$graphBack, colour=plotColours$graphBack),panel.spacing=margin(0,0,0,0),plot.margin=margin(0.5,0.5,0.3,-0.2,"cm"))
           braw.env$blankTheme<-mainTheme+theme(panel.spacing=margin(0,0,0,0,"cm"),plot.margin=margin(0,0,0,0,"cm"),panel.background = element_rect(fill=plotColours$graphC, colour=plotColours$graphC))
           braw.env$reportTheme<-braw.env$blankTheme+theme(plot.margin=margin(0.15,0.8,0,0.25,"cm"),
                                           axis.title.x=element_blank(),
