@@ -1,7 +1,9 @@
 #' export
-drawEffectES<-function(r,t=1){
+drawEffectES<-function(r,t=1,plotArea=c(0,0,1,1),g=NULL){
 
-  xoff<-0
+  if (is.null(g))
+    g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme
+  
   switch (t,
           {start=c(0,0.92)
           direction=0
@@ -16,7 +18,6 @@ drawEffectES<-function(r,t=1){
           labelpts<-data.frame(x=0.15,y=0.6)
           ends="last"
           col=braw.env$plotColours$maineffectES
-          xoff<- 0
           },
 
           {start=c(0,0.92)
@@ -25,7 +26,6 @@ drawEffectES<-function(r,t=1){
           labelpts<-data.frame(x=-0.15,y=0.6)
           ends="last"
           col=braw.env$plotColours$maineffectES
-          xoff<- 0
           },
           
           {start=c(0.6,0.5)
@@ -69,29 +69,22 @@ drawEffectES<-function(r,t=1){
     x<-arrow_x*cos(direction/(180/pi))+arrow_y*sin(direction/(180/pi))
     y<-arrow_x*sin(direction/(180/pi))-arrow_y*cos(direction/(180/pi))
     pts<-data.frame(x=x+start[1],y=y+start[2])
-  g<-ggplot(pts,aes(x=x,y=y))+
-    geom_polygon(color="black",fill=col, lwd=0.5)#+coord_fixed(1,xlim=c(-1,1),ylim=c(0,1))
+    pts$x<-(pts$x+1)/2*plotArea[3]+plotArea[1]
+    pts$y<-pts$y*plotArea[4]+plotArea[2]
+    
+  g<-g+
+    geom_polygon(data=pts,aes(x=x,y=y),color="black",fill=col, lwd=0.5)#+coord_fixed(1,xlim=c(-1,1),ylim=c(0,1))
   
   if (braw.env$simData) {
     if (t==1){
       lbl=paste("r=",as.character(r),sep="")
     }else{ lbl=as.character(r)
     }
+    labelpts$x<-(labelpts$x+1)/2*plotArea[3]+plotArea[1]
+    labelpts$y<-labelpts$y*plotArea[4]+plotArea[2]
     g<-g+geom_label(data=labelpts,aes(x = mean(x), y = mean(y), label = lbl), color="black", fill = "white",size=braw.env$labelSize)
   }
   
-  ESplotMargins<-margin(-0.5,-0.5,-0.5,-1,"cm")
+  return(g)
 
-  g + 
-    braw.env$blankTheme+
-    theme(axis.text.y=element_blank(),
-          axis.ticks.y=element_blank(),
-          axis.text.x=element_blank(),
-          axis.ticks.x=element_blank())+
-    theme(panel.spacing=margin(0,0,0,0,"cm"),plot.margin=ESplotMargins)+
-    theme(panel.background = element_rect(fill="transparent", colour="transparent"),
-          plot.background = element_rect(fill="transparent", colour="transparent"))+
-    labs(x="",y="")+
-    coord_cartesian(c(-1,1)*0.6+xoff, ylim = 0.5+c(-1, 1)*0.45)
-  
 }

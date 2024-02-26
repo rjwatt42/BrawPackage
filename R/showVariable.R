@@ -1,39 +1,38 @@
+reRange<-function(r,plotRange,rRange=NULL) {
+  if (is.null(rRange)) rRange<-c(min(r),max(r))
+  r_range<-diff(rRange)
+  r<-(r-rRange[1]+r_range/20)/(r_range*1.1)
+  r<-r*(plotRange[2])+plotRange[1]
+  
+}
 
-drawVar<-function(pts,var){
-  if (is.null(pts)) {
-    pts<-data.frame(x=0,y=0.5,t=var$name)
-    ggplot()+
-      # geom_label(data=pts,aes(x=x,y=y,label=t),hjust=0.5, vjust=0.5, size=11, fontface="bold",label.size = NA)+
-      labs(x=var$name,y="")+
-      braw.env$diagramTheme+
-      # theme(plot.margin=margin(1.15,1.8,1,1.25,"cm"))+
-      theme(axis.text.y=element_blank(),
-            axis.ticks.y=element_blank(),
-            axis.title.x=element_text(size=12,face="bold")
-            # axis.text.x=element_blank(),
-            # axis.ticks.x=element_blank()
-      )+
-      # theme(plot.margin=margin(0.0,-0.2,0,-1,"cm"))+
-    coord_cartesian(xlim = c(-1,1), ylim = c(0, 1))
-  } else {
-  ggplot(pts,aes(x=r,y=dens))+geom_polygon(fill=braw.env$plotColours$sampleC)+
-    geom_line(lwd=0.25,color="black")+
-      # geom_line(aes(x=r,y=dens*0),color="black",lwd=0.5)+
-      labs(x=var$name,y="")+
-      braw.env$plainDiagramTheme+
-      theme(plot.margin=margin(0,0,0,-0.7,"cm"))+
-    theme(axis.text.y=element_blank(),axis.ticks.y=element_blank(),
-          axis.title.x=element_text(size=12,face="bold"))
-    
-}
-}
+drawVar<-function(pts,ticks,var,plotArea=c(0,0,1,1),g){
+
+  pts$r<-reRange(pts$r,plotArea[c(1,3)])
+  pts$dens<-reRange(pts$dens*0.8,plotArea[c(2,4)]+plotArea[4]*c(1,-1)*0.2,c(0,1))
+
+  ticks$breaks<-reRange(ticks$breaks,plotArea[c(1,3)])
+  
+  back<-data.frame(x=plotArea[1]+plotArea[3]*c(0,0,1,1),
+                   y=reRange(c(0,1,1,0),plotArea[c(2,4)]+plotArea[4]*c(1,-1)*0.2,c(0,1)))
+  axis<-data.frame(x=plotArea[1]+plotArea[3]*c(0,1),
+                   y=reRange(c(0,1),plotArea[c(2,4)]+plotArea[4]*c(1,-1)*0.2,c(0,1)))
+
+  g<-g+geom_polygon(data=back,aes(x=x,y=y),fill=braw.env$plotColours$graphBack, col=braw.env$plotColours$graphBack)
+  g<-g+geom_polygon(data=pts,aes(x=r,y=dens),fill=braw.env$plotColours$sampleC, col="black")
+  
+    g+geom_line(data=axis,aes(x=x,y=y[1]),color="black",lwd=0.5)+
+      geom_text(data=axis,aes(x=mean(x),y=y[1]),label=var$name,vjust=2.2,fontface="bold")+
+      geom_text(data=ticks,aes(x=breaks,y=axis$y[1],label=labels),vjust=1.4,size=3)      
+    }
 
 shrinkString<-function(s,n) {return(substr(s,1,n))}
 
-drawCategorical<-function(var){
+drawCategorical<-function(var,plotArea=c(0,0,1,1),g){
   ng<-var$ncats
   pp<-CatProportions(var)
   b<-(1:ng)*2-(ng+1)
+  bt<-b
   
   r1<-c(-1, -1, 1, 1)*0.6
   d1<-c(0,1,1,0)
@@ -45,28 +44,29 @@ drawCategorical<-function(var){
     dens<-c(dens,d1*pp[i])
   }
 
-  l<-var$cases[1:ng]
-  if (sum(sapply(l,nchar))>12) {
-    l<-sapply(l,shrinkString,ceil(12/ng))
+  lt<-var$cases[1:ng]
+  if (sum(sapply(lt,nchar))>12) {
+    lt<-sapply(lt,shrinkString,ceil(12/ng))
   }
 
   xlim<-c(-ng,ng)+c(-1,1)*ng/10
   r<-c(xlim[1],r,xlim[2])
   dens<-c(0,dens,0)
   pts=data.frame(r=r,dens=dens)
+  ticks<-data.frame(breaks=bt,labels=lt)
   
-  g<-drawVar(pts,var)
+  g<-drawVar(pts,ticks,var,plotArea,g)
+  
   if (var$deploy=="Within") {
     pts<-data.frame(x=b,y=pp*0.75)
     g<-g+geom_line(data=pts,aes(x=x,y=y),colour="gray",lwd=1)+
       geom_point(data=pts,aes(x=x,y=y),colour="black")
   }
-    g+scale_x_continuous(breaks=b,labels=l)+
-    coord_cartesian(xlim = xlim, ylim = c(0, 1.2))
-  
+
+  return(g)
 }
 
-drawOrdinal<-function(var){
+drawOrdinal<-function(var,plotArea=c(0,0,1,1),g){
   r1<-c(-1, -1, 1, 1)*0.5
   d1<-c(0,1,1,0)
   
@@ -90,14 +90,12 @@ drawOrdinal<-function(var){
   r<-c(xlim[1],r,xlim[2])
   dens<-c(0,dens,0)
   pts=data.frame(r=r,dens=dens)
-  
-  drawVar(pts,var)+
-    scale_x_continuous(breaks=bt,labels=lt)+
-    coord_cartesian(xlim = xlim, ylim = c(0, 1.2))
+  ticks<-data.frame(breaks=bt,labels=lt)
+  drawVar(pts,ticks,var,plotArea,g)
   
 }
 
-drawInterval<-function(var){
+drawInterval<-function(var,plotArea=c(0,0,1,1),g){
   r<-seq(-braw.env$fullRange,braw.env$fullRange,length.out=braw.env$varNPoints)*var$sd+var$mu
   if (var$skew!=0 || var$kurtosis!=0) {
     a<-f_johnson_M(var$mu,var$sd,var$skew,var$kurtosis)
@@ -110,9 +108,11 @@ drawInterval<-function(var){
   dens[1]=0; dens[length(dens)]=0
   
   pts=data.frame(r=r,dens=dens/max(dens))
-  xlim<-c(-1,1)*3*var$sd+var$mu
-  drawVar(pts,var)+
-    coord_cartesian(xlim = xlim, ylim = c(0, 1.2))
+  bt<-c(-2,-1,0,1,2)*var$sd+var$mu
+  lt<-bt
+  ticks<-data.frame(breaks=bt,labels=lt)
+  
+  drawVar(pts,ticks,var,plotArea,g)
 }
 
 #' show a variable object
@@ -122,14 +122,16 @@ drawInterval<-function(var){
 #' @examples
 #' variable<-showVariable(variable=makeVariable())
 #' @export
-showVariable<-function(variable=makeVariable(),single=FALSE){
+showVariable<-function(variable=makeVariable(),plotArea=c(0,0,1,1),g=NULL){
+  if (is.null(g)) 
+    g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme
   switch(variable$type,
-         "Interval"={g<-drawInterval(variable)},
-         "Ordinal"={g<-drawOrdinal(variable)},
-         "Categorical"={g<-drawCategorical(variable)},
-         "empty"={g<-drawVar(NULL,variable)}
+         "Interval"={g<-drawInterval(variable,plotArea,g)},
+         "Ordinal"={g<-drawOrdinal(variable,plotArea,g)},
+         "Categorical"={g<-drawCategorical(variable,plotArea,g)},
+         "empty"={g<-g+drawVar(NULL,variable)}
   )
-  # if (single)
-  # g<-g+theme(plot.margin=margin(0.5,0.5,0.1,0.5,"cm"))
-  g
+  return(g)
+      
+  
 }

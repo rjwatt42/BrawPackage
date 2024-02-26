@@ -18,24 +18,22 @@ showHypothesis<-function(hypothesis=makeHypothesis()) {
   if (is.null(IV) || is.null(DV)) {return(ggplot()+braw.env$blankTheme)}
   if (is.null(IV2)) no_ivs<-1 else no_ivs<-2
     
-  g1<-showVariable(IV)
-  g3<-showVariable(DV)
-  g0<-drawEffectES(effect$rIV,1)+braw.env$blankTheme
-  # switch(no_ivs,
-  #        {g<-grid.arrange(g1,g0,g3,ncol=1)},
-  #        {
-  #          gbl<-ggplot()+braw.env$blankTheme
-  #          g2<-showVariable(IV2)
-  #          g0a<-drawEffectES(effect$rIVIV2,4)+braw.env$blankTheme
-  #          ga<-grid.arrange(g1,g0a,g2,ncol=3,padding=0)
-  #          g0b<-drawEffectES(effect$rIV,2)+braw.env$blankTheme
-  #          g0c<-drawEffectES(effect$rIVIV2DV,5)+braw.env$blankTheme
-  #          g0d<-drawEffectES(effect$rIV2,3)+braw.env$blankTheme
-  #          gb<-grid.arrange(g0b,g0c,g0d,ncol=3,padding=0)
-  #          gc<-grid.arrange(gbl,g3,gbl,ncol=3,padding=0)
-  #          g<-grid.arrange(ga,gb,gc,ncol=1,padding=0)
-  #        })
-  # return(g)
+  switch(no_ivs,
+         {
+           g<-showVariable(IV,plotArea=c(0.3,0.6,0.4,0.4))
+           g<-showVariable(DV,plotArea=c(0.3,0.0,0.4,0.4),g)
+           g<-drawEffectES(effect$rIV,1,plotArea=c(0.3,0.4,0.4,0.22),g)
+         },
+         {
+           g<-showVariable(IV,plotArea=c(0.0,0.6,0.4,0.4))
+           g<-showVariable(IV2,plotArea=c(0.6,0.6,0.4,0.4),g)
+           g<-showVariable(DV,plotArea=c(0.3,0.0,0.4,0.4),g)
+           g<-drawEffectES(effect$rIV,2,plotArea=c(0.1,0.4,0.4,0.22),g)
+           g<-drawEffectES(effect$rIV2,3,plotArea=c(0.5,0.4,0.4,0.22),g)
+           g<-drawEffectES(effect$rIVIV2,4,plotArea=c(0.3,0.7,0.4,0.22),g)
+           g<-drawEffectES(effect$rIVIV2DV,5,plotArea=c(0.3,0.4,0.4,0.22),g)
+         })
+  return(joinPlots(g))
   # 
   PlotNULL<-ggplot()+braw.env$blankTheme+theme(plot.margin=margin(0,-0.1,0,0,"cm"))+
     scale_x_continuous(limits = c(0,10),labels=NULL,breaks=NULL)+scale_y_continuous(limits = c(0,10),labels=NULL,breaks=NULL)
@@ -108,7 +106,7 @@ showWorld<-function(world=makeWorld()) {
 
   g<-g1
 
-  g
+  return(joinPlots(g))
 }
 
 #' show a design object
@@ -138,7 +136,7 @@ showDesign<-function(design=makeDesign()) {
   g<-g+geom_line(data=pts,aes(x=x,y=y),color="black",lwd=0.25)
   g<-g+labs(x="n",y="Density")+braw.env$diagramTheme
   
-  g  
+  return(joinPlots(g+theme(plot.margin=margin(1.3,0.8,0,0.25,"cm"))))
 }
 
 # population diagram
@@ -174,7 +172,7 @@ showPopulation <- function(hypothesis=makeHypothesis()) {
             )
           }
   )
-  g
+  return(joinPlots(g))
 }
 
 # prediction diagram
@@ -222,7 +220,7 @@ showPrediction <- function(hypothesis=makeHypothesis(),design=makeDesign(),evide
             }
           }
   )
-  g
+  return(joinPlots(g))
 }
 ##################################################################################    
 
@@ -261,6 +259,6 @@ plotWorldSampling<-function(effect,design,sigOnly=FALSE) {
          "r"={g<-g+labs(x=braw.env$rsLabel,y="Frequency")+braw.env$diagramTheme},
          "z"={g<-g+labs(x=braw.env$zsLabel,y="Frequency")+braw.env$diagramTheme}
   )
-  g+theme(plot.margin=margin(1.3,0.8,0,0.25,"cm"))
+  return(joinPlots(g+theme(plot.margin=margin(1.3,0.8,0,0.25,"cm"))))
 }
 
