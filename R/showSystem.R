@@ -19,7 +19,8 @@ showHypothesis<-function(hypothesis=makeHypothesis()) {
   if (is.null(IV2)) no_ivs<-1 else no_ivs<-2
     
   switch(no_ivs,
-         {
+         { 
+           braw.env$plotArea<-c(0.3,0.6,0.4,0.4)
            g<-showVariable(IV,plotArea=c(0.3,0.6,0.4,0.4))
            g<-showVariable(DV,plotArea=c(0.3,0.0,0.4,0.4),g)
            g<-drawEffectES(effect$rIV,1,plotArea=c(0.3,0.4,0.4,0.22),g)
@@ -34,35 +35,6 @@ showHypothesis<-function(hypothesis=makeHypothesis()) {
            g<-drawEffectES(effect$rIVIV2DV,5,plotArea=c(0.3,0.4,0.4,0.22),g)
          })
   return(joinPlots(g))
-  # 
-  PlotNULL<-ggplot()+braw.env$blankTheme+theme(plot.margin=margin(0,-0.1,0,0,"cm"))+
-    scale_x_continuous(limits = c(0,10),labels=NULL,breaks=NULL)+scale_y_continuous(limits = c(0,10),labels=NULL,breaks=NULL)
-  
-  switch (no_ivs,
-          {
-            xmin<-3
-            xmax<-7
-            g<-PlotNULL+
-              annotation_custom(grob=ggplotGrob(g1),xmin=xmin,xmax=xmax,ymin=6,ymax=10)+
-              annotation_custom(grob=ggplotGrob(g3),xmin=xmin,xmax=xmax,ymin=0,ymax=4)
-            # arrow
-            g<-g+annotation_custom(grob=ggplotGrob(g0),xmin=xmin,xmax=xmax,ymin=3.5,ymax=6)
-          },
-          {
-            xmin<-2
-            xmax<-8
-            g<-PlotNULL+
-              annotation_custom(grob=ggplotGrob(showVariable(IV)), xmin=0,  xmax=4,  ymin=6, ymax=10)+
-              annotation_custom(grob=ggplotGrob(showVariable(IV2)),xmin=6,  xmax=10, ymin=6, ymax=10)+
-              annotation_custom(grob=ggplotGrob(showVariable(DV)), xmin=3,  xmax=7,  ymin=0, ymax=4)
-            # arrows
-            g<-g+annotation_custom(grob=ggplotGrob(drawEffectES(effect$rIV,2)),xmin=1.5,xmax=3,ymin=3.9, ymax=5.65)+
-              annotation_custom(grob=ggplotGrob(drawEffectES(effect$rIV2,3)),xmin=7,xmax=8.5,ymin=3.9, ymax=5.65)+
-              annotation_custom(grob=ggplotGrob(drawEffectES(effect$rIVIV2,4)),xmin=4.2,  xmax=5.8,  ymin=7, ymax=8.5)+
-              annotation_custom(grob=ggplotGrob(drawEffectES(effect$rIVIV2DV,5)),xmin=4,  xmax=6,  ymin=3.9, ymax=6)
-          }
-  )
-  g
 }
 
 #' show a world object
@@ -71,9 +43,15 @@ showHypothesis<-function(hypothesis=makeHypothesis()) {
 #' @examples
 #' showWorld(world=makeWorld())
 #' @export
-showWorld<-function(world=makeWorld()) {
+showWorld<-function(hypothesis=makeHypothesis(effect=makeEffect(world=makeWorld()))) {
 # world diagram
 
+  world<-hypothesis$effect$world
+  if (!world$worldOn) {
+    world<-makeWorld(worldOn=TRUE,populationPDF="Single",populationRZ="r",
+                     populationPDFk=hypothesis$effect$rIV,populationNullp=0)
+  }
+    
   PlotNULL<-ggplot()+braw.env$blankTheme+theme(plot.margin=margin(0,-0.1,0,0,"cm"))+
     scale_x_continuous(limits = c(0,10),labels=NULL,breaks=NULL)+scale_y_continuous(limits = c(0,10),labels=NULL,breaks=NULL)
 
@@ -136,7 +114,7 @@ showDesign<-function(design=makeDesign()) {
   g<-g+geom_line(data=pts,aes(x=x,y=y),color="black",lwd=0.25)
   g<-g+labs(x="n",y="Density")+braw.env$diagramTheme
   
-  return(joinPlots(g+theme(plot.margin=margin(1.3,0.8,0,0.25,"cm"))))
+  return(joinPlots(g))
 }
 
 # population diagram
@@ -224,19 +202,28 @@ showPrediction <- function(hypothesis=makeHypothesis(),design=makeDesign(),evide
 }
 ##################################################################################    
 
-plotWorldSampling<-function(effect,design,sigOnly=FALSE) {
+# world sampling distribution
+#' show the prediction corresponding to a hypothesis & design
+#' 
+#' @return ggplot2 object - and printed
+#' @examples
+#' showWorldSampling(hypothesis=makeHypothesis(),design=makeDesign(),sigOnly=FALSE)
+#' @export
+showWorldSampling<-function(hypothesis=makeHypothesis(),design=makeDesign(),sigOnly=FALSE) {
+  world<-hypothesis$effect$world
+  
   g<-ggplot()
   
   np<-braw.env$worldNPoints
-  if (effect$world$worldAbs) np<-braw.env$worldNPoints*2+1
+  if (world$worldAbs) np<-braw.env$worldNPoints*2+1
   
   vals<-seq(-1,1,length=np)*braw.env$r_range
   if (braw.env$RZ=="z") {
     vals<-tanh(seq(-1,1,length=np*2)*braw.env$z_range*2)
   }
   
-  dens<-fullRSamplingDist(vals,effect$world,design,sigOnly=sigOnly) 
-  if (effect$world$worldAbs) {
+  dens<-fullRSamplingDist(vals,world,design,sigOnly=sigOnly) 
+  if (world$worldAbs) {
     vals<-vals[braw.env$worldNPoints+(1:braw.env$worldNPoints)]
     dens<-dens[braw.env$worldNPoints+(1:braw.env$worldNPoints)]
   }
@@ -259,6 +246,6 @@ plotWorldSampling<-function(effect,design,sigOnly=FALSE) {
          "r"={g<-g+labs(x=braw.env$rsLabel,y="Frequency")+braw.env$diagramTheme},
          "z"={g<-g+labs(x=braw.env$zsLabel,y="Frequency")+braw.env$diagramTheme}
   )
-  return(joinPlots(g+theme(plot.margin=margin(1.3,0.8,0,0.25,"cm"))))
+  return(joinPlots(g))
 }
 

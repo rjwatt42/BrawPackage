@@ -76,7 +76,7 @@ resetExpected<-function(nsims=0,expectedResult=NULL){
 #'                              doingNull=FALSE,autoShow=FALSE,showType="Basic")
 #' @seealso showExpected() and reportExpected())
 #' @export
-makeExpected <- function(nsims=100,expectedResult=NULL,hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
+makeExpected <- function(nsims=10,expectedResult=NULL,hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
                          doingNull=FALSE,autoShow=FALSE,showType="Basic") {
   
   if (!is.null(expectedResult)) {

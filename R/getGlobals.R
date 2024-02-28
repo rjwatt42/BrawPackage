@@ -1,5 +1,5 @@
 
-braw.env<-NULL
+# braw.env<-NULL
 .onLoad<- function(...) {
   BrawOpts()
 }
@@ -12,6 +12,8 @@ BrawOpts<-function(BW=FALSE,fontScale=1) {
   braw.env$CatCatCols<-c()
   braw.env$lastSample<-NULL
   
+  braw.env$plotArea<-c(0,0,1,1) 
+  # left, bottom, x-size, y-size
   ################################
   # graph design
   
@@ -55,9 +57,12 @@ BrawOpts<-function(BW=FALSE,fontScale=1) {
           braw.env$plotShapes<-list(data=21,study=22,parameter=21,meta=24)
           
           braw.env$plotTheme<-mainTheme+SMplotTheme+theme(plot.margin=margin(1.0,1.5,0.5,0.5,"cm"))
-          braw.env$diagramTheme<-mainTheme+SMplotTheme+theme(panel.background = element_rect(fill=plotColours$graphBack, colour=plotColours$graphBack),panel.spacing=margin(0,0,0,0),plot.margin=margin(0.5,0.5,0.3,0.3,"cm"))
-          braw.env$plainDiagramTheme<-mainTheme+SMplotTheme+theme(panel.background = element_rect(fill=plotColours$graphBack, colour=plotColours$graphBack),panel.spacing=margin(0,0,0,0),plot.margin=margin(0.5,0.5,0.3,-0.2,"cm"))
-          braw.env$blankTheme<-mainTheme+theme(panel.spacing=margin(0,0,0,0,"cm"),plot.margin=margin(0,0,0,0,"cm"),panel.background = element_rect(fill=plotColours$graphC, colour=plotColours$graphC),
+          braw.env$diagramTheme<-mainTheme+SMplotTheme+theme(panel.background = element_rect(fill=plotColours$graphBack, colour=plotColours$graphBack),
+                                                             panel.spacing=margin(0,0,0,0),plot.margin=margin(0.5,0.5,0.3,0.3,"cm"))
+          braw.env$plainDiagramTheme<-mainTheme+SMplotTheme+theme(panel.background = element_rect(fill=plotColours$graphBack, colour=plotColours$graphBack),
+                                                                  panel.spacing=margin(0,0,0,0),plot.margin=margin(0.5,0.5,0.3,-0.2,"cm"))
+          braw.env$blankTheme<-mainTheme+theme(panel.background = element_rect(fill=plotColours$graphC, colour=plotColours$graphC),
+                                               panel.spacing=margin(0,0,0,0,"cm"),plot.margin=margin(0,0,0,0,"cm"),
                                                axis.title.x=element_blank(),
                                                axis.text.x=element_blank(),
                                                axis.ticks.x=element_blank(),
@@ -65,16 +70,9 @@ BrawOpts<-function(BW=FALSE,fontScale=1) {
                                                axis.text.y=element_blank(),
                                                axis.ticks.y=element_blank()
           )
-          braw.env$reportTheme<-braw.env$blankTheme+theme(plot.margin=margin(0.15,0.8,0,0.25,"cm"),
-                                          axis.title.x=element_blank(),
-                                          axis.text.x=element_blank(),
-                                          axis.ticks.x=element_blank(),
-                                          axis.title.y=element_blank(),
-                                          axis.text.y=element_blank(),
-                                          axis.ticks.y=element_blank()
-          )
+          braw.env$reportTheme<-braw.env$blankTheme+theme(plot.margin=margin(0.15,0.8,0,0.25,"cm"))
           
-          braw.env$labelSize<-4*fontScale
+          braw.env$labelSize<-3.2*fontScale
           
           braw.env$layout<-layout
           
@@ -199,6 +197,7 @@ BrawOpts<-function(BW=FALSE,fontScale=1) {
                   }
           )
           
+          braw.env$pPlus<-pPlus 
           braw.env$Pchar<-Pchar 
           braw.env$Zchar<-Zchar
           braw.env$Lchar<-Lchar

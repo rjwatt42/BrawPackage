@@ -1,14 +1,72 @@
+reRangeY<-function(y) {
+  y<-(y-braw.env$plotLimits$ylim[1])/diff(braw.env$plotLimits$ylim)
+  y<-y*braw.env$plotArea[4]+braw.env$plotArea[2]
+  return(y)
+}
+reRangeX<-function(x) {
+  x<-(x-braw.env$plotLimits$xlim[1])/diff(braw.env$plotLimits$xlim)
+  if (braw.env$plotArea[1]>0)
+    x<-x*(braw.env$plotArea[3]-0.15)+braw.env$plotArea[1]+0.15
+  else
+    x<-x*(braw.env$plotArea[3]-0.15)+0.1
+  return(x)
+}
+reRangeXY<-function(data) {
+  data$x<-reRangeX(data$x)
+  data$y<-reRangeY(data$y)
+  return(data)
+}
+reRangeYX<-function(data) {
+  data$x<-reRangeY(data$x)
+  data$y<-reRangeX(data$y)
+  return(data)
+}
+
+
+start_plot<-function(xlim,ylim,orientation,g=NULL) {
+  plotLimits(xlim = xlim, ylim = ylim,orientation=orientation)
+  
+  if (is.null(g)) g<-ggplot()
+  back<-reRangeXY(data.frame(x=xlim[c(1,2,2,1)],y=ylim[c(1,1,2,2)]))
+  axis<-reRangeXY(data.frame(x=xlim[1],y=ylim))
+  
+  g<-g+geom_polygon(data=back,aes(x=x,y=y),fill=braw.env$plotColours$graphBack, col=braw.env$plotColours$graphBack)
+  g<-g+geom_line(data=axis,aes(x=x,y=y),color="black",lwd=0.25)
+  
+  g<-g+theme(legend.position = "none")+braw.env$blankTheme
+  g<-g+densScale(breaks=NULL,labels=NULL,orientation=orientation)
+  g<-g+densLab(NULL,orientation)
+}
+
+plotTitle<-function(label) {
+  ggtitle(label)+theme(plot.title=element_text(face='bold', size=9, hjust=0))
+}
 
 varLab<-function(label,orientation) {
+  axis<-reRangeXY(data.frame(x=braw.env$plotLimits$xlim[1],y=mean(braw.env$plotLimits$ylim)))
   switch(orientation,
          "vert"={
-           ylab(label)
+           geom_text(data=axis,aes(x=x,y=y),label=deparse(label), parse = TRUE,hjust=0.5,vjust=-1.4,
+                     size=braw.env$labelSize*1.5,angle=90,fontface="bold")      
          },
          "horz"={
            xlab(label)
          }
   )
 }
+varScale<-function(breaks,labels,orientation){
+  switch(orientation,
+         "vert"={
+           ticks<-reRangeXY(data.frame(x=braw.env$plotLimits$xlim[1],y=breaks))
+           geom_text(data=ticks,aes(x=x,y=y),label=labels,hjust=1.1,
+                     size=braw.env$labelSize)
+         },
+         "horz"={
+           # scale_x_continuous(breaks=breaks,labels=labels)
+         }
+  )
+}
+
 densLab<-function(label,orientation){
   switch(orientation,
          "vert"={
@@ -30,55 +88,44 @@ densLab<-function(label,orientation){
   )
 }
 dataLabel<-function(data,orientation) {
+  data<-reRangeXY(data)
   geom_label(data=data,aes(x = x, y = y, label=label), hjust=0, vjust=0, fill="white",size=braw.env$labelSize)
-}
-varScale<-function(breaks,labels,orientation){
-  switch(orientation,
-         "vert"={
-           scale_y_continuous(breaks=breaks,labels=labels)
-         },
-         "horz"={
-           scale_x_continuous(breaks=breaks,labels=labels)
-         }
-  )
 }
 densScale<-function(breaks,labels,orientation){
   switch(orientation,
          "vert"={
-           scale_x_continuous(breaks=breaks,labels=labels)
+           # scale_x_continuous(breaks=breaks,labels=labels)
          },
          "horz"={
-           scale_y_continuous(breaks=breaks,labels=labels)
+           # scale_y_continuous(breaks=breaks,labels=labels)
          }
   )
 }
 plotLimits<-function(xlim,ylim,orientation) {
-  switch(orientation,
-         "vert"={
-           coord_cartesian(xlim=xlim,ylim=ylim)
-         },
-         "horz"={
-           xlim[1]<-0
-           coord_cartesian(xlim=ylim,ylim=xlim)
-         }
-  )
+  if (orientation=="horz") xlim[1]<-0
+  braw.env$plotLimits<-list(xlim=xlim,ylim=ylim)
 }
 varLine<-function(intercept=NULL,linetype="solid",color,linewidth,orientation){
+  data<-data.frame(x=reRangeX(braw.env$plotLimits$xlim),
+                   y=reRangeY(intercept))
   switch(orientation,
          "vert"={
-           geom_hline(yintercept=intercept,linetype=linetype, color=color, linewidth=linewidth)
+           geom_line(data=data,aes(x=x,y=y),linetype=linetype, color=color, linewidth=linewidth)
          },
          "horz"={
+           intercept<-reRangeX(intercept)
            geom_vline(xintercept=intercept,linetype=linetype, color=color, linewidth=linewidth)
          }
-         )
+  )
 }
 dataLine<-function(data,arrow=NULL,colour,linewidth,orientation) {
   switch(orientation,
          "vert"={
+           data<-reRangeXY(data)
            geom_line(data=data,aes(x=x,y=y),arrow=arrow,colour=colour,linewidth=linewidth)
          },
          "horz"={
+           data<-reRangeYX(data)
            geom_line(data=data,aes(x=y,y=x),arrow=arrow,colour=colour,linewidth=linewidth)
          }
   )
@@ -86,10 +133,12 @@ dataLine<-function(data,arrow=NULL,colour,linewidth,orientation) {
 dataPath<-function(data,arrow=NULL,colour,linewidth,orientation) {
   switch(orientation,
          "vert"={
+           data<-reRangeXY(data)
            geom_path(data=data,aes(x=x,y=y),arrow=arrow,colour=colour,linewidth=linewidth)
          },
          "horz"={
            use<-data$x>=0 & c(diff(data$y),0)>=0
+           data<-reRangeYX(data)
            geom_path(data=data[use,],aes(x=y,y=x),arrow=arrow,colour=colour,linewidth=linewidth)
          }
   )
@@ -97,9 +146,11 @@ dataPath<-function(data,arrow=NULL,colour,linewidth,orientation) {
 dataPoint<-function(data,shape,colour,fill,size,orientation) {
   switch(orientation,
          "vert"={
+           data<-reRangeXY(data)
            geom_point(data=data,aes(x=x,y=y),shape=shape, colour = colour, fill = fill, size = size)
          },
          "horz"={
+           data<-reRangeYX(data)
            geom_point(data=data,aes(x=y,y=x),shape=shape, colour = colour, fill = fill, size = size)
          }
   )
@@ -107,10 +158,12 @@ dataPoint<-function(data,shape,colour,fill,size,orientation) {
 dataPolygon<-function(data,colour,fill,alpha=1, orientation) {
   switch(orientation,
          "vert"={
+           data<-reRangeXY(data)
            geom_polygon(data=data,aes(x=x,y=y),colour = colour, fill = fill,alpha=alpha)
          },
          "horz"={
            data$x[data$x<0]<-0
+           data<-reRangeYX(data)
            geom_polygon(data=data,aes(x=y,y=x),colour = colour, fill = fill,alpha=alpha)
          }
   )
@@ -185,9 +238,9 @@ makeFiddle<-function(y,yd,orientation){
         xz<-c(xz,x_min-x_inc*xd)
         yz<-c(yz,y[i])
       } else {
-      x_inc<-sqrt(1-((y[i]-y_at_max)/yd)^2)
-      xz<-c(xz,x_max+x_inc*xd)
-      yz<-c(yz,y[i])
+        x_inc<-sqrt(1-((y[i]-y_at_max)/yd)^2)
+        xz<-c(xz,x_max+x_inc*xd)
+        yz<-c(yz,y[i])
       }
     } else {
       xz<-c(xz,0)
@@ -218,7 +271,7 @@ getBins<-function(vals,nsvals,target,minVal,maxVal,fixed=FALSE) {
   if (min(vals,na.rm=TRUE)==max(vals,na.rm=TRUE)) {
     bins<-min(vals)+min(vals)/10*c(-1.5,-0.5,0.5,1.5)
     return(bins)
-    }
+  }
   
   nv=max(length(nsvals),length(vals))
   nb<-round(sqrt(nv)*0.75)
@@ -236,7 +289,7 @@ getBins<-function(vals,nsvals,target,minVal,maxVal,fixed=FALSE) {
     bins<-seq(low_p,high_p,length.out=nb)
     return(bins)
   }
-
+  
   if (fixed) {
     target_low<-max(-target,low_p)
     target_high<-min(target,high_p)
@@ -294,7 +347,7 @@ getBins<-function(vals,nsvals,target,minVal,maxVal,fixed=FALSE) {
 }
 
 expected_hist<-function(vals,svals,valType,histGain,histGainrange){
-
+  
   if (is.null(valType)) valType<-"r"
   if (is.element(valType,c("ro","ci1","ci2"))) valType<-"r"
   if (is.element(valType,c("e1","e2","po"))) valType<-"p"
@@ -305,7 +358,7 @@ expected_hist<-function(vals,svals,valType,histGain,histGainrange){
             target<-get_upperEdge(abs(vals),abs(svals))
             bins<-getBins(vals,svals,target,NULL,NULL,fixed=TRUE)
           },
-
+          
           "p"=  { # ns is large
             if (braw.env$pPlotScale=="log10") {
               target<-log10(braw.env$alphaSig)
@@ -316,7 +369,7 @@ expected_hist<-function(vals,svals,valType,histGain,histGainrange){
               bins<-c(0,bins[bins>0])
             }
           },
-            
+          
           "rp"=  { # ns is small
             target<-0.3
             bins<-getBins(vals,svals,target,NULL,NULL,fixed=TRUE)
@@ -365,11 +418,11 @@ expected_hist<-function(vals,svals,valType,histGain,histGainrange){
   use<-vals>=bins[1] & vals<bins[length(bins)]
   dens<-hist(vals[use],breaks=bins,plot=FALSE,warn.unused = FALSE,right=TRUE)
   dens<-dens$counts
-
+  
   use<-svals>=bins[1] & svals<bins[length(bins)]
   sdens<-hist(svals[use],breaks=bins,plot=FALSE,warn.unused = FALSE,right=TRUE)
   sdens<-sdens$counts
-
+  
   if (is.na(histGain)) {
     sdens<-sdens/max(dens,na.rm=TRUE)/2
     dens<-dens/max(dens,na.rm=TRUE)/2
@@ -384,13 +437,6 @@ expected_hist<-function(vals,svals,valType,histGain,histGainrange){
   y1<-c(0,as.vector(matrix(c(dens,dens),2,byrow=TRUE)),0)
   y2<-c(0,as.vector(matrix(c(sdens,sdens),2,byrow=TRUE)),0)
   data.frame(y1=c(-y1,rev(y1)), y2=c(-y2,rev(y2)), x=c(x,rev(x)))
-}
-
-start_plot<-function(orientation) {
-  g<-ggplot()
-  g<-g+theme(legend.position = "none")+braw.env$plotTheme
-  g<-g+densScale(breaks=NULL,labels=NULL,orientation=orientation)
-  g<-g+densLab(NULL,orientation)
 }
 
 expected_plot<-function(g,pts,expType=NULL,analysis=NULL,IV=NULL,DV=NULL,i=1,scale=1,col="white",orientation="vert",histGain=NA,histGainrange=NA){
@@ -444,23 +490,23 @@ expected_plot<-function(g,pts,expType=NULL,analysis=NULL,IV=NULL,DV=NULL,i=1,sca
              pCI<-analysis$pIVIV2CI
              if (isSignificant(braw.env$STMethod,analysis$pIVIV2DV,analysis$rIVIV2DV,analysis$nval,analysis$df12,analysis$evidence)) {c<-c1} else (c<-c2)
              }
-             )
+      )
       if (is.null(analysis$hypothesis$IV2)) {
-      if (expType=="r" && !is.null(rCI)){
-        x<-pts$x
-        if (length(x)<length(rCI)) x<-rep(x,length(rCI))
-        pts1se<-data.frame(x=x,y=rCI[1,])
-        g<-g+dataLine(data=pts1se,arrow=arrow(length=unit(se_arrow,"cm"),ends="both"),colour=c,linewidth=se_size,orientation=orientation)
-      }
-      if (expType=="p" && !is.null(analysis$pIVCI)){
-        x<-pts$x
-        if (length(x)<length(pCI)) x<-rep(x,length(pCI))
-        pts1se<-data.frame(x=pts$x,y=log10(pCI[1,]))
-        g<-g+dataLine(data=pts1se,arrow=arrow(length=unit(se_arrow,"cm"),ends="both"),colour=c,linewidth=se_size,orientation=orientation)
-      }
+        if (expType=="r" && !is.null(rCI)){
+          x<-pts$x
+          if (length(x)<length(rCI)) x<-rep(x,length(rCI))
+          pts1se<-data.frame(x=x,y=rCI[1,])
+          g<-g+dataLine(data=pts1se,arrow=arrow(length=unit(se_arrow,"cm"),ends="both"),colour=c,linewidth=se_size,orientation=orientation)
+        }
+        if (expType=="p" && !is.null(analysis$pIVCI)){
+          x<-pts$x
+          if (length(x)<length(pCI)) x<-rep(x,length(pCI))
+          pts1se<-data.frame(x=pts$x,y=log10(pCI[1,]))
+          g<-g+dataLine(data=pts1se,arrow=arrow(length=unit(se_arrow,"cm"),ends="both"),colour=c,linewidth=se_size,orientation=orientation)
+        }
       }
     }
-      
+    
     xr<-makeFiddle(pts$y1,2/40,orientation)*scale*scale
     pts$x<-pts$x+xr
     
@@ -509,8 +555,8 @@ expected_plot<-function(g,pts,expType=NULL,analysis=NULL,IV=NULL,DV=NULL,i=1,sca
 }
 
 
-r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientation="vert",effectType="direct",showTheory=TRUE){
-
+r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientation="vert",effectType="direct",showTheory=TRUE,g=NULL){
+  
   hypothesis<-analysis$hypothesis
   effect<-hypothesis$effect
   design<-analysis$design
@@ -519,7 +565,7 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
   histGain<-NA
   histGainrange<-c(NA,NA)
   
-
+  
   r<-effect$rIV
   if (!is.null(hypothesis$IV2)){
     r<-c(r,effect$rIV2,effect$rIVIV2DV)
@@ -534,7 +580,7 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
   }
   rActual<-r
   rActual[is.na(r)]<-0
-
+  
   if (all(is.na(analysis$rIVIV2DV)) && is.null(hypothesis$IV2)){
     xoff=0
   } else {
@@ -545,89 +591,116 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
     }
   }
   
+  xlim<-c(0,max(xoff))+c(-1,1)
   switch (expType,
           "r"={
             ylim<-rlims
             if (braw.env$RZ=="z") ylabel<-braw.env$zsLabel
             else ylabel<-braw.env$rsLabel 
-            },
+            ybreaks<-seq(-1,1,0.5)
+          },
           "ra"={
             ylim<-rlims
             if (braw.env$RZ=="z") ylabel<-bquote(z[a])
             else ylabel<-bquote(r[a])
+            ybreaks<-seq(-1,1,0.5)
           },
           "p"={
             ylim<-c(braw.env$min_p, 1)
             ylabel<-bquote(p)
+            ybreaks<-seq(0,1,0.1)
           },
           "rp"={
             ylim<-rlims
             if (braw.env$RZ=="z") ylabel<-braw.env$zpLabel
             else ylabel<-braw.env$rpLabel 
+            ybreaks<-seq(-1,1,0.5)
           },
           "ro"={
             ylim<-rlims
             ylabel<-bquote(r[o])
+            ybreaks<-seq(-1,1,0.5)
           },
           "po"={
             ylim<-c(braw.env$min_p, 1)
             ylabel<-bquote(p[o])
+            ybreaks<-seq(0,1,0.1)
           },
           "log(lrs)"={
             ylim<-c(0, braw.env$lrRange)
             ylabel<-bquote(log[e](lr[s]))
+            ybreaks<-seq(0,braw.env$lrRange,1)
           },
           "log(lrd)"={
             ylim<-c(-braw.env$lrRange, braw.env$lrRange)
             ylabel<-bquote(log[e](lr[d]))
+            ybreaks<-seq(-braw.env$lrRange,1,2)
           },
           "e1d"={
             ylim<-c(-braw.env$lrRange, braw.env$lrRange)
             ylabel<-bquote(log[e](lr[d]))
+            ybreaks<-seq(-braw.env$lrRange,1,2)
           },
           "e2d"={
             ylim<-c(-braw.env$lrRange, braw.env$lrRange)
             ylabel<-bquote(log[e](lr[d]))
+            ybreaks<-seq(-braw.env$lrRange,1,2)
           },
           "w"={
             ylim<-c(0.01, 1)
             ylabel<-bquote(w)
+            ybreaks<-seq(0,1,0.1)
           },
           "nw"={
             ylim<-c(1, braw.env$max_nw)
             ylabel<-bquote(n[w=80])
-            },
+            ybreaks<-seq(50,250,50)
+          },
           "n"={
             ylim<-c(1, design$sN*5*1.1)
             ylabel<-"n"
+            ybreaks<-seq(50,200,50)
           },
           "wp"={
             ylim<-c(0.01, 1)
             ylabel<-bquote(w)
+            ybreaks<-seq(0,1,0.1)
           },
           "ci1"={
             ylim<-rlims
             ylabel<-rlab
+            ybreaks<-seq(-1,1,0.5)
           },
           "ci2"={
             ylim<-rlims
             ylabel<-rlab
+            ybreaks<-seq(-1,1,0.5)
           },
           "e1"={
             ylim<-c(braw.env$min_p, 1)
             ylabel<-bquote(p)
+            ybreaks<-seq(0,1,0.1)
           },
           "e2"={
             ylim<-c(braw.env$min_p, 1)
             ylabel<-bquote(p)
+            ybreaks<-seq(0,1,0.1)
           }
   )
   if (logScale) {
     ylim<-log10(ylim)
     ylabel<-bquote(bold(log['10'](.(ylabel))))
   }  else {
-    ylabel<-bquote(bold(.(ylabel)))
+    ylabel<-bquote(.(ylabel))
   }
+  ylim[2]<-ylim[2]+diff(ylim)/16
+  
+  g<-start_plot(xlim,ylim,orientation=orientation,g)
+  if (logScale) {
+    if (is.element(expType,c("p","e1","e2","po")))
+      g<-g+varScale(seq(-4,0),10^seq(-4,0),orientation)
+  } else g<-g+varScale(ybreaks,ybreaks,orientation)
+  g<-g+varLab(ylabel,orientation)
   
   if (!all(is.na(analysis$rIV))) {
     data<-collectData(analysis,effectType)
@@ -660,9 +733,8 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
       data$sh<-log10(data$sh)
     }  
   }    
-  g<-start_plot(orientation=orientation)
   sigOnly<-evidence$sigOnly
-
+  
   # make theory
   if (!effect$world$worldOn) {
     effect$world$worldOn<-TRUE
@@ -687,13 +759,13 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
           yvUse<-yv
         }
         oldEffect<-effect
-          if (expType=="e1") effect$world$populationNullp<-1
-          if (expType=="e2") effect$world$populationNullp<-0
+        if (expType=="e1") effect$world$populationNullp<-1
+        if (expType=="e2") effect$world$populationNullp<-0
         xd<-fullRSamplingDist(yvUse,effect$world,design,"p",logScale=logScale,sigOnly=FALSE,HQ=showTheoryHQ)
         xdsig<-fullRSamplingDist(yvUse,effect$world,design,"p",logScale=logScale,sigOnly=TRUE,HQ=showTheoryHQ)
         effect<-oldEffect
       } 
-        
+      
       if (is.element(expType,c("r","ra","ro","ci1","ci2"))) {
         npt<-101
         if (braw.env$RZ=="z") {
@@ -717,61 +789,61 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
         }
       }
       
-        npt<-101
-        switch(expType,
-               "rp"={
-                 if (braw.env$RZ=="z") {
-                   yv<-seq(-1,1,length.out=npt)*braw.env$z_range
-                   xd<-fullRPopulationDist(tanh(yv),effect$world)
-                   xd<-rdens2zdens(xd,tanh(yv))
-                 } else {
-                   yv<-seq(-1,1,length.out=npt)*0.99
-                   xd<-fullRPopulationDist(yv,effect$world)
-                 }
-               },
-               "n"={
-                 ndist<-getNDist(analysis$design,effect$world,logScale=logScale,sigOnly=TRUE)
-                 yv<-ndist$nvals
-                 xd<-ndist$ndens
-                 xdsig<-ndist$ndensSig
-               },
-               "w"={
-                 yv<-seq(braw.env$alphaSig*1.01,1/1.01,length.out=npt)
-                 xd<-fullRSamplingDist(yv,effect$world,design,"w",logScale=logScale,sigOnly=sigOnly)
-               },
-               "log(lrs)"={
-                 yv<-seq(0,braw.env$lrRange,length.out=npt)
-                 xd<-fullRSamplingDist(yv,effect$world,design,"log(lrs)",logScale=logScale,sigOnly=sigOnly)
-               },
-               "log(lrd)"={
-                 yv<-seq(-braw.env$lrRange,braw.env$lrRange,length.out=npt)
-                 xd<-fullRSamplingDist(yv,effect$world,design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
-               },
-               "e1d"={
-                 yv<-seq(-braw.env$lrRange,braw.env$lrRange,length.out=npt)
-                 xd<-fullRSamplingDist(yv,effect$world,design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
-               },
-               "e2d"={
-                 yv<-seq(-braw.env$lrRange,braw.env$lrRange,length.out=npt)
-                 xd<-fullRSamplingDist(yv,effect$world,design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
-               },
-               "nw"={
-                 if (logScale) {
-                   yv<-seq(log10(5),log10(braw.env$max_nw),length.out=npt)
-                   yvUse<-10^yv
-                 }else{
-                   yv<-5+seq(0,braw.env$max_nw,length.out=npt)
-                   yvUse<-yv
-                 }
-                 xd<-fullRSamplingDist(yvUse,effect$world,design,"nw",logScale=logScale,sigOnly=sigOnly)
-               },
-               "wp"={
-                 yv<-seq(braw.env$alphaSig*1.01,1/1.01,length.out=npt)
-                 xd<-fullRSamplingDist(yv,effect$world,design,"wp",logScale=logScale,sigOnly=sigOnly)
-               },
-               { } # do nothing
-        )
-
+      npt<-101
+      switch(expType,
+             "rp"={
+               if (braw.env$RZ=="z") {
+                 yv<-seq(-1,1,length.out=npt)*braw.env$z_range
+                 xd<-fullRPopulationDist(tanh(yv),effect$world)
+                 xd<-rdens2zdens(xd,tanh(yv))
+               } else {
+                 yv<-seq(-1,1,length.out=npt)*0.99
+                 xd<-fullRPopulationDist(yv,effect$world)
+               }
+             },
+             "n"={
+               ndist<-getNDist(analysis$design,effect$world,logScale=logScale,sigOnly=TRUE)
+               yv<-ndist$nvals
+               xd<-ndist$ndens
+               xdsig<-ndist$ndensSig
+             },
+             "w"={
+               yv<-seq(braw.env$alphaSig*1.01,1/1.01,length.out=npt)
+               xd<-fullRSamplingDist(yv,effect$world,design,"w",logScale=logScale,sigOnly=sigOnly)
+             },
+             "log(lrs)"={
+               yv<-seq(0,braw.env$lrRange,length.out=npt)
+               xd<-fullRSamplingDist(yv,effect$world,design,"log(lrs)",logScale=logScale,sigOnly=sigOnly)
+             },
+             "log(lrd)"={
+               yv<-seq(-braw.env$lrRange,braw.env$lrRange,length.out=npt)
+               xd<-fullRSamplingDist(yv,effect$world,design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
+             },
+             "e1d"={
+               yv<-seq(-braw.env$lrRange,braw.env$lrRange,length.out=npt)
+               xd<-fullRSamplingDist(yv,effect$world,design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
+             },
+             "e2d"={
+               yv<-seq(-braw.env$lrRange,braw.env$lrRange,length.out=npt)
+               xd<-fullRSamplingDist(yv,effect$world,design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
+             },
+             "nw"={
+               if (logScale) {
+                 yv<-seq(log10(5),log10(braw.env$max_nw),length.out=npt)
+                 yvUse<-10^yv
+               }else{
+                 yv<-5+seq(0,braw.env$max_nw,length.out=npt)
+                 yvUse<-yv
+               }
+               xd<-fullRSamplingDist(yvUse,effect$world,design,"nw",logScale=logScale,sigOnly=sigOnly)
+             },
+             "wp"={
+               yv<-seq(braw.env$alphaSig*1.01,1/1.01,length.out=npt)
+               xd<-fullRSamplingDist(yv,effect$world,design,"wp",logScale=logScale,sigOnly=sigOnly)
+             },
+             { } # do nothing
+      )
+      
       if (orientation=="horz")  distMax<-0.8
       else distMax<-0.5
       
@@ -796,9 +868,9 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
     } else {
       histGain<-NA
     }
-
+    
     # then the samples
-  if (!all(is.na(analysis$rIV))) {
+    if (!all(is.na(analysis$rIV))) {
       shvals<-data$sh[,i]
       rvals<-data$rs[,i]
       pvals<-data$ps[,i]
@@ -828,135 +900,133 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
       #   pts1$y1<-atanh(pts1$y1)
       # }
       g<-expected_plot(g,pts,expType,analysis,IV,DV,i,orientation=orientation,histGain=histGain,histGainrange=histGainrange)
-    
-    if (is.element(expType,c("p","e1","e2","e1d","e2d"))) {
-      if (effect$world$worldOn && is.element(expType,c("e1","e2","e1d","e2d"))) {
-        n<-length(pvals)
-        if (!is.null(otheranalysis)) n<-n+length(otheranalysis$pIV)
-        switch (expType,
-                "e1"={
-                  ns<-sum(!resSig,na.rm=TRUE)
-                  s<-sum(resSig,na.rm=TRUE)
-                  labelPt1<-paste0("p(ns correct) = ",format(ns/n*100,digits=2),"% ")
-                  labelPt1a<-paste0("p(sig error) = ",format(s/n*100,digits=2),"% ")
-                },
-                "e2"={
-                  ns<-sum(!resSig,na.rm=TRUE)
-                  s<-sum(resSig,na.rm=TRUE)
-                  labelPt1<-paste0("p(ns miss) = ",format(ns/n*100,digits=2),"% ")
-                  labelPt1a<-paste0("p(sig correct) = ",format(s/n*100,digits=2),"% ")
-                },
-                "e1d"={
-                  ns<-sum(!resSig,na.rm=TRUE)
-                  s2<-sum(resSig & shvals<0,na.rm=TRUE)
-                  s1<-sum(resSig & shvals>0,na.rm=TRUE)
-                  labelPt1b<-paste0("p(ns) = ",format(ns/n*100,digits=2),"% ")
-                  labelPt1a<-paste0("p(sig correct) = ",format(s2/n*100,digits=2),"% ")
-                  labelPt1<-paste0("p(sig error) = ",format(s1/n*100,digits=2),"% ")
-                  labelPt1b<-paste0("p(ns) = ",format(ns/n*100,digits=2),"%")
-                  labelPt1a<-paste0("p(sig correct) = ",format(s2/n*100,digits=2),"%")
-                  labelPt1<-paste0("p(sig error) = ",format(s1/n*100,digits=2),"%")
-                },
-                "e2d"={
-                  ns<-sum(!resSig,na.rm=TRUE)
-                  s2<-sum(resSig & shvals<0,na.rm=TRUE)
-                  s1<-sum(resSig & shvals>0,na.rm=TRUE)
-                  labelPt1b<-paste0("p(ns) = ",format(ns/n*100,digits=2),"% ")
-                  labelPt1a<-paste0("p(sig error) = ",format(s2/n*100,digits=2),"% ")
-                  labelPt1<-paste0("p(sig correct) = ",format(s1/n*100,digits=2),"% ")
-                  labelPt1b<-paste0("p(ns) = ",format(ns/n*100,digits=2),"%")
-                  labelPt1a<-paste0("p(sig error) = ",format(s2/n*100,digits=2),"%")
-                  labelPt1<-paste0("p(sig correct) = ",format(s1/n*100,digits=2),"%")
-                }
-        )
-        lpts1<-data.frame(x = xoff[i]-0.98, y = ylim[2]+diff(ylim)/50,label = labelPt1)
-        g<-g+dataLabel(data=lpts1,orientation=orientation)
-        lpts1a<-data.frame(x = xoff[i]-0.98, y = ylim[1]-diff(ylim)/50,label = labelPt1a)
-        g<-g+dataLabel(data=lpts1a,orientation=orientation)
-        if (is.element(expType,c("e1d","e2d"))) {
-          lpts1<-data.frame(x = xoff[i]-0.98, y = sum(ylim)/2,label = labelPt1b)
+      
+      if (length(rvals)>1 && is.element(expType,c("p","e1","e2","e1d","e2d"))) {
+        if (effect$world$worldOn && is.element(expType,c("e1","e2","e1d","e2d"))) {
+          n<-length(pvals)
+          if (!is.null(otheranalysis)) n<-n+length(otheranalysis$pIV)
+          switch (expType,
+                  "e1"={
+                    ns<-sum(!resSig,na.rm=TRUE)
+                    s<-sum(resSig,na.rm=TRUE)
+                    labelPt1<-paste0("p(ns correct) = ",format(ns/n*100,digits=2),"% ")
+                    labelPt1a<-paste0("p(sig error) = ",format(s/n*100,digits=2),"% ")
+                  },
+                  "e2"={
+                    ns<-sum(!resSig,na.rm=TRUE)
+                    s<-sum(resSig,na.rm=TRUE)
+                    labelPt1<-paste0("p(ns miss) = ",format(ns/n*100,digits=2),"% ")
+                    labelPt1a<-paste0("p(sig correct) = ",format(s/n*100,digits=2),"% ")
+                  },
+                  "e1d"={
+                    ns<-sum(!resSig,na.rm=TRUE)
+                    s2<-sum(resSig & shvals<0,na.rm=TRUE)
+                    s1<-sum(resSig & shvals>0,na.rm=TRUE)
+                    labelPt1b<-paste0("p(ns) = ",format(ns/n*100,digits=2),"% ")
+                    labelPt1a<-paste0("p(sig correct) = ",format(s2/n*100,digits=2),"% ")
+                    labelPt1<-paste0("p(sig error) = ",format(s1/n*100,digits=2),"% ")
+                    labelPt1b<-paste0("p(ns) = ",format(ns/n*100,digits=2),"%")
+                    labelPt1a<-paste0("p(sig correct) = ",format(s2/n*100,digits=2),"%")
+                    labelPt1<-paste0("p(sig error) = ",format(s1/n*100,digits=2),"%")
+                  },
+                  "e2d"={
+                    ns<-sum(!resSig,na.rm=TRUE)
+                    s2<-sum(resSig & shvals<0,na.rm=TRUE)
+                    s1<-sum(resSig & shvals>0,na.rm=TRUE)
+                    labelPt1b<-paste0("p(ns) = ",format(ns/n*100,digits=2),"% ")
+                    labelPt1a<-paste0("p(sig error) = ",format(s2/n*100,digits=2),"% ")
+                    labelPt1<-paste0("p(sig correct) = ",format(s1/n*100,digits=2),"% ")
+                    labelPt1b<-paste0("p(ns) = ",format(ns/n*100,digits=2),"%")
+                    labelPt1a<-paste0("p(sig error) = ",format(s2/n*100,digits=2),"%")
+                    labelPt1<-paste0("p(sig correct) = ",format(s1/n*100,digits=2),"%")
+                  }
+          )
+          lpts1<-data.frame(x = xoff[i]-0.98, y = ylim[2]-diff(ylim)/20,label = labelPt1)
           g<-g+dataLabel(data=lpts1,orientation=orientation)
+          lpts1a<-data.frame(x = xoff[i]-0.98, y = ylim[1]+diff(ylim)/20,label = labelPt1a)
+          g<-g+dataLabel(data=lpts1a,orientation=orientation)
+          if (is.element(expType,c("e1d","e2d"))) {
+            lpts1<-data.frame(x = xoff[i]-0.98, y = mean(ylim),label = labelPt1b)
+            g<-g+dataLabel(data=lpts1,orientation=orientation)
+          }
+        } else {
+          switch (expType,
+                  "p"={labelPt1<-paste0("p(sig)"," = ")},
+                  "e1"={labelPt1<-"p(Type I) = "},
+                  "e2"={labelPt1<-"p(Type II) = "}
+          )
+          if (expType=="e2") {
+            labelPt2<-paste0(labelPt1,format(mean(!resSig,na.rm=TRUE)*100,digits=braw.env$graph_precision),"%")
+          } else {
+            labelPt2<-paste0(labelPt1,format(mean(resSig,na.rm=TRUE)*100,digits=braw.env$graph_precision),"%")
+          }
+          lpts1<-data.frame(x = xoff[i]-0.95, y = ylim[2]-diff(ylim)/20,label = labelPt2)
+          g<-g+dataLabel(data=lpts1,orientation=orientation)
+          # if (!is.null(lpts2)) {
+          # g<-g+geom_label(data=lpts2,aes(x = x, y = y, label=label), hjust=0, vjust=0, fill="white",size=braw.env$labelSize)
+          # }
         }
-      } else {
-        switch (expType,
-                "p"={labelPt1<-paste0("p(sig)"," = ")},
-                "e1"={labelPt1<-"p(Type I) = "},
-                "e2"={labelPt1<-"p(Type II) = "}
-        )
-        if (expType=="e2") {
-        labelPt2<-paste0(labelPt1,format(mean(!resSig,na.rm=TRUE)*100,digits=braw.env$graph_precision),"%")
-      } else {
-        labelPt2<-paste0(labelPt1,format(mean(resSig,na.rm=TRUE)*100,digits=braw.env$graph_precision),"%")
+        
       }
-        lpts1<-data.frame(x = xoff[i]-0.95, y = ylim[2]+diff(ylim)/50,label = labelPt2)
-      g<-g+dataLabel(data=lpts1,orientation=orientation)
-      # if (!is.null(lpts2)) {
-      # g<-g+geom_label(data=lpts2,aes(x = x, y = y, label=label), hjust=0, vjust=0, fill="white",size=braw.env$labelSize)
-      # }
-      }
+      
+      # if (length(rvals)>1 && is.element(expType,c("r","ci1","ci2"))) {
+      #   lpts<-data.frame(x = xoff[i]-0.95, y = ylim[2]-diff(ylim)/20,label=paste("actual =",format(rActual[i],digits=braw.env$graph_precision)))
+      #   g<-g+dataLabel(data=lpts,orientation=orientation)
+      # } 
     }
-    
-    if (is.element(expType,c("r","ci1","ci2"))) {
-      lpts<-data.frame(x = xoff[i]-0.95, y = ylim[2]+diff(ylim)/50,label=paste("actual =",format(rActual[i],digits=braw.env$graph_precision)))
-      g<-g+dataLabel(data=lpts,orientation=orientation)
-    }
-  }
   }
   
   if (length(xoff)>1)
     if (rem(i,3)==1)
       switch (xoff[i]/2+1,
-              {g<-g+annotate("text",x=xoff[i],y=ylim[2]+diff(ylim)/16,label="Main Effect 1",color="white",size=3)},
-              {g<-g+annotate("text",x=xoff[i],y=ylim[2]+diff(ylim)/16,label="Main Effect 2",color="white",size=3)},
-              {g<-g+annotate("text",x=xoff[i],y=ylim[2]+diff(ylim)/16,label="Interaction",color="white",size=3)}
+              {g<-g+annotate("text",x=xoff[i],y=ylim[2]-diff(ylim)/20,label="Main Effect 1",color="white",size=3)},
+              {g<-g+annotate("text",x=xoff[i],y=ylim[2]-diff(ylim)/20,label="Main Effect 2",color="white",size=3)},
+              {g<-g+annotate("text",x=xoff[i],y=ylim[2]-diff(ylim)/20,label="Interaction",color="white",size=3)}
       )
-
+  
   if (effectType=="all") {
     for (i in 1:3) {
       g<-g+varLine(intercept=(-1+1)*ysc*0.9+(i-1)*ysc*2-1, color="black", linewidth=1,orientation=orientation)
       g<-g+varLine(intercept=(0.0+1)*ysc*0.9+(i-1)*ysc*2-1, linetype="dotted", color="black", linewidth=0.5,orientation=orientation)
       g<-g+varLine(intercept=(1+1)*ysc*0.9+(i-1)*ysc*2-1, color="black", linewidth=1,orientation=orientation)
     }
-    g<-g+plotLimits(xlim = c(min(xoff),max(xoff))+c(-1,1), ylim = ylim+c(0,diff(ylim)/16),orientation=orientation)+
-      varScale(breaks=(c(-1,0,1,-1,0,1,-1,0,1)+1)*ysc*0.9+(c(1,1,1,2,2,2,3,3,3)-1)*ysc*2-1,labels=c(-1,0,1,-1,0,1,-1,0,1),orientation = orientation)
+    g<-g+varScale(breaks=(c(-1,0,1,-1,0,1,-1,0,1)+1)*ysc*0.9+(c(1,1,1,2,2,2,3,3,3)-1)*ysc*2-1,labels=c(-1,0,1,-1,0,1,-1,0,1),orientation = orientation)
   } else {
-    g<-g+varLine(intercept=0.0, linetype="dotted", color="black", linewidth=0.5,orientation=orientation)+
-      plotLimits(xlim = c(min(xoff),max(xoff))+c(-1,1), ylim = ylim+c(0,diff(ylim)/16),orientation=orientation)
+    g<-g+varLine(intercept=0.0, linetype="dotted", color="black", linewidth=0.5,orientation=orientation)
   }
-  g<-g+varLab(ylabel,orientation)
+  
   g
 }
 
-l_plot<-function(analysis,ptype=NULL,otheranalysis=NULL,orientation="vert",showTheory=TRUE){
+l_plot<-function(analysis,ptype=NULL,otheranalysis=NULL,orientation="vert",showTheory=TRUE,g=NULL){
   g<-r_plot(analysis,ptype,orientation=orientation,showTheory=showTheory)
   sAlpha<-log(dnorm(0)/dnorm(qnorm(1-braw.env$alphaSig/2)))
   g<-g+varLine(intercept=sAlpha, linetype="dotted", color=braw.env$plotColours$alpha, linewidth=0.5,orientation=orientation)
   if (ptype=="log(lrd)")
-  g<-g+varLine(intercept=-sAlpha, linetype="dotted", color=braw.env$plotColours$alpha, linewidth=0.5,orientation=orientation)
+    g<-g+varLine(intercept=-sAlpha, linetype="dotted", color=braw.env$plotColours$alpha, linewidth=0.5,orientation=orientation)
   g
 }
 
-p_plot<-function(analysis,ptype="p",otheranalysis=NULL,PlotScale=braw.env$pPlotScale,orientation="vert",effectType="direct",showTheory=TRUE){
-
-  g<-r_plot(analysis,ptype,PlotScale=="log10",otheranalysis,orientation=orientation,effectType=effectType,showTheory=showTheory)
+p_plot<-function(analysis,ptype="p",otheranalysis=NULL,PlotScale=braw.env$pPlotScale,orientation="vert",effectType="direct",showTheory=TRUE,g=NULL){
+  
+  g<-r_plot(analysis,ptype,PlotScale=="log10",otheranalysis,orientation=orientation,effectType=effectType,showTheory=showTheory,g=g)
   
   if (is.element(ptype,c("p","po"))) {
-  if (PlotScale=="log10") {
-    g<-g+varLine(intercept=log10(1), linetype="dotted", color=braw.env$plotColours$alpha, linewidth=0.5,orientation=orientation)
-    g<-g+varLine(intercept=log10(0.005), linetype="dotted", color=braw.env$plotColours$alpha, linewidth=0.5,orientation=orientation)
-    g<-g+varLine(intercept=log10(0.01), linetype="dotted", color=braw.env$plotColours$alpha, linewidth=0.5,orientation=orientation)
-    g<-g+varLine(intercept=log10(braw.env$alphaSig), linetype="dotted", color=braw.env$plotColours$alpha, linewidth=0.5,orientation=orientation)
-    g<-g+varScale(breaks=c(-4,-3,-2,-1,0),labels=c(0.0001,0.001,0.01,0.1,1),orientation=orientation)
-  } else
-  {
-    g<-g+varLine(intercept=log10(braw.env$alphaSig), linetype="dotted", color=braw.env$plotColours$alpha, linewidth=0.5,orientation=orientation)
-  }
-  }
+    if (PlotScale=="log10") {
+      g<-g+varLine(intercept=log10(1), linetype="dotted", color=braw.env$plotColours$alpha, linewidth=0.5,orientation=orientation)
+      g<-g+varLine(intercept=log10(0.005), linetype="dotted", color=braw.env$plotColours$alpha, linewidth=0.5,orientation=orientation)
+      g<-g+varLine(intercept=log10(0.01), linetype="dotted", color=braw.env$plotColours$alpha, linewidth=0.5,orientation=orientation)
+      g<-g+varLine(intercept=log10(braw.env$alphaSig), linetype="dotted", color=braw.env$plotColours$alpha, linewidth=0.5,orientation=orientation)
+    } else
+    {
+      g<-g+varLine(intercept=log10(braw.env$alphaSig), linetype="dotted", color=braw.env$plotColours$alpha, linewidth=0.5,orientation=orientation)
+    }
+  } 
   g
 }
 
-w_plot<-function(analysis,wtype,orientation="vert",showTheory=TRUE){
-  g<-r_plot(analysis,wtype,braw.env$wPlotScale=="log10",orientation=orientation,showTheory=showTheory)
+w_plot<-function(analysis,wtype,orientation="vert",showTheory=TRUE,g=NULL){
+  g<-r_plot(analysis,wtype,braw.env$wPlotScale=="log10",orientation=orientation,showTheory=showTheory,g=g)
   
   if (braw.env$wPlotScale=="log10") {
     g<-g+varLine(intercept=log10(braw.env$alphaSig), linetype="dotted", color=braw.env$plotColours$alpha, linewidth=0.5,orientation=orientation)+
@@ -970,11 +1040,11 @@ w_plot<-function(analysis,wtype,orientation="vert",showTheory=TRUE){
   g
 }
 
-n_plot<-function(analysis,ntype,orientation="vert",showTheory=TRUE){
-  r_plot(analysis,ntype,braw.env$nPlotScale=="log10",orientation=orientation,showTheory=showTheory)
+n_plot<-function(analysis,ntype,orientation="vert",showTheory=TRUE,g=NULL){
+  r_plot(analysis,ntype,braw.env$nPlotScale=="log10",orientation=orientation,showTheory=showTheory,g=g)
 }
 
-e2_plot<-function(analysis,nullanalysis=NULL,orientation="vert",showTheory=TRUE){
+e2_plot<-function(analysis,nullanalysis=NULL,orientation="vert",showTheory=TRUE,g=NULL){
   distr<-tolower(analysis$hypothesis$effect$world$populationPDF)
   lambda<-format(analysis$hypothesis$effect$world$populationPDFk,digits=3)
   switch (braw.env$RZ,
@@ -985,27 +1055,27 @@ e2_plot<-function(analysis,nullanalysis=NULL,orientation="vert",showTheory=TRUE)
             lab<-bquote(bold("Non-null: " ~ z["p"] ~ "~" ~ .(distr) (z/.(lambda))))
           }
   )
-
+  
   switch (braw.env$STMethod,
           "NHST"={
-            g<-p_plot(analysis,ptype="e2",otheranalysis=nullanalysis,orientation=orientation,showTheory=showTheory)
-            g<-g+ggtitle(lab)+theme(plot.title=element_text(face='bold', size=9, hjust=0))
+            g<-p_plot(analysis,ptype="e2",otheranalysis=nullanalysis,orientation=orientation,showTheory=showTheory,g=g)
+            g<-g+plotTitle(lab)
           },
           "sLLR"={
-            g<-p_plot(analysis,ptype="e2",otheranalysis=nullanalysis,orientation=orientation,showTheory=showTheory)
-            g<-g+ggtitle(lab)+theme(plot.title=element_text(face='bold', size=9, hjust=0))
+            g<-p_plot(analysis,ptype="e2",otheranalysis=nullanalysis,orientation=orientation,showTheory=showTheory,g=g)
+            g<-g+plotTitle(lab)
           },
           "dLLR"={
-            g<-p_plot(nullanalysis,ptype="e2d",otheranalysis=nullanalysis,PlotScale="linear",orientation=orientation,showTheory=showTheory)
+            g<-p_plot(nullanalysis,ptype="e2d",otheranalysis=nullanalysis,PlotScale="linear",orientation=orientation,showTheory=showTheory,g=g)
             g<-g+varLine(intercept=alphaLLR(), linetype="dotted", color=braw.env$plotColours$alpha, linewidth=0.5,orientation=orientation)
             g<-g+varLine(intercept=-alphaLLR(), linetype="dotted", color=braw.env$plotColours$alpha, linewidth=0.5,orientation=orientation)
-            g<-g+ggtitle(lab)+theme(plot.title=element_text(face='bold', size=9, hjust=0))
+            g<-g+plotTitle(lab)
           }
   )
   return(g)
 }
 
-e1_plot<-function(nullanalysis,analysis=NULL,orientation="vert",showTheory=TRUE){
+e1_plot<-function(nullanalysis,analysis=NULL,orientation="vert",showTheory=TRUE,g=NULL){
   switch (braw.env$RZ,
           "r"={
             lab<-bquote(bold("Null: " ~ r["p"] == 0))
@@ -1014,21 +1084,20 @@ e1_plot<-function(nullanalysis,analysis=NULL,orientation="vert",showTheory=TRUE)
             lab<-bquote(bold("Null: " ~ z["p"] == 0))
           }
   )
-  
   switch (braw.env$STMethod,
           "NHST"={
-            g<-p_plot(nullanalysis,ptype="e1",otheranalysis=analysis,orientation=orientation,showTheory=showTheory)
-            g<-g+ggtitle(lab)+theme(plot.title=element_text(face='bold', size=9, hjust=0))
+            g<-p_plot(nullanalysis,ptype="e1",otheranalysis=analysis,orientation=orientation,showTheory=showTheory,g=g)
+            g<-g+plotTitle(lab)
           },
           "sLLR"={
-            g<-p_plot(nullanalysis,ptype="e1",otheranalysis=analysis,orientation=orientation,showTheory=showTheory)+
-              g<-g+ggtitle(lab)+theme(plot.title=element_text(face='bold', size=9, hjust=0))
+            g<-p_plot(nullanalysis,ptype="e1",otheranalysis=analysis,orientation=orientation,showTheory=showTheory,g=g)+
+              g<-g+plotTitle(lab)
           },
           "dLLR"={
-            g<-p_plot(nullanalysis,ptype="e1d",otheranalysis=analysis,PlotScale="linear",orientation=orientation,showTheory=showTheory)
+            g<-p_plot(nullanalysis,ptype="e1d",otheranalysis=analysis,PlotScale="linear",orientation=orientation,showTheory=showTheory,g=g)
             g<-g+varLine(intercept=alphaLLR(), linetype="dotted", color=braw.env$plotColours$alpha, linewidth=0.5,orientation=orientation)
             g<-g+varLine(intercept=-alphaLLR(), linetype="dotted", color=braw.env$plotColours$alpha, linewidth=0.5,orientation=orientation)
-            g<-g+ggtitle(lab)+theme(plot.title=element_text(face='bold', size=9, hjust=0))
+            g<-g+plotTitle(lab)
           }
   )
   return(g)

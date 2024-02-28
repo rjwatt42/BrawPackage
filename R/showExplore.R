@@ -71,7 +71,7 @@ showExplore<-function(exploreResult=makeExplore(autoShow=TRUE),showType="r",ylog
     doLine=FALSE
   } else {doLine=TRUE}
   
-  if (explore$exploreType=="pNull" && pPlus) vals<-1-vals
+  if (explore$exploreType=="pNull" && braw.env$pPlus) vals<-1-vals
   
   g<-ggplot()
   ybreaks=c()
@@ -416,7 +416,7 @@ showExplore<-function(exploreResult=makeExplore(autoShow=TRUE),showType="r",ylog
             },
             "pNull"={
               showVals<-result$pnull
-              if (pPlus) showVals<-1-showVals
+              if (braw.env$pPlus) showVals<-1-showVals
               
               lines<-c()
               col<-"white"
@@ -1188,6 +1188,7 @@ showExplore<-function(exploreResult=makeExplore(autoShow=TRUE),showType="r",ylog
           g<-g+xlab(explore$exploreType)
   )
   g<-g+ggtitle(paste0("Explore: ",format(exploreResult$count)))
-  g+braw.env$plotTheme+theme(plot.title=element_text(face='plain', size=8, hjust=0.9))
+  g<-g+braw.env$plotTheme+theme(plot.title=element_text(face='plain', size=8, hjust=0.9))
+  joinPlots(g)
 }
 

@@ -27,14 +27,11 @@ makeWorld<-function(worldOn=FALSE,populationPDF="Single",populationRZ="r",
 #' @returns an effect object
 #' @examples
 #' makeEffect(rIV=0.3,rIV2=0,rIVIV2=0,rIVIV2DV=0,Heteroscedasticity=0,
-#'            ResidDistr="normal",world=NA
+#'            ResidDistr="normal",world=makeWorld()
 #' )
 #' @export
 makeEffect<-function(rIV=0.3,rIV2=0,rIVIV2=0,rIVIV2DV=0,Heteroscedasticity=0,
-                     ResidDistr="normal",world=NA){
-
-  if (is.na(world))
-    world<-list(worldOn=FALSE,populationPDF="Single",populationPDFk=rIV,populationRZ="r",populationNullp=0,worldAbs=FALSE)
+                     ResidDistr="normal",world=makeWorld()){
 
   effect<-list(rIV=rIV,rIV2=rIV2,rIVIV2=rIVIV2,rIVIV2DV=rIVIV2DV,
                Heteroscedasticity=Heteroscedasticity,ResidDistr=ResidDistr,

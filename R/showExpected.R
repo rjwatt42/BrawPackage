@@ -4,7 +4,7 @@
 #' @param showType "Basic", "CILimits", "NHSTErrors", "FDR", "FDR:FMR" \cr
 #'        \emph{ or one or two of:} \cr
 #'         "r","p","ci1","ci2", "rp","n" \cr
-#'          "w","wp","nw", ro","po", 
+#'          "w","wp","nw", ro","po"
 #' @param dimension "1D", "2D"
 #' @param orientation "vert", "horz"
 #' @return ggplot2 object - and printed
@@ -45,6 +45,6 @@ showExpected<-function(expectedResult=makeExpected(),showType="Basic",
   g<-showInference(fullResult,showType=showType,dimension=dimension,orientation=orientation,
                 effectType=effectType,showTheory=showTheory
   ) 
-  g
+  joinPlots(g)
 }
 

@@ -1,11 +1,11 @@
 abind<-function(a,b) array(c(a, b), dim = c(dim(a)[1], dim(a)[2], dim(a)[3]+dim(b)[3]))
 
 
-resetExploreResult<-function(n_sims,n_vals,oldResult=NULL) {
+resetExploreResult<-function(nsims,n_vals,oldResult=NULL) {
   
-  if (n_sims>0) {
-    b<-array(NA,c(n_sims,n_vals))
-    bm<-array(NA,c(n_sims,n_vals,3))
+  if (nsims>0) {
+    b<-array(NA,c(nsims,n_vals))
+    bm<-array(NA,c(nsims,n_vals,3))
   } else {
     b<-NULL
     bm<-NULL
@@ -141,7 +141,7 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
   min_n<-explore$min_n
   max_n<-explore$max_n
   max_r<-explore$max_r
-  if (braw.env$RZ=="z") {max_es<-max_es*braw.env$z_range}
+  if (braw.env$RZ=="z") {max_r<-max_r*braw.env$z_range}
   max_anom<-explore$max_anom
   kurtRange<-10^5
   
@@ -166,7 +166,7 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
           "DVskew"={vals<-vals},
           "DVkurtosis"={vals<-seq(0,log10(kurtRange),length.out=npoints)},
           "rIV"={
-            vals<-vals*max_es
+            vals<-vals*max_r
             if (braw.env$RZ=="z") vals<-tanh(vals)
           },
           "rIV2"={
@@ -183,7 +183,7 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
             vals<-seq(-maxCov,maxCov,length.out=npoints)
           },
           "rIVIV2DV"={
-            vals<-vals*max_es
+            vals<-vals*max_r
           },
           
           "PDF"={vals<-c("Single","Double","Uniform","Gauss","Exp",">","<")},
@@ -242,27 +242,27 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
           "sig_only"={vals<-c(FALSE,TRUE)}
   )
   
-  n_sims<-nsim
+  nsims<-nsim
   exploreResult$vals<-vals
   exploreResult$explore<-explore
   
-  result<-resetExploreResult(n_sims,length(vals),exploreResult$result)
+  result<-resetExploreResult(nsims,length(vals),exploreResult$result)
   
   if (doingNull) {
     nullhypothesis<-hypothesis
     nullhypothesis$effect$rIV<-0
-    nullresult<-resetExploreResult(n_sims,length(vals),exploreResult$nullresult)
+    nullresult<-resetExploreResult(nsims,length(vals),exploreResult$nullresult)
   } else nullresult<-NULL
-  n_sims<-exploreResult$count+n_sims
+  nsims<-exploreResult$count+nsims
   
-  while (exploreResult$count<n_sims){
-    if (!autoShow) ns<-n_sims
+  while (exploreResult$count<nsims){
+    if (!autoShow) ns<-nsims
     else {
       if (exploreResult$count==0) ns<-1
       else                        ns<-10^floor(log10(exploreResult$count))
     }
     ns<-min(ns,100)
-    if (exploreResult$count+ns>n_sims) ns<-n_sims-exploreResult$count
+    if (exploreResult$count+ns>nsims) ns<-nsims-exploreResult$count
     for (ni in 1:ns) {
       ri<-exploreResult$count+ni
       for (vi in 1:length(vals)){

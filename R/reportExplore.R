@@ -21,7 +21,7 @@ reportExplore<-function(exploreResult,showType="r",
   max_cols<-8
   
   vals<-exploreResult$vals
-  if (explore$exploreType=="pNull" && pPlus) vals<-1-vals
+  if (explore$exploreType=="pNull" && braw.env$pPlus) vals<-1-vals
   
   if (length(vals)>max_cols)  {
     use<-seq(1,length(vals),2)

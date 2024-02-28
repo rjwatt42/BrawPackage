@@ -1,5 +1,5 @@
 joinPlots<-function(g1,g2=NULL,g3=NULL,layout="triangle") {
-  
+
   if (layout=="separate") {
    
   # if (is.null(g2)) return(g2)
@@ -15,6 +15,7 @@ joinPlots<-function(g1,g2=NULL,g3=NULL,layout="triangle") {
     return(g)    
   }
   
+  if (is.null(g2)) return(g1)
   gridTheme<-theme(plot.margin=margin(-0.3,0,0,0,"cm"))
   
   g<-ggplot()+braw.env$blankTheme+theme(plot.margin=margin(0.3,-0.2,0,0,"cm"))

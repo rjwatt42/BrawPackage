@@ -1,7 +1,7 @@
 
 #' show the estimated population characteristics from multiple simulated sample
 #' 
-#' @param showType "Basic", "CILimits", "NHSTErrors", "FDR", "FDR:FMR" \cr
+#' @param showType "Basic", "CILimits", "NHST", "FDR", "FDR:FMR" \cr
 #'        \emph{ or one or two of:} \cr
 #'                   "r","p","ci1","ci2", "rp","n" \cr 
 #'                   "w","wp","nw", ro","po"
@@ -18,8 +18,9 @@ reportExpected<-function(expectedResult=makeExpected(100),showType="Basic"){
   if (length(showType)==1) {
     switch(showType,
            "Basic"=     {pars<-c("r","p")},
+           "2D"=     {pars<-c("r","p")},
            "CILimits"=  {pars<-c("ci1","ci2")},
-           "NHSTErrors"={pars<-c("e2","e1")},
+           "NHST"={pars<-c("e2","e1")},
            "FDR"=       {pars<-c("e1","e2")},
            {pars<-c(showType,NA)}
     )
@@ -29,7 +30,7 @@ reportExpected<-function(expectedResult=makeExpected(100),showType="Basic"){
   else{
     if (is.na(result$rIVIV2DV[1])) {nc=6} else {nc=9}
   }
-  if (showType=="NHSTErrors" || showType=="FDR"){nc=4}
+  if (showType=="NHST" || showType=="FDR"){nc=4}
   
   # header
   if (sum(!is.na(nullresult$rIV))>0) {
@@ -70,7 +71,7 @@ reportExpected<-function(expectedResult=makeExpected(100),showType="Basic"){
   }
 
   # column labels
-  if (showType=="NHSTErrors") {outputText1<-c("!j\bErrors:","\bI","\bII"," ")}
+  if (showType=="NHST") {outputText1<-c("!j\bErrors:","\bI","\bII"," ")}
   else {
     if (showType=="CILimits") {outputText1<-c("   ","lower","upper")}
     else {
@@ -93,12 +94,15 @@ reportExpected<-function(expectedResult=makeExpected(100),showType="Basic"){
                {par2=par2}
         )
       }
+      if (!is.na(pars[2]))
       outputText1<-c("   ",paste0("\b",par1),paste0("\b",par2))
+      else 
+        outputText1<-c("   ",paste0("\b",par1),paste0("\b"," "))
     }
   }
   outputText<-c(outputText,rep(outputText1,nc/3))
 
-  if (showType=="NHSTErrors"){
+  if (showType=="NHST"){
     nullSig<-isSignificant(braw.env$STMethod,nullresult$pIV,nullresult$rIV,nullresult$nval,nullresult$df1,nullresult$evidence)
     resSig<-isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,result$evidence)
     if (braw.env$STMethod=="dLLR") {
@@ -237,6 +241,7 @@ reportExpected<-function(expectedResult=makeExpected(100),showType="Basic"){
                 "wp"={b<-rn2w(result$rpIV,result$nval)}
         )
       }
+      if (!is.na(pars[2])) {
       ot1<-c(ot1,
              "!jmean",
              brawFormat(mean(a,na.rm=TRUE),digits=braw.env$report_precision),
@@ -262,6 +267,33 @@ reportExpected<-function(expectedResult=makeExpected(100),showType="Basic"){
              brawFormat(quantile(a,0.25,na.rm=TRUE,names=FALSE),digits=braw.env$report_precision),
              brawFormat(quantile(b,0.25,na.rm=TRUE,names=FALSE),digits=braw.env$report_precision)
       )
+      } else {
+        ot1<-c(ot1,
+               "!jmean",
+               brawFormat(mean(a,na.rm=TRUE),digits=braw.env$report_precision),
+               " "
+        )
+        ot2<-c(ot2,
+               "!jsd",
+               brawFormat(sd(a,na.rm=TRUE),digits=braw.env$report_precision),
+               " "
+        )
+        ot4<-c(ot4,
+               "!jquant75",
+               brawFormat(quantile(a,0.75,na.rm=TRUE,names=FALSE),digits=braw.env$report_precision),
+               " "
+        )
+        ot5<-c(ot5,
+               "!jmedian",
+               brawFormat(quantile(a,0.5,na.rm=TRUE,names=FALSE),digits=braw.env$report_precision),
+               " "
+        )
+        ot6<-c(ot6,
+               "!jquant25",
+               brawFormat(quantile(a,0.25,na.rm=TRUE,names=FALSE),digits=braw.env$report_precision),
+               " "
+        )
+      }
       if (i>1){
         ot1[length(ot1)-2]<-""
         ot2[length(ot1)-2]<-""
@@ -274,7 +306,7 @@ reportExpected<-function(expectedResult=makeExpected(100),showType="Basic"){
     if (pars[1]=="p") {
       outputText<-c(outputText,rep("  ",nc),"p(sig)",paste0(brawFormat(mean(p<braw.env$alphaSig)*100,digits=braw.env$report_precision),"%"),rep(" ",nc-2))
     }
-    if (pars[2]=="p") {
+    if (!is.na(pars[2]) && pars[2]=="p") {
       outputText<-c(outputText,rep("  ",nc),"p(sig)"," ",paste0(brawFormat(mean(p<braw.env$alphaSig)*100,digits=braw.env$report_precision),"%"),rep(" ",nc-3))
     }
   }
