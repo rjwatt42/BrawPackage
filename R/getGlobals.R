@@ -1,4 +1,4 @@
-
+braw.env<-c()
 .onLoad<- function(...) {
   BrawOpts()
 }

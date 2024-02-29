@@ -860,8 +860,14 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
       if (is.element(expType,c("r","n","p"))) {
         g<-g+dataPolygon(data=ptsp,colour=NA,fill=braw.env$plotColours$infer_nsigC,alpha=theoryAlpha, orientation=orientation)
         # xdsig[xdsig==0]<-NA
-        ptsp1<-data.frame(x=c(xdsig,-rev(xdsig))*theoryGain+xoff[i],y=c(yv,rev(yv)))
-        g<-g+dataPolygon(data=ptsp1,colour=NA,fill=braw.env$plotColours$infer_sigC,alpha=theoryAlpha, orientation=orientation)
+        i2<-0
+        while (i2<length(xdsig)) {
+          i1<-i2+min(which(c(xdsig[(i2+1):length(xdsig)],1)>0))
+          i2<-(i1-1)+min(which(c(xdsig[i1:length(xdsig)],0)==0))
+          use<-i1:(i2-1)
+          ptsp1<-data.frame(x=c(xdsig[use],-rev(xdsig[use]))*theoryGain+xoff[i],y=c(yv[use],rev(yv[use])))
+          g<-g+dataPolygon(data=ptsp1,colour=NA,fill=braw.env$plotColours$infer_sigC,alpha=theoryAlpha, orientation=orientation)
+        }
         # g<-g+dataPath(data=ptsp1,colour="black",linewidth=0.1, orientation=orientation)
         g<-g+dataPath(data=ptsp,colour="black",linewidth=0.1, orientation=orientation)
       } else {
