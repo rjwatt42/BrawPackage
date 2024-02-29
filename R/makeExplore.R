@@ -25,7 +25,6 @@ storeExploreResult<-function(result,res,ri,vi) {
   result$rval[ri,vi]<-res$rIV
   result$pval[ri,vi]<-res$pIV
   result$rpval[ri,vi]<-res$rpIV
-  result$raval[ri,vi]<-res$raIV
   result$roval[ri,vi]<-res$roIV
   result$poval[ri,vi]<-res$poIV
   result$nval[ri,vi]<-res$nval
@@ -87,7 +86,7 @@ mergeExploreResult<-function(res1,res2) {
 #'                              hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
 #'                              doingNull=FALSE,autoShow=FALSE,showType="Basic")
 #' @export
-makeExplore<-function(nsim=10,exploreResult=NULL,exploreType="n",exploreNPoints=13,
+makeExplore<-function(nsims=10,exploreResult=NULL,exploreType="n",exploreNPoints=13,
                       min_n=10,max_n=250,max_r=0.9,max_anom=1,
                       xlog=FALSE,xabs=FALSE,mx_log=FALSE,
                       hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
@@ -113,12 +112,12 @@ makeExplore<-function(nsim=10,exploreResult=NULL,exploreType="n",exploreNPoints=
     )
   }
   
-  exploreResult <- runExplore(nsim=nsim,exploreResult,doingNull=doingNull,
+  exploreResult <- runExplore(nsims=nsims,exploreResult,doingNull=doingNull,
                               autoShow=autoShow,showType=showType)
   return(exploreResult)
 }
 
-runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
+runExplore <- function(nsims,exploreResult=NULL,doingNull=FALSE,
                        autoShow=FALSE,showType="r"){
   
   explore<-exploreResult$explore
@@ -199,7 +198,7 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
           },
           "Method"={vals<-c("Random","Stratified","Cluster","Snowball","Convenience")},
           "ClusterRad"={vals<-seq(0,1,length.out=npoints)},
-          "Usage"={vals<-c("Between","Between2","Within0","Within")},
+          "Usage"={vals<-c("Between","Within")},
           "WithinCorr"={vals<-seq(0,0.8,length.out=npoints)},
           "SampleGamma"={vals<-seq(1,10,length.out=npoints)},
           "Alpha"={
@@ -242,7 +241,6 @@ runExplore <- function(nsim,exploreResult=NULL,doingNull=FALSE,
           "sig_only"={vals<-c(FALSE,TRUE)}
   )
   
-  nsims<-nsim
   exploreResult$vals<-vals
   exploreResult$explore<-explore
   

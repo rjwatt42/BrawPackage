@@ -1,9 +1,11 @@
 reRangeY<-function(y) {
+  if (is.null(braw.env$plotLimits)) return(y)
   y<-(y-braw.env$plotLimits$ylim[1])/diff(braw.env$plotLimits$ylim)
   y<-y*braw.env$plotArea[4]+braw.env$plotArea[2]
   return(y)
 }
 reRangeX<-function(x) {
+  if (is.null(braw.env$plotLimits)) return(x)
   x<-(x-braw.env$plotLimits$xlim[1])/diff(braw.env$plotLimits$xlim)
   if (braw.env$plotArea[1]>0)
     x<-x*(braw.env$plotArea[3]-0.15)+braw.env$plotArea[1]+0.15
@@ -976,25 +978,25 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
     }
   }
   
-  if (length(xoff)>1)
+  if (length(xoff)>1) {
     if (rem(i,3)==1)
       switch (xoff[i]/2+1,
               {g<-g+annotate("text",x=xoff[i],y=ylim[2]-diff(ylim)/20,label="Main Effect 1",color="white",size=3)},
               {g<-g+annotate("text",x=xoff[i],y=ylim[2]-diff(ylim)/20,label="Main Effect 2",color="white",size=3)},
               {g<-g+annotate("text",x=xoff[i],y=ylim[2]-diff(ylim)/20,label="Interaction",color="white",size=3)}
       )
-  
-  if (effectType=="all") {
-    for (i in 1:3) {
-      g<-g+varLine(intercept=(-1+1)*ysc*0.9+(i-1)*ysc*2-1, color="black", linewidth=1,orientation=orientation)
-      g<-g+varLine(intercept=(0.0+1)*ysc*0.9+(i-1)*ysc*2-1, linetype="dotted", color="black", linewidth=0.5,orientation=orientation)
-      g<-g+varLine(intercept=(1+1)*ysc*0.9+(i-1)*ysc*2-1, color="black", linewidth=1,orientation=orientation)
+    
+    if (effectType=="all") {
+      for (i in 1:3) {
+        g<-g+varLine(intercept=(-1+1)*ysc*0.9+(i-1)*ysc*2-1, color="black", linewidth=1,orientation=orientation)
+        g<-g+varLine(intercept=(0.0+1)*ysc*0.9+(i-1)*ysc*2-1, linetype="dotted", color="black", linewidth=0.5,orientation=orientation)
+        g<-g+varLine(intercept=(1+1)*ysc*0.9+(i-1)*ysc*2-1, color="black", linewidth=1,orientation=orientation)
+      }
+      g<-g+varScale(breaks=(c(-1,0,1,-1,0,1,-1,0,1)+1)*ysc*0.9+(c(1,1,1,2,2,2,3,3,3)-1)*ysc*2-1,labels=c(-1,0,1,-1,0,1,-1,0,1),orientation = orientation)
+    } else {
+      g<-g+varLine(intercept=0.0, linetype="dotted", color="black", linewidth=0.5,orientation=orientation)
     }
-    g<-g+varScale(breaks=(c(-1,0,1,-1,0,1,-1,0,1)+1)*ysc*0.9+(c(1,1,1,2,2,2,3,3,3)-1)*ysc*2-1,labels=c(-1,0,1,-1,0,1,-1,0,1),orientation = orientation)
-  } else {
-    g<-g+varLine(intercept=0.0, linetype="dotted", color="black", linewidth=0.5,orientation=orientation)
   }
-  
   g
 }
 

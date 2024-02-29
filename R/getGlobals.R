@@ -1,5 +1,4 @@
 
-# braw.env<-NULL
 .onLoad<- function(...) {
   BrawOpts()
 }
@@ -84,6 +83,7 @@ BrawOpts<-function(BW=FALSE,fontScale=1) {
           braw.env$STMethod<-"NHST"
           braw.env$lrRange<-10
           braw.env$anovaMethod<-"F"
+          braw.env$modelType<-"Norm"
           
           #########################
           # display choices

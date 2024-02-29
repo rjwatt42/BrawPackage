@@ -1,88 +1,19 @@
 
-makeFormula<-function(IV,IV2,DV,evidence,analysis,an_vars,modelType="Raw"){
+makeFormula<-function(IV,IV2,DV,design,evidence,analysis,an_vars){
 
   assign_string = "<<"  
   when_string = "="
   times_string = "x"
   
-  switch (modelType,
-          "Norm"={a<-analysis$normModel},
-          "Raw"={a<-analysis$rawModel},
-          "NormC"={a<-analysis$normModelC},
-          "RawC"={a<-analysis$rawModelC}
-  )
-
-  if (any(class(a)[1]==c("lmerMod","glmerMod")))
-  { coeffs<-colMeans(coef(a)$participant)
-    use<-!grepl("participant",an_vars)
-    an_vars<-an_vars[use]
+  if (design$sIV1Use=="Within" || design$sIV2Use=="Within")
+  { #coeffs<-colMeans(coef(analysis$model)$participant)
+   coeffs<-analysis$model$Estimate
+    # use<-!grepl("participant",an_vars)
+    # an_vars<-an_vars[use]
   } else {
-    coeffs<-a$coefficients
+    coeffs<-analysis$model$coefficients
   }
 
-  if (1==2){
-  if (DV$type=="Interval") {
-    dvm<-mean(analysis$dv,na.rm=TRUE)
-    dvs<-sd(analysis$dv,na.rm=TRUE)
-  } else {
-    dvm<-0
-    dvs<-1
-  }
-  
-  if (IV$type=="Interval") {
-    iv1m<-mean(analysis$iv,na.rm=TRUE)
-    iv1s<-sd(analysis$iv,na.rm=TRUE)
-    iv1nc<-1
-  } else {
-    iv1m<-0
-    iv1s<- 1
-    iv1nc<-IV$ncats-1
-  }
-    
-    if (!is.null(IV2)){
-      if (IV2$type=="Interval") {
-        iv2m<-mean(analysis$iv2,na.rm=TRUE)
-        iv2s<-sd(analysis$iv2,na.rm=TRUE)
-        iv2nc<-1
-      } else {
-        iv2m<-0
-        iv2s<- 1
-        iv2nc<-IV2$ncats-1
-      }
-    }
-    
-    if (is.null(IV2)){
-      intercept<-1
-      iv1<-intercept+(1:iv1nc)
-      c0<-c(
-        -coeffs[intercept]-sum(coeffs[iv1])*iv1m/iv1s,
-        coeffs[iv1]/iv1s
-      )
-      c1<- c(dvm,rep(0,length(c0)-1))+c0*dvs
-      coeffs<-c1
-    } else {
-      intercept<-1
-      iv1<-intercept+(1:iv1nc)
-      iv2<-max(iv1)+(1:iv2nc)
-      iv1iv2<-max(iv2)+(1:iv1nc*iv2nc)
-      if (length(coeffs)<4) {
-        c1<-c(
-          -coeffs[intercept]-coeffs[iv1]*iv1m/iv1s-coeffs[iv2]*iv2m/iv2s,
-          coeffs[iv1]/iv1s,
-          coeffs[iv2]/iv2s
-        )
-      } else {
-        c1<-c(
-          coeffs[intercept]-coeffs[iv1]*iv1m/iv1s-coeffs[iv2]*iv2m/iv2s+coeffs[iv1iv2]*iv1m/iv1s*iv2m/iv2s,
-          coeffs[iv1]/iv1s-coeffs[iv1iv2]*iv2m/iv1s/iv2s,
-          coeffs[iv2]/iv2s-coeffs[iv1iv2]*iv1m/iv1s/iv2s,
-          coeffs[iv1iv2]/iv1s/iv2s
-        )
-      }
-      c1<- c(dvm,rep(0,length(c1)-1))+c1*dvs
-      coeffs<-c1
-    }
-  }
   switch (DV$type,
           "Interval"={
             an_model<-paste(DV$name,assign_string,sep="")
@@ -116,12 +47,15 @@ makeFormula<-function(IV,IV2,DV,evidence,analysis,an_vars,modelType="Raw"){
 #' @examples
 #' reportDescription(analysis=makeAnalysis())
 #' @export
-reportDescription<-function(analysis=makeAnalysis(),modelType="Raw"){
+reportDescription<-function(analysis=makeAnalysis()){
   IV<-analysis$hypothesis$IV
   IV2<-analysis$hypothesis$IV2
   DV<-analysis$hypothesis$DV
   effect<-analysis$hypothesis
+  design<-analysis$design
   evidence<-analysis$evidence
+  
+  analysis$model<-data.frame(summary(analysis$model)$coefficients)
   
   if (is.null(IV2)) no_ivs<-1 else no_ivs<-2
   
@@ -144,8 +78,7 @@ reportDescription<-function(analysis=makeAnalysis(),modelType="Raw"){
   )
   
   
-  a<-analysis$normModel
-  if (any(class(a)[1]==c("lmerMod","glmerMod"))) {
+  if (design$sIV1Use=="Within" || design$sIV2Use=="Within") {
     an_vars<-c("Intercept")
     if (IV$type=="Categorical") {
       for (i in 2:IV$ncats) {
@@ -164,7 +97,7 @@ reportDescription<-function(analysis=makeAnalysis(),modelType="Raw"){
       }
     }
   } else {
-    an_vars<-variable.names(a)
+    an_vars<-variable.names(analysis$model)
     an_vars<-sub("iv1$",IV$name,an_vars)
   }
   
@@ -175,7 +108,7 @@ reportDescription<-function(analysis=makeAnalysis(),modelType="Raw"){
     an_vars<-sub("iv2",paste(IV2$name,"|",sep=""),an_vars)
   } 
   
-  an_model<-makeFormula(IV,IV2,DV,evidence,analysis,an_vars,modelType)
+  an_model<-makeFormula(IV,IV2,DV,design,evidence,analysis,an_vars)
   if (nchar(an_model)>80) {
     breaks<-unlist(gregexpr("[+-]",an_model))
     use<-sum(breaks<80)
@@ -259,7 +192,7 @@ reportDescription<-function(analysis=makeAnalysis(),modelType="Raw"){
                 }
                 outputText<-c(outputText,rep("",nc-(IV$ncats+1)))
               }
-              if (any(class(analysis$model)[1]==c("lmerMod","glmerMod"))) {
+              if (design$sIV1Use=="Within" || design$sIV2Use=="Within") {
                 fitted<-fitted(analysis$model)
                 residuals<-residuals(analysis$model)
               } else {

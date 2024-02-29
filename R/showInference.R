@@ -95,6 +95,7 @@ showInference<-function(analysis=makeAnalysis(),showType="Basic",dimension="1D",
           g1<-plotInference(analysis1,showType[2],effectType=effectType[fi],orientation=orientation,showTheory=showTheory,g=g1)
       } 
     }
+    braw.env$plotLimits<-NULL
   }
  # g1<-g1+ggtitle(paste0("Expected: ",format(length(analysis$rIV)),"  "))+
  #   theme(plot.title=element_text(face='plain', size=8, hjust=0.9))

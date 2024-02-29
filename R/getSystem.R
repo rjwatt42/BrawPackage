@@ -18,6 +18,45 @@ getHypothesis<-function(name,hypothesis=makeHypothesis()) {
          "3"={
            hypothesis$IV2<-makeVariable("IV2")
          },
+         "2C"={
+           hypothesis$IV<-makeVariable("IV","Categorical")
+         },
+         "II"={
+           hypothesis$IV<-makeVariable("IV","Interval")
+           hypothesis$DV<-makeVariable("DV","Interval")
+         },
+         "IC"={
+           hypothesis$IV<-makeVariable("IV","Categorical")
+           hypothesis$DV<-makeVariable("DV","Interval")
+         },
+         "CI"={
+           hypothesis$IV<-makeVariable("IV","Interval")
+           hypothesis$DV<-makeVariable("DV","Categorical")
+         },
+         "CC"={
+           hypothesis$IV<-makeVariable("IV","Categorical")
+           hypothesis$DV<-makeVariable("DV","Categorical")
+         },
+         "III"={
+           hypothesis$IV<-makeVariable("IV","Interval")
+           hypothesis$IV2<-makeVariable("IV2","Interval")
+           hypothesis$DV<-makeVariable("DV","Interval")
+         },
+         "ICI"={
+           hypothesis$IV<-makeVariable("IV","Categorical")
+           hypothesis$IV2<-makeVariable("IV2","Interval")
+           hypothesis$DV<-makeVariable("DV","Interval")
+         },
+         "CII"={
+           hypothesis$IV<-makeVariable("IV","Interval")
+           hypothesis$IV2<-makeVariable("IV2","Interval")
+           hypothesis$DV<-makeVariable("DV","Categorical")
+         },
+         "CCI"={
+           hypothesis$IV<-makeVariable("IV","Categorical")
+           hypothesis$IV2<-makeVariable("IV2","Interval")
+           hypothesis$DV<-makeVariable("DV","Categorical")
+         },
          {}
          )
   return(hypothesis)
@@ -37,6 +76,9 @@ getDesign<-function(name,design=makeDesign()) {
            design$sN<-52
            design$sNRand<-TRUE
            design$sNRandK<-1.56
+         },
+         "Within"={
+           design$sIV1Use<-"Within"
          },
          {}
   )

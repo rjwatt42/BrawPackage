@@ -255,7 +255,7 @@ model2fulleffect<-function(mF,anU) {
     if (class(mF)=="glmerMod") {
       r.full<-sqrt((sum(anU$Chisq)-anU$Chisq[1])/nlevels(mF$model$participant))
     } else {
-      r.full<-r.squaredGLMM(mF)[[1]]
+      r.full<-sd(predict(mF))/sd(attributes(mF)$frame$dv)
     }
   } else {
     if (grepl("Intercept",rownames(anU)[[1]])) {n1<-2} else {n1<-1}
@@ -302,7 +302,6 @@ multipleAnalysis<-function(nsims=1,hypothesis,design,evidence,newResult=c()){
     }
     j<-i+offset
     newResult$rIV[j]<-res$rIV
-    newResult$raIV[j]<-res$raIV
     newResult$rpIV[j]<-res$rpIV
     newResult$pIV[j]<-res$pIV
     newResult$roIV[j]<-res$roIV
@@ -409,16 +408,9 @@ generalAnalysis<-function(allData,InteractionOn,withins,ssqType="Type3",caseOrde
   # get linear model and anova
   if (catVars[1]) {
     if (doingWithin) {
-      lmRaw<-glmer(formula=as.formula(formula),data=analysisRawData,family="binomial")
-      lmRawC<-glmer(formula=as.formula(formula),data=analysisRawData,family="binomial",contrasts=contrasts)
-      # lmNorm to calculate effect sizes
-      lmNorm<-glmer(formula=as.formula(formula),data=analysisNormData,family="binomial")
       lmNormC<-glmer(formula=as.formula(formula),data=analysisNormData,family="binomial",contrasts=contrasts)
       braw.env$anovaMethod<-"Chisq"
     } else {
-      lmRaw<-glm(formula=as.formula(formula),data=analysisRawData,family="binomial")
-      lmRawC<-glm(formula=as.formula(formula),data=analysisRawData,family="binomial",contrasts=contrasts)
-      lmNorm<-glm(formula=as.formula(formula),data=analysisNormData,family="binomial")
       lmNormC<-glm(formula=as.formula(formula),data=analysisNormData,family="binomial",contrasts=contrasts)
       braw.env$anovaMethod<-"F"
     }
@@ -427,17 +419,8 @@ generalAnalysis<-function(allData,InteractionOn,withins,ssqType="Type3",caseOrde
   } else { # Interval DV
     # lmRaw to report model
     if (doingWithin) {
-      # print(cor(analysisRawData[1:42,4],analysisRawData[43:84,4]))
-      lmRaw<-lmer(formula=as.formula(formula),data=analysisRawData)
-      lmRawC<-lmer(formula=as.formula(formula),data=analysisRawData,contrasts=contrasts)
-      # lmNorm to calculate effect sizes
-      lmNorm<-lmer(formula=as.formula(formula),data=analysisNormData)
       lmNormC<-lmer(formula=as.formula(formula),data=analysisNormData,contrasts=contrasts)
     } else {
-      lmRaw<-lm(formula=as.formula(formula),data=analysisRawData)
-      lmRawC<-lm(formula=as.formula(formula),data=analysisRawData,contrasts=contrasts)
-      # lmNorm to calculate effect sizes
-      lmNorm<-lm(formula=as.formula(formula),data=analysisNormData)
       lmNormC<-lm(formula=as.formula(formula),data=analysisNormData,contrasts=contrasts)
     }
     braw.env$anovaMethod<-"F"
@@ -447,29 +430,20 @@ generalAnalysis<-function(allData,InteractionOn,withins,ssqType="Type3",caseOrde
   #ANOVAS
   switch (ssqType,
           "Type1"={
-            anRaw<-Anova(lmRaw,test=braw.env$anovaMethod)
-            anRawC<-Anova(lmRawC,test=braw.env$anovaMethod)
-            anNorm<-Anova(lmNorm,test=braw.env$anovaMethod)
             anNormC<-Anova(lmNormC,test=braw.env$anovaMethod)
           },
           "Type2"={
-            anRaw<-Anova(lmRaw,test=braw.env$anovaMethod,type=2)
-            anRawC<-Anova(lmRawC,test=braw.env$anovaMethod,type=2)
-            anNorm<-Anova(lmNorm,test=braw.env$anovaMethod,type=2)
             anNormC<-Anova(lmNormC,test=braw.env$anovaMethod,type=2)
           },
           "Type3"={
-            anRaw<-Anova(lmRaw,test=braw.env$anovaMethod,type=3,singular.ok=TRUE)
-            anRawC<-Anova(lmRawC,test=braw.env$anovaMethod,type=3,singular.ok=TRUE)
-            anNorm<-Anova(lmNorm,test=braw.env$anovaMethod,type=3,singular.ok=TRUE)
             anNormC<-Anova(lmNormC,test=braw.env$anovaMethod,type=3,singular.ok=TRUE)
           }
   )
   
-  if (grepl("Intercept",rownames(anRaw)[[1]])) {n1<-2} else {n1<-1}
-  n2<-nrow(anRaw)
-  if (grepl("Residuals",rownames(anRaw)[[n2]])) {n2<-n2-1}
-  df<-anRaw$Df[n1:n2]
+  if (grepl("Intercept",rownames(anNormC)[[1]])) {n1<-2} else {n1<-1}
+  n2<-nrow(anNormC)
+  if (grepl("Residuals",rownames(anNormC)[[n2]])) {n2<-n2-1}
+  df<-anNormC$Df[n1:n2]
 
   # EFFECT SIZES  
   r.direct<-matrix(model2directeffect(lmNormC),nrow=1)
@@ -495,16 +469,10 @@ generalAnalysis<-function(allData,InteractionOn,withins,ssqType="Type3",caseOrde
               p.unique=p.unique,
               p.total=p.total,
               
-              lmRaw=lmRaw,
-              lmNorm=lmNorm,
-              lmRawC=lmRawC,
               lmNormC=lmNormC,
               
               df=df,
               
-              anRaw=anRaw,
-              anNorm=anNorm,
-              anRawC=anRawC,
               anNormC=anNormC
   ))
 }
@@ -586,7 +554,7 @@ makeAnalysis<-function(sample=makeSample(),evidence=makeEvidence(),autoShow=FALS
   iv2<-analysis$iv2
   dv<-analysis$dv
   # prepare the output to look like Jamovi
-  if (any(class(anResult$lmRaw)[1]==c("lmerMod","glmerMod"))) {
+  if (any(class(anResult$lmNormC)[1]==c("lmerMod","glmerMod"))) {
     # we need to sort this to match Jamovi etc
     # we use anNormC as the starting point, but replace any Interval predictors
     anRaw<-anResult$anNormC
@@ -625,16 +593,11 @@ makeAnalysis<-function(sample=makeSample(),evidence=makeEvidence(),autoShow=FALS
     anResult$anRaw<-anRaw
   }
   
-  lmRaw<-anResult$lmRaw
-  lmNorm<-anResult$lmNorm
-  lmRawC<-anResult$lmRawC
   lmNormC<-anResult$lmNormC
-  
-  anRaw<-anResult$anRaw
-  anNorm<-anResult$anNorm
-  anRawC<-anResult$anRawC
   anNormC<-anResult$anNormC
   
+  anRaw<-anNormC
+  lmRaw<-lmNormC
   # simulate the single IV analyses
   if (is.null(IV2)) {
     hypothesisType=paste(IV$type,DV$type,sep=" ")
@@ -653,7 +616,7 @@ makeAnalysis<-function(sample=makeSample(),evidence=makeEvidence(),autoShow=FALS
             },
             "Categorical Interval"={
               if (IV$ncats==2){
-                if (IV$type=="Categorical" && design$sIV1Use=="Within"){
+                if (design$sIV1Use=="Within"){
                   an_name<-"t-test: Paired Samples"
                   tv<-t.test(dv~iv1,paired=TRUE,var.equal=!evidence$Welch)
                   tval<-tv$statistic
@@ -775,8 +738,7 @@ makeAnalysis<-function(sample=makeSample(),evidence=makeEvidence(),autoShow=FALS
             "Categorical Categorical"={
               an_name<-"Chi-square test of independence"
               t_name<-"chi2"
-              print(c(lmRaw$null.deviance,lmRaw$deviance))
-              
+
               chiResult<-chisq.test(iv1,dv,correct = FALSE)
               df<-paste("(",format(chiResult$parameter),",","n=",format(length(analysis$participant)),")",sep="")
               
@@ -822,15 +784,17 @@ makeAnalysis<-function(sample=makeSample(),evidence=makeEvidence(),autoShow=FALS
   }
   
   # adding fields to existing analysis
-  analysis$rawModel<-anResult$lmRaw
-  analysis$normModel<-anResult$lmNorm
-  analysis$rawModelC<-anResult$lmRawC
-  analysis$normModelC<-anResult$lmNormC
-  
-  analysis$rawAnova<-anResult$anRaw
-  analysis$normAnova<-anResult$anNorm
-  analysis$rawAnovaC<-anResult$anRawC
-  analysis$normAnovaC<-anResult$anNormC
+  switch (braw.env$modelType,
+          "Raw"={
+            analysis$model<-anResult$lmRawC
+            analysis$anova<-anResult$anRawC
+          },
+          "Norm"={
+            analysis$model<-anResult$lmNormC
+            analysis$anova<-anResult$anNormC
+          }
+  )
+
   analysis$nval<-n
   if (IV$type=="Categorical") {
     analysis$df1<-IV$ncats-1
@@ -847,9 +811,6 @@ makeAnalysis<-function(sample=makeSample(),evidence=makeEvidence(),autoShow=FALS
     analysis$df2<-0
   }
   analysis$df12<-analysis$df1*analysis$df2
-  
-  analysis$model<-analysis$rawModel
-  analysis$anova<-analysis$rawAnovaC
   
   analysis$an_name<-an_name
   analysis$test_name<-t_name
