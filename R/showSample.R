@@ -5,7 +5,7 @@ plotSample<-function(IV,DV,effect,ivplot,dvplot) {
   # the scattered points
   dotSize<-(braw.env$plotTheme$axis.title$size)/3
   if (length(ivplot)>100) {
-    dotSize<-dotSize*sqrt(100/length(iv))
+    dotSize<-dotSize*sqrt(100/length(ivplot))
   }
   
   x<-ivplot

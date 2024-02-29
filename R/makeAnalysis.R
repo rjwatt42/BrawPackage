@@ -505,7 +505,7 @@ makeAnalysis<-function(sample=makeSample(),evidence=makeEvidence(),autoShow=FALS
   n<-nrow(allData)
 
   withins<-c(design$sIV1Use=="Within",design$sIV2Use=="Within")
-  
+
   anResult<-generalAnalysis(allData,evidence$rInteractionOn,withins,evidence$ssqType,evidence$caseOrder)
   
 # MOVE RESULTS OUT TO BRAWSTATS  
@@ -620,7 +620,7 @@ makeAnalysis<-function(sample=makeSample(),evidence=makeEvidence(),autoShow=FALS
                   an_name<-"t-test: Paired Samples"
                   tv<-t.test(dv~iv1,paired=TRUE,var.equal=!evidence$Welch)
                   tval<-tv$statistic
-                  df<-paste("(",format(anRaw$Df[nrow(anRaw)]),")",sep="")
+                  df<-paste("(",format(tv$parameter),")",sep="")
                   analysis$pIV<-tv$p.value
                 } else {
                   an_name<-"t-test: Independent Samples"

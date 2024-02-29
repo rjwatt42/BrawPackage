@@ -71,9 +71,9 @@ reportInference<-function(analysis=makeAnalysis(),analysisType="Anova"){
       vn<-rownames(anova)[i]
       if (vn!="(Intercept)") {
         if (vn=="NULL") vn<-"Total"
-        if (vn=="iv1"){vn<-paste("",analysis$hypothesis$IVs$name,sep="")}
-        if (vn=="iv2"){vn<-paste("",analysis$hypothesis$IV2s$name,sep="")}
-        if (vn=="iv1:iv2"){vn<-paste("",analysis$hypothesis$IVs$name,":",analysis$hypothesis$IV2s$name,sep="")}
+        if (vn=="iv1"){vn<-paste("",analysis$hypothesis$IV$name,sep="")}
+        if (vn=="iv2"){vn<-paste("",analysis$hypothesis$IV2$name,sep="")}
+        if (vn=="iv1:iv2"){vn<-paste("",analysis$hypothesis$IV$name,":",analysis$hypothesis$IV2$name,sep="")}
         if (vn=="Residuals"){vn<-"Error"}
         if (vn=="Total"){
           vn<-"\bTotal"
