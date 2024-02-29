@@ -12,9 +12,6 @@ reportInference<-function(analysis=makeAnalysis(),analysisType="Anova"){
   effect<-analysis$hypothesis$effect
   evidence<-analysis$evidence
   
-  analysis$anova<-as.matrix(analysis$anova[,])
-  analysis$model<-data.frame(summary(analysis$model)$coefficients)
-  
   switch (analysisType,
           "Anova"= {anova<-analysis$anova},
           "Model"= {anova<-analysis$model}

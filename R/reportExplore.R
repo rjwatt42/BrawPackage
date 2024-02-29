@@ -283,7 +283,7 @@ reportExplore<-function(exploreResult,showType="r",
   outputText<-rep("",nc+1)
   outputText[1]<-"\bExplore:"
   outputText[2]<-explore$exploreType
-  outputText[3]<-paste(" (nsims=",format(nrow(exploreResult$result$rval)),")",sep="")
+  outputText[3]<-paste("nsims = ",format(nrow(exploreResult$result$rval)),sep="")
   outputText<-c(outputText,rep("",nc+1))
 
   if (showType=="NHSTErrors" || showType=="FDR;FMR") {

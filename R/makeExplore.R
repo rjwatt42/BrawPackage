@@ -48,6 +48,7 @@ storeExploreResult<-function(result,res,ri,vi) {
 }
 
 mergeExploreResult<-function(res1,res2) {
+  result<-res1
   result$rval<-rbind(res1$rval,res2$rval)
   result$pval<-rbind(res1$pval,res2$pval)
   result$rpval<-rbind(res1$rpval,res2$rpval)

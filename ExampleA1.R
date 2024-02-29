@@ -1,6 +1,7 @@
 
 hypothesis<-getHypothesis("2C")
 design<-getDesign("Within")
+design1<-makeDesign()
 analysis<-makeAnalysis(makeSample(hypothesis=hypothesis,design=design))
 showInference(analysis)
 

@@ -108,6 +108,7 @@ makeExpected <- function(nsims=10,expectedResult=NULL,hypothesis=makeHypothesis(
   } else
     ns<-nsims
 
+  nsims<-nsims+expectedResult$count
   while (expectedResult$count<nsims) {
     if (expectedResult$count/ns>=10) ns<-ns*10
     if (expectedResult$count+ns>nsims) ns<-nsims-expectedResult$count

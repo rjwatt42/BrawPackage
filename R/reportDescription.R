@@ -5,15 +5,8 @@ makeFormula<-function(IV,IV2,DV,design,evidence,analysis,an_vars){
   when_string = "="
   times_string = "x"
   
-  if (design$sIV1Use=="Within" || design$sIV2Use=="Within")
-  { #coeffs<-colMeans(coef(analysis$model)$participant)
-   coeffs<-analysis$model$Estimate
-    # use<-!grepl("participant",an_vars)
-    # an_vars<-an_vars[use]
-  } else {
-    coeffs<-analysis$model$coefficients
-  }
-
+  coeffs<-analysis$coefficients
+  
   switch (DV$type,
           "Interval"={
             an_model<-paste(DV$name,assign_string,sep="")
@@ -54,8 +47,6 @@ reportDescription<-function(analysis=makeAnalysis()){
   effect<-analysis$hypothesis
   design<-analysis$design
   evidence<-analysis$evidence
-  
-  analysis$model<-data.frame(summary(analysis$model)$coefficients)
   
   if (is.null(IV2)) no_ivs<-1 else no_ivs<-2
   
@@ -192,13 +183,8 @@ reportDescription<-function(analysis=makeAnalysis()){
                 }
                 outputText<-c(outputText,rep("",nc-(IV$ncats+1)))
               }
-              if (design$sIV1Use=="Within" || design$sIV2Use=="Within") {
-                fitted<-fitted(analysis$model)
-                residuals<-residuals(analysis$model)
-              } else {
-                fitted<-analysis$model$fitted
-                residuals<-analysis$model$residuals
-              }
+              fitted<-analysis$fitted
+              residuals<-analysis$residuals
               rsd<-sd(residuals,na.rm=TRUE)
               outputText<-c(outputText,rep("",nc))
               if (IV$ncats==2){

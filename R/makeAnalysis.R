@@ -794,6 +794,23 @@ makeAnalysis<-function(sample=makeSample(),evidence=makeEvidence(),autoShow=FALS
             analysis$anova<-anResult$anNormC
           }
   )
+  
+  if (design$sIV1Use=="Within" || design$sIV2Use=="Within") {
+    coeffs<-coeffs(analysis$model)
+    fitted<-fitted(analysis$model)
+    residuals<-residuals(analysis$model)
+  } else {
+    coeffs<-analysis$model$coefficients
+    fitted<-analysis$model$fitted
+    residuals<-analysis$model$residuals
+  }
+  
+  analysis$coefficients<-coeffs
+  analysis$fitted<-fitted
+  analysis$residuals<-residuals
+  analysis$anova<-as.matrix(analysis$anova[,])
+  analysis$model<-data.frame(summary(analysis$model)$coefficients)
+  
 
   analysis$nval<-n
   if (IV$type=="Categorical") {
@@ -821,14 +838,8 @@ makeAnalysis<-function(sample=makeSample(),evidence=makeEvidence(),autoShow=FALS
   analysis$design<-design
   analysis$evidence<-evidence
   
-  # analysis$ResultHistory<-ResultHistory
-  
   analysis$Heteroscedasticity<-0
-  F<-analysis$rawAnova$F[[2]]
-  df2<-analysis$rawAnova$Df[[3]]
-  analysis$raIV<-sqrt(F/(F+df2))*sign(analysis$rIV)
-  
-  
+
   if (autoShow) print(showDescription(analysis))
   
   analysis

@@ -1061,7 +1061,7 @@ showExplore<-function(exploreResult=makeExplore(autoShow=TRUE),showType="r",ylog
       n80<-optimize(minnw,c(explore$min_n,explore$max_n),w=0.8,r=r_est)
       
       if (sum(n<n80$minimum)>=2 && sum(n>n80$minimum)>=2){
-        label<-paste("n80 =",format(n80$minimum,digits=2))
+        label<-paste("n80 =",format(round(n80$minimum),digits=2))
         # label<-paste("n80 =",format(n80$minimum,digits=2),"  r_est =", format(r_est,digits=3))
       } else {
         if (sum(n<n80$minimum)<2) label<-paste("Unsafe result - decrease range")
