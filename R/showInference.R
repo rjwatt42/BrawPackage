@@ -73,6 +73,7 @@ showInference<-function(analysis=makeAnalysis(),showType="Basic",dimension="1D",
            {showType<-c(showType,NA)}
     )
   } 
+  
   if (dimension=="2D") {
     g1<-plot2Inference(analysis,showType[1],showType[2])
   } else {
@@ -80,14 +81,16 @@ showInference<-function(analysis=makeAnalysis(),showType="Basic",dimension="1D",
       effectType<-c("direct","unique","total")
       area.y<-0.25
     } else area.y<-1
-    g1<-ggplot()+coord_cartesian(xlim=c(0,1),ylim=c(0,1))
+    
+    g1<-ggplot()
+    
     for (fi in 1:length(effectType)) {
-      braw.env$plotArea<-c(0.0,0.33*(fi-1),0.5,area.y)
+      braw.env$plotArea<-c(0.0,0.33*(fi-1),0.48,area.y)
       if (showType[1]=="e1")
         g1<-plotInference(analysis2,showType[1],effectType=effectType[fi],orientation=orientation,showTheory=showTheory,g=g1)
       else
         g1<-plotInference(analysis1,showType[1],effectType=effectType[fi],orientation=orientation,showTheory=showTheory,g=g1)
-      braw.env$plotArea<-c(0.5,0.33*(fi-1),0.5,area.y)
+      braw.env$plotArea<-c(0.52,0.33*(fi-1),0.48,area.y)
       if (!is.na(showType[2])) {
         if (showType[2]=="e1")
           g1<-plotInference(analysis2,showType[2],effectType=effectType[fi],orientation=orientation,showTheory=showTheory,g=g1)
@@ -100,6 +103,6 @@ showInference<-function(analysis=makeAnalysis(),showType="Basic",dimension="1D",
  # g1<-g1+ggtitle(paste0("Expected: ",format(length(analysis$rIV)),"  "))+
  #   theme(plot.title=element_text(face='plain', size=8, hjust=0.9))
 
-    g<-joinPlots(g1)
+    g<-joinPlots(g1)+coord_cartesian(xlim=c(0,1),ylim=c(0,1))
   return(g)
 }

@@ -1,8 +1,11 @@
 #' export
-drawEffectES<-function(r,t=1,plotArea=c(0,0,1,1),g=NULL){
+drawEffectES<-function(r,t=1,plotArea=NULL,g=NULL){
 
   if (is.null(g))
     g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme
+  if (!is.null(plotArea)) braw.env$plotArea<-plotArea
+  
+  g<-startPlot(xlim=c(-1,1),ylim=c(0,1),back="transparent",box="",g=g)
   
   switch (t,
           {start=c(0,0.92)
@@ -69,20 +72,15 @@ drawEffectES<-function(r,t=1,plotArea=c(0,0,1,1),g=NULL){
     x<-arrow_x*cos(direction/(180/pi))+arrow_y*sin(direction/(180/pi))
     y<-arrow_x*sin(direction/(180/pi))-arrow_y*cos(direction/(180/pi))
     pts<-data.frame(x=x+start[1],y=y+start[2])
-    pts$x<-(pts$x+1)/2*plotArea[3]+plotArea[1]
-    pts$y<-pts$y*plotArea[4]+plotArea[2]
-    
-  g<-g+
-    geom_polygon(data=pts,aes(x=x,y=y),color="black",fill=col, lwd=0.5)#+coord_fixed(1,xlim=c(-1,1),ylim=c(0,1))
+
+  g<-g+dataPolygon(data=pts,colour="black",fill=col)
   
   if (braw.env$simData) {
     if (t==1){
       lbl=paste("r=",as.character(r),sep="")
     }else{ lbl=as.character(r)
     }
-    labelpts$x<-(labelpts$x+1)/2*plotArea[3]+plotArea[1]
-    labelpts$y<-labelpts$y*plotArea[4]+plotArea[2]
-    g<-g+geom_label(data=labelpts,aes(x = mean(x), y = mean(y), label = lbl), color="black", fill = "white",size=braw.env$labelSize)
+    g<-g+dataLabel(data=labelpts, label = lbl)
   }
   
   return(g)

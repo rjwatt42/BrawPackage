@@ -8,23 +8,14 @@ reRange<-function(r,plotRange,rRange=NULL) {
 
 drawVar<-function(pts,ticks,var,plotArea=c(0,0,1,1),g){
 
-  pts$r<-reRange(pts$r,plotArea[c(1,3)])
-  pts$dens<-reRange(pts$dens*0.8,plotArea[c(2,4)]+plotArea[4]*c(1,-1)*0.2,c(0,1))
-
-  ticks$breaks<-reRange(ticks$breaks,plotArea[c(1,3)])
-  
-  back<-data.frame(x=plotArea[1]+plotArea[3]*c(0,0,1,1),
-                   y=reRange(c(0,1,1,0),plotArea[c(2,4)]+plotArea[4]*c(1,-1)*0.2,c(0,1)))
-  axis<-data.frame(x=plotArea[1]+plotArea[3]*c(0,1),
-                   y=reRange(c(0,1),plotArea[c(2,4)]+plotArea[4]*c(1,-1)*0.2,c(0,1)))
-
-  g<-g+geom_polygon(data=back,aes(x=x,y=y),fill=braw.env$plotColours$graphBack, col=braw.env$plotColours$graphBack)
-  g<-g+geom_polygon(data=pts,aes(x=r,y=dens),fill=braw.env$plotColours$sampleC, col="black")
-  
-    g+geom_line(data=axis,aes(x=x,y=y[1]),color="black",lwd=0.5)+
-      geom_text(data=axis,aes(x=mean(x),y=y[1]),label=var$name,vjust=2.2,fontface="bold")+
-      geom_text(data=ticks,aes(x=breaks,y=axis$y[1],label=labels),vjust=1.4,size=3)      
-    }
+  pts<-data.frame(x=pts$r,y=pts$dens)
+  g<-startPlot(xlim=c(min(pts$x),max(pts$x)),ylim=c(0,1),box="x",g=g)
+  g<-g+xAxisLabel(bquote(bold(.(var$name))))
+  g<-g+xAxisTicks(ticks$breaks,ticks$labels)
+  g<-g+dataPolygon(pts,fill=braw.env$plotColours$sampleC,colour=braw.env$plotColours$sampleC)
+  g<-g+dataLine(pts,colour="black",linewidth=0.5)
+  g<-g+dataLine(data.frame(x=braw.env$plotLimits$xlim,y=braw.env$plotLimits$ylim[1]),colour="black")
+}
 
 shrinkString<-function(s,n) {return(substr(s,1,n))}
 
@@ -122,9 +113,10 @@ drawInterval<-function(var,plotArea=c(0,0,1,1),g){
 #' @examples
 #' variable<-showVariable(variable=makeVariable())
 #' @export
-showVariable<-function(variable=makeVariable(),plotArea=c(0,0,1,1),g=NULL){
+showVariable<-function(variable=makeVariable(),plotArea=NULL,g=NULL){
   if (is.null(g)) 
     g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme
+  if (!is.null(plotArea)) braw.env$plotArea<-plotArea
   switch(variable$type,
          "Interval"={g<-drawInterval(variable,plotArea,g)},
          "Ordinal"={g<-drawOrdinal(variable,plotArea,g)},

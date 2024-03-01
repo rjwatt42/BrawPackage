@@ -18,15 +18,15 @@ showHypothesis<-function(hypothesis=makeHypothesis()) {
   if (is.null(IV) || is.null(DV)) {return(ggplot()+braw.env$blankTheme)}
   if (is.null(IV2)) no_ivs<-1 else no_ivs<-2
     
+  g<-NULL
   switch(no_ivs,
          { 
-           braw.env$plotArea<-c(0.3,0.6,0.4,0.4)
-           g<-showVariable(IV,plotArea=c(0.3,0.6,0.4,0.4))
+           g<-showVariable(IV,plotArea=c(0.3,0.6,0.4,0.4),g)
            g<-showVariable(DV,plotArea=c(0.3,0.0,0.4,0.4),g)
-           g<-drawEffectES(effect$rIV,1,plotArea=c(0.3,0.4,0.4,0.22),g)
+           g<-drawEffectES(effect$rIV,plotArea=c(0.3,0.42,0.4,0.18),1,g)
          },
          {
-           g<-showVariable(IV,plotArea=c(0.0,0.6,0.4,0.4))
+           g<-showVariable(IV,plotArea=c(0.0,0.6,0.4,0.4),g)
            g<-showVariable(IV2,plotArea=c(0.6,0.6,0.4,0.4),g)
            g<-showVariable(DV,plotArea=c(0.3,0.0,0.4,0.4),g)
            g<-drawEffectES(effect$rIV,2,plotArea=c(0.1,0.4,0.4,0.22),g)
@@ -134,7 +134,8 @@ showPopulation <- function(hypothesis=makeHypothesis()) {
 
   switch (no_ivs,
           {
-            g<-plotPopulation(IV,DV,effect,alpha=1)
+            braw.env$plotArea<-c(0,0,1,1)
+            g<-plotPopulation(IV,DV,effect)
           },
           {
             effect1<-effect
@@ -143,11 +144,12 @@ showPopulation <- function(hypothesis=makeHypothesis()) {
             effect3<-effect
             effect3$rIV<-effect3$rIVIV2
 
-            g<-joinPlots(
-              plotPopulation(IV,DV,effect1,alpha=1),
-              plotPopulation(IV2,DV,effect2,alpha=1),
-              plotPopulation(IV,IV2,effect3,alpha=1)
-            )
+            braw.env$plotArea<-c(0,0,0.45,0.45)
+            g<-plotPopulation(IV,IV2,effect3)
+            braw.env$plotArea<-c(0.55,0,0.45,0.45)
+            g<-plotPopulation(IV,DV,effect1,g=g)
+            braw.env$plotArea<-c(0.55/2,0.55,0.45,0.45)
+            g<-plotPopulation(IV2,DV,effect2,g=g)
           }
   )
   return(joinPlots(g))
