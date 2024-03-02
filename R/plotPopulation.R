@@ -86,7 +86,7 @@ plotCatParPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha,g){
     l<-sapply(l,shrinkString,ceil(12/length(l)))
   }
   pp<-CatProportions(IV)
-  b<-(1:ncats)-1
+  b<-(1:ncats)
 
   pbreaks<-seq(0,1,1/(ncats))
   ebreaks<-qnorm(pbreaks)
@@ -159,7 +159,7 @@ plotCatOrdPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha,g){
   if (sum(sapply(l1,nchar))>12) {
     l1<-sapply(l1,shrinkString,ceil(12/length(l1)))
   }
-  b1<-(1:ncats1)-1
+  b1<-(1:ncats1)
   
   ng2<-DV$nlevs
   b2<-1:ng2
@@ -176,7 +176,7 @@ plotCatOrdPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha,g){
   for (ix in 1:ncats1) {
     for (iy in 1:ng2) {
       idc<-idc+1
-      newpts<-data.frame(x=x*s[iy,ix]*pp1[ix]*pp[iy]+b1[ix]+1, y=y+b2[iy], value=rep(s[iy,ix]*pp1[ix]*pp[iy],4),ids=idc)
+      newpts<-data.frame(x=x*s[iy,ix]*pp1[ix]*pp[iy]+b1[ix], y=y+b2[iy], value=rep(s[iy,ix]*pp1[ix]*pp[iy],4),ids=idc)
       pts<-rbind(pts,newpts)
     }
   }
@@ -245,12 +245,12 @@ plotParCatPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha,g){
 plotCatCatPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha,g){
   ncats1<-IV$ncats
   pp1<-CatProportions(IV)
-  b1<-(1:ncats1)-1
+  b1<-(1:ncats1)
   l1=IV$cases
   
   ncats2<-DV$ncats
   pp2<-CatProportions(DV)
-  b2<-(1:ncats2)-1
+  b2<-(1:ncats2)
   l2=DV$cases
   
   division<-r2CatProportions(rho,ncats1,ncats2)

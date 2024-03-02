@@ -88,7 +88,7 @@ reportDescription<-function(analysis=makeAnalysis()){
       }
     }
   } else {
-    an_vars<-variable.names(analysis$model)
+    an_vars<-row.names(analysis$model)
     an_vars<-sub("iv1$",IV$name,an_vars)
   }
   

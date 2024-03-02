@@ -25,12 +25,32 @@ getHypothesis<-function(name,hypothesis=makeHypothesis()) {
            hypothesis$IV<-makeVariable("IV","Interval")
            hypothesis$DV<-makeVariable("DV","Interval")
          },
+         "IO"={
+           hypothesis$IV<-makeVariable("IV","Ordinal")
+           hypothesis$DV<-makeVariable("DV","Interval")
+         },
          "IC"={
            hypothesis$IV<-makeVariable("IV","Categorical")
            hypothesis$DV<-makeVariable("DV","Interval")
          },
+         "OI"={
+           hypothesis$IV<-makeVariable("IV","Interval")
+           hypothesis$DV<-makeVariable("DV","Ordinal")
+         },
+         "OO"={
+           hypothesis$IV<-makeVariable("IV","Ordinal")
+           hypothesis$DV<-makeVariable("DV","Ordinal")
+         },
+         "OC"={
+           hypothesis$IV<-makeVariable("IV","Categorical")
+           hypothesis$DV<-makeVariable("DV","Ordinal")
+         },
          "CI"={
            hypothesis$IV<-makeVariable("IV","Interval")
+           hypothesis$DV<-makeVariable("DV","Categorical")
+         },
+         "CO"={
+           hypothesis$IV<-makeVariable("IV","Ordinal")
            hypothesis$DV<-makeVariable("DV","Categorical")
          },
          "CC"={
@@ -42,9 +62,19 @@ getHypothesis<-function(name,hypothesis=makeHypothesis()) {
            hypothesis$IV2<-makeVariable("IV2","Interval")
            hypothesis$DV<-makeVariable("DV","Interval")
          },
+         "IIC"={
+           hypothesis$IV<-makeVariable("IV","Interval")
+           hypothesis$IV2<-makeVariable("IV2","Categorical")
+           hypothesis$DV<-makeVariable("DV","Interval")
+         },
          "ICI"={
            hypothesis$IV<-makeVariable("IV","Categorical")
            hypothesis$IV2<-makeVariable("IV2","Interval")
+           hypothesis$DV<-makeVariable("DV","Interval")
+         },
+         "ICC"={
+           hypothesis$IV<-makeVariable("IV","Categorical")
+           hypothesis$IV2<-makeVariable("IV2","Categorical")
            hypothesis$DV<-makeVariable("DV","Interval")
          },
          "CII"={
@@ -55,6 +85,16 @@ getHypothesis<-function(name,hypothesis=makeHypothesis()) {
          "CCI"={
            hypothesis$IV<-makeVariable("IV","Categorical")
            hypothesis$IV2<-makeVariable("IV2","Interval")
+           hypothesis$DV<-makeVariable("DV","Categorical")
+         },
+         "CIC"={
+           hypothesis$IV<-makeVariable("IV","Interval")
+           hypothesis$IV2<-makeVariable("IV2","Categorical")
+           hypothesis$DV<-makeVariable("DV","Categorical")
+         },
+         "CCC"={
+           hypothesis$IV<-makeVariable("IV","Categorical")
+           hypothesis$IV2<-makeVariable("IV2","Categorical")
            hypothesis$DV<-makeVariable("DV","Categorical")
          },
          {}

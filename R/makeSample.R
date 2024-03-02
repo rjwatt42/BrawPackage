@@ -690,9 +690,9 @@ makeSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=FA
         if (DV$type=="Interval"){
           mn1=mean(dv[use1])
           sd1=sd(dv[use1])
-          xplot[use1]<-i-1+rnorm(length(xplot[use1]),mean=0,sd=exp(-0.5*((dv[use1]-mn1)/sd1)^2))*0.15*2*sum(use1)/length(xp)
+          xplot[use1]<-i+rnorm(length(xplot[use1]),mean=0,sd=exp(-0.5*((dv[use1]-mn1)/sd1)^2))*0.15*2*sum(use1)/length(xp)
         } else {
-          xplot[use1]<-i-1+rnorm(length(xplot[use1]))*mean(use1)*0.3
+          xplot[use1]<-i+rnorm(length(xplot[use1]))*mean(use1)*0.3
         }
         }
       }
@@ -713,9 +713,9 @@ makeSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=FA
           if (DV$type=="Interval"){
             mn1=mean(dv[use1])
             sd1=sd(dv[use1])
-            x2plot[use1]<-i-1+rnorm(length(x2plot[use1]),mean=0,sd=exp(-0.5*((dv[use1]-mn1)/sd1)^2))*0.15*2*sum(use1)/length(x2plot)
+            x2plot[use1]<-i+rnorm(length(x2plot[use1]),mean=0,sd=exp(-0.5*((dv[use1]-mn1)/sd1)^2))*0.15*2*sum(use1)/length(x2plot)
           } else {
-            x2plot[use1]<-i-1+rnorm(length(x2plot[use1]))*mean(use1)*0.3
+            x2plot[use1]<-i+rnorm(length(x2plot[use1]))*mean(use1)*0.3
           }
           }
         }
@@ -740,10 +740,10 @@ makeSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=FA
           mn1<-mean(iv[use1])
           sd1<-sd(iv[use1])
           jitter<-rnorm(length(yplot[use1]),mean=0,sd=exp(-0.5*((iv[use1]-mn1)/sd1)^2))*0.15*2*sum(use1)/length(yplot)
-          yplot[use1]<-i-1+jitter
+          yplot[use1]<-i+jitter
         } else{
           jitter<-rnorm(length(yplot[use1]),0,1)*mean(use1)*0.3
-          yplot[use1]<-i-1+jitter
+          yplot[use1]<-i+jitter
         }
       }
       # yplot<-yplot-(DV$ncats+1)/2

@@ -34,7 +34,7 @@ showHypothesis<-function(hypothesis=makeHypothesis()) {
            g<-drawEffectES(effect$rIVIV2,4,plotArea=c(0.3,0.7,0.4,0.22),g)
            g<-drawEffectES(effect$rIVIV2DV,5,plotArea=c(0.3,0.4,0.4,0.22),g)
          })
-  return(joinPlots(g))
+  return(g)
 }
 
 #' show a world object
@@ -84,7 +84,7 @@ showWorld<-function(hypothesis=makeHypothesis(effect=makeEffect(world=makeWorld(
 
   g<-g1
 
-  return(joinPlots(g))
+  return(g)
 }
 
 #' show a design object
@@ -114,7 +114,7 @@ showDesign<-function(design=makeDesign()) {
   g<-g+geom_line(data=pts,aes(x=x,y=y),color="black",lwd=0.25)
   g<-g+labs(x="n",y="Density")+braw.env$diagramTheme
   
-  return(joinPlots(g))
+  return(g)
 }
 
 # population diagram
@@ -152,7 +152,7 @@ showPopulation <- function(hypothesis=makeHypothesis()) {
             g<-plotPopulation(IV2,DV,effect2,g=g)
           }
   )
-  return(joinPlots(g))
+  return(g)
 }
 
 # prediction diagram
@@ -171,7 +171,8 @@ showPrediction <- function(hypothesis=makeHypothesis(),design=makeDesign(),evide
   if (is.null(IV2)) no_ivs<-1 else no_ivs<-2
 
   switch (no_ivs,
-          {  g<-plotPrediction(IV,IV2,DV,effect,design)
+          { braw.env$plotArea<-c(0,0,1,1) 
+            g<-plotPrediction(IV,IV2,DV,effect,design)
           },
           {
             if (evidence$rInteractionOn==FALSE){
@@ -179,28 +180,31 @@ showPrediction <- function(hypothesis=makeHypothesis(),design=makeDesign(),evide
               effect2<-effect
               effect2$rIV<-effect2$rIV2
 
-              g<-joinPlots(
-                plotPrediction(IV,NULL,DV,effect1,design),
-                plotPrediction(IV2,NULL,DV,effect2,design)
-              )
+                braw.env$plotArea<-c(0,0,0.5,1) 
+                g<-plotPrediction(IV,NULL,DV,effect1,design)
+                braw.env$plotArea<-c(0,0.5,0.5,1) 
+                g<-plotPrediction(IV2,NULL,DV,effect2,design,g=g)
+              
             } else{
-              if (braw.env$showInteractionOnly){
+              if (evidence$rInteractionOnly){
                 g<-plotPrediction(IV,IV2,DV,effect,design)
               } else{
                 effect1<-effect
                 effect2<-effect
                 effect2$rIV<-effect2$rIV2
 
-                g<-joinPlots(
-                  plotPrediction(IV,NULL,DV,effect1,design),
-                  plotPrediction(IV2,NULL,DV,effect2,design),
-                  plotPrediction(IV,IV2,DV,effect,design)
-                )
+                braw.env$plotArea<-c(0,0,0.5,0.5) 
+                g<-plotPrediction(IV,NULL,DV,effect1,design)
+                braw.env$plotArea<-c(0,0.5,0.5,0.5) 
+                g<-plotPrediction(IV2,NULL,DV,effect2,design,g=g)
+                braw.env$plotArea<-c(0.25,0.5,0.5,0.5) 
+                g<-plotPrediction(IV,IV2,DV,effect,design,g=g)
+                
               }
             }
           }
   )
-  return(joinPlots(g))
+  return(g)
 }
 ##################################################################################    
 
@@ -248,6 +252,6 @@ showWorldSampling<-function(hypothesis=makeHypothesis(),design=makeDesign(),sigO
          "r"={g<-g+labs(x=braw.env$rsLabel,y="Frequency")+braw.env$diagramTheme},
          "z"={g<-g+labs(x=braw.env$zsLabel,y="Frequency")+braw.env$diagramTheme}
   )
-  return(joinPlots(g))
+  return(g)
 }
 

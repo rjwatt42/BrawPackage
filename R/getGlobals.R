@@ -72,9 +72,7 @@ BrawOpts<-function(BW=FALSE,fontScale=1) {
           braw.env$reportTheme<-braw.env$blankTheme+theme(plot.margin=margin(0.15,0.8,0,0.25,"cm"))
           
           braw.env$labelSize<-3.2*fontScale
-          
-          braw.env$layout<-layout
-          
+
           ##########################
           # NHST constants
           
@@ -113,8 +111,9 @@ BrawOpts<-function(BW=FALSE,fontScale=1) {
           braw.env$minN<-10
           braw.env$maxRandN<-5 # times mean sample size
           braw.env$reportGroupMeans<-TRUE
-          braw.env$CdoLegendBars<-TRUE
+          braw.env$doLegendBars<-TRUE
           braw.env$doLegendPoints<-FALSE
+          braw.env$onesided<-TRUE
           braw.env$simData<-TRUE
           
           braw.env$wPlotScale<-"log10"
@@ -122,8 +121,7 @@ BrawOpts<-function(BW=FALSE,fontScale=1) {
           braw.env$nPlotScale<-"linear"
           
           braw.env$useSignificanceCols<-TRUE
-          braw.env$showInteractionOnly<-TRUE
-          
+
           braw.env$includeSingle<-FALSE  # in "All" meta-analysis
           
           braw.env$alphaChar<-'\u03B1'

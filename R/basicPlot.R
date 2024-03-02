@@ -159,20 +159,73 @@ dataLine<-function(data,arrow=NULL,colour="black",linewidth=0.25) {
   data<-reRangeXY(data)
   geom_path(data=data,aes(x=x,y=y),arrow=arrow,colour=colour,linewidth=linewidth)
 }
-dataPath<-function(data,arrow=NULL,colour,linewidth,orientation) {
+dataPath<-function(data,arrow=NULL,colour,linewidth) {
   data<-reRangeXY(data)
   geom_path(data=data,aes(x=x,y=y),arrow=arrow,colour=colour,linewidth=linewidth)
 }
 dataPoint<-function(data,shape=21,colour="black",fill="white",alpha=1,size=3) {
   data<-reRangeXY(data)
-  geom_point(data=data,aes(x=x,y=y),shape=shape,colour=colour,fill=fill,alpha=alpha,size=size)
+  if (is.null(data$fill)) {
+    geom_point(data=data,aes(x=x,y=y),shape=shape,colour=colour,fill=fill,alpha=alpha,size=size)
+  } else {
+    geom_point(data=data,aes(x=x,y=y,fill=fill),shape=shape,colour=colour,alpha=alpha,size=size)
+  }
+}
+dataBar<-function(data,colour="black",fill="white",alpha=1,barwidth) {
+  bar<-data.frame(x=c(-1,1,1,-1)*barwidth/length(data$x),
+                  y=c(0,0,1,1)
+  )
+  output<-c()
+  for (i in 1:length(data$x)) {
+    databar<-data.frame(x=bar$x+data$x[i],y=bar$y*data$y[i])
+    output<-c(output,dataPolygon(databar,colour=colour,fill=fill[i],alpha=alpha))
+  }
+  return(output)
 }
 dataPolygon<-function(data,colour="black",fill="white",alpha=1) {
+  data<-reRangeXY(data)
   if (!is.null(data$ids)) {
-    data<-reRangeXY(data)
     geom_polygon(data=data,aes(x=x,y=y,group=ids,alpha=alpha*value),colour = colour, fill = fill)
   } else {
-    data<-reRangeXY(data)
-    geom_polygon(data=data,aes(x=x,y=y),colour = colour, fill = fill,alpha=alpha)
+    if (!is.null(data$fill)) {
+      geom_polygon(data=data,aes(x=x,y=y, fill = fill),colour = colour,alpha=alpha)
+    } else {
+      geom_polygon(data=data,aes(x=x,y=y),colour = colour, fill = fill,alpha=alpha)
+    }
   }
+}
+dataErrorBar<-function(data,colour,linewidth) {
+  data1<-reRangeXY(data.frame(x=data$x,y=data$ymin))
+  data2<-reRangeXY(data.frame(x=data$x,y=data$ymax))
+  if (braw.env$plotLimits$orientation=="horz"){
+    data<-data.frame(x=data1$x,ymin=data1$y,ymax=data2$y)
+    geom_errorbar(data=data,aes(x=x, ymin=ymin, ymax=ymax),width=0.1)
+  } else {
+    data<-data.frame(y=data1$y,xmin=data1$x,xmax=data2$x)
+    geom_errorbarh(data=data,aes(y=y, xmin=xmin, xmax=xmax),width=0.1)
+  }
+}
+dataLegend<-function(data,title="title",fontsize=3.5) {
+  names<-data$names
+  width<-max(nchar(names)+4)*0.0045*fontsize
+  height<-(length(names)+1)*0.018*fontsize
+  colours<-data$colours
+  x<-braw.env$plotArea[c(1,3)]
+  y<-braw.env$plotArea[c(2,4)]
+  top<-1.01
+  legX<-c(x[1]+x[2]*c(top-width,top))
+  legY<-c(y[1]+y[2]*c(top-height,top))
+  ptsX<-rep(legX[1]+legX[2]*0.025,length(colours))
+  ptsY<-legY[1]+seq(1,length(colours))*0.25*(legY[2]-legY[1])
+  titleY<-legY[1]+0.8*(legY[2]-legY[1])
+  list(
+    geom_polygon(data=data.frame(x=legX[c(1,2,2,1)],y=legY[c(1,1,2,2)]),
+                 aes(x=x,y=y),color="black",fill="white",alpha=1),
+    geom_point(data=data.frame(x=ptsX,y=ptsY),
+               aes(x=x,y=y),shape=21,size=fontsize,colour="black",fill=colours),
+    geom_text(data=data.frame(x=ptsX+legX[2]*0.025,y=ptsY,label=names),
+              aes(x=x,y=y,label=label),hjust=0,size=fontsize*0.8),
+    geom_text(data=data.frame(x=ptsX[1],y=titleY,label=title),
+              aes(x=x,y=y,label=label),hjust=0,size=fontsize*0.8,fontface="bold")
+  )
 }

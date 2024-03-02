@@ -1189,6 +1189,6 @@ showExplore<-function(exploreResult=makeExplore(autoShow=TRUE),showType="r",ylog
   )
   g<-g+ggtitle(paste0("Explore: ",format(exploreResult$count)))
   g<-g+braw.env$plotTheme+theme(plot.title=element_text(face='plain', size=8, hjust=0.9))
-  joinPlots(g)
+  g
 }
 

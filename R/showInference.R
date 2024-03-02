@@ -103,6 +103,6 @@ showInference<-function(analysis=makeAnalysis(),showType="Basic",dimension="1D",
  # g1<-g1+ggtitle(paste0("Expected: ",format(length(analysis$rIV)),"  "))+
  #   theme(plot.title=element_text(face='plain', size=8, hjust=0.9))
 
-    g<-joinPlots(g1)+coord_cartesian(xlim=c(0,1),ylim=c(0,1))
+    g<-g1+coord_cartesian(xlim=c(0,1),ylim=c(0,1))
   return(g)
 }

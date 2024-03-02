@@ -45,6 +45,6 @@ showExpected<-function(expectedResult=makeExpected(),showType="Basic",
   g<-showInference(fullResult,showType=showType,dimension=dimension,orientation=orientation,
                 effectType=effectType,showTheory=showTheory
   ) 
-  joinPlots(g)
+  g
 }
 
