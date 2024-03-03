@@ -795,8 +795,9 @@ makeAnalysis<-function(sample=makeSample(),evidence=makeEvidence(),autoShow=FALS
           }
   )
   
+  
   if (design$sIV1Use=="Within" || design$sIV2Use=="Within") {
-    coeffs<-coeffs(analysis$model)
+    coeffs<-coef(summary(analysis$model))[,1]
     fitted<-fitted(analysis$model)
     residuals<-residuals(analysis$model)
   } else {

@@ -4,7 +4,7 @@
 # suppressPackageStartupMessages
 
 list.of.packages<-c("ggplot2","gridExtra","tidyr",
-                    "mnormt","lme4","MuMIn",
+                    "mnormt","lme4",
                     "readxl","writexl","car","stringi","stringr","clipr",
                     "SuppDists","e1071","pracma",
                     "NlcOptim"
@@ -19,7 +19,6 @@ library(tidyr)
 # library(gridExtra)   # not sure any longer
 library(mnormt)      # pmnorm for logistic
 library(lme4)        # lmer (mixed models)
-library(MuMIn)       # r-squared for mixed models
 library(readxl)      # excel
 library(writexl)     # x excel
 library(car)         # Anova type 3 correct
