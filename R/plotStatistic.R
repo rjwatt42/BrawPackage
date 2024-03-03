@@ -348,21 +348,21 @@ expected_plot<-function(g,pts,expType=NULL,analysis=NULL,IV=NULL,DV=NULL,i=1,sca
       co1<-"black"
       co2<-"black"
     }
-    pts1=pts[!pts$y2,]
-    g<-g+dataPoint(data=data.frame(y=pts1$x,x=pts1$y1),shape=braw.env$plotShapes$study, colour = co2, fill = c2, size = dotSize)
-    pts2=pts[pts$y2,]
-    g<-g+dataPoint(data=data.frame(y=pts2$x,x=pts2$y1),shape=braw.env$plotShapes$study, colour = co1, fill = c1, size = dotSize)
+    pts_ns<-pts[!pts$y2,]
+    g<-g+dataPoint(data=data.frame(y=pts_ns$x,x=pts_ns$y1),shape=braw.env$plotShapes$study, colour = co2, fill = c2, size = dotSize)
+    pts_sig=pts[pts$y2,]
+    g<-g+dataPoint(data=data.frame(y=pts_sig$x,x=pts_sig$y1),shape=braw.env$plotShapes$study, colour = co1, fill = c1, size = dotSize)
     if (!is.null(expType))
       if (is.element(expType,c("e1d","e2d"))) {
-        pts3=pts[pts$y3,]
-        g<-g+dataPoint(data=data.frame(x=pts3$x,y=pts3$y1),shape=braw.env$plotShapes$study, colour = co1, fill = c3, size = dotSize)
+        pts_wsig=pts[pts$y3,]
+        g<-g+dataPoint(data=data.frame(x=pts_wsig$x,y=pts_wsig$y1),shape=braw.env$plotShapes$study, colour = co1, fill = c3, size = dotSize)
       }
     
   } else {
     if (is.logical(pts$y2)) {
-      pts1<-expected_hist(pts$y1,pts$y1[pts$y2],expType,histGain,histGainrange)
+      hist1<-expected_hist(pts$y1,pts$y1[pts$y2],expType,histGain,histGainrange)
     } else {
-      pts1<-expected_hist(pts$y1,pts$y2,expType,histGain,histGainrange)
+      hist1<-expected_hist(pts$y1,pts$y2,expType,histGain,histGainrange)
     }
     xoff<-pts$x[1]
     if (orientation=="vert") {
@@ -371,15 +371,15 @@ expected_plot<-function(g,pts,expType=NULL,analysis=NULL,IV=NULL,DV=NULL,i=1,sca
       simAlpha<-0.7
     }
     g<-g+
-      dataPolygon(data=data.frame(y=pts1$x,x=pts1$y1*scale*scale+xoff),colour=NA, fill = c2,alpha=simAlpha)+
-      dataPolygon(data=data.frame(y=pts1$x,x=pts1$y2*scale*scale+xoff),colour=NA, fill = c1,alpha=simAlpha)
+      dataPolygon(data=data.frame(x=hist1$x,y=hist1$y1*scale*scale+xoff),colour=NA, fill = c2,alpha=simAlpha)+
+      dataPolygon(data=data.frame(x=hist1$x,y=hist1$y2*scale*scale+xoff),colour=NA, fill = c1,alpha=simAlpha)
     if (!is.null(expType))
       if (is.element(expType,c("e1d","e2d"))) {
         if (is.logical(pts$y3)) {
-          pts1<-expected_hist(pts$y1,pts$y1[pts$y3],expType)
+          hist1<-expected_hist(pts$y1,pts$y1[pts$y3],expType)
         }
         g<-g+
-          dataPolygon(data=data.frame(y=pts1$x,x=pts1$y2+xoff),colour=NA, fill = c3,alpha=simAlpha)
+          dataPolygon(data=data.frame(y=hist1$x,x=hist1$y2+xoff),colour=NA, fill = c3,alpha=simAlpha)
       }
   }
   g
@@ -786,13 +786,13 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
                     labelPt1<-paste0("p(sig correct) = ",format(s1/n*100,digits=2),"%")
                   }
           )
-          lpts1<-data.frame(x = xoff[i]-0.98, y = xlim[2]-diff(xlim)/20)
-          g<-g+dataLabel(data=lpts1,label = labelPt1)
-          lpts1a<-data.frame(x = xoff[i]-0.98, y = xlim[1]+diff(xlim)/20)
-          g<-g+dataLabel(data=lpts1a,label = labelPt1a)
+          lpts1<-data.frame(x = xoff[i]+xlim[2], y = ylim[1])
+          g<-g+dataLabel(data=lpts1,label = labelPt1,hjust=1)
+          lpts1a<-data.frame(x = xoff[i]+xlim[1], y = ylim[1])
+          g<-g+dataLabel(data=lpts1a,label = labelPt1a,hjust=0)
           if (is.element(expType,c("e1d","e2d"))) {
-            lpts1<-data.frame(x = xoff[i]-0.98, y = mean(xlim))
-            g<-g+dataLabel(data=lpts1,label = labelPt1b)
+            lpts1<-data.frame(x = xoff[i]+mean(xlim), y = ylim[1])
+            g<-g+dataLabel(data=lpts1,label = labelPt1b,hjust=0.5)
           }
         } else {
           switch (expType,
@@ -805,8 +805,8 @@ r_plot<-function(analysis,expType="r",logScale=FALSE,otheranalysis=NULL,orientat
           } else {
             labelPt2<-paste0(labelPt1,format(mean(resSig,na.rm=TRUE)*100,digits=braw.env$graph_precision),"%")
           }
-          lpts1<-data.frame(x = xoff[i]-0.95, y = xlim[2]-diff(xlim)/20)
-          g<-g+dataLabel(data=lpts1,label = labelPt2)
+          lpts1<-data.frame(x = xoff[i]+xlim[2], y = ylim[1])
+          g<-g+dataLabel(data=lpts1,label = labelPt2,hjust=1)
           # if (!is.null(lpts2)) {
           # g<-g+geom_label(data=lpts2,aes(x = x, y = y, label=label), hjust=0, vjust=0, fill="white",size=braw.env$labelSize)
           # }
@@ -889,7 +889,7 @@ n_plot<-function(analysis,ntype,orientation="vert",showTheory=TRUE,g=NULL){
   r_plot(analysis,ntype,braw.env$nPlotScale=="log10",orientation=orientation,showTheory=showTheory,g=g)
 }
 
-e2_plot<-function(analysis,nullanalysis=NULL,orientation="vert",showTheory=TRUE,g=NULL){
+e2_plot<-function(analysis,otheranalysis=NULL,orientation="vert",showTheory=TRUE,g=NULL){
   distr<-tolower(analysis$hypothesis$effect$world$populationPDF)
   lambda<-format(analysis$hypothesis$effect$world$populationPDFk,digits=3)
   switch (braw.env$RZ,
@@ -903,15 +903,15 @@ e2_plot<-function(analysis,nullanalysis=NULL,orientation="vert",showTheory=TRUE,
   
   switch (braw.env$STMethod,
           "NHST"={
-            g<-p_plot(analysis,ptype="e2",otheranalysis=nullanalysis,orientation=orientation,showTheory=showTheory,g=g)
+            g<-p_plot(analysis,ptype="e2",otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
             g<-g+plotTitle(lab)
           },
           "sLLR"={
-            g<-p_plot(analysis,ptype="e2",otheranalysis=nullanalysis,orientation=orientation,showTheory=showTheory,g=g)
+            g<-p_plot(analysis,ptype="e2",otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
             g<-g+plotTitle(lab)
           },
           "dLLR"={
-            g<-p_plot(nullanalysis,ptype="e2d",otheranalysis=nullanalysis,PlotScale="linear",orientation=orientation,showTheory=showTheory,g=g)
+            g<-p_plot(nullanalysis,ptype="e2d",otheranalysis=otheranalysis,PlotScale="linear",orientation=orientation,showTheory=showTheory,g=g)
             g<-g+vertLine(intercept=alphaLLR(), linetype="dotted", colour=braw.env$plotColours$alpha, linewidth=0.5)
             g<-g+vertLine(intercept=-alphaLLR(), linetype="dotted", colour=braw.env$plotColours$alpha, linewidth=0.5)
             g<-g+plotTitle(lab)
@@ -920,7 +920,7 @@ e2_plot<-function(analysis,nullanalysis=NULL,orientation="vert",showTheory=TRUE,
   return(g)
 }
 
-e1_plot<-function(nullanalysis,analysis=NULL,orientation="vert",showTheory=TRUE,g=NULL){
+e1_plot<-function(nullanalysis,otheranalysis=NULL,orientation="vert",showTheory=TRUE,g=NULL){
   switch (braw.env$RZ,
           "r"={
             lab<-bquote(bold("Null: " ~ r["p"] == 0))
@@ -931,15 +931,15 @@ e1_plot<-function(nullanalysis,analysis=NULL,orientation="vert",showTheory=TRUE,
   )
   switch (braw.env$STMethod,
           "NHST"={
-            g<-p_plot(nullanalysis,ptype="e1",otheranalysis=analysis,orientation=orientation,showTheory=showTheory,g=g)
+            g<-p_plot(nullanalysis,ptype="e1",otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
             g<-g+plotTitle(lab)
           },
           "sLLR"={
-            g<-p_plot(nullanalysis,ptype="e1",otheranalysis=analysis,orientation=orientation,showTheory=showTheory,g=g)+
+            g<-p_plot(nullanalysis,ptype="e1",otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)+
               g<-g+plotTitle(lab)
           },
           "dLLR"={
-            g<-p_plot(nullanalysis,ptype="e1d",otheranalysis=analysis,PlotScale="linear",orientation=orientation,showTheory=showTheory,g=g)
+            g<-p_plot(nullanalysis,ptype="e1d",otheranalysis=otheranalysis,PlotScale="linear",orientation=orientation,showTheory=showTheory,g=g)
             g<-g+vertLine(intercept=alphaLLR(), linetype="dotted", colour=braw.env$plotColours$alpha, linewidth=0.5)
             g<-g+vertLine(intercept=-alphaLLR(), linetype="dotted", colour=braw.env$plotColours$alpha, linewidth=0.5)
             g<-g+plotTitle(lab)

@@ -28,7 +28,7 @@ trimanalysis<-function(analysis) {
   analysis
 }
 
-plotInference<-function(analysis,disp="r",orientation="vert",effectType="direct",showTheory=TRUE,g=NULL){
+plotInference<-function(analysis,otheranalysis=NULL,disp="r",orientation="vert",effectType="direct",showTheory=TRUE,g=NULL){
   if (length(disp)==2) {
     return(plot2Inference(analysis,disp[1],disp[2]))
   } 
@@ -54,8 +54,8 @@ plotInference<-function(analysis,disp="r",orientation="vert",effectType="direct"
           "nw"={g<-n_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
           "n"= {g<-n_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
           
-          "e1"={g<-e1_plot(analysis,orientation=orientation,showTheory=showTheory,g=g)},
-          "e2"={g<-e2_plot(analysis,orientation=orientation,showTheory=showTheory,g=g)}
+          "e1"={g<-e1_plot(analysis,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
+          "e2"={g<-e2_plot(analysis,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)}
   )
   return(g)
 }

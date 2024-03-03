@@ -151,9 +151,15 @@ horzLine<-function(intercept=NULL,linetype="solid",colour="black",alpha=1,linewi
   data<-data.frame(x=braw.env$plotLimits$xlim,y=intercept)
   geom_line(data=reRangeXY(data),aes(x=x,y=y),linetype=linetype, color=colour, alpha=alpha, linewidth=linewidth)
 }
-dataLabel<-function(data,label) {
+dataLabel<-function(data,label, hjust=0, vjust=0) {
   data<-reRangeXY(data)
-  geom_label(data=data,aes(x = x, y = y), label=label, hjust=0, vjust=0, fill="white",size=braw.env$labelSize)
+  switch(braw.env$plotLimits$orientation,
+         "horz"=
+           geom_label(data=data,aes(x = x, y = y), label=label, hjust=hjust, vjust=vjust, fill="white",size=braw.env$labelSize),
+         "vert"=   
+           geom_label(data=data,aes(x = x, y = y), label=label, hjust=vjust, vjust=hjust, fill="white",size=braw.env$labelSize)
+         )
+  
 }
 dataLine<-function(data,arrow=NULL,colour="black",linewidth=0.25) {
   data<-reRangeXY(data)

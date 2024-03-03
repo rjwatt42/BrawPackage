@@ -1,7 +1,15 @@
 
-getNulls<-function(analysis) {
-    nonnulls<-which(analysis$rpIV!=0)
-    nulls<-which(analysis$rpIV==0)
+getNulls<-function(analysis,useSig=FALSE) {
+    if (useSig) {
+      sigs<-isSignificant(braw.env$STMethod,
+                          analysis$pIV,analysis$rIV,analysis$nval,analysis$df1,analysis$evidence)
+      
+      nonnulls<-which(analysis$rpIV!=0 & sigs)
+      nulls<-which(analysis$rpIV==0 & sigs)
+    } else {
+      nonnulls<-which(analysis$rpIV!=0)
+      nulls<-which(analysis$rpIV==0)
+    }
     
     nullanalysis<-analysis
     nullanalysis$rIV<-analysis$rIV[nulls]
@@ -54,6 +62,8 @@ showInference<-function(analysis=makeAnalysis(),showType="Basic",dimension="1D",
   }
   analysis1<-analysis
   analysis2<-NA
+  other1<-NULL
+  other2<-NULL
   if (length(showType)==1) {
     switch(showType,
            "Basic"=     {showType<-c("r","p")},
@@ -63,12 +73,16 @@ showInference<-function(analysis=makeAnalysis(),showType="Basic",dimension="1D",
              r<-getNulls(analysis)
              analysis1<-r$analysis
              analysis2<-r$nullanalysis
+             other1<-analysis2
+             other2<-analysis1
              },
            "FDR"=       {
-             showType<-c("e1","e2")
-             r<-getNulls(analysis)
-             analysis2<-r$nullanalysis
+             showType<-c("e2","e1")
+             r<-getNulls(analysis,useSig=TRUE)
              analysis1<-r$analysis
+             analysis2<-r$nullanalysis
+             other1<-analysis2
+             other2<-analysis1
            },
            {showType<-c(showType,NA)}
     )
@@ -86,16 +100,12 @@ showInference<-function(analysis=makeAnalysis(),showType="Basic",dimension="1D",
     
     for (fi in 1:length(effectType)) {
       braw.env$plotArea<-c(0.0,0.33*(fi-1),0.48,area.y)
-      if (showType[1]=="e1")
-        g1<-plotInference(analysis2,showType[1],effectType=effectType[fi],orientation=orientation,showTheory=showTheory,g=g1)
-      else
-        g1<-plotInference(analysis1,showType[1],effectType=effectType[fi],orientation=orientation,showTheory=showTheory,g=g1)
+        g1<-plotInference(analysis1,otheranalysis=other1,
+                          disp=showType[1],effectType=effectType[fi],orientation=orientation,showTheory=showTheory,g=g1)
       braw.env$plotArea<-c(0.52,0.33*(fi-1),0.48,area.y)
       if (!is.na(showType[2])) {
-        if (showType[2]=="e1")
-          g1<-plotInference(analysis2,showType[2],effectType=effectType[fi],orientation=orientation,showTheory=showTheory,g=g1)
-        else
-          g1<-plotInference(analysis1,showType[2],effectType=effectType[fi],orientation=orientation,showTheory=showTheory,g=g1)
+          g1<-plotInference(analysis2,otheranalysis=other2,
+                            disp=showType[2],effectType=effectType[fi],orientation=orientation,showTheory=showTheory,g=g1)
       } 
     }
     braw.env$plotLimits<-NULL
