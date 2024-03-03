@@ -1,3 +1,11 @@
+skewness<-function(s,na.rm=TRUE) {
+  mean((s-mean(s,na.rm=na.rm))^3,na.rm=na.rm)/sd(s,na.rm)^3
+}
+
+kurtosis<-function(s,na.rm=TRUE) {
+  mean((s-mean(s,na.rm=na.rm))^4,na.rm=na.rm)/sd(s,na.rm)^4
+}
+
 iqr<-function(s) {
   diff(quantile(s,c(0.25,0.75)))
 }
@@ -28,7 +36,7 @@ reportSample<-function(sample=makeSample()){
   if (IV$type=="Interval"){
     outputTextI<-c(outputTextI,IV$name,
                    brawFormat(mean(s1,na.rm=TRUE),digits=braw.env$report_precision),brawFormat(sd(s1,na.rm=TRUE),digits=braw.env$report_precision),
-                   brawFormat(skewness(s1,na.rm=TRUE),digits=braw.env$report_precision),brawFormat(kurtosis(s1,na.rm=TRUE)+3,digits=braw.env$report_precision),
+                   brawFormat(skewness(s1,na.rm=TRUE),digits=braw.env$report_precision),brawFormat(kurtosis(s1,na.rm=TRUE),digits=braw.env$report_precision),
                    brawFormat(median(s1),digits=braw.env$report_precision),brawFormat(iqr(s1),digits=braw.env$report_precision)
     )
     done_interval<-TRUE
@@ -38,7 +46,7 @@ reportSample<-function(sample=makeSample()){
     if (IV2$type=="Interval"){
       outputTextI<-c(outputTextI,IV2$name,
                      brawFormat(mean(s1a),digits=braw.env$report_precision),  brawFormat(sd(s1a),digits=braw.env$report_precision),
-                     brawFormat(skewness(s1a,na.rm=TRUE),digits=braw.env$report_precision),brawFormat(kurtosis(s1a,na.rm=TRUE)+3,digits=braw.env$report_precision),
+                     brawFormat(skewness(s1a,na.rm=TRUE),digits=braw.env$report_precision),brawFormat(kurtosis(s1a,na.rm=TRUE),digits=braw.env$report_precision),
                      brawFormat(median(s1a),digits=braw.env$report_precision),brawFormat(iqr(s1a),digits=braw.env$report_precision)
       )
       done_interval<-TRUE
@@ -47,7 +55,7 @@ reportSample<-function(sample=makeSample()){
   if (DV$type=="Interval"){
     outputTextI<-c(outputTextI,DV$name,
                    brawFormat(mean(s2),digits=braw.env$report_precision),  brawFormat(sd(s2),digits=braw.env$report_precision),
-                   brawFormat(skewness(s2,na.rm=TRUE),digits=braw.env$report_precision),brawFormat(kurtosis(s2,na.rm=TRUE)+3,digits=braw.env$report_precision),
+                   brawFormat(skewness(s2,na.rm=TRUE),digits=braw.env$report_precision),brawFormat(kurtosis(s2,na.rm=TRUE),digits=braw.env$report_precision),
                    brawFormat(median(s2),digits=braw.env$report_precision),brawFormat(iqr(s2),digits=braw.env$report_precision)
     )
     done_interval<-TRUE
