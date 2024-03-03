@@ -216,13 +216,15 @@ dataLegend<-function(data,title="title",fontsize=3.5) {
   width<-max(nchar(names)+4)*0.0045*fontsize
   height<-(length(names)+1)*0.018*fontsize
   colours<-data$colours
+  
   x<-braw.env$plotArea[c(1,3)]
   y<-braw.env$plotArea[c(2,4)]
   top<-1.01
-  legX<-c(x[1]+x[2]*c(top-width,top))
-  legY<-c(y[1]+y[2]*c(top-height,top))
+  legX<-x[1]+x[2]*c(top-width,top)
+  legY<-y[1]+y[2]*c(top-height,top)
   ptsX<-rep(legX[1]+legX[2]*0.025,length(colours))
   ptsY<-legY[1]+seq(1,length(colours))*0.25*(legY[2]-legY[1])
+  
   titleY<-legY[1]+0.8*(legY[2]-legY[1])
   list(
     geom_polygon(data=data.frame(x=legX[c(1,2,2,1)],y=legY[c(1,1,2,2)]),

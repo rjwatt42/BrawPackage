@@ -61,7 +61,7 @@ showInference<-function(analysis=makeAnalysis(),showType="Basic",dimension="1D",
     dimension<-"2D"
   }
   analysis1<-analysis
-  analysis2<-NA
+  analysis2<-analysis
   other1<-NULL
   other2<-NULL
   if (length(showType)==1) {

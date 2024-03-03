@@ -448,6 +448,10 @@ plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL,theme=braw.env$
               g<-plotCatCatPrediction(g,IV,DV,rho,n,offset)
             }
     )
+    if (DV$type=="Categorical") {
+      cols<-c(braw.env$plotColours$descriptionC,darken(braw.env$plotColours$descriptionC,0.25,0.75))
+      g<-g+dataLegend(data.frame(names<-DV$cases,colours=cols),title=bquote(bold(.(DV$name))))
+    }
   } else {
     # more than 1 IV
     braw.env$doLegendBars<-FALSE
@@ -467,14 +471,12 @@ plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL,theme=braw.env$
         col<- col2rgb(braw.env$plotColours$descriptionC1)*(1-off)+col2rgb(braw.env$plotColours$descriptionC2)*off
         cols<- c(cols,rgb(col[1]/255,col[2]/255,col[3]/255))
       }
-      names(cols)<-analysis$hypothesis$IV2$cases
+      names<-analysis$hypothesis$IV2$cases
     } else {
       cols<-c( braw.env$plotColours$descriptionC1, braw.env$plotColours$descriptionC2)
-      names(cols)<-c(paste(IV2$name,"<median",sep=""), paste(IV2$name,">median",sep=""))
+      names<-c(paste(IV2$name,"<median",sep=""), paste(IV2$name,">median",sep=""))
     }
-    cols<-as.list(cols)
     braw.env$plotDescriptionCols <- cols
-    print("OK")
     for (i in 1:length(rho)) {
       offset=2+(i-1)/(length(rho)-1)
       DV1<-DV
@@ -483,7 +485,6 @@ plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL,theme=braw.env$
       switch (hypothesisType,
               "Interval Interval"={
                 g<-plotParParPrediction(g,IV,DV1,rho[i],n,offset)
-                g<-g+dataLegend(data.frame(names<-names(cols),colours=cols))
               },
               "Categorical Interval"={
                 g<-plotCatParPrediction(g,IV,DV1,rho[i],n,offset,design$sIV1Use=="Within")
@@ -496,11 +497,7 @@ plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL,theme=braw.env$
               }
       )
     }
-    # if (IV2$type=="Categorical") {
-    #   g<-g+scale_fill_manual(name=IV2$name,values=braw.env$plotDescriptionCols)
-    # } else {
-    #   g<-g+scale_fill_manual(name=IV2$name,values=braw.env$plotDescriptionCols)
-    # }
+    g<-g+dataLegend(data.frame(names=names,colours=cols),title=IV2$name)
   }
   
   return(g)  
