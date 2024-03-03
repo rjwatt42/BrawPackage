@@ -75,7 +75,7 @@ drawEffectES<-function(r,t=1,plotArea=NULL,g=NULL){
 
   g<-g+dataPolygon(data=pts,colour="black",fill=col)
   
-  if (braw.env$simData) {
+  if (braw.env$simData && !is.null(r)) {
     if (t==1){
       lbl=paste("r=",as.character(r),sep="")
     }else{ lbl=as.character(r)

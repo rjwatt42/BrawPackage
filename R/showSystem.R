@@ -10,7 +10,7 @@
 #' @examples
 #' showHypothesis(hypothesis=makeHypothesis())
 #' @export
-showHypothesis<-function(hypothesis=makeHypothesis()) {
+showHypothesis<-function(hypothesis=makeHypothesis(),doWorld=FALSE) {
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV
@@ -18,12 +18,18 @@ showHypothesis<-function(hypothesis=makeHypothesis()) {
   if (is.null(IV) || is.null(DV)) {return(ggplot()+braw.env$blankTheme)}
   if (is.null(IV2)) no_ivs<-1 else no_ivs<-2
     
+  doWorld<-doWorld && effect$world$worldOn
+  if (doWorld) {
+    xoff<-0.025
+    effect$rIV<-NULL
+  } else xoff<-0.3
   g<-NULL
   switch(no_ivs,
          { 
-           g<-showVariable(IV,plotArea=c(0.3,0.6,0.4,0.4),g)
-           g<-showVariable(DV,plotArea=c(0.3,0.0,0.4,0.4),g)
-           g<-drawEffectES(effect$rIV,plotArea=c(0.3,0.42,0.4,0.18),1,g)
+           g<-showVariable(IV,plotArea=c(xoff,0.6,0.4,0.4),g)
+           g<-showVariable(DV,plotArea=c(xoff,0.0,0.4,0.4),g)
+           g<-drawEffectES(effect$rIV,plotArea=c(xoff,0.42,0.4,0.15),1,g)
+           if (doWorld) g<-showWorld(hypothesis,plotArea=c(0.45,0.2,0.5,0.6),g=g)
          },
          {
            g<-showVariable(IV,plotArea=c(0.0,0.6,0.4,0.4),g)
@@ -43,7 +49,7 @@ showHypothesis<-function(hypothesis=makeHypothesis()) {
 #' @examples
 #' showWorld(world=makeWorld())
 #' @export
-showWorld<-function(hypothesis=makeHypothesis(effect=makeEffect(world=makeWorld()))) {
+showWorld<-function(hypothesis=makeHypothesis(effect=makeEffect(world=makeWorld())),plotArea=c(0,0,1,1),g=NULL) {
 # world diagram
 
   world<-hypothesis$effect$world
@@ -52,18 +58,21 @@ showWorld<-function(hypothesis=makeHypothesis(effect=makeEffect(world=makeWorld(
                      populationPDFk=hypothesis$effect$rIV,populationNullp=0)
   }
     
-  PlotNULL<-ggplot()+braw.env$blankTheme+theme(plot.margin=margin(0,-0.1,0,0,"cm"))+
-    scale_x_continuous(limits = c(0,10),labels=NULL,breaks=NULL)+scale_y_continuous(limits = c(0,10),labels=NULL,breaks=NULL)
+  braw.env$plotArea<-plotArea
+  # 
+  # PlotNULL<-ggplot()+braw.env$blankTheme+theme(plot.margin=margin(0,-0.1,0,0,"cm"))+
+  #   scale_x_continuous(limits = c(0,10),labels=NULL,breaks=NULL)+scale_y_continuous(limits = c(0,10),labels=NULL,breaks=NULL)
 
   switch(braw.env$RZ,
          "r"={range<-braw.env$r_range},
          "z"={range<-tanh(braw.env$z_range)}
   )
-  if (world$worldAbs) {
-    rx<-seq(0,1,length.out=braw.env$worldNPoints)*range
-  } else {
+  g<-startPlot(xlim=c(-1,1)*range,ylim=c(0,1.05),box="x",g=g)
+  # if (world$worldAbs) {
+  #   rx<-seq(0,1,length.out=braw.env$worldNPoints)*range
+  # } else {
     rx<-seq(-1,1,length.out=braw.env$worldNPoints)*range
-  }
+  # }
 
   rdens<-fullRPopulationDist(rx,world)
 
@@ -74,15 +83,21 @@ showWorld<-function(hypothesis=makeHypothesis(effect=makeEffect(world=makeWorld(
   rx<-c(rx[1],rx,rx[length(rx)])
   rdens<-c(0,rdens,0)
   pts=data.frame(x=rx,y=rdens)
-  g1<-ggplot(pts,aes(x=x,y=y))
-  g1<-g1+geom_polygon(data=pts,aes(x=x,y=y),fill=braw.env$plotColours$descriptionC)+scale_y_continuous(limits = c(0,1.05),labels=NULL,breaks=NULL)
-  g1<-g1+geom_line(data=pts,aes(x=x,y=y),color="black",lwd=0.25)
+  g<-g+dataPolygon(pts,fill=braw.env$plotColours$descriptionC,colour=NA)
+  g<-g+dataLine(pts)
   switch(braw.env$RZ,
-         "r"={ g1<-g1+labs(x=braw.env$rpLabel,y="Density")+braw.env$diagramTheme },
-         "z"={ g1<-g1+labs(x=braw.env$zpLabel,y="Density")+braw.env$diagramTheme }
-         )
-
-  g<-g1
+         "r"={ g<-g+xAxisLabel(braw.env$rpLabel)+xAxisTicks(seq(-1,1,0.25))},
+         "z"={ g<-g+xAxisLabel(braw.env$zpLabel)+xAxisTicks(seq(-2,2,0.5))}
+  )
+  
+  # g1<-ggplot(pts,aes(x=x,y=y))
+  # g1<-g1+geom_polygon(data=pts,aes(x=x,y=y),fill=braw.env$plotColours$descriptionC)+scale_y_continuous(limits = c(0,1.05),labels=NULL,breaks=NULL)
+  # g1<-g1+geom_line(data=pts,aes(x=x,y=y),color="black",lwd=0.25)
+  # switch(braw.env$RZ,
+  #        "r"={ g1<-g1+labs(x=braw.env$rpLabel,y="Density")+braw.env$diagramTheme },
+  #        "z"={ g1<-g1+labs(x=braw.env$zpLabel,y="Density")+braw.env$diagramTheme }
+  #        )
+  # g<-g1
 
   return(g)
 }
