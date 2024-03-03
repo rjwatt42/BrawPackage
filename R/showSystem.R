@@ -22,14 +22,14 @@ showHypothesis<-function(hypothesis=makeHypothesis(),doWorld=FALSE) {
   if (doWorld) {
     xoff<-0.025
     effect$rIV<-NULL
-  } else xoff<-0.3
+  } else xoff<-0.325
   g<-NULL
   switch(no_ivs,
          { 
-           g<-showVariable(IV,plotArea=c(xoff,0.6,0.4,0.4),g)
-           g<-showVariable(DV,plotArea=c(xoff,0.0,0.4,0.4),g)
-           g<-drawEffectES(effect$rIV,plotArea=c(xoff,0.42,0.4,0.15),1,g)
-           if (doWorld) g<-showWorld(hypothesis,plotArea=c(0.45,0.2,0.5,0.6),g=g)
+           g<-showVariable(IV,plotArea=c(xoff,0.6,0.35,0.4),g)
+           g<-showVariable(DV,plotArea=c(xoff,0.0,0.35,0.4),g)
+           g<-drawEffectES(effect$rIV,plotArea=c(xoff,0.42,0.35,0.15),1,g)
+           if (doWorld) g<-showWorld(hypothesis,plotArea=c(0.425,0.2,0.55,0.6),g=g)
          },
          {
            g<-showVariable(IV,plotArea=c(0.0,0.6,0.4,0.4),g)
