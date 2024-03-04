@@ -15,6 +15,7 @@ explore<-makeExplore(nsims=1000,NULL,"n",max_n=1000,xlog=TRUE,hypothesis=hypothe
 
 expect<-makeExpected(nsims=1000,doingNull=TRUE)
 showExpected(expect)
+showExpected(expect,dimension="2D")
 
 
 expect<-makeExpected(nsims=1000,hypothesis=getHypothesis("III"))

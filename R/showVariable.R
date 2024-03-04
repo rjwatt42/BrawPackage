@@ -48,12 +48,12 @@ drawCategorical<-function(var,plotArea=c(0,0,1,1),g){
   
   g<-drawVar(pts,ticks,var,plotArea,g)
   
-  if (var$deploy=="Within") {
-    pts<-data.frame(x=b,y=pp*0.75)
-    g<-g+geom_line(data=pts,aes(x=x,y=y),colour="gray",lwd=1)+
-      geom_point(data=pts,aes(x=x,y=y),colour="black")
-  }
-
+  # if (var$deploy=="Within") {
+  #   pts<-data.frame(x=b,y=pp*0.75)
+  #   g<-g+geom_line(data=pts,aes(x=x,y=y),colour="gray",lwd=1)+
+  #     geom_point(data=pts,aes(x=x,y=y),colour="black")
+  # }
+  # 
   return(g)
 }
 

@@ -111,7 +111,7 @@ showInference<-function(analysis=makeAnalysis(),showType="Basic",dimension="1D",
       area.y<-0.25
     } else area.y<-1
     
-    g1<-ggplot()
+    g1<-ggplot()+coord_cartesian(xlim=c(0,1),ylim=c(0,1))
     
     for (fi in 1:length(effectType)) {
       braw.env$plotArea<-c(0.0,0.33*(fi-1),0.48,area.y)
@@ -125,9 +125,6 @@ showInference<-function(analysis=makeAnalysis(),showType="Basic",dimension="1D",
     }
     braw.env$plotLimits<-NULL
   }
- # g1<-g1+ggtitle(paste0("Expected: ",format(length(analysis$rIV)),"  "))+
- #   theme(plot.title=element_text(face='plain', size=8, hjust=0.9))
 
-    g<-g1+coord_cartesian(xlim=c(0,1),ylim=c(0,1))
-  return(g)
+  return(g1)
 }
