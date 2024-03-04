@@ -12,7 +12,7 @@ resetExploreResult<-function(nsims,n_vals,oldResult=NULL) {
   }
   
   result<-list(rval=b,pval=b,rpval=b,raval=b,roval=b,poval=b,nval=b,df1=b,
-               rIV1=b,rIVIV2DV=b,pIV2=b,pIVIV2DV=b,
+               rIV2=b,rIVIV2DV=b,pIV2=b,pIVIV2DV=b,
                r=list(direct=bm,unique=bm,total=bm),
                p=list(direct=bm,unique=bm,total=bm)
   )

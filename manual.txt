@@ -149,7 +149,7 @@ showExpected(expectedResult=makeExpected(),showType="Basic",
                        dimension="1D",orientation="vert",
                        effectType="direct",showTheory=FALSE)
 
-showType:    "Basic","NHSTErrors","FDR","CILimits"
+showType:    "Basic","NHST","FDR","CILimits"
 or 1 or 2:   "r","rp","p","n","ci1","ci2","e1","e2","w","wp","nw"
              "log(lrs)","log(lrd)"
              "ro","po"
@@ -181,7 +181,7 @@ exploreType: "IVType","IVcats","IVlevels","IVprop","IVskew","IVkurtosis"
 showExplore(exploreResult,showType="r",ylog=FALSE,
                       whichEffect="All",effectType="All")
 
-showType:    "r","z","p","w","p(sig)","n","NHSTErrors","FDR","FDR;FMR",
+showType:    "r","z","p","w","p(sig)","n","NHST","FDR","FDR;FMR",
              "likelihood","log(lrs)","log(lrd)"
              
 whichEffect: "All","Mains","Main1","Main2","rIVIV2DV"

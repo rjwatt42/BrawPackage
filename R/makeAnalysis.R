@@ -300,29 +300,32 @@ multipleAnalysis<-function(nsims=1,hypothesis,design,evidence,newResult=c()){
       res$pIV<-1
       res$nval<-0
     }
-    j<-i+offset
-    newResult$rIV[j]<-res$rIV
-    newResult$rpIV[j]<-res$rpIV
-    newResult$pIV[j]<-res$pIV
-    newResult$roIV[j]<-res$roIV
-    newResult$poIV[j]<-res$poIV
-    newResult$nval[j]<-res$nval
-    newResult$df1[j]<-res$df1
-    if (!is.null(hypothesis$IV2)) {
-      newResult$rIV2[j]<-res$rIV2
-      newResult$pIV2[j]<-res$pIV2
-      newResult$rIVIV2DV[j]<-res$rIVIV2DV
-      newResult$pIVIV2DV[j]<-res$pIVIV2DV
-      
-      newResult$r$direct[j,]<-res$r$direct
-      newResult$r$unique[j,]<-res$r$unique
-      newResult$r$total[j,]<-res$r$total
-      newResult$p$direct[j,]<-res$p$direct
-      newResult$p$unique[j,]<-res$p$unique
-      newResult$p$total[j,]<-res$p$total
+    if (is.null(newResult)) newResult<-res
+    else {
+      j<-i+offset
+      newResult$rIV[j]<-res$rIV
+      newResult$rpIV[j]<-res$rpIV
+      newResult$pIV[j]<-res$pIV
+      newResult$roIV[j]<-res$roIV
+      newResult$poIV[j]<-res$poIV
+      newResult$nval[j]<-res$nval
+      newResult$df1[j]<-res$df1
+      if (!is.null(hypothesis$IV2)) {
+        newResult$rIV2[j]<-res$rIV2
+        newResult$pIV2[j]<-res$pIV2
+        newResult$rIVIV2DV[j]<-res$rIVIV2DV
+        newResult$pIVIV2DV[j]<-res$pIVIV2DV
+        
+        newResult$r$direct[j,]<-res$r$direct
+        newResult$r$unique[j,]<-res$r$unique
+        newResult$r$total[j,]<-res$r$total
+        newResult$p$direct[j,]<-res$p$direct
+        newResult$p$unique[j,]<-res$p$unique
+        newResult$p$total[j,]<-res$p$total
+      }
     }
   }
-
+  
   newResult$effect<-hypothesis$effect
   newResult$design<-design
   newResult$evidence<-evidence

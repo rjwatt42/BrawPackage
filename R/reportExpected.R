@@ -101,7 +101,7 @@ reportExpected<-function(expectedResult=makeExpected(100),showType="Basic"){
     }
   }
   outputText<-c(outputText,rep(outputText1,nc/3))
-
+  
   if (showType=="NHST"){
     nullSig<-isSignificant(braw.env$STMethod,nullresult$pIV,nullresult$rIV,nullresult$nval,nullresult$df1,nullresult$evidence)
     resSig<-isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,result$evidence)
@@ -113,6 +113,7 @@ reportExpected<-function(expectedResult=makeExpected(100),showType="Basic"){
       resSigW<-(d<0 & resSig)
       resSigC<-(d>0 & resSig)
     }
+    
     if (braw.env$STMethod=="NHST") {
       e1=paste0(brawFormat(mean(nullSig)*100,digits=braw.env$report_precision),"%")
       e2=paste0(brawFormat(mean(!resSig)*100,digits=braw.env$report_precision),"%")
@@ -120,6 +121,7 @@ reportExpected<-function(expectedResult=makeExpected(100),showType="Basic"){
       e1=paste0(brawFormat(sum(nullSigW)/length(nullSig)*100,digits=braw.env$report_precision),"%")
       e2=paste0(brawFormat(sum(resSigW)/length(resSig)*100,digits=braw.env$report_precision),"%")
     }
+    
     if (result$effect$world$worldOn) {
         nr<-(length(nullresult$pIV)+length(result$pIV))
         if (braw.env$STMethod=="NHST") {

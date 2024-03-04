@@ -1,16 +1,22 @@
 
-getNulls<-function(analysis,useSig=FALSE) {
-    if (useSig) {
-      sigs<-isSignificant(braw.env$STMethod,
-                          analysis$pIV,analysis$rIV,analysis$nval,analysis$df1,analysis$evidence)
-      
-      nonnulls<-which(analysis$rpIV!=0 & sigs)
-      nulls<-which(analysis$rpIV==0 & sigs)
-    } else {
-      nonnulls<-which(analysis$rpIV!=0)
-      nulls<-which(analysis$rpIV==0)
-    }
+getNulls<-function(analysis,useSig=FALSE,useNSig=FALSE) {
+  nonnulls<-which(analysis$rpIV!=0)
+  nulls<-which(analysis$rpIV==0)
+  if (useSig) {
+    sigs<-isSignificant(braw.env$STMethod,
+                        analysis$pIV,analysis$rIV,analysis$nval,analysis$df1,analysis$evidence)
     
+    nonnulls<-which(analysis$rpIV!=0 & sigs)
+    nulls<-which(analysis$rpIV==0 & sigs)
+  }
+  if (useNSig) {
+    sigs<-isSignificant(braw.env$STMethod,
+                        analysis$pIV,analysis$rIV,analysis$nval,analysis$df1,analysis$evidence)
+    
+    nonnulls<-which(analysis$rpIV!=0 & !sigs)
+    nulls<-which(analysis$rpIV==0 & !sigs)
+  }
+  
     nullanalysis<-analysis
     nullanalysis$rIV<-analysis$rIV[nulls]
     nullanalysis$pIV<-analysis$pIV[nulls]
@@ -39,7 +45,8 @@ getNulls<-function(analysis,useSig=FALSE) {
 
 #' show the estimated population characteristics from a simulated sample
 #' 
-#' @param showType "Basic", "CILimits" \cr
+#' @param showType "Basic", "CILimits", \cr
+#' "NHST","FDR","FMR",
 #'        \emph{ or one or two of:} \cr
 #' "r","p","ci1","ci2", "rp","n"
 #' @param dimension "1D", "2D"
@@ -68,7 +75,7 @@ showInference<-function(analysis=makeAnalysis(),showType="Basic",dimension="1D",
     switch(showType,
            "Basic"=     {showType<-c("r","p")},
            "CILimits"=  {showType<-c("ci1","ci2")},
-           "NHSTErrors"={
+           "NHST"={
              showType<-c("e2","e1")
              r<-getNulls(analysis)
              analysis1<-r$analysis
@@ -79,6 +86,14 @@ showInference<-function(analysis=makeAnalysis(),showType="Basic",dimension="1D",
            "FDR"=       {
              showType<-c("e2","e1")
              r<-getNulls(analysis,useSig=TRUE)
+             analysis1<-r$analysis
+             analysis2<-r$nullanalysis
+             other1<-analysis2
+             other2<-analysis1
+           },
+           "FMR"=       {
+             showType<-c("e2","e1")
+             r<-getNulls(analysis,useNSig=TRUE)
              analysis1<-r$analysis
              analysis2<-r$nullanalysis
              other1<-analysis2

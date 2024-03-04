@@ -1,7 +1,7 @@
 reRangeY<-function(y) {
   if (is.null(braw.env$plotLimits)) return(y)
   y<-(y-braw.env$plotLimits$ysc[1])/diff(braw.env$plotLimits$ysc)
-  y<-y*(braw.env$plotArea[4]-braw.env$plotLimits$gap[2])+braw.env$plotArea[2]+braw.env$plotLimits$gap[2]
+  y<-y*(braw.env$plotArea[4]-braw.env$plotLimits$gap[2]-braw.env$plotLimits$gap[3])+braw.env$plotArea[2]+braw.env$plotLimits$gap[2]
   return(y)
 }
 reRangeX<-function(x) {
@@ -31,7 +31,7 @@ reOrientXY<-function(data,orientation=braw.env$plotLimits$orientation) {
          "vert"={data.frame(x=data$y,y=data$x)})
 }
 
-plotLimits<-function(xlim,ylim,orientation,gaps=c(1,1)) {
+plotLimits<-function(xlim,ylim,orientation,gaps=c(1,1,0)) {
   switch(orientation,
          "horz"={braw.env$plotLimits<-list(xlim=xlim,ylim=ylim,xsc=xlim,ysc=ylim,
                                            orientation=orientation,gap=gaps)},
@@ -40,14 +40,16 @@ plotLimits<-function(xlim,ylim,orientation,gaps=c(1,1)) {
          )
 }
 
-startPlot<-function(xlim,ylim,box="both",backC=braw.env$plotColours$graphBack,orientation="horz",g=NULL) {
+startPlot<-function(xlim,ylim,box="both",top=FALSE,backC=braw.env$plotColours$graphBack,orientation="horz",g=NULL) {
   switch(box,
          "x"=gaps<-c(0,1),
          "y"=gaps<-c(1,0),
          "both"=gaps<-c(1,1),
          {gaps<-c(0,0)}
   )
-  gaps<-gaps*braw.env$plotArea[3:4]*0.14
+  if (top) gaps<-c(gaps,1)
+  else gaps<-c(gaps,0)
+  gaps<-gaps*c(0.1,0.1,0.1)
   plotLimits(xlim = xlim, ylim = ylim,orientation=orientation,gaps)
 
   if (is.null(g)) g<-ggplot()
@@ -76,69 +78,112 @@ startPlot<-function(xlim,ylim,box="both",backC=braw.env$plotColours$graphBack,or
   g<-g+theme(legend.position = "none")+braw.env$blankTheme
 }
 
-plotTitle<-function(label) {
-  ggtitle(label)+theme(plot.title=element_text(face='bold', size=9, hjust=0))
+plotTitle<-function(label,position="centre") {
+  switch(position,
+         "centre"={
+           dataText(data.frame(x=mean(braw.env$plotLimits$xlim),y=braw.env$plotLimits$ylim[2]),label,
+                     hjust=0.5,vjust=-1)
+         },
+         "right"={
+           dataText(data.frame(x=braw.env$plotLimits$xlim[2],y=braw.env$plotLimits$ylim[2]),label,
+                     hjust=1,vjust=-0.1)
+         },
+  )
+  
 }
 
 xAxisLabel<-function(label) {
+  mathlabel<-grepl("['^']{1}",label) | grepl("['[']{1}",label)
+  if (any(mathlabel)) {
+    label<-deparse(label)
+  } else {
+    label<-deparse(bquote(bold(.(label))))
+  }
+  
   axis<-data.frame(x=mean(braw.env$plotLimits$xlim),y=braw.env$plotLimits$ylim[1])
   axis<-reRangeXY(axis)
   switch(braw.env$plotLimits$orientation,
          "vert"={
-           geom_text(data=axis,aes(x=x-0.18*braw.env$plotArea[3],y=y),label=deparse(label), parse = TRUE,
+           geom_text(data=axis,aes(x=x-0.18*braw.env$plotArea[3],y=y),label=label, parse = TRUE,
                      hjust=0.5,vjust=0,
                      size=braw.env$labelSize*1.25,angle=90,fontface="bold")      
          },
          "horz"={
-           geom_text(data=axis,aes(x=x,y=y),label=deparse(label), parse = TRUE,
-                     hjust=0.5,vjust=2,
+           geom_text(data=axis,aes(x=x,y=y),label=label, parse = TRUE,
+                     hjust=0.5,vjust=2.5,
                      size=braw.env$labelSize*1.25,angle=0,fontface="bold")      
          }
   )
 }
 yAxisLabel<-function(label){
+  mathlabel<-grepl("['^']{1}",label) | grepl("['[']{1}",label)
+  if (any(mathlabel)) {
+    label<-deparse(label)
+  } else {
+    label<-deparse(bquote(bold(.(label))))
+  }
+  
   axis<-data.frame(x=braw.env$plotLimits$xlim[1],y=mean(braw.env$plotLimits$ylim))
   axis<-reRangeXY(axis)
   switch(braw.env$plotLimits$orientation,
          "vert"={
-           geom_text(data=axis,aes(x=x,y=y-0.18*braw.env$plotArea[4]),label=deparse(label), parse = TRUE,
+           geom_text(data=axis,aes(x=x,y=y-0.18*braw.env$plotArea[4]),label=label, parse = TRUE,
                      hjust=0,vjust=0.5,
                      size=braw.env$labelSize*1.25,angle=0,fontface="bold")      
          },
          "horz"={
-           geom_text(data=axis,aes(x=x,y=y),label=deparse(label), parse = TRUE,
+           geom_text(data=axis,aes(x=x,y=y),label=label, parse = TRUE,
                      hjust=0.5,vjust=-2,
                      size=braw.env$labelSize*1.25,angle=90,fontface="bold")      
          }
   )
 }
-yAxisTicks<-function(breaks,labels=NULL){
-  ticks<-reRangeXY(data.frame(x=braw.env$plotLimits$xlim[1],y=breaks))
+yAxisTicks<-function(breaks,labels=NULL,logScale=FALSE){
+  if (is.null(breaks)) {
+    if (logScale)
+      breaks<-axisTicks(usr=braw.env$plotLimits$ylim, log=logScale, axp = NULL, nint = 7)
+    else 
+      breaks<-axisTicks(usr=braw.env$plotLimits$ylim, log=logScale, axp = NULL, nint = 7)
+  }
+  
   if (is.null(labels)) labels<-breaks
-  mn<-max(4,max(nchar(labels)))
+  if (logScale) breaks<-log10(breaks)
+  
+  ticks<-reRangeXY(data.frame(x=braw.env$plotLimits$xlim[1],y=breaks))
   switch(braw.env$plotLimits$orientation,
          "vert"={
+           mn<-1
            geom_text(data=ticks,aes(x=x,y=y),label=labels,hjust=0.5,vjust=1.1,
-                     size=braw.env$labelSize*4/mn)
+                     size=braw.env$labelSize*mn)
          },
          "horz"={
+           mn<-4/max(4,max(nchar(labels)))
            geom_text(data=ticks,aes(x=x,y=y),label=labels,hjust=1.1,vjust=0.5,
-                     size=braw.env$labelSize*4/mn)
+                     size=braw.env$labelSize*mn)
          }
   )
 }
-xAxisTicks<-function(breaks,labels=NULL){
-  ticks<-reRangeXY(data.frame(x=breaks,y=braw.env$plotLimits$ylim[1]))
+xAxisTicks<-function(breaks,labels=NULL,logScale=FALSE){
+  if (is.null(breaks)) {
+    if (logScale)
+      breaks<-axisTicks(usr=braw.env$plotLimits$xlim, log=logScale, axp = NULL, nint = 7)
+    else 
+      breaks<-axisTicks(usr=braw.env$plotLimits$xlim, log=logScale, axp = NULL, nint = 7)
+  }
   if (is.null(labels)) labels<-breaks
-  mn<-max(4,max(nchar(labels)))
+  if (logScale) breaks<-log10(breaks)
+  
+  ticks<-reRangeXY(data.frame(x=breaks,y=braw.env$plotLimits$ylim[1]))
   switch(braw.env$plotLimits$orientation,
          "vert"={
+           mn<-4/max(4,max(nchar(labels)))
            geom_text(data=ticks,aes(x=x,y=y),label=labels,hjust=1.1,vjust=0.5,
-                     size=braw.env$labelSize*4/mn)
+                     size=braw.env$labelSize*mn)
          },
          "horz"={
+           mn<-1
            geom_text(data=ticks,aes(x=x,y=y),label=labels,hjust=0.5,vjust=1.1,
-                     size=braw.env$labelSize*4/mn)
+                     size=braw.env$labelSize*mn)
          }
   )
 }
@@ -151,14 +196,49 @@ horzLine<-function(intercept=NULL,linetype="solid",colour="black",alpha=1,linewi
   data<-data.frame(x=braw.env$plotLimits$xlim,y=intercept)
   geom_line(data=reRangeXY(data),aes(x=x,y=y),linetype=linetype, color=colour, alpha=alpha, linewidth=linewidth)
 }
-dataLabel<-function(data,label, hjust=0, vjust=0) {
+dataLabel<-function(data,label, hjust=0, vjust=0, fill="white",colour="black") {
+  mathlabel<-grepl("['^']{1}",label) | grepl("['[']{1}",label)
+  if (any(mathlabel)) {
+    label<-deparse(label)
+  } else {
+    label<-deparse(bquote(bold(.(label))))
+  }
   data<-reRangeXY(data)
+  
   switch(braw.env$plotLimits$orientation,
          "horz"=
-           geom_label(data=data,aes(x = x, y = y), label=label, hjust=hjust, vjust=vjust, fill="white",size=braw.env$labelSize),
+           geom_label(data=data,aes(x = x, y = y), label=label, 
+                      hjust=hjust, vjust=vjust, 
+               fill=fill,color=colour,
+               size=braw.env$labelSize,parse=TRUE),
          "vert"=   
-           geom_label(data=data,aes(x = x, y = y), label=label, hjust=vjust, vjust=hjust, fill="white",size=braw.env$labelSize)
-         )
+           geom_label(data=data,aes(x = x, y = y), label=label, 
+                      hjust=vjust,vjust=hjust, 
+               fill=fill,color=colour,
+               size=braw.env$labelSize),parse=TRUE
+  )
+  
+}
+dataText<-function(data,label, hjust=0, vjust=0, colour="black") {
+  mathlabel<-grepl("['^']{1}",label) | grepl("['[']{1}",label)
+  if (any(mathlabel)) {
+    label<-deparse(label)
+  } else {
+    label<-deparse(bquote(.(label)))
+  }
+  data<-reRangeXY(data)
+  
+  switch(braw.env$plotLimits$orientation,
+         "horz"=
+           geom_text(data=data,aes(x = x, y = y), label=label, hjust=hjust, vjust=vjust, 
+               color=colour,
+               size=braw.env$labelSize,parse=TRUE),
+         "vert"=   
+           geom_text(data=data,aes(x = x, y = y), label=label, hjust=vjust, 
+               vjust=hjust, 
+               color=colour,
+               size=braw.env$labelSize),parse=TRUE
+  )
   
 }
 dataLine<-function(data,arrow=NULL,colour="black",linewidth=0.25) {
@@ -200,15 +280,16 @@ dataPolygon<-function(data,colour="black",fill="white",alpha=1) {
     }
   }
 }
-dataErrorBar<-function(data,colour,linewidth) {
+dataErrorBar<-function(data,colour,linewidth=0.25) {
   data1<-reRangeXY(data.frame(x=data$x,y=data$ymin))
   data2<-reRangeXY(data.frame(x=data$x,y=data$ymax))
+  width<-diff(braw.env$plotLimits$xlim)/100
   if (braw.env$plotLimits$orientation=="horz"){
     data<-data.frame(x=data1$x,ymin=data1$y,ymax=data2$y)
-    geom_errorbar(data=data,aes(x=x, ymin=ymin, ymax=ymax),width=0.1)
+    geom_errorbar(data=data,aes(x=x, ymin=ymin, ymax=ymax),width=width,linewidth=linewidth)
   } else {
     data<-data.frame(y=data1$y,xmin=data1$x,xmax=data2$x)
-    geom_errorbarh(data=data,aes(y=y, xmin=xmin, xmax=xmax),width=0.1)
+    geom_errorbarh(data=data,aes(y=y, xmin=xmin, xmax=xmax),width=width,linewidth=linewidth)
   }
 }
 dataLegend<-function(data,title="title",fontsize=3.5) {

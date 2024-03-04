@@ -3,7 +3,7 @@
 # source("https://github.com/rjwatt42/BrawStats/raw/main/packages.R")
 # suppressPackageStartupMessages
 
-list.of.packages<-c("ggplot2","tidyr",
+list.of.packages<-c("ggplot2","tidyr","grDevices",
                     "mnormt","lme4",
                     "readxl","writexl","stringr","clipr",
                     "car","pracma"
@@ -13,6 +13,7 @@ if(length(new.packages)>0) install.packages(new.packages,repos="http://cran.fhcr
 
 library(ggplot2)
 library(tidyr)
+library(grDevices)
 
 library(mnormt)      # pmnorm for logistic
 library(lme4)        # lmer (mixed models)

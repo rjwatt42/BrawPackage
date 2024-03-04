@@ -1,7 +1,7 @@
 #' report the estimated population characteristics from varying parameter
 #' 
 #' @param showType        "r","p","n","w", "p(sig)" \cr
-#'                        "NHSTErrors", "FDR","FDR;FMR"
+#'                        "NHST", "FDR","FDR;FMR"
 #' @return ggplot2 object - and printed
 #' @examples
 #' showExplore(exploreResult=makeExplore(),
@@ -105,7 +105,7 @@ reportExplore<-function(exploreResult,showType="r",
             y50<-y50*max(nVals)/colMeans(nVals)
             y75<-y75*max(nVals)/colMeans(nVals)
           },
-          "NHSTErrors"={
+          "NHST"={
             extra_y_label<-"Type II errors"
             y50<-c()
             y25<-c()
@@ -286,7 +286,7 @@ reportExplore<-function(exploreResult,showType="r",
   outputText[3]<-paste("nsims = ",format(nrow(exploreResult$result$rval)),sep="")
   outputText<-c(outputText,rep("",nc+1))
 
-  if (showType=="NHSTErrors" || showType=="FDR;FMR") {
+  if (showType=="NHST" || showType=="FDR;FMR") {
     switch (braw.env$STMethod,
             "NHST"={outputText<-c(outputText,"NHST")},
             "sLLR"={outputText<-c(outputText,"sLLR")},
@@ -332,9 +332,9 @@ reportExplore<-function(exploreResult,showType="r",
     }
   }    
 
-  if (showType=="NHSTErrors" || showType=="FDR;FMR") {
+  if (showType=="NHST" || showType=="FDR;FMR") {
     switch(showType,
-           "NHSTErrors"={extra_y_label<-"Type I errors"},
+           "NHST"={extra_y_label<-"Type I errors"},
            "FDR;FMR"={extra_y_label<-"FDR"}
     )
     if (is.null(IV2)){
