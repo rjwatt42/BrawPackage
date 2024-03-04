@@ -21,6 +21,6 @@ expect<-makeExpected(nsims=1000,hypothesis=getHypothesis("III"))
 showExpected(expect)
 
 hypothesis=getHypothesis("III")
-explore<-makeExplore(nsims=10,NULL,"n",max_n=1000,xlog=TRUE,hypothesis=hypothesis)
-showExplore(explore,showType="r")
+explore<-makeExplore(nsims=1000,NULL,"rIVIV2",hypothesis=hypothesis)
+showExplore(explore,showType="r",effectType="unique")
 

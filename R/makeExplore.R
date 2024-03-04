@@ -178,7 +178,7 @@ runExplore <- function(nsims,exploreResult=NULL,doingNull=FALSE,
           },
           "rIVIV2"={
             # fullES<-effect$rIV^2+effect$rIV2^2+2*effect$rIV*effect$rIV2*effect$rIVIV2+effect$rIVIV2DV^2
-            maxCov<-abs((maxESrange-effect$rIV^2-effect$rIV2^2-effect$rIVIV2DV^2)/(2*effect$rIV*effect$rIV2))
+            maxCov<-abs((max_r-effect$rIV^2-effect$rIV2^2-effect$rIVIV2DV^2)/(2*effect$rIV*effect$rIV2))
             maxCov<-min(maxCov,max_r)
             vals<-seq(-maxCov,maxCov,length.out=npoints)
           },
