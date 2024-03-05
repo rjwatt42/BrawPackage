@@ -537,6 +537,8 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
         if (showType=="e2") effectTheory$world$populationNullp<-0
         xd<-fullRSamplingDist(yvUse,effectTheory$world,design,"p",logScale=logScale,sigOnly=FALSE,HQ=showTheoryHQ)
         xdsig<-fullRSamplingDist(yvUse,effectTheory$world,design,"p",logScale=logScale,sigOnly=TRUE,HQ=showTheoryHQ)
+        if (!labelNSig) xd<-xd-xdsig
+        if (!labelSig) xd<-xdsig
         effectTheory<-oldEffect
       } 
       
