@@ -259,11 +259,13 @@ get_pRho<-function(world,by="r",viewRZ="r") {
             },
             {
               pRho<-seq(-1,1,length=npops)*braw.env$r_range
-              pRhogain<-zPopulationDist(pRho,world)
+              pRhogain<-zPopulationDist(atanh(pRho),world)*(1-pRho^2)
             }
     )
     switch (viewRZ,
             "r" ={
+              pRho<-tanh(pRho)
+              pRhogain<-zdens2rdens(pRhogain,pRho)
             },
             "z" ={
               pRho<-atanh(pRho)
@@ -476,7 +478,7 @@ fullRSamplingDist<-function(vals,world,design,doStat="r",logScale=FALSE,sigOnly=
         }
         d<-d+addition
       }
-      d<-d/sum(d1*c(diff(rp[1:2]),diff(rp)),na.rm=TRUE)
+      d<-d/sum(d1,na.rm=TRUE)
       sourceSampDens_r<-rbind(sourceSampDens_r,d*rdens[ei])
   }
 
