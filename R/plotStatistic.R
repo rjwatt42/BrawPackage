@@ -388,6 +388,34 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
 
 r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orientation="vert",effectType="direct",showTheory=TRUE,g=NULL){
   
+  npct<-1
+  labelSig<-TRUE
+  labelNSig<-TRUE
+  
+  if (showType=="e1a") {
+    showType<-"e1"
+    labelSig<-FALSE
+    labelNSig<-TRUE
+  }
+  
+  if (showType=="e2a") {
+    showType<-"e2"
+    labelSig<-FALSE
+    labelNSig<-TRUE
+  }
+  
+  if (showType=="e1b") {
+    showType<-"e1"
+    labelSig<-TRUE
+    labelNSig<-FALSE
+  }
+  
+  if (showType=="e2b") {
+    showType<-"e2"
+    labelSig<-TRUE
+    labelNSig<-FALSE
+  }
+  
   hypothesis<-analysis$hypothesis
   effect<-hypothesis$effect
   design<-analysis$design
@@ -669,41 +697,43 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
                   "e1"={
                     ns<-sum(!resSig,na.rm=TRUE)
                     s<-sum(resSig,na.rm=TRUE)
-                    labelPt1<-paste0("p(ns correct) = ",format(ns/n*100,digits=2),"% ")
-                    labelPt1a<-paste0("p(sig error) = ",format(s/n*100,digits=2),"% ")
+                    labelPt1<-paste0("p(ns correct) = ",brawFormat(ns/n*100,digits=npct),"% ")
+                    labelPt1a<-paste0("p(sig error) = ",brawFormat(s/n*100,digits=npct),"% ")
                   },
                   "e2"={
                     ns<-sum(!resSig,na.rm=TRUE)
                     s<-sum(resSig,na.rm=TRUE)
-                    labelPt1<-paste0("p(ns miss) = ",format(ns/n*100,digits=2),"% ")
-                    labelPt1a<-paste0("p(sig correct) = ",format(s/n*100,digits=2),"% ")
+                    labelPt1<-paste0("p(ns miss) = ",brawFormat(ns/n*100,digits=npct),"% ")
+                    labelPt1a<-paste0("p(sig correct) = ",brawFormat(s/n*100,digits=npct),"% ")
                   },
                   "e1d"={
                     ns<-sum(!resSig,na.rm=TRUE)
                     s2<-sum(resSig & shvals<0,na.rm=TRUE)
                     s1<-sum(resSig & shvals>0,na.rm=TRUE)
-                    labelPt1b<-paste0("p(ns) = ",format(ns/n*100,digits=2),"% ")
-                    labelPt1a<-paste0("p(sig correct) = ",format(s2/n*100,digits=2),"% ")
-                    labelPt1<-paste0("p(sig error) = ",format(s1/n*100,digits=2),"% ")
-                    labelPt1b<-paste0("p(ns) = ",format(ns/n*100,digits=2),"%")
-                    labelPt1a<-paste0("p(sig correct) = ",format(s2/n*100,digits=2),"%")
-                    labelPt1<-paste0("p(sig error) = ",format(s1/n*100,digits=2),"%")
+                    labelPt1b<-paste0("p(ns) = ",brawFormat(ns/n*100,digits=npct),"% ")
+                    labelPt1a<-paste0("p(sig correct) = ",brawFormat(s2/n*100,digits=npct),"% ")
+                    labelPt1<-paste0("p(sig error) = ",brawFormat(s1/n*100,digits=npct),"% ")
+                    labelPt1b<-paste0("p(ns) = ",brawFormat(ns/n*100,digits=npct),"%")
+                    labelPt1a<-paste0("p(sig correct) = ",brawFormat(s2/n*100,digits=npct),"%")
+                    labelPt1<-paste0("p(sig error) = ",brawFormat(s1/n*100,digits=npct),"%")
                   },
                   "e2d"={
                     ns<-sum(!resSig,na.rm=TRUE)
                     s2<-sum(resSig & shvals<0,na.rm=TRUE)
                     s1<-sum(resSig & shvals>0,na.rm=TRUE)
-                    labelPt1b<-paste0("p(ns) = ",format(ns/n*100,digits=2),"% ")
-                    labelPt1a<-paste0("p(sig error) = ",format(s2/n*100,digits=2),"% ")
-                    labelPt1<-paste0("p(sig correct) = ",format(s1/n*100,digits=2),"% ")
-                    labelPt1b<-paste0("p(ns) = ",format(ns/n*100,digits=2),"%")
-                    labelPt1a<-paste0("p(sig error) = ",format(s2/n*100,digits=2),"%")
-                    labelPt1<-paste0("p(sig correct) = ",format(s1/n*100,digits=2),"%")
+                    labelPt1b<-paste0("p(ns) = ",brawFormat(ns/n*100,digits=npct),"% ")
+                    labelPt1a<-paste0("p(sig error) = ",brawFormat(s2/n*100,digits=npct),"% ")
+                    labelPt1<-paste0("p(sig correct) = ",brawFormat(s1/n*100,digits=npct),"% ")
+                    labelPt1b<-paste0("p(ns) = ",brawFormat(ns/n*100,digits=npct),"%")
+                    labelPt1a<-paste0("p(sig error) = ",brawFormat(s2/n*100,digits=npct),"%")
+                    labelPt1<-paste0("p(sig correct) = ",brawFormat(s1/n*100,digits=npct),"%")
                   }
           )
           lpts1<-data.frame(y = xoff[i]+ylim[2], x = xlim[1])
+          if (labelSig)
           g<-g+dataLabel(data=lpts1,label = labelPt1,vjust=1)
           lpts1a<-data.frame(y = xoff[i]+ylim[1], x = xlim[1])
+          if (labelNSig)
           g<-g+dataLabel(data=lpts1a,label = labelPt1a,vjust=0)
           if (is.element(showType,c("e1d","e2d"))) {
             lpts1<-data.frame(y = xoff[i]+mean(ylim), x = xlim[1])
@@ -716,9 +746,9 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
                   "e2"={labelPt1<-"p(Type II) = "}
           )
           if (showType=="e2") {
-            labelPt2<-paste0(labelPt1,format(mean(!resSig,na.rm=TRUE)*100,digits=braw.env$graph_precision),"%")
+            labelPt2<-paste0(labelPt1,brawFormat(mean(!resSig,na.rm=TRUE)*100,digits=npct),"%")
           } else {
-            labelPt2<-paste0(labelPt1,format(mean(resSig,na.rm=TRUE)*100,digits=braw.env$graph_precision),"%")
+            labelPt2<-paste0(labelPt1,brawFormat(mean(resSig,na.rm=TRUE)*100,digits=npct),"%")
           }
           lpts1<-data.frame(y = xoff[i]+ylim[2], x = xlim[1])
           g<-g+dataLabel(data=lpts1,label = labelPt2,vjust=1)
@@ -768,9 +798,9 @@ n_plot<-function(analysis,ntype,orientation="vert",showTheory=TRUE,g=NULL){
   r_plot(analysis,ntype,braw.env$nPlotScale=="log10",orientation=orientation,showTheory=showTheory,g=g)
 }
 
-e2_plot<-function(analysis,otheranalysis=NULL,orientation="vert",showTheory=TRUE,g=NULL){
+e2_plot<-function(analysis,disp,otheranalysis=NULL,orientation="vert",showTheory=TRUE,g=NULL){
   distr<-tolower(analysis$hypothesis$effect$world$populationPDF)
-  lambda<-format(analysis$hypothesis$effect$world$populationPDFk,digits=3)
+  lambda<-brawFormat(analysis$hypothesis$effect$world$populationPDFk,digits=3)
   switch (braw.env$RZ,
           "r"={
             lab<-bquote(bold("Non-null: " ~ r["p"] ~ "~" ~ .(distr) (r/.(lambda))))
@@ -782,22 +812,22 @@ e2_plot<-function(analysis,otheranalysis=NULL,orientation="vert",showTheory=TRUE
   
   switch (braw.env$STMethod,
           "NHST"={
-            g<-p_plot(analysis,ptype="e2",otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
+            g<-p_plot(analysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
             g<-g+plotTitle(lab)
           },
           "sLLR"={
-            g<-p_plot(analysis,ptype="e2",otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
+            g<-p_plot(analysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
             g<-g+plotTitle(lab)
           },
           "dLLR"={
-            g<-p_plot(nullanalysis,ptype="e2d",otheranalysis=otheranalysis,PlotScale="linear",orientation=orientation,showTheory=showTheory,g=g)
+            g<-p_plot(nullanalysis,"e2d",otheranalysis=otheranalysis,PlotScale="linear",orientation=orientation,showTheory=showTheory,g=g)
             g<-g+plotTitle(lab)
           }
   )
   return(g)
 }
 
-e1_plot<-function(nullanalysis,otheranalysis=NULL,orientation="vert",showTheory=TRUE,g=NULL){
+e1_plot<-function(nullanalysis,disp,otheranalysis=NULL,orientation="vert",showTheory=TRUE,g=NULL){
   switch (braw.env$RZ,
           "r"={
             lab<-bquote(bold("Null: " ~ r["p"] == 0))
@@ -808,15 +838,15 @@ e1_plot<-function(nullanalysis,otheranalysis=NULL,orientation="vert",showTheory=
   )
   switch (braw.env$STMethod,
           "NHST"={
-            g<-p_plot(nullanalysis,ptype="e1",otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
+            g<-p_plot(nullanalysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
             g<-g+plotTitle(lab)
           },
           "sLLR"={
-            g<-p_plot(nullanalysis,ptype="e1",otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)+
+            g<-p_plot(nullanalysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)+
               g<-g+plotTitle(lab)
           },
           "dLLR"={
-            g<-p_plot(nullanalysis,ptype="e1d",otheranalysis=otheranalysis,PlotScale="linear",orientation=orientation,showTheory=showTheory,g=g)
+            g<-p_plot(nullanalysis,"e1d",otheranalysis=otheranalysis,PlotScale="linear",orientation=orientation,showTheory=showTheory,g=g)
             g<-g+plotTitle(lab)
           }
   )

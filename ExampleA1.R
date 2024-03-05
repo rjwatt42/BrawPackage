@@ -17,8 +17,9 @@ showExpected(expect)
 showExpected(expect,dimension="2D")
 
 
-expect<-makeExpected(nsims=1000,hypothesis=getHypothesis("III"))
-showExpected(expect)
+hypothesis=getHypothesis("Psych")
+expect<-makeExpected(nsims=1000,hypothesis=hypothesis)
+showExpected(expect,"FDR")
 
 hypothesis=getHypothesis("III")
 explore<-makeExplore(nsims=1000,NULL,"rIVIV2",hypothesis=hypothesis)

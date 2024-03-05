@@ -54,8 +54,12 @@ plotInference<-function(analysis,otheranalysis=NULL,disp="r",orientation="vert",
           "wn"={g<-n_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
           "n"= {g<-n_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
           
-          "e1"={g<-e1_plot(analysis,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
-          "e2"={g<-e2_plot(analysis,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)}
+          "e1"={g<-e1_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
+          "e2"={g<-e2_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
+          "e1a"={g<-e1_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
+          "e2a"={g<-e2_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
+          "e1b"={g<-e1_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
+          "e2b"={g<-e2_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)}
   )
   return(g)
 }

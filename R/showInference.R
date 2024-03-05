@@ -84,7 +84,7 @@ showInference<-function(analysis=makeAnalysis(),showType="Basic",dimension="1D",
              other2<-analysis1
              },
            "FDR"=       {
-             showType<-c("e2","e1")
+             showType<-c("e2a","e1a")
              r<-getNulls(analysis,useSig=TRUE)
              analysis1<-r$analysis
              analysis2<-r$nullanalysis
@@ -92,7 +92,7 @@ showInference<-function(analysis=makeAnalysis(),showType="Basic",dimension="1D",
              other2<-analysis1
            },
            "FMR"=       {
-             showType<-c("e2","e1")
+             showType<-c("e2b","e1b")
              r<-getNulls(analysis,useNSig=TRUE)
              analysis1<-r$analysis
              analysis2<-r$nullanalysis

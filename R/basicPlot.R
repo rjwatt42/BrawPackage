@@ -201,7 +201,7 @@ dataLabel<-function(data,label, hjust=0, vjust=0, fill="white",colour="black") {
   if (any(mathlabel)) {
     label<-deparse(label)
   } else {
-    label<-deparse(bquote(bold(.(label))))
+    label<-deparse(bquote(.(label)))
   }
   data<-reRangeXY(data)
   
