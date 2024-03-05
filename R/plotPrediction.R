@@ -262,62 +262,6 @@ plotParCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
       dataLine(data=pts2,colour=col,linewidth=2)
   }
   
-  if (plotBars) {
-    if (length(IV$vals)>0)  {
-      bin_breaks<-c(-Inf,seq(-1,1,length.out=braw.env$varNPoints-1)*braw.env$fullRange*sd(IV$vals)+mean(IV$vals),Inf)
-      dens2<-hist(IV$vals,breaks=bin_breaks,freq=TRUE,plot=FALSE,warn.unused = FALSE)
-      bins=dens2$mids
-      
-      full_x<-c()
-      full_y<-c()
-      full_f<-c()
-      for (i2 in 1:DV$ncats){
-        dens1<-hist(IV$vals[DV$vals==DV$cases[i2]],breaks=bin_breaks,freq=TRUE,plot=FALSE,warn.unused = FALSE)
-        densities<-dens1$counts/dens2$counts
-        xoff<-(i2-1)/(DV$ncats-1)-(DV$ncats-1)/2
-        full_x<-c(full_x,bins[2:(length(bins)-1)]+xoff/4)
-        full_y<-c(full_y,densities[2:(length(bins)-1)])
-        full_f<-c(full_f,rep(i2,length(bins)-2))
-      }
-      
-      pts<-data.frame(x=full_x,y=full_y,fill=full_f)
-      if (braw.env$doLegendBars) {
-        g<-g+geom_bar(data=pts,aes(x=x,y=y,fill=factor(fill)),stat="identity",width=barwidth/(DV$ncats+1))
-      } else {
-        g<-g+geom_bar(data=pts,aes(x=x,y=y),stat="identity",width=barwidth/(DV$ncats+1),fill=col)
-      }
-    } else {
-      dens2<-1
-      bins<-seq(-1,1,length.out=braw.env$varNPoints-1)*braw.env$fullRange*IV$sd+IV$mu
-      full_x<-c()
-      full_y<-c()
-      full_f<-c()
-      dens<-get_logistic_r(rho,ncats,bins)
-      
-      if (braw.env$onesided) i2<-2
-      else i2<-1
-      for (i2 in i2:DV$ncats){
-        dens1<-dens[,i2]
-        densities<-dens1/dens2
-        xoff<-(i2-1)/(DV$ncats-1)-(DV$ncats-1)/2
-        full_x<-c(full_x,bins[2:(length(bins)-1)]+xoff/4)
-        full_y<-c(full_y,densities[2:(length(bins)-1)])
-        full_f<-c(full_f,rep(i2,length(bins)-2))
-      }
-      pts<-data.frame(x=full_x,y=full_y,fill=full_f)
-      if (offset==1) {
-        col<-braw.env$CatCatCols[i2]
-      }
-      if (braw.env$doLegendBars) {
-        g<-g+geom_bar(data=pts,aes(x=x,y=y,fill=factor(fill)),stat="identity",width=barwidth/(DV$ncats+1))
-      } else {
-        g<-g+geom_bar(data=pts,aes(x=x,y=y),stat="identity",width=barwidth/(DV$ncats+1),fill=col)
-      }
-    }
-  }
-  if (braw.env$doLegendBars && offset==1){
-    g<-g+scale_fill_manual(name=DV$name,values=braw.env$CatCatCols)
-  }
   if (plotBaseline) {
     pts1<-data.frame(x=c(-1,1)*braw.env$fullRange*IV$sd+IV$mu,y=c(0,0))
     g<-g+dataLine(data=pts1,colour="black")
@@ -369,22 +313,9 @@ plotCatCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
     full_c<-c(full_c,rep(col,length(pp[i2,])))
   }
 
-  braw.env$doLegendBars<-FALSE
   pts<-data.frame(x=full_x,y=full_y,fill=factor(full_f))
-  if (offset==1) {
-    if (braw.env$doLegendBars) {
-      g<-g+dataBar(data=pts,barwidth=barwidth)
-    } else {
-      g<-g+dataBar(data=pts,barwidth=barwidth,fill=full_c)
-    }
-  } else{
-    g<-g+dataBar(data=pts,barwidth=barwidth,fill=full_c)
-  }
-  
-  if (braw.env$doLegendBars && offset==1){
-    # g<-g+scale_fill_manual(name=DV$name,values=braw.env$CatCatCols,labels=DV$cases)
-  }
-  
+  g<-g+dataBar(data=pts,barwidth=barwidth,fill=full_c)
+
   pts1<-data.frame(x=c(0,ncats1+1),y=c(0,0))
   g<-g+dataLine(data=pts1,colour="black")
   g
@@ -401,8 +332,6 @@ plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL,theme=braw.env$
   hypothesisType=paste(IV$type,DV$type,sep=" ")
   
   if (is.null(IV2)){
-    
-    braw.env$doLegendBars<-TRUE
     if (DV$type=="Categorical" && (is.null(braw.env$CatCatCols) || length(braw.env$CatCatCols)<DV$ncats)) {
       braw.env$CatCatCols <- c()
       cols<-c()
@@ -412,7 +341,6 @@ plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL,theme=braw.env$
         col<- rgb(col[1]/255,col[2]/255,col[3]/255)
         cols<-c(cols,col)
       }
-      # names(cols)<-DV$cases
       braw.env$CatCatCols<-cols
     }
     
@@ -454,7 +382,6 @@ plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL,theme=braw.env$
     }
   } else {
     # more than 1 IV
-    braw.env$doLegendBars<-FALSE
     roff=0.82
     # deal with interaction
     switch (IV2$type,
@@ -471,7 +398,7 @@ plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL,theme=braw.env$
         col<- col2rgb(braw.env$plotColours$descriptionC1)*(1-off)+col2rgb(braw.env$plotColours$descriptionC2)*off
         cols<- c(cols,rgb(col[1]/255,col[2]/255,col[3]/255))
       }
-      names<-analysis$hypothesis$IV2$cases
+      names<-IV2$cases
     } else {
       cols<-c( braw.env$plotColours$descriptionC1, braw.env$plotColours$descriptionC2)
       names<-c(paste(IV2$name,"<median",sep=""), paste(IV2$name,">median",sep=""))

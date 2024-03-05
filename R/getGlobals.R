@@ -111,7 +111,6 @@ BrawOpts<-function(BW=FALSE,fontScale=1) {
           braw.env$minN<-10
           braw.env$maxRandN<-5 # times mean sample size
           braw.env$reportGroupMeans<-TRUE
-          braw.env$doLegendBars<-TRUE
           braw.env$doLegendPoints<-FALSE
           braw.env$onesided<-TRUE
           braw.env$simData<-TRUE

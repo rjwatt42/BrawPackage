@@ -720,17 +720,10 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
           }
           lpts1<-data.frame(y = xoff[i]+ylim[2], x = xlim[1])
           g<-g+dataLabel(data=lpts1,label = labelPt2,vjust=1)
-          # if (!is.null(lpts2)) {
-          # g<-g+geom_label(data=lpts2,aes(x = x, y = y, label=label), hjust=0, vjust=0, fill="white",size=braw.env$labelSize)
-          # }
         }
         
       }
       
-      # if (length(rvals)>1 && is.element(showType,c("r","ci1","ci2"))) {
-      #   lpts<-data.frame(x = xoff[i]-0.95, y = xlim[2]-diff(xlim)/20,label=paste("actual =",format(rActual[i],digits=braw.env$graph_precision)))
-      #   g<-g+dataLabel(data=lpts,orientation=orientation)
-      # } 
     }
   }
   

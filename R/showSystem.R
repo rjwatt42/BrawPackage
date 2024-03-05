@@ -90,15 +90,6 @@ showWorld<-function(hypothesis=makeHypothesis(effect=makeEffect(world=makeWorld(
          "z"={ g<-g+xAxisLabel(braw.env$zpLabel)+xAxisTicks(seq(-2,2,0.5))}
   )
   
-  # g1<-ggplot(pts,aes(x=x,y=y))
-  # g1<-g1+geom_polygon(data=pts,aes(x=x,y=y),fill=braw.env$plotColours$descriptionC)+scale_y_continuous(limits = c(0,1.05),labels=NULL,breaks=NULL)
-  # g1<-g1+geom_line(data=pts,aes(x=x,y=y),color="black",lwd=0.25)
-  # switch(braw.env$RZ,
-  #        "r"={ g1<-g1+labs(x=braw.env$rpLabel,y="Density")+braw.env$diagramTheme },
-  #        "z"={ g1<-g1+labs(x=braw.env$zpLabel,y="Density")+braw.env$diagramTheme }
-  #        )
-  # g<-g1
-
   return(g)
 }
 
@@ -123,12 +114,14 @@ showDesign<-function(design=makeDesign()) {
   x<-c(min(nbin),nbin,max(nbin))
   y<-c(0,ndens,0)
   
+  braw.env$plotArea<-c(0,0,1,1)
+  g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme
+  g<-startPlot(xlim=c(braw.env$minN,braw.env$maxN), ylim=c(0,1.05),bos="x")
+  g<-g+xAxisLabel("n")+xAxisTicks(breaks=NULL)
   pts=data.frame(x=x,y=y)
-  g<-ggplot(pts,aes(x=x,y=y))
-  g<-g+geom_polygon(data=pts,aes(x=x,y=y),fill=braw.env$plotColours$descriptionC)+scale_y_continuous(limits = c(0,1.05),labels=NULL,breaks=NULL)
-  g<-g+geom_line(data=pts,aes(x=x,y=y),color="black",lwd=0.25)
-  g<-g+labs(x="n",y="Density")+braw.env$diagramTheme
-  
+  g<-g+dataPolygon(data=pts,fill=braw.env$plotColours$descriptionC)
+  g<-g+dataLine(data=pts,color="black",lwd=0.25)
+
   return(g)
 }
 
@@ -233,8 +226,6 @@ showPrediction <- function(hypothesis=makeHypothesis(),design=makeDesign(),evide
 showWorldSampling<-function(hypothesis=makeHypothesis(),design=makeDesign(),sigOnly=FALSE) {
   world<-hypothesis$effect$world
   
-  g<-ggplot()
-  
   np<-braw.env$worldNPoints
   if (world$worldAbs) np<-braw.env$worldNPoints*2+1
   
@@ -261,12 +252,18 @@ showWorldSampling<-function(hypothesis=makeHypothesis(),design=makeDesign(),sigO
   x<-c(vals[1],vals,vals[length(vals)])
   y<-c(0,dens,0)
   pts=data.frame(x=x,y=y)
-  g<-g+geom_polygon(data=pts,aes(x=x,y=y),fill="yellow")+scale_y_continuous(limits = c(0,1.05),labels=NULL,breaks=NULL)
-  g<-g+geom_line(data=pts,aes(x=x,y=y),color="black",lwd=0.25)
+  
+  braw.env$plotArea<-c(0,0,1,1)
+  g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme
+  g<-startPlot(xlim=c(braw.env$minN,braw.env$maxN), ylim=c(0,1.05),bos="x")
   switch(braw.env$RZ,
-         "r"={g<-g+labs(x=braw.env$rsLabel,y="Frequency")+braw.env$diagramTheme},
-         "z"={g<-g+labs(x=braw.env$zsLabel,y="Frequency")+braw.env$diagramTheme}
+         "r"={g<-g+xAxisLabel(braw.env$rsLabel)},
+         "z"={g<-g+xAxisLabel(braw.env$zsLabel)}
   )
+  g<-g+xAxisTicks(breaks=NULL)
+  
+  g<-g+dataPolygon(data=pts,fill="yellow")+scale_y_continuous(limits = c(0,1.05),labels=NULL,breaks=NULL)
+  g<-g+dataLine(data=pts,color="black",lwd=0.25)
   return(g)
 }
 

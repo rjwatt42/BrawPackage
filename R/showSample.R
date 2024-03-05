@@ -15,14 +15,11 @@ plotSample<-function(IV,DV,effect,ivplot,dvplot,g=NULL) {
   y<-dvplot
   pts<-data.frame(x=x,y=y)
   g<-g+dataPoint(data=pts,shape=braw.env$plotShapes$data, colour = "black", fill = braw.env$plotColours$sampleC, size = dotSize)
-  # g<-g+geom_point(data=pts,aes(x=x,y=y),shape=braw.env$plotShapes$data, colour = "black", fill = braw.env$plotColours$sampleC, size = dotSize)
   if (braw.env$showMedians) {
     if (sample$type=="Categorical") {yuse<-0.5} else {yuse<-median(y)}
     g<-g+horizLine(intercept=yuse,col="red")
-    # g<-g+geom_hline(yintercept=yuse,col="red")
     if (sample$type=="Categorical") {xuse<-0.5} else {xuse<-median(x)}
     g<-g+vertLine(intercept=xuse,col="red")
-    # g<-g+geom_vline(xintercept=xuse,col="red")
   }
   # g<-g+labs(x=IV$name,y=DV$name)+braw.env$plotTheme
   g

@@ -293,6 +293,13 @@ dataErrorBar<-function(data,colour,linewidth=0.25) {
   }
 }
 dataLegend<-function(data,title="title",fontsize=3.5) {
+  mathlabel<-grepl("['^']{1}",title) | grepl("['[']{1}",title)
+  if (any(mathlabel)) {
+    title<-deparse(title)
+  } else {
+    title<-deparse(bquote(bold(.(title))))
+  }
+  
   names<-data$names
   width<-max(nchar(names)+4)*0.0045*fontsize
   height<-(length(names)+1)*0.018*fontsize
@@ -307,6 +314,7 @@ dataLegend<-function(data,title="title",fontsize=3.5) {
   ptsY<-legY[1]+seq(1,length(colours))*0.25*(legY[2]-legY[1])
   
   titleY<-legY[1]+0.8*(legY[2]-legY[1])
+  
   list(
     geom_polygon(data=data.frame(x=legX[c(1,2,2,1)],y=legY[c(1,1,2,2)]),
                  aes(x=x,y=y),color="black",fill="white",alpha=1),
@@ -315,6 +323,6 @@ dataLegend<-function(data,title="title",fontsize=3.5) {
     geom_text(data=data.frame(x=ptsX+legX[2]*0.025,y=ptsY,label=names),
               aes(x=x,y=y,label=label),hjust=0,size=fontsize*0.8),
     geom_text(data=data.frame(x=ptsX[1],y=titleY,label=title),
-              aes(x=x,y=y,label=label),hjust=0,size=fontsize*0.8,fontface="bold")
+              aes(x=x,y=y,label=label),hjust=0,size=fontsize*0.8,parse=TRUE)
   )
 }

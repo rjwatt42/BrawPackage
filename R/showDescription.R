@@ -74,9 +74,6 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,maxoff=1){
           "Categorical Ordinal"={
             pts<-data.frame(x=x,y=y);
             if (showRawData) {
-              # if (colindex>=2)
-              #   g<-g+geom_point(data=pts,aes(x=IV,y=DV,fill=names(braw.env$plotDescriptionCols)[colindex-1]),shape=braw.env$plotShapes$data, colour = "black", alpha=alphaPoints, size =dotSize)
-              # else
                 g<-g+dataPoint(data=pts,shape=braw.env$plotShapes$data, colour = "black", fill=col, alpha=alphaPoints, size =dotSize*shrinkDots)
             }
           },
@@ -117,11 +114,7 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,maxoff=1){
               if (colindex>=2) {
                 g<-g+dataPoint(data=pts,shape=braw.env$plotShapes$data, size =dotSize, alpha=alphaPoints, colour="black", fill=full_c)
               } else {
-                if (braw.env$doLegendPoints) {
-                  g<-g+dataPoint(data=pts,shape=braw.env$plotShapes$data, size =dotSize*shrinkDots, alpha=alphaPoints)
-                } else {
-                  g<-g+dataPoint(data=pts,shape=braw.env$plotShapes$data, size =dotSize*shrinkDots, alpha=alphaPoints, colour="black",fill=full_c)
-                }
+                g<-g+dataPoint(data=pts,shape=braw.env$plotShapes$data, size =dotSize*shrinkDots, alpha=alphaPoints, colour="black",fill=full_c)
               }
             }
           },
@@ -162,15 +155,9 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,maxoff=1){
             pts<-data.frame(x=full_x,y=full_y)
             if (showRawData) {
               if (colindex>=2) {
-                # g<-g+geom_point(data=pts,aes(x=x,y=y,fill=names(braw.env$plotDescriptionCols)[colindex-1]),shape=braw.env$plotShapes$data, size =dotSize, alpha=0.95, colour="black")
                 g<-g+dataPoint(data=pts,shape=braw.env$plotShapes$data, size =dotSize, alpha=alphaPoints, colour="black",fill="white")
               } else {
-                if (braw.env$doLegendPoints) {
-                  pts<-data.frame(x=full_x,y=full_y,fill=factor(full_f))
-                  g<-g+dataPoint(data=pts,shape=braw.env$plotShapes$data, size =dotSize*shrinkDots, alpha=alphaPoints)
-                } else {
-                  g<-g+dataPoint(data=pts,shape=braw.env$plotShapes$data, size =dotSize*shrinkDots, alpha=alphaPoints, colour="black",fill=full_c)
-                }
+                g<-g+dataPoint(data=pts,shape=braw.env$plotShapes$data, size =dotSize*shrinkDots, alpha=alphaPoints, colour="black",fill=full_c)
               }
             }
           },
@@ -210,14 +197,9 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,maxoff=1){
                   if (i2==1) col<-darken(col,0.25,off=0.75)
                   g<-g+dataPoint(data=pts,shape=braw.env$plotShapes$data, size =dotSize, alpha=alphaPoints, colour="black", fill=col)
                 } else {
-                  if (braw.env$doLegendPoints) {
-                    pts<-data.frame(x=x+xoff,y=y,fill=factor(i2))
-                    g<-g+dataPoint(data=pts,shape=braw.env$plotShapes$data, size =dotSize*shrinkDots, alpha=alphaPoints, colour="black")
-                  } else {
-                    col<-braw.env$plotColours$descriptionC
-                    if (i2==1) col<-darken(col,0.5,off=0.5)
-                    g<-g+dataPoint(data=pts,shape=braw.env$plotShapes$data, size =dotSize*shrinkDots, colour="black", fill=col, alpha=alphaPoints)
-                  }
+                  col<-braw.env$plotColours$descriptionC
+                  if (i2==1) col<-darken(col,0.5,off=0.5)
+                  g<-g+dataPoint(data=pts,shape=braw.env$plotShapes$data, size =dotSize*shrinkDots, colour="black", fill=col, alpha=alphaPoints)
                 }
               }
             }
@@ -336,11 +318,7 @@ plotCatDescription<-function(analysis,g) {
   
   g<-plotPoints(g,analysis$hypothesis$IV,analysis$hypothesis$DV,analysis,1)
   g<-plotPrediction(analysis$hypothesis$IV,analysis$hypothesis$IV2,analysis$hypothesis$DV,analysis,analysis$design,1,g,theme=braw.env$plotTheme)
-  
-  # if (braw.env$doLegendPoints) {
-  #   g<-g+scale_fill_manual(name=analysis$hypothesis$DV$name,values=braw.env$CatCatCols,labels=analysis$hypothesis$DV$cases)
-  # }
-  
+
   g
 }
 
