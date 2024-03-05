@@ -72,7 +72,7 @@ switch(braw.env$RZ,
             use_cols<-c(hsv(0.65,1,1),hsv(0.65+0.075,1,1),hsv(0.65+0.15,1,1))
             lines<-c(0.05,0.8)
           },
-          "nw"={
+          "wn"={
             ylim<-c(10, braw.env$max_nw*10)
             ylabel<-bquote(n[w=80])
           },
@@ -146,16 +146,16 @@ switch(braw.env$RZ,
   )
   
   logScale<-FALSE
-  if (is.element(showType,c("w","wp","nw")) && braw.env$wPlotScale=="log10"){
+  if (is.element(showType,c("w","wp","wn")) && braw.env$wPlotScale=="log10"){
     ylim<-log10(ylim)
     if (!is.null(lines))
       lines<-log10(lines)
     ylabel<-bquote(bold(log['10'](.(ylabel))))
     logScale<-TRUE
   }
-  if (is.element(showType,c("n","nw")) && braw.env$nPlotScale=="log10"){
+  if (is.element(showType,c("n","wn")) && braw.env$nPlotScale=="log10"){
     ylim<-log10(c(5,1000))
-    lines<-log10(lines)
+    if (!is.null(lines))  lines<-log10(lines)
     ylabel<-bquote(bold(log['10'](.(ylabel))))
     logScale<-TRUE
   }

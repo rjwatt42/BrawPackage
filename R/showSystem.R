@@ -58,6 +58,9 @@ showWorld<-function(hypothesis=makeHypothesis(effect=makeEffect(world=makeWorld(
                      populationPDFk=hypothesis$effect$rIV,populationNullp=0)
   }
     
+  if (is.null(g)) 
+    g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme
+  
   braw.env$plotArea<-plotArea
   # 
   # PlotNULL<-ggplot()+braw.env$blankTheme+theme(plot.margin=margin(0,-0.1,0,0,"cm"))+
@@ -107,20 +110,21 @@ showDesign<-function(design=makeDesign()) {
     ndens<-ndens/max(ndens)
   } else {
     nbin<-seq(1,250,length.out=braw.env$worldNPoints)
-    ndens<-nbin*0+0.01
+    ndens<-nbin*0
     use=which.min(abs(nbin-design$sN))
     ndens[use]<-1
   }
   x<-c(min(nbin),nbin,max(nbin))
-  y<-c(0,ndens,0)
+  y<-c(0,ndens,0)*0.8
+  pts=data.frame(x=x,y=y)
   
   braw.env$plotArea<-c(0,0,1,1)
-  g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme
-  g<-startPlot(xlim=c(braw.env$minN,braw.env$maxN), ylim=c(0,1.05),bos="x")
+  g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0,1)) + braw.env$blankTheme
+  g<-startPlot(xlim=c(braw.env$minN,design$sN*braw.env$maxRandN), ylim=c(0,1),
+               box="x",g=g)
   g<-g+xAxisLabel("n")+xAxisTicks(breaks=NULL)
-  pts=data.frame(x=x,y=y)
   g<-g+dataPolygon(data=pts,fill=braw.env$plotColours$descriptionC)
-  g<-g+dataLine(data=pts,color="black",lwd=0.25)
+  g<-g+dataLine(data=pts)
 
   return(g)
 }
@@ -255,15 +259,15 @@ showWorldSampling<-function(hypothesis=makeHypothesis(),design=makeDesign(),sigO
   
   braw.env$plotArea<-c(0,0,1,1)
   g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme
-  g<-startPlot(xlim=c(braw.env$minN,braw.env$maxN), ylim=c(0,1.05),bos="x")
+  g<-startPlot(xlim=c(braw.env$minN,braw.env$maxN), ylim=c(0,1.05),box="both",g=g)
   switch(braw.env$RZ,
          "r"={g<-g+xAxisLabel(braw.env$rsLabel)},
          "z"={g<-g+xAxisLabel(braw.env$zsLabel)}
   )
   g<-g+xAxisTicks(breaks=NULL)
   
-  g<-g+dataPolygon(data=pts,fill="yellow")+scale_y_continuous(limits = c(0,1.05),labels=NULL,breaks=NULL)
-  g<-g+dataLine(data=pts,color="black",lwd=0.25)
+  g<-g+dataPolygon(data=pts,fill=braw.env$plotColours$descriptionC)+scale_y_continuous(limits = c(0,1.05),labels=NULL,breaks=NULL)
+  g<-g+dataLine(data=pts)
   return(g)
 }
 

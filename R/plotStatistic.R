@@ -241,7 +241,7 @@ expected_hist<-function(vals,svals,valType,histGain,histGainrange){
             }
           },
           
-          "nw"= { # ns is large
+          "wn"= { # ns is large
             target<-get_lowerEdge(vals,svals)
             bins<-getBins(vals,svals,target,NULL,braw.env$max_nw)
           }
@@ -464,7 +464,7 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
             "n"={showVals<-data$ns},
             "w"={showVals<-rn2w(data$rs,data$ns)},
             "wp"={showVals<-rn2w(data$rp,data$ns)},
-            "nw"={showVals<-rw2n(data$rs,0.8,analysis$design$ReplTails)},
+            "wn"={showVals<-rw2n(data$rs,0.8,design$Replication$ReplTails)},
             "ci1"={showVals<-r2ci(data$rs,data$ns,-1)},
             "ci2"={showVals<-r2ci(data$rs,data$ns,+1)},
             "e1"={showVals<-data$ps},
@@ -512,6 +512,7 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
         effectTheory<-oldEffect
       } 
       
+      xdsig<-NULL
       if (is.element(showType,c("r","ra","ro","ci1","ci2"))) {
         npt<-101
         if (braw.env$RZ=="z") {
@@ -573,7 +574,7 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
                yv<-seq(-braw.env$lrRange,braw.env$lrRange,length.out=npt)
                xd<-fullRSamplingDist(yv,effectTheory$world,design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
              },
-             "nw"={
+             "wn"={
                if (logScale) {
                  yv<-seq(log10(5),log10(braw.env$max_nw),length.out=npt)
                  yvUse<-10^yv
@@ -581,7 +582,8 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
                  yv<-5+seq(0,braw.env$max_nw,length.out=npt)
                  yvUse<-yv
                }
-               xd<-fullRSamplingDist(yvUse,effectTheory$world,design,"nw",logScale=logScale,sigOnly=sigOnly)
+               xd<-fullRSamplingDist(yvUse,effectTheory$world,design,"wn",logScale=logScale,sigOnly=sigOnly)
+               xd<-abs(xd)
              },
              "wp"={
                yv<-seq(braw.env$alphaSig*1.01,1/1.01,length.out=npt)
@@ -594,7 +596,6 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
       else distMax<-0.5
       
       xd[is.na(xd)]<-0
-      xdsig[is.na(xdsig)]<-0
       theoryGain<-1/max(xd)*distMax
       xd<-xd*theoryGain
       histGain<-abs(sum(xd*c(0,diff(yv))))
@@ -602,6 +603,7 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
       ptsp<-data.frame(y=c(yv,rev(yv)),x=c(xd,-rev(xd))+xoff[i])
       g<-g+dataPolygon(data=ptsp,colour=NA,fill="white",alpha=theoryAlpha)
       if (is.element(showType,c("r","n","p"))) {
+        xdsig[is.na(xdsig)]<-0
         g<-g+dataPolygon(data=ptsp,colour=NA,fill=braw.env$plotColours$infer_nsigC,alpha=theoryAlpha)
         # xdsig[xdsig==0]<-NA
         i2<-0

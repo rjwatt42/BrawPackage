@@ -445,12 +445,12 @@ fullRSamplingDist<-function(vals,world,design,doStat="r",logScale=FALSE,sigOnly=
                   use<-which(diff(wp)!=0)
                   addition<-approx(wp[c(1,use+1)],addition[c(1,use+1)],vals)$y
                 },
-                "nw"={ 
+                "wn"={ 
                   zp<-(qnorm(0.8)-qnorm(braw.env$alphaSig))/sqrt(vals-3)
                   rp<-tanh(zp)
                   addition<-rSamplingDistr(rp,rvals[ei],nvals[ni])+
                             rSamplingDistr(-rp,rvals[ei],nvals[ni])
-                  dznw<- -zp/(vals-3)/2
+                  dznw<- zp/(vals-3)/2
                   addition<-addition*dznw*(1-rp^2)
                 },
                 "wp"={

@@ -17,7 +17,7 @@ showExpected(
 \item{showType}{"Basic", "CILimits", "NHST", "FDR", "FDR:FMR" \cr
 \emph{ or one or two of:} \cr
  "r","p","ci1","ci2", "rp","n" \cr
-  "w","wp","nw", ro","po",}
+  "w","wp","wn", ro","po",}
 
 \item{dimension}{"1D", "2D"}
 

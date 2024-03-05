@@ -51,7 +51,7 @@ plotInference<-function(analysis,otheranalysis=NULL,disp="r",orientation="vert",
           "w"= {g<-w_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
           "wp"={g<-w_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
           
-          "nw"={g<-n_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
+          "wn"={g<-n_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
           "n"= {g<-n_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
           
           "e1"={g<-e1_plot(analysis,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
@@ -110,8 +110,8 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
             d1<-rn2w(analysis$rp,analysis$nval)
             if (braw.env$wPlotScale=="log10") d1<-log10(d1)
           },
-          "nw"={
-            d1<-rw2n(analysis$rIV,0.8,analysis$design$ReplTails)
+          "wn"={
+            d1<-rw2n(analysis$rIV,0.8,analysis$design$Replication$ReplTails)
             if (braw.env$wPlotScale=="log10") d1<-log10(d1)
           }
   )
@@ -123,7 +123,6 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
           "p"={
             d2<-analysis$pIV
             if (braw.env$pPlotScale=="log10") d2<-log10(d2)
-            print(d2)
           },
           "rp"={
             d2<-analysis$rpIV
@@ -151,8 +150,8 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
             d2<-rn2w(analysis$rp,analysis$nval)
             if (braw.env$wPlotScale=="log10") d2<-log10(d2)
           },
-          "nw"={
-            d2<-rw2n(analysis$rIV,0.8,analysis$design$ReplTails)
+          "wn"={
+            d2<-rw2n(analysis$rIV,0.8,analysis$design$Replication$ReplTails)
             if (braw.env$wPlotScale=="log10") d2<-log10(d2)
           }
   )

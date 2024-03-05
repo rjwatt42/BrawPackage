@@ -115,9 +115,9 @@ BrawOpts<-function(BW=FALSE,fontScale=1) {
           braw.env$onesided<-TRUE
           braw.env$simData<-TRUE
           
-          braw.env$wPlotScale<-"log10"
+          braw.env$wPlotScale<-"linear"
           braw.env$pPlotScale<-"log10"
-          braw.env$nPlotScale<-"linear"
+          braw.env$nPlotScale<-"log10"
           
           braw.env$useSignificanceCols<-TRUE
 

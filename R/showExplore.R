@@ -55,7 +55,7 @@ trimExploreResult<-function(result,nullresult) {
 #'                        ylog=FALSE,
 #'                        effectType="unique",whichEffect="All")
 #' @export
-showExplore<-function(exploreResult=makeExplore(autoShow=TRUE),showType="r",ylog=FALSE,
+showExplore<-function(exploreResult=makeExplore(),showType="r",ylog=FALSE,
                       effectType="unique",whichEffect="All"){
   quants<-0.25
   
@@ -149,7 +149,7 @@ showExplore<-function(exploreResult=makeExplore(autoShow=TRUE),showType="r",ylog
               showVals<-log10(showVals)
             }
           },
-          "nw"={
+          "wn"={
             showVals<-rw2n(rVals,0.8,2)
             if (braw.env$wPlotScale=="log10"){
               showVals<-log10(showVals)
@@ -301,10 +301,12 @@ showExplore<-function(exploreResult=makeExplore(autoShow=TRUE),showType="r",ylog
       pts1f<-data.frame(x=vals,ymin=y25,ymax=y75)
       g<-g+dataLine(data=pts0f,linewidth=0.25)
       sigVals<-isSignificant(braw.env$STMethod,pVals,rVals,nVals,df1Vals,exploreResult$evidence,braw.env$alphaSig)
+      if (!is.null(showVals)) {
       for (i in 1:length(vals))
-      g<-expected_plot(g,
-                       data.frame(x=vals[i],y1=showVals[,i],y2=sigVals[,i]),
-                       showType=showType,scale=2.25/(length(vals)+1),col=col)
+        g<-expected_plot(g,
+                         data.frame(x=vals[i],y1=showVals[,i],y2=sigVals[,i]),
+                         showType=showType,scale=2.25/(length(vals)+1),col=col)
+      }
       g<-g+dataPoint(data=pts0f,fill=col)
       g<-g+dataErrorBar(pts1f)
     } # end of line and point

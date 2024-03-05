@@ -150,7 +150,7 @@ showExpected(expectedResult=makeExpected(),showType="Basic",
                        effectType="direct",showTheory=FALSE)
 
 showType:    "Basic","NHST","FDR","CILimits"
-or 1 or 2:   "r","rp","p","n","ci1","ci2","e1","e2","w","wp","nw"
+or 1 or 2:   "r","rp","p","n","ci1","ci2","e1","e2","w","wp","wn"
              "log(lrs)","log(lrd)"
              "ro","po"
 dimension:   "1D","2D"

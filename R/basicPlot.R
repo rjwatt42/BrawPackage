@@ -49,7 +49,7 @@ startPlot<-function(xlim,ylim,box="both",top=FALSE,backC=braw.env$plotColours$gr
   )
   if (top) gaps<-c(gaps,1)
   else gaps<-c(gaps,0)
-  gaps<-gaps*c(0.1,0.1,0.1)
+  gaps<-gaps*c(0.125,0.1,0.1)
   plotLimits(xlim = xlim, ylim = ylim,orientation=orientation,gaps)
 
   if (is.null(g)) g<-ggplot()

@@ -1,8 +1,7 @@
 
 hypothesis<-getHypothesis("2C")
 design<-getDesign("Within")
-
-explore<-makeExplore(nsims=1000,NULL,"Usage",hypothesis=hypothesis,design=design)
+explore<-makeExplore(nsims=100,NULL,"Usage",hypothesis=hypothesis,design=design)
 
 
 
