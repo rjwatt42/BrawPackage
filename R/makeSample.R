@@ -420,6 +420,9 @@ makeSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=FA
                  if (length(pp)<ng) {pp<-c(pp,rep(pp[length(pp)],ng-length(pp)))}
                  proportions<-c(0,pp)
                  breaks<-qnorm(cumsum(proportions)/sum(proportions))
+                 # not sure we should do this.
+                 while (all(ivr<breaks[2])) breaks[2]<-breaks[2]-0.1
+                 while (all(ivr>breaks[ng])) breaks[ng]<-breaks[ng]+0.1
                  vals=ivr*0
                  for (i in 1:IV$ncats) {vals=vals+(ivr>breaks[i])}
                  ivr<-(vals-(IV$ncats+1)/2)/std((1:IV$ncats),1)

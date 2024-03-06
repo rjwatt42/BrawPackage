@@ -350,10 +350,7 @@ convert2Interval<-function(var) {
 generalAnalysis<-function(allData,InteractionOn,withins,ssqType="Type3",caseOrder="Alphabetic") {
   
   if (ncol(allData)<3) {
-    analysis$rIV<-NA
-    analysis$pIV<-NA
-    analysis$rpIV<-NA
-    return(analysis)
+    return(NULL)
   }
   
   no_ivs<-ncol(allData)-2

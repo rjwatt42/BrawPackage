@@ -71,8 +71,8 @@ mergeExploreResult<-function(res1,res2) {
 
 #' make multiple samples whilst varying a parameter
 #' 
-#' @param exploreType "n","rIV","Heteroscedasticity","rIV2","rIVIV2","rIVIV2DV" \cr
-#'                     "Method","Usage","WithinCorr","ClusterRad","SampleGamma" \cr
+#' @param exploreType "rIV","Heteroscedasticity","rIV2","rIVIV2","rIVIV2DV" \cr
+#'                    "n","Method","Usage","WithinCorr","ClusterRad","SampleGamma" \cr
 #'                     "Dependence","Outliers","IVRange","DVRange" \cr
 #'                     "Cheating","CheatingAmount" \cr
 #'                     "Alpha","Transform" \cr
@@ -218,10 +218,10 @@ runExplore <- function(nsims,exploreResult=NULL,doingNull=FALSE,
           "Cheating"={vals<-c("None","Grow","Prune","Replace","Retry","Add")},
           "CheatingAmount"={
             if (xlog){
-              vals<-round(10^seq(log10(1),log10(max_n),length.out=npoints))
+              vals<-round(10^seq(log10(1),log10(design$sN),length.out=npoints))
             }else{
-              if ((max_n+1)<npoints) vals<-0:max_n
-              else vals<-round(seq(0,max_n,length.out=npoints))
+              if ((design$sN+1)<npoints) vals<-0:design$sN
+              else vals<-round(seq(0,design$sN,length.out=npoints))
             }
           },
           
@@ -612,7 +612,7 @@ runExplore <- function(nsims,exploreResult=NULL,doingNull=FALSE,
         } else {
           res<-multipleAnalysis(1,hypothesis,design,evidence)
           result<-storeExploreResult(result,res,ri,vi)
-          
+
           if (doingNull) {
             res_null<-multipleAnalysis(1,nullhypothesis,design,evidence)
             nullresult<-storeExploreResult(nullresult,res_null,ri,vi)
