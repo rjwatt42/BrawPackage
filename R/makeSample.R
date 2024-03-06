@@ -369,53 +369,12 @@ makeSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=FA
       dvr_m<-data$dvr_m
       dvr_s<-data$dvr_s
       
-      switch(IV$type,
-             "Interval"={
-             },
-             "Ordinal"={
-             },
-             "Categorical"={
-               if (IV$catSource=="discrete") {
-                 ng<-IV$ncats
-                 pp<-IV$proportions
-                 # pp<-as.numeric(unlist(strsplit(IV$proportions,",")))
-                 if (length(pp)<ng) {pp<-c(pp,rep(pp[length(pp)],ng-length(pp)))}
-                 proportions<-c(0,pp)
-                 breaks<-qnorm(cumsum(proportions)/sum(proportions))
-                 vals=ivr*0
-                 for (i in 1:IV$ncats) {vals=vals+(ivr>breaks[i])}
-                 ivr<-(vals-(IV$ncats+1)/2)/std((1:IV$ncats),1)
-               }
-             }
-      )
-      
-
       # make iv2 (if needed)
       if (!is.null(IV2)){
         rho2<-effect$rIV2
         rho12<-effect$rIVIV2
         ivr2_resid<-makeSampleVals(n,0,sqrt(1-rho12^2),IV2)
         iv2r<-ivr*rho12+ivr2_resid
-        switch(IV2$type,
-               "Interval"={
-               },
-               "Ordinal"={
-               },
-               "Categorical"={
-                 if (IV2$catSource=="discrete") {
-                   ng<-IV2$ncats
-                   pp<-IV2$proportions
-                   if (is.character(pp))
-                   pp<-as.numeric(unlist(strsplit(IV2$proportions,",")))
-                   if (length(pp)<ng) {pp<-c(pp,rep(pp[length(pp)],ng-length(pp)))}
-                   proportions<-c(0,pp)
-                   breaks<-qnorm(cumsum(proportions)/sum(proportions))
-                   vals=iv2r*0
-                   for (i in 1:IV2$ncats) {vals=vals+(iv2r>breaks[i])}
-                   iv2r<-(vals-(IV2$ncats+1)/2)/std((1:IV2$ncats),1)
-                 }
-               }
-        )
       } else {
         rho2<-0
         rho12<-0
@@ -446,6 +405,48 @@ makeSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=FA
         iv12r[1:change]<-iv12r[change+(1:change)]+rnorm(change,0,1)*dependenceVal
         }
         residual[1:change]<-residual[change+(1:change)]+rnorm(change,0,1)*dependenceVal
+      }
+      
+      switch(IV$type,
+             "Interval"={
+             },
+             "Ordinal"={
+             },
+             "Categorical"={
+               if (IV$catSource=="discrete") {
+                 ng<-IV$ncats
+                 pp<-IV$proportions
+                 # pp<-as.numeric(unlist(strsplit(IV$proportions,",")))
+                 if (length(pp)<ng) {pp<-c(pp,rep(pp[length(pp)],ng-length(pp)))}
+                 proportions<-c(0,pp)
+                 breaks<-qnorm(cumsum(proportions)/sum(proportions))
+                 vals=ivr*0
+                 for (i in 1:IV$ncats) {vals=vals+(ivr>breaks[i])}
+                 ivr<-(vals-(IV$ncats+1)/2)/std((1:IV$ncats),1)
+               }
+             }
+      )
+      if (!is.null(IV2)){
+        switch(IV2$type,
+               "Interval"={
+               },
+               "Ordinal"={
+               },
+               "Categorical"={
+                 if (IV2$catSource=="discrete") {
+                   ng<-IV2$ncats
+                   pp<-IV2$proportions
+                   if (is.character(pp))
+                     pp<-as.numeric(unlist(strsplit(IV2$proportions,",")))
+                   if (length(pp)<ng) {pp<-c(pp,rep(pp[length(pp)],ng-length(pp)))}
+                   proportions<-c(0,pp)
+                   breaks<-qnorm(cumsum(proportions)/sum(proportions))
+                   vals=iv2r*0
+                   for (i in 1:IV2$ncats) {vals=vals+(iv2r>breaks[i])}
+                   iv2r<-(vals-(IV2$ncats+1)/2)/std((1:IV2$ncats),1)
+                 }
+               }
+        )
       }
       
       # do within design
@@ -686,11 +687,11 @@ makeSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=FA
       xp<-xplot
       for (i in 1:IV$ncats) {
         use1=(xp==i)
-        if (sum(use1)>1) {
+        if (sum(use1,na.rm=TRUE)>1) {
         if (DV$type=="Interval"){
           mn1=mean(dv[use1])
           sd1=sd(dv[use1])
-          xplot[use1]<-i+rnorm(length(xplot[use1]),mean=0,sd=exp(-0.5*((dv[use1]-mn1)/sd1)^2))*0.15*2*sum(use1)/length(xp)
+          xplot[use1]<-i+rnorm(length(xplot[use1]),mean=0,sd=exp(-0.5*((dv[use1]-mn1)/sd1)^2))*0.15*2*sum(use1,na.rm=TRUE)/length(xp)
         } else {
           xplot[use1]<-i+rnorm(length(xplot[use1]))*mean(use1)*0.3
         }
@@ -709,11 +710,11 @@ makeSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=FA
         xp2<-x2plot
         for (i in 1:IV2$ncats) {
           use1=(xp2==i)
-          if (sum(use1)>1) {
+          if (sum(use1,na.rm=TRUE)>1) {
           if (DV$type=="Interval"){
             mn1=mean(dv[use1])
             sd1=sd(dv[use1])
-            x2plot[use1]<-i+rnorm(length(x2plot[use1]),mean=0,sd=exp(-0.5*((dv[use1]-mn1)/sd1)^2))*0.15*2*sum(use1)/length(x2plot)
+            x2plot[use1]<-i+rnorm(length(x2plot[use1]),mean=0,sd=exp(-0.5*((dv[use1]-mn1)/sd1)^2))*0.15*2*sum(use1,na.rm=TRUE)/length(x2plot)
           } else {
             x2plot[use1]<-i+rnorm(length(x2plot[use1]))*mean(use1)*0.3
           }
@@ -739,7 +740,7 @@ makeSample<-function(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=FA
         if (IV$type=="Interval"){
           mn1<-mean(iv[use1])
           sd1<-sd(iv[use1])
-          jitter<-rnorm(length(yplot[use1]),mean=0,sd=exp(-0.5*((iv[use1]-mn1)/sd1)^2))*0.15*2*sum(use1)/length(yplot)
+          jitter<-rnorm(length(yplot[use1]),mean=0,sd=exp(-0.5*((iv[use1]-mn1)/sd1)^2))*0.15*2*sum(use1,na.rm=TRUE)/length(yplot)
           yplot[use1]<-i+jitter
         } else{
           jitter<-rnorm(length(yplot[use1]),0,1)*mean(use1)*0.3
