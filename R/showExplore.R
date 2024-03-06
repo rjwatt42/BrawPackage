@@ -495,7 +495,7 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",ylog=FALSE,
       if (sum(r<n80$minimum)<2) label<-paste("Unsafe result - decrease range")
       if (sum(r>n80$minimum)<2) label<-paste("Unsafe result - increase range")
     }
-    lpts<-data.frame(x=0,y=0.8+(ni_max2-1)/10)
+    lpts<-data.frame(x=0,y=0.8)
     g<-g+dataLabel(data=lpts,label = label)
   }
   

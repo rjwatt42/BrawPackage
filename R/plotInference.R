@@ -6,7 +6,6 @@ trimanalysis<-function(analysis) {
   analysis$rIV=analysis$rIV[use]
   analysis$pIV=analysis$pIV[use]
   analysis$rpIV=analysis$rpIV[use]
-  analysis$raIV=analysis$raIV[use]
   analysis$roIV=analysis$roIV[use]
   analysis$poIV=analysis$poIV[use]
   analysis$nval=analysis$nval[use]
@@ -38,7 +37,6 @@ plotInference<-function(analysis,otheranalysis=NULL,disp="r",orientation="vert",
           "r"= {g<-r_plot(analysis,disp,orientation=orientation,effectType=effectType,showTheory=showTheory,g=g)},
           "rp"={g<-r_plot(analysis,disp,orientation=orientation,effectType=effectType,showTheory=showTheory,g=g)},
           "ro"={g<-r_plot(analysis,disp,orientation=orientation,effectType=effectType,showTheory=showTheory,g=g)},
-          "ra"= {g<-r_plot(analysis,disp,orientation=orientation,effectType=effectType,showTheory=showTheory,g=g)},
           "ci1"={g<-r_plot(analysis,disp,orientation=orientation,effectType=effectType,showTheory=showTheory,g=g)},
           "ci2"={g<-r_plot(analysis,disp,orientation=orientation,effectType=effectType,showTheory=showTheory,g=g)},
 

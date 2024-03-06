@@ -107,7 +107,6 @@ sampleShortCut<-function(hypothesis,design,evidence,nsims,appendData,oldanalysis
     analysis<-list(rIV=rbind(matrix(r_effects[1:nsims],ncol=1),oldanalysis$rIV),
                    pIV=rbind(matrix(p_effects[1:nsims],ncol=1),oldanalysis$pIV),
                    rpIV=rbind(matrix(r_effects[1:nsims],ncol=1),oldanalysis$rpIV),
-                   raIV=rbind(matrix(ra_effects[1:nsims],ncol=1),oldanalysis$raIV),
                    nval=rbind(matrix(n_effects[1:nsims],ncol=1),oldanalysis$nval),
                    df1=rbind(matrix(rep(df1,nsims),ncol=1),oldanalysis$df1),
                    dv=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$dv)
@@ -117,7 +116,6 @@ sampleShortCut<-function(hypothesis,design,evidence,nsims,appendData,oldanalysis
   analysis<-list(rIV=matrix(r_effects[1:nsims],ncol=1),
                  pIV=matrix(p_effects[1:nsims],ncol=1),
                  rpIV=matrix(rp_effects[1:nsims],ncol=1),
-                 raIV=matrix(ra_effects[1:nsims],ncol=1),
                  nval=matrix(n_effects[1:nsims],ncol=1),
                  df1=matrix(rep(df1,nsims),ncol=1),
                  dv=rep(0,nsims)

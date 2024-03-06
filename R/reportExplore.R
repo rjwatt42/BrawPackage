@@ -34,7 +34,6 @@ reportExplore<-function(exploreResult,showType="r",
 
   if (is.null(hypothesis$IV2)){
     rVals<-exploreResult$result$rval
-    raVals<-exploreResult$result$raval
     pVals<-exploreResult$result$pval
   } else {
     if (effectType=="all") {effectType<-"direct"}
@@ -63,10 +62,6 @@ reportExplore<-function(exploreResult,showType="r",
   switch (showType,
           "r"={
             showVals<-rVals
-            if (braw.env$RZ=="z") showVals<-atanh(showVals)
-          },
-          "rA"={
-            showVals<-raVals
             if (braw.env$RZ=="z") showVals<-atanh(showVals)
           },
           "p"={
@@ -265,7 +260,7 @@ reportExplore<-function(exploreResult,showType="r",
           
   )
 
-  if (is.element(showType,c("r","rA","p","w","n","log(lrs)","log(lrd)","k","pNull","S"))) {
+  if (is.element(showType,c("r","p","w","n","log(lrs)","log(lrd)","k","pNull","S"))) {
     y75<-c()
     y50<-c()
     y25<-c()
@@ -320,7 +315,7 @@ reportExplore<-function(exploreResult,showType="r",
     outputText<-c(outputText,brawFormat(y75[use[i]],digits=braw.env$report_precision))
   }
   
-  if (is.element(showType,c("r","rA","p","w","n","log(lrs)","log(lrd)","k","pNull","S"))) {
+  if (is.element(showType,c("r","p","w","n","log(lrs)","log(lrd)","k","pNull","S"))) {
     outputText<-c(outputText,rep(" ",nc+1))
     outputText<-c(outputText,"!jmean")
     for (i in 1:nc) {

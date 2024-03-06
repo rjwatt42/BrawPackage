@@ -1,3 +1,12 @@
+test2effectsize<-function(tname,tval,df1,df2) {
+  switch(tname,
+         "r"=return(tval),
+         "t"=return(tval/(sqrt(tval^2+df2))),
+         "F"=return(sqrt(tval*df1/(tval*df1+df2))),
+         "chi2"=return(sqrt(tval/df2))
+  )
+}
+
 
 check_r<-function(r,from=" ") {
   if (!is.numeric(r)) {
@@ -837,6 +846,7 @@ makeAnalysis<-function(sample=makeSample(),evidence=makeEvidence(),autoShow=FALS
   analysis$test_name<-t_name
   analysis$df<-df
   analysis$test_val<-tval
+  analysis$rCalc<-test2effectsize(t_name,tval,analysis$df1,analysis$df2)
   
   analysis$hypothesis<-hypothesis
   analysis$design<-design

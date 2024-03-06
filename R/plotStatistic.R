@@ -10,10 +10,8 @@ collectData<-function(analysis,effectType) {
   
   if (all(is.na(analysis$rIV2))){
     rs<-cbind(analysis$rIV[use])
-    ra<-cbind(analysis$raIV[use])
     ps<-cbind(analysis$pIV[use])
   } else {
-    ra<-cbind(analysis$raIV[use])
     switch (effectType,
             "direct"={
               rs<-rbind(analysis$r$direct[use,])
@@ -47,7 +45,7 @@ collectData<-function(analysis,effectType) {
     ps[ps<braw.env$min_p]<-braw.env$min_p
     po[po<braw.env$min_p]<-braw.env$min_p
   }
-  out<-list(rs=rs,ps=ps,ns=ns,df1=df1,rp=rp,ra=ra,ro=ro,po=po)
+  out<-list(rs=rs,ps=ps,ns=ns,df1=df1,rp=rp,ro=ro,po=po)
 }
 
 makeFiddle<-function(y,yd,orientation){
@@ -480,7 +478,6 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
     }
     switch (showType,
             "r"={showVals<-data$rs},
-            "ra"={showVals<-data$ra},
             "rp"={showVals<-data$rp},
             "ro"={showVals<-data$ro},
             "p"={showVals<-data$ps},
@@ -543,7 +540,7 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
       } 
       
       xdsig<-NULL
-      if (is.element(showType,c("r","ra","ro","ci1","ci2"))) {
+      if (is.element(showType,c("r","ro","ci1","ci2"))) {
         npt<-101
         if (braw.env$RZ=="z") {
           zvals<-seq(-1,1,length.out=npt*2)*braw.env$z_range*2

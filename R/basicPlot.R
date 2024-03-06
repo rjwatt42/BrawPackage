@@ -241,9 +241,9 @@ dataText<-function(data,label, hjust=0, vjust=0, colour="black") {
   )
   
 }
-dataLine<-function(data,arrow=NULL,colour="black",linewidth=0.25) {
+dataLine<-function(data,arrow=NULL,colour="black",linetype="solid",linewidth=0.25) {
   data<-reRangeXY(data)
-  geom_path(data=data,aes(x=x,y=y),arrow=arrow,colour=colour,linewidth=linewidth)
+  geom_path(data=data,aes(x=x,y=y),arrow=arrow,colour=colour,linetype=linetype,linewidth=linewidth)
 }
 dataPath<-function(data,arrow=NULL,colour,linewidth) {
   data<-reRangeXY(data)

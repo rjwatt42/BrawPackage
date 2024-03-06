@@ -82,14 +82,12 @@ reportExpected<-function(expectedResult=makeExpected(100),showType="Basic"){
         switch(par1,
                "r"={par1="z"},
                "rp"={par1="zp"},
-               "ra"={par1="za"},
                "ro"={par1="zo"},
                {par1=par1}
         )
         switch(par2,
                "r"={par2="z"},
                "rp"={par2="zp"},
-               "ra"={par2="za"},
                "ro"={par2="zo"},
                {par2=par2}
         )
@@ -200,10 +198,6 @@ reportExpected<-function(expectedResult=makeExpected(100),showType="Basic"){
                   a<-result$rpIV
                   if (braw.env$RZ=="z") a<-atanh(a)
                 },
-                "ra"={
-                  a<-result$raIV
-                  if (braw.env$RZ=="z") a<-atanh(a)
-                },
                 "ro"={
                   a<-result$roIV
                   if (braw.env$RZ=="z") a<-atanh(a)
@@ -223,10 +217,6 @@ reportExpected<-function(expectedResult=makeExpected(100),showType="Basic"){
                 },
                 "p"={b<-p},
                 "rp"={
-                  b<-result$rpIV
-                  if (braw.env$RZ=="z") b<-atanh(b)
-                },
-                "ra"={
                   b<-result$rpIV
                   if (braw.env$RZ=="z") b<-atanh(b)
                 },

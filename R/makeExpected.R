@@ -6,7 +6,6 @@ mergeExpected<-function(r1,r2) {
     rIV=rbind(r1$rIV,r2$rIV),
     pIV=rbind(r1$pIV,r2$pIV),
     rpIV=rbind(r1$rpIV,r2$rpIV),
-    raIV=rbind(r1$raIV,r2$raIV),
     roIV=rbind(r1$roIV,r2$roIV),
     poIV=rbind(r1$poIV,r2$poIV),
     nval=rbind(r1$nval,r2$nval),
@@ -41,7 +40,7 @@ resetExpected<-function(nsims=0,expectedResult=NULL){
     bm<-NULL
   }
   newResult<-list(
-    rIV=b,pIV=b,rpIV=b,raIV=b,roIV=b,poIV=b,nval=b,df1=b
+    rIV=b,pIV=b,rpIV=b,roIV=b,poIV=b,nval=b,df1=b
   )
   newResult<-c(newResult,list(
     rIV2=b,pIV2=b,rIVIV2DV=b,pIVIV2DV=b,
