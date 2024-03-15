@@ -86,7 +86,7 @@ BrawOpts<-function(BW=FALSE,fontScale=1) {
           #########################
           # display choices
           
-          braw.env$report_precision<-3
+          braw.env$report_precision<-2
           braw.env$graph_precision<-2
           
           braw.env$RZ<-"r"
@@ -137,10 +137,10 @@ BrawOpts<-function(BW=FALSE,fontScale=1) {
           # notation for world
           #
           
-          useLabels<-list(psig="psig",UD="D",P="0")
+          useLabels<-list(hypLabel="H",psig="psig",UD="D",P="0")
           
           Pchar<-"P"
-          Zchar<-"Z"
+          Zchar<-useLabels$hypLabel
           Lchar<-'\u03BB'
           
           switch(useLabels$psig,

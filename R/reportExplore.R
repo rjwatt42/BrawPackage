@@ -332,7 +332,7 @@ reportExplore<-function(exploreResult,showType="r",
            "NHST"={extra_y_label<-"Type I errors"},
            "FDR;FMR"={extra_y_label<-"FDR"}
     )
-    if (is.null(IV2)){
+    if (is.null(hypothesis$IV2)){
       rVals<-exploreResult$nullresult$rIVs
       pVals<-exploreResult$nullresult$pIVs
     } else {

@@ -264,8 +264,6 @@ get_pRho<-function(world,by="r",viewRZ="r") {
     )
     switch (viewRZ,
             "r" ={
-              pRho<-tanh(pRho)
-              pRhogain<-zdens2rdens(pRhogain,pRho)
             },
             "z" ={
               pRho<-atanh(pRho)

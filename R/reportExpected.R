@@ -15,6 +15,12 @@ reportExpected<-function(expectedResult=makeExpected(100),showType="Basic"){
   result<-expectedResult$result
   nullresult<-expectedResult$nullresult
   
+  if (effect$world$worldOn) {
+    r<-getNulls(result)
+    result<-r$analysis
+    nullresult<-r$nullanalysis
+  }
+  
   if (length(showType)==1) {
     switch(showType,
            "Basic"=     {pars<-c("r","p")},
@@ -71,8 +77,9 @@ reportExpected<-function(expectedResult=makeExpected(100),showType="Basic"){
   }
 
   # column labels
-  if (is.element(showType,c("NHST","FDR","FMR"))) {outputText1<-c("!j\bErrors:","\bI","\bII"," ")}
-  else {
+  if (is.element(showType,c("NHST","FDR","FMR"))) {
+    outputText1<-c("!j\bErrors:","\bI","\bII"," ")
+    } else {
     if (showType=="CILimits") {outputText1<-c("   ","lower","upper")}
     else {
       outputText1<-

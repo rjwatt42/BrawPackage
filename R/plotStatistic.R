@@ -41,10 +41,10 @@ collectData<-function(analysis,effectType) {
             }
     )
   }
-  if (braw.env$truncate_p) {
-    ps[ps<braw.env$min_p]<-braw.env$min_p
-    po[po<braw.env$min_p]<-braw.env$min_p
-  }
+  # if (braw.env$truncate_p) {
+  #   ps[ps<braw.env$min_p]<-braw.env$min_p
+  #   po[po<braw.env$min_p]<-braw.env$min_p
+  # }
   out<-list(rs=rs,ps=ps,ns=ns,df1=df1,rp=rp,ro=ro,po=po)
 }
 
@@ -175,7 +175,7 @@ getBins<-function(vals,nsvals,target,minVal,maxVal,fixed=FALSE) {
   return(bins)
 }
 
-expected_hist<-function(vals,svals,valType,histGain,histGainrange){
+expected_hist<-function(vals,svals,valType,ylim,histGain,histGainrange){
   
   if (is.null(valType)) valType<-"r"
   if (is.element(valType,c("ro","ci1","ci2"))) valType<-"r"
@@ -191,7 +191,7 @@ expected_hist<-function(vals,svals,valType,histGain,histGainrange){
           "p"=  { # ns is large
             if (braw.env$pPlotScale=="log10") {
               target<-log10(braw.env$alphaSig)
-              bins<-getBins(vals,svals,target,log10(braw.env$min_p),log10(1))
+              bins<-getBins(vals,svals,target,ylim[1],log10(1))
             } else {
               target<-braw.env$alphaSig
               bins<-getBins(vals,svals,target,0,1)
@@ -269,7 +269,7 @@ expected_hist<-function(vals,svals,valType,histGain,histGainrange){
 }
 
 expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
-                        i=1,scale=1,col="white",orientation="vert",histGain=NA,histGainrange=NA){
+                        i=1,scale=1,col="white",orientation="vert",ylim,histGain=NA,histGainrange=NA){
   dotSize<-(braw.env$plotTheme$axis.title$size)/3*scale
   se_arrow<-0.3
   se_size<-0.75
@@ -359,9 +359,9 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
     
   } else { # more than 50 points
     if (is.logical(pts$y2)) {
-      hist1<-expected_hist(pts$y1,pts$y1[pts$y2],showType,histGain,histGainrange)
+      hist1<-expected_hist(pts$y1,pts$y1[pts$y2],showType,ylim,histGain,histGainrange)
     } else {
-      hist1<-expected_hist(pts$y1,pts$y2,showType,histGain,histGainrange)
+      hist1<-expected_hist(pts$y1,pts$y2,showType,ylim,histGain,histGainrange)
     }
     xoff<-pts$x[1]
     if (orientation=="vert") {
@@ -375,7 +375,7 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
     if (!is.null(showType))
       if (is.element(showType,c("e1d","e2d"))) {
         if (is.logical(pts$y3)) {
-          hist1<-expected_hist(pts$y1,pts$y1[pts$y3],showType)
+          hist1<-expected_hist(pts$y1,pts$y1[pts$y3],showType,ylim)
         }
         g<-g+
           dataPolygon(data=data.frame(y=hist1$x,x=hist1$y2+xoff),colour=NA, fill = c3,alpha=simAlpha)
@@ -459,6 +459,9 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
   ylines<-yaxis$lines
   ybreaks<-NULL
   
+  if (showType=="p" && braw.env$pPlotScale) 
+    while (mean(log10(analysis$pIV)>ylim[1])<0.75) ylim[1]<-ylim[1]-1
+  
   ylim[2]<-ylim[2]+diff(ylim)/16
   
   if (is.null(hypothesis$IV2)) box<-"y" else box<-"both"
@@ -510,7 +513,7 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
     effectTheory$world$populationPDFk<-effect$rIV
     effectTheory$world$populationNullp<-0
   }
-  
+
   if (!all(is.na(analysis$rIV))) { theoryAlpha<-0.5} else {theoryAlpha<-1}
   
   for (i in 1:length(xoff)){
@@ -523,7 +526,7 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
       if (is.element(showType,c("p","e1","e2","po"))) {
         npt<-201
         if (logScale) {
-          yv<-seq(0,log10(braw.env$min_p),length.out=npt)
+          yv<-seq(0,ylim[1],length.out=npt)
           yvUse<-10^yv
         }else{
           yv<-seq(1,0,length.out=npt)
@@ -681,7 +684,7 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
       #   pts1$y1<-atanh(pts1$y1)
       # }
       g<-expected_plot(g,pts,showType,analysis,IV,DV,i,orientation=orientation,
-                       histGain=histGain,histGainrange=histGainrange)
+                       ylim=ylim,histGain=histGain,histGainrange=histGainrange)
       
       lineCol<-"black"
       if (is.element(showType,c("p","e1","e2","e1d","e2d"))) lineCol<-"green"

@@ -22,6 +22,7 @@ getNulls<-function(analysis,useSig=FALSE,useNSig=FALSE) {
     nullanalysis$pIV<-analysis$pIV[nulls]
     nullanalysis$rpIV<-analysis$rpIV[nulls]
     nullanalysis$roIV<-analysis$roIV[nulls]
+    nullanalysis$poIV<-analysis$poIV[nulls]
     nullanalysis$nval<-analysis$nval[nulls]
     nullanalysis$df1<-analysis$df1[nulls]
     
@@ -29,6 +30,7 @@ getNulls<-function(analysis,useSig=FALSE,useNSig=FALSE) {
     analysis$pIV<-analysis$pIV[nonnulls]
     analysis$rpIV<-analysis$rpIV[nonnulls]
     analysis$roIV<-analysis$roIV[nonnulls]
+    analysis$poIV<-analysis$poIV[nonnulls]
     analysis$nval<-analysis$nval[nonnulls]
     analysis$df1<-analysis$df1[nonnulls]
     

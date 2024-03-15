@@ -245,7 +245,7 @@ dataLine<-function(data,arrow=NULL,colour="black",linetype="solid",linewidth=0.2
   data<-reRangeXY(data)
   geom_path(data=data,aes(x=x,y=y),arrow=arrow,colour=colour,linetype=linetype,linewidth=linewidth)
 }
-dataPath<-function(data,arrow=NULL,colour,linewidth) {
+dataPath<-function(data,arrow=NULL,colour="black",linetype="solid",linewidth=0.25) {
   data<-reRangeXY(data)
   geom_path(data=data,aes(x=x,y=y),arrow=arrow,colour=colour,linewidth=linewidth)
 }
@@ -257,7 +257,7 @@ dataPoint<-function(data,shape=21,colour="black",fill="white",alpha=1,size=3) {
     geom_point(data=data,aes(x=x,y=y,fill=fill),shape=shape,colour=colour,alpha=alpha,size=size)
   }
 }
-dataBar<-function(data,colour="black",fill="white",alpha=1,barwidth) {
+dataBar<-function(data,colour="black",fill="white",alpha=1,barwidth=0.85) {
   bar<-data.frame(x=c(-1,1,1,-1)*barwidth/length(data$x),
                   y=c(0,0,1,1)
   )
@@ -280,7 +280,7 @@ dataPolygon<-function(data,colour="black",fill="white",alpha=1) {
     }
   }
 }
-dataErrorBar<-function(data,colour,linewidth=0.25) {
+dataErrorBar<-function(data,colour="black",linewidth=0.25) {
   data1<-reRangeXY(data.frame(x=data$x,y=data$ymin))
   data2<-reRangeXY(data.frame(x=data$x,y=data$ymax))
   width<-diff(braw.env$plotLimits$xlim)/100

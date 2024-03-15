@@ -95,6 +95,9 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",ylog=FALSE,
   ylines<-yaxis$lines
   ySecond<-NULL
 
+  if (showType=="p" && braw.env$pPlotScale=="log10") 
+    while (mean(log10(exploreResult$result$pval)>ylim[1])<0.75) ylim[1]<-ylim[1]-1
+  
   if (!is.null(hypothesis$IV2) && whichEffect=="All") {
     plots<-c(0,0.33,0.65)
     plotWidth<-0.35
@@ -284,7 +287,7 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",ylog=FALSE,
     y62[y62<ylim[1]]<-ylim[1]
     y38[y38<ylim[1]]<-ylim[1]
     y25[y25<ylim[1]]<-ylim[1]
-    y50[y50<ylim[1]]<-NA
+    y50[y50<ylim[1]]<-ylim[1]
     
     pts1<-data.frame(vals=vals,y25=y25,y38=y38,y50=y50,y62=y62,y75=y75)
     
@@ -305,7 +308,7 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",ylog=FALSE,
       for (i in 1:length(vals))
         g<-expected_plot(g,
                          data.frame(x=vals[i],y1=showVals[,i],y2=sigVals[,i]),
-                         showType=showType,scale=2.25/(length(vals)+1),col=col)
+                         showType=showType,ylim=ylim,scale=2.25/(length(vals)+1),col=col)
       }
       g<-g+dataPoint(data=pts0f,fill=col)
       g<-g+dataErrorBar(pts1f)

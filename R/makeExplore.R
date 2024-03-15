@@ -118,7 +118,7 @@ makeExplore<-function(nsims=10,exploreResult=NULL,exploreType="n",exploreNPoints
   return(exploreResult)
 }
 
-runExplore <- function(nsims,exploreResult=NULL,doingNull=FALSE,
+runExplore <- function(nsims,exploreResult,doingNull=FALSE,
                        autoShow=FALSE,showType="r"){
   
   explore<-exploreResult$explore
@@ -130,9 +130,6 @@ runExplore <- function(nsims,exploreResult=NULL,doingNull=FALSE,
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV
   effect<-hypothesis$effect
-  
-  oldAlpha<-braw.env$alphaSig
-  on.exit(braw.env$alphaSig<-oldAlpha)
   
   if (hypothesis$effect$world$worldOn && hypothesis$effect$world$populationNullp>0) 
     doingNull<-FALSE
@@ -557,7 +554,7 @@ runExplore <- function(nsims,exploreResult=NULL,doingNull=FALSE,
                   design$sNRandK<-vals[vi]
                 },
                 "Alpha"={
-                  braw.env$alphaSig<-vals[vi]
+                  evidence$alphaSig<-vals[vi]
                 },
                 "Dependence"={design$sDependence<-vals[vi]},
                 "Outliers"={design$sOutliers<-vals[vi]},
