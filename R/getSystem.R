@@ -15,6 +15,13 @@ getHypothesis<-function(name,hypothesis=makeHypothesis()) {
                                          populationPDFk=0.3,
                                          populationNullp=0.74)
          },
+         "PsychF"={
+           hypothesis$effect$world<-list(worldOn=TRUE,
+                                         populationPDF="Exp",
+                                         populationRZ="z",
+                                         populationPDFk=0.3,
+                                         populationNullp=0.0)
+         },
          "3"={
            hypothesis$IV2<-makeVariable("IV2")
          },

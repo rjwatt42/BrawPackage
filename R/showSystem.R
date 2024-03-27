@@ -77,7 +77,7 @@ showWorld<-function(hypothesis=makeHypothesis(effect=makeEffect(world=makeWorld(
     rx<-seq(-1,1,length.out=braw.env$worldNPoints)*range
   # }
 
-  rdens<-fullRPopulationDist(rx,world)
+  rdens<-rPopulationDist(rx,world)
 
   if (braw.env$RZ=="z") {
     rdens<-rdens2zdens(rdens,rx)

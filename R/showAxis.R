@@ -1,4 +1,4 @@
-showAxis<-function(showType,effect,logScale=FALSE) {
+showAxis<-function(showType,effect) {
   
 switch(braw.env$RZ,
        "r"={
@@ -120,7 +120,7 @@ switch(braw.env$RZ,
                         braw.env$plotColours$infer_nsigC,
                         braw.env$plotColours$infer_sigNull,
                         braw.env$plotColours$infer_nsigNull)
-  
+            
             },
           "FMR"={
             ylim<-c(0,1)
@@ -146,7 +146,7 @@ switch(braw.env$RZ,
   )
   
   logScale<-FALSE
-  if (is.element(showType,c("w","wp","wn")) && braw.env$wPlotScale=="log10"){
+  if (is.element(showType,c("w","wp")) && braw.env$wPlotScale=="log10"){
     ylim<-log10(ylim)
     if (!is.null(lines))
       lines<-log10(lines)
