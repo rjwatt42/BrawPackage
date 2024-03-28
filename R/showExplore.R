@@ -566,7 +566,8 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
           if (!is.null(pts3) && !is.null(col3)) g<-g+dataPoint(data=pts3,fill=col3)
           if (!is.null(pts4) && !is.null(col4)) g<-g+dataPoint(data=pts4,fill=col4)
           if (!is.null(pts5) && !is.null(col5)) g<-g+dataPoint(data=pts5,fill=col5)
-        }        else            
+          g<-g+dataPoint(nonNullsLine,fill="black",size=1)
+        }        else  {          
         if (doLine) {
           #   errors
           if (!is.null(pts0) && !is.null(col0)) g<-g+dataPolygon(data=pts0,fill=col0,colour=NA)
@@ -595,10 +596,9 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
             if (!is.null(pts5) && !is.null(col5)) g<-g+drawNHSTBar(i,npts,pts5,bwidth,col5)
           }
         }
-        
-        if (showType=="NHST") {
           g<-g+dataLine(nonNullsLine)
         }
+        
       }
       
       # find n80
@@ -670,6 +670,7 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
       g<-g+horzLine(yl,linetype="dotted",colour=lineCol)
     }
   }
+  if (exploreResult$count>0)
   g<-g+plotTitle(paste0("Explore: ",format(exploreResult$count)),"right")
   g
 }
