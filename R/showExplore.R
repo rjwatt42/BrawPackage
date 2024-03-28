@@ -217,17 +217,17 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
       if (is.element(showType,c("NHST","FDR","FMR"))) {
         Nullp<-hypothesis$effect$world$populationNullp
         hypothesis$effect$world$populationNullp<-0
-        theoryVals0<-c()
+        theoryVals1<-c()
         for (i in 1:length(newvals)) {
           hypothesis$effect$world$populationPDFk<-rVals[i]
           design$sN<-nVals[i]
           r<-fullPSig(hypothesis$effect$world,design)
-          theoryVals0<-c(theoryVals0,r)
+          theoryVals1<-c(theoryVals1,r)
         }
         switch(showType,
                "NHST"={
-                 theoryVals0<-1-theoryVals0*(1-Nullp)
-                 theoryVals1<-theoryVals0*0+braw.env$alphaSig*Nullp
+                 theoryVals1<-theoryVals1*(1-Nullp)
+                 theoryVals0<-theoryVals1*0+braw.env$alphaSig*Nullp
                  theoryVals2<-theoryVals0*0+Nullp
                },
                "FDR"={
@@ -243,9 +243,47 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
                  theoryVals2<-c()
                }
         )
-        if (showType=="FDR") {
-        }
         hypothesis$effect$world$populationNullp<-Nullp
+        
+        switch (braw.env$STMethod,
+                "NHST"={
+                  col1<-NULL
+                  col0<-braw.env$plotColours$infer_sigNonNull
+                  col4<-NULL
+                  },
+                "sLLR"={
+                  col1<-NULL
+                  col0<-braw.env$plotColours$infer_nsNonNull
+                  col4<-NULL
+                },
+                "dLLR"={
+                  col1<-braw.env$plotColours$infer_isigNonNull
+                  col0<-braw.env$plotColours$infer_nsdNonNull
+                  col4<-braw.env$plotColours$infer_isigNull
+                }
+        )
+        lb0<-braw.env$nonNullPositive
+        lb1<-braw.env$nonNullNegative
+        lb2<-braw.env$nonNullNS
+        lb3<-braw.env$nullNS
+        lb4<-braw.env$nullNegative
+        lb5<-braw.env$nullPositive
+
+        col2<-braw.env$plotColours$infer_miss
+        col3<-braw.env$plotColours$infer_miss
+        col5<-braw.env$plotColours$infer_sigNull
+        yn<-0.5
+        lb0xy<-data.frame(x=max(xlim),y=1-yn/10)
+        yn<-yn+1
+        lb1xy<-data.frame(x=max(xlim),y=1-yn/10)
+        yn<-yn+1
+        lb2xy<-data.frame(x=max(xlim),y=1-yn/10)
+        yn<-0.5
+        lb5xy<-data.frame(x=max(xlim),y=0+yn/10)
+        yn<-yn+1
+        lb4xy<-data.frame(x=max(xlim),y=0+yn/10)
+        yn<-yn+1
+        lb3xy<-data.frame(x=max(xlim),y=0+yn/10)
       }
       
       if (explore$xlog) newvals<-log10(newvals)
@@ -261,6 +299,20 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
         theory<-data.frame(x=newvals, y=theoryLower)
         g<-g+dataLine(theory,colour=darken(col,1,-0.15),linewidth=0.5)
       }
+      
+        if (!is.null(theoryVals1)) {
+          theory<-data.frame(x=c(newvals,rev(newvals)), y=1-c(theoryVals1,theoryVals1*0))
+          g<-g+dataPolygon(theory,colour=braw.env$plotColours$infer_sigNonNull,fill=braw.env$plotColours$infer_sigNonNull)
+        }
+        if (!is.null(theoryVals0)) {
+          theory<-data.frame(x=c(newvals,rev(newvals)), y=c(theoryVals0,theoryVals0*0))
+          g<-g+dataPolygon(theory,colour=braw.env$plotColours$infer_sigNull,fill=braw.env$plotColours$infer_sigNull)
+        }
+        if (!is.null(theoryVals2)) {
+          theory<-data.frame(x=newvals, y=theoryVals2)
+          g<-g+dataLine(theory,colour="black",linewidth=0.5)
+        }
+
     }
     
     if (!is.null(exploreResult$result)) {
@@ -449,106 +501,85 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
       } else {
         # now the NHST filled areas
         ytop<-1-sigNonNulls*0
-        yn<-0.5
-        
-        col0<-braw.env$plotColours$infer_isigNonNull
-        lb0<-braw.env$nonNullNegative
-        switch (braw.env$STMethod,
-                "NHST"={col1<-braw.env$plotColours$infer_sigNonNull},
-                "sLLR"={col1<-braw.env$plotColours$infer_nsNonNull},
-                "dLLR"={col1<-braw.env$plotColours$infer_nsdNonNull}
-        )
-        lb1<-braw.env$nonNullNS
-        # col2<-braw.env$plotColours$infer_nsNonNull
-        col2<-braw.env$plotColours$infer_miss
-        lb2<-braw.env$nonNullPositive
-        col3<-braw.env$plotColours$infer_isigNull
-        lb3<-braw.env$nullNegative
-        # switch (braw.env$STMethod,
-        #         "NHST"={col4<-braw.env$plotColours$infer_nsigNull},
-        #         "sLLR"={col4<-braw.env$plotColours$infer_nsigNull},
-        #         "dLLR"={col4<-braw.env$plotColours$infer_nsdNull}
-        #         )
-        col4<-braw.env$plotColours$infer_miss
-        lb4<-braw.env$nullNS
-        col5<-braw.env$plotColours$infer_sigNull
-        lb5<-braw.env$nullPositive
+
+        # true hits
+        if (any(sigNonNulls!=0)) {
+          ybottom<-ytop-sigNonNulls
+          ybottom[ybottom<0]<-0
+          if (showTheory) pts0<-data.frame(x=vals,y=ybottom)
+          else            pts0<-data.frame(x=c(vals,rev(vals)),y=c(ybottom,rev(ytop)))
+          ytop<-ybottom
+        } else {pts0<-NULL}
         
         # error Z+
         if (any(isigNonNulls!=0)) {
           ybottom<-ytop-isigNonNulls
           ybottom[ybottom<0]<-0
-          pts0<-data.frame(x=c(vals,rev(vals)),y=c(ybottom,rev(ytop)))
-          lb0xy<-data.frame(x=max(xlim),y=1-yn/10)
-          yn<-yn+1
-          ytop<-ybottom
-        } else {pts0<-NULL}
-        
-        # false misses
-        if (any(sigNonNulls!=0)) {
-          ybottom<-ytop-sigNonNulls
-          ybottom[ybottom<0]<-0
-          pts1<-data.frame(x=c(vals,rev(vals)),y=c(ybottom,rev(ytop)))
-          lb1xy<-data.frame(x=max(xlim),y=1-yn/10)
-          yn<-yn+1
+          if (showTheory) pts1<-data.frame(x=vals,y=ybottom)
+          else            pts1<-data.frame(x=c(vals,rev(vals)),y=c(ybottom,rev(ytop)))
           ytop<-ybottom
         } else {pts1<-NULL}
         
-        # true hits
+        # false misses
         if (any(nsigNonNulls!=0)) {
           ybottom<-ytop-nsigNonNulls
           ybottom[ybottom<0]<-0
-          pts2<-data.frame(x=c(vals,rev(vals)),y=c(ybottom,rev(ytop)))
-          lb2xy<-data.frame(x=max(xlim),y=1-yn/10)
-          yn<-yn+1
+          if (showTheory) pts2<-data.frame(x=vals,y=ybottom)
+          else            pts2<-data.frame(x=c(vals,rev(vals)),y=c(ybottom,rev(ytop)))
           ytop<-ybottom
         } else {pts2<-NULL}
         nonNullsLine<-data.frame(x=vals,y=ybottom)
         
         yn<-any(isigNulls!=0)+any(nsigNulls!=0)+any(sigNulls!=0)-0.5
-        # false hits
-        if (any(isigNulls!=0)) {
-          ybottom<-ytop-isigNulls
-          ybottom[ybottom<0]<-0
-          pts3<-data.frame(x=c(vals,rev(vals)),y=c(ybottom,rev(ytop)))
-          lb3xy<-data.frame(x=max(xlim),y=0+yn/10)
-          yn<-yn-1
-          ytop<-ybottom
-        } else {pts3<-NULL}
         
         # true misses
         if (any(nsigNulls!=0)) {
           ybottom<-ytop-nsigNulls
           ybottom[ybottom<0]<-0
-          pts4<-data.frame(x=c(vals,rev(vals)),y=c(ybottom,rev(ytop)))
-          lb4xy<-data.frame(x=max(xlim),y=0+yn/10)
-          yn<-yn-1
+          if (showTheory) pts3<-data.frame(x=vals,y=ytop)
+          else            pts3<-data.frame(x=c(vals,rev(vals)),y=c(ybottom,rev(ytop)))
+          ytop<-ybottom
+        } else {pts3<-NULL}
+        
+        # Z0
+        if (any(isigNulls!=0)) {
+          ybottom<-ytop-isigNulls
+          ybottom[ybottom<0]<-0
+          if (showTheory) pts4<-data.frame(x=vals,y=ytop)
+          else            pts4<-data.frame(x=c(vals,rev(vals)),y=c(ybottom,rev(ytop)))
           ytop<-ybottom
         } else {pts4<-NULL}
         
-        # error Z0
+        # false hits
         if (any(sigNulls!=0)) {
           ybottom<-ytop-sigNulls
           ybottom[ybottom<0]<-0
-          pts5<-data.frame(x=c(vals,rev(vals)),y=c(ybottom,rev(ytop)))
-          lb5xy<-data.frame(x=max(xlim),y=0+yn/10)
-          yn<-yn-1
+          if (showTheory) pts5<-data.frame(x=vals,y=ytop)
+          else            pts5<-data.frame(x=c(vals,rev(vals)),y=c(ybottom,rev(ytop)))
           ytop<-ybottom
         } else {pts5<-NULL}
         
+        if (showTheory) {
+          if (!is.null(pts0) && !is.null(col0)) g<-g+dataPoint(data=pts0,fill=col0)
+          if (!is.null(pts1) && !is.null(col1)) g<-g+dataPoint(data=pts1,fill=col1)
+          if (!is.null(pts2) && !is.null(col2)) g<-g+dataPoint(data=pts2,fill=col2)
+          if (!is.null(pts3) && !is.null(col3)) g<-g+dataPoint(data=pts3,fill=col3)
+          if (!is.null(pts4) && !is.null(col4)) g<-g+dataPoint(data=pts4,fill=col4)
+          if (!is.null(pts5) && !is.null(col5)) g<-g+dataPoint(data=pts5,fill=col5)
+        }        else            
         if (doLine) {
           #   errors
-          if (!is.null(pts0)) g<-g+dataPolygon(data=pts0,fill=col0,colour=NA)
-          if (!is.null(pts1)) g<-g+dataPolygon(data=pts1,fill=col1,colour=NA)
-          if (!is.null(pts2)) g<-g+dataPolygon(data=pts2,fill=col2,colour=NA)
-          if (!is.null(pts3)) g<-g+dataPolygon(data=pts3,fill=col3,colour=NA)
-          if (!is.null(pts4)) g<-g+dataPolygon(data=pts4,fill=col4,colour=NA)
-          if (!is.null(pts5)) g<-g+dataPolygon(data=pts5,fill=col5,colour=NA)
-          if (!is.null(pts1)) {
+          if (!is.null(pts0) && !is.null(col0)) g<-g+dataPolygon(data=pts0,fill=col0,colour=NA)
+          if (!is.null(pts1) && !is.null(col1)) g<-g+dataPolygon(data=pts1,fill=col1,colour=NA)
+          if (!is.null(pts2) && !is.null(col2)) g<-g+dataPolygon(data=pts2,fill=col2,colour=NA)
+          if (!is.null(pts3) && !is.null(col3)) g<-g+dataPolygon(data=pts3,fill=col3,colour=NA)
+          if (!is.null(pts4) && !is.null(col4)) g<-g+dataPolygon(data=pts4,fill=col4,colour=NA)
+          if (!is.null(pts5) && !is.null(col5)) g<-g+dataPolygon(data=pts5,fill=col5,colour=NA)
+          if (!is.null(pts1) && !is.null(col1)) {
             use<-1:(nrow(pts1)/2)
             g<-g+dataLine(data=pts1[use,],colour=col1)
           }
-          if (!is.null(pts5)) {
+          if (!is.null(pts5) && !is.null(col5)) {
             use<-1:(nrow(pts5)/2)
             g<-g+dataLine(data=pts5[nrow(pts5)/2+use,],colour=col5)
           }
@@ -556,29 +587,17 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
           npts<-length(vals)
           bwidth<-0.4*(pts1$x[2]-pts1$x[1])
           for (i in 1:npts) {
-            if (!is.null(pts0)) g<-g+drawNHSTBar(i,npts,pts0,bwidth,col0)
-            if (!is.null(pts1)) g<-g+drawNHSTBar(i,npts,pts1,bwidth,col1)
-            if (!is.null(pts2)) g<-g+drawNHSTBar(i,npts,pts2,bwidth,col2)
-            if (!is.null(pts3)) g<-g+drawNHSTBar(i,npts,pts3,bwidth,col3)
-            if (!is.null(pts4)) g<-g+drawNHSTBar(i,npts,pts4,bwidth,col4)
-            if (!is.null(pts5)) g<-g+drawNHSTBar(i,npts,pts5,bwidth,col5)
+            if (!is.null(pts0) && !is.null(col0)) g<-g+drawNHSTBar(i,npts,pts0,bwidth,col0)
+            if (!is.null(pts1) && !is.null(col1)) g<-g+drawNHSTBar(i,npts,pts1,bwidth,col1)
+            if (!is.null(pts2) && !is.null(col2)) g<-g+drawNHSTBar(i,npts,pts2,bwidth,col2)
+            if (!is.null(pts3) && !is.null(col3)) g<-g+drawNHSTBar(i,npts,pts3,bwidth,col3)
+            if (!is.null(pts4) && !is.null(col4)) g<-g+drawNHSTBar(i,npts,pts4,bwidth,col4)
+            if (!is.null(pts5) && !is.null(col5)) g<-g+drawNHSTBar(i,npts,pts5,bwidth,col5)
           }
         }
         
         if (showType=="NHST") {
           g<-g+dataLine(nonNullsLine)
-          # g<-g+horzLine(intercept=1)
-          # g<-g+horzLine(intercept=0)
-          
-          if (doLine) xoff<-0
-          else        xoff<-bwidth
-          
-          if (!is.null(pts0)) g<-g+drawNHSTLabel(lb0,lb0xy,xoff,col0)
-          if (!is.null(pts1)) g<-g+drawNHSTLabel(lb1,lb1xy,xoff,col1)
-          if (!is.null(pts2)) g<-g+drawNHSTLabel(lb2,lb2xy,xoff,col2)
-          if (!is.null(pts3)) g<-g+drawNHSTLabel(lb3,lb3xy,xoff,col3)
-          if (!is.null(pts4)) g<-g+drawNHSTLabel(lb4,lb4xy,xoff,col4)
-          if (!is.null(pts5)) g<-g+drawNHSTLabel(lb5,lb5xy,xoff,col5)
         }
       }
       
@@ -633,21 +652,18 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
       }
     }
     
-    if (is.element(showType,c("NHST"))) {
-      if (!is.null(theoryVals0)) {
-        theory<-data.frame(x=newvals, y=theoryVals0)
-        g<-g+dataLine(theory,colour="white",linewidth=0.25)
-      }
-      if (!is.null(theoryVals1)) {
-        theory<-data.frame(x=newvals, y=theoryVals1)
-        g<-g+dataLine(theory,colour="white",linewidth=0.25)
-      }
-      if (!is.null(theoryVals2)) {
-        theory<-data.frame(x=newvals, y=theoryVals2)
-        g<-g+dataLine(theory,colour="black",linewidth=0.5)
-      }
+    if (showType=="NHST") {
+      if (doLine) xoff<-0
+      else        xoff<-bwidth
+      
+      if (!is.null(col0)) g<-g+drawNHSTLabel(lb0,lb0xy,xoff,col0)
+      if (!is.null(col1)) g<-g+drawNHSTLabel(lb1,lb1xy,xoff,col1)
+      if (!is.null(col2)) g<-g+drawNHSTLabel(lb2,lb2xy,xoff,col2)
+      if (!is.null(col3)) g<-g+drawNHSTLabel(lb3,lb3xy,xoff,col3)
+      if (!is.null(col4)) g<-g+drawNHSTLabel(lb4,lb4xy,xoff,col4)
+      if (!is.null(col5)) g<-g+drawNHSTLabel(lb5,lb5xy,xoff,col5)
     }
-    
+
     lineCol<-"black"
     if (is.element(showType,c("p","e1","e2","e1d","e2d"))) lineCol<-"green"
     for (yl in ylines) {
