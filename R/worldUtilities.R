@@ -172,11 +172,11 @@ rPopulationDist<-function(rvals,world) {
             rdens[which.min(abs(tanh(k)+rvals))]<-1/2
           },
           "Uniform_r"={
-            rdens<-rvals*0+1
+            rdens<-rvals*0+0.5
           },
           "Uniform_z"={
             zvals<-atanh(rvals)
-            zdens<-zvals*0+1
+            zdens<-zvals*0+0.5
             rdens<-zdens2rdens(zdens,rvals)
           },
           "Exp_r"={
@@ -242,10 +242,10 @@ fullRSamplingDist<-function(vals,world,design,doStat="r",logScale=FALSE,sigOnly=
   rvals<-pR$pRho
   rdens<-pR$pRhogain
   if (length(rvals)>1) rdens<-rdens*diff(rvals[1:2])
-  if (world$worldOn && world$populationNullp>0) {
-    rvals<-c(rvals,0)
-    rdens<-c(rdens/sum(rdens)*(1-world$populationNullp),world$populationNullp)
-  }
+  if (!world$worldOn) world$populationNullp<-0
+  rvals<-c(rvals,0)
+  rdens<-c(rdens/sum(rdens)*(1-world$populationNullp),world$populationNullp)
+  
   # distribution of sample sizes
   ndist<-getNList(design,HQ=HQ)
   nvals<-ndist$nvals
@@ -330,21 +330,27 @@ fullRSamplingDist<-function(vals,world,design,doStat="r",logScale=FALSE,sigOnly=
 
   if (separate) {
     r<-sourceSampDens_r
+    rn<-nrow(r)
+    if (rn==2) 
+      return(list(vals=rvals[1:(rn-1)],dens=colSums(sourceSampDens_r,na.rm=TRUE),
+                  densPlus=rbind(r[1:(rn-1),]),densNull=r[rn,]))
+    else 
+      return(list(vals=rvals[1:(rn-1)],dens=colSums(sourceSampDens_r,na.rm=TRUE),
+                  densPlus=r[1:(rn-1),],densNull=r[rn,]))
   } else {
     r<-colSums(sourceSampDens_r,na.rm=TRUE)
-  }
-  
-  if (!is.null(quantiles)) {
-    r[is.na(r)]<-0
-    cs<-cumsum(r)
-    use<-!duplicated(cs)
-    if (sum(use)<2) {
-      print(use)
+    
+    if (!is.null(quantiles)) {
+      r[is.na(r)]<-0
+      cs<-cumsum(r)
+      use<-!duplicated(cs)
+      if (sum(use)<2) {
+        print(use)
+      }
+      vals<-vals+c(diff(vals),0)/2
+      return(approx(cs[use],vals[use],xout=quantiles)$y)
     }
-    vals<-vals+c(diff(vals),0)/2
-    return(approx(cs[use],vals[use],xout=quantiles)$y)
   }
-  else           
-    return(r)
+  return(r)
 }
 

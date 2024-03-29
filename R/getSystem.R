@@ -1,5 +1,32 @@
 #' make a specific hypothesis
 #' 
+#' @param name  "Psych","PsychF"
+#' @returns world object
+#' @examples
+#' world<-getWorld(name
+#' @export
+getWorld<-function(name) {
+  switch(name,
+         "Psych"={
+           world<-list(worldOn=TRUE,
+                       populationPDF="Exp",
+                       populationRZ="z",
+                       populationPDFk=0.3,
+                       populationNullp=0.74)
+         },
+         "PsychF"={
+           world<-list(worldOn=TRUE,
+                       populationPDF="Exp",
+                       populationRZ="z",
+                       populationPDFk=0.3,
+                       populationNullp=0.0)
+         }
+  )
+  return(world)
+}
+
+#' make a specific hypothesis
+#' 
 #' @param name  "Psych","3"
 #' @returns hypothesis object
 #' @examples
@@ -9,18 +36,10 @@ getHypothesis<-function(name,hypothesis=makeHypothesis()) {
   
   switch(name,
          "Psych"={
-           hypothesis$effect$world<-list(worldOn=TRUE,
-                                         populationPDF="Exp",
-                                         populationRZ="z",
-                                         populationPDFk=0.3,
-                                         populationNullp=0.74)
+           hypothesis$effect$world<-getWorld("Psych")
          },
          "PsychF"={
-           hypothesis$effect$world<-list(worldOn=TRUE,
-                                         populationPDF="Exp",
-                                         populationRZ="z",
-                                         populationPDFk=0.3,
-                                         populationNullp=0.0)
+           hypothesis$effect$world<-getWorld("PsychF")
          },
          "3"={
            hypothesis$IV2<-makeVariable("IV2")
