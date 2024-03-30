@@ -900,8 +900,8 @@ showPossible <- function(possible=makePossible(),possibleResult=NULL,
         lines(x=c(-1,-1,1,1)*0.02,y=c(0,1,1,0),col=addTransparency(colNullS,0.2),lwd=2)
       }
       
-    zpSample<-approx(rw,rw_dens,sRho[1])$y
-    lines(x=c(0,0)+sRho[1],y=c(0,zpSample),col="red", lwd=3)
+    # zpSample<-approx(rw,rw_dens,sRho[1])$y
+    # lines(x=c(0,0)+sRho[1],y=c(0,zpSample),col="red", lwd=3)
     }
     
     theoryAlpha=0.85
@@ -1038,7 +1038,7 @@ showPossible <- function(possible=makePossible(),possibleResult=NULL,
                   
                   if (possible$prior$worldOn && possible$prior$populationNullp>0) {
                     ln_at_sample<-approx(rs,priorSampDens_r_null,sRho[1])$y
-                    ld_at_sample<-approx(rs,priorSampDens_r_plus,sRho[1])$y
+                    ld_at_sample<-approx(rs,colMeans(priorSampDens_r_plus),sRho[1])$y
                     llrNull<-log(ln_at_sample/ld_at_sample)
                     text(xlim[1],1.15,labels=bquote(
                       bold(llr)(bolditalic(.(braw.env$RZ))["+"]/bolditalic(.(braw.env$RZ))[0])==bold(.(format(-llrNull,digits=3)))),
