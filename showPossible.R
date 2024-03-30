@@ -244,6 +244,7 @@ showPossible <- function(possible=makePossible(),possibleResult=NULL,
   sourceSampDens_r<-possibleResult$Theory$sourceSampDens_r
   sourceSampDens_r_null<-possibleResult$Theory$sourceSampDens_r_null
   sourceSampDens_r_plus<-possibleResult$Theory$sourceSampDens_r_plus
+  sourceSampDens_r_total<-sourceSampDens_r
   
   rp<-possibleResult$Theory$rp
   priorSampDens_r<-possibleResult$Theory$priorSampDens_r
@@ -336,11 +337,11 @@ showPossible <- function(possible=makePossible(),possibleResult=NULL,
 
   rpw_dens[rpw_dens>1 | is.na(rpw_dens)]<-1
   if (!(possible$type=="Populations" && possible$UsePrior=="none")) {
-    rsw_dens_plus<-rsw_dens_plus/max(rsw_dens_plus+rsw_dens_null,na.rm=TRUE)
-    rsw_dens_null<-rsw_dens_null/max(rsw_dens_plus+rsw_dens_null,na.rm=TRUE)
+    rsw_dens_plus<-rsw_dens_plus/max(rsw_dens,na.rm=TRUE)
+    rsw_dens_null<-rsw_dens_null/max(rsw_dens,na.rm=TRUE)
     }
   populationBackwall<-list(rpw=rpw,rpw_dens=rpw_dens,priorSampDens_r=priorSampDens_r,rp=rp)
-  sampleBackwall<-list(rsw=rsw,rsw_dens_plus=rsw_dens_plus,rsw_dens_null=rsw_dens_null,rs=rs)
+  sampleBackwall<-list(rsw=rsw,rsw_dens_plus=rsw_dens_plus,rsw_dens_null=rsw_dens_null)
   
   # graph frame
   switch (view,
@@ -891,14 +892,14 @@ showPossible <- function(possible=makePossible(),possibleResult=NULL,
     rect(u[1], u[3], u[2], u[4], col=braw.env$plotColours$graphBack, border=NA)
     lines(xlim,c(0,0),col="black")
     
-    if (show!="Power") {
-    # make the back wall
-    polygon(x=rwd,y=rwd_dens,col=addTransparency(col,0.2))
-    lines(x=rw,y=rw_dens,col=colDistS,lwd=2)
-    if (possible$type=="Populations" && possible$source$populationNullp>0) {
-      lines(x=c(-1,-1,1,1)*0.02,y=c(0,1,1,0),col=addTransparency(colNullS,0.2),lwd=2)
-    }
-    
+    if (possible$type=="Populations") {
+      # make the back wall
+      polygon(x=rwd,y=rwd_dens,col=addTransparency(col,0.2))
+      lines(x=rw,y=rw_dens,col=colDistS,lwd=2)
+      if (possible$source$populationNullp>0) {
+        lines(x=c(-1,-1,1,1)*0.02,y=c(0,1,1,0),col=addTransparency(colNullS,0.2),lwd=2)
+      }
+      
     zpSample<-approx(rw,rw_dens,sRho[1])$y
     lines(x=c(0,0)+sRho[1],y=c(0,zpSample),col="red", lwd=3)
     }
@@ -935,13 +936,13 @@ showPossible <- function(possible=makePossible(),possibleResult=NULL,
                 if (!all(is.na(sourceSampDens_r_total))){
                   # main distributions
                   # total
-                  polygon (x = rs[c(1,1:length(rs),length(rs))], y = c(0,sourceSampDens_r_total,0), col = addTransparency(colS,theoryAlpha), lwd=1)
-                  # null
+                  polygon (x = rs[c(1,1:length(rs),length(rs))], y = c(0,sampleBackwall$rsw_dens_plus+sampleBackwall$rsw_dens_null,0), col = addTransparency(colS,theoryAlpha), lwd=1)
                   if (possible$world$worldOn) {
                     if (possible$world$populationNullp>0)
-                      lines (x = rs, y = sourceSampDens_r_null, col = colNullS, lwd=2)
+                      # null
+                      lines (x = rs, y = sampleBackwall$rsw_dens_null, col = colNullS, lwd=2)
                       # plus
-                      lines (x = rs, y = sourceSampDens_r_plus, col = colDistS, lwd=2)
+                      lines (x = rs, y = sampleBackwall$rsw_dens_plus, col = colDistS, lwd=2)
                   }
                   
                   if (!all(is.na(sRho))) {
@@ -954,7 +955,7 @@ showPossible <- function(possible=makePossible(),possibleResult=NULL,
                     
                     l_at_sample<-approx(rs,sourceSampDens_r_total,s)$y#/mean(sourceSampDens_r_total)
                     ln_at_sample<-approx(rs,sourceSampDens_r_null,s)$y#/mean(sourceSampDens_r_total)
-                    ld_at_sample<-approx(rs,sourceSampDens_r_plus,s)$y#/mean(sourceSampDens_r_total)
+                    ld_at_sample<-approx(rs,colSums(sourceSampDens_r_plus),s)$y#/mean(sourceSampDens_r_total)
                     
                     lines(x=c(sRho[i],sRho[i]),y=c(0,l_at_sample),col=colVline,lwd=1)
                     points(x=sRho[i],y=l_at_sample,col=colVline,pch=16,cex=1.5)
@@ -966,7 +967,7 @@ showPossible <- function(possible=makePossible(),possibleResult=NULL,
                         ltext<-bquote(
                           bold(pd(.(braw.env$RZ)[s]))==.(format(l_at_sample/gain,digits=3)) ~" "~ atop(phantom(.(format(ld_at_sample,digits=3))),phantom(.(format(ln_at_sample,digits=3))))
                         )
-                        ltext<-format(log(l_at_sample),digits=3)
+                        # ltext<-format(log(l_at_sample),digits=3)
                         if (s>0)   {
                           # text(s,0.95,labels=ptext,col=colPdark,adj=0,cex=0.9)
                           text(s+0.05,l_at_sample+0.05,labels=ltext,col="black",adj=0,cex=0.9)
@@ -1004,19 +1005,22 @@ showPossible <- function(possible=makePossible(),possibleResult=NULL,
                 }
               },
               "Populations"={
-                if (!all(is.na(priorSampDens_r))){
+                if (!all(is.na(sampleLikelihood_r))){
                   # main distribution
-                  polygon (x = c(rp[1],rp,rp[length(rp)]), y = c(0,priorSampDens_r,0), col = addTransparency(colP,theoryAlpha), lwd=1)
+                  polygon (x = c(rp[1],rp,rp[length(rp)]), y = c(0,sampleLikelihood_r,0), col = addTransparency(colP,theoryAlpha), lwd=1)
                   # vertical lines
                   if (show!="Power") {
-                  dens_at_peak<-max(priorSampDens_r)
-                  dens_at_sample<-approx(rp,priorSampDens_r,sRho[1])$y
-                  dens_at_ci<-approx(rp,priorSampDens_r,rp_ci)$y
-                  lines(x=c(sRho[1],sRho[1]),y=c(0,dens_at_sample-0.01),col="black",lwd=1.5)
+                    dens_at_peak<-max(sampleLikelihood_r)
+                    dens_at_zero<-approx(rp,sampleLikelihood_r,0)$y
+                    dens_at_sample<-approx(rp,sampleLikelihood_r,sRho[1])$y
+                  dens_at_ci<-approx(rp,sampleLikelihood_r,rp_ci)$y
+                  # lines(x=c(sRho[1],sRho[1]),y=c(0,dens_at_sample-0.01),col="black",lwd=1.5)
                   if (possible$world$populationPDF!="Uniform_r" && !is.null(rp_peak)){
-                    lines(x=c(rp_peak,rp_peak),y=c(0,dens_at_peak-0.01),col="black",lwd=2.5)
-                    lines(x=c(rp_peak,rp_peak),y=c(0,dens_at_peak-0.01),col="white",lwd=2)
-                    lines(x=c(rp_peak,rp_peak),y=c(0,dens_at_peak-0.01),col="red",lty=3,lwd=2)
+                    lines(x=c(0,0),y=c(0,dens_at_zero-0.01),col="black",lwd=1.5)
+                    lines(x=c(rp_peak,rp_peak),y=c(0,dens_at_peak-0.01),col="black",lwd=1.5)
+                    # lines(x=c(rp_peak,rp_peak),y=c(0,dens_at_peak-0.01),col="black",lwd=2.5)
+                    # lines(x=c(rp_peak,rp_peak),y=c(0,dens_at_peak-0.01),col="white",lwd=2)
+                    # lines(x=c(rp_peak,rp_peak),y=c(0,dens_at_peak-0.01),col="red",lty=3,lwd=2)
                     
                     lines(x=c(0,0)+rp_ci[1],y=c(0,dens_at_ci[1]-0.01),col="black",lwd=2.5)
                     lines(x=c(0,0)+rp_ci[1],y=c(0,dens_at_ci[1]-0.01),col="white",lwd=2)
@@ -1029,10 +1033,10 @@ showPossible <- function(possible=makePossible(),possibleResult=NULL,
                     bolditalic(.(braw.env$RZ))[mle]== bold(.(format(rp_peak,digits=3)))
                   ),col=colPdark,adj=(sign(rp_peak)+1)/2,cex=0.9)
                   text(x=rp_peak,1.15,labels=bquote(
-                    bold(llr)(bolditalic(.(braw.env$RZ))[mle]/bolditalic(.(braw.env$RZ))[0])==bold(.(format(log(1/approx(rp,priorSampDens_r,0)$y),digits=3)))
+                    bold(llr)(bolditalic(.(braw.env$RZ))[mle]/bolditalic(.(braw.env$RZ))[0])==bold(.(format(log(1/dens_at_zero),digits=3)))
                   ),col=colPdark,adj=(sign(rp_peak)+1)/2,cex=0.9)
                   
-                  if (effect$world$worldOn && possible$prior$populationNullp>0) {
+                  if (possible$prior$worldOn && possible$prior$populationNullp>0) {
                     ln_at_sample<-approx(rs,priorSampDens_r_null,sRho[1])$y
                     ld_at_sample<-approx(rs,priorSampDens_r_plus,sRho[1])$y
                     llrNull<-log(ln_at_sample/ld_at_sample)
