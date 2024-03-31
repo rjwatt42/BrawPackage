@@ -77,7 +77,7 @@ switch(braw.env$RZ,
             ylabel<-bquote(n[w=80])
           },
           "n"={
-            ylim<-c(1, design$sN*5*1.1)
+            ylim<-c(1, 50*5*1.1)
             ylabel<-"n"
           },
           "wp"={

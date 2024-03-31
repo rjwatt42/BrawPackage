@@ -137,19 +137,32 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
              "rIV"={
                rVals<-newvals
                nVals<-rep(design$sN,length(newvals))
+               alphas<-rep(braw.env$alphaSig,length(newvals))
+               nullPs<-rep(hypothesis$effect$world$populationNullp,length(newvals))
              },
              "n"={
                rVals<-rep(hypothesis$effect$rIV,length(newvals))
                nVals<-newvals
+               alphas<-rep(braw.env$alphaSig,length(newvals))
+               nullPs<-rep(hypothesis$effect$world$populationNullp,length(newvals))
              },
              "Alpha"={
                rVals<-rep(hypothesis$effect$rIV,length(newvals))
                nVals<-rep(design$sN,length(newvals))
                alphas<-newvals
+               nullPs<-rep(hypothesis$effect$world$populationNullp,length(newvals))
+             },
+             "pNull"={
+               rVals<-rep(hypothesis$effect$rIV,length(newvals))
+               nVals<-rep(design$sN,length(newvals))
+               alphas<-rep(braw.env$alphaSig,length(newvals))
+               nullPs<-newvals
              },
              {
                rVals<-rep(hypothesis$effect$rIV,length(newvals))
                nVals<-rep(design$sN,length(newvals))
+               alphas<-rep(braw.env$alphaSig,length(newvals))
+               nullPs<-rep(hypothesis$effect$world$populationNullp,length(newvals))
              }
       )
       basenpts<-51
@@ -191,6 +204,7 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
         for (i in 1:length(newvals)) {
           hypothesis$effect$world$populationPDFk<-rVals[i]
           design$sN<-nVals[i]
+          hypothesis$effect$world$populationNullp<-nullPs[i]
           r<-fullRSamplingDist(basevals,hypothesis$effect$world,design,
                                doStat=showType,logScale=logScale,quantiles=c(0.25,0.5,0.75))
           if (length(r)==1) theoryVals<-c(theoryVals,r)
@@ -210,9 +224,13 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
         for (i in 1:length(newvals)) {
           hypothesis$effect$world$populationPDFk<-rVals[i]
           design$sN<-nVals[i]
-          r<-fullPSig(hypothesis$effect$world,design)
+          hypothesis$effect$world$populationNullp<-nullPs[i]
+          r<-fullPSig(hypothesis$effect$world,design,alpha=alphas[i])
           theoryVals<-c(theoryVals,r)
         }
+        theoryVals0<-c()
+        theoryVals1<-c()
+        theoryVals2<-c()
       }
       if (is.element(showType,c("NHST","FDR","FMR"))) {
         Nullp<-hypothesis$effect$world$populationNullp
@@ -221,23 +239,24 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
         for (i in 1:length(newvals)) {
           hypothesis$effect$world$populationPDFk<-rVals[i]
           design$sN<-nVals[i]
-          r<-fullPSig(hypothesis$effect$world,design)
+          hypothesis$effect$world$populationNullp<-nullPs[i]
+          r<-fullPSig(hypothesis$effect$world,design,alpha=alphas[i])
           theoryVals1<-c(theoryVals1,r)
         }
         switch(showType,
                "NHST"={
-                 theoryVals1<-theoryVals1*(1-Nullp)
-                 theoryVals0<-theoryVals1*0+braw.env$alphaSig*Nullp
-                 theoryVals2<-theoryVals0*0+Nullp
+                 theoryVals1<-theoryVals1*(1-nullPs)
+                 theoryVals0<-theoryVals1*0+alphas*nullPs
+                 theoryVals2<-theoryVals0*0+nullPs
                },
                "FDR"={
-                 theoryVals<-braw.env$alphaSig*Nullp/(theoryVals0*(1-Nullp)+braw.env$alphaSig*Nullp)
+                 theoryVals<-alphas*nullPs/(theoryVals1*(1-nullPs)+alphas*nullPs)
                  theoryVals0<-c()
                  theoryVals1<-c()
                  theoryVals2<-c()
                },
                "FMR"={
-                 theoryVals<-(1-theoryVals0)*(1-Nullp)/((1-theoryVals0)*(1-Nullp)+(1-braw.env$alphaSig)*Nullp)
+                 theoryVals<-(1-theoryVals1)*(1-nullPs)/((1-theoryVals1)*(1-nullPs)+(1-alphas)*nullPs)
                  theoryVals0<-c()
                  theoryVals1<-c()
                  theoryVals2<-c()

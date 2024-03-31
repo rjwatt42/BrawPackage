@@ -35,10 +35,10 @@ getNulls<-function(analysis,useSig=FALSE,useNSig=FALSE) {
     analysis$df1<-analysis$df1[nonnulls]
     
     analysis$count<-sum(!is.na(analysis$rIV))
-    analysis$hypothesis$effect$world$populationNullp<-0
+    # analysis$hypothesis$effect$world$populationNullp<-0
     
     nullanalysis$count<-sum(!is.na(nullanalysis$rIV))
-    nullanalysis$hypothesis$effect$world$populationNullp<-1
+    # nullanalysis$hypothesis$effect$world$populationNullp<-1
     
     list(analysis=analysis,nullanalysis=nullanalysis)
   }
@@ -114,6 +114,7 @@ showInference<-function(analysis=makeAnalysis(),showType="Basic",dimension="1D",
     g1<-ggplot()+coord_cartesian(xlim=c(0,1),ylim=c(0,1))
     
     nplots<-sum(!is.na(showType))
+    if (orientation=="vert") nplots<-2
     for (fi in 1:length(effectType)) {
       braw.env$plotArea<-c(0.0,0.33*(fi-1),1/nplots,area.y)
         g1<-plotInference(analysis1,otheranalysis=other1,

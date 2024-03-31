@@ -518,7 +518,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
                 "pNull"={
                   effect$world$worldOn<-TRUE
                   effect$world$populationNullp<-vals[vi]
-                  metaAnalysis$meta_nullAnal<-TRUE
+                  # metaAnalysis$meta_nullAnal<-TRUE
                 },
                 
                 "Heteroscedasticity"={effect$Heteroscedasticity<-vals[vi]},

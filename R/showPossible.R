@@ -158,6 +158,7 @@ showPossible <- function(possibleResult=makePossible(),
   BoxCol<-"#666666"
   
   colS<-"yellow"
+  if (showP>0) colS<-braw.env$plotColours$infer_nsigC
   colSdark=darken(colS,off=-0.67)
   colSsim=darken(colS,off=0.0)
   
