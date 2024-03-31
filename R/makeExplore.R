@@ -72,6 +72,7 @@ mergeExploreResult<-function(res1,res2) {
 #' make multiple samples whilst varying a parameter
 #' 
 #' @param exploreType "rIV","Heteroscedasticity","rIV2","rIVIV2","rIVIV2DV" \cr
+#'                    "pNull","k" \cr
 #'                    "n","Method","Usage","WithinCorr","ClusterRad","SampleGamma" \cr
 #'                     "Dependence","Outliers","IVRange","DVRange" \cr
 #'                     "Cheating","CheatingAmount" \cr

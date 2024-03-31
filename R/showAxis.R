@@ -103,9 +103,14 @@ switch(braw.env$RZ,
             ylabel<-bquote(p)
             use_cols<-c(hsv(0,1,1),hsv(0+0.075,1,1),hsv(0+0.15,1,1))
           },
-          "FDR"={
+          "fDR"={
             ylim<-c(0,1)
             ylabel<-"False Discovery"
+            use_cols<-braw.env$plotColours$fdr
+          },
+          "tDR"={
+            ylim<-c(0,1)
+            ylabel<-"Discovery Rate"
             use_cols<-braw.env$plotColours$fdr
           },
           "NHST"={
@@ -122,7 +127,7 @@ switch(braw.env$RZ,
                         braw.env$plotColours$infer_nsigNull)
             
             },
-          "FMR"={
+          "fMR"={
             ylim<-c(0,1)
             ylabel<-"False Miss"
             use_cols<-braw.env$plotColours$fmr

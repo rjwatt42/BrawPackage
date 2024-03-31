@@ -47,7 +47,7 @@ trimExploreResult<-function(result,nullresult) {
 #' show the estimated population characteristics from varying parameter
 #' 
 #' @param showType        "r","p","w","wn", "p(sig)" \cr
-#' "NHST", "FDR","FMR"
+#' "NHST", "tDR","fDR","fMR"
 #' @return ggplot2 object - and printed
 #' @examples
 #' showExplore(exploreResult=makeExplore(),
@@ -232,7 +232,7 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
         theoryVals1<-c()
         theoryVals2<-c()
       }
-      if (is.element(showType,c("NHST","FDR","FMR"))) {
+      if (is.element(showType,c("NHST","tDR","fDR","fMR"))) {
         Nullp<-hypothesis$effect$world$populationNullp
         hypothesis$effect$world$populationNullp<-0
         theoryVals1<-c()
@@ -249,13 +249,19 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
                  theoryVals0<-theoryVals1*0+alphas*nullPs
                  theoryVals2<-theoryVals0*0+nullPs
                },
-               "FDR"={
+               "fDR"={
                  theoryVals<-alphas*nullPs/(theoryVals1*(1-nullPs)+alphas*nullPs)
                  theoryVals0<-c()
                  theoryVals1<-c()
                  theoryVals2<-c()
                },
-               "FMR"={
+               "tDR"={
+                 theoryVals<-1-alphas*nullPs/(theoryVals1*(1-nullPs)+alphas*nullPs)
+                 theoryVals0<-c()
+                 theoryVals1<-c()
+                 theoryVals2<-c()
+               },
+               "fMR"={
                  theoryVals<-(1-theoryVals1)*(1-nullPs)/((1-theoryVals1)*(1-nullPs)+(1-alphas)*nullPs)
                  theoryVals0<-c()
                  theoryVals1<-c()
@@ -417,7 +423,17 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
                 } else showMeans2<-NULL
                 showMeans<-showMeans+showMeans2
               },
-              "FDR"={
+              "tDR"={
+                showVals<-NULL
+                if (explore$exploreType=="Alpha") {
+                  braw.env$alphaSig<-exploreResult$vals
+                }
+                nulls<-result$rpval==0
+                sigs<-isSignificant(braw.env$STMethod,pVals,rVals,nVals,df1Vals,evidence,braw.env$alphaSig)
+                showMeans<-1-colMeans(abs(sigs & nulls))/colMeans(abs(sigs))
+                showSE<-sqrt(showMeans*(1-showMeans)/sum(sigs))
+              },
+              "fDR"={
                 showVals<-NULL
                 if (explore$exploreType=="Alpha") {
                   braw.env$alphaSig<-exploreResult$vals
@@ -427,7 +443,7 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
                 showMeans<-colMeans(abs(sigs & nulls))/colMeans(abs(sigs))
                 showSE<-sqrt(showMeans*(1-showMeans)/sum(sigs))
               },
-              "FMR"={
+              "fMR"={
                 showVals<-NULL
                 if (explore$exploreType=="Alpha") {
                   braw.env$alphaSig<-exploreResult$vals

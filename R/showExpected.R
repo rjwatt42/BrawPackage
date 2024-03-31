@@ -1,7 +1,7 @@
 
 #' show the estimated population characteristics from multiple simulated sample
 #' 
-#' @param showType "Basic", "CILimits", "NHST", "FDR", "FDR:FMR" \cr
+#' @param showType "Basic", "CILimits", "NHST", "tDR", "fDR" \cr
 #'        \emph{ or one or two of:} \cr
 #'         "r","p","ci1","ci2", "rp","n" \cr
 #'          "w","wp","wn", ro","po"
@@ -21,7 +21,8 @@ showExpected<-function(expectedResult=makeExpected(),showType="Basic",
 ) {
   if (is.numeric(expectedResult)) expectedResult=makeExpected(expectedResult)
   
-  if (is.element(showType,c("NHST","FDR","FMR"))) {
+  if (showType=="tDR") showType<-"fDR"
+  if (is.element(showType,c("NHST","fDR","fMR"))) {
     if (expectedResult$nullcount<expectedResult$count) {
       expectedResult<-makeExpected(0,expectedResult,doingNull=TRUE)
     }
@@ -32,8 +33,8 @@ showExpected<-function(expectedResult=makeExpected(),showType="Basic",
   } else {
     switch (showType,
             "NHST"={fullResult<-mergeExpected(expectedResult$result,expectedResult$nullresult)},
-            "FDR"={fullResult<-mergeExpected(expectedResult$result,expectedResult$nullresult)},
-            "FMR"={fullResult<-mergeExpected(expectedResult$result,expectedResult$nullresult)},
+            "fDR"={fullResult<-mergeExpected(expectedResult$result,expectedResult$nullresult)},
+            "fMR"={fullResult<-mergeExpected(expectedResult$result,expectedResult$nullresult)},
             "e1"={fullResult<-expectedResult$nullresult},
             "e2"={fullResult<-expectedResult$result},
             {fullResult<-expectedResult$result}

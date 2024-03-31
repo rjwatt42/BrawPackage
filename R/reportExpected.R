@@ -1,7 +1,7 @@
 
 #' show the estimated population characteristics from multiple simulated sample
 #' 
-#' @param showType "Basic", "CILimits", "NHST", "FDR", "FDR:FMR" \cr
+#' @param showType "Basic", "CILimits", "NHST", "fDR", "tDR" \cr
 #'        \emph{ or one or two of:} \cr
 #'                   "r","p","ci1","ci2", "rp","n" \cr 
 #'                   "w","wp","wn", ro","po"
@@ -27,7 +27,8 @@ reportExpected<-function(expectedResult=makeExpected(100),showType="Basic"){
            "2D"=     {pars<-c("r","p")},
            "CILimits"=  {pars<-c("ci1","ci2")},
            "NHST"={pars<-c("e2","e1")},
-           "FDR"=       {pars<-c("e1","e2")},
+           "tDR"=       {pars<-c("e1","e2")},
+           "fDR"=       {pars<-c("e1","e2")},
            {pars<-c(showType,NA)}
     )
   } else pars<-showType
@@ -36,7 +37,7 @@ reportExpected<-function(expectedResult=makeExpected(100),showType="Basic"){
   else{
     if (is.na(result$rIVIV2DV[1])) {nc=6} else {nc=9}
   }
-  if (is.element(showType,c("NHST","FDR","FMR"))) {nc=4}
+  if (is.element(showType,c("NHST","tDR","fDR","fMR"))) {nc=4}
   
   # header
   if (sum(!is.na(nullresult$rIV))>0) {
@@ -77,7 +78,7 @@ reportExpected<-function(expectedResult=makeExpected(100),showType="Basic"){
   }
 
   # column labels
-  if (is.element(showType,c("NHST","FDR","FMR"))) {
+  if (is.element(showType,c("NHST","tDR","fDR","fMR"))) {
     outputText1<-c("!j\bErrors:","\bI","\bII"," ")
     } else {
     if (showType=="CILimits") {outputText1<-c("   ","lower","upper")}
@@ -107,7 +108,7 @@ reportExpected<-function(expectedResult=makeExpected(100),showType="Basic"){
   }
   outputText<-c(outputText,rep(outputText1,nc/3))
   
-  if (is.element(showType,c("NHST","FDR","FMR"))){
+  if (is.element(showType,c("NHST","tDR","fDR","fMR"))){
     nullSig<-isSignificant(braw.env$STMethod,nullresult$pIV,nullresult$rIV,nullresult$nval,nullresult$df1,nullresult$evidence)
     resSig<-isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,result$evidence)
     if (braw.env$STMethod=="dLLR") {

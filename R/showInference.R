@@ -46,7 +46,7 @@ getNulls<-function(analysis,useSig=FALSE,useNSig=FALSE) {
 #' show the estimated population characteristics from a simulated sample
 #' 
 #' @param showType "Basic", "CILimits", \cr
-#' "NHST","FDR","FMR",
+#' "NHST","fDR","fMR",
 #'        \emph{ or one or two of:} \cr
 #' "r","p","ci1","ci2", "rp","n"
 #' @param dimension "1D", "2D"
@@ -83,7 +83,7 @@ showInference<-function(analysis=makeAnalysis(),showType="Basic",dimension="1D",
              other1<-analysis2
              other2<-analysis1
              },
-           "FDR"=       {
+           "fDR"=       {
              showType<-c("e2a","e1a")
              r<-getNulls(analysis,useSig=TRUE)
              analysis1<-r$analysis
@@ -91,7 +91,7 @@ showInference<-function(analysis=makeAnalysis(),showType="Basic",dimension="1D",
              other1<-analysis2
              other2<-analysis1
            },
-           "FMR"=       {
+           "fMR"=       {
              showType<-c("e2b","e1b")
              r<-getNulls(analysis,useNSig=TRUE)
              analysis1<-r$analysis

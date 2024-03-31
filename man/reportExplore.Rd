@@ -13,7 +13,7 @@ reportExplore(
 }
 \arguments{
 \item{showType}{"r","p","n","w", "p(sig)" \cr
-"NHST", "FDR","FDR;FMR"}
+"NHST", "fDR","FDR;FMR"}
 }
 \value{
 ggplot2 object - and printed

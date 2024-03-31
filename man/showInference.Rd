@@ -15,7 +15,7 @@ showInference(
 }
 \arguments{
 \item{showType}{"Basic", "CILimits", \cr
-"NHST","FDR","FMR",
+"NHST","fDR","fMR",
        \emph{ or one or two of:} \cr
 "r","p","ci1","ci2", "rp","n"}
 
