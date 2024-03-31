@@ -1,13 +1,64 @@
+##################################################################################    
+# LIKELIHOOD
 
-runPossible <- function(possible=makePossible()){
+#' likelihood theory
+#' 
+#' @param typePossible "Samples","Populations"
+#' @returns possibleResult object
+#' @seealso showPossible() 
+#' @examples
+#' makePossible<-function(typePossible="Samples",
+#' possibleResult=NULL,
+#' UseSource="world",targetSample=0.3,
+#' UsePrior="none",prior=getWorld("Psych"),targetPopulation=0.3,
+#' hypothesis=makeHypothesis(),design=makeDesign(),
+#' simSlice=0.1,correction=TRUE,
+#' appendSim=FALSE,possibleLength="10")
+#' @export
+makePossible<-function(typePossible="Samples",
+                       possibleResult=NULL,
+                       UseSource="world",targetSample=0.3,
+                       UsePrior="none",prior=getWorld("Psych"),targetPopulation=0.2,
+                       hypothesis=makeHypothesis(),design=makeDesign(),
+                       simSlice=0.1,correction=TRUE,
+                       appendSim=FALSE,possibleLength="10"
+) {
+  
+  if (hypothesis$effect$world$worldOn==FALSE) {
+    hypothesis$effect$world$populationPDF<-"Single"
+    hypothesis$effect$world$populationRZ<-"r"
+    hypothesis$effect$world$populationPDFk<-hypothesis$effect$rIV
+    hypothesis$effect$world$populationNullp<-0
+  }
+  
+  possible<-
+  list(type=typePossible,
+       UseSource=UseSource,
+       targetSample=targetSample,
+       UsePrior=UsePrior,
+       prior=prior,
+       targetPopulation=targetPopulation,
+       hypothesis=hypothesis,
+       design=design,
+       showTheory=TRUE,
+       simSlice=simSlice,correction=correction
+  )
+  
+  possibleResult<-runPossible(possible,possibleResult=possibleResult)
+  return(possibleResult)
+}
+
+
+runPossible <- function(possible=makePossible(),possibleResult=NULL){
   
   npoints=201
-  wDensMethod=2
-  
-  design<-possible$design
-  n<-design$sN
 
-  # note that we do everything in z and then, if required transform to r at the end
+  design<-possible$design
+  hypothesis<-possible$hypothesis
+  world<-hypothesis$effect$world
+  n<-design$sN
+  
+  # note that we do everything in r and then, if required transform to z at the end
   switch (braw.env$RZ,
           "r" ={
             rs<-seq(-1,1,length=npoints)*braw.env$r_range
@@ -18,7 +69,7 @@ runPossible <- function(possible=makePossible()){
             rp<-tanh(seq(-1,1,length=npoints)*braw.env$z_range)
           }
   )
-
+  
   # get the sample effect size of interest and its corresponding sample size
   sRho<-possible$targetSample
   if (braw.env$RZ=="z") sRho<-tanh(sRho)
@@ -33,11 +84,11 @@ runPossible <- function(possible=makePossible()){
          )},
          "hypothesis"={source<-list(worldOn=FALSE,
                                     populationPDF="Single",
-                                    populationPDFk=effect$rIV,
+                                    populationPDFk=hypothesis$effect$rIV,
                                     populationRZ="r",
                                     populationNullp=0
          )},
-         "world"={source<-possible$world},
+         "world"={source<-world},
          "prior"={source<-possible$prior}
   )
   sourcePopDens_r<-rPopulationDist(rp,source)
@@ -55,7 +106,7 @@ runPossible <- function(possible=makePossible()){
                               populationPDFk=1,
                               populationRZ="r",
                               populationNullp=0.0) },
-         "world"={ prior<-possible$world },
+         "world"={ prior<-world },
          "prior"={ prior<-possible$prior }
   )
   if (possible$type=="Populations") source<-prior
@@ -86,10 +137,10 @@ runPossible <- function(possible=makePossible()){
   priorSampDens_r<-pD$dens
   priorSampDens_r_plus<-pD$densPlus
   priorSampDens_r_null<-pD$densNull
-
-  if (possible$possibleCorrection) {
-    nout<-ceil(possible$possibleSimSlice*sqrt(design$sN-3))*20+1
-    correction<-seq(-1,1,length.out=nout)*possible$possibleSimSlice
+  
+  if (possible$correction) {
+    nout<-ceil(possible$simSlice*sqrt(design$sN-3))*20+1
+    correction<-seq(-1,1,length.out=nout)*possible$simSlice
   }  else {
     correction<-0
   }
@@ -119,59 +170,10 @@ runPossible <- function(possible=makePossible()){
   }
   # times the a-priori distribution
   sampleSampDens_r<-sampleSampDens_r*priorPopDens_r_full
-    for (ei in 1:length(sRho)){
-      sampleLikelihood_r[ei,]<-sampleLikelihood_r[ei,]*priorPopDens_r_full
-    }
+  for (ei in 1:length(sRho)){
+    sampleLikelihood_r[ei,]<-sampleLikelihood_r[ei,]*priorPopDens_r_full
+  }
   
-  # convert from z to r
-  # rs<-zs
-  # rp<-zp
-  # sourcePopDens_r<-sourcePopDens_z
-  # sourceSampDens_r<-sourceSampDens_z
-  # sourceSampDens_r_plus<-sourceSampDens_z_plus
-  # sourceSampDens_r_null<-sourceSampDens_z_null
-  # 
-  # priorPopDens_r<-priorPopDens_z_show
-  # priorSampDens_r<-priorSampDens_z
-  # priorLikelihood_r<-priorLikelihood_z
-  # priorSampDens_r_plus<-priorSampDens_z_plus
-  # priorSampDens_r_null<-priorSampDens_z_null
-  # if (braw.env$RZ=="r") {
-  #   sourceRVals<-tanh(sourceRVals)
-  #   sRho<-tanh(sRho)
-  #   rp<-tanh(zp)
-  #   rs<-tanh(zs)
-  #   for (ei in 1:length(sRho)){
-  #     priorLikelihood_r[ei,]<-zdens2rdens(priorLikelihood_z[ei,],rp)
-  #   }
-  #   for (ei in 1:length(sourceRVals)){
-  #     sourceSampDens_r[ei,]<-zdens2rdens(sourceSampDens_z[ei,],rs)
-  #   }
-  #   sourceSampDens_r_plus<-zdens2rdens(sourceSampDens_z_plus,rs)
-  #   sourceSampDens_r_null<-zdens2rdens(sourceSampDens_z_null,rs)
-  #   priorSampDens_r<-zdens2rdens(priorSampDens_z,rp)
-  #   priorPopDens_r<-zdens2rdens(priorPopDens_z_show,rp)
-  #   priorSampDens_r_plus<-zdens2rdens(priorSampDens_z_plus,rs)
-  #   priorSampDens_r_null<-zdens2rdens(priorSampDens_z_null,rs)
-  #   sourcePopDens_r<-zdens2rdens(sourcePopDens_z,rs)
-  # }
-  # if (any(!is.na(priorLikelihood_r))) {
-  #   dr_gain<-max(priorLikelihood_r,na.rm=TRUE)
-  #   priorLikelihood_r<-priorLikelihood_r/dr_gain
-  # }
-
-  # power calculations
-  # if (design$Replication$ReplicationOn && design$Replication$ReplPowerOn) {
-  #   if (braw.env$RZ=="r") {
-  #     nUse<-rw2n(sRho[1],design$Replication$ReplPowerOn)
-  #   } else {
-  #     nUse<-rw2n(tanh(sRho[1]),design$Replication$ReplPowerOn)
-  #   }
-  # }
-  # else {
-  #   nUse<-design$sN
-  # }
-
   dr_gain<-max(sourceSampDens_r,na.rm=TRUE)
   sourceSampDens_r<-sourceSampDens_r/dr_gain
   
@@ -196,27 +198,27 @@ runPossible <- function(possible=makePossible()){
   }
   sampleLikelihood_r<-sampleLikelihood_r/max(sampleLikelihood_r,na.rm=TRUE)
   
-    switch (possible$type,
+  switch (possible$type,
           "Samples"={
             possibleResult<-list(possible=possible,
-                                   sourceRVals=sourceRVals,
-                                   sRho=sRho,
-                                   source=source,prior=prior,
-                                   Theory=list(
-                                     rs=rs,sourceSampDens_r=sourceSampDens_r,sourceSampDens_r_plus=sourceSampDens_r_plus,sourceSampDens_r_null=sourceSampDens_r_null,
-                                     rp=rp,priorSampDens_r=sourceSampDens_r,sampleLikelihood_r=sampleLikelihood_r,priorPopDens_r=priorPopDens_r,sourcePopDens_r=sourcePopDens_r
-                                   )
+                                 sourceRVals=sourceRVals,
+                                 sRho=sRho,
+                                 source=source,prior=prior,
+                                 Theory=list(
+                                   rs=rs,sourceSampDens_r=sourceSampDens_r,sourceSampDens_r_plus=sourceSampDens_r_plus,sourceSampDens_r_null=sourceSampDens_r_null,
+                                   rp=rp,priorSampDens_r=sourceSampDens_r,sampleLikelihood_r=sampleLikelihood_r,priorPopDens_r=priorPopDens_r,sourcePopDens_r=sourcePopDens_r
+                                 )
             )
           },
           "Populations"={
             possibleResult<-list(possible=possible,
-                                   sourceRVals=sourceRVals,
-                                   sRho=sRho,
-                                   source=source,prior=prior,
-                                   Theory=list(
-                                     rs=rs,sourceSampDens_r=sourceSampDens_r,sourceSampDens_r_plus=sourceSampDens_r_plus,sourceSampDens_r_null=sourceSampDens_r_null,
-                                     rp=rp,priorSampDens_r=priorSampDens_r,sampleLikelihood_r=sampleLikelihood_r,priorPopDens_r=priorPopDens_r,sourcePopDens_r=sourcePopDens_r,priorSampDens_r_null=priorSampDens_r_null,priorSampDens_r_plus=priorSampDens_r_plus
-                                   )
+                                 sourceRVals=sourceRVals,
+                                 sRho=sRho,
+                                 source=source,prior=prior,
+                                 Theory=list(
+                                   rs=rs,sourceSampDens_r=sourceSampDens_r,sourceSampDens_r_plus=sourceSampDens_r_plus,sourceSampDens_r_null=sourceSampDens_r_null,
+                                   rp=rp,priorSampDens_r=priorSampDens_r,sampleLikelihood_r=sampleLikelihood_r,priorPopDens_r=priorPopDens_r,sourcePopDens_r=sourcePopDens_r,priorSampDens_r_null=priorSampDens_r_null,priorSampDens_r_plus=priorSampDens_r_plus
+                                 )
             )
           }
   )

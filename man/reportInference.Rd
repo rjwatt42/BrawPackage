@@ -4,15 +4,9 @@
 \alias{reportInference}
 \title{report population estimates from a simulated sample}
 \usage{
-reportInference(
-  analysis = makeAnalysis(),
-  modelType = "Raw",
-  analysisType = "Anova"
-)
+reportInference(analysis = makeAnalysis(), analysisType = "Anova")
 }
 \arguments{
-\item{modelType}{"Norm", "Raw"}
-
 \item{analysisType}{"Model", "Anova"}
 }
 \value{

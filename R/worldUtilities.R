@@ -65,8 +65,8 @@ rSamp2Pop<-function(r_s,n,world=NULL) {
 }
   
 getRList<-function(world) {
-  npops=20*6+1 # 2*3*4*n+1
-  
+  npops=20*6+1 # 2*3*4*5+1
+
   if (is.null(world)) {
     return(list(pRho=0,pRhogain=1)  )
   }
@@ -172,7 +172,8 @@ rPopulationDist<-function(rvals,world) {
             rdens[which.min(abs(tanh(k)+rvals))]<-1/2
           },
           "Uniform_r"={
-            rdens<-rvals*0+0.5
+            rdens<-rvals*0
+            rdens[abs(rvals)<0.75]<-0.5
           },
           "Uniform_z"={
             zvals<-atanh(rvals)

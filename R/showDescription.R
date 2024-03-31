@@ -1,9 +1,3 @@
-darken <- function(col,gain=1,off=0) {
-  col<-col2rgb(col)/255*gain+off
-  col[col<0]<-0
-  col[col>1]<-1
-  rgb(col[1],col[2],col[3])
-}
 
 plotPoints<-function(g,IV,DV,analysis,colindex=1,maxoff=1){
 

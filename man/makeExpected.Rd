@@ -5,7 +5,7 @@
 \title{make multiple samples with analysis}
 \usage{
 makeExpected(
-  nsims = 100,
+  nsims = 10,
   expectedResult = NULL,
   hypothesis = makeHypothesis(),
   design = makeDesign(),

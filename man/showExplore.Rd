@@ -5,16 +5,16 @@
 \title{show the estimated population characteristics from varying parameter}
 \usage{
 showExplore(
-  exploreResult = makeExplore(autoShow = TRUE),
+  exploreResult = makeExplore(),
   showType = "r",
-  ylog = FALSE,
-  whichEffect = "All",
-  effectType = "All"
+  showTheory = TRUE,
+  effectType = "unique",
+  whichEffect = "All"
 )
 }
 \arguments{
-\item{showType}{"r","p","n","w", "p(sig)" \cr
-"NHST", "FDR","FDR;FMR"}
+\item{showType}{"r","p","w","wn", "p(sig)" \cr
+"NHST", "FDR","FMR"}
 }
 \value{
 ggplot2 object - and printed
@@ -25,6 +25,5 @@ show the estimated population characteristics from varying parameter
 \examples{
 showExplore(exploreResult=makeExplore(),
                        showType="r",
-                       ylog=FALSE,
-                       whichEffect="All",effectType="All")
+                       effectType="unique",whichEffect="All")
 }

@@ -10,14 +10,14 @@ showExpected(
   dimension = "1D",
   orientation = "vert",
   effectType = "direct",
-  showTheory = FALSE
+  showTheory = TRUE
 )
 }
 \arguments{
 \item{showType}{"Basic", "CILimits", "NHST", "FDR", "FDR:FMR" \cr
 \emph{ or one or two of:} \cr
  "r","p","ci1","ci2", "rp","n" \cr
-  "w","wp","wn", ro","po",}
+  "w","wp","wn", ro","po"}
 
 \item{dimension}{"1D", "2D"}
 
@@ -34,5 +34,5 @@ showExpected(expectedResult=makeExpected(),
                        showType="Basic",
                        dimension="1D",
                        orientation="vert",
-                       effectType="direct",showTheory=FALSE)
+                       effectType="direct",showTheory=TRUE)
 }

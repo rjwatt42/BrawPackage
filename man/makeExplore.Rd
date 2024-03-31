@@ -5,7 +5,7 @@
 \title{make multiple samples whilst varying a parameter}
 \usage{
 makeExplore(
-  nsim = 10,
+  nsims = 10,
   exploreResult = NULL,
   exploreType = "n",
   exploreNPoints = 13,
@@ -19,18 +19,18 @@ makeExplore(
   hypothesis = makeHypothesis(),
   design = makeDesign(),
   evidence = makeEvidence(),
-  adoingNull = FALSE,
-  utoShow = FALSE,
+  doingNull = FALSE,
+  autoShow = FALSE,
   showType = "r"
 )
 }
 \arguments{
-\item{exploreType}{"n","rIV","Heteroscedasticity","rIV2","rIVIV2","rIVIV2DV" \cr
-"Method","Usage","WithinCorr","ClusterRad","SampleGamma" \cr
-"Dependence","Outliers","IVRange","DVRange" \cr
-"Cheating","CheatingAmount" \cr
-"Alpha","Transform" \cr
-"Power","SigOnly","Repeats" \cr}
+\item{exploreType}{"rIV","Heteroscedasticity","rIV2","rIVIV2","rIVIV2DV" \cr
+"n","Method","Usage","WithinCorr","ClusterRad","SampleGamma" \cr
+ "Dependence","Outliers","IVRange","DVRange" \cr
+ "Cheating","CheatingAmount" \cr
+ "Alpha","Transform" \cr
+ "Power","SigOnly","Repeats" \cr}
 }
 \value{
 exploreResult object

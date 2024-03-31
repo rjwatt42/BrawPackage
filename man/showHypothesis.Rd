@@ -4,7 +4,7 @@
 \alias{showHypothesis}
 \title{show a hypothesis}
 \usage{
-showHypothesis(hypothesis = makeHypothesis())
+showHypothesis(hypothesis = makeHypothesis(), doWorld = FALSE)
 }
 \value{
 ggplot2 object - and printed

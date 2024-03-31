@@ -4,7 +4,11 @@
 \alias{showWorld}
 \title{show a world object}
 \usage{
-showWorld(world = makeWorld())
+showWorld(
+  hypothesis = makeHypothesis(effect = makeEffect(world = makeWorld())),
+  plotArea = c(0, 0, 1, 1),
+  g = NULL
+)
 }
 \value{
 ggplot2 object - and printed

@@ -450,8 +450,14 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
   }
   
   switch(orientation,
-         "horz"=xlim<-c(0,max(xoff))+c(0,1),
-         "vert"=xlim<-c(0,max(xoff))+c(-1,1)
+         "horz"={
+           xlim<-c(0,max(xoff))+c(0,1)
+           orient<-"vert"
+           },
+         "vert"={
+           xlim<-c(0,max(xoff))+c(-1,1)
+           orient<-"horz"
+         }
          )
   
   yaxis<-showAxis(showType,effect)
@@ -463,12 +469,13 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
   if (showType=="p" && braw.env$pPlotScale=="log10" && any(is.numeric(analysis$pIV))) 
     while (mean(log10(analysis$pIV)>ylim[1])<0.75) ylim[1]<-ylim[1]-1
   
-  ylim[2]<-ylim[2]+diff(ylim)/16
+  if (orient=="horz") ylim[2]<-ylim[2]+diff(ylim)/16
+  else                ylim<-ylim+c(-1,1)*diff(ylim)/16
   
   if (is.null(hypothesis$IV2)) box<-"y" else box<-"both"
   top<-is.element(showType,c("e1","e2","e1d","e2d"))
   
-  g<-startPlot(xlim,ylim,box=box,top=top,g=g)
+  g<-startPlot(xlim,ylim,box=box,top=top,orientation=orient,g=g)
   g<-g+yAxisTicks(ybreaks,logScale=yaxis$logScale)
   g<-g+yAxisLabel(ylabel)
   if (!is.null(hypothesis$IV2)) g<-g+xAxisTicks(breaks=c(0,2,4),c("Main1","Main2","Interaction"))

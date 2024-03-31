@@ -11,7 +11,7 @@ makeEffect(
   rIVIV2DV = 0,
   Heteroscedasticity = 0,
   ResidDistr = "normal",
-  world = NA
+  world = makeWorld()
 )
 }
 \arguments{
@@ -25,6 +25,6 @@ make an effect object
 }
 \examples{
 makeEffect(rIV=0.3,rIV2=0,rIVIV2=0,rIVIV2DV=0,Heteroscedasticity=0,
-           ResidDistr="normal",world=NA
+           ResidDistr="normal",world=makeWorld()
 )
 }

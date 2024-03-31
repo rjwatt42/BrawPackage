@@ -78,11 +78,12 @@ showWorld<-function(hypothesis=makeHypothesis(effect=makeEffect(world=makeWorld(
   # }
 
   rdens<-rPopulationDist(rx,world)
-
   if (braw.env$RZ=="z") {
     rdens<-rdens2zdens(rdens,rx)
     rx<-atanh(rx)
   }
+  rdens<-rdens/max(rdens)*(1-world$populationNullp)
+  
   rx<-c(rx[1],rx,rx[length(rx)])
   rdens<-c(0,rdens,0)
   pts=data.frame(x=rx,y=rdens)

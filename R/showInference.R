@@ -113,11 +113,12 @@ showInference<-function(analysis=makeAnalysis(),showType="Basic",dimension="1D",
     
     g1<-ggplot()+coord_cartesian(xlim=c(0,1),ylim=c(0,1))
     
+    nplots<-sum(!is.na(showType))
     for (fi in 1:length(effectType)) {
-      braw.env$plotArea<-c(0.0,0.33*(fi-1),0.48,area.y)
+      braw.env$plotArea<-c(0.0,0.33*(fi-1),1/nplots,area.y)
         g1<-plotInference(analysis1,otheranalysis=other1,
                           disp=showType[1],effectType=effectType[fi],orientation=orientation,showTheory=showTheory,g=g1)
-      braw.env$plotArea<-c(0.52,0.33*(fi-1),0.48,area.y)
+      braw.env$plotArea<-c(0.5,0.33*(fi-1),1/nplots,area.y,area.y)
       if (!is.na(showType[2])) {
           g1<-plotInference(analysis2,otheranalysis=other2,
                             disp=showType[2],effectType=effectType[fi],orientation=orientation,showTheory=showTheory,g=g1)

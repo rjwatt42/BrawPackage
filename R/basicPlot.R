@@ -36,7 +36,7 @@ plotLimits<-function(xlim,ylim,orientation,gaps=c(1,1,0)) {
          "horz"={braw.env$plotLimits<-list(xlim=xlim,ylim=ylim,xsc=xlim,ysc=ylim,
                                            orientation=orientation,gap=gaps)},
          "vert"={braw.env$plotLimits<-list(xlim=xlim,ylim=ylim,xsc=ylim,ysc=xlim,
-                                           orientation=orientation,gap=gaps[c(2,1)])}
+                                           orientation=orientation,gap=gaps[c(2,1,3)])}
          )
 }
 
@@ -49,7 +49,7 @@ startPlot<-function(xlim,ylim,box="both",top=FALSE,backC=braw.env$plotColours$gr
   )
   if (top) gaps<-c(gaps,1)
   else gaps<-c(gaps,0)
-  gaps<-gaps*c(0.125,0.1,0.1)
+  gaps<-gaps*c(0.125,0.125,0.1)
   plotLimits(xlim = xlim, ylim = ylim,orientation=orientation,gaps)
 
   if (is.null(g)) g<-ggplot()
@@ -104,14 +104,16 @@ xAxisLabel<-function(label) {
   axis<-reRangeXY(axis)
   switch(braw.env$plotLimits$orientation,
          "vert"={
-           geom_text(data=axis,aes(x=x-0.18*braw.env$plotArea[3],y=y),label=label, parse = TRUE,
-                     hjust=0.5,vjust=0,
-                     size=braw.env$labelSize*1.25,angle=90,fontface="bold")      
+           xoff<-0.1*braw.env$plotArea[3]
+           geom_text(data=axis,aes(x=x-xoff,y=y),label=label, parse = TRUE,
+                     hjust=0.5,vjust=0.5,
+                     size=braw.env$labelSize*1.5,angle=90,fontface="bold")      
          },
          "horz"={
-           geom_text(data=axis,aes(x=x,y=y),label=label, parse = TRUE,
-                     hjust=0.5,vjust=2.5,
-                     size=braw.env$labelSize*1.25,angle=0,fontface="bold")      
+           yoff<-0.1*braw.env$plotArea[4]
+           geom_text(data=axis,aes(x=x,y=y-yoff),label=label, parse = TRUE,
+                     hjust=0.5,vjust=0.5,
+                     size=braw.env$labelSize*1.5,angle=0,fontface="bold")      
          }
   )
 }
@@ -127,14 +129,16 @@ yAxisLabel<-function(label){
   axis<-reRangeXY(axis)
   switch(braw.env$plotLimits$orientation,
          "vert"={
-           geom_text(data=axis,aes(x=x,y=y-0.18*braw.env$plotArea[4]),label=label, parse = TRUE,
-                     hjust=0,vjust=0.5,
-                     size=braw.env$labelSize*1.25,angle=0,fontface="bold")      
+           yoff<-0.1*braw.env$plotArea[4]
+           geom_text(data=axis,aes(x=x,y=y-yoff),label=label, parse = TRUE,
+                     hjust=0.5,vjust=0.5,
+                     size=braw.env$labelSize*1.5,angle=0,fontface="bold")      
          },
          "horz"={
-           geom_text(data=axis,aes(x=x,y=y),label=label, parse = TRUE,
-                     hjust=0.5,vjust=-2,
-                     size=braw.env$labelSize*1.25,angle=90,fontface="bold")      
+           xoff<-0.1*braw.env$plotArea[3]
+           geom_text(data=axis,aes(x=x-xoff,y=y),label=label, parse = TRUE,
+                     hjust=0.5,vjust=0.5,
+                     size=braw.env$labelSize*1.5,angle=90,fontface="bold")      
          }
   )
 }
@@ -325,4 +329,16 @@ dataLegend<-function(data,title="title",fontsize=3.5) {
     geom_text(data=data.frame(x=ptsX[1],y=titleY,label=title),
               aes(x=x,y=y,label=label),hjust=0,size=fontsize*0.8,parse=TRUE)
   )
+}
+
+darken <- function(col,gain=1,off=0) {
+  col<-col2rgb(col)/255*gain+off
+  col[col<0]<-0
+  col[col>1]<-1
+  rgb(col[1],col[2],col[3])
+}
+
+addTransparency <- function(col,alpha) {
+  col<-col2rgb(col)/255
+  rgb(col[1],col[2],col[3],alpha)
 }
