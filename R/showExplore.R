@@ -239,7 +239,7 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
         for (i in 1:length(newvals)) {
           hypothesis$effect$world$populationPDFk<-rVals[i]
           design$sN<-nVals[i]
-          hypothesis$effect$world$populationNullp<-nullPs[i]
+          # hypothesis$effect$world$populationNullp<-nullPs[i]
           r<-fullPSig(hypothesis$effect$world,design,alpha=alphas[i])
           theoryVals1<-c(theoryVals1,r)
         }

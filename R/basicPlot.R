@@ -179,7 +179,7 @@ xAxisTicks<-function(breaks,labels=NULL,logScale=FALSE){
   
   yoff<-diff(braw.env$plotLimits$ylim)/20
   ticksTop<-reRangeXY(data.frame(x=breaks,y=braw.env$plotLimits$ylim[1]))
-  ticksBottom<-reRangeXY(data.frame(x=breaks,y=braw.env$plotLimits$ylim[1]-yoff)))
+  ticksBottom<-reRangeXY(data.frame(x=breaks,y=braw.env$plotLimits$ylim[1]-yoff))
   
   switch(braw.env$plotLimits$orientation,
          "vert"={
