@@ -120,7 +120,7 @@ showDesign<-function(design=makeDesign()) {
   g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0,1)) + braw.env$blankTheme()
   g<-startPlot(xlim=c(braw.env$minN,design$sN*braw.env$maxRandN), ylim=c(0,1),
                box="x",g=g)
-  g<-g+xAxisLabel("n")+xAxisTicks(breaks=NULL)
+  g<-g+xAxisLabel("n")+xAxisTicks()
   g<-g+dataPolygon(data=pts,fill=braw.env$plotColours$descriptionC)
   g<-g+dataLine(data=pts)
 
@@ -262,7 +262,7 @@ showWorldSampling<-function(hypothesis=makeHypothesis(),design=makeDesign(),sigO
          "r"={g<-g+xAxisLabel(braw.env$rsLabel)},
          "z"={g<-g+xAxisLabel(braw.env$zsLabel)}
   )
-  g<-g+xAxisTicks(breaks=NULL)
+  g<-g+xAxisTicks()
   
   g<-g+dataPolygon(data=pts,fill=braw.env$plotColours$descriptionC)+scale_y_continuous(limits = c(0,1.05),labels=NULL,breaks=NULL)
   g<-g+dataLine(data=pts)

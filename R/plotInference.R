@@ -162,9 +162,9 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
   braw.env$plotArea<-c(0,0,1,1)
   g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme()
   g<-startPlot(xaxis$lim,yaxis$lim,box="both",top=FALSE,g=g)
-  g<-g+xAxisTicks(NULL,logScale=xaxis$logScale)
+  g<-g+xAxisTicks(logScale=xaxis$logScale)
   g<-g+xAxisLabel(xaxis$label)
-  g<-g+yAxisTicks(NULL,logScale=yaxis$logScale)
+  g<-g+yAxisTicks(logScale=yaxis$logScale)
   g<-g+yAxisLabel(yaxis$label)
   
   if (disp1=="r" && disp2=="p") {

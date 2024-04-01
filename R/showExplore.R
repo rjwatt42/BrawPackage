@@ -92,7 +92,6 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
   yaxis<-showAxis(showType,effect)
   ylim<-yaxis$lim
   ylabel<-yaxis$label
-  ybreaks<-NULL
   ycols<-yaxis$cols
   ylines<-yaxis$lines
   ySecond<-NULL
@@ -120,7 +119,7 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
     braw.env$plotArea<-c(plots[whichEffect],0,plotWidth,1)
     g<-startPlot(xlim,ylim,top=TRUE,g=g)
     g<-g+xAxisLabel(bquote(bold(.(explore$exploreType))))+xAxisTicks(xbreaks,xnames,logScale=explore$xlog)
-    g<-g+yAxisLabel(ylabel)+yAxisTicks(ybreaks,logScale=yaxis$logScale)
+    g<-g+yAxisLabel(ylabel)+yAxisTicks(logScale=yaxis$logScale)
     col<-ycols[1]
     
     theoryVals<-NULL

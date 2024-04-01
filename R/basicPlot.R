@@ -142,11 +142,13 @@ yAxisLabel<-function(label){
          }
   )
 }
-yAxisTicks<-function(breaks,labels=NULL,logScale=FALSE){
+yAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE){
   if (is.null(breaks)) {
-    if (logScale)
-      breaks<-axisTicks(usr=braw.env$plotLimits$ylim, log=logScale, axp = NULL, nint = 7)
-    else 
+    # if (logScale) {
+    #   ylim<-c(ceil(log10(braw.env$plotLimits$ylim[1])),floor(braw.env$plotLimits$ylim[2]))
+    #   breaks<-axisTicks(usr=braw.env$plotLimits$ylim, log=logScale, axp = c(10^ylim,1), nint = 7)
+    # }
+    # else 
       breaks<-axisTicks(usr=braw.env$plotLimits$ylim, log=logScale, axp = NULL, nint = 7)
   }
   
@@ -167,11 +169,13 @@ yAxisTicks<-function(breaks,labels=NULL,logScale=FALSE){
          }
   )
 }
-xAxisTicks<-function(breaks,labels=NULL,logScale=FALSE){
+xAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE){
   if (is.null(breaks)) {
-    if (logScale)
-      breaks<-axisTicks(usr=braw.env$plotLimits$xlim, log=logScale, axp = NULL, nint = 7)
-    else 
+    # if (logScale) {
+    #   xlim<-c(ceil(log10(braw.env$plotLimits$xlim[1])),floor(braw.env$plotLimits$xlim[2]))
+    #   breaks<-axisTicks(usr=braw.env$plotLimits$xlim, log=logScale, axp = c(10^xlim,1), nint = 7)
+    # }
+    # else 
       breaks<-axisTicks(usr=braw.env$plotLimits$xlim, log=logScale, axp = NULL, nint = 7)
   }
   if (is.null(labels)) labels<-breaks

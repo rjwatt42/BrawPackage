@@ -464,8 +464,7 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
   ylim<-yaxis$lim
   ylabel<-yaxis$label
   ylines<-yaxis$lines
-  ybreaks<-NULL
-  
+
   if (showType=="p" && braw.env$pPlotScale=="log10" && any(is.numeric(analysis$pIV))) 
     while (mean(log10(analysis$pIV)>ylim[1])<0.75) ylim[1]<-ylim[1]-1
   
@@ -476,7 +475,7 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
   top<-is.element(showType,c("e1","e2","e1d","e2d"))
   
   g<-startPlot(xlim,ylim,box=box,top=top,orientation=orient,g=g)
-  g<-g+yAxisTicks(ybreaks,logScale=yaxis$logScale)
+  g<-g+yAxisTicks(logScale=yaxis$logScale)
   g<-g+yAxisLabel(ylabel)
   if (!is.null(hypothesis$IV2)) g<-g+xAxisTicks(breaks=c(0,2,4),c("Main1","Main2","Interaction"))
   
