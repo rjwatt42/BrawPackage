@@ -110,7 +110,7 @@ switch(braw.env$RZ,
           },
           "tDR"={
             ylim<-c(0,1)
-            ylabel<-"Discovery Rate"
+            ylabel<-"True Discovery"
             use_cols<-braw.env$plotColours$fdr
           },
           "NHST"={

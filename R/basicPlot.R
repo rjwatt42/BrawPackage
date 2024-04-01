@@ -156,7 +156,7 @@ yAxisTicks<-function(breaks,labels=NULL,logScale=FALSE){
   ticks<-reRangeXY(data.frame(x=braw.env$plotLimits$xlim[1],y=breaks))
   switch(braw.env$plotLimits$orientation,
          "vert"={
-           mn<-1
+           mn<-4/max(4,max(nchar(labels)))
            geom_text(data=ticks,aes(x=x,y=y),label=labels,hjust=0.5,vjust=1.1,
                      size=braw.env$labelSize*mn)
          },
@@ -177,16 +177,19 @@ xAxisTicks<-function(breaks,labels=NULL,logScale=FALSE){
   if (is.null(labels)) labels<-breaks
   if (logScale) breaks<-log10(breaks)
   
-  ticks<-reRangeXY(data.frame(x=breaks,y=braw.env$plotLimits$ylim[1]))
+  yoff<-diff(braw.env$plotLimits$ylim)/20
+  ticksTop<-reRangeXY(data.frame(x=breaks,y=braw.env$plotLimits$ylim[1]))
+  ticksBottom<-reRangeXY(data.frame(x=breaks,y=braw.env$plotLimits$ylim[1]-yoff)))
+  
   switch(braw.env$plotLimits$orientation,
          "vert"={
            mn<-4/max(4,max(nchar(labels)))
-           geom_text(data=ticks,aes(x=x,y=y),label=labels,hjust=1.1,vjust=0.5,
+           geom_text(data=ticksTop,aes(x=x,y=y),label=labels,hjust=1.1,vjust=0.5,
                      size=braw.env$labelSize*mn)
          },
          "horz"={
-           mn<-1
-           geom_text(data=ticks,aes(x=x,y=y),label=labels,hjust=0.5,vjust=1.1,
+           mn<-4/max(4,max(nchar(labels)))
+           geom_text(data=ticksTop,aes(x=x,y=y),label=labels,hjust=0.5,vjust=1.1,
                      size=braw.env$labelSize*mn)
          }
   )
