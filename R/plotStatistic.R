@@ -271,7 +271,7 @@ expected_hist<-function(vals,svals,valType,ylim,histGain,histGainrange){
 
 expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
                         i=1,scale=1,col="white",orientation="vert",ylim,histGain=NA,histGainrange=NA){
-  dotSize<-(braw.env$plotTheme$axis.title$size)/3*scale
+  dotSize<-braw.env$dotSize*scale
   se_arrow<-0.3
   se_size<-0.75
   
@@ -701,43 +701,14 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
                        ylim=ylim,histGain=histGain,histGainrange=histGainrange)
       
       if (length(rvals)>1 && is.element(showType,c("p","e1","e2","e1d","e2d"))) {
-        if (effectTheory$world$worldOn && is.element(showType,c("e1","e2","e1d","e2d"))) {
           n<-length(pvals)
           if (!is.null(otheranalysis) && effect$world$worldOn) n<-n+length(otheranalysis$pIV)
-          switch (showType,
-                  "e1"={
-                    ns<-sum(!resSig,na.rm=TRUE)/n
-                    s<-sum(resSig,na.rm=TRUE)/n
-                  },
-                  "e2"={
-                    ns<-sum(!resSig,na.rm=TRUE)/n
-                    s<-sum(resSig,na.rm=TRUE)/n
-                  },
-                  "e1d"={
-                    ns<-sum(!resSig,na.rm=TRUE)/n
-                    s2<-sum(resSig & shvals<0,na.rm=TRUE)/n
-                    s1<-sum(resSig & shvals>0,na.rm=TRUE)/n
-                  },
-                  "e2d"={
-                    ns<-sum(!resSig,na.rm=TRUE)/n
-                    s2<-sum(resSig & shvals<0,na.rm=TRUE)/n
-                    s1<-sum(resSig & shvals>0,na.rm=TRUE)/n
-                  }
-          )
-        } else {
-          switch (showType,
-                  "p"={labelPt1<-paste0("p(sig)"," = ")},
-                  "e1"={labelPt1<-"p(Type I) = "},
-                  "e2"={labelPt1<-"p(Type II) = "}
-          )
-          if (showType=="e2") {
-            labelPt2<-paste0(labelPt1,brawFormat(mean(!resSig,na.rm=TRUE)*100,digits=npct),"%")
-          } else {
-            labelPt2<-paste0(labelPt1,brawFormat(mean(resSig,na.rm=TRUE)*100,digits=npct),"%")
+          ns<-sum(!resSig,na.rm=TRUE)/n
+          s<-sum(resSig,na.rm=TRUE)/n
+          if (is.element(showType,c("e1d","e2d"))) {
+            s2<-sum(resSig & shvals<0,na.rm=TRUE)/n
+            s1<-sum(resSig & shvals>0,na.rm=TRUE)/n
           }
-          lpts1<-data.frame(y = xoff[i]+ylim[2], x = xlim[1])
-          g<-g+dataLabel(data=lpts1,label = labelPt2,vjust=1)
-        }
       }
     }  else {
       # no simulations
@@ -794,7 +765,7 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
     for (yl in ylines)
       g<-g+horzLine(intercept=yl,linetype="dotted",colour=lineCol)
     
-    if (is.element(showType,c("p","e1","e2","e1d","e2d"))) {
+    if (length(rvals)>1 && is.element(showType,c("p","e1","e2","e1d","e2d"))) {
     switch (showType,
             "p"={
               labelPt1<-paste0("p(ns) = ",brawFormat(ns*100,digits=npct),"% ")

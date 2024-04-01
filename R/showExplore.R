@@ -115,7 +115,7 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
     else whichEffect<-1
   }
   
-  g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme
+  g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme()
   for (whichEffect in 1:length(plots)) {
     braw.env$plotArea<-c(plots[whichEffect],0,plotWidth,1)
     g<-startPlot(xlim,ylim,top=TRUE,g=g)
@@ -126,6 +126,9 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
     theoryVals<-NULL
     theoryUpper<-NULL
     theoryLower<-NULL
+    theoryVals0<-c()
+    theoryVals1<-c()
+    theoryVals2<-c()
     if (showTheory) {
       # if (!hypothesis$effect$world$worldOn)
       #   hypothesis$effect$world<-list(worldOn=TRUE,populationPDF="Single",populationRZ="r",populationPDFk=hypothesis$effect$rIV,populationNullp<-0)
@@ -228,9 +231,6 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
           r<-fullPSig(hypothesis$effect$world,design,alpha=alphas[i])
           theoryVals<-c(theoryVals,r)
         }
-        theoryVals0<-c()
-        theoryVals1<-c()
-        theoryVals2<-c()
       }
       if (is.element(showType,c("NHST","tDR","fDR","fMR"))) {
         Nullp<-hypothesis$effect$world$populationNullp
@@ -251,21 +251,12 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
                },
                "fDR"={
                  theoryVals<-alphas*nullPs/(theoryVals1*(1-nullPs)+alphas*nullPs)
-                 theoryVals0<-c()
-                 theoryVals1<-c()
-                 theoryVals2<-c()
                },
                "tDR"={
                  theoryVals<-1-alphas*nullPs/(theoryVals1*(1-nullPs)+alphas*nullPs)
-                 theoryVals0<-c()
-                 theoryVals1<-c()
-                 theoryVals2<-c()
                },
                "fMR"={
                  theoryVals<-(1-theoryVals1)*(1-nullPs)/((1-theoryVals1)*(1-nullPs)+(1-alphas)*nullPs)
-                 theoryVals0<-c()
-                 theoryVals1<-c()
-                 theoryVals2<-c()
                }
         )
         hypothesis$effect$world$populationNullp<-Nullp
@@ -325,19 +316,19 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
         g<-g+dataLine(theory,colour=darken(col,1,-0.15),linewidth=0.5)
       }
       
-        if (!is.null(theoryVals1)) {
-          theory<-data.frame(x=c(newvals,rev(newvals)), y=1-c(theoryVals1,theoryVals1*0))
-          g<-g+dataPolygon(theory,colour=braw.env$plotColours$infer_sigNonNull,fill=braw.env$plotColours$infer_sigNonNull)
-        }
-        if (!is.null(theoryVals0)) {
-          theory<-data.frame(x=c(newvals,rev(newvals)), y=c(theoryVals0,theoryVals0*0))
-          g<-g+dataPolygon(theory,colour=braw.env$plotColours$infer_sigNull,fill=braw.env$plotColours$infer_sigNull)
-        }
-        if (!is.null(theoryVals2)) {
-          theory<-data.frame(x=newvals, y=theoryVals2)
-          g<-g+dataLine(theory,colour="black",linewidth=0.5)
-        }
-
+      if (!is.null(theoryVals1)) {
+        theory<-data.frame(x=c(newvals,rev(newvals)), y=1-c(theoryVals1,theoryVals1*0))
+        g<-g+dataPolygon(theory,colour=braw.env$plotColours$infer_sigNonNull,fill=braw.env$plotColours$infer_sigNonNull)
+      }
+      if (!is.null(theoryVals0)) {
+        theory<-data.frame(x=c(newvals,rev(newvals)), y=c(theoryVals0,theoryVals0*0))
+        g<-g+dataPolygon(theory,colour=braw.env$plotColours$infer_sigNull,fill=braw.env$plotColours$infer_sigNull)
+      }
+      if (!is.null(theoryVals2)) {
+        theory<-data.frame(x=newvals, y=theoryVals2)
+        g<-g+dataLine(theory,colour="black",linewidth=0.5)
+      }
+      
     }
     
     if (!is.null(exploreResult$result)) {

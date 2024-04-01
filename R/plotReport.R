@@ -78,7 +78,7 @@ reportPlot<-function(outputText,nc,nr){
                                          label.size=NA,label.padding=unit(0,"lines"))
   }
   
-  g<-g+labs(x="  ",y="  ")+braw.env$reportTheme+theme(legend.position = "none")
+  g<-g+labs(x="  ",y="  ")+theme(legend.position = "none")
   g<-g+coord_cartesian(xlim = c(1-margin,edge+margin), ylim = c(1-margin,top+margin))
-  g+braw.env$blankTheme
+  g+braw.env$blankTheme()
 }

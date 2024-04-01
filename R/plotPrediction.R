@@ -36,7 +36,7 @@ getAxisPrediction<-function(hypothesis) {
           }
   )
   
-  g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme
+  g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme()
   g<-startPlot(xlim,ylim,g=g)
   g<-g+xAxisLabel(bquote(bold(.(IV$name))))+xAxisTicks(xticks,xlabels)
   g<-g+yAxisLabel(bquote(bold(.(DV$name))))+yAxisTicks(yticks,ylabels)
@@ -323,7 +323,7 @@ plotCatCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
 }
 
 
-plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL,theme=braw.env$diagramTheme){
+plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL){
   if (is.null(g)) {
     g<-getAxisPrediction(hypothesis=list(IV=IV,DV=DV)) 
   }

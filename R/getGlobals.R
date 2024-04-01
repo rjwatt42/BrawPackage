@@ -55,24 +55,29 @@ BrawOpts<-function(BW=FALSE,fontScale=1) {
           braw.env$plotColours<-plotColours
           braw.env$plotShapes<-list(data=21,study=22,parameter=21,meta=24)
           
-          braw.env$plotTheme<-mainTheme+SMplotTheme+theme(plot.margin=margin(1.0,1.5,0.5,0.5,"cm"))
-          braw.env$diagramTheme<-mainTheme+SMplotTheme+theme(panel.background = element_rect(fill=plotColours$graphBack, colour=plotColours$graphBack),
-                                                             panel.spacing=margin(0,0,0,0),plot.margin=margin(0.5,0.5,0.3,0.3,"cm"))
-          braw.env$plainDiagramTheme<-mainTheme+SMplotTheme+theme(panel.background = element_rect(fill=plotColours$graphBack, colour=plotColours$graphBack),
-                                                                  panel.spacing=margin(0,0,0,0),plot.margin=margin(0.5,0.5,0.3,-0.2,"cm"))
-          braw.env$blankTheme<-mainTheme+theme(panel.background = element_rect(fill=plotColours$graphC, colour=plotColours$graphC),
-                                               panel.spacing=margin(0,0,0,0,"cm"),plot.margin=margin(-0.2,-0.4,-0.2,-0.5,"cm"),
-                                               axis.title.x=element_blank(),
-                                               axis.text.x=element_blank(),
-                                               axis.ticks.x=element_blank(),
-                                               axis.title.y=element_blank(),
-                                               axis.text.y=element_blank(),
-                                               axis.ticks.y=element_blank()
+          # braw.env$plotTheme<-mainTheme+SMplotTheme+theme(plot.margin=margin(1.0,1.5,0.5,0.5,"cm"))
+          # braw.env$diagramTheme<-mainTheme+SMplotTheme+theme(panel.background = element_rect(fill=plotColours$graphBack, colour=plotColours$graphBack),
+          #                                                    panel.spacing=margin(0,0,0,0),plot.margin=margin(0.5,0.5,0.3,0.3,"cm"))
+          # braw.env$plainDiagramTheme<-mainTheme+SMplotTheme+theme(panel.background = element_rect(fill=plotColours$graphBack, colour=plotColours$graphBack),
+          #                                                         panel.spacing=margin(0,0,0,0),plot.margin=margin(0.5,0.5,0.3,-0.2,"cm"))
+  braw.env$blankTheme<-function() {
+    theme(panel.background = element_rect(fill=plotColours$graphC, colour=plotColours$graphC),
+          panel.spacing=margin(0,0,0,0,"cm"),plot.margin=margin(-0.2,-0.4,-0.2,-0.5,"cm"),
+          panel.grid.major = element_line(linetype="blank"),panel.grid.minor = element_line(linetype="blank"),
+                    plot.background = element_rect(fill=plotColours$graphC, colour=plotColours$graphC),
+                         axis.title.x=element_blank(),
+                         axis.text.x=element_blank(),
+                         axis.ticks.x=element_blank(),
+                         axis.title.y=element_blank(),
+                         axis.text.y=element_blank(),
+                         axis.ticks.y=element_blank()
           )
-          braw.env$reportTheme<-braw.env$blankTheme+theme(plot.margin=margin(0.15,0.8,0,0.25,"cm"))
+  }
+          # braw.env$reportTheme<-braw.env$blankTheme()+theme(plot.margin=margin(0.15,0.8,0,0.25,"cm"))
           
           braw.env$labelSize<-3.2*fontScale
-
+          braw.env$dotSize<-16/3
+          
           ##########################
           # NHST constants
           

@@ -1,12 +1,12 @@
 plotSample<-function(IV,DV,effect,ivplot,dvplot,g=NULL) {
   if (is.null(g)) 
-    g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme
+    g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme()
 
   # the population
-  g<-plotPopulation(IV,DV,effect,alpha=1,theme=braw.env$plotTheme,g)
+  g<-plotPopulation(IV,DV,effect,alpha=1,g)
   
   # the scattered points
-  dotSize<-(braw.env$plotTheme$axis.title$size)/3
+  dotSize<-braw.env$dotSize
   if (length(ivplot)>100) {
     dotSize<-dotSize*sqrt(100/length(ivplot))
   }
@@ -21,7 +21,6 @@ plotSample<-function(IV,DV,effect,ivplot,dvplot,g=NULL) {
     if (sample$type=="Categorical") {xuse<-0.5} else {xuse<-median(x)}
     g<-g+vertLine(intercept=xuse,col="red")
   }
-  # g<-g+labs(x=IV$name,y=DV$name)+braw.env$plotTheme
   g
   
 }

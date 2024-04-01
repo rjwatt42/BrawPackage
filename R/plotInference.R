@@ -160,7 +160,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
   
   pts<-data.frame(x=d1,y=d2)
   braw.env$plotArea<-c(0,0,1,1)
-  g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme
+  g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme()
   g<-startPlot(xaxis$lim,yaxis$lim,box="both",top=FALSE,g=g)
   g<-g+xAxisTicks(NULL,logScale=xaxis$logScale)
   g<-g+xAxisLabel(xaxis$label)
@@ -175,7 +175,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
   }
 
   dotSize=min(8,max(3.5,sqrt(400/length(d1))))
-  dotSize<-dotSize<-(braw.env$plotTheme$axis.title$size)/3
+  dotSize<-braw.env$dotSize
 
   if (!metaPlot && braw.env$useSignificanceCols){
     c1=braw.env$plotColours$infer_sigC

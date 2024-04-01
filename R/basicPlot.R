@@ -75,7 +75,7 @@ startPlot<-function(xlim,ylim,box="both",top=FALSE,backC=braw.env$plotColours$gr
          }
          )
   
-  g<-g+theme(legend.position = "none")+braw.env$blankTheme
+  g<-g+theme(legend.position = "none")+braw.env$blankTheme()
 }
 
 plotTitle<-function(label,position="centre") {

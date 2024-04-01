@@ -23,7 +23,7 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,maxoff=1){
   
   hypothesisType=paste(IV$type,DV$type,sep=" ")
 
-  dotSize<-(braw.env$plotTheme$axis.title$size)/3
+  dotSize<-braw.env$dotSize
   shrinkDots=1
   if (length(x)>100) {
     dotSize<-max(dotSize*sqrt(100/length(x)),2)
@@ -233,11 +233,11 @@ plotCatInterDescription<-function(analysis,g=NULL){
     analysis1$hypothesis$DV$vals<-Dvals[use] 
     
     if (analysis1$hypothesis$DV$type=="Categorical") {
-      g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,2+(i-1)/(hypothesis$IV2$ncats-1),g,theme=braw.env$plotTheme)
+      g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,2+(i-1)/(hypothesis$IV2$ncats-1),g)
       g<-plotPoints(g,analysis1$hypothesis$IV,analysis1$hypothesis$DV,analysis1,i+1,hypothesis$IV2$ncats)
     } else {
       g<-plotPoints(g,analysis1$hypothesis$IV,analysis1$hypothesis$DV,analysis1,i+1,hypothesis$IV2$ncats)
-      g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,2+(i-1)/(hypothesis$IV2$ncats-1),g,theme=braw.env$plotTheme)
+      g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,2+(i-1)/(hypothesis$IV2$ncats-1),g)
     }
   }
   g<-g+dataLegend(data.frame(names=names,colours=cols),title=analysis$hypothesis$IV2$name)
@@ -281,15 +281,15 @@ plotParInterDescription<-function(analysis,g=NULL){
         # analysis2$hypothesis$DV$mu<-mean(analysis$dv[use2],na.rm=TRUE)
 
         if (analysis1$hypothesis$DV$type=="Categorical") {
-          g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,2,g,theme=braw.env$plotTheme)
-          g<-plotPrediction(analysis2$hypothesis$IV,NULL,analysis2$hypothesis$DV,analysis2,analysis$design,3,g,theme=braw.env$plotTheme)
+          g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,2,g)
+          g<-plotPrediction(analysis2$hypothesis$IV,NULL,analysis2$hypothesis$DV,analysis2,analysis$design,3,g)
           g<-plotPoints(g,analysis1$hypothesis$IV,analysis1$hypothesis$DV,analysis1,2,2)
           g<-plotPoints(g,analysis2$hypothesis$IV,analysis2$hypothesis$DV,analysis2,3,2)
         } else {
           g<-plotPoints(g,analysis1$hypothesis$IV,analysis1$hypothesis$DV,analysis1,2,2)
           g<-plotPoints(g,analysis2$hypothesis$IV,analysis2$hypothesis$DV,analysis2,3,2)
-          g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,2,g,theme=braw.env$plotTheme)
-          g<-plotPrediction(analysis2$hypothesis$IV,NULL,analysis2$hypothesis$DV,analysis2,analysis$design,3,g,theme=braw.env$plotTheme)
+          g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,2,g)
+          g<-plotPrediction(analysis2$hypothesis$IV,NULL,analysis2$hypothesis$DV,analysis2,analysis$design,3,g)
         }
    g<-g+dataLegend(data.frame(names=names,colours=col),title=analysis1$hypothesis$IV2$name)     
   g
@@ -301,7 +301,7 @@ plotParDescription<-function(analysis,g) {
   analysis$hypothesis$DV$vals<-analysis$dv
   
   g<-plotPoints(g,analysis$hypothesis$IV,analysis$hypothesis$DV,analysis,1)
-  g<-plotPrediction(analysis$hypothesis$IV,analysis$hypothesis$IV2,analysis$hypothesis$DV,analysis,analysis$design,1,g,theme=braw.env$plotTheme)
+  g<-plotPrediction(analysis$hypothesis$IV,analysis$hypothesis$IV2,analysis$hypothesis$DV,analysis,analysis$design,1,g)
   g
 }
 
@@ -311,7 +311,7 @@ plotCatDescription<-function(analysis,g) {
   analysis$hypothesis$DV$vals<-analysis$dv
   
   g<-plotPoints(g,analysis$hypothesis$IV,analysis$hypothesis$DV,analysis,1)
-  g<-plotPrediction(analysis$hypothesis$IV,analysis$hypothesis$IV2,analysis$hypothesis$DV,analysis,analysis$design,1,g,theme=braw.env$plotTheme)
+  g<-plotPrediction(analysis$hypothesis$IV,analysis$hypothesis$IV2,analysis$hypothesis$DV,analysis,analysis$design,1,g)
 
   g
 }
