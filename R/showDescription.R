@@ -28,7 +28,7 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,maxoff=1){
   if (length(x)>100) {
     dotSize<-max(dotSize*sqrt(100/length(x)),2)
   }
-  dotSize<-dotSize/2
+  # dotSize<-dotSize/2
   
   switch (hypothesisType,
           "Interval Interval"={

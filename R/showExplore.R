@@ -250,12 +250,15 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
                },
                "fDR"={
                  theoryVals<-alphas*nullPs/(theoryVals1*(1-nullPs)+alphas*nullPs)
+                 theoryVals1<-c()
                },
                "tDR"={
                  theoryVals<-1-alphas*nullPs/(theoryVals1*(1-nullPs)+alphas*nullPs)
+                 theoryVals1<-c()
                },
                "fMR"={
                  theoryVals<-(1-theoryVals1)*(1-nullPs)/((1-theoryVals1)*(1-nullPs)+(1-alphas)*nullPs)
+                 theoryVals1<-c()
                }
         )
         hypothesis$effect$world$populationNullp<-Nullp

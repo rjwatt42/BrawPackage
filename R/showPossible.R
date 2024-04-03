@@ -158,7 +158,7 @@ showPossible <- function(possibleResult=makePossible(),
   BoxCol<-"#666666"
   
   colS<-"yellow"
-  if (showP>0) colS<-braw.env$plotColours$infer_nsigC
+  if (showP>0)  colS<-braw.env$plotColours$infer_nsigC
   colSdark=darken(colS,off=-0.67)
   colSsim=darken(colS,off=0.0)
   
@@ -172,9 +172,10 @@ showPossible <- function(possibleResult=makePossible(),
   colDistS=braw.env$plotColours$infer_sigC
   highTransparency=0.25
   
-  char3D=1.2
+  char3D=braw.env$labelSize/3
   xylabelSize=1.1
-  zlabelSize=0.8
+  zlabelSize=0.7
+  tickLabelSize<-0.6
   wallHeight<-1.2
   logZ<-FALSE
   magRange<-0.5
@@ -275,7 +276,7 @@ showPossible <- function(possibleResult=makePossible(),
   rsw_dens<-rsw_dens_plus+rsw_dens_null
   
   offRange<-0
-  if (axisScale<1 && !is.na(possible$targetSample)) offRange<-possible$targetSample  
+  if (axisScale<1 && !is.null(possible$targetSample)) offRange<-possible$targetSample  
   if (braw.env$RZ=="r") {
     xlim<-c(-1,1)*axisScale+offRange # population
     ylim<-c(-1,1)*axisScale+offRange
@@ -297,11 +298,12 @@ showPossible <- function(possibleResult=makePossible(),
   }
   zlim[2]<-zlim[2]+diff(zlim)*0.2
   
-  
+  if (!is.null(sampleLikelihood_r)) {
   rp_stats<-densityFunctionStats(sampleLikelihood_r,rp)
   rp_peak<-rp_stats$peak
   rp_ci<-rp_stats$ci
   dens_at_peak<-rp_stats$dens_at_peak
+  }
   
   rpw_dens[rpw_dens>1 | is.na(rpw_dens)]<-1
   if (!(possible$type=="Populations" && possible$UsePrior=="none")) {
@@ -410,8 +412,8 @@ showPossible <- function(possibleResult=makePossible(),
     tick.x.end <- trans3d(long_ticks , ylim[1]-ytick_length*tick_grow, zlim[1], mapping)
     segments(tick.x.start$x, tick.x.start$y, tick.x.end$x, tick.x.end$y)
     # tick labels
-    ticks.x<-trans3d(long_ticks+xtick_length,ylim[1]- ytick_length*tick_grow*char3D*1.2,zlim[1],mapping)
-    text(ticks.x$x,ticks.x$y,long_ticks,cex=0.6*char3D,adj=c(1,NA))
+    ticks.x<-trans3d(long_ticks+xtick_length,ylim[1]- ytick_length*tick_grow*2.5,zlim[1],mapping)
+    text(ticks.x$x,ticks.x$y,long_ticks,cex=char3D*tickLabelSize,adj=c(0.5,0.5))
     
     # y ticks
     plot_ticks<-seq(ceil(ylim[1]*10),floor(ylim[2]*10))/10
@@ -429,8 +431,8 @@ showPossible <- function(possibleResult=makePossible(),
     tick.y.end <- trans3d(xlim[2]+xtick_length*tick_grow, long_ticks , zlim[1], mapping)
     segments(tick.y.start$x, tick.y.start$y, tick.y.end$x, tick.y.end$y)
     # tick labels
-    ticks.y<-trans3d(xlim[2]+xtick_length*tick_grow*char3D*1.5,long_ticks-0.02,zlim[1],mapping)
-    text(ticks.y$x,ticks.y$y,long_ticks,cex=0.6*char3D,adj=c(0,NA))
+    ticks.y<-trans3d(xlim[2]+xtick_length*tick_grow*2.5,long_ticks,zlim[1],mapping)
+    text(ticks.y$x,ticks.y$y,long_ticks,cex=char3D*tickLabelSize,adj=c(0.5,0.5))
     
     if (braw.env$RZ=="r") {
       label.x<-bquote(bold(r['p']))
@@ -440,11 +442,11 @@ showPossible <- function(possibleResult=makePossible(),
       label.y<-bquote(bold(z['s']))
     }
     
-    pos.x<-trans3d(sum(xlim)/2+0.1,ylim[1]-ytick_length*tick_grow*char3D*2.5,zlim[1],mapping)
-    text(pos.x$x,pos.x$y,label.x,adj=c(1,1),font=2,cex=char3D*xylabelSize)
+    pos.x<-trans3d(sum(xlim)/2,ylim[1]-ytick_length*tick_grow*5,zlim[1]-0.1,mapping)
+    text(pos.x$x,pos.x$y,label.x,adj=c(0.5,0.5),font=2,cex=char3D*xylabelSize)
     
-    pos.y<-trans3d(xlim[2]+xtick_length*tick_grow*char3D*3.5,sum(ylim)/2-0.2,zlim[1],mapping)
-    text(pos.y$x,pos.y$y,label.y,adj=c(0,1),font=2,cex=char3D*xylabelSize)
+    pos.y<-trans3d(xlim[2]+xtick_length*tick_grow*5,sum(ylim)/2,zlim[1]-0.1,mapping)
+    text(pos.y$x,pos.y$y,label.y,adj=c(0.5,0.5),font=2,cex=char3D*xylabelSize)
     
   }
   # graph frame
@@ -458,7 +460,7 @@ showPossible <- function(possibleResult=makePossible(),
               lines(trans3d(x=c(0,0),y=ylim,z=c(0,0)+zlim[1],pmat=mapping),col="black",lty=3)
             }
             # populations 
-            if (!is.na(possible$targetSample)) {
+            if (!is.null(possible$targetSample)) {
               lines(trans3d(x=xlim,y=c(0,0)+possible$targetSample,z=c(0,0)+zlim[1],pmat=mapping),col=colVline,lwd=1,lty=3)
             }
             if (possible$type=="Populations" && !is.na(possible$targetPopulation)) {
@@ -470,7 +472,7 @@ showPossible <- function(possibleResult=makePossible(),
             }
             
             # populations 
-            # if (!is.na(possible$targetSample)) {
+            # if (!is.null(possible$targetSample)) {
             #   # show peak and CIs on floor
             #   if (doFloorCILines) {
             #     lines(trans3d(x=c(rp_peak,rp_peak),y=ylim,z=c(0,0)+zlim[1],pmat=mapping),col=colVline,lwd=2)
@@ -486,7 +488,7 @@ showPossible <- function(possibleResult=makePossible(),
             #   # }
             # }
             
-            if (possible$type=="Populations" && !is.na(possible$targetSample)) {
+            if (possible$type=="Populations" && !is.null(possible$targetSample)) {
               # show peak likelihood on population back wall
               dens_rp_peak<-approx(populationBackwall$rpw,populationBackwall$rpw_dens,rp_peak)$y
               if (logZ) {
@@ -519,7 +521,7 @@ showPossible <- function(possibleResult=makePossible(),
                 if (logZ) z<-log10(z)
                 polygon(trans3d(x=c(x[1],x,x[length(x)]),y=c(y[1],y,y[length(y)]),z=c(zlim[1],z,zlim[1])*wallHeight,pmat=mapping),col = addTransparency(colPdark,0.5),border=NA)
               }
-              if (possible$type=="Populations" && !is.na(possible$targetSample)) {
+              if (possible$type=="Populations" && !is.null(possible$targetSample)) {
                 # show peak likelihood on population back wall
                 lines(trans3d(x=c(0,0)+rp_peak,y=c(0,0)+ylim[2],z=c(zlim[1],dens_rp_peak)*wallHeight,pmat=mapping),col=colVline,lwd=2)
               }
@@ -579,7 +581,7 @@ showPossible <- function(possibleResult=makePossible(),
                     }
                   }
                 }
-                if (possible$type=="Populations" &&!is.na(possible$targetSample)) {
+                if (possible$type=="Populations" &&!is.null(possible$targetSample)) {
                   # show likelihood on sample back wall
                   si=1;
                   if (possible$UsePrior!="none") {
@@ -685,7 +687,7 @@ showPossible <- function(possibleResult=makePossible(),
                             z_use<-z_use[(use2+1):length(z_use)]
                             r_use<-r_use[(use2+1):length(r_use)]
                           }
-                          if (showP>0) {
+                          if (showP>0 && !is.null(sRho)) {
                             rcrit<-sRho
                             if (sRho>0)  use<-which(rs>=rcrit)
                             else         use<-which(rs<=rcrit)
@@ -773,7 +775,7 @@ showPossible <- function(possibleResult=makePossible(),
                       # draw theory main distribution & lines
                       if (possible$showTheory){
                         theoryAlpha=0.85
-                        if (!is.na(possible$targetSample)) {
+                        if (!is.null(possible$targetSample)) {
                           rd<-sampleLikelihood_r
                           if (logZ) {
                             rd<-log10(rd)
@@ -850,15 +852,15 @@ showPossible <- function(possibleResult=makePossible(),
                     "Populations"={
                       rw<-rpw
                       rw_dens<-rpw_dens
+                      xlabel<-bquote(bold(r['p']))
                       if (braw.env$RZ=="z") xlabel<-bquote(bold(z['p']))
-                      else xlabel<-bquote(bold(r['p']))
                       col<-colP
                     },
                     "Samples"={
                       rw<-rsw
                       rw_dens<-rsw_dens
+                      xlabel<-bquote(bold(r['s']))
                       if (braw.env$RZ=="z") xlabel<-bquote(bold(z['s']))
-                      else xlabel<-bquote(bold(r['s']))
                       col<-colS
                     }
             )
@@ -1033,7 +1035,7 @@ showPossible <- function(possibleResult=makePossible(),
             }
           },
           "flat"={
-            if (!is.na(possible$targetSample) && !is.na(possible$targetPopulation)) {
+            if (!is.null(possible$targetSample) && !is.na(possible$targetPopulation)) {
               lines(trans3d(x=xlim,y=c(0,0)+possible$targetSample,z=c(0,0)+zlim[1],pmat=mapping),col=colVline,lwd=1)
               lines(trans3d(x=c(0,0)+possible$targetPopulation,y=ylim,z=c(0,0)+zlim[1],pmat=mapping),col=colVline,lwd=1,lty=2)
               points(trans3d(x=possible$targetPopulation,

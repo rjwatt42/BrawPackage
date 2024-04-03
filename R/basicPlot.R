@@ -7,7 +7,7 @@ reRangeY<-function(y) {
 reRangeX<-function(x) {
   if (is.null(braw.env$plotLimits)) return(x)
   x<-(x-braw.env$plotLimits$xsc[1])/diff(braw.env$plotLimits$xsc)
-  x<-x*(braw.env$plotArea[3]-braw.env$plotLimits$gap[1])+braw.env$plotArea[1]+braw.env$plotLimits$gap[1]
+  x<-x*(braw.env$plotArea[3]-braw.env$plotLimits$gap[1]-braw.env$plotLimits$gap[4])+braw.env$plotArea[1]+braw.env$plotLimits$gap[1]
   return(x)
 }
 reRangeXY<-function(data) {
@@ -36,23 +36,24 @@ plotLimits<-function(xlim,ylim,orientation,gaps=c(1,1,0)) {
          "horz"={braw.env$plotLimits<-list(xlim=xlim,ylim=ylim,xsc=xlim,ysc=ylim,
                                            orientation=orientation,gap=gaps)},
          "vert"={braw.env$plotLimits<-list(xlim=xlim,ylim=ylim,xsc=ylim,ysc=xlim,
-                                           orientation=orientation,gap=gaps[c(2,1,3)])}
+                                           orientation=orientation,gap=gaps[c(2,1,4,3)])}
          )
 }
 
 startPlot<-function(xlim,ylim,box="both",top=FALSE,backC=braw.env$plotColours$graphBack,orientation="horz",g=NULL) {
+  minGap<-0.05
+  maxGap<-0.125
   switch(box,
-         "x"=gaps<-c(0,1),
-         "y"=gaps<-c(1,0),
-         "both"=gaps<-c(1,1),
-         {gaps<-c(0,0)}
+         "x"=gaps<-c(minGap,maxGap),
+         "y"=gaps<-c(maxGap,minGap),
+         "both"=gaps<-c(maxGap,maxGap),
+         {gaps<-c(minGap,minGap)}
   )
-  if (top) gaps<-c(gaps,1)
-  else gaps<-c(gaps,0)
-  gaps<-gaps*c(0.125,0.125,0.1)
+  if (top) gaps<-c(gaps,maxGap,minGap)
+  else gaps<-c(gaps,minGap,minGap)
   plotLimits(xlim = xlim, ylim = ylim,orientation=orientation,gaps)
 
-  if (is.null(g)) g<-ggplot()
+  if (is.null(g)) g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))
   back<-data.frame(x=xlim[c(1,2,2,1)],y=ylim[c(1,1,2,2)])
   xaxis<-data.frame(x=xlim,y=ylim[1])
   yaxis<-data.frame(x=xlim[1],y=ylim)
@@ -105,14 +106,16 @@ xAxisLabel<-function(label) {
   switch(braw.env$plotLimits$orientation,
          "vert"={
            xoff<-0.1*braw.env$plotArea[3]
+           xoff<-0
            geom_text(data=axis,aes(x=x-xoff,y=y),label=label, parse = TRUE,
-                     hjust=0.5,vjust=0.5,
+                     hjust=0.5,vjust=-2.5/1.5*0.8,
                      size=braw.env$labelSize*1.5,angle=90,fontface="bold")      
          },
          "horz"={
            yoff<-0.1*braw.env$plotArea[4]
+           yoff<-0
            geom_text(data=axis,aes(x=x,y=y-yoff),label=label, parse = TRUE,
-                     hjust=0.5,vjust=0.5,
+                     hjust=0.5,vjust=3.5/1.5*0.8,
                      size=braw.env$labelSize*1.5,angle=0,fontface="bold")      
          }
   )
@@ -130,14 +133,16 @@ yAxisLabel<-function(label){
   switch(braw.env$plotLimits$orientation,
          "vert"={
            yoff<-0.1*braw.env$plotArea[4]
+           yoff<-0
            geom_text(data=axis,aes(x=x,y=y-yoff),label=label, parse = TRUE,
-                     hjust=0.5,vjust=0.5,
+                     hjust=0.5,vjust=3.5/1.5*0.8,
                      size=braw.env$labelSize*1.5,angle=0,fontface="bold")      
          },
          "horz"={
            xoff<-0.1*braw.env$plotArea[3]
+           xoff<-0
            geom_text(data=axis,aes(x=x-xoff,y=y),label=label, parse = TRUE,
-                     hjust=0.5,vjust=0.5,
+                     hjust=0.5,vjust=-2.5/1.5*0.8,
                      size=braw.env$labelSize*1.5,angle=90,fontface="bold")      
          }
   )
@@ -156,14 +161,13 @@ yAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE){
   if (logScale) breaks<-log10(breaks)
   
   ticks<-reRangeXY(data.frame(x=braw.env$plotLimits$xlim[1],y=breaks))
+  mn<-4/max(5,max(nchar(labels)))
   switch(braw.env$plotLimits$orientation,
          "vert"={
-           mn<-4/max(4,max(nchar(labels)))
            geom_text(data=ticks,aes(x=x,y=y),label=labels,hjust=0.5,vjust=1.1,
                      size=braw.env$labelSize*mn)
          },
          "horz"={
-           mn<-4/max(4,max(nchar(labels)))
            geom_text(data=ticks,aes(x=x,y=y),label=labels,hjust=1.1,vjust=0.5,
                      size=braw.env$labelSize*mn)
          }
@@ -185,14 +189,13 @@ xAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE){
   ticksTop<-reRangeXY(data.frame(x=breaks,y=braw.env$plotLimits$ylim[1]))
   ticksBottom<-reRangeXY(data.frame(x=breaks,y=braw.env$plotLimits$ylim[1]-yoff))
   
+  mn<-4/max(5,max(nchar(labels)))
   switch(braw.env$plotLimits$orientation,
          "vert"={
-           mn<-4/max(4,max(nchar(labels)))
            geom_text(data=ticksTop,aes(x=x,y=y),label=labels,hjust=1.1,vjust=0.5,
                      size=braw.env$labelSize*mn)
          },
          "horz"={
-           mn<-4/max(4,max(nchar(labels)))
            geom_text(data=ticksTop,aes(x=x,y=y),label=labels,hjust=0.5,vjust=1.1,
                      size=braw.env$labelSize*mn)
          }
@@ -221,12 +224,12 @@ dataLabel<-function(data,label, hjust=0, vjust=0, fill="white",colour="black") {
            geom_label(data=data,aes(x = x, y = y), label=label, 
                       hjust=hjust, vjust=vjust, 
                fill=fill,color=colour,
-               size=braw.env$labelSize,parse=TRUE),
+               size=braw.env$labelSize*0.75,parse=TRUE),
          "vert"=   
            geom_label(data=data,aes(x = x, y = y), label=label, 
                       hjust=vjust,vjust=hjust, 
                fill=fill,color=colour,
-               size=braw.env$labelSize),parse=TRUE
+               size=braw.env$labelSize*0.75),parse=TRUE
   )
   
 }

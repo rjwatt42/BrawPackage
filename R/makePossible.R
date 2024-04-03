@@ -59,17 +59,13 @@ runPossible <- function(possible=makePossible(),possibleResult=NULL){
   n<-design$sN
   
   # note that we do everything in r and then, if required transform to z at the end
-  switch (braw.env$RZ,
-          "r" ={
-            rs<-seq(-1,1,length=npoints)*braw.env$r_range
-            rp<-seq(-1,1,length=npoints)*braw.env$r_range
-          },
-          "z" ={
+  rs<-seq(-1,1,length=npoints)*braw.env$r_range
+  rp<-seq(-1,1,length=npoints)*braw.env$r_range
+  if (braw.env$RZ=="z") {
             rs<-tanh(seq(-1,1,length=npoints)*braw.env$z_range)
             rp<-tanh(seq(-1,1,length=npoints)*braw.env$z_range)
           }
-  )
-  
+
   # get the sample effect size of interest and its corresponding sample size
   sRho<-possible$targetSample
   if (braw.env$RZ=="z") sRho<-tanh(sRho)
@@ -131,7 +127,11 @@ runPossible <- function(possible=makePossible(),possibleResult=NULL){
     sourceRVals<-c(sourceRVals,0)
     sourceSampDens_r_plus<-rbind(sourceSampDens_r_plus,sourceSampDens_r_null)
   }
+  dr_gain<-max(sourceSampDens_r_plus,na.rm=TRUE)
+  sourceSampDens_r_null<-sourceSampDens_r_null/dr_gain
+  sourceSampDens_r_plus<-sourceSampDens_r_plus/dr_gain
   
+  # enumerate the prior populations
   pD<-fullRSamplingDist(rp,prior,design,separate=TRUE)
   priorRVals<-pD$vals
   priorSampDens_r<-pD$dens
@@ -148,55 +148,55 @@ runPossible <- function(possible=makePossible(),possibleResult=NULL){
   # likelihood function for each sample (there's usually only 1)
   sampleSampDens_r<-1
   sampleLikelihood_r<-c()
-  for (ei in 1:length(sRho)){
-    rDens<-0
-    for (ci in 1:length(correction)) {
-      local_r<-tanh(atanh(sRho[ei])+correction[ci])
-      if (design$sNRand) {
-        d<-0
-        for (ni in seq(minN,maxRandN*design$sN,length.out=nNpoints)) {
-          # for (ni in 5+seq(0,maxRandN,1/n[ei])*n[ei]) {
-          g<-dgamma(ni-minN,shape=design$sNRandK,scale=(design$sN-minN)/design$sNRandK)
-          d<-d+rSamplingDistr(rp,local_r,ni)*g
+  if (!is.null(sRho)) {
+    for (ei in 1:length(sRho)){
+      rDens<-0
+      for (ci in 1:length(correction)) {
+        local_r<-tanh(atanh(sRho[ei])+correction[ci])
+        if (design$sNRand) {
+          d<-0
+          for (ni in seq(minN,maxRandN*design$sN,length.out=nNpoints)) {
+            # for (ni in 5+seq(0,maxRandN,1/n[ei])*n[ei]) {
+            g<-dgamma(ni-minN,shape=design$sNRandK,scale=(design$sN-minN)/design$sNRandK)
+            d<-d+rSamplingDistr(rp,local_r,ni)*g
+          }
+          d<-d/sum(d)
+          rDens<-rDens+d
+        } else {
+          rDens<-rDens+rSamplingDistr(rp,local_r,n[ei])
         }
-        d<-d/sum(d)
-        rDens<-rDens+d
-      } else {
-        rDens<-rDens+rSamplingDistr(rp,local_r,n[ei])
       }
+      sampleLikelihood_r<-rbind(sampleLikelihood_r,rDens/length(correction))
+      sampleSampDens_r <- sampleSampDens_r * rDens/length(correction)
     }
-    sampleLikelihood_r<-rbind(sampleLikelihood_r,rDens/length(correction))
-    sampleSampDens_r <- sampleSampDens_r * rDens/length(correction)
-  }
-  # times the a-priori distribution
-  sampleSampDens_r<-sampleSampDens_r*priorPopDens_r_full
-  for (ei in 1:length(sRho)){
-    sampleLikelihood_r[ei,]<-sampleLikelihood_r[ei,]*priorPopDens_r_full
-  }
-  
-  dr_gain<-max(sourceSampDens_r,na.rm=TRUE)
-  sourceSampDens_r<-sourceSampDens_r/dr_gain
-  
-  dr_gain<-max(sourceSampDens_r_plus,na.rm=TRUE)
-  sourceSampDens_r_null<-sourceSampDens_r_null/dr_gain
-  sourceSampDens_r_plus<-sourceSampDens_r_plus/dr_gain
-  
-  if (any(!is.na(priorSampDens_r))) {
-    dr_gain<-max(priorSampDens_r,na.rm=TRUE)
-    priorSampDens_r<-priorSampDens_r/dr_gain
-  }
-  
-  if (prior$worldOn && prior$populationNullp>0) {
-    sampleLikelihood_r<-sampleLikelihood_r*(1-prior$populationNullp)
-    priorPopDens_r<-priorPopDens_r*(1-prior$populationNullp)
-    sourcePopDens_r<-sourcePopDens_r*(1-source$populationNullp)
-    for (i in 1:length(sRho)) {
-      sampleLikelihood_r<-sampleLikelihood_r*dnorm(atanh(sRho[i]),0,1/sqrt(n[i]-3))
+    # times the a-priori distribution
+    sampleSampDens_r<-sampleSampDens_r*priorPopDens_r_full
+    for (ei in 1:length(sRho)){
+      sampleLikelihood_r[ei,]<-sampleLikelihood_r[ei,]*priorPopDens_r_full
     }
-    priorSampDens_r_plus<-priorSampDens_r_plus/sum(priorSampDens_r_plus)*(1-prior$populationNullp)
-    priorSampDens_r_null<-priorSampDens_r_null/sum(priorSampDens_r_null)*(prior$populationNullp)
+    
+    dr_gain<-max(sourceSampDens_r,na.rm=TRUE)
+    sourceSampDens_r<-sourceSampDens_r/dr_gain
+    
+    if (any(!is.na(priorSampDens_r))) {
+      dr_gain<-max(priorSampDens_r,na.rm=TRUE)
+      priorSampDens_r<-priorSampDens_r/dr_gain
+    }
+    
+    if (prior$worldOn && prior$populationNullp>0) {
+      sampleLikelihood_r<-sampleLikelihood_r*(1-prior$populationNullp)
+      priorPopDens_r<-priorPopDens_r*(1-prior$populationNullp)
+      sourcePopDens_r<-sourcePopDens_r*(1-source$populationNullp)
+      for (i in 1:length(sRho)) {
+        sampleLikelihood_r<-sampleLikelihood_r*dnorm(atanh(sRho[i]),0,1/sqrt(n[i]-3))
+      }
+      priorSampDens_r_plus<-priorSampDens_r_plus/sum(priorSampDens_r_plus)*(1-prior$populationNullp)
+      priorSampDens_r_null<-priorSampDens_r_null/sum(priorSampDens_r_null)*(prior$populationNullp)
+    }
+    sampleLikelihood_r<-sampleLikelihood_r/max(sampleLikelihood_r,na.rm=TRUE)
+  } else {
+    sampleLikelihood_r<-c()
   }
-  sampleLikelihood_r<-sampleLikelihood_r/max(sampleLikelihood_r,na.rm=TRUE)
   
   switch (possible$type,
           "Samples"={

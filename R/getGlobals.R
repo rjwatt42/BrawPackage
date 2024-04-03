@@ -3,9 +3,21 @@ braw.env<-c()
   BrawOpts()
 }
 
-BrawOpts<-function(BW=FALSE,fontScale=1) {
+newBrawDev<-function(fontScale=1,height=576,aspect=1.736) {
+  while (dev.cur()!=1) dev.off()
+  dev.new(width=height*aspect/144, height=height/144, noRStudioGD = TRUE)
+  fontScale<-min(dev.size(units="px"))/200
+  assign("labelSize",3.2*fontScale,braw.env)
+}
+
+BrawOpts<-function(BW=FALSE,fontScale=1,newDev=FALSE,height=576,aspect=1.736) {
   braw.env <- new.env(parent = emptyenv())
   
+  if (newDev) {
+    while (dev.cur()!=1) dev.off()
+    dev.new(width=height*aspect/144, height=height/144, noRStudioGD = TRUE)
+    fontScale<-min(dev.size(units="px"))/200
+  }
   # genuine globals (for now)
   braw.env$plotDescriptionCols<-c()
   braw.env$CatCatCols<-c()

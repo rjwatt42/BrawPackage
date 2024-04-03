@@ -63,10 +63,9 @@ showWorld<-function(hypothesis=makeHypothesis(effect=makeEffect(world=makeWorld(
   
   braw.env$plotArea<-plotArea
 
-  switch(braw.env$RZ,
-         "r"={range<-braw.env$r_range},
-         "z"={range<-tanh(braw.env$z_range)}
-  )
+  range<-braw.env$r_range
+  if (braw.env$RZ=="z"){range<-tanh(braw.env$z_range)}
+
   g<-startPlot(xlim=c(-1,1)*range,ylim=c(0,1.05),box="x",g=g)
   # if (world$worldAbs) {
   #   rx<-seq(0,1,length.out=braw.env$worldNPoints)*range

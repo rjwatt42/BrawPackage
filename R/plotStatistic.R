@@ -453,18 +453,18 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
          "horz"={
            xlim<-c(0,max(xoff))+c(0,1)
            orient<-"vert"
-           },
+         },
          "vert"={
            xlim<-c(0,max(xoff))+c(-1,1)
            orient<-"horz"
          }
-         )
+  )
   
   yaxis<-showAxis(showType,effect)
   ylim<-yaxis$lim
   ylabel<-yaxis$label
   ylines<-yaxis$lines
-
+  
   if (showType=="p" && braw.env$pPlotScale=="log10" && any(is.numeric(analysis$pIV))) 
     while (mean(log10(analysis$pIV)>ylim[1])<0.75) ylim[1]<-ylim[1]-1
   
@@ -520,7 +520,7 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
     effectTheory$world$populationPDFk<-effect$rIV
     effectTheory$world$populationNullp<-0
   }
-
+  
   if (!all(is.na(analysis$rIV))) { theoryAlpha<-0.5} else {theoryAlpha<-1}
   
   for (i in 1:length(xoff)){
@@ -667,6 +667,7 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
     }
     
     # then the samples
+    rvals<-c()
     if (!all(is.na(analysis$rIV))) {
       shvals<-showVals[,i]
       rvals<-data$rs[,i]
@@ -693,21 +694,18 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
         pts<-data.frame(x=rvals*0+xoff[i],y1=shvals,y2=resSig,n<-nvals)
       }
       
-      # if (braw.env$RZ=="z" && is.element(showType,c("r","rp"))) {
-      #   pts1$y1<-atanh(pts1$y1)
-      # }
       g<-expected_plot(g,pts,showType,analysis,IV,DV,i,orientation=orientation,
                        ylim=ylim,histGain=histGain,histGainrange=histGainrange)
       
       if (length(rvals)>1 && is.element(showType,c("p","e1","e2","e1d","e2d"))) {
-          n<-length(pvals)
-          if (!is.null(otheranalysis) && effect$world$worldOn) n<-n+length(otheranalysis$pIV)
-          ns<-sum(!resSig,na.rm=TRUE)/n
-          s<-sum(resSig,na.rm=TRUE)/n
-          if (is.element(showType,c("e1d","e2d"))) {
-            s2<-sum(resSig & shvals<0,na.rm=TRUE)/n
-            s1<-sum(resSig & shvals>0,na.rm=TRUE)/n
-          }
+        n<-length(pvals)
+        if (!is.null(otheranalysis) && effect$world$worldOn) n<-n+length(otheranalysis$pIV)
+        ns<-sum(!resSig,na.rm=TRUE)/n
+        s<-sum(resSig,na.rm=TRUE)/n
+        if (is.element(showType,c("e1d","e2d"))) {
+          s2<-sum(resSig & shvals<0,na.rm=TRUE)/n
+          s1<-sum(resSig & shvals>0,na.rm=TRUE)/n
+        }
       }
     }  else {
       # no simulations
@@ -764,47 +762,47 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
     for (yl in ylines)
       g<-g+horzLine(intercept=yl,linetype="dotted",colour=lineCol)
     
-    if (length(rvals)>1 && is.element(showType,c("p","e1","e2","e1d","e2d"))) {
-    switch (showType,
-            "p"={
-              labelPt1<-paste0("p(ns) = ",brawFormat(ns*100,digits=npct),"% ")
-              labelPt1a<-paste0("p(sig) = ",brawFormat(s*100,digits=npct),"% ")
-            },
-            "e1"={
-              labelPt1<-paste0("p(ns correct) = ",brawFormat(ns*100,digits=npct),"% ")
-              labelPt1a<-paste0("p(sig error) = ",brawFormat(s*100,digits=npct),"% ")
-            },
-            "e2"={
-              labelPt1<-paste0("p(ns miss) = ",brawFormat(ns*100,digits=npct),"% ")
-              labelPt1a<-paste0("p(sig correct) = ",brawFormat(s*100,digits=npct),"% ")
-            },
-            "e1d"={
-              labelPt1b<-paste0("p(ns) = ",brawFormat(ns/n*100,digits=npct),"% ")
-              labelPt1a<-paste0("p(sig correct) = ",brawFormat(s2/n*100,digits=npct),"% ")
-              labelPt1<-paste0("p(sig error) = ",brawFormat(s1/n*100,digits=npct),"% ")
-              labelPt1b<-paste0("p(ns) = ",brawFormat(ns/n*100,digits=npct),"%")
-              labelPt1a<-paste0("p(sig correct) = ",brawFormat(s2/n*100,digits=npct),"%")
-              labelPt1<-paste0("p(sig error) = ",brawFormat(s1/n*100,digits=npct),"%")
-            },
-            "e2d"={
-              labelPt1b<-paste0("p(ns) = ",brawFormat(ns/n*100,digits=npct),"% ")
-              labelPt1a<-paste0("p(sig error) = ",brawFormat(s2/n*100,digits=npct),"% ")
-              labelPt1<-paste0("p(sig correct) = ",brawFormat(s1/n*100,digits=npct),"% ")
-              labelPt1b<-paste0("p(ns) = ",brawFormat(ns/n*100,digits=npct),"%")
-              labelPt1a<-paste0("p(sig error) = ",brawFormat(s2/n*100,digits=npct),"%")
-              labelPt1<-paste0("p(sig correct) = ",brawFormat(s1/n*100,digits=npct),"%")
-            }
-    )
-    lpts1<-data.frame(y = xoff[i]+ylim[2], x = xlim[1])
-    if (labelSig)
-      g<-g+dataLabel(data=lpts1,label = labelPt1,vjust=1)
-    lpts1a<-data.frame(y = xoff[i]+ylim[1], x = xlim[1])
-    if (labelNSig)
-      g<-g+dataLabel(data=lpts1a,label = labelPt1a,vjust=0)
-    if (is.element(showType,c("e1d","e2d"))) {
-      lpts1<-data.frame(y = xoff[i]+mean(ylim), x = xlim[1])
-      g<-g+dataLabel(data=lpts1,label = labelPt1b,vjust=0.5)
-    }
+    if (is.element(showType,c("p","e1","e2","e1d","e2d"))) {
+      switch (showType,
+              "p"={
+                labelPt1<-paste0("p(ns) = ",brawFormat(ns*100,digits=npct),"% ")
+                labelPt1a<-paste0("p(sig) = ",brawFormat(s*100,digits=npct),"% ")
+              },
+              "e1"={
+                labelPt1<-paste0("p(ns correct) = ",brawFormat(ns*100,digits=npct),"% ")
+                labelPt1a<-paste0("p(sig error) = ",brawFormat(s*100,digits=npct),"% ")
+              },
+              "e2"={
+                labelPt1<-paste0("p(ns miss) = ",brawFormat(ns*100,digits=npct),"% ")
+                labelPt1a<-paste0("p(sig correct) = ",brawFormat(s*100,digits=npct),"% ")
+              },
+              "e1d"={
+                labelPt1b<-paste0("p(ns) = ",brawFormat(ns/n*100,digits=npct),"% ")
+                labelPt1a<-paste0("p(sig correct) = ",brawFormat(s2/n*100,digits=npct),"% ")
+                labelPt1<-paste0("p(sig error) = ",brawFormat(s1/n*100,digits=npct),"% ")
+                labelPt1b<-paste0("p(ns) = ",brawFormat(ns/n*100,digits=npct),"%")
+                labelPt1a<-paste0("p(sig correct) = ",brawFormat(s2/n*100,digits=npct),"%")
+                labelPt1<-paste0("p(sig error) = ",brawFormat(s1/n*100,digits=npct),"%")
+              },
+              "e2d"={
+                labelPt1b<-paste0("p(ns) = ",brawFormat(ns/n*100,digits=npct),"% ")
+                labelPt1a<-paste0("p(sig error) = ",brawFormat(s2/n*100,digits=npct),"% ")
+                labelPt1<-paste0("p(sig correct) = ",brawFormat(s1/n*100,digits=npct),"% ")
+                labelPt1b<-paste0("p(ns) = ",brawFormat(ns/n*100,digits=npct),"%")
+                labelPt1a<-paste0("p(sig error) = ",brawFormat(s2/n*100,digits=npct),"%")
+                labelPt1<-paste0("p(sig correct) = ",brawFormat(s1/n*100,digits=npct),"%")
+              }
+      )
+      lpts1<-data.frame(y = xoff[i]+ylim[2], x = xlim[1])
+      if (labelSig)
+        g<-g+dataLabel(data=lpts1,label = labelPt1,vjust=1)
+      lpts1a<-data.frame(y = xoff[i]+ylim[1], x = xlim[1])
+      if (labelNSig)
+        g<-g+dataLabel(data=lpts1a,label = labelPt1a,vjust=0)
+      if (is.element(showType,c("e1d","e2d"))) {
+        lpts1<-data.frame(y = xoff[i]+mean(ylim), x = xlim[1])
+        g<-g+dataLabel(data=lpts1,label = labelPt1b,vjust=0.5)
+      }
     }
   }
   
