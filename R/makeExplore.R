@@ -90,7 +90,7 @@ mergeExploreResult<-function(res1,res2) {
 #' @export
 makeExplore<-function(nsims=10,exploreResult=NULL,exploreType="n",exploreNPoints=13,
                       min_n=10,max_n=250,max_r=0.9,max_anom=1,
-                      xlog=FALSE,xabs=FALSE,mx_log=FALSE,
+                      xlog=FALSE,xabs=FALSE,
                       hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
                       doingNull=FALSE,autoShow=FALSE,showType="r"
 ) {
@@ -98,12 +98,10 @@ makeExplore<-function(nsims=10,exploreResult=NULL,exploreType="n",exploreNPoints
                 exploreNPoints=exploreNPoints,
                 min_n=min_n,max_n=max_n,max_r=max_r,max_anom=max_anom,
                 xlog=xlog,xabs=xabs,
-                mx_log=mx_log,
                 hypothesis=hypothesis,
                 design=design,
                 evidence=evidence
   )
-
   if (is.null(exploreResult)) {
     exploreResult<-list(count=0,
                         result=NULL,

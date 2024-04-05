@@ -22,23 +22,23 @@ showHypothesis<-function(hypothesis=makeHypothesis(),doWorld=FALSE) {
   if (doWorld) {
     xoff<-0.025
     effect$rIV<-NULL
-  } else xoff<-0.325
+  } else xoff<-0.2
   g<-NULL
   switch(no_ivs,
          { 
-           g<-showVariable(IV,plotArea=c(xoff,0.6,0.35,0.4),g)
-           g<-showVariable(DV,plotArea=c(xoff,0.0,0.35,0.4),g)
-           g<-drawEffectES(effect$rIV,plotArea=c(xoff+0.05,0.42,0.25,0.15),1,g)
+           g<-showVariable(IV,plotArea=c(xoff,0.6,0.6,0.4),g)
+           g<-showVariable(DV,plotArea=c(xoff,0.0,0.6,0.4),g)
+           g<-showEffect(effect$rIV,plotArea=c(xoff,0.37,0.65,0.3),1,g)
            if (doWorld) g<-showWorld(hypothesis,plotArea=c(0.425,0.2,0.55,0.6),g=g)
          },
          {
            g<-showVariable(IV,plotArea=c(0.0,0.6,0.4,0.4),g)
            g<-showVariable(IV2,plotArea=c(0.6,0.6,0.4,0.4),g)
            g<-showVariable(DV,plotArea=c(0.3,0.0,0.4,0.4),g)
-           g<-drawEffectES(effect$rIV,2,plotArea=c(0.1,0.4,0.4,0.22),g)
-           g<-drawEffectES(effect$rIV2,3,plotArea=c(0.5,0.4,0.4,0.22),g)
-           g<-drawEffectES(effect$rIVIV2,4,plotArea=c(0.3,0.7,0.4,0.22),g)
-           g<-drawEffectES(effect$rIVIV2DV,5,plotArea=c(0.3,0.4,0.4,0.22),g)
+           g<-showEffect(effect$rIV,2,plotArea=c(0.1,0.4,0.4,0.22),g)
+           g<-showEffect(effect$rIV2,3,plotArea=c(0.5,0.4,0.4,0.22),g)
+           g<-showEffect(effect$rIVIV2,4,plotArea=c(0.3,0.7,0.4,0.22),g)
+           g<-showEffect(effect$rIVIV2DV,5,plotArea=c(0.3,0.4,0.4,0.22),g)
          })
   return(g)
 }
@@ -59,7 +59,7 @@ showWorld<-function(hypothesis=makeHypothesis(effect=makeEffect(world=makeWorld(
   }
     
   if (is.null(g)) 
-    g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme()
+    g<-ggplot()+coord_cartesian(xlim = c(0,1)+c(-1,1)*0.1, ylim = c(0, 1)+c(-1,1)*0.1)+braw.env$blankTheme()
   
   braw.env$plotArea<-plotArea
 
@@ -86,8 +86,8 @@ showWorld<-function(hypothesis=makeHypothesis(effect=makeEffect(world=makeWorld(
   g<-g+dataPolygon(pts,fill=braw.env$plotColours$descriptionC,colour=NA)
   g<-g+dataLine(pts)
   switch(braw.env$RZ,
-         "r"={ g<-g+xAxisLabel(braw.env$rpLabel)+xAxisTicks(seq(-1,1,0.25))},
-         "z"={ g<-g+xAxisLabel(braw.env$zpLabel)+xAxisTicks(seq(-2,2,0.5))}
+         "r"={ g<-g+xAxisLabel(braw.env$rpLabel)+xAxisTicks(seq(-1,1,0.5))},
+         "z"={ g<-g+xAxisLabel(braw.env$zpLabel)+xAxisTicks(seq(-2,2,1))}
   )
   
   return(g)
@@ -116,7 +116,7 @@ showDesign<-function(design=makeDesign()) {
   pts=data.frame(x=x,y=y)
   
   braw.env$plotArea<-c(0,0,1,1)
-  g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0,1)) + braw.env$blankTheme()
+  g<-ggplot()+coord_cartesian(xlim = c(0,1)+c(-1,1)*0.1, ylim = c(0,1)+c(-1,1)*0.1) + braw.env$blankTheme()
   g<-startPlot(xlim=c(braw.env$minN,design$sN*braw.env$maxRandN), ylim=c(0,1),
                box="x",g=g)
   g<-g+xAxisLabel("n")+xAxisTicks()
@@ -228,7 +228,7 @@ showWorldSampling<-function(hypothesis=makeHypothesis(),design=makeDesign(),sigO
   world<-hypothesis$effect$world
   
   np<-braw.env$worldNPoints
-  if (world$worldAbs) np<-braw.env$worldNPoints*2+1
+  # if (world$worldAbs) np<-braw.env$worldNPoints*2+1
   
   vals<-seq(-1,1,length=np)*braw.env$r_range
   if (braw.env$RZ=="z") {
@@ -236,10 +236,10 @@ showWorldSampling<-function(hypothesis=makeHypothesis(),design=makeDesign(),sigO
   }
   
   dens<-fullRSamplingDist(vals,world,design,sigOnly=sigOnly) 
-  if (world$worldAbs) {
-    vals<-vals[braw.env$worldNPoints+(1:braw.env$worldNPoints)]
-    dens<-dens[braw.env$worldNPoints+(1:braw.env$worldNPoints)]
-  }
+  # if (world$worldAbs) {
+  #   vals<-vals[braw.env$worldNPoints+(1:braw.env$worldNPoints)]
+  #   dens<-dens[braw.env$worldNPoints+(1:braw.env$worldNPoints)]
+  # }
   
   if (braw.env$RZ=="z") {
     dens<-rdens2zdens(dens,vals)
@@ -256,14 +256,13 @@ showWorldSampling<-function(hypothesis=makeHypothesis(),design=makeDesign(),sigO
   
   braw.env$plotArea<-c(0,0,1,1)
   g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme()
-  g<-startPlot(xlim=c(braw.env$minN,braw.env$maxN), ylim=c(0,1.05),box="both",g=g)
+  g<-startPlot(xlim=c(-1,1), ylim=c(0,1.05),box="x",g=g)
   switch(braw.env$RZ,
          "r"={g<-g+xAxisLabel(braw.env$rsLabel)},
          "z"={g<-g+xAxisLabel(braw.env$zsLabel)}
   )
   g<-g+xAxisTicks()
-  
-  g<-g+dataPolygon(data=pts,fill=braw.env$plotColours$descriptionC)+scale_y_continuous(limits = c(0,1.05),labels=NULL,breaks=NULL)
+  g<-g+dataPolygon(data=pts,fill=braw.env$plotColours$descriptionC)
   g<-g+dataLine(data=pts)
   return(g)
 }

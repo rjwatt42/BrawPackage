@@ -74,6 +74,7 @@ showInference<-function(analysis=makeAnalysis(),showType="Basic",dimension="1D",
   if (length(showType)==1) {
     switch(showType,
            "Basic"=     {showType<-c("r","p")},
+           "Power"=     {showType<-c("w","wp")},
            "CILimits"=  {showType<-c("ci1","ci2")},
            "NHST"={
              showType<-c("e2","e1")

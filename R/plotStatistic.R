@@ -271,7 +271,6 @@ expected_hist<-function(vals,svals,valType,ylim,histGain,histGainrange){
 
 expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
                         i=1,scale=1,col="white",orientation="vert",ylim,histGain=NA,histGainrange=NA){
-  dotSize<-braw.env$dotSize*scale
   se_arrow<-0.3
   se_size<-0.75
   
@@ -306,7 +305,7 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
     c2=col
   }
   
-  if (length(pts$y1)<=50) {
+  if (length(pts$y1)<=250) {
     if (!is.null(analysis) && is.element(showType,c("r","p")) && length(pts$y1)==1) {
       switch(i,
              {rCI<-analysis$rIVCI
@@ -339,7 +338,10 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
     }
     
     xr<-makeFiddle(pts$y1,2/40,orientation)*scale*scale
+    xr<-xr/max(c(1,abs(xr)))/1.5
     pts$x<-pts$x+xr
+    gain<-7/max(7,sqrt(length(xr)))
+    colgain<-1-sqrt(max(0,(length(xr)-50))/200)
     
     if (scale<1) {
       co1<-c1
@@ -348,6 +350,9 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
       co1<-"black"
       co2<-"black"
     }
+    co1<-darken(c1,off=-colgain)
+    co2<-darken(c2,off=-colgain)
+    dotSize<-braw.env$dotSize*scale*gain
     pts_ns<-pts[!pts$y2,]
     g<-g+dataPoint(data=data.frame(x=pts_ns$x,y=pts_ns$y1),shape=braw.env$plotShapes$study, colour = co2, fill = c2, size = dotSize)
     pts_sig=pts[pts$y2,]
@@ -486,6 +491,7 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
       data$rp<-atanh(data$rp)
       data$ro<-atanh(data$ro)
     }
+    
     switch (showType,
             "r"={showVals<-data$rs},
             "rp"={showVals<-data$rp},
@@ -525,11 +531,12 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
   
   for (i in 1:length(xoff)){
     if (showTheory) {
-      switch(i,
+      if (!effectTheory$world$worldOn) 
+        switch(i,
              effectTheory$world$populationPDFk<-hypothesis$effect$rIV,
              effectTheory$world$populationPDFk<-hypothesis$effect$rIV2,
              effectTheory$world$populationPDFk<-hypothesis$effect$rIVIV2DV
-      )
+        )
       
       xdsig<-NULL
       if (is.element(showType,c("p","e1","e2","po"))) {
@@ -627,7 +634,7 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
                xd<-abs(xd)
              },
              "wp"={
-               yv<-seq(braw.env$alphaSig*1.01,1/1.01,length.out=npt)
+               yv<-seq(braw.env$alphaSig,1/1.01,length.out=npt)
                xd<-fullRSamplingDist(yv,effectTheory$world,design,"wp",logScale=logScale,sigOnly=sigOnly)
              },
              { } # do nothing
@@ -697,6 +704,8 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
       g<-expected_plot(g,pts,showType,analysis,IV,DV,i,orientation=orientation,
                        ylim=ylim,histGain=histGain,histGainrange=histGainrange)
       
+      ns<-c()
+      s<-c()
       if (length(rvals)>1 && is.element(showType,c("p","e1","e2","e1d","e2d"))) {
         n<-length(pvals)
         if (!is.null(otheranalysis) && effect$world$worldOn) n<-n+length(otheranalysis$pIV)
@@ -762,6 +771,7 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
     for (yl in ylines)
       g<-g+horzLine(intercept=yl,linetype="dotted",colour=lineCol)
     
+    if (!isempty(ns) && !isempty(s))
     if (is.element(showType,c("p","e1","e2","e1d","e2d"))) {
       switch (showType,
               "p"={

@@ -52,8 +52,8 @@ reportExpected<-function(expectedResult=makeExpected(100),showType="Basic"){
     }
 
   if (is.null(IV2)) {
-    rs<-result$rIV
-    ps<-result$pIV
+    rs<-matrix(result$rIV,ncol=1)
+    ps<-matrix(result$pIV,ncol=1)
   } else {
     switch (result$effectType,
             "direct"={rs<-result$r$direct

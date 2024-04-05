@@ -135,6 +135,8 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
       newvals<-seq(min(vals),max(vals),length.out=51)
       if (explore$xlog) newvals<-10^newvals
       alphas<-braw.env$alphaSig
+      if (hypothesis$effect$world$worldOn)  rVal<-hypothesis$effect$world$populationPDFk
+      else                                  rVal<-hypothesis$effect$rIV
       switch(explore$exploreType,
              "rIV"={
                rVals<-newvals
@@ -143,25 +145,25 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
                nullPs<-rep(hypothesis$effect$world$populationNullp,length(newvals))
              },
              "n"={
-               rVals<-rep(hypothesis$effect$rIV,length(newvals))
+               rVals<-rep(rVal,length(newvals))
                nVals<-newvals
                alphas<-rep(braw.env$alphaSig,length(newvals))
                nullPs<-rep(hypothesis$effect$world$populationNullp,length(newvals))
              },
              "Alpha"={
-               rVals<-rep(hypothesis$effect$rIV,length(newvals))
+               rVals<-rep(rVal,length(newvals))
                nVals<-rep(design$sN,length(newvals))
                alphas<-newvals
                nullPs<-rep(hypothesis$effect$world$populationNullp,length(newvals))
              },
              "pNull"={
-               rVals<-rep(hypothesis$effect$rIV,length(newvals))
+               rVals<-rep(rVal,length(newvals))
                nVals<-rep(design$sN,length(newvals))
                alphas<-rep(braw.env$alphaSig,length(newvals))
                nullPs<-newvals
              },
              {
-               rVals<-rep(hypothesis$effect$rIV,length(newvals))
+               rVals<-rep(rVal,length(newvals))
                nVals<-rep(design$sN,length(newvals))
                alphas<-rep(braw.env$alphaSig,length(newvals))
                nullPs<-rep(hypothesis$effect$world$populationNullp,length(newvals))

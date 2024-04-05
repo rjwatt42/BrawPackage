@@ -126,6 +126,7 @@ BrawOpts<-function(BW=FALSE,fontScale=1,newDev=FALSE,height=576,aspect=1.736) {
           braw.env$allScatter<-TRUE
           braw.env$showMedians<-FALSE
           braw.env$minN<-10
+          braw.env$maxN<-250
           braw.env$maxRandN<-5 # times mean sample size
           braw.env$reportGroupMeans<-TRUE
           braw.env$doLegendPoints<-FALSE

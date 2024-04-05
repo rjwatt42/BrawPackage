@@ -35,12 +35,12 @@ pSamplingDistr<-function(pvals,R,n) {
 
 wSamplingDistr<-function(wvals,R,n,alpha=braw.env$alphaSig) {
   # we need to do it this way, alas
-  z<-seq(0,10,0.05)
-  wz<-pnorm(qnorm(alpha/2),z)+pnorm(qnorm(alpha/2),-z)
-  Z <- atanh(R)*sqrt(n-3)
-  dwdz<-sqrt(n-3)/(2*pi)*(exp(-0.5*(z+qnorm(alpha/2))^2)-exp(-0.5*(z-qnorm(alpha/2))^2))
-  densW<-(exp(-0.5*(z-Z)^2)+exp(-0.5*(z+Z)^2))/dwdz
-  approx(wz,densW,w)$y
+    z<-seq(0,10,0.05)
+    wz<-pnorm(qnorm(alpha/2),z)+pnorm(qnorm(alpha/2),-z)
+    Z <- atanh(R)*sqrt(n-3)
+    dwdz<-sqrt(n-3)/(2*pi)*(exp(-0.5*(z+qnorm(alpha/2))^2)-exp(-0.5*(z-qnorm(alpha/2))^2))
+    densW<-(exp(-0.5*(z-Z)^2)+exp(-0.5*(z+Z)^2))/dwdz
+    approx(wz,densW,wvals)$y
 }
 
 rSamp2Pop<-function(r_s,n,world=NULL) {
@@ -244,8 +244,14 @@ fullRSamplingDist<-function(vals,world,design,doStat="r",logScale=FALSE,sigOnly=
   rdens<-pR$pRhogain
   if (length(rvals)>1) rdens<-rdens*diff(rvals[1:2])
   if (!world$worldOn) world$populationNullp<-0
-  rvals<-c(rvals,0)
-  rdens<-c(rdens/sum(rdens)*(1-world$populationNullp),world$populationNullp)
+  if (any(rvals==0)) {
+    use<-which(rvals==0)
+    rdens<-rdens/sum(rdens)*(1-world$populationNullp)
+    rdens[use]<-rdens[use]+world$populationNullp
+  } else {
+    rvals<-c(rvals,0)
+    rdens<-c(rdens/sum(rdens)*(1-world$populationNullp),world$populationNullp)
+  }
   
   # distribution of sample sizes
   ndist<-getNList(design,HQ=HQ)
@@ -307,6 +313,7 @@ fullRSamplingDist<-function(vals,world,design,doStat="r",logScale=FALSE,sigOnly=
                   zp<-atanh(rp)
                   wp<-pnorm(qnorm(braw.env$alphaSig/2)+zp*sqrt(nvals[ni]-3)) + pnorm(qnorm(braw.env$alphaSig/2)-zp*sqrt(nvals[ni]-3))
                   addition<-rPopulationDist(rp,world)
+                  if (sum(addition>0)>1) {
                   dwz<-dnorm(zp,qnorm(braw.env$alphaSig/2)/sqrt(nvals[ni]-3),1/sqrt(nvals[ni]-3)) -
                     dnorm(zp,-qnorm(braw.env$alphaSig/2)/sqrt(nvals[ni]-3),1/sqrt(nvals[ni]-3))
                   a<-addition[1]
@@ -314,6 +321,7 @@ fullRSamplingDist<-function(vals,world,design,doStat="r",logScale=FALSE,sigOnly=
                   addition[1]<-a
                   use<-which(diff(wp)!=0)
                   addition<-approx(wp[c(1,use+1)],addition[c(1,use+1)],vals)$y
+                  }
                 }
         )
         if (logScale) addition<-addition*vals

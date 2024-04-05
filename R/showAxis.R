@@ -1,49 +1,123 @@
 showAxis<-function(showType,effect) {
   
-switch(braw.env$RZ,
-       "r"={
-         rlims<-c(-1,1)
-         rlab<-"r"
-       },
-       "z"={    
-         rlims<-c(-1,1)*braw.env$z_range
-         rlab<-"z"
-       }
-       )
-
+  logScale<-(is.element(showType,c("p","e1","e2")) && braw.env$pPlotScale=="log10") ||
+    (is.element(showType,c("w","wp")) && braw.env$wPlotScale=="log10") ||
+    (is.element(showType,c("n")) && braw.env$nPlotScale=="log10") ||
+    (is.element(showType,c("wn")))
+  
+  switch(braw.env$RZ,
+         "r"={
+           rlims<-c(-1,1)
+           rlab<-"r"
+           rslab<-braw.env$rsLabel 
+           rplab<-braw.env$rpLabel 
+           rticks<-seq(-1,1,0.5)
+           rmins<-seq(-1,1,0.1)
+         },
+         "z"={    
+           rlims<-c(-1,1)*braw.env$z_range
+           rlab<-"z"
+           rslab<-braw.env$zsLabel
+           rplab<-braw.env$zpLabel
+           rticks<-seq(-1.5,1.5,0.5)
+           rmins<-seq(-1.5,1.5,0.1)
+         }
+  )
+  switch(braw.env$pPlotScale,
+         "log10"={
+           plim<-c(-4,0)
+           pticks<-seq(-4,0,1)
+           pmins<-log10(c(seq(1,10)/10000,seq(1,10)/1000,seq(1,10)/100,seq(1,10)/10))
+           plines<-log10(c(0.05,0.01,0.005,0.001))
+           plabel<-bquote(bold(log['10'](p)))
+           polabel<-bquote(bold(log['10'](p[o])))
+         },
+         "linear"={
+           plim<-c(braw.env$min_p, 1)
+           pticks<-seq(0,1,0.2)
+           pmins<-seq(0,1,0.1)
+           plabel<-bquote(p)
+           polabel<-bquote(p[o])
+           plines<-c(0.05)
+         }
+         )
+  switch (braw.env$wPlotScale,
+          "log10"={
+            wlim<-c(-2,0)
+            wticks<-seq(-2,0,1)
+            wmins<-log10(c(seq(1,10)/100,seq(1,10)/10))
+            wslabel<-bquote(bold(log['10'](w[s])))
+            wplabel<-bquote(bold(log['10'](w[p])))
+            wlines<-log10(c(0.05,0.8))
+          },
+          "linear"={
+            wlim<-c(0, 1)
+            wticks<-seq(0,1,0.2)
+            wmins<-seq(0,1,0.1)
+            wslabel<-bquote(w[s])
+            wplabel<-bquote(w[p])
+            wlines<-c(0.05,0.8)
+          }
+  )
+  switch(braw.env$nPlotScale,
+         "log10"={
+           nlim<-log10(c(5,1000))
+           nticks<-seq(0,3,1)
+           nmins<-log10(c(seq(1,10),seq(1,10)*10,seq(1,10)*100))
+           nlabel<-bquote(bold(log['10'](n)))
+         },
+         "linear"={
+           nlim<-c(1, 50*5*1.1)
+           nticks<-seq(0,250,50)
+           nmins<-seq(0,250,10)
+           nlabel<-"n"
+         }
+  )
+  
   use_cols<-c("#FFFFFF","#DDDDDD","#AAAAAA")
-  lines<-c()
-  ybreaks<-NULL
+  ylines<-c()
+  ymins<-c()
+  yticks<-c()
+  
   switch (showType,
           "r"={
             ylim<-rlims
-            if (braw.env$RZ=="z") ylabel<-braw.env$zsLabel
-            else ylabel<-braw.env$rsLabel 
+            yticks<-rticks
+            ymins<-rmins
+            ylabel<-rslab
             use_cols<-c(hsv(0.1,1,1),hsv(0.1+0.075,1,1),hsv(0.1+0.15,1,1))
-            lines<-c(0,effect$rIV)
+            ylines<-c(0,effect$rIV)
           },
           "rp"={
             ylim<-rlims
-            if (braw.env$RZ=="z") ylabel<-braw.env$zpLabel
-            else ylabel<-braw.env$rpLabel 
+            yticks<-rticks
+            ymins<-rmins
+            ylabel<-rplab
             use_cols<-c(hsv(0.1,1,1),hsv(0.1+0.075,1,1),hsv(0.1+0.15,1,1))
-            lines<-c(0)
+            ylines<-c(0)
           },
           "ro"={
             ylim<-rlims
+            yticks<-rticks
+            ymins<-rmins
             ylabel<-bquote(r[o])
             use_cols<-c(hsv(0.1,1,1),hsv(0.1+0.075,1,1),hsv(0.1+0.15,1,1))
-            lines<-c(0,effect$rIV)
+            ylines<-c(0,effect$rIV)
           },
           "p"={
-            ylim<-c(braw.env$min_p, 1)
-            ylabel<-bquote(p)
+            ylim<-plim
+            yticks<-pticks
+            ymins<-pmins
+            ylabel<-plabel
+            ylines<-plines
             use_cols<-c(hsv(0,1,1),hsv(0+0.075,1,1),hsv(0+0.15,1,1))
-            lines<-c(0.05)
           },
           "po"={
-            ylim<-c(braw.env$min_p, 1)
-            ylabel<-bquote(p[o])
+            ylim<-plim
+            yticks<-pticks
+            ymins<-pmins
+            ylines<-plines
+            ylabel<-polabel
             use_cols<-c(hsv(0,1,1),hsv(0+0.075,1,1),hsv(0+0.15,1,1))
           },
           "log(lrs)"={
@@ -67,58 +141,89 @@ switch(braw.env$RZ,
             use_cols<-c(hsv(0,1,1),hsv(0+0.075,1,1),hsv(0+0.15,1,1))
           },
           "w"={
-            ylim<-c(0.01, 1)
-            ylabel<-bquote(w)
+            ylim<-wlim
+            yticks<-wticks
+            ymins<-wmins
+            ylabel<-wslabel
+            ylines<-wlines
             use_cols<-c(hsv(0.65,1,1),hsv(0.65+0.075,1,1),hsv(0.65+0.15,1,1))
-            lines<-c(0.05,0.8)
           },
           "wn"={
-            ylim<-c(10, braw.env$max_nw*10)
-            ylabel<-bquote(n[w=80])
+            ylim<-log10(c(5,1000))
+            yticks<-seq(0,3,1)
+            ylabel<-bquote(bold(log['10'](n[w=80])))
+            logScale<-TRUE
           },
           "n"={
-            ylim<-c(1, 50*5*1.1)
-            ylabel<-"n"
+            ylim<-nlim
+            yticks<-nticks
+            ymins<-nmins
+            ylabel<-nlabel
           },
           "wp"={
-            ylim<-c(0.01, 1)
-            ylabel<-bquote(w)
+            ylim<-wlim
+            yticks<-wticks
+            ymins<-log10(c(seq(1,10),seq(1,10)*10,seq(1,10)*100))
+            ylabel<-wplabel
+            ylines<-wlines
             use_cols<-c(hsv(0.65,1,1),hsv(0.65+0.075,1,1),hsv(0.65+0.15,1,1))
           },
           "ci1"={
             ylim<-rlims
-            ylabel<-rlab
+            yticks<-rticks
+            ymins<-rmins
+            ylabel<-rslab
+            use_cols<-c(hsv(0.1,1,1),hsv(0.1+0.075,1,1),hsv(0.1+0.15,1,1))
+            ylines<-c(0,effect$rIV)
           },
           "ci2"={
             ylim<-rlims
-            ylabel<-rlab
+            yticks<-rticks
+            ymins<-rmins
+            ylabel<-rslab
+            use_cols<-c(hsv(0.1,1,1),hsv(0.1+0.075,1,1),hsv(0.1+0.15,1,1))
+            ylines<-c(0,effect$rIV)
           },
           "e1"={
-            ylim<-c(braw.env$min_p, 1)
-            ylabel<-bquote(p)
+            ylim<-plim
+            yticks<-pticks
+            ymins<-pmins
+            ylabel<-plabel
+            ylines<-plines
             use_cols<-c(hsv(0,1,1),hsv(0+0.075,1,1),hsv(0+0.15,1,1))
           },
           "e2"={
-            ylim<-c(braw.env$min_p, 1)
-            ylabel<-bquote(p)
+            ylim<-plim
+            yticks<-pticks
+            ymins<-pmins
+            ylabel<-plabel
+            ylines<-plines
             use_cols<-c(hsv(0,1,1),hsv(0+0.075,1,1),hsv(0+0.15,1,1))
           },
           "fDR"={
             ylim<-c(0,1)
+            ytick<-seq(0,1,0.2)
+            ymins<-seq(0,1,0.1)
             ylabel<-"False Discovery"
             use_cols<-braw.env$plotColours$fdr
           },
           "tDR"={
             ylim<-c(0,1)
+            ytick<-seq(0,1,0.2)
+            ymins<-seq(0,1,0.1)
             ylabel<-"True Discovery"
             use_cols<-braw.env$plotColours$fdr
           },
           "NHST"={
             ylim<-c(0,1)
+            ytick<-seq(0,1,0.2)
+            ymins<-seq(0,1,0.1)
             ylabel<-"Outcomes"
           },
           "p(sig)"={
             ylim<-c(0,1)
+            ytick<-seq(0,1,0.2)
+            ymins<-seq(0,1,0.1)
             ylabel<-"p(sig)"
             lines<-c(0.05,0.8)
             use_cols<-c(braw.env$plotColours$infer_sigC,
@@ -129,54 +234,35 @@ switch(braw.env$RZ,
             },
           "fMR"={
             ylim<-c(0,1)
+            ytick<-seq(0,1,0.2)
+            ymins<-seq(0,1,0.1)
             ylabel<-"False Miss"
             use_cols<-braw.env$plotColours$fmr
           },
           "k"={
             ylim<-c(-0.01,1.01)
+            ytick<-seq(0,1,0.2)
+            ymins<-seq(0,1,0.1)
             ylabel<-braw.env$Llabel
           },
           "pNull"={
             ylim<-c(-0.01,1.01)
+            ytick<-seq(0,1,0.2)
+            ymins<-seq(0,1,0.1)
             ylabel<-braw.env$Plabel
           },
           "PDF"={
             ylim<-c(0,1)
+            ytick<-seq(0,1,0.2)
+            ymins<-seq(0,1,0.1)
             ylabel<-"p(PDF)"
           },
           "S"={
             ylim<-c(min(result$Ss),max(result$Ss))
             ylabel<-"S"
+            ytick<-seq(ceil(min(result$Ss)),ceil(max(result$Ss)),1)
           }
   )
   
-  logScale<-FALSE
-  if (is.element(showType,c("w","wp")) && braw.env$wPlotScale=="log10"){
-    ylim<-log10(ylim)
-    if (!is.null(lines))
-      lines<-log10(lines)
-    ylabel<-bquote(bold(log['10'](.(ylabel))))
-    logScale<-TRUE
-  }
-  if (is.element(showType,c("n","wn")) && braw.env$nPlotScale=="log10"){
-    ylim<-log10(c(5,1000))
-    if (!is.null(lines))  lines<-log10(lines)
-    ylabel<-bquote(bold(log['10'](.(ylabel))))
-    logScale<-TRUE
-  }
-  if (is.element(showType,c("p","e1","e2","po")) && braw.env$pPlotScale=="log10") {
-    ylim<-c(-4,0)
-    lines<-log10(c(0.05,0.01,0.005,0.001))
-    ylabel<-bquote(bold(log['10'](.(ylabel))))
-    logScale<-TRUE
-  }
-  
-  # if (logScale) {
-  #     ylim<-log10(ylim)
-  #   ylabel<-bquote(bold(log['10'](.(ylabel))))
-  # }  else {
-  #   ylabel<-bquote(.(ylabel))
-  # }
-  # 
-  return(list(lim=ylim,label=ylabel,cols=use_cols,lines=lines,logScale=logScale))
+  return(list(lim=ylim,ticks=yticks,label=ylabel,cols=use_cols,lines=ylines,logScale=logScale))
 }
