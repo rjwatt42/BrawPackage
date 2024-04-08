@@ -23,7 +23,7 @@ make multiple samples with analysis
 }
 \examples{
 expectedResult<-makeExpected(nsims=100,expectedResult=NULL,hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
-                             doingNull=FALSE,autoShow=FALSE,showType="Basic")
+                             doingNull=FALSE,autoShow=braw.env$autoShow,showType="Basic")
 }
 \seealso{
 showExpected() and reportExpected())

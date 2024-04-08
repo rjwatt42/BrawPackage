@@ -1,6 +1,6 @@
 plotSample<-function(IV,DV,effect,ivplot,dvplot,g=NULL) {
   if (is.null(g)) 
-    g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme()
+    g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
 
   # the population
   g<-plotPopulation(IV,DV,effect,alpha=1,g)
@@ -31,7 +31,7 @@ plotSample<-function(IV,DV,effect,ivplot,dvplot,g=NULL) {
 #' @examples
 #' showSample(sample=makeSample())
 #' @export
-showSample<-function(sample=makeSample()){
+showSample<-function(sample=makeSample(autoShow=FALSE)){
   IV<-sample$hypothesis$IV
   IV2<-sample$hypothesis$IV2
   DV<-sample$hypothesis$DV

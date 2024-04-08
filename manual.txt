@@ -115,7 +115,7 @@ design<-getDesign(name,design=makeDesign())
 make a simulated sample
 
 @examples
-sample<-makeSample(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=FALSE)
+sample<-makeSample(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=braw.env$autoShow)
 
 show a simulated sample
 
@@ -127,7 +127,7 @@ report a simulated sample
 @examples
 reportSample(sample=makeSample())
 
-analysis<-makeAnalysis(sample=makeSample(),evidence=makeEvidence(),autoShow=FALSE)
+analysis<-makeAnalysis(sample=makeSample(),evidence=makeEvidence(),autoShow=braw.env$autoShow)
 
 showDescription(analysis)
 reportDescription(analysis,modelType="Raw")
@@ -142,7 +142,7 @@ analysisType: "Anova","Model"
 expectedResult<-makeExpected(nsims=100,expectedResult=NULL,
                              hypothesis=makeHypothesis(),design=makeDesign(),
                              evidence=makeEvidence(),
-                             doingNull=FALSE,autoShow=FALSE,showType="Basic"
+                             doingNull=FALSE,autoShow=braw.env$autoShow,showType="Basic"
                              )
                              
 showExpected(expectedResult=makeExpected(),showType="Basic",
@@ -167,7 +167,7 @@ exploreResult<-makeExplore(nsim=10,exploreResult=NULL,
                       hypothesis=makeHypothesis(),design=makeDesign(),
                       evidence=makeEvidence(),
                       doingNull=FALSE,
-                      autoShow=FALSE,showType="r"
+                      autoShow=braw.env$autoShow,showType="r"
                     ) 
                     
 exploreType: "IVType","IVcats","IVlevels","IVprop","IVskew","IVkurtosis"      

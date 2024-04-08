@@ -19,7 +19,7 @@ makePossible<-function(typePossible="Samples",
                        possibleResult=NULL,
                        UseSource="world",targetSample=0.3,
                        UsePrior="none",prior=getWorld("Psych"),targetPopulation=0.2,
-                       hypothesis=makeHypothesis(),design=makeDesign(),
+                       hypothesis=braw.def$hypothesis,design=braw.def$design,
                        simSlice=0.1,correction=TRUE,
                        appendSim=FALSE,possibleLength="10"
 ) {

@@ -17,7 +17,7 @@ a sample object
 make a simulated sample
 }
 \examples{
-sample<-makeSample(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=FALSE)
+sample<-makeSample(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=braw.env$autoShow)
 }
 \seealso{
 showSample() reportSample()

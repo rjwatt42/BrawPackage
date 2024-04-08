@@ -10,7 +10,7 @@
 #' @examples
 #' showHypothesis(hypothesis=makeHypothesis())
 #' @export
-showHypothesis<-function(hypothesis=makeHypothesis(),doWorld=FALSE) {
+showHypothesis<-function(hypothesis=braw.def$hypothesis,doWorld=TRUE,scale=0.5) {
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV
@@ -26,10 +26,10 @@ showHypothesis<-function(hypothesis=makeHypothesis(),doWorld=FALSE) {
   g<-NULL
   switch(no_ivs,
          { 
-           g<-showVariable(IV,plotArea=c(xoff,0.6,0.6,0.4),g)
-           g<-showVariable(DV,plotArea=c(xoff,0.0,0.6,0.4),g)
-           g<-showEffect(effect$rIV,plotArea=c(xoff,0.37,0.65,0.3),1,g)
-           if (doWorld) g<-showWorld(hypothesis,plotArea=c(0.425,0.2,0.55,0.6),g=g)
+           g<-showVariable(IV,plotArea=c(xoff*scale,0.6,0.6*scale,0.4),g)
+           g<-showVariable(DV,plotArea=c(xoff*scale,0.0,0.6*scale,0.4),g)
+           g<-showEffect(effect$rIV,plotArea=c(xoff*scale,0.37,0.65*scale,0.3),1,g)
+           if (doWorld) g<-showWorld(hypothesis,plotArea=c(0.4*scale,0.27,0.55*scale,0.38),g=g)
          },
          {
            g<-showVariable(IV,plotArea=c(0.0,0.6,0.4,0.4),g)
@@ -99,27 +99,31 @@ showWorld<-function(hypothesis=makeHypothesis(effect=makeEffect(world=makeWorld(
 #' @examples
 #' showDesign(design=makeDesign())
 #' @export
-showDesign<-function(design=makeDesign()) {
+showDesign<-function(design=braw.def$design) {
+  nRange<-showAxis("n")
+  binRange<-nRange$lim
+  
+  nbin<-seq(binRange[1],binRange[2],length.out=braw.env$worldNPoints)
+  
+  if (braw.env$nPlotScale=="log10")  nbin<-10^(nbin)
   if (design$sNRand) {
-    nbin<-seq(braw.env$minN,braw.env$maxRandN*design$sN,length.out=braw.env$worldNPoints)
-    # nbin<-5+seq(0,qgamma(0.99,shape=design$sNRandK,scale=(design$sN-5)/design$sNRandK),length.out=101)
     ndens<-dgamma(nbin-braw.env$minN,shape=design$sNRandK,scale=(design$sN-braw.env$minN)/design$sNRandK)
     ndens<-ndens/max(ndens)
   } else {
-    nbin<-seq(1,250,length.out=braw.env$worldNPoints)
     ndens<-nbin*0
     use=which.min(abs(nbin-design$sN))
     ndens[use]<-1
   }
+  
   x<-c(min(nbin),nbin,max(nbin))
   y<-c(0,ndens,0)*0.8
-  pts=data.frame(x=x,y=y)
+  pts=data.frame(x=log10(x),y=y)
   
   braw.env$plotArea<-c(0,0,1,1)
   g<-ggplot()+coord_cartesian(xlim = c(0,1)+c(-1,1)*0.1, ylim = c(0,1)+c(-1,1)*0.1) + braw.env$blankTheme()
-  g<-startPlot(xlim=c(braw.env$minN,design$sN*braw.env$maxRandN), ylim=c(0,1),
+  g<-startPlot(xlim=binRange, ylim=c(0,1),
                box="x",g=g)
-  g<-g+xAxisLabel("n")+xAxisTicks()
+  g<-g+xAxisLabel(nRange$label)+xAxisTicks(nRange$ticks,10^nRange$ticks)
   g<-g+dataPolygon(data=pts,fill=braw.env$plotColours$descriptionC)
   g<-g+dataLine(data=pts)
 
@@ -133,7 +137,7 @@ showDesign<-function(design=makeDesign()) {
 #' @examples
 #' showPopulation(hypothesis=makeHypothesis())
 #' @export
-showPopulation <- function(hypothesis=makeHypothesis()) {
+showPopulation <- function(hypothesis=braw.def$hypothesis) {
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV
@@ -171,7 +175,7 @@ showPopulation <- function(hypothesis=makeHypothesis()) {
 #' @examples
 #' showPrediction(hypothesis=makeHypothesis()=makeDesign(),evidence=makeEvidence())
 #' @export
-showPrediction <- function(hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence()){
+showPrediction <- function(hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=makeEvidence()){
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV
@@ -224,7 +228,7 @@ showPrediction <- function(hypothesis=makeHypothesis(),design=makeDesign(),evide
 #' @examples
 #' showWorldSampling(hypothesis=makeHypothesis(),design=makeDesign(),sigOnly=FALSE)
 #' @export
-showWorldSampling<-function(hypothesis=makeHypothesis(),design=makeDesign(),sigOnly=FALSE) {
+showWorldSampling<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,sigOnly=FALSE) {
   world<-hypothesis$effect$world
   
   np<-braw.env$worldNPoints
@@ -255,7 +259,7 @@ showWorldSampling<-function(hypothesis=makeHypothesis(),design=makeDesign(),sigO
   pts=data.frame(x=x,y=y)
   
   braw.env$plotArea<-c(0,0,1,1)
-  g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme()
+  g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
   g<-startPlot(xlim=c(-1,1), ylim=c(0,1.05),box="x",g=g)
   switch(braw.env$RZ,
          "r"={g<-g+xAxisLabel(braw.env$rsLabel)},

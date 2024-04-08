@@ -54,7 +54,7 @@ trimExploreResult<-function(result,nullresult) {
 #'                        showType="r",
 #'                        effectType="unique",whichEffect="All")
 #' @export
-showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
+showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=braw.env$showTheory,
                       effectType="unique",whichEffect="All"){
   quants<-0.25
   
@@ -114,7 +114,7 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
     else whichEffect<-1
   }
   
-  g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme()
+  g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
   for (whichEffect in 1:length(plots)) {
     braw.env$plotArea<-c(plots[whichEffect],0,plotWidth,1)
     g<-startPlot(xlim,ylim,top=TRUE,g=g)
@@ -410,13 +410,17 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
                   showMeans<-getStat(abs(sigs & !nulls),nVals)
                   sigs0<-colMeans(abs(sigs & !nulls))
                   showSE<-sqrt(sigs0*(1-sigs0)/sum(!nulls))
-                } else showMeans<-NULL
+                } else {
+                  showMeans<-0
+                  showSE<-NULL
+                }
                 if (any(nulls)) {
                   showMeans2<-getStat(abs(sigs & nulls),nVals)
                   sigs0<-colMeans(abs(sigs & nulls))
                   showSE2<-sqrt(sigs0*(1-sigs0)/sum(nulls))
-                } else showMeans2<-NULL
+                } else showMeans2<-0
                 showMeans<-showMeans+showMeans2
+                showSE<-NULL
               },
               "tDR"={
                 showVals<-NULL
@@ -426,7 +430,7 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
                 nulls<-result$rpval==0
                 sigs<-isSignificant(braw.env$STMethod,pVals,rVals,nVals,df1Vals,evidence,braw.env$alphaSig)
                 showMeans<-1-colMeans(abs(sigs & nulls))/colMeans(abs(sigs))
-                showSE<-sqrt(showMeans*(1-showMeans)/sum(sigs))
+                showSE<-NULL
               },
               "fDR"={
                 showVals<-NULL
@@ -436,7 +440,7 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
                 nulls<-result$rpval==0
                 sigs<-isSignificant(braw.env$STMethod,pVals,rVals,nVals,df1Vals,evidence,braw.env$alphaSig)
                 showMeans<-colMeans(abs(sigs & nulls))/colMeans(abs(sigs))
-                showSE<-sqrt(showMeans*(1-showMeans)/sum(sigs))
+                showSE<-NULL
               },
               "fMR"={
                 showVals<-NULL
@@ -446,7 +450,7 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
                 nulls<-result$rpval==0
                 sigs<-isSignificant(braw.env$STMethod,pVals,rVals,nVals,df1Vals,evidence,braw.env$alphaSig)
                 showMeans<-colMeans(abs(!sigs & !nulls))/colMeans(abs(!sigs))
-                showSE<-sqrt(showMeans*(1-showMeans)/sum(!sigs))
+                showSE<-NULL
               },
               
               "NHST"={
@@ -479,44 +483,44 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
       
       if (!is.element(showType,c("NHST"))) {
         # draw the basic line and point data
-        if (!is.null(showVals)) {
+        if (is.element(showType,c("p(sig)","tDR","fDR","fMR"))) {
+          y50<-showMeans
+          y75<-NULL
+        } else {
           y75<-apply( showVals , 2 , quantile , probs = 0.50+quants , na.rm = TRUE ,names=FALSE)
           y62<-apply( showVals , 2 , quantile , probs = 0.50+quants/2 , na.rm = TRUE ,names=FALSE)
           y50<-apply( showVals , 2 , quantile , probs = 0.50 , na.rm = TRUE ,names=FALSE)
           y38<-apply( showVals , 2 , quantile , probs = 0.50-quants/2 , na.rm = TRUE ,names=FALSE)
           y25<-apply( showVals , 2 , quantile , probs = 0.50-quants , na.rm = TRUE ,names=FALSE)
-        } else {
-          y75<-showMeans+showSE*2
-          y62<-showMeans+showSE
-          y50<-showMeans
-          y38<-showMeans-showSE
-          y25<-showMeans-showSE*2
         }
-        
-        y75[y75>ylim[2]]<-ylim[2]
-        y62[y62>ylim[2]]<-ylim[2]
-        y38[y38>ylim[2]]<-ylim[2]
-        y25[y25>ylim[2]]<-ylim[2]
-        
-        y75[y75<ylim[1]]<-ylim[1]
-        y62[y62<ylim[1]]<-ylim[1]
-        y38[y38<ylim[1]]<-ylim[1]
-        y25[y25<ylim[1]]<-ylim[1]
-        y50[y50<ylim[1]]<-ylim[1]
-        
-        pts1<-data.frame(vals=vals,y25=y25,y38=y38,y50=y50,y62=y62,y75=y75)
-        
+
+        if (!isempty(y50)) {
+          y50[y50>ylim[2]]<-ylim[2]
+          y50[y50<ylim[1]]<-ylim[1]
+          if (!is.null(y75)) {
+            y75[y75>ylim[2]]<-ylim[2]
+            y62[y62>ylim[2]]<-ylim[2]
+            y38[y38>ylim[2]]<-ylim[2]
+            y25[y25>ylim[2]]<-ylim[2]
+            
+            y75[y75<ylim[1]]<-ylim[1]
+            y62[y62<ylim[1]]<-ylim[1]
+            y38[y38<ylim[1]]<-ylim[1]
+            y25[y25<ylim[1]]<-ylim[1]
+          }
+          
         if (doLine) {
+          if (!is.null(y75)) {
+            pts1f<-data.frame(x=c(vals,rev(vals)),y=c(y25,rev(y75)))
+            pts2f<-data.frame(x=c(vals,rev(vals)),y=c(y38,rev(y62)))
+            g<-g+dataPolygon(data=pts1f,fill=col,alpha=0.2,colour=NA)
+            g<-g+dataPolygon(data=pts2f,fill=col,alpha=0.4,colour=NA)
+          }
           pts0f<-data.frame(x=vals,y=y50)
-          pts1f<-data.frame(x=c(vals,rev(vals)),y=c(y25,rev(y75)))
-          pts2f<-data.frame(x=c(vals,rev(vals)),y=c(y38,rev(y62)))
-          g<-g+dataPolygon(data=pts1f,fill=col,alpha=0.2,colour=NA)
-          g<-g+dataPolygon(data=pts2f,fill=col,alpha=0.4,colour=NA)
           g<-g+dataLine(data=pts0f)
           g<-g+dataPoint(data=pts0f,fill=col)
         } else {
           pts0f<-data.frame(x=vals,y=y50)
-          pts1f<-data.frame(x=vals,ymin=y25,ymax=y75)
           g<-g+dataLine(data=pts0f,linewidth=0.25)
           sigVals<-isSignificant(braw.env$STMethod,pVals,rVals,nVals,df1Vals,exploreResult$evidence,braw.env$alphaSig)
           if (!is.null(showVals)) {
@@ -526,8 +530,12 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
                                showType=showType,ylim=ylim,scale=2.25/(length(vals)+1),col=col)
           }
           g<-g+dataPoint(data=pts0f,fill=col)
+          if (!is.null(y75)) {
+          pts1f<-data.frame(x=vals,ymin=y25,ymax=y75)
           g<-g+dataErrorBar(pts1f)
+          }
         } # end of line and point
+        }
       } else {
         # now the NHST filled areas
         ytop<-1-sigNonNulls*0
@@ -701,7 +709,7 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=TRUE,
     }
   }
   if (exploreResult$count>0)
-  g<-g+plotTitle(paste0("Explore: ",format(exploreResult$count)),"right")
+  g<-g+plotTitle(paste0("Explore: ",brawFormat(exploreResult$count)),"right")
   g
 }
 

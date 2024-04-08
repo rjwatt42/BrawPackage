@@ -2,7 +2,7 @@
 showEffect<-function(r,t=1,plotArea=NULL,g=NULL){
 
   if (is.null(g))
-    g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme()
+    g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
   if (!is.null(plotArea)) braw.env$plotArea<-plotArea
   
   g<-startPlot(xlim=c(-1,1),ylim=c(0,1),back="transparent",box="none",g=g)

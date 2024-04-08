@@ -54,7 +54,7 @@ startPlot<-function(xlim,ylim,box="both",top=FALSE,backC=braw.env$plotColours$gr
   else gaps<-c(gaps,minGap,minGap)
   plotLimits(xlim = xlim, ylim = ylim,orientation=orientation,gaps,fontScale=fontScale)
 
-  if (is.null(g)) g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))
+  if (is.null(g)) g<-ggplot()+braw.env$plotRect
   back<-data.frame(x=xlim[c(1,2,2,1)],y=ylim[c(1,1,2,2)])
   xaxis<-data.frame(x=xlim,y=ylim[1])
   yaxis<-data.frame(x=xlim[1],y=ylim)
@@ -82,9 +82,13 @@ startPlot<-function(xlim,ylim,box="both",top=FALSE,backC=braw.env$plotColours$gr
 
 plotTitle<-function(label,position="centre") {
   switch(position,
+         "left"={
+           dataText(data.frame(x=braw.env$plotLimits$xlim[1],y=braw.env$plotLimits$ylim[2]),label,
+                    hjust=0,vjust=-1)
+         },
          "centre"={
            dataText(data.frame(x=mean(braw.env$plotLimits$xlim),y=braw.env$plotLimits$ylim[2]),label,
-                     hjust=0.5,vjust=-1)
+                    hjust=0.5,vjust=-1)
          },
          "right"={
            dataText(data.frame(x=braw.env$plotLimits$xlim[2],y=braw.env$plotLimits$ylim[2]),label,

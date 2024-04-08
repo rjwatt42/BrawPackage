@@ -31,7 +31,7 @@ makeWorld<-function(worldOn=FALSE,populationPDF="Single",populationRZ="r",
 #' )
 #' @export
 makeEffect<-function(rIV=0,rIV2=0,rIVIV2=0,rIVIV2DV=0,Heteroscedasticity=0,
-                     ResidDistr="normal",world=makeWorld()){
+                     ResidDistr="normal",world=braw.def$world){
 
   effect<-list(rIV=rIV,rIV2=rIV2,rIVIV2=rIVIV2,rIVIV2DV=rIVIV2DV,
                Heteroscedasticity=Heteroscedasticity,ResidDistr=ResidDistr,
@@ -48,7 +48,7 @@ makeEffect<-function(rIV=0,rIV2=0,rIVIV2=0,rIVIV2DV=0,Heteroscedasticity=0,
 #' @examples
 #' makeHypothesis(IV=makeVariable("IV"),IV2=NULL,DV=makeVariable("DV"),effect=makeEffect())
 #' @export
-makeHypothesis<-function(IV=makeVariable("IV"),IV2=NULL,DV=makeVariable("DV"),effect=makeEffect()) {
+makeHypothesis<-function(IV=braw.def$IV,IV2=braw.def$IV2,DV=braw.def$DV,effect=braw.def$effect) {
   hypothesis<-list(IV=IV,IV2=IV2,DV=DV,effect=effect)
 }
 

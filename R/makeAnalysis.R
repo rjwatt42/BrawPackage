@@ -490,9 +490,9 @@ generalAnalysis<-function(allData,InteractionOn,withins,ssqType="Type3",caseOrde
 #' 
 #' @returns analysis object
 #' @examples
-#' analysis<-makeAnalysis(sample=makeSample(),evidence=makeEvidence(),autoShow=FALSE)#' make a multiple samples
+#' analysis<-makeAnalysis(sample=makeSample(),evidence=makeEvidence(),autoShow=braw.env$autoShow)#' make a multiple samples
 #' @export
-makeAnalysis<-function(sample=makeSample(),evidence=makeEvidence(),autoShow=FALSE){
+makeAnalysis<-function(sample=makeSample(autoShow=FALSE),evidence=makeEvidence(),autoShow=braw.env$autoShow){
   design<-sample$design
   hypothesis<-sample$hypothesis
   IV<-hypothesis$IV
@@ -859,7 +859,7 @@ makeAnalysis<-function(sample=makeSample(),evidence=makeEvidence(),autoShow=FALS
 
 runSimulation<-function(hypothesis,design,evidence,sig_only=FALSE,onlyAnalysis=FALSE,oldResult=NULL) {
     if (onlyAnalysis && !is.null(oldResult)) {
-    res<-makeAnalysis(oldResult,evidence)
+    res<-makeAnalysis(oldResult,evidence,autoShow=FALSE)
     return(res)
   }
   
@@ -910,8 +910,8 @@ runSimulation<-function(hypothesis,design,evidence,sig_only=FALSE,onlyAnalysis=F
 
 getSample<-function(hypothesis,design,evidence) {
   if (!evidence$shortHand) {
-    sample<-makeSample(hypothesis,design)
-    res<-makeAnalysis(sample,evidence)
+    sample<-makeSample(hypothesis,design,autoShow=FALSE)
+    res<-makeAnalysis(sample,evidence,autoShow=FALSE)
   } else {
     res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
   }

@@ -17,5 +17,5 @@ analysis object
 perform an analysis of a sample object
 }
 \examples{
-analysis<-makeAnalysis(sample=makeSample(),evidence=makeEvidence(),autoShow=FALSE)#' make a multiple samples
+analysis<-makeAnalysis(sample=makeSample(),evidence=makeEvidence(),autoShow=braw.env$autoShow)#' make a multiple samples
 }

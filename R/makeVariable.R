@@ -143,37 +143,51 @@ makeVariable<-function(name,type="Interval",
 #' @examples
 #' variable<-getVariable(name)
 #' @export
-getVariable<-function(name) {
+getVariable<-function(name=NULL) {
   
-  defaultVars<-rbind(
-    makeVariable(name="IV",type="Interval",mu=0,sd=1,ncats=2,cases="C1,C2"),
-    makeVariable(name="IV2",type="Interval",mu=0,sd=1,ncats=2,cases="D1,D2"),
-    makeVariable(name="DV",type="Interval",mu=0,sd=1,ncats=2,cases="E1,E2"),
+  if (is.null(name)) return(NULL)
+  return(braw.env$variables[[name]])
+  
+}
+
+addVariable<-function(var) {
+  var<-list(var)
+  names(var)<-var[[1]]$name
+  vars<-c(braw.env$variables,var)
+  assign("variables",vars,braw.env)
+}
+
+changeVariable<-function(var) {
+  var<-list(var)
+  vars<-braw.env$variables
+  vars[var[[1]]$name]<-var
+  assign("variables",vars,braw.env)
+}
+
+makeDefaultVariables<-function() {
+  defaultVars<-list(
+    IV=makeVariable(name="IV",type="Interval",mu=0,sd=1,ncats=2,cases="C1,C2"),
+    IV2=makeVariable(name="IV2",type="Interval",mu=0,sd=1,ncats=2,cases="D1,D2"),
+    DV=makeVariable(name="DV",type="Interval",mu=0,sd=1,ncats=2,cases="E1,E2"),
     
-    makeVariable(name="Treatment",type="Categorical",ncats=2,cases="before,after",proportions="1,1"),
-    makeVariable(name="Treatment?",type="Categorical",ncats=2,cases="no,yes",proportions="1,1"),
-    makeVariable(name="IQ",type="Interval",mu=100,sd=15),
-    makeVariable(name="Diligence",type="Interval",mu=0,sd=2),
-    makeVariable(name="Perfectionism",type="Interval",mu=0,sd=2),
-    makeVariable(name="Happiness",type="Interval",mu=50,sd=12),
-    makeVariable(name="Grade",type="Interval",mu=65,sd=10),
-    makeVariable(name="RiskTaking",type="Interval",mu=30,sd=6),
-    makeVariable(name="Interesting",type="Interval",mu=10,sd=2),
+    Treatment=makeVariable(name="Treatment",type="Categorical",ncats=2,cases="before,after",proportions="1,1"),
+    "Treatment?"=makeVariable(name="Treatment?",type="Categorical",ncats=2,cases="no,yes",proportions="1,1"),
+    IQ=makeVariable(name="IQ",type="Interval",mu=100,sd=15),
+    Diligence=makeVariable(name="Diligence",type="Interval",mu=0,sd=2),
+    Perfectionism=makeVariable(name="Perfectionism",type="Interval",mu=0,sd=2),
+    Happiness=makeVariable(name="Happiness",type="Interval",mu=50,sd=12),
+    Grade=makeVariable(name="Grade",type="Interval",mu=65,sd=10),
+    RiskTaking=makeVariable(name="RiskTaking",type="Interval",mu=30,sd=6),
+    Interesting=makeVariable(name="Interesting",type="Interval",mu=10,sd=2),
     
-    makeVariable(name="Coffee?",type="Categorical",ncats=2,cases="no,yes",proportions="1,1"),
-    makeVariable(name="Smoker?",type="Categorical",ncats=2,cases="no,yes",proportions="2,1"),
-    makeVariable(name="RiskTaker?",type="Categorical",ncats=2,cases="no,yes"),
-    makeVariable(name="Musician?",type="Categorical",ncats=2,cases="no,yes"),
+    "Coffee?"=makeVariable(name="Coffee?",type="Categorical",ncats=2,cases="no,yes",proportions="1,1"),
+    "Smoker?"=makeVariable(name="Smoker?",type="Categorical",ncats=2,cases="no,yes",proportions="2,1"),
+    "RiskTaker?"=makeVariable(name="RiskTaker?",type="Categorical",ncats=2,cases="no,yes"),
+    "Musician?"=makeVariable(name="Musician?",type="Categorical",ncats=2,cases="no,yes"),
     
-    makeVariable(name="StudySubject",type="Categorical",ncats=3,cases="psych,phil,sports",proportions="1.5,1,2"),
-    makeVariable(name="BirthOrder",type="Categorical",ncats=4,cases="first,middle,last,only",proportions="1,0.4,0.6,0.2")
+    StudySubject=makeVariable(name="StudySubject",type="Categorical",ncats=3,cases="psych,phil,sports",proportions="1.5,1,2"),
+    BirthOrder=makeVariable(name="BirthOrder",type="Categorical",ncats=4,cases="first,middle,last,only",proportions="1,0.4,0.6,0.2")
   )
   
-  variablesLocal<-matrix(defaultVars,nrow=18)
-  
-  use<-which(variablesLocal[,1]==name)
-  if (isempty(use)) return(NULL)
-  theVariable<-variablesLocal[use,]
-  names(theVariable)<-names(makeVariable(" "))
-  return(theVariable)
+  return(defaultVars)
 }

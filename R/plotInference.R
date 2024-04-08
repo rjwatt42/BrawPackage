@@ -1,6 +1,7 @@
 
 trimanalysis<-function(analysis) {
   
+  if (all(is.na(analysis$rIV))) return(analysis)
   use<-(!is.na(analysis$rIV))
   
   analysis$rIV=analysis$rIV[use]
@@ -27,7 +28,7 @@ trimanalysis<-function(analysis) {
   analysis
 }
 
-plotInference<-function(analysis,otheranalysis=NULL,disp="r",orientation="vert",effectType="direct",showTheory=TRUE,g=NULL){
+plotInference<-function(analysis,otheranalysis=NULL,disp="r",orientation="vert",effectType="direct",showTheory=braw.env$showTheory,g=NULL){
   if (length(disp)==2) {
     return(plot2Inference(analysis,disp[1],disp[2]))
   } 
@@ -160,7 +161,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
   
   pts<-data.frame(x=d1,y=d2)
   braw.env$plotArea<-c(0,0,1,1)
-  g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme()
+  g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
   g<-startPlot(xaxis$lim,yaxis$lim,box="both",top=FALSE,g=g)
   g<-g+xAxisTicks(logScale=xaxis$logScale)
   g<-g+xAxisLabel(xaxis$label)

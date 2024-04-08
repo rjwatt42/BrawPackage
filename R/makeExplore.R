@@ -86,14 +86,17 @@ mergeExploreResult<-function(res1,res2) {
 #'                              min_n=10,max_n=250,max_r=0.9,max_anom=1,
 #'                              xlog=FALSE,xabs=FALSE,mx_log=FALSE,
 #'                              hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
-#'                              doingNull=FALSE,autoShow=FALSE,showType="Basic")
+#'                              doingNull=FALSE,autoShow=braw.env$autoShow,showType="Basic")
 #' @export
 makeExplore<-function(nsims=10,exploreResult=NULL,exploreType="n",exploreNPoints=13,
                       min_n=10,max_n=250,max_r=0.9,max_anom=1,
                       xlog=FALSE,xabs=FALSE,
-                      hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
-                      doingNull=FALSE,autoShow=FALSE,showType="r"
+                      hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=makeEvidence(),
+                      doingNull=FALSE,autoShow=braw.env$autoShow,showType="r"
 ) {
+  autoShowLocal<-autoShow
+  assign("autoShow",FALSE,braw.env)
+  
   explore<-list(exploreType=exploreType,
                 exploreNPoints=exploreNPoints,
                 min_n=min_n,max_n=max_n,max_r=max_r,max_anom=max_anom,
@@ -114,11 +117,13 @@ makeExplore<-function(nsims=10,exploreResult=NULL,exploreType="n",exploreNPoints
   
   exploreResult <- runExplore(nsims=nsims,exploreResult,doingNull=doingNull,
                               autoShow=autoShow,showType=showType)
+  assign("autoShow",autoShow,braw.env)
+  
   return(exploreResult)
 }
 
 runExplore <- function(nsims,exploreResult,doingNull=FALSE,
-                       autoShow=FALSE,showType="r"){
+                       autoShow=braw.env$autoShow,showType="r"){
   
   explore<-exploreResult$explore
   hypothesis<-explore$hypothesis
@@ -145,7 +150,6 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
   if (explore$xabs) {vals<-seq(0,1,length.out=npoints)}
   else              {vals<-seq(-1,1,length.out=npoints)}
   
-  metaExplore<-is.element(explore$exploreType,c("NoStudies","sig_only"))
   switch (explore$exploreType,
           "IVType"={vals<-c("Interval","Ord7","Ord4","Cat2","Cat3")},
           "DVType"={vals<-c("Interval","Ord7","Ord4","Cat2")},
@@ -226,16 +230,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
           "Repeats" ={
             if (design$ReplKeep=="median") vals<-seq(0,explore$Explore_nrRange,by=2)
             else vals<-seq(0,explore$Explore_nrRange)
-          },
-          
-          "NoStudies"={
-            if (explore$Explore_Mxlog){
-              vals<-round(10^seq(log10(min_n),log10(explore$Explore_metaRange),length.out=npoints))
-            }else{
-              vals<-round(seq(min_n,explore$Explore_metaRange,length.out=npoints))
-            }
-          },
-          "sig_only"={vals<-c(FALSE,TRUE)}
+          }
   )
   
   exploreResult$vals<-vals
@@ -595,24 +590,12 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
         hypothesis$DV<-DV
         hypothesis$effect<-effect
         
-        if (metaExplore) {
-          res<-multipleAnalysis(metaAnalysis$nstudies,hypothesis,design,evidence,metaResult$result,sigOnly=metaAnalysis$sig_only)
-          metaResult$result<-res
-          metaResult<-runMetaAnalysis(metaAnalysis,metaResult)
-          
-          result$rval[ri,vi]<-metaResult$bestS
-          result$S[ri,vi]<-metaResult$bestS
-          result$k[ri,vi]<-metaResult$bestK
-          result$pnull[ri,vi]<-metaResult$bestNull
-          result$dist[ri,vi]<-metaResult$bestDist
-        } else {
-          res<-multipleAnalysis(1,hypothesis,design,evidence)
-          result<-storeExploreResult(result,res,ri,vi)
-
-          if (doingNull) {
-            res_null<-multipleAnalysis(1,nullhypothesis,design,evidence)
-            nullresult<-storeExploreResult(nullresult,res_null,ri,vi)
-          }
+        res<-multipleAnalysis(1,hypothesis,design,evidence)
+        result<-storeExploreResult(result,res,ri,vi)
+        
+        if (doingNull) {
+          res_null<-multipleAnalysis(1,nullhypothesis,design,evidence)
+          nullresult<-storeExploreResult(nullresult,res_null,ri,vi)
         }
       }
     }

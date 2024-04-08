@@ -62,8 +62,8 @@ showAxis<-function(showType,effect) {
   switch(braw.env$nPlotScale,
          "log10"={
            nlim<-log10(c(5,1000))
-           nticks<-seq(0,3,1)
-           nmins<-log10(c(seq(1,10),seq(1,10)*10,seq(1,10)*100))
+           nticks<-seq(1,3,1)
+           nmins<-log10(c(seq(5,10),seq(1,10)*10,seq(1,10)*100))
            nlabel<-bquote(bold(log['10'](n)))
          },
          "linear"={

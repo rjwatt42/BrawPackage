@@ -322,7 +322,7 @@ plotCatDescription<-function(analysis,g) {
 #' @examples
 #' showDescription(analysis=makeAnalysis())
 #' @export
-showDescription<-function(analysis=makeAnalysis()) {
+showDescription<-function(analysis=makeAnalysis(autoShow=FALSE)) {
 
   g<-getAxisPrediction(analysis$hypothesis) 
   

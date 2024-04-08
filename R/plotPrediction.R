@@ -36,7 +36,7 @@ getAxisPrediction<-function(hypothesis) {
           }
   )
   
-  g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme()
+  g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
   g<-startPlot(xlim,ylim,g=g)
   g<-g+xAxisLabel(bquote(bold(.(IV$name))))+xAxisTicks(xticks,xlabels)
   g<-g+yAxisLabel(bquote(bold(.(DV$name))))+yAxisTicks(yticks,ylabels)

@@ -32,9 +32,17 @@ getWorld<-function(name) {
 #' @examples
 #' hypothesis<-getHypothesis(name,hypothesis=makeHypothesis())
 #' @export
-getHypothesis<-function(name,hypothesis=makeHypothesis()) {
+getHypothesis<-function(name,hypothesis=braw.def$hypothesis) {
   
   switch(name,
+         "null"={
+           hypothesis$effect$world$worldOn<-FALSE
+           hypothesis$effect$rIV<-0
+         },
+         "simple"={
+           hypothesis$effect$world$worldOn<-FALSE
+           hypothesis$effect$rIV<-0.3
+         },
          "Psych"={
            hypothesis$effect$world<-getWorld("Psych")
          },
@@ -135,9 +143,14 @@ getHypothesis<-function(name,hypothesis=makeHypothesis()) {
 #' @examples
 #' design<-getDesign(name,design=makeDesign())
 #' @export
-getDesign<-function(name,design=makeDesign()) {
+getDesign<-function(name,design=braw.def$design) {
  
   switch(name,
+         "simple"={
+           design$sN<-42
+           design$sNRand<-FALSE
+           design$sNRandK<-1.56
+         },
          "Psych"={
            design$sN<-52
            design$sNRand<-TRUE

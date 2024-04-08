@@ -1,17 +1,20 @@
 braw.env<-c()
+braw.def<-c()
 .onLoad<- function(...) {
   BrawOpts()
 }
 
-newBrawDev<-function(fontScale=1,height=576,aspect=1.736) {
+newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
   while (dev.cur()!=1) dev.off()
   dev.new(width=height*aspect/144, height=height/144, noRStudioGD = TRUE)
-  fontScale<-min(dev.size(units="px"))/200
+  fontScale<-min(dev.size(units="px"))/200/1.75
   assign("labelSize",3.2*fontScale,braw.env)
+  setBrawEnv("plotRect",coord_cartesian(xlim=c(0,1),ylim=c(-0.25,1.5)))
 }
 
 BrawOpts<-function(BW=FALSE,fontScale=1,newDev=FALSE,height=576,aspect=1.736) {
   braw.env <- new.env(parent = emptyenv())
+  braw.def <- new.env(parent = emptyenv())
   
   if (newDev) {
     while (dev.cur()!=1) dev.off()
@@ -90,6 +93,8 @@ BrawOpts<-function(BW=FALSE,fontScale=1,newDev=FALSE,height=576,aspect=1.736) {
           braw.env$labelSize<-3.2*fontScale
           braw.env$dotSize<-16/3
           
+          braw.env$autoShow<-TRUE
+          braw.env$plotRect<-coord_cartesian(xlim=c(0,1),ylim=c(0,1))
           ##########################
           # NHST constants
           
@@ -144,8 +149,15 @@ BrawOpts<-function(BW=FALSE,fontScale=1,newDev=FALSE,height=576,aspect=1.736) {
           braw.env$alphaChar<-'\u03B1'
           
           braw.env$showTheoryHQ<-TRUE
+          braw.env$showTheory<-TRUE
+          
           ##################################
-          # notation for worlds
+          # default variables
+          
+          braw.env$variables<-makeDefaultVariables()
+          
+          ##################################
+          # notation for effect sizes
           
           braw.env$rpLabel<-bquote(bold(r[p]))
           braw.env$rsLabel<-bquote(bold(r[s]))
@@ -239,4 +251,29 @@ BrawOpts<-function(BW=FALSE,fontScale=1,newDev=FALSE,height=576,aspect=1.736) {
           braw.env$allNegative<-bquote(.(Zchar) ~"ns")
 
 braw.env<<-braw.env          
+
+braw.def$world<-makeWorld()
+braw.def$effect<-makeEffect(world=braw.def$world)
+braw.def$IV<-makeVariable("IV")
+braw.def$IV2<-NULL
+braw.def$DV<-makeVariable("DV")
+braw.def$hypothesis<-makeHypothesis(IV=braw.def$IV,IV2=braw.def$IV2,DV=braw.def$DV,effect=braw.def$effect)
+braw.def$design<-makeDesign()
+braw.def$evidence<-makeEvidence()
+
+braw.def<<-braw.def
+}
+
+setBrawEnv<-function(which,value) {
+  assign(which,value,braw.env)
+}
+
+setBrawDef<-function(which,value) {
+  assign(which,value,braw.def)
+  if (is.element(which,c("world"))) {
+    assign("effect",makeEffect(),braw.def)
+  }
+  if (is.element(which,c("world","effect","IV","IV2","DV"))) {
+    assign("hypothesis",makeHypothesis(),braw.def)
+  }
 }

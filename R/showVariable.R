@@ -109,7 +109,7 @@ drawInterval<-function(var,plotArea=c(0,0,1,1),g){
 #' @export
 showVariable<-function(variable=makeVariable(),plotArea=NULL,g=NULL){
   if (is.null(g)) 
-    g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme()
+    g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
   if (!is.null(plotArea)) braw.env$plotArea<-plotArea
   switch(variable$type,
          "Interval"={g<-drawInterval(variable,plotArea,g)},

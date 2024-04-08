@@ -15,14 +15,14 @@
 #'                        orientation="vert",
 #'                        effectType="direct",showTheory=TRUE)
 #' @export
-showExpected<-function(expectedResult=makeExpected(),showType="Basic",
+showExpected<-function(expectedResult=makeExpected(autoShow=FALSE),showType="Basic",
                        dimension="1D",orientation="vert",
-                       effectType="direct",showTheory=TRUE
+                       effectType="direct",showTheory=braw.env$showTheory
 ) {
-  if (is.numeric(expectedResult)) expectedResult=makeExpected(expectedResult)
-  
+  if (is.numeric(expectedResult)) expectedResult=makeExpected(expectedResult,autoShow=FALSE)
+
   if (showType=="tDR") showType<-"fDR"
-  if (is.element(showType,c("NHST","fDR","fMR"))) {
+  if (!expectedResult$hypothesis$effect$world$worldOn && is.element(showType,c("NHST","fDR","fMR"))) {
     if (expectedResult$nullcount<expectedResult$count) {
       expectedResult<-makeExpected(0,expectedResult,doingNull=TRUE)
     }
@@ -47,6 +47,7 @@ showExpected<-function(expectedResult=makeExpected(),showType="Basic",
   g<-showInference(fullResult,showType=showType,dimension=dimension,orientation=orientation,
                 effectType=effectType,showTheory=showTheory
   ) 
+  g<-g+plotTitle(paste0("Expected: ",brawFormat(expectedResult$count)),"right")
   g
 }
 

@@ -36,8 +36,8 @@ resetExpected<-function(nsims=0,expectedResult=NULL){
     b<-matrix(NA,nsims,1)
     bm<-matrix(NA,nsims,3)
   } else {
-    b<-NULL
-    bm<-NULL
+    b<-NA
+    bm<-NA
   }
   newResult<-list(
     rIV=b,pIV=b,rpIV=b,roIV=b,poIV=b,nval=b,df1=b
@@ -72,12 +72,12 @@ resetExpected<-function(nsims=0,expectedResult=NULL){
 #' @returns expectedResult object
 #' @examples
 #' expectedResult<-makeExpected(nsims=100,expectedResult=NULL,hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
-#'                              doingNull=FALSE,autoShow=FALSE,showType="Basic")
+#'                              doingNull=FALSE,autoShow=braw.env$autoShow,showType="Basic")
 #' @seealso showExpected() and reportExpected())
 #' @export
-makeExpected <- function(nsims=10,expectedResult=NULL,hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
-                         doingNull=FALSE,autoShow=FALSE,showType="Basic") {
-  
+makeExpected <- function(nsims=10,expectedResult=NULL,hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=makeEvidence(),
+                         doingNull=FALSE,autoShow=braw.env$autoShow,showType="Basic") {
+
   if (!is.null(expectedResult)) {
     hypothesis<-expectedResult$hypothesis
     design<-expectedResult$design
@@ -119,7 +119,8 @@ makeExpected <- function(nsims=10,expectedResult=NULL,hypothesis=makeHypothesis(
     }
     if (autoShow) print(showExpected(expectedResult,showType=showType))
   }
-  
+
+  # if (autoShow) return(NULL)
   return(expectedResult)
 }
 

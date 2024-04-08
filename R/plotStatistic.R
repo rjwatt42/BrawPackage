@@ -473,8 +473,8 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
   if (showType=="p" && braw.env$pPlotScale=="log10" && any(is.numeric(analysis$pIV))) 
     while (mean(log10(analysis$pIV)>ylim[1])<0.75) ylim[1]<-ylim[1]-1
   
-  if (orient=="horz") ylim[2]<-ylim[2]+diff(ylim)/16
-  else                ylim<-ylim+c(-1,1)*diff(ylim)/16
+  if (orient=="vert") ylim[2]<-ylim[2]+diff(ylim)/5
+  else                ylim<-ylim+c(-1,1)*diff(ylim)/5
   
   if (is.null(hypothesis$IV2)) box<-"y" else box<-"both"
   top<-is.element(showType,c("e1","e2","e1d","e2d"))
@@ -641,8 +641,8 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
       )
       
       if (orientation=="horz")  distMax<-0.8
-      else distMax<-0.5
-      
+      else distMax<-0.8
+
       xd[is.na(xd)]<-0
       theoryGain<-1/max(xd)*distMax
       xd<-xd*theoryGain
@@ -718,6 +718,7 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
       }
     }  else {
       # no simulations
+      ns<-c()
       switch (showType,
               "p"={
                 s<-fullPSig(hypothesis$effect$world,design)

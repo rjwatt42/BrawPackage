@@ -43,7 +43,7 @@ exploreResult<-makeExplore(nsims=10,exploreResult=NULL,exploreType="n",exploreNP
                              min_n=10,max_n=250,max_r=0.9,max_anom=1,
                              xlog=FALSE,xabs=FALSE,mx_log=FALSE,
                              hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
-                             doingNull=FALSE,autoShow=FALSE,showType="Basic")
+                             doingNull=FALSE,autoShow=braw.env$autoShow,showType="Basic")
 }
 \seealso{
 showExplore()

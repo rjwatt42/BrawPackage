@@ -60,8 +60,8 @@ getNulls<-function(analysis,useSig=FALSE,useNSig=FALSE) {
 #'               effectType="direct",
 #'               showTheory=TRUE)
 #' @export
-showInference<-function(analysis=makeAnalysis(),showType="Basic",dimension="1D",orientation="vert",
-                        effectType="direct",showTheory=TRUE
+showInference<-function(analysis=makeAnalysis(autoShow=FALSE),showType="Basic",dimension="1D",orientation="vert",
+                        effectType="direct",showTheory=braw.env$showTheory
 ) {
   if (showType[1]=="2D") {
     showType<-"Basic"
@@ -112,7 +112,7 @@ showInference<-function(analysis=makeAnalysis(),showType="Basic",dimension="1D",
       area.y<-0.25
     } else area.y<-1
     
-    g1<-ggplot()+coord_cartesian(xlim=c(0,1),ylim=c(0,1))
+    g1<-ggplot()+braw.env$plotRect
     
     nplots<-sum(!is.na(showType))
     if (orientation=="vert") nplots<-2
@@ -120,13 +120,13 @@ showInference<-function(analysis=makeAnalysis(),showType="Basic",dimension="1D",
       braw.env$plotArea<-c(0.0,0.33*(fi-1),1/nplots,area.y)
         g1<-plotInference(analysis1,otheranalysis=other1,
                           disp=showType[1],effectType=effectType[fi],orientation=orientation,showTheory=showTheory,g=g1)
-      braw.env$plotArea<-c(0.5,0.33*(fi-1),1/nplots,area.y,area.y)
-      if (!is.na(showType[2])) {
-          g1<-plotInference(analysis2,otheranalysis=other2,
+        if (!is.na(showType[2])) {
+        braw.env$plotArea<-c(0.5,0.33*(fi-1),1/nplots,area.y,area.y)
+        g1<-plotInference(analysis2,otheranalysis=other2,
                             disp=showType[2],effectType=effectType[fi],orientation=orientation,showTheory=showTheory,g=g1)
       } 
     }
-    braw.env$plotLimits<-NULL
+    # braw.env$plotLimits<-NULL
   }
 
   return(g1)

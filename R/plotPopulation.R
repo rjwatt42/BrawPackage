@@ -296,7 +296,7 @@ plotOrdOrdPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha,g){
 
 plotPopulation<-function(IV,DV,effect,alpha=1,g=NULL){
   if (is.null(g)) 
-    g<-ggplot()+coord_cartesian(xlim = c(0,1), ylim = c(0, 1))+braw.env$blankTheme()
+    g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
   
   rho<-effect$rIV
   if (is.na(rho)) {rho<-0}
