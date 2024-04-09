@@ -97,6 +97,7 @@ makeExplore<-function(nsims=10,exploreResult=NULL,exploreType="n",exploreNPoints
   autoShowLocal<-autoShow
   assign("autoShow",FALSE,braw.env)
   
+  if (exploreType=="alpha") exploreType<-"Alpha"
   explore<-list(exploreType=exploreType,
                 exploreNPoints=exploreNPoints,
                 min_n=min_n,max_n=max_n,max_r=max_r,max_anom=max_anom,

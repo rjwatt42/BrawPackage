@@ -28,7 +28,9 @@ DV<-"Interval"
 rIV<-0.3
 pNull<-0.0
 sN<-42
-setBrawDef("hypothesis",getHypothesis("Single"))
+sAlpha<-0.05
+nameHypothesis<-"Single"
+setBrawDef("hypothesis",getHypothesis(nameHypothesis))
 
 setIV<-function(panel) {
   IV<<-panel$IV
@@ -43,7 +45,8 @@ setHypExtras<-function(panel) {
 }
 
 setDesignExtras<-function(panel) {
-  sN<<-as.numeric(panel$sN)
+  sN<<-as.numeric(panel$designPars[1])
+  sAlpha<<-as.numeric(panel$designPars[2])
 }
 
 setSingle<-function(panel) {
@@ -64,32 +67,49 @@ setExploreType<-function(panel) {
 }
 
 setHypothesis<-function(panel) {
+  nameHypothesis<<-panel$hypothesis
   switch(panel$hypothesis,
          "null"= setBrawDef("hypothesis",getHypothesis("Null")),
          "single"= setBrawDef("hypothesis",getHypothesis("Single")),
+         "double"= setBrawDef("hypothesis",getHypothesis("Double")),
          "exp"= setBrawDef("hypothesis",getHypothesis("PsychF"))
   )
   multipleResult<<-NULL
   exploreResult<<-NULL
 }
+doHypothesis<-function(panel) {
+  prepare()
+  print(showHypothesis())
+}
 
 setDesign<-function(panel) {
   switch(panel$design,
          "simple"= setBrawDef("design",getDesign("simple")),
-         "world"= setBrawDef("hypothesis",getDesign("Psych"))
+         "world"= setBrawDef("design",getDesign("Psych"))
   )
   multipleResult<<-NULL
   exploreResult<<-NULL
 }
+doDesign<-function(panel) {
+  prepare()
+  print(showDesign())
+}
 
 
 prepare<-function() {
+  setBrawEnv("alphaSig",sAlpha)
+  
   hypothesis<-braw.def$hypothesis
   hypothesis$IV<-makeVariable(name="IV",type=IV)
   hypothesis$DV<-makeVariable(name="DV",type=DV)
   hypothesis$effect$world$worldOn<-TRUE
-  hypothesis$effect$world$populationPDFk<-rIV
-  hypothesis$effect$world$populationNullp<-pNull
+  if (nameHypothesis=="null") {
+    hypothesis$effect$world$populationPDFk<-0
+    hypothesis$effect$world$populationNullp<-0
+  } else {
+    hypothesis$effect$world$populationPDFk<-rIV
+    hypothesis$effect$world$populationNullp<-pNull
+  }
   setBrawDef("hypothesis",hypothesis)
   
   design<-braw.def$design
@@ -144,34 +164,40 @@ doExplore<-function(panel) {
 # }
 
 margin<-10
+rowMargin<-20
 panelWidth<-120
 
-panel<-rp.control("controls",background=backP,size=c(350,800))
+panel<-rp.control("controls",background=backP,size=c(2.5*margin+2*panelWidth,800))
 
 row<-0
-rp.grid(panel, pos=list(row=row, column=0, sticky="news", width=margin, height=margin),
+rp.grid(panel, pos=list(row=row, column=0, sticky="news", width=margin, height=rowMargin),
         background=backP, name="b0")
+rp.grid(panel, pos=list(row=row, column=1, sticky="news",width=panelWidth),
+        background=backP, name="b1")
+rp.grid(panel, pos=list(row=row, column=2, sticky="news", width=margin/2),
+        background=backP, name="b2")
+rp.grid(panel, pos=list(row=row, column=3, sticky="news",width=panelWidth),
+        background=backP, name="b3")
+rp.grid(panel, pos=list(row=row, column=4, sticky="news", width=margin),
+        background=backP,name="b4")
 row<-row+1
-rp.grid(panel, pos=list(row=row, column=0, sticky="news", width=margin, height=margin),
-        background=backP)
+# Hypothesis
 rp.grid(panel, pos=list(row=row, column=1, sticky="news"),
         background=backP, name="hypothesis")
-rp.grid(panel, pos=list(row=row, column=2, sticky="news", width=margin/2, height=margin),
-        background=backP)
 rp.grid(panel, pos=list(row=row, column=3, sticky="news"),
         background=backP, name="hypothesis2")
-rp.grid(panel, pos=list(row=row, column=4, sticky="news", width=margin, height=margin),
+row<-row+1
+# Gap
+rp.grid(panel, pos=list(row=row, column=0, sticky="news",height=rowMargin),
         background=backP)
 row<-row+1
-rp.grid(panel, pos=list(row=row, column=1, sticky="news", width=panelWidth, height=margin),
-        background=backP)
-row<-row+1
+# Design
 rp.grid(panel, pos=list(row=row, column=1, sticky="news"),
         background=backP, name="design")
 rp.grid(panel, pos=list(row=row, column=3, sticky="news"),
         background=backP, name="design2")
 row<-row+1
-rp.grid(panel, pos=list(row=row, column=1, sticky="news", width=panelWidth, height=margin),
+rp.grid(panel, pos=list(row=row, column=1, sticky="news",height=rowMargin),
         background=backP)
 row<-row+1
 rp.grid(panel, pos=list(row=row, column=1, sticky="news"),
@@ -179,18 +205,18 @@ rp.grid(panel, pos=list(row=row, column=1, sticky="news"),
 rp.grid(panel, pos=list(row=row, column=3, sticky="news"),
         background=backP, name="multiple")
 row<-row+1
-rp.grid(panel, pos=list(row=row, column=1, sticky="news", width=panelWidth, height=margin),
+rp.grid(panel, pos=list(row=row, column=1, sticky="news",height=rowMargin),
         background=backP)
 row<-row+1
 rp.grid(panel, pos=list(row=row, column=1, sticky="news"),
-        background=backP, name="exploreType")
-# rp.grid(panel, pos=list(row=row, column=3, sticky="news"),
-#         background=exploreC, name="exploreShow")
-# row<-row+1
-# rp.grid(panel, pos=list(row=row, column=1, sticky="news"),
-#         background=exploreC, name="explore")
+        background=backP, name="exploreHypothesis")
+rp.grid(panel, pos=list(row=row, column=3, sticky="news"),
+        background=backP, name="exploreDesign")
 row<-row+1
-rp.grid(panel, pos=list(row=row, column=1, sticky="news", width=panelWidth, height=margin),
+rp.grid(panel, pos=list(row=row, column=1, sticky="news"),
+        background=backP, name="explore")
+row<-row+1
+rp.grid(panel, pos=list(row=row, column=1, sticky="news",height=rowMargin),
         background=backP)
 row<-row+1
 rp.grid(panel, pos=list(row=row, column=3, sticky="news"),
@@ -205,8 +231,10 @@ rp.radiogroup(panel,action=setIV,variable=IV,
 rp.radiogroup(panel,action=setDV,variable=DV,
               vals=c("Interval","Categorical"),initval="Interval",title="DV",
               background=hypothesisC,parentname="hypothesis")
+rp.button(panel,action=doHypothesis,title="Show",
+          background=backB,foreground="white",parentname="hypothesis")
 rp.radiogroup(panel,action=setHypothesis,variable=hypothesis,
-              vals=c("null","single","exp"),initval="single",title="Effect",
+              vals=c("null","single","double","exp"),initval="single",title="Effect",
               background=hypothesisC,parentname="hypothesis2")
 rp.textentry(panel,hypothesisPars,action=setHypExtras,labels=c("rIV","pNull"),initval=c(rIV,pNull),
              background=hypothesisC,parentname="hypothesis2",pos="bottom")
@@ -214,7 +242,9 @@ rp.textentry(panel,hypothesisPars,action=setHypExtras,labels=c("rIV","pNull"),in
 rp.radiogroup(panel,action=setDesign,variable=design,
            vals=c("simple","world"),initval="simple",title="Design",
            background=designC,parentname="design")
-rp.textentry(panel,sN,action=setDesignExtras,labels="n",initval=sN,
+rp.button(panel,action=doDesign,title="Show",
+          background=backB,foreground="white",parentname="design")
+rp.textentry(panel,designPars,action=setDesignExtras,labels=c("n","alpha"),initval=c(sN,sAlpha),
              background=designC,parentname="design2",pos="bottom")
 
 rp.radiogroup(panel,action=setSingle,variable=single,
@@ -229,13 +259,16 @@ rp.button(panel,action=doMultiple,title="Make",
           background=backB,foreground="white",parentname="multiple")
 
 rp.radiogroup(panel,action=setExploreType,variable=exploreType,
-           vals=c("n","alpha","pNull",""),initval="n",title="Explore Type",
-           background=exploreC,parentname="exploreType")
+              vals=c("rIV","pNull"),initval="n",title="Explore Hypothesis",
+              background=exploreC,parentname="exploreHypothesis")
+rp.radiogroup(panel,action=setExploreType,variable=exploreType,
+              vals=c("n","alpha"),initval="n",title="Explore Design",
+              background=exploreC,parentname="exploreDesign")
 rp.radiogroup(panel,action=setExplore,variable=exploreShow,
            vals=c("r","p(sig)","NHST","fDR"),initval="r",title="Show",
-           background=exploreC,parentname="exploreType")
+           background=exploreC,parentname="explore")
 rp.button(panel,action=doExplore,title="Explore",
-          background=backB,foreground="white",parentname="exploreType")
+          background=backB,foreground="white",parentname="explore")
 
 rp.button(panel,action=newDisplay,title="New Display",
           background=backB,foreground="white",parentname="display")

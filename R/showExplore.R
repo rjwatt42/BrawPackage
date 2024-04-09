@@ -648,8 +648,9 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=braw.e
         r_est<-r_est$minimum
         nvals<-seq(min(n),max(n),length.out=101)
         yvals<-rn2w(r_est,nvals)
-        ptsn<-data.frame(x=nvals,y=yvals)
-        g<-g+dataLine(data=ptsn,colour="white",linetype="dotted",linewidth=0.25)
+        if (braw.env$nPlotScale=="log10") ptsn<-data.frame(x=log10(nvals),y=yvals)
+        else          ptsn<-data.frame(x=nvals,y=yvals)
+        g<-g+dataLine(data=ptsn,colour="black",linetype="dotted",linewidth=0.25)
         
         minnw<-function(n,r,w){sum(abs(w-rn2w(r,n)),na.rm=TRUE)}
         n80<-optimize(minnw,c(explore$min_n,explore$max_n),w=0.8,r=r_est)
@@ -660,7 +661,8 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=braw.e
           if (sum(n<n80$minimum)<2) label<-paste("Unsafe result - decrease range")
           if (sum(n>n80$minimum)<2) label<-paste("Unsafe result - increase range")
         }
-        lpts<-data.frame(x=min(n),y=0.8,label=label)
+        if (braw.env$nPlotScale=="log10") lpts<-data.frame(x=log10(min(n)),y=0.8,label=label)
+        else lpts<-data.frame(x=min(n),y=0.8,label=label)
         g<-g+dataLabel(data=lpts,label = label)
       }
       

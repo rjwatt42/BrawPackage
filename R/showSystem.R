@@ -78,8 +78,12 @@ showWorld<-function(hypothesis=makeHypothesis(effect=makeEffect(world=makeWorld(
     rdens<-rdens2zdens(rdens,rx)
     rx<-atanh(rx)
   }
-  rdens<-rdens/max(rdens)*(1-world$populationNullp)
-  
+  if (is.element(world$populationPDF,c("Single","Double"))) {
+    rdens<-rdens/sum(rdens)*(1-world$populationNullp)
+    rdens[rx==0]<-world$populationNullp
+  } else 
+    rdens<-rdens*(1-world$populationNullp)
+  rdens<-rdens/max(rdens)
   rx<-c(rx[1],rx,rx[length(rx)])
   rdens<-c(0,rdens,0)
   pts=data.frame(x=rx,y=rdens)

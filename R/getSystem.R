@@ -21,6 +21,13 @@ getWorld<-function(name) {
                        populationPDFk=0.3,
                        populationNullp=0)
          },
+         "Double"={
+           world<-list(worldOn=TRUE,
+                       populationPDF="Double",
+                       populationRZ="r",
+                       populationPDFk=0.3,
+                       populationNullp=0)
+         },
          "Psych"={
            world<-list(worldOn=TRUE,
                        populationPDF="Exp",
@@ -54,6 +61,9 @@ getHypothesis<-function(name,hypothesis=braw.def$hypothesis) {
          },
          "Single"={
            hypothesis$effect$world<-getWorld("Single")
+         },
+         "Double"={
+           hypothesis$effect$world<-getWorld("Double")
          },
          "Psych"={
            hypothesis$effect$world<-getWorld("Psych")
