@@ -174,7 +174,11 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
     if (braw.env$pPlotScale=="log10")  ps<-log10(ps)
     g<-g+dataLine(data=data.frame(x=rs,y=ps),col="white")
   }
-
+ if (disp2=="p") {
+   ps<-0.05
+   if (braw.env$pPlotScale=="log10")  ps<-log10(ps)
+   g<-g+horzLine(ps,linetype="dotted",colour=braw.env$plotColours$infer_sigC,linewidth=1)
+ }
   dotSize=min(8,max(3.5,sqrt(400/length(d1))))
   dotSize<-braw.env$dotSize
 

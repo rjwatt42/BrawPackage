@@ -6,7 +6,21 @@
 #' world<-getWorld(name
 #' @export
 getWorld<-function(name) {
-  switch(name,
+  switch(name,         
+         "Null"={
+           world<-list(worldOn=TRUE,
+                       populationPDF="Single",
+                       populationRZ="z",
+                       populationPDFk=0,
+                       populationNullp=0)
+         },
+         "Single"={
+           world<-list(worldOn=TRUE,
+                       populationPDF="Single",
+                       populationRZ="r",
+                       populationPDFk=0.3,
+                       populationNullp=0)
+         },
          "Psych"={
            world<-list(worldOn=TRUE,
                        populationPDF="Exp",
@@ -33,15 +47,13 @@ getWorld<-function(name) {
 #' hypothesis<-getHypothesis(name,hypothesis=makeHypothesis())
 #' @export
 getHypothesis<-function(name,hypothesis=braw.def$hypothesis) {
-  
+
   switch(name,
-         "null"={
-           hypothesis$effect$world$worldOn<-FALSE
-           hypothesis$effect$rIV<-0
+         "Null"={
+           hypothesis$effect$world<-getWorld("Null")
          },
-         "simple"={
-           hypothesis$effect$world$worldOn<-FALSE
-           hypothesis$effect$rIV<-0.3
+         "Single"={
+           hypothesis$effect$world<-getWorld("Single")
          },
          "Psych"={
            hypothesis$effect$world<-getWorld("Psych")

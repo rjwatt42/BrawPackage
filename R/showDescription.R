@@ -324,17 +324,16 @@ plotCatDescription<-function(analysis,g) {
 #' @export
 showDescription<-function(analysis=makeAnalysis(autoShow=FALSE)) {
 
+  braw.env$plotArea<-c(0,0,1,1)
   g<-getAxisPrediction(analysis$hypothesis) 
   
   if (is.null(analysis$hypothesis$IV2)){
-    braw.env$plotArea<-c(0,0,1,1)
     switch (analysis$hypothesis$DV$type,
             "Interval"=g<-plotParDescription(analysis,g),
             "Ordinal"=g<-plotParDescription(analysis,g),
             "Categorical"=g<-plotCatDescription(analysis,g)
     )
   } else{
-    braw.env$plotArea<-c(0,0,1,1)
     switch (analysis$hypothesis$IV2$type,
             "Interval"=g<-plotParInterDescription(analysis,g),
             "Ordinal"=g<-plotParInterDescription(analysis,g),

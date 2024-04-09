@@ -6,10 +6,14 @@ braw.def<-c()
 
 newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
   while (dev.cur()!=1) dev.off()
-  dev.new(width=height*aspect/144, height=height/144, noRStudioGD = TRUE)
+  if (Sys.info()[['sysname']]=="Darwin")
+    quartz("BrawStats",width=height*aspect/144, height=height/144)
+  else
+    dev.new(width=height*aspect/144, height=height/144, noRStudioGD = TRUE)
   fontScale<-min(dev.size(units="px"))/200/1.75
   assign("labelSize",3.2*fontScale,braw.env)
   setBrawEnv("plotRect",coord_cartesian(xlim=c(0,1),ylim=c(-0.25,1.5)))
+  print(startPlot(box="none",backC=NA))
 }
 
 BrawOpts<-function(BW=FALSE,fontScale=1,newDev=FALSE,height=576,aspect=1.736) {

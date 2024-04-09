@@ -36,6 +36,7 @@ showSample<-function(sample=makeSample(autoShow=FALSE)){
   IV2<-sample$hypothesis$IV2
   DV<-sample$hypothesis$DV
   effect<-sample$hypothesis$effect
+  if (!is.null(sample$rIV)) effect$rIV<-sample$rIV
   
   if (is.null(IV2)) {
     braw.env$plotArea<-c(0,0,1,1)
