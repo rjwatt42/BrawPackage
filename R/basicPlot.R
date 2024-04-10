@@ -200,7 +200,8 @@ xAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE){
   ticksTop<-reRangeXY(data.frame(x=breaks,y=braw.env$plotLimits$ylim[1]))
   ticksBottom<-reRangeXY(data.frame(x=breaks,y=braw.env$plotLimits$ylim[1]-yoff))
   
-  mn<-4.5/max(5,max(nchar(labels)))
+  sz<-100/length(breaks)
+  mn<-sz*0.9/max(sz,max(nchar(labels)))
   switch(braw.env$plotLimits$orientation,
          "vert"={
            geom_text(data=ticksTop,aes(x=x,y=y),label=labels,hjust=1.1,vjust=0.5,

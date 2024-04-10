@@ -54,9 +54,10 @@ trimExploreResult<-function(result,nullresult) {
 #'                        showType="r",
 #'                        effectType="unique",whichEffect="All")
 #' @export
-showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=braw.env$showTheory,
+showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=FALSE,
                       effectType="unique",whichEffect="All"){
   quants<-0.25
+  showPower<-FALSE
   
   explore<-exploreResult$explore
   hypothesis<-explore$hypothesis
@@ -640,7 +641,7 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=braw.e
       }
       
       # find n80
-      if (showType=="p(sig)" && explore$exploreType=="n" && effect$world$populationPDF=="Single"){
+      if (showType=="p(sig)" && explore$exploreType=="n" && effect$world$populationPDF=="Single" && showPower){
         w<-y50
         n<-exploreResult$vals
         minrw<-function(r,w,n){sum(abs(w-rn2w(r,n)),na.rm=TRUE)}
@@ -667,7 +668,7 @@ showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=braw.e
       }
       
       # find r80
-      if (showType=="p(sig)" && explore$exploreType=="rIV"){
+      if (showType=="p(sig)" && explore$exploreType=="rIV" && showPower){
         w<-y50
         r<-exploreResult$vals
         minrw<-function(r,w,n){sum(abs(w-rn2w(r,n)),na.rm=TRUE)}

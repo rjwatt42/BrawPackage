@@ -16,12 +16,16 @@ newDisplay<-function(panel) {
 
 singleResult<-NULL
 multipleResult<-NULL
-exploreResult<-NULL
-exploreType<-"n"
+exploreResultH<-NULL
+exploreTypeH<-"rIV"
+exploreResultD<-NULL
+exploreTypeD<-"n"
 
 singleShow<-"data"
 multipleShow<-"Basic"
-exploreShow<-"r"
+exploreShowH<-"p(sig)"
+exploreShowD<-"p(sig)"
+exploreDone<-"H"
 
 IV<-"Interval"
 DV<-"Interval"
@@ -29,6 +33,7 @@ rIV<-0.3
 pNull<-0.0
 sN<-42
 sAlpha<-0.05
+sMethod<-"Random"
 nameHypothesis<-"Single"
 setBrawDef("hypothesis",getHypothesis(nameHypothesis))
 
@@ -42,11 +47,24 @@ setDV<-function(panel) {
 setHypExtras<-function(panel) {
   rIV<<-as.numeric(panel$hypothesisPars[1])
   pNull<<-as.numeric(panel$hypothesisPars[2])
+  multipleResult<<-NULL
+  exploreResultH<<-NULL
+  exploreResultD<<-NULL
 }
 
 setDesignExtras<-function(panel) {
   sN<<-as.numeric(panel$designPars[1])
   sAlpha<<-as.numeric(panel$designPars[2])
+  multipleResult<<-NULL
+  exploreResultH<<-NULL
+  exploreResultD<<-NULL
+}
+
+setDesignMethod<-function(panel) {
+  sMethod<<-panel$sMethod
+  multipleResult<<-NULL
+  exploreResultH<<-NULL
+  exploreResultD<<-NULL
 }
 
 setSingle<-function(panel) {
@@ -57,13 +75,21 @@ setMultiple<-function(panel) {
   multipleShow<<-panel$multiple
   if (!is.null(multipleResult)) displayMultiple()
 }
-setExplore<-function(panel) {
-  exploreShow<<-panel$exploreShow
-  if (!is.null(exploreResult)) displayExplore()
+setExploreH<-function(panel) {
+  exploreShowH<<-panel$exploreShowH
+  if (!is.null(exploreResultH)) displayExplore()
 }
-setExploreType<-function(panel) {
-  exploreType<<-panel$exploreType
-  exploreResult<<-NULL
+setExploreD<-function(panel) {
+  exploreShowD<<-panel$exploreShowD
+  if (!is.null(exploreResultD)) displayExplore()
+}
+setExploreTypeH<-function(panel) {
+  exploreTypeH<<-panel$exploreTypeH
+  exploreResultH<<-NULL
+}
+setExploreTypeD<-function(panel) {
+  exploreTypeD<<-panel$exploreTypeD
+  exploreResultD<<-NULL
 }
 
 setHypothesis<-function(panel) {
@@ -75,7 +101,8 @@ setHypothesis<-function(panel) {
          "exp"= setBrawDef("hypothesis",getHypothesis("PsychF"))
   )
   multipleResult<<-NULL
-  exploreResult<<-NULL
+  exploreResultH<<-NULL
+  exploreResultD<<-NULL
 }
 doHypothesis<-function(panel) {
   prepare()
@@ -88,7 +115,8 @@ setDesign<-function(panel) {
          "world"= setBrawDef("design",getDesign("Psych"))
   )
   multipleResult<<-NULL
-  exploreResult<<-NULL
+  exploreResultH<<-NULL
+  exploreResultD<<-NULL
 }
 doDesign<-function(panel) {
   prepare()
@@ -114,6 +142,7 @@ prepare<-function() {
   
   design<-braw.def$design
   design$sN<-sN
+  design$sMethod<-makeSampling(sMethod)
   setBrawDef("design",design)
   
 }
@@ -137,19 +166,39 @@ displayMultiple<-function() {
 }
 doMultiple<-function(panel) {
   prepare()
-  multipleResult<<-makeExpected(50,expectedResult=multipleResult)
+  multipleResult<<-makeExpected(50,expectedResult=multipleResult,autoShow=FALSE)
   displayMultiple()
 }
 
 displayExplore<-function() {
-  print(showExplore(exploreResult,showType=exploreShow))
+  switch(exploreDone,
+         "D"={
+           print(showExplore(exploreResultD,showType=exploreShowD))
+         },
+         "H"={
+           print(showExplore(exploreResultH,showType=exploreShowH))
+         })
 }
-doExplore<-function(panel) {
+doExploreH<-function(panel) {
   prepare()
-  if (exploreType=="n") 
-    exploreResult<<-makeExplore(10,exploreResult=exploreResult,exploreType=exploreType,max_n=1000,xlog=TRUE,autoShow=FALSE)
-  else 
-    exploreResult<<-makeExplore(10,exploreResult=exploreResult,exploreType=exploreType,autoShow=FALSE)
+  exploreResultH<<-makeExplore(10,exploreResult=exploreResultH,exploreType=exploreTypeH,autoShow=FALSE)
+  exploreDone<<-"H"
+  displayExplore()
+}
+doExploreD<-function(panel) {
+  prepare()
+  switch(exploreTypeD,
+         "n"={
+           exploreResultD<<-makeExplore(10,exploreResult=exploreResultD,exploreType=exploreTypeD,max_n=1000,xlog=TRUE,autoShow=FALSE)
+         },
+         "method"={
+           exploreResultD<<-makeExplore(10,exploreResult=exploreResultD,exploreType="Method",autoShow=FALSE)
+         },
+         {
+           exploreResultD<<-makeExplore(10,exploreResult=exploreResultD,exploreType=exploreTypeD,autoShow=FALSE)
+         }
+  )
+  exploreDone<<-"D"
   displayExplore()
 }
 # 
@@ -215,6 +264,8 @@ rp.grid(panel, pos=list(row=row, column=3, sticky="news"),
 row<-row+1
 rp.grid(panel, pos=list(row=row, column=1, sticky="news"),
         background=backP, name="explore")
+rp.grid(panel, pos=list(row=row, column=3, sticky="news"),
+        background=backP, name="explore2")
 row<-row+1
 rp.grid(panel, pos=list(row=row, column=1, sticky="news",height=rowMargin),
         background=backP)
@@ -244,6 +295,9 @@ rp.radiogroup(panel,action=setDesign,variable=design,
            background=designC,parentname="design")
 rp.button(panel,action=doDesign,title="Show",
           background=backB,foreground="white",parentname="design")
+rp.radiogroup(panel,action=setDesignMethod,variable=sMethod,
+              vals=c("Random","Convenience"),initval="Random",title="Method",
+              background=designC,parentname="design2")
 rp.textentry(panel,designPars,action=setDesignExtras,labels=c("n","alpha"),initval=c(sN,sAlpha),
              background=designC,parentname="design2",pos="bottom")
 
@@ -258,17 +312,22 @@ rp.radiogroup(panel,action=setMultiple,variable=multiple,
 rp.button(panel,action=doMultiple,title="Make",
           background=backB,foreground="white",parentname="multiple")
 
-rp.radiogroup(panel,action=setExploreType,variable=exploreType,
-              vals=c("rIV","pNull"),initval="n",title="Explore Hypothesis",
+rp.radiogroup(panel,action=setExploreTypeH,variable=exploreTypeH,
+              vals=c("rIV","pNull"),initval="rIV",title="Explore Hypothesis",
               background=exploreC,parentname="exploreHypothesis")
-rp.radiogroup(panel,action=setExploreType,variable=exploreType,
-              vals=c("n","alpha"),initval="n",title="Explore Design",
+rp.radiogroup(panel,action=setExploreTypeD,variable=exploreTypeD,
+              vals=c("n","method","alpha"),initval="n",title="Explore Design",
               background=exploreC,parentname="exploreDesign")
-rp.radiogroup(panel,action=setExplore,variable=exploreShow,
-           vals=c("r","p(sig)","NHST","fDR"),initval="r",title="Show",
+rp.radiogroup(panel,action=setExploreH,variable=exploreShowH,
+           vals=c("r","p","p(sig)","NHST","fDR"),initval=exploreShowH,title="Show",
            background=exploreC,parentname="explore")
-rp.button(panel,action=doExplore,title="Explore",
+rp.button(panel,action=doExploreH,title="Explore",
           background=backB,foreground="white",parentname="explore")
+rp.radiogroup(panel,action=setExploreD,variable=exploreShowD,
+              vals=c("r","p","p(sig)","NHST","fDR"),initval=exploreShowD,title="Show",
+              background=exploreC,parentname="explore2")
+rp.button(panel,action=doExploreD,title="Explore",
+          background=backB,foreground="white",parentname="explore2")
 
 rp.button(panel,action=newDisplay,title="New Display",
           background=backB,foreground="white",parentname="display")

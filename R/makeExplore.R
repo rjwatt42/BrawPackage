@@ -167,7 +167,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
           "DVskew"={vals<-vals},
           "DVkurtosis"={vals<-seq(0,log10(kurtRange),length.out=npoints)},
           "rIV"={
-            vals<-vals*max_r
+            vals<-seq(0,1,length.out=npoints)*max_r
             if (braw.env$RZ=="z") vals<-tanh(vals)
           },
           "rIV2"={
@@ -497,7 +497,13 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
                   DV$type<-"Interval"
                   DV$kurtosis<-10^vals[vi]
                 },
-                "rIV"={effect$rIV<-vals[vi]},
+                "rIV"={
+                  if (effect$world$worldOn) {
+                    effect$world$populationPDFk<-vals[vi]
+                  } else {
+                    effect$rIV<-vals[vi]
+                  }
+                  },
                 "rIV2"={effect$rIV2<-vals[vi]},
                 "rIVIV2"={effect$rIVIV2<-vals[vi]},
                 "rIVIV2DV"={effect$rIVIV2DV<-vals[vi]},

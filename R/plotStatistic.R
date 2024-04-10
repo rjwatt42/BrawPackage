@@ -371,9 +371,9 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
     }
     xoff<-pts$x[1]
     if (orientation=="vert") {
-      simAlpha<-0.8
+      simAlpha<-1
     } else {
-      simAlpha<-0.7
+      simAlpha<-1
     }
     g<-g+
       dataPolygon(data=data.frame(y=hist1$x,x=hist1$y1*scale*scale+xoff),colour=NA, fill = c2,alpha=simAlpha)+
@@ -531,14 +531,27 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
   
   for (i in 1:length(xoff)){
     if (showTheory) {
-      if (!effectTheory$world$worldOn) 
+      # theory<-makeExpectedTheory(showType,logScale,hypothesis,design,i)
+      # yv<-theory$yv
+      # xd<-theory$xd
+      # xdsig<-theory$xdsig
+      
+      effectTheory<-effect
+      if (!effectTheory$world$worldOn) {
+        effectTheory$world$worldOn<-TRUE
+        effectTheory$world$populationPDF<-"Single"
+        effectTheory$world$populationRZ<-"r"
         switch(i,
-             effectTheory$world$populationPDFk<-hypothesis$effect$rIV,
-             effectTheory$world$populationPDFk<-hypothesis$effect$rIV2,
-             effectTheory$world$populationPDFk<-hypothesis$effect$rIVIV2DV
+               effectTheory$world$populationPDFk<-effect$rIV,
+               effectTheory$world$populationPDFk<-effect$rIV2,
+               effectTheory$world$populationPDFk<-effect$rIVIV2DV
         )
+        effectTheory$world$populationNullp<-0
+      }
       
       xdsig<-NULL
+      xd<-NULL
+      
       if (is.element(showType,c("p","e1","e2","po"))) {
         npt<-201
         if (logScale) {
@@ -553,13 +566,8 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
         if (showType=="e2") effectTheory$world$populationNullp<-0
         xd<-fullRSamplingDist(yvUse,effectTheory$world,design,"p",logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
         xdsig<-fullRSamplingDist(yvUse,effectTheory$world,design,"p",logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
-        if (!labelNSig) {
-          xd<-xd-xdsig
-          xdsig<-NA
-        }
-        if (!labelSig) xd<-xdsig
         effectTheory<-oldEffect
-      } 
+      }
       
       if (is.element(showType,c("r","ro","ci1","ci2"))) {
         npt<-101
@@ -639,9 +647,15 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
              },
              { } # do nothing
       )
+      if (is.element(showType,c("p","e1","e2","po"))) {
+        if (!labelNSig) {
+          xd<-xd-xdsig
+          xdsig<-NA
+        }
+        if (!labelSig) xd<-xdsig
+      }
       
-      if (orientation=="horz")  distMax<-0.8
-      else distMax<-0.8
+      distMax<-0.8
 
       xd[is.na(xd)]<-0
       theoryGain<-1/max(xd)*distMax
