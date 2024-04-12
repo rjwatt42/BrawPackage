@@ -271,8 +271,11 @@ showPossible <- function(possibleResult=makePossible(),
   
   # make the back wall sample distributions
   rsw<-rs
-  rsw_dens_plus<-colSums(possibleResult$Theory$sourceSampDens_r_plus)
+  rsw_dens_plus<-possibleResult$Theory$sourceSampDens_r_plus
+  if (!is.null(nrow(rsw_dens_plus)))
+  rsw_dens_plus<-colSums(rsw_dens_plus)
   rsw_dens_null<-possibleResult$Theory$sourceSampDens_r_null
+  if (is.element(world$populationPDF,c("Single","Double"))) rsw_dens_plus<-rsw_dens_plus-rsw_dens_null
   rsw_dens<-rsw_dens_plus+rsw_dens_null
   
   offRange<-0

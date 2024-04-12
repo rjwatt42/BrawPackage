@@ -127,20 +127,20 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
   
   res1<-res
   ResultHistory<-list(n=res$nval,df1=res$df1,r=res$rIV,rp=res$rpIV,p=res$pIV)
-  replication<-design$Replication
+  Replication<-design$Replication
   
-  if (replication$ReplicationOn) {
-    if (replication$ReplVarAlpha) braw.env$alphaSig<-oldalpha*replication$ReplAlphaChange
-    while (replication$ReplSigOnly && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
+  if (Replication$On) {
+    if (Replication$VarAlpha) braw.env$alphaSig<-oldalpha*Replication$AlphaChange
+    while (Replication$forceSig && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
       if (!evidence$shortHand) {
-        sample<-makeSample(hypothesis,design)
-        res<-makeAnalysis(sample,evidence)
+        sample<-makeSample(hypothesis,design,autoShow=FALSE)
+        res<-makeAnalysis(sample,evidence,autoShow=FALSE)
       } else {
         res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
       }
       ResultHistory<-list(n=res$nval,df1=res$df1,r=res$rIV,rp=res$rpIV,p=res$pIV)
     }
-    if (replication$ReplVarAlpha) braw.env$alphaSig<-(oldalpha/design$ReplAlphaChange)
+    if (Replication$VarAlpha) braw.env$alphaSig<-(oldalpha/Replication$AlphaChange)
     
     res1<-res
     resHold<-res
@@ -153,45 +153,46 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
     design1<-design
     design1$sNRand<-FALSE
     design1$sN<-res$nval
-    if (replication$ReplBudgetType=="Budget") {
-      replication$ReplRepeats<-1000
+    if (Replication$BudgetType=="Budget") {
+      Replication$Repeats<-1000
       budgetUse<-res$nval
     }
-    if (replication$ReplRepeats>0) {
-    for (i in 1:replication$ReplRepeats) {
-      if (replication$ReplKeep=="cautious" && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
+    
+    if (Replication$Repeats>0) {
+    for (i in 1:Replication$Repeats) {
+      if (Replication$ignoreNS && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
         break
       }
       # get the relevant sample effect size for the power calc
-      if (replication$ReplPowerOn && (replication$ReplPower>0)) {
-        switch(replication$ReplCorrection,
+      if (Replication$PowerOn && (Replication$Power>0)) {
+        switch(Replication$Correction,
                "None"={r<-res$rIV},
                "World"={r<-rSamp2Pop(res$rIV,design1$sN,hypothesis$effect$world)},
                "Prior"={r<-rSamp2Pop(res$rIV,design1$sN,evidence$prior)}
         ) 
         # get the new sample size
-        design1$sN<-rw2n(r,replication$ReplPower,replication$ReplTails)
+        design1$sN<-rw2n(r,Replication$Power,Replication$Tails)
         design1$sNRand<-FALSE
-        if (replication$ReplBudgetType=="Budget") {
-          design1$sN<-min(design1$sN,replication$ReplBudget-budgetUse)
+        if (Replication$BudgetType=="Budget") {
+          design1$sN<-min(design1$sN,Replication$Budget-budgetUse)
         }
       }
 
       if (!evidence$shortHand) {
-        sample<-makeSample(hypothesis,design1)
-        res<-makeAnalysis(sample,evidence)
+        sample<-makeSample(hypothesis,design1,autoShow=FALSE)
+        res<-makeAnalysis(sample,evidence,autoShow=FALSE)
       } else {
         res<-sampleShortCut(hypothesis,design1,evidence,1,FALSE)
       }
-      if (replication$ReplTails==1) {
+      if (Replication$Tails==1) {
         if (sign(res$rIV)!=sign(ResultHistory$r[1])) {
           res$pIV<-1
         }
       }
       
-      if ((replication$ReplKeep=="largeN" && res$nval>resHold$nval) || 
-          (replication$ReplKeep=="smallP" && res$pIV<resHold$pIV) || 
-          replication$ReplKeep=="last")
+      if ((Replication$Keep=="largeN" && res$nval>resHold$nval) || 
+          (Replication$Keep=="smallP" && res$pIV<resHold$pIV) || 
+          Replication$Keep=="last")
       { resHold<-res }
       ResultHistory$n<-c(ResultHistory$n,res$nval)
       ResultHistory$df1<-c(ResultHistory$df1,res$df1)
@@ -199,15 +200,15 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
       ResultHistory$rp<-c(ResultHistory$rp,res$rpIV)
       ResultHistory$p<-c(ResultHistory$p,res$pIV)
       
-      if (design$ReplBudgetType=="Budget") {
+      if (Replication$BudgetType=="Budget") {
         budgetUse<-budgetUse+res$nval
-        if (budgetUse>=replication$ReplBudget) break;
+        if (budgetUse>=Replication$Budget) break;
       }
     }
     }
     res<-resHold
     
-    if (design$ReplKeep=="cautious") {
+    if (Replication$Keep=="cautious") {
       use<-!isSignificant(braw.env$STMethod,ResultHistory$p,ResultHistory$r,ResultHistory$n,ResultHistory$df1,evidence)
       use[1]<-FALSE
       if (any(use)) {
@@ -219,7 +220,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
       }
     }
     
-    if (replication$ReplKeep=="median" && replication$ReplRepeats>0) {
+    if (Replication$Keep=="median" && Replication$Repeats>0) {
       use<-which(ResultHistory$p==sort(ResultHistory$p)[ceil(length(ResultHistory$p)/2)])
       use<-use[1]
         res$rIV<-ResultHistory$r[use]

@@ -229,7 +229,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
           "SigOnly"={vals<-c(FALSE,TRUE)},
           "Power"={vals<-seq(0.1,0.9,length.out=npoints)},
           "Repeats" ={
-            if (design$ReplKeep=="median") vals<-seq(0,explore$Explore_nrRange,by=2)
+            if (design$Replication$Keep=="median") vals<-seq(0,explore$Explore_nrRange,by=2)
             else vals<-seq(0,explore$Explore_nrRange)
           }
   )
@@ -575,13 +575,13 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
                 },
                 
                 "SigOnly"={
-                  design$ReplSigOnly<-vals[vi]
+                  design$Replication$SigOnly<-vals[vi]
                 },
                 "Power"={
-                  design$ReplPower<-vals[vi]
+                  design$Replication$Power<-vals[vi]
                 },
                 "Repeats"={
-                  design$ReplRepeats<-vals[vi]
+                  design$Replication$Repeats<-vals[vi]
                 },
                 
                 "NoStudies"={

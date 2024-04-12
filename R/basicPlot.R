@@ -80,19 +80,19 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),box="both",top=FALSE,backC=braw.env$
   g<-g+theme(legend.position = "none")+braw.env$blankTheme()
 }
 
-plotTitle<-function(label,position="centre") {
+plotTitle<-function(label,position="centre",size=1) {
   switch(position,
          "left"={
            dataText(data.frame(x=braw.env$plotLimits$xlim[1],y=braw.env$plotLimits$ylim[2]),label,
-                    hjust=0,vjust=-1)
+                    hjust=0,vjust=-1,size=size)
          },
          "centre"={
            dataText(data.frame(x=mean(braw.env$plotLimits$xlim),y=braw.env$plotLimits$ylim[2]),label,
-                    hjust=0.5,vjust=-1)
+                    hjust=0.5,vjust=-1,size=size)
          },
          "right"={
            dataText(data.frame(x=braw.env$plotLimits$xlim[2],y=braw.env$plotLimits$ylim[2]),label,
-                     hjust=1,vjust=-0.1)
+                     hjust=1,vjust=-0.1,size=size)
          },
   )
   
@@ -232,7 +232,6 @@ dataLabel<-function(data,label, hjust=0, vjust=0, fill="white",colour="black") {
     voff<-0
   }
   data<-reRangeXY(data)
-  
   switch(braw.env$plotLimits$orientation,
          "horz"=
            geom_label(data=data,aes(x = x, y = y), label=label, 
@@ -247,7 +246,7 @@ dataLabel<-function(data,label, hjust=0, vjust=0, fill="white",colour="black") {
   )
   
 }
-dataText<-function(data,label, hjust=0, vjust=0, colour="black") {
+dataText<-function(data,label, hjust=0, vjust=0, colour="black",size=1) {
   mathlabel<-grepl("['^']{1}",label) | grepl("['[']{1}",label)
   if (any(mathlabel)) {
     label<-deparse(label)
@@ -260,12 +259,12 @@ dataText<-function(data,label, hjust=0, vjust=0, colour="black") {
          "horz"=
            geom_text(data=data,aes(x = x, y = y), label=label, hjust=hjust, vjust=vjust, 
                color=colour,
-               size=braw.env$labelSize,parse=TRUE),
+               size=size*braw.env$labelSize,parse=TRUE),
          "vert"=   
            geom_text(data=data,aes(x = x, y = y), label=label, hjust=vjust, 
                vjust=hjust, 
                color=colour,
-               size=braw.env$labelSize),parse=TRUE
+               size=size*braw.env$labelSize),parse=TRUE
   )
   
 }
@@ -353,6 +352,11 @@ dataLegend<-function(data,title="title",fontsize=3.5) {
     geom_text(data=data.frame(x=ptsX[1],y=titleY,label=title),
               aes(x=x,y=y,label=label),hjust=0,size=fontsize*0.8,parse=TRUE)
   )
+}
+
+dataContour<-function(data,colour="black",breaks=c(0.1,0.3,0.5,0.7,0.9),lwd=0.25) {
+  data<-reRangeXY(data)
+  geom_contour(data=data,aes(x=x,y=y,z=z),colour=colour,breaks=breaks,lwd=lwd)
 }
 
 darken <- function(col,gain=1,off=0) {

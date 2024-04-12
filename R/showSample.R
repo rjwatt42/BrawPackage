@@ -31,7 +31,7 @@ plotSample<-function(IV,DV,effect,ivplot,dvplot,g=NULL) {
 #' @examples
 #' showSample(sample=makeSample())
 #' @export
-showSample<-function(sample=makeSample(autoShow=FALSE)){
+showSample<-function(sample=makeResult(autoShow=FALSE)){
   IV<-sample$hypothesis$IV
   IV2<-sample$hypothesis$IV2
   DV<-sample$hypothesis$DV

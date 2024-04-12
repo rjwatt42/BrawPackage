@@ -13,7 +13,7 @@ newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
   fontScale<-min(dev.size(units="px"))/200/1.75
   assign("labelSize",3.2*fontScale,braw.env)
   setBrawEnv("plotRect",coord_cartesian(xlim=c(0,1),ylim=c(-0.25,1.5)))
-  print(startPlot(box="none",backC=NA))
+  print(startPlot(box="none",backC=braw.env$plotColours$graphC))
 }
 
 BrawOpts<-function(BW=FALSE,fontScale=1,newDev=FALSE,height=576,aspect=1.736) {

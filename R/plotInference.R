@@ -114,7 +114,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
             if (braw.env$wPlotScale=="log10") d1<-log10(d1)
           },
           "wn"={
-            d1<-rw2n(analysis$rIV,0.8,analysis$design$Replication$ReplTails)
+            d1<-rw2n(analysis$rIV,0.8,analysis$design$Replication$Tails)
             if (braw.env$wPlotScale=="log10") d1<-log10(d1)
           }
   )
@@ -154,7 +154,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
             if (braw.env$wPlotScale=="log10") d2<-log10(d2)
           },
           "wn"={
-            d2<-rw2n(analysis$rIV,0.8,analysis$design$Replication$ReplTails)
+            d2<-rw2n(analysis$rIV,0.8,analysis$design$Replication$Tails)
             if (braw.env$wPlotScale=="log10") d2<-log10(d2)
           }
   )

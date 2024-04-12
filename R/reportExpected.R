@@ -215,7 +215,7 @@ reportExpected<-function(expectedResult=makeExpected(100),showType="Basic"){
                 "log(lrd)"={a<-res2llr(result,"dLLR")},
                 "n"={a<-result$nval},
                 "w"={a<-rn2w(r,result$nval)},
-                "wn"={a<-rw2n(r,0.8,result$design$Replication$ReplTails)},
+                "wn"={a<-rw2n(r,0.8,result$design$Replication$Tails)},
                 "wp"={a<-rn2w(result$rpIV,result$nval)}
         )
         switch (pars[2],
@@ -237,7 +237,7 @@ reportExpected<-function(expectedResult=makeExpected(100),showType="Basic"){
                 "log(lrd)"={b<-res2llr(result,"dLLR")},
                 "n"={b<-result$nval},
                 "w"={b<-rn2w(r,result$nval)},
-                "wn"={b<-rw2n(r,0.8,result$design$Replication$ReplTails)},
+                "wn"={b<-rw2n(r,0.8,result$design$Replication$Tails)},
                 "wp"={b<-rn2w(result$rpIV,result$nval)}
         )
       }

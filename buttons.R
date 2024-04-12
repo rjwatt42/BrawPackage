@@ -1,4 +1,8 @@
 
+library(devtools)
+load_all("/Users/rogerwatt/Documents/GitHub/BrawPack")
+newBrawDev()
+
 library(rpanel)
 
 backC<-"#BFECFF"
@@ -20,11 +24,11 @@ exploreResultH<-NULL
 exploreTypeH<-"rIV"
 exploreResultD<-NULL
 exploreTypeD<-"n"
+showing<-"none"
 
 singleShow<-"data"
 multipleShow<-"Basic"
-exploreShowH<-"p(sig)"
-exploreShowD<-"p(sig)"
+exploreShow<-"r"
 exploreDone<-"H"
 
 IV<-"Interval"
@@ -34,6 +38,11 @@ pNull<-0.0
 sN<-42
 sAlpha<-0.05
 sMethod<-"Random"
+replicationPower<-0.8
+replicationRepeats<-1
+replicationType<-"none"
+replicationIgnoreNS<-TRUE
+replicationSigOnly<-FALSE
 nameHypothesis<-"Single"
 setBrawDef("hypothesis",getHypothesis(nameHypothesis))
 
@@ -50,6 +59,8 @@ setHypExtras<-function(panel) {
   multipleResult<<-NULL
   exploreResultH<<-NULL
   exploreResultD<<-NULL
+  if (showing=="possible") doPossible(panel)
+  if (showing=="hypothesis") doHypothesis(panel)
 }
 
 setDesignExtras<-function(panel) {
@@ -58,10 +69,27 @@ setDesignExtras<-function(panel) {
   multipleResult<<-NULL
   exploreResultH<<-NULL
   exploreResultD<<-NULL
+  if (showing=="possible") doPossible(panel)
+  if (showing=="design") doDesign(panel)
 }
 
 setDesignMethod<-function(panel) {
   sMethod<<-panel$sMethod
+  multipleResult<<-NULL
+  exploreResultH<<-NULL
+  exploreResultD<<-NULL
+}
+
+setReplication<-function(panel) {
+  replicationType<<-panel$replicationType
+  multipleResult<<-NULL
+  exploreResultH<<-NULL
+  exploreResultD<<-NULL
+}
+
+setReplicationExtras<-function(panel) {
+  replicationPower<<-as.numeric(panel$replPars[1])
+  replicationRepeats<<-as.numeric(panel$replPars[2])
   multipleResult<<-NULL
   exploreResultH<<-NULL
   exploreResultD<<-NULL
@@ -75,13 +103,9 @@ setMultiple<-function(panel) {
   multipleShow<<-panel$multiple
   if (!is.null(multipleResult)) displayMultiple()
 }
-setExploreH<-function(panel) {
-  exploreShowH<<-panel$exploreShowH
+setExplore<-function(panel) {
+  exploreShow<<-panel$exploreShow
   if (!is.null(exploreResultH)) displayExplore()
-}
-setExploreD<-function(panel) {
-  exploreShowD<<-panel$exploreShowD
-  if (!is.null(exploreResultD)) displayExplore()
 }
 setExploreTypeH<-function(panel) {
   exploreTypeH<<-panel$exploreTypeH
@@ -103,9 +127,12 @@ setHypothesis<-function(panel) {
   multipleResult<<-NULL
   exploreResultH<<-NULL
   exploreResultD<<-NULL
+  if (showing=="possible") doPossible(panel)
+  if (showing=="hypothesis") doHypothesis(panel)
 }
 doHypothesis<-function(panel) {
   prepare()
+  showing<<-"hypothesis"
   print(showHypothesis())
 }
 
@@ -117,9 +144,12 @@ setDesign<-function(panel) {
   multipleResult<<-NULL
   exploreResultH<<-NULL
   exploreResultD<<-NULL
+  if (showing=="possible") doPossible(panel)
+  if (showing=="design") doDesign(panel)
 }
 doDesign<-function(panel) {
   prepare()
+  showing<<-"design"
   print(showDesign())
 }
 
@@ -143,25 +173,31 @@ prepare<-function() {
   design<-braw.def$design
   design$sN<-sN
   design$sMethod<-makeSampling(sMethod)
+    switch (replicationType,
+            "none"=design$Replication<-makeReplication(On=FALSE),
+            "all"=design$Replication<-makeReplication(On=TRUE,Power=replicationPower,ignoreNS=FALSE,Repeats=replicationRepeats),
+            "sig only"=design$Replication<-makeReplication(On=TRUE,Power=replicationPower,ignoreNS=TRUE,Repeats=replicationRepeats)
+            )
   setBrawDef("design",design)
   
 }
 
 displaySingle<-function() {
-  switch(singleShow,
-         "data"={print(showSample(singleResult))},
-         "describe"={print(showDescription(singleResult))},
-         "infer"={print(showInference(singleResult))},
-         "2D"={print(showInference(singleResult,dimension="2D"))}
-  )
+  showing<<-"single"
+  if (singleShow=="2D") {
+    print(showResult(singleResult,show="infer",showType="Basic",dimension="2D"))
+  } else {
+    print(showResult(singleResult,show=singleShow))
+  }
 }
 doSingle<-function(panel) {
   prepare()
-  singleResult<<-makeAnalysis(autoShow=FALSE)
+  singleResult<<-makeResult(autoShow=FALSE)
   displaySingle()
 }
 
 displayMultiple<-function() {
+  showing<<-"multiple"
   print(showExpected(multipleResult,showType=multipleShow))
 }
 doMultiple<-function(panel) {
@@ -171,12 +207,13 @@ doMultiple<-function(panel) {
 }
 
 displayExplore<-function() {
+  showing<<-"explore"
   switch(exploreDone,
          "D"={
-           print(showExplore(exploreResultD,showType=exploreShowD))
+           print(showExplore(exploreResultD,showType=exploreShow))
          },
          "H"={
-           print(showExplore(exploreResultH,showType=exploreShowH))
+           print(showExplore(exploreResultH,showType=exploreShow))
          })
 }
 doExploreH<-function(panel) {
@@ -201,6 +238,12 @@ doExploreD<-function(panel) {
   exploreDone<<-"D"
   displayExplore()
 }
+
+doPossible<-function(panel) {
+  prepare()
+  showing<<-"possible"
+  showPossible(makePossible("Samples"))
+}
 # 
 # draw<-function(panel) {
 #   print(showSample())
@@ -212,68 +255,74 @@ doExploreD<-function(panel) {
 #   panel
 # }
 
-margin<-10
-rowMargin<-20
-panelWidth<-120
-
-panel<-rp.control("controls",background=backP,size=c(2.5*margin+2*panelWidth,800))
+margin<-1
+rowMargin<-10
+panelWidth<-90
+alignment<-"news"
+textWidth<-12
+panel<-rp.control("controls",background=backP,size=c(3*margin+3*panelWidth,800))
 
 row<-0
-rp.grid(panel, pos=list(row=row, column=0, sticky="news", width=margin, height=rowMargin),
+rp.grid(panel, pos=list(row=row, column=0, sticky=alignment, width=margin, height=rowMargin),
         background=backP, name="b0")
-rp.grid(panel, pos=list(row=row, column=1, sticky="news",width=panelWidth),
+rp.grid(panel, pos=list(row=row, column=1, sticky=alignment,width=panelWidth),
         background=backP, name="b1")
-rp.grid(panel, pos=list(row=row, column=2, sticky="news", width=margin/2),
+rp.grid(panel, pos=list(row=row, column=2, sticky=alignment, width=margin/2),
         background=backP, name="b2")
-rp.grid(panel, pos=list(row=row, column=3, sticky="news",width=panelWidth),
+rp.grid(panel, pos=list(row=row, column=3, sticky=alignment,width=panelWidth),
         background=backP, name="b3")
-rp.grid(panel, pos=list(row=row, column=4, sticky="news", width=margin),
+rp.grid(panel, pos=list(row=row, column=4, sticky=alignment, width=margin/2),
         background=backP,name="b4")
+rp.grid(panel, pos=list(row=row, column=5, sticky=alignment,width=panelWidth),
+        background=backP, name="b5")
+rp.grid(panel, pos=list(row=row, column=6, sticky=alignment, width=margin),
+        background=backP,name="b6")
 row<-row+1
 # Hypothesis
-rp.grid(panel, pos=list(row=row, column=1, sticky="news"),
+rp.grid(panel, pos=list(row=row, column=1, sticky=alignment),
         background=backP, name="hypothesis")
-rp.grid(panel, pos=list(row=row, column=3, sticky="news"),
+rp.grid(panel, pos=list(row=row, column=3, sticky=alignment),
         background=backP, name="hypothesis2")
 row<-row+1
 # Gap
-rp.grid(panel, pos=list(row=row, column=0, sticky="news",height=rowMargin),
+rp.grid(panel, pos=list(row=row, column=0, sticky=alignment,height=rowMargin),
         background=backP)
 row<-row+1
 # Design
-rp.grid(panel, pos=list(row=row, column=1, sticky="news"),
+rp.grid(panel, pos=list(row=row, column=1, sticky=alignment),
         background=backP, name="design")
-rp.grid(panel, pos=list(row=row, column=3, sticky="news"),
+rp.grid(panel, pos=list(row=row, column=3, sticky=alignment),
         background=backP, name="design2")
+rp.grid(panel, pos=list(row=row, column=5, sticky=alignment),
+        background=backP, name="replication")
 row<-row+1
-rp.grid(panel, pos=list(row=row, column=1, sticky="news",height=rowMargin),
+rp.grid(panel, pos=list(row=row, column=1, sticky=alignment,height=rowMargin),
         background=backP)
 row<-row+1
-rp.grid(panel, pos=list(row=row, column=1, sticky="news"),
+rp.grid(panel, pos=list(row=row, column=1, sticky=alignment),
         background=backP, name="single")
-rp.grid(panel, pos=list(row=row, column=3, sticky="news"),
+rp.grid(panel, pos=list(row=row, column=3, sticky=alignment),
         background=backP, name="multiple")
 row<-row+1
-rp.grid(panel, pos=list(row=row, column=1, sticky="news",height=rowMargin),
+rp.grid(panel, pos=list(row=row, column=1, sticky=alignment,height=rowMargin),
         background=backP)
 row<-row+1
-rp.grid(panel, pos=list(row=row, column=1, sticky="news"),
+rp.grid(panel, pos=list(row=row, column=1, sticky=alignment),
         background=backP, name="exploreHypothesis")
-rp.grid(panel, pos=list(row=row, column=3, sticky="news"),
+rp.grid(panel, pos=list(row=row, column=3, sticky=alignment),
         background=backP, name="exploreDesign")
+rp.grid(panel, pos=list(row=row, column=5, sticky=alignment),
+        background=backP, name="explore3")
 row<-row+1
-rp.grid(panel, pos=list(row=row, column=1, sticky="news"),
-        background=backP, name="explore")
-rp.grid(panel, pos=list(row=row, column=3, sticky="news"),
-        background=backP, name="explore2")
-row<-row+1
-rp.grid(panel, pos=list(row=row, column=1, sticky="news",height=rowMargin),
+rp.grid(panel, pos=list(row=row, column=1, sticky=alignment,height=rowMargin),
         background=backP)
 row<-row+1
-rp.grid(panel, pos=list(row=row, column=3, sticky="news"),
+rp.grid(panel, pos=list(row=row, column=1, sticky=alignment),
+        background=backP, name="possible")
+rp.grid(panel, pos=list(row=row, column=3, sticky=alignment),
         background=backP, name="display")
 
-# rp.grid(panel, pos=list(row=row+1,column=6,sticky="news",width=700,height=700),background=backC,
+# rp.grid(panel, pos=list(row=row+1,column=6,sticky=alignment,width=700,height=700),background=backC,
 #         name="plot")
 
 rp.radiogroup(panel,action=setIV,variable=IV,
@@ -287,19 +336,24 @@ rp.button(panel,action=doHypothesis,title="Show",
 rp.radiogroup(panel,action=setHypothesis,variable=hypothesis,
               vals=c("null","single","double","exp"),initval="single",title="Effect",
               background=hypothesisC,parentname="hypothesis2")
-rp.textentry(panel,hypothesisPars,action=setHypExtras,labels=c("rIV","pNull"),initval=c(rIV,pNull),
-             background=hypothesisC,parentname="hypothesis2",pos="bottom")
+rp.textentry(panel,hypothesisPars,action=setHypExtras,labels=c("rIV","pNull"),initval=c(rIV,pNull),width=textWidth,
+             background=hypothesisC,parentname="hypothesis2")
 
 rp.radiogroup(panel,action=setDesign,variable=design,
-           vals=c("simple","world"),initval="simple",title="Design",
+           vals=c("simple","world"),initval="simple",title="Sample Size",
            background=designC,parentname="design")
 rp.button(panel,action=doDesign,title="Show",
           background=backB,foreground="white",parentname="design")
 rp.radiogroup(panel,action=setDesignMethod,variable=sMethod,
-              vals=c("Random","Convenience"),initval="Random",title="Method",
+              vals=c("Random","Convenience"),initval="Random",title="Sample Method",
               background=designC,parentname="design2")
-rp.textentry(panel,designPars,action=setDesignExtras,labels=c("n","alpha"),initval=c(sN,sAlpha),
-             background=designC,parentname="design2",pos="bottom")
+rp.textentry(panel,designPars,action=setDesignExtras,labels=c("n","alpha"),initval=c(sN,sAlpha),width=textWidth,
+             background=designC,parentname="design2")
+
+rp.radiogroup(panel,variable=replicationType,action=setReplication,vals=c("none","sig only","all"),title="Replicate",initval=replicationType,
+            background=designC,parentname="replication")
+rp.textentry(panel,replPars,action=setReplicationExtras,labels=c("power","repeats"),initval=c(replicationPower,replicationRepeats),width=textWidth,
+             background=designC,parentname="replication")
 
 rp.radiogroup(panel,action=setSingle,variable=single,
            vals=c("data","describe","infer","2D"),initval=singleShow,title="Single",
@@ -315,19 +369,19 @@ rp.button(panel,action=doMultiple,title="Make",
 rp.radiogroup(panel,action=setExploreTypeH,variable=exploreTypeH,
               vals=c("rIV","pNull"),initval="rIV",title="Explore Hypothesis",
               background=exploreC,parentname="exploreHypothesis")
+rp.button(panel,action=doExploreH,title="Explore",
+          background=backB,foreground="white",parentname="exploreHypothesis")
 rp.radiogroup(panel,action=setExploreTypeD,variable=exploreTypeD,
               vals=c("n","method","alpha"),initval="n",title="Explore Design",
               background=exploreC,parentname="exploreDesign")
-rp.radiogroup(panel,action=setExploreH,variable=exploreShowH,
-           vals=c("r","p","p(sig)","NHST","fDR"),initval=exploreShowH,title="Show",
-           background=exploreC,parentname="explore")
-rp.button(panel,action=doExploreH,title="Explore",
-          background=backB,foreground="white",parentname="explore")
-rp.radiogroup(panel,action=setExploreD,variable=exploreShowD,
-              vals=c("r","p","p(sig)","NHST","fDR"),initval=exploreShowD,title="Show",
-              background=exploreC,parentname="explore2")
 rp.button(panel,action=doExploreD,title="Explore",
-          background=backB,foreground="white",parentname="explore2")
+          background=backB,foreground="white",parentname="exploreDesign")
+rp.radiogroup(panel,action=setExplore,variable=exploreShow,
+           vals=c("r","p","p(sig)","NHST","fDR"),initval=exploreShow,title="Show",
+           background=exploreC,parentname="explore3")
+
+rp.button(panel,action=doPossible,title="Possible",
+          background=backB,foreground="white",parentname="possible")
 
 rp.button(panel,action=newDisplay,title="New Display",
           background=backB,foreground="white",parentname="display")

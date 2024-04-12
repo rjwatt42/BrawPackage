@@ -492,7 +492,7 @@ generalAnalysis<-function(allData,InteractionOn,withins,ssqType="Type3",caseOrde
 #' @examples
 #' analysis<-makeAnalysis(sample=makeSample(),evidence=makeEvidence(),autoShow=braw.env$autoShow)#' make a multiple samples
 #' @export
-makeAnalysis<-function(sample=makeSample(autoShow=FALSE),evidence=makeEvidence(),autoShow=braw.env$autoShow){
+makeAnalysis<-function(sample=makeSample(autoShow=FALSE),evidence=braw.def$evidence,autoShow=braw.env$autoShow){
   design<-sample$design
   hypothesis<-sample$hypothesis
   IV<-hypothesis$IV
@@ -857,7 +857,7 @@ makeAnalysis<-function(sample=makeSample(autoShow=FALSE),evidence=makeEvidence()
   
 }
 
-runSimulation<-function(hypothesis,design,evidence,sig_only=FALSE,onlyAnalysis=FALSE,oldResult=NULL) {
+runSimulation<-function(hypothesis,design,evidence,sig_only=FALSE,onlyAnalysis=FALSE,oldResult=NULL,autoShow=FALSE) {
     if (onlyAnalysis && !is.null(oldResult)) {
     res<-makeAnalysis(oldResult,evidence,autoShow=FALSE)
     return(res)
@@ -900,8 +900,6 @@ runSimulation<-function(hypothesis,design,evidence,sig_only=FALSE,onlyAnalysis=F
       res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
     }
   }
-  # # Cheating ?
-  # res<-cheatSample(IV,IV2,DV,effect,design,evidence,sample,res)
   # Replication?
   res<-replicateSample(hypothesis,design,evidence,sample,res)
 

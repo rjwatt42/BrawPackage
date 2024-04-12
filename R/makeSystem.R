@@ -126,27 +126,27 @@ makeSampling<-function(type="Random") {
 #' @param ReplCorrection "None", "World", "Prior"
 #' @returns a replication object
 #' @examples
-#' makeReplication(ReplicationOn=FALSE,ReplRepeats=1,ReplKeep="last",
-#'                 ReplPowerOn=TRUE,ReplPower=0.8,ReplTails=2,
-#'                 ReplSigOnly="No",
-#'                 ReplBudgetType="Fixed",ReplBudget=1000,
-#'                 ReplCorrection="None",
-#'                 ReplVarAlpha=FALSE,ReplAlphaChange=2
+#' makeReplication(On=FALSE,Repeats=1,Keep="last",
+#'                 PowerOn=TRUE,Power=0.8,Tails=2,
+#'                 SigOnly="No",
+#'                 BudgetType="Fixed",Budget=1000,
+#'                 Correction="None",
+#'                 VarAlpha=FALSE,AlphaChange=2
 #'                 )
 #' @export
-makeReplication<-function(ReplicationOn=FALSE,ReplRepeats=1,ReplKeep="last",
-                          ReplPowerOn=TRUE,ReplPower=0.8,ReplTails=2,
-                          ReplSigOnly=FALSE,
-                          ReplBudgetType="Fixed",ReplBudget=1000,
-                          ReplCorrection="None",
-                          ReplVarAlpha=FALSE,ReplAlphaChange=2) {
+makeReplication<-function(On=FALSE,Repeats=1,Keep="last",
+                          PowerOn=TRUE,Power=0.8,Tails=2,
+                          ignoreNS=FALSE,forceSig=FALSE,
+                          BudgetType="Fixed",Budget=1000,
+                          Correction="None",
+                          VarAlpha=FALSE,AlphaChange=2) {
   
-  replication<-list(ReplicationOn=ReplicationOn,ReplRepeats=ReplRepeats,ReplKeep=ReplKeep,
-                    ReplPowerOn=ReplPowerOn,ReplPower=ReplPower,ReplTails=ReplTails,
-                    ReplSigOnly=ReplSigOnly,
-                    ReplBudgetType=ReplBudgetType,ReplBudget=ReplBudget,
-                    ReplCorrection=ReplCorrection,
-                    ReplVarAlpha=ReplVarAlpha,ReplAlphaChange=ReplAlphaChange)
+  replication<-list(On=On,Repeats=Repeats,Keep=Keep,
+                    PowerOn=PowerOn,Power=Power,Tails=Tails,
+                    ignoreNS=ignoreNS,forceSig=forceSig,
+                    BudgetType=BudgetType,Budget=Budget,
+                    Correction=Correction,
+                    VarAlpha=VarAlpha,AlphaChange=AlphaChange)
 }
 
 #' make a design

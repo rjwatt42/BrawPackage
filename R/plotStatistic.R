@@ -505,7 +505,7 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
             "n"={showVals<-data$ns},
             "w"={showVals<-rn2w(data$rs,data$ns)},
             "wp"={showVals<-rn2w(data$rp,data$ns)},
-            "wn"={showVals<-rw2n(data$rs,0.8,design$Replication$ReplTails)},
+            "wn"={showVals<-rw2n(data$rs,0.8,design$Replication$Tails)},
             "ci1"={showVals<-r2ci(data$rs,data$ns,-1)},
             "ci2"={showVals<-r2ci(data$rs,data$ns,+1)},
             "e1"={showVals<-data$ps},

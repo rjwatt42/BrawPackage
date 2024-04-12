@@ -16,7 +16,7 @@ iqr<-function(s) {
 #' @examples
 #' reportSample(sample=makeSample())
 #' @export
-reportSample<-function(sample=makeSample()){
+reportSample<-function(sample=makeAnalysis()){
   hypothesis<-sample$hypothesis
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2

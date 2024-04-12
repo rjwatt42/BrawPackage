@@ -121,7 +121,7 @@ runPossible <- function(possible=makePossible(),possibleResult=NULL){
   sD<-fullRSamplingDist(rs,source,design,separate=TRUE)
   sourceRVals<-sD$vals
   sourceSampDens_r<-sD$dens
-  sourceSampDens_r_plus<-sD$densPlus
+  sourceSampDens_r_plus<-rbind(sD$densPlus)
   sourceSampDens_r_null<-sD$densNull
   if (is.element(source$populationPDF,c("Single","Double")) && source$populationNullp>0) {
     sourceRVals<-c(sourceRVals,0)
@@ -155,9 +155,8 @@ runPossible <- function(possible=makePossible(),possibleResult=NULL){
         local_r<-tanh(atanh(sRho[ei])+correction[ci])
         if (design$sNRand) {
           d<-0
-          for (ni in seq(minN,maxRandN*design$sN,length.out=nNpoints)) {
-            # for (ni in 5+seq(0,maxRandN,1/n[ei])*n[ei]) {
-            g<-dgamma(ni-minN,shape=design$sNRandK,scale=(design$sN-minN)/design$sNRandK)
+          for (ni in seq(braw.env$minN,braw.env$maxRandN*design$sN,length.out=braw.env$nNpoints)) {
+            g<-dgamma(ni-braw.env$minN,shape=design$sNRandK,scale=(design$sN-braw.env$minN)/design$sNRandK)
             d<-d+rSamplingDistr(rp,local_r,ni)*g
           }
           d<-d/sum(d)
