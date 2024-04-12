@@ -341,7 +341,7 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
     xr<-xr/max(c(1,abs(xr)))/1.5
     pts$x<-pts$x+xr
     gain<-7/max(7,sqrt(length(xr)))
-    colgain<-1-sqrt(max(0,(length(xr)-50))/200)
+    colgain<-1-min(1,sqrt(max(0,(length(xr)-50))/200))
     
     if (scale<1) {
       co1<-c1

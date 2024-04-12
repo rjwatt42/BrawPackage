@@ -24,7 +24,7 @@ worldLabel<-function(metaResult,whichMeta=NULL) {
   return(lb)
 }
 
-drawSingleMeta<-function(metaResult=doMetaAnalysis(),showTheory=FALSE) {
+showSingleMeta<-function(metaResult=doMetaAnalysis(1,makeMetaAnalysis(500)),showTheory=FALSE) {
 
   metaAnalysis<-metaResult$metaAnalysis
   hypothesis<-metaResult$hypothesis
@@ -49,6 +49,7 @@ drawSingleMeta<-function(metaResult=doMetaAnalysis(),showTheory=FALSE) {
   ptsNull<-data.frame(x=d1[useNull],y=d2[useNull])
   
   g<-ggplot()+braw.env$plotRect
+  assign("plotArea",c(0,0,1,1),braw.env)
   g<-startPlot(xlim,ylim,box="both",top=FALSE,g=g)
   
   if (length(d1)>=1200) {
@@ -63,16 +64,20 @@ drawSingleMeta<-function(metaResult=doMetaAnalysis(),showTheory=FALSE) {
   
   # show individual studies
   if (length(d1)<1200) {
+    colgain<-1-min(1,sqrt(max(0,(length(d1)-50))/200))
     dotSize<-dotSize/(ceil(length(d1)/400))
     cl<-"black"
-    g<-g+dataPoint(data=ptsAll,shape=braw.env$plotShapes$study, colour = cl, fill = braw.env$plotColours$descriptionC, size = dotSize)
-    g<-g+dataPoint(data=ptsNull,shape=braw.env$plotShapes$study, colour = cl, fill = braw.env$plotColours$infer_nsigC, size = dotSize)
+    col1<-braw.env$plotColours$descriptionC
+    col2<-braw.env$plotColours$infer_nsigC
+    g<-g+dataPoint(data=ptsAll, shape=braw.env$plotShapes$study, colour = darken(col1,off=-colgain), fill = col1, size = dotSize)
+    g<-g+dataPoint(data=ptsNull,shape=braw.env$plotShapes$study, colour = darken(col2,off=-colgain), fill = col2,  size = dotSize)
   }
   g<-g+xAxisLabel(disp1)+xAxisTicks(x$ticks)+yAxisLabel(disp2)+yAxisTicks(y$ticks)
   
   lb<-worldLabel(metaResult)
-  pts_lb<-data.frame(x=mean(xlim),y=ylim[2]-diff(ylim)*0.1)
-  g<-g+dataLabel(data=pts_lb,label=lb, hjust=0.5,colour="black",fill=braw.env$plotColours$descriptionC)
+  # pts_lb<-data.frame(x=mean(xlim),y=ylim[2]-diff(ylim)*0.1)
+  # g<-g+dataLabel(data=pts_lb,label=lb, hjust=0.5,colour="black",fill=braw.env$plotColours$descriptionC)
+  g<-g+plotTitle(lb,"left",size=1)
   
   return(g)
   
@@ -222,7 +227,7 @@ drawMeta<-function(metaResult=doMetaAnalysis(),whichMeta="Single",showType="n-k"
 
 }
 
-makeWorldDist<-function(world,x,y,sigOnly=FALSE) {
+makeWorldDist<-function(design,world,x,y,sigOnly=FALSE) {
   lambda<-world$populationPDFk
   nullP<-world$populationNullp
   sigma<-1/sqrt(y-3)
@@ -273,12 +278,12 @@ drawWorld<-function(hypothesis,design,metaResult,g,colour="white",showTheory=FAL
   x<-seq(-1,1,length.out=101)*braw.env$r_range
   y<-seq(5,braw.env$maxN,length.out=101)
 
-  za<-makeWorldDist(world,x,y)
+  za<-makeWorldDist(design,world,x,y)
 
   world$populationPDF<-metaResult$bestDist
   world$populationPDFk<-metaResult$bestK
   world$populationNullp<-metaResult$bestNull
-  zb<-makeWorldDist(world,x,y)
+  zb<-makeWorldDist(design,world,x,y)
   
   if (braw.env$nPlotScale=="log10") {y<-log10(y)}
   

@@ -24,8 +24,9 @@ makeMetaAnalysis<-function(nstudies=100,
 #    
 
 # make this a stand-alone function to be called from observEvent
-doMetaAnalysis<-function(nsims=50,hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,
-                         metaAnalysis=makeMetaAnalysis(),metaResult=NULL) {
+doMetaAnalysis<-function(nsims=50,metaAnalysis=makeMetaAnalysis(),
+                         hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,
+                         metaResult=NULL) {
   
   for (i in 1:nsims) {
     studies<-multipleAnalysis(metaAnalysis$nstudies,hypothesis,design,evidence)
