@@ -1,29 +1,16 @@
 
-makeMetaAnalysis<-function(nstudies=100,
-                           meta_fixedAnal="random",
-                           meta_pdf="All",
-                           sig_only=FALSE,
-                           meta_psigAnal=FALSE,
-                           meta_nullAnal=TRUE) {
-  
-  metaAnalysis<-list(
-    nstudies=nstudies,
-    meta_fixedAnal=meta_fixedAnal,
-    meta_pdf=meta_pdf,
-    sig_only=sig_only,
-    meta_psigAnal=meta_psigAnal,
-    meta_nullAnal=meta_nullAnal
-  )
-  
-}
-
 # META-ANALYSIS
 # calculations
 # graphs (sample, describe, infer)
 # report (sample, describe, infer)
 #    
 
-# make this a stand-alone function to be called from observEvent
+#' @return metaResult object 
+#' @examples
+#' doMetaAnalysis<-function(nsims=50,metaAnalysis=makeMetaAnalysis(),
+#'                          hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,
+#'                          metaResult=NULL) {
+#' @export
 doMetaAnalysis<-function(nsims=50,metaAnalysis=makeMetaAnalysis(),
                          hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,
                          metaResult=NULL) {
@@ -45,7 +32,7 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis) {
   niterations<-1
   reInc<-(nkpoints-1)/2/3
   
-  if (metaAnalysis$meta_nullAnal) {
+  if (metaAnalysis$includeNulls) {
     nullvals<-seq(0,1,length.out=nnullpoints)
   } else {
     nullvals<-0
@@ -58,7 +45,7 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis) {
   }
   
   for (re in 1:niterations) {
-    S<-getLogLikelihood(zs,ns,df1,dist,kvals,nullvals,metaAnalysis$meta_psigAnal)
+    S<-getLogLikelihood(zs,ns,df1,dist,kvals,nullvals)
     Smax<-max(S,na.rm=TRUE)
     
     use<-which(S==Smax, arr.ind = TRUE)
@@ -70,13 +57,13 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis) {
     ub1<-kvals[min(length(kvals),use[1,1]+reInc)]
     
     kvals<-seq(lb1,ub1,length.out=nkpoints)
-    if (metaAnalysis$meta_nullAnal) {
+    if (metaAnalysis$includeNulls) {
       nullvals<-seq(lb2,ub2,length.out=nnullpoints)
     }
   }
   
   if (niterations==1) {      
-    fun<-function(x) { -getLogLikelihood(zs,ns,df1,dist,x[1],x[2],metaAnalysis$meta_psigAnal)}
+    fun<-function(x) { -getLogLikelihood(zs,ns,df1,dist,x[1],x[2])}
     result<-fmincon(c(Kmax,Nullmax),fun,ub=c(ub1,ub2),lb=c(lb1,lb2))
     Kmax<-result$par[1]
     Nullmax<-result$par[2]
@@ -92,7 +79,7 @@ runMetaAnalysis<-function(metaAnalysis,studies,metaResult){
   ns<-studies$nval
   df1<-studies$df1
   
-  if (metaAnalysis$meta_fixedAnal=="fixed") {
+  if (metaAnalysis$analysisType=="fixed") {
     single<-getMaxLikelihood(zs,ns,df1,"Single",metaAnalysis)
     gauss<-list(Kmax=NA,Nullmax=NA,Smax=NA)
     exp<-list(Kmax=NA,Nullmax=NA,Smax=NA)
@@ -102,21 +89,21 @@ runMetaAnalysis<-function(metaAnalysis,studies,metaResult){
     # doing random effects analysis
     
     # find best Single 
-    if (metaAnalysis$meta_pdf=="Single" || (metaAnalysis$meta_pdf=="All")) {
+    if (metaAnalysis$modelPDF=="Single" || (metaAnalysis$modelPDF=="All")) {
       single<-getMaxLikelihood(zs,ns,df1,"Single",metaAnalysis)
     } else {
       single<-list(Kmax=NA,Nullmax=NA,Smax=NA)
     }
     
     # find best Gauss
-    if (metaAnalysis$meta_pdf=="Gauss" || metaAnalysis$meta_pdf=="All") {
+    if (metaAnalysis$modelPDF=="Gauss" || metaAnalysis$modelPDF=="All") {
       gauss<-getMaxLikelihood(zs,ns,df1,"Gauss",metaAnalysis)
     } else {
       gauss<-list(Kmax=NA,Nullmax=NA,Smax=NA)
     }
     
     # find best Exp
-    if (metaAnalysis$meta_pdf=="Exp" || metaAnalysis$meta_pdf=="All") {
+    if (metaAnalysis$modelPDF=="Exp" || metaAnalysis$modelPDF=="All") {
       exp<-getMaxLikelihood(zs,ns,df1,"Exp",metaAnalysis)
     } else {
       exp<-list(Kmax=NA,Nullmax=NA,Smax=NA)
@@ -159,6 +146,4 @@ runMetaAnalysis<-function(metaAnalysis,studies,metaResult){
   )
   return(metaResult)
 }
-
-
 

@@ -5,7 +5,7 @@
 \title{show the estimated population characteristics from a simulated sample}
 \usage{
 showInference(
-  analysis = makeAnalysis(),
+  analysis = doAnalysis(),
   showType = "Basic",
   dimension = "1D",
   orientation = "vert",
@@ -30,7 +30,7 @@ ggplot2 object - and printed
 show the estimated population characteristics from a simulated sample
 }
 \examples{
-showInference(analysis=makeAnalysis(),
+showInference(analysis=doAnalysis(),
               showType="Basic",
               dimension="1D",
               orientation="vert",

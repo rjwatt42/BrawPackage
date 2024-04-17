@@ -23,7 +23,7 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
            )
     while (!isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence) && ntrials<limit) {
       sample<-makeSample(hypothesis,design)
-      result<-makeAnalysis(sample,evidence)
+      result<-doAnalysis(sample,evidence)
       switch(design$sCheatingLimit,
              "Fixed"={ntrials<-ntrials+1},
              "Budget"={ntrials<-ntrials+result$nval}
@@ -54,7 +54,7 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
         sample1$iv<-sample1$iv[use]
         sample1$dv<-sample1$dv[use]
         design$sN<-length(sample1$iv)
-        result1<-makeAnalysis(sample1,evidence)
+        result1<-doAnalysis(sample1,evidence)
         ps<-c(ps,result1$pIV)
       }
       switch(design$sCheating,
@@ -73,7 +73,7 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
                sample$dvplot[change]<-sample2$dvplot[ntrials+1]
              }
       )
-      result<-makeAnalysis(sample,evidence)
+      result<-doAnalysis(sample,evidence)
       ntrials<-ntrials+1
     }
     return(result)
@@ -89,7 +89,7 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
       sample$dvplot<-c(sample$dvplot,sample2$dvplot[ntrials+(1:changeAmount)])
       design$sN<-design$sN+(1:changeAmount)
       
-      result<-makeAnalysis(sample,evidence)
+      result<-doAnalysis(sample,evidence)
       ntrials<-ntrials+changeAmount
     }
     return(result)
@@ -108,11 +108,11 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
         sample1$iv<-sample1$iv[use]
         sample1$dv<-sample1$dv[use]
 
-        result1<-makeAnalysis(sample1,evidence)
+        result1<-doAnalysis(sample1,evidence)
         ps<-c(ps,result1$pIV)
       }
       
-      result<-makeAnalysis(sample,evidence)
+      result<-doAnalysis(sample,evidence)
       ntrials<-ntrials+1
     }
     return(result)
@@ -134,7 +134,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
     while (Replication$forceSig && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
       if (!evidence$shortHand) {
         sample<-makeSample(hypothesis,design,autoShow=FALSE)
-        res<-makeAnalysis(sample,evidence,autoShow=FALSE)
+        res<-doAnalysis(sample,evidence,autoShow=FALSE)
       } else {
         res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
       }
@@ -180,7 +180,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
 
       if (!evidence$shortHand) {
         sample<-makeSample(hypothesis,design1,autoShow=FALSE)
-        res<-makeAnalysis(sample,evidence,autoShow=FALSE)
+        res<-doAnalysis(sample,evidence,autoShow=FALSE)
       } else {
         res<-sampleShortCut(hypothesis,design1,evidence,1,FALSE)
       }

@@ -4,7 +4,7 @@
 #'                        "NHST", "fDR", "tDR", "FMR"
 #' @return ggplot2 object - and printed
 #' @examples
-#' showExplore(exploreResult=makeExplore(),
+#' showExplore(exploreResult=doExplore(),
 #'                        showType="r",
 #'                        whichEffect="All",effectType="All")
 #' @export

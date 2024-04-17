@@ -38,9 +38,9 @@ makeFormula<-function(IV,IV2,DV,design,evidence,analysis,an_vars){
 #' 
 #' @return ggplot2 object - and printed
 #' @examples
-#' reportDescription(analysis=makeAnalysis())
+#' reportDescription(analysis=doAnalysis())
 #' @export
-reportDescription<-function(analysis=makeAnalysis()){
+reportDescription<-function(analysis=doAnalysis()){
   IV<-analysis$hypothesis$IV
   IV2<-analysis$hypothesis$IV2
   DV<-analysis$hypothesis$DV

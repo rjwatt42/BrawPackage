@@ -22,7 +22,7 @@ ggplot2 object - and printed
 report the estimated population characteristics from varying parameter
 }
 \examples{
-showExplore(exploreResult=makeExplore(),
+showExplore(exploreResult=doExplore(),
                        showType="r",
                        whichEffect="All",effectType="All")
 }

@@ -4,7 +4,7 @@
 \alias{reportExpected}
 \title{show the estimated population characteristics from multiple simulated sample}
 \usage{
-reportExpected(expectedResult = makeExpected(100), showType = "Basic")
+reportExpected(expectedResult = doExpected(100), showType = "Basic")
 }
 \arguments{
 \item{showType}{"Basic", "CILimits", "NHST", "fDR", "FDR:FMR" \cr

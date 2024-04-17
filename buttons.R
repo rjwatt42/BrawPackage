@@ -192,7 +192,7 @@ displaySingle<-function() {
 }
 doSingle<-function(panel) {
   prepare()
-  singleResult<<-makeResult(autoShow=FALSE)
+  singleResult<<-doResult(autoShow=FALSE)
   displaySingle()
 }
 
@@ -202,7 +202,7 @@ displayMultiple<-function() {
 }
 doMultiple<-function(panel) {
   prepare()
-  multipleResult<<-makeExpected(50,expectedResult=multipleResult,autoShow=FALSE)
+  multipleResult<<-doExpected(50,expectedResult=multipleResult,autoShow=FALSE)
   displayMultiple()
 }
 
@@ -218,7 +218,7 @@ displayExplore<-function() {
 }
 doExploreH<-function(panel) {
   prepare()
-  exploreResultH<<-makeExplore(10,exploreResult=exploreResultH,exploreType=exploreTypeH,autoShow=FALSE)
+  exploreResultH<<-doExplore(10,exploreResult=exploreResultH,exploreType=exploreTypeH,autoShow=FALSE)
   exploreDone<<-"H"
   displayExplore()
 }
@@ -226,13 +226,13 @@ doExploreD<-function(panel) {
   prepare()
   switch(exploreTypeD,
          "n"={
-           exploreResultD<<-makeExplore(10,exploreResult=exploreResultD,exploreType=exploreTypeD,max_n=1000,xlog=TRUE,autoShow=FALSE)
+           exploreResultD<<-doExplore(10,exploreResult=exploreResultD,exploreType=exploreTypeD,max_n=1000,xlog=TRUE,autoShow=FALSE)
          },
          "method"={
-           exploreResultD<<-makeExplore(10,exploreResult=exploreResultD,exploreType="Method",autoShow=FALSE)
+           exploreResultD<<-doExplore(10,exploreResult=exploreResultD,exploreType="Method",autoShow=FALSE)
          },
          {
-           exploreResultD<<-makeExplore(10,exploreResult=exploreResultD,exploreType=exploreTypeD,autoShow=FALSE)
+           exploreResultD<<-doExplore(10,exploreResult=exploreResultD,exploreType=exploreTypeD,autoShow=FALSE)
          }
   )
   exploreDone<<-"D"
@@ -243,6 +243,10 @@ doPossible<-function(panel) {
   prepare()
   showing<<-"possible"
   showPossible(makePossible("Samples"))
+}
+
+doMenu<-function(panel) {
+  print(panel$menuItem)
 }
 # 
 # draw<-function(panel) {
@@ -261,6 +265,7 @@ panelWidth<-90
 alignment<-"news"
 textWidth<-12
 panel<-rp.control("controls",background=backP,size=c(3*margin+3*panelWidth,800))
+rp.menu(panel,menuItem,list(list("type1","type2","type3")),initval="type1",action=doMenu)
 
 row<-0
 rp.grid(panel, pos=list(row=row, column=0, sticky=alignment, width=margin, height=rowMargin),

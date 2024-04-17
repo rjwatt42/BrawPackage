@@ -50,11 +50,11 @@ trimExploreResult<-function(result,nullresult) {
 #' "NHST", "tDR","fDR","fMR"
 #' @return ggplot2 object - and printed
 #' @examples
-#' showExplore(exploreResult=makeExplore(),
+#' showExplore(exploreResult=doExplore(),
 #'                        showType="r",
 #'                        effectType="unique",whichEffect="All")
 #' @export
-showExplore<-function(exploreResult=makeExplore(),showType="r",showTheory=FALSE,
+showExplore<-function(exploreResult=doExplore(),showType="r",showTheory=FALSE,
                       effectType="unique",whichEffect="All"){
   quants<-0.25
   showPower<-FALSE

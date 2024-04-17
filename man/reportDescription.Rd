@@ -4,7 +4,7 @@
 \alias{reportDescription}
 \title{report a sample effect-size analysis of a simulated sample}
 \usage{
-reportDescription(analysis = makeAnalysis())
+reportDescription(analysis = doAnalysis())
 }
 \value{
 ggplot2 object - and printed
@@ -13,5 +13,5 @@ ggplot2 object - and printed
 report a sample effect-size analysis of a simulated sample
 }
 \examples{
-reportDescription(analysis=makeAnalysis())
+reportDescription(analysis=doAnalysis())
 }

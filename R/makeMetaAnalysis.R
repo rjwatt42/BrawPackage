@@ -1,19 +1,28 @@
 
+#' set up for a meta-analysis
+#' 
+#' @return metaAnalysis object 
+#' @examples
+#' makeMetaAnalysis<-function(nstudies=100,
+#' analysisType="random",
+#' modelPDF="All",
+#' sig_only=FALSE,
+#' includeNulls=TRUE)
+#' @export
 makeMetaAnalysis<-function(nstudies=100,
-                           meta_fixedAnal="random",
-                           meta_pdf="All",
+                           analysisType="random",
+                           modelPDF="All",
                            sig_only=FALSE,
-                           meta_psigAnal=FALSE,
-                           meta_nullAnal=TRUE) {
+                           includeNulls=TRUE) {
   
   metaAnalysis<-list(
     nstudies=nstudies,
-    meta_fixedAnal=meta_fixedAnal,
-    meta_pdf=meta_pdf,
+    analysisType=analysisType,
+    modelPDF=modelPDF,
     sig_only=sig_only,
-    meta_psigAnal=meta_psigAnal,
-    meta_nullAnal=meta_nullAnal
+    includeNulls=includeNulls
   )
   
 }
+
 

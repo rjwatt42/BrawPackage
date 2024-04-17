@@ -56,7 +56,7 @@ hypothesis<-makeHypothesis(IV=getVariable("Smoker?"),
 showPrediction(hypothesis)
 
 # sample<-makeSample(hypothesis,design)
-# analysis<-makeAnalysis(sample=sample)
+# analysis<-doAnalysis(sample=sample)
 # showDescription(analysis)
 
 #######################
@@ -105,7 +105,7 @@ hypothesis<-makeHypothesis(IV=makeVariable("IV","Interval"),
                            effect=makeEffect(0.4))
 
 sample<-makeSample(hypothesis,makeDesign(sN=42))
-analysis<-makeAnalysis(sample=sample)
+analysis<-doAnalysis(sample=sample)
 
 showDescription(analysis)
 
@@ -130,7 +130,7 @@ hypothesis<-makeHypothesis(IV=makeVariable("IV","Interval"),
                            effect=makeEffect(0.2,Heteroscedasticity = 0))
 design<-makeDesign(sN=120,sOutliers = 0)
 sample<-makeSample(hypothesis,design)
-analysis<-makeAnalysis(sample=sample)
+analysis<-doAnalysis(sample=sample)
 
 showDescription(analysis)
 
@@ -145,7 +145,7 @@ hypothesis<-makeHypothesis(IV=makeVariable("Week","Categorical",ncats=5,cases=1:
                            effect=makeEffect(-0.2,-0.2,0,-0.2))
 design<-makeDesign(sN=4000,sOutliers = 0)
 sample<-makeSample(hypothesis,design)
-analysis<-makeAnalysis(sample=sample)
+analysis<-doAnalysis(sample=sample)
 
 showDescription(analysis)
 

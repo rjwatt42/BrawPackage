@@ -1,5 +1,3 @@
-d_zi=0.05
-d_max=4
 
 SingleSamplingPDF<-function(z,lambda,sigma,shape,remove_nonsig=FALSE,df1=1) {
   d1<-exp(-0.5*((z-lambda)^2/sigma^2))/sqrt(2*pi*sigma^2)
@@ -86,7 +84,7 @@ convolveWith<-function(zi,zpd,z,sigma) {
   d1<-z*0
   for (i in 1:length(z)) {
     zs<-zpd*dnorm(zi,z[i],sigma[i])
-    d1[i]<-sum(zs)*d_zi
+    d1[i]<-sum(zs)*braw.env$dist_zi
   }
   return(d1)
 }
@@ -98,13 +96,13 @@ removeNonSig<-function(zi,zpd,sigma,df1) {
   zcritUnique<-unique(zcrit)
   for (i in 1:length(zcritUnique)) {
     use<-which(zcrit==zcritUnique[i])
-    zi1<-seq(-d_max,-zcritUnique[i],d_zi)
+    zi1<-seq(-braw.env$dist_range,-zcritUnique[i],braw.env$dist_zi)
     zi1<-c(zi1,-zcritUnique[i])
     
     d0<-zi1*0
     for (j in 1:length(zi1)) {
       zs<-zpd*dnorm(zi,zi1[j],sigma[use[1]])
-      d0[j]<-sum(zs)*d_zi
+      d0[j]<-sum(zs)*braw.env$dist_zi
     }
     areas<-(d0[1:(length(zi1)-1)]+d0[2:length(zi1)])/2*diff(zi1)
     d2[use]<-sum(areas)*2
@@ -116,9 +114,9 @@ removeNonSig<-function(zi,zpd,sigma,df1) {
 GammaSamplingPDF<-function(z,lambda,sigma,gamma_shape=1,remove_nonsig=FALSE,df1=1) {
   if (length(sigma)==1) {sigma<-rep(sigma,length(z))}
   
-  zi<-seq(-d_max,d_max,d_zi)
+  zi<-seq(-braw.env$dist_range,braw.env$dist_range,braw.env$dist_zi)
   zpd<-dgamma(abs(zi),shape=gamma_shape,scale=lambda/gamma_shape)
-  zpd<-zpd/(sum(zpd)*d_zi)
+  zpd<-zpd/(sum(zpd)*braw.env$dist_zi)
   
   d1<-convolveWith(zi,zpd,z,sigma)
 
@@ -141,9 +139,9 @@ GenExpSamplingPDF<-function(z,lambda,sigma,genexp_shape=1,remove_nonsig=FALSE,df
 
   if (length(sigma)==1) {sigma<-rep(sigma,length(z))}
 
-  zi<-seq(-d_max,d_max,d_zi)
+  zi<-seq(-braw.env$dist_range,braw.env$dist_range,braw.env$dist_zi)
   zpd<-1-(1-exp(-abs(zi)/lambda))^genexp_shape
-  zpd<-zpd/(sum(zpd)*d_zi)
+  zpd<-zpd/(sum(zpd)*braw.env$dist_zi)
 
   d1<-convolveWith(zi,zpd,z,sigma)
   

@@ -5,7 +5,7 @@
 \title{show the estimated population characteristics from varying parameter}
 \usage{
 showExplore(
-  exploreResult = makeExplore(),
+  exploreResult = doExplore(),
   showType = "r",
   showTheory = TRUE,
   effectType = "unique",
@@ -23,7 +23,7 @@ ggplot2 object - and printed
 show the estimated population characteristics from varying parameter
 }
 \examples{
-showExplore(exploreResult=makeExplore(),
+showExplore(exploreResult=doExplore(),
                        showType="r",
                        effectType="unique",whichEffect="All")
 }

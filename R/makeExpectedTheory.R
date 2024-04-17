@@ -1,5 +1,5 @@
 
-makeExpectedTheory<-function(showType,logScale,hypothesis=braw.def$hypothesis,design=braw.def$design,i=1) {
+doExpectedTheory<-function(showType,logScale,hypothesis=braw.def$hypothesis,design=braw.def$design,i=1) {
   
   effect<-hypothesis$effect
   

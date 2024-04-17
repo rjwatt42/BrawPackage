@@ -4,7 +4,7 @@
 \alias{reportInference}
 \title{report population estimates from a simulated sample}
 \usage{
-reportInference(analysis = makeAnalysis(), analysisType = "Anova")
+reportInference(analysis = doAnalysis(), analysisType = "Anova")
 }
 \arguments{
 \item{analysisType}{"Model", "Anova"}
@@ -16,5 +16,5 @@ ggplot2 object - and printed
 report population estimates from a simulated sample
 }
 \examples{
-reportInference(analysis=makeAnalysis())
+reportInference(analysis=doAnalysis())
 }

@@ -71,11 +71,11 @@ resetExpected<-function(nsims=0,expectedResult=NULL){
 #' 
 #' @returns expectedResult object
 #' @examples
-#' expectedResult<-makeExpected(nsims=100,expectedResult=NULL,hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
+#' expectedResult<-doExpected(nsims=100,expectedResult=NULL,hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
 #'                              doingNull=FALSE,autoShow=braw.env$autoShow,showType="Basic")
 #' @seealso showExpected() and reportExpected())
 #' @export
-makeExpected <- function(nsims=10,expectedResult=NULL,hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=makeEvidence(),
+doExpected <- function(nsims=10,expectedResult=NULL,hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=makeEvidence(),
                          doingNull=FALSE,autoShow=braw.env$autoShow,showType="Basic") {
 
   if (!is.null(expectedResult)) {
@@ -120,7 +120,7 @@ makeExpected <- function(nsims=10,expectedResult=NULL,hypothesis=braw.def$hypoth
     if (autoShow) print(showExpected(expectedResult,showType=showType))
   }
 
-  # if (autoShow) return(NULL)
+  setBrawRes("expected",expectedResult)
   return(expectedResult)
 }
 

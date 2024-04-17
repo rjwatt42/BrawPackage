@@ -3,9 +3,9 @@
 #' @param analysisType "Model", "Anova"
 #' @return ggplot2 object - and printed
 #' @examples
-#' reportInference(analysis=makeAnalysis())
+#' reportInference(analysis=doAnalysis())
 #' @export
-reportInference<-function(analysis=makeAnalysis(),analysisType="Anova"){
+reportInference<-function(analysis=doAnalysis(),analysisType="Anova"){
   IV<-analysis$hypothesis$IV
   IV2<-analysis$hypothesis$IV2
   DV<-analysis$hypothesis$DV

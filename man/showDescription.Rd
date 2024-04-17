@@ -4,7 +4,7 @@
 \alias{showDescription}
 \title{show the sample effect-size analysis of a simulated sample}
 \usage{
-showDescription(analysis = makeAnalysis())
+showDescription(analysis = doAnalysis())
 }
 \value{
 ggplot2 object - and printed
@@ -13,5 +13,5 @@ ggplot2 object - and printed
 show the sample effect-size analysis of a simulated sample
 }
 \examples{
-showDescription(analysis=makeAnalysis())
+showDescription(analysis=doAnalysis())
 }

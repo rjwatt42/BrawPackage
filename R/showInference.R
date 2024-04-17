@@ -53,20 +53,22 @@ getNulls<-function(analysis,useSig=FALSE,useNSig=FALSE) {
 #' @param orientation "vert", "horz"
 #' @return ggplot2 object - and printed
 #' @examples
-#' showInference(analysis=makeAnalysis(),
+#' showInference(analysis=doAnalysis(),
 #'               showType="Basic",
 #'               dimension="1D",
 #'               orientation="vert",
 #'               effectType="direct",
 #'               showTheory=TRUE)
 #' @export
-showInference<-function(analysis=makeAnalysis(autoShow=FALSE),showType="Basic",dimension="1D",orientation="vert",
+showInference<-function(analysis=doAnalysis(autoShow=FALSE),showType="Basic",dimension="1D",orientation="vert",
                         effectType="direct",showTheory=braw.env$showTheory
 ) {
   if (showType[1]=="2D") {
     showType<-"Basic"
     dimension<-"2D"
   }
+  if (is.numeric(dimension)) dimension<-paste0(dimension,"D")
+  
   analysis1<-analysis
   analysis2<-analysis
   other1<-NULL

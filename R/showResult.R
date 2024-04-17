@@ -3,9 +3,9 @@
 #' 
 #' @return ggplot2 object - and printed
 #' @examples
-#' showDescription(analysis=makeAnalysis())
+#' showDescription(analysis=doAnalysis())
 #' @export
-showResult<-function(result=makeResult(autoShow=FALSE),show="describe",showType="Basic",dimension="1D") {
+showResult<-function(result=doResult(autoShow=FALSE),show="describe",showType="Basic",dimension="1D") {
   
   switch(tolower(show),
          "data"=showSample(result),

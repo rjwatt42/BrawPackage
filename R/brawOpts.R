@@ -1,5 +1,6 @@
 braw.env<-c()
 braw.def<-c()
+braw.res<-c()
 .onLoad<- function(...) {
   BrawOpts()
 }
@@ -19,6 +20,7 @@ newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
 BrawOpts<-function(BW=FALSE,fontScale=1,newDev=FALSE,height=576,aspect=1.736) {
   braw.env <- new.env(parent = emptyenv())
   braw.def <- new.env(parent = emptyenv())
+  braw.res <- new.env(parent = emptyenv())
   
   if (newDev) {
     while (dev.cur()!=1) dev.off()
@@ -131,6 +133,9 @@ BrawOpts<-function(BW=FALSE,fontScale=1,newDev=FALSE,height=576,aspect=1.736) {
           braw.env$truncate_p<-FALSE
           braw.env$min_nw<-10
           braw.env$max_nw<-10000
+          
+          braw.env$dist_zi<-0.05
+          braw.env$dist_range<-4
           
           braw.env$allScatter<-TRUE
           braw.env$showMedians<-FALSE
@@ -256,20 +261,31 @@ BrawOpts<-function(BW=FALSE,fontScale=1,newDev=FALSE,height=576,aspect=1.736) {
 
 braw.env<<-braw.env          
 
-braw.def$world<-makeWorld()
-braw.def$effect<-makeEffect(world=braw.def$world)
 braw.def$IV<-makeVariable("IV")
 braw.def$IV2<-NULL
 braw.def$DV<-makeVariable("DV")
+braw.def$world<-makeWorld()
+braw.def$effect<-makeEffect(world=braw.def$world)
 braw.def$hypothesis<-makeHypothesis(IV=braw.def$IV,IV2=braw.def$IV2,DV=braw.def$DV,effect=braw.def$effect)
 braw.def$design<-makeDesign()
 braw.def$evidence<-makeEvidence()
+braw.def$metaAnalysis<-makeMetaAnalysis()
 
 braw.def<<-braw.def
+
+braw.res$result<-NULL 
+braw.res$expected<-NULL 
+braw.res$explore<-NULL 
+
+braw.res<<-braw.res
 }
 
 setBrawEnv<-function(which,value) {
   assign(which,value,braw.env)
+}
+
+setBrawRes<-function(which,value) {
+  assign(which,value,braw.res)
 }
 
 setBrawDef<-function(which,value) {

@@ -82,13 +82,13 @@ mergeExploreResult<-function(res1,res2) {
 #' @seealso showExplore() 
 #' @seealso reportExplore()
 #' @examples
-#' exploreResult<-makeExplore(nsims=10,exploreResult=NULL,exploreType="n",exploreNPoints=13,
+#' exploreResult<-doExplore(nsims=10,exploreResult=NULL,exploreType="n",exploreNPoints=13,
 #'                              min_n=10,max_n=250,max_r=0.9,max_anom=1,
 #'                              xlog=FALSE,xabs=FALSE,mx_log=FALSE,
 #'                              hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
 #'                              doingNull=FALSE,autoShow=braw.env$autoShow,showType="Basic")
 #' @export
-makeExplore<-function(nsims=10,exploreResult=NULL,exploreType="n",exploreNPoints=13,
+doExplore<-function(nsims=10,exploreResult=NULL,exploreType="n",exploreNPoints=13,
                       min_n=10,max_n=250,max_r=0.9,max_anom=1,
                       xlog=FALSE,xabs=FALSE,
                       hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=makeEvidence(),
@@ -519,7 +519,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
                 "pNull"={
                   effect$world$worldOn<-TRUE
                   effect$world$populationNullp<-vals[vi]
-                  # metaAnalysis$meta_nullAnal<-TRUE
+                  # metaAnalysis$includeNulls<-TRUE
                 },
                 
                 "Heteroscedasticity"={effect$Heteroscedasticity<-vals[vi]},
@@ -589,7 +589,6 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
                 },
                 "sig_only"={
                   metaAnalysis$sig_only<-vals[vi]
-                  metaAnalysis$meta_psigAnal<-vals[vi]
                 }
         )
         hypothesis$IV<-IV
@@ -615,5 +614,6 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
     if (autoShow) print(showExplore(exploreResult,showType=showType))
   }
 
-  exploreResult
+  setBrawRes("explore",exploreResult)
+  return(exploreResult)
 }

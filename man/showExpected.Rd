@@ -5,7 +5,7 @@
 \title{show the estimated population characteristics from multiple simulated sample}
 \usage{
 showExpected(
-  expectedResult = makeExpected(),
+  expectedResult = doExpected(),
   showType = "Basic",
   dimension = "1D",
   orientation = "vert",
@@ -30,7 +30,7 @@ ggplot2 object - and printed
 show the estimated population characteristics from multiple simulated sample
 }
 \examples{
-showExpected(expectedResult=makeExpected(),
+showExpected(expectedResult=doExpected(),
                        showType="Basic",
                        dimension="1D",
                        orientation="vert",

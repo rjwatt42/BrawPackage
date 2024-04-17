@@ -24,6 +24,12 @@ worldLabel<-function(metaResult,whichMeta=NULL) {
   return(lb)
 }
 
+#' show a single meta-analysis 
+#' 
+#' @return ggplot2 object - and printed
+#' @examples
+#' showSingleMeta(metaResult=doMetaAnalysis(1,makeMetaAnalysis(500)),showTheory=FALSE)
+#' @export
 showSingleMeta<-function(metaResult=doMetaAnalysis(1,makeMetaAnalysis(500)),showTheory=FALSE) {
 
   metaAnalysis<-metaResult$metaAnalysis
@@ -83,6 +89,12 @@ showSingleMeta<-function(metaResult=doMetaAnalysis(1,makeMetaAnalysis(500)),show
   
 }
 
+#' show a multiple meta-analyses
+#' 
+#' @return ggplot2 object - and printed
+#' @examples
+#' showMetaAnalysis<-function(metaResult=doMetaAnalysis(),showType="n-k")
+#' @export
 showMetaAnalysis<-function(metaResult=doMetaAnalysis(),showType="n-k") {
   g<-ggplot()+braw.env$plotRect
   braw.env$plotArea<-c(0,0,0.48,1)
@@ -188,7 +200,7 @@ drawMeta<-function(metaResult=doMetaAnalysis(),whichMeta="Single",showType="n-k"
         }
     if (showType=="S-S") {
       fullText<-paste0("Exp","(",format(mean(metaResult$exp$Kmax),digits=3),"\u00B1",format(std(metaResult$exp$Kmax),digits=2),")")
-      if (metaAnalysis$meta_nullAnal) {
+      if (metaAnalysis$includeNulls) {
         fullText<-paste0(fullText,"\nnull=",format(mean(metaResult$exp$Nullmax),digits=3),"\u00B1",format(std(metaResult$exp$Nullmax),digits=2))
       }
       fullText<-paste0(fullText,"\nS= ",format(mean(metaResult$exp$Smax),digits=2),"\u00B1",format(std(metaResult$exp$Smax),digits=2)," (",format(sum(y>x)),"/",length(metaResult$bestDist),")")
@@ -199,7 +211,7 @@ drawMeta<-function(metaResult=doMetaAnalysis(),whichMeta="Single",showType="n-k"
         g<-g+geom_label(data=pts_lb,aes(x=x,y=y,label=lb),hjust=0,vjust=1,size=labelSize,fill="grey")
       }
       fullText<-paste0("Gauss","(",format(metaResult$gauss$Kmax,digits=3),"\u00B1",format(std(metaResult$gauss$Kmax),digits=2),")")
-      if (metaAnalysis$meta_nullAnal) {
+      if (metaAnalysis$includeNulls) {
         fullText<-paste0(fullText,"\nnull=",format(mean(metaResult$gauss$Nullmax),digits=3),"\u00B1",format(std(metaResult$gauss$Nullmax),digits=2))
       }
       fullText<-paste0(fullText,"\nS= ",format(mean(metaResult$gauss$Smax),digits=2),"\u00B1",format(std(metaResult$gauss$Smax),digits=2)," (",format(sum(x>y)),"/",length(metaResult$bestDist),")")

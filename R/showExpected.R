@@ -9,22 +9,22 @@
 #' @param orientation "vert", "horz"
 #' @return ggplot2 object - and printed
 #' @examples
-#' showExpected(expectedResult=makeExpected(),
+#' showExpected(expectedResult=doExpected(),
 #'                        showType="Basic",
 #'                        dimension="1D",
 #'                        orientation="vert",
 #'                        effectType="direct",showTheory=TRUE)
 #' @export
-showExpected<-function(expectedResult=makeExpected(autoShow=FALSE),showType="Basic",
+showExpected<-function(expectedResult=doExpected(autoShow=FALSE),showType="Basic",
                        dimension="1D",orientation="vert",
                        effectType="direct",showTheory=braw.env$showTheory
 ) {
-  if (is.numeric(expectedResult)) expectedResult=makeExpected(expectedResult,autoShow=FALSE)
+  if (is.numeric(expectedResult)) expectedResult=doExpected(expectedResult,autoShow=FALSE)
 
   if (showType=="tDR") showType<-"fDR"
   if (!expectedResult$hypothesis$effect$world$worldOn && is.element(showType,c("NHST","fDR","fMR"))) {
     if (expectedResult$nullcount<expectedResult$count) {
-      expectedResult<-makeExpected(0,expectedResult,doingNull=TRUE)
+      expectedResult<-doExpected(0,expectedResult,doingNull=TRUE)
     }
   }
 
