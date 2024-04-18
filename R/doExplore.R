@@ -614,6 +614,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
     if (autoShow) print(showExplore(exploreResult,showType=showType))
   }
 
+  exploreResult<-c(list(type="explore"),exploreResult)
   setBrawRes("explore",exploreResult)
   return(exploreResult)
 }

@@ -10,7 +10,7 @@ hypothesis1<-makeHypothesis(IV=makeVariable("IV","Categorical"),effect=makeEffec
 design1<-makeDesign(sIV1Use="Between")
 design2<-makeDesign(sIV1Use="Within")
 
-sample<-makeSample(hypothesis1,design1)
+sample<-doSample(hypothesis1,design1)
 showSample(sample)
 analysis<-doAnalysis(sample=sample)
 showDescription(analysis)

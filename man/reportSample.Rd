@@ -4,7 +4,7 @@
 \alias{reportSample}
 \title{report a simulated sample}
 \usage{
-reportSample(sample = makeSample())
+reportSample(sample = doSample())
 }
 \value{
 ggplot2 object - and printed
@@ -13,5 +13,5 @@ ggplot2 object - and printed
 report a simulated sample
 }
 \examples{
-reportSample(sample=makeSample())
+reportSample(sample=doSample())
 }

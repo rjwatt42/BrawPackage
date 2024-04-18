@@ -22,7 +22,7 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
            "Budget"={limit<-design$sCheatingBudget}
            )
     while (!isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence) && ntrials<limit) {
-      sample<-makeSample(hypothesis,design)
+      sample<-doSample(hypothesis,design)
       result<-doAnalysis(sample,evidence)
       switch(design$sCheatingLimit,
              "Fixed"={ntrials<-ntrials+1},
@@ -39,7 +39,7 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
     
     effect2<-effect
     
-    sample2<-makeSample(makeHypothesis(IV,IV2,DV,effect2),design2)
+    sample2<-doSample(makeHypothesis(IV,IV2,DV,effect2),design2)
   }
 
   if (is.element(design$sCheating,c("Prune","Replace"))) {
@@ -133,7 +133,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
     if (Replication$VarAlpha) braw.env$alphaSig<-oldalpha*Replication$AlphaChange
     while (Replication$forceSig && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
       if (!evidence$shortHand) {
-        sample<-makeSample(hypothesis,design,autoShow=FALSE)
+        sample<-doSample(hypothesis,design,autoShow=FALSE)
         res<-doAnalysis(sample,evidence,autoShow=FALSE)
       } else {
         res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
@@ -179,7 +179,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
       }
 
       if (!evidence$shortHand) {
-        sample<-makeSample(hypothesis,design1,autoShow=FALSE)
+        sample<-doSample(hypothesis,design1,autoShow=FALSE)
         res<-doAnalysis(sample,evidence,autoShow=FALSE)
       } else {
         res<-sampleShortCut(hypothesis,design1,evidence,1,FALSE)

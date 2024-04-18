@@ -5,7 +5,7 @@
 \title{perform an analysis of a sample object}
 \usage{
 doAnalysis(
-  sample = makeSample(),
+  sample = doSample(),
   evidence = makeEvidence(),
   autoShow = FALSE
 )
@@ -17,5 +17,5 @@ analysis object
 perform an analysis of a sample object
 }
 \examples{
-analysis<-doAnalysis(sample=makeSample(),evidence=makeEvidence(),autoShow=braw.env$autoShow)#' make a multiple samples
+analysis<-doAnalysis(sample=doSample(),evidence=makeEvidence(),autoShow=braw.env$autoShow)#' make a multiple samples
 }

@@ -115,19 +115,19 @@ design<-getDesign(name,design=makeDesign())
 make a simulated sample
 
 @examples
-sample<-makeSample(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=braw.env$autoShow)
+sample<-doSample(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=braw.env$autoShow)
 
 show a simulated sample
 
 @examples
-showSample(sample=makeSample())
+showSample(sample=doSample())
 
 report a simulated sample
 
 @examples
-reportSample(sample=makeSample())
+reportSample(sample=doSample())
 
-analysis<-doAnalysis(sample=makeSample(),evidence=makeEvidence(),autoShow=braw.env$autoShow)
+analysis<-doAnalysis(sample=doSample(),evidence=makeEvidence(),autoShow=braw.env$autoShow)
 
 showDescription(analysis)
 reportDescription(analysis,modelType="Raw")

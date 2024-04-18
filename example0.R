@@ -6,7 +6,7 @@ hypothesis<-makeHypothesis(IV=makeVariable("IV","Categorical",ncats=3),
                            effect=makeEffect(0.5))
 design<-makeDesign(sN=100)
 
-sample<-makeSample(hypothesis,design,autoShow = TRUE)
+sample<-doSample(hypothesis,design,autoShow = TRUE)
 
 #######################
 #
@@ -55,7 +55,7 @@ hypothesis<-makeHypothesis(IV=getVariable("Smoker?"),
                            effect=makeEffect(-0.3,0.3,0,0.3))
 showPrediction(hypothesis)
 
-# sample<-makeSample(hypothesis,design)
+# sample<-doSample(hypothesis,design)
 # analysis<-doAnalysis(sample=sample)
 # showDescription(analysis)
 
@@ -104,7 +104,7 @@ hypothesis<-makeHypothesis(IV=makeVariable("IV","Interval"),
                            DV=makeVariable("DV","Interval"),
                            effect=makeEffect(0.4))
 
-sample<-makeSample(hypothesis,makeDesign(sN=42))
+sample<-doSample(hypothesis,makeDesign(sN=42))
 analysis<-doAnalysis(sample=sample)
 
 showDescription(analysis)
@@ -118,7 +118,7 @@ hypothesis<-makeHypothesis(IV=makeVariable("IV","Categorical"),
                            DV=makeVariable("DV","Interval"),
                            effect=makeEffect(0))
 
-sample<-makeSample(hypothesis,makeDesign(sN=42))
+sample<-doSample(hypothesis,makeDesign(sN=42))
 
 showSample(sample)
 
@@ -129,7 +129,7 @@ hypothesis<-makeHypothesis(IV=makeVariable("IV","Interval"),
                            DV=makeVariable("DV","Interval",skew=0),
                            effect=makeEffect(0.2,Heteroscedasticity = 0))
 design<-makeDesign(sN=120,sOutliers = 0)
-sample<-makeSample(hypothesis,design)
+sample<-doSample(hypothesis,design)
 analysis<-doAnalysis(sample=sample)
 
 showDescription(analysis)
@@ -144,7 +144,7 @@ hypothesis<-makeHypothesis(IV=makeVariable("Week","Categorical",ncats=5,cases=1:
                            DV=makeVariable("examStress","Interval",skew=0),
                            effect=makeEffect(-0.2,-0.2,0,-0.2))
 design<-makeDesign(sN=4000,sOutliers = 0)
-sample<-makeSample(hypothesis,design)
+sample<-doSample(hypothesis,design)
 analysis<-doAnalysis(sample=sample)
 
 showDescription(analysis)

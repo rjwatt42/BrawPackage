@@ -120,6 +120,7 @@ doExpected <- function(nsims=10,expectedResult=NULL,hypothesis=braw.def$hypothes
     if (autoShow) print(showExpected(expectedResult,showType=showType))
   }
 
+  expectedResult<-c(list(type="expected"),expectedResult)
   setBrawRes("expected",expectedResult)
   return(expectedResult)
 }

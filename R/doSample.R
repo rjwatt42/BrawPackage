@@ -128,9 +128,9 @@ makeSampleVar<-function(design,n,MV){
 #' @returns a sample object
 #' @seealso showSample() reportSample()
 #' @examples
-#' sample<-makeSample(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=braw.env$autoShow)
+#' sample<-doSample(hypothesis=makeHypothesis(),design=makeDesign(),autoShow=braw.env$autoShow)
 #' @export
-makeSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoShow=braw.env$autoShow){
+doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoShow=braw.env$autoShow){
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV

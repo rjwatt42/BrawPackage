@@ -29,7 +29,7 @@ plotSample<-function(IV,DV,effect,ivplot,dvplot,g=NULL) {
 #' 
 #' @return ggplot2 object - and printed
 #' @examples
-#' showSample(sample=makeSample())
+#' showSample(sample=doSample())
 #' @export
 showSample<-function(sample=doResult(autoShow=FALSE)){
   IV<-sample$hypothesis$IV

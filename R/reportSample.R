@@ -14,7 +14,7 @@ iqr<-function(s) {
 #' 
 #' @return ggplot2 object - and printed
 #' @examples
-#' reportSample(sample=makeSample())
+#' reportSample(sample=doSample())
 #' @export
 reportSample<-function(sample=doAnalysis()){
   hypothesis<-sample$hypothesis
