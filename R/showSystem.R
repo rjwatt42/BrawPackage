@@ -49,7 +49,7 @@ showHypothesis<-function(hypothesis=braw.def$hypothesis,doWorld=TRUE,scale=0.5) 
 #' @examples
 #' showWorld(world=makeWorld())
 #' @export
-showWorld<-function(hypothesis=makeHypothesis(effect=makeEffect(world=makeWorld())),plotArea=c(0,0,1,1),g=NULL) {
+showWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),g=NULL) {
 # world diagram
 
   world<-hypothesis$effect$world

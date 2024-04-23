@@ -54,8 +54,11 @@ trimExploreResult<-function(result,nullresult) {
 #'                        showType="r",
 #'                        effectType="unique",whichEffect="All")
 #' @export
-showExplore<-function(exploreResult=doExplore(),showType="r",showTheory=FALSE,
+showExplore<-function(exploreResult=braw.res$explore,showType="r",showTheory=FALSE,
                       effectType="unique",whichEffect="All"){
+
+  if (is.null(exploreResult)) exploreResult=doExplore()
+  
   quants<-0.25
   showPower<-FALSE
   

@@ -5,7 +5,9 @@
 #' @examples
 #' showDescription(analysis=doAnalysis())
 #' @export
-showResult<-function(result=doResult(autoShow=FALSE),show="describe",showType="Basic",dimension="1D") {
+showResult<-function(result=braw.res$result,show="describe",showType="Basic",dimension="1D") {
+  
+  if (is.null(result)) result<-doResult()
   
   switch(tolower(show),
          "data"=showSample(result),

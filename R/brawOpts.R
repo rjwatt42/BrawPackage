@@ -99,7 +99,7 @@ BrawOpts<-function(BW=FALSE,fontScale=1,newDev=FALSE,height=576,aspect=1.736) {
           braw.env$labelSize<-3.2*fontScale
           braw.env$dotSize<-16/3
           
-          braw.env$autoShow<-TRUE
+          braw.env$autoShow<-FALSE
           braw.env$plotRect<-coord_cartesian(xlim=c(0,1),ylim=c(0,1))
           ##########################
           # NHST constants

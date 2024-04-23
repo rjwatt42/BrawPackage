@@ -15,10 +15,11 @@
 #'                        orientation="vert",
 #'                        effectType="direct",showTheory=TRUE)
 #' @export
-showExpected<-function(expectedResult=doExpected(autoShow=FALSE),showType="Basic",
+showExpected<-function(expectedResult=braw.res$expected,showType="Basic",
                        dimension="1D",orientation="vert",
                        effectType="direct",showTheory=braw.env$showTheory
 ) {
+  if (is.null(expectedResult)) expectedResult=doExpected(autoShow=FALSE)
   if (is.numeric(expectedResult)) expectedResult=doExpected(expectedResult,autoShow=FALSE)
 
   if (showType=="tDR") showType<-"fDR"
