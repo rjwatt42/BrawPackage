@@ -60,9 +60,11 @@ getNulls<-function(analysis,useSig=FALSE,useNSig=FALSE) {
 #'               effectType="direct",
 #'               showTheory=TRUE)
 #' @export
-showInference<-function(analysis=doAnalysis(autoShow=FALSE),showType="Basic",dimension="1D",orientation="vert",
+showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D",orientation="vert",
                         effectType="direct",showTheory=braw.env$showTheory
 ) {
+  if (is.null(analysis)) analysis<-doResult(autoShow=FALSE)
+  
   if (showType[1]=="2D") {
     showType<-"Basic"
     dimension<-"2D"

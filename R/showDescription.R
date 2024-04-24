@@ -322,8 +322,9 @@ plotCatDescription<-function(analysis,g) {
 #' @examples
 #' showDescription(analysis=doAnalysis())
 #' @export
-showDescription<-function(analysis=doAnalysis(autoShow=FALSE)) {
-
+showDescription<-function(analysis=braw.res$result) {
+  if(is.null(analysis)) analysis<-doAnalysis(autoShow=FALSE)
+  
   braw.env$plotArea<-c(0,0,1,1)
   g<-getAxisPrediction(analysis$hypothesis) 
   
