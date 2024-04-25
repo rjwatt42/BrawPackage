@@ -3,7 +3,7 @@ reportPlot<-function(outputText,nc,nr){
 
   bg<-braw.env$plotColours$graphC
   margin=0.5
-  colSpace=2.5
+  colSpace=1.5
   
   font_size=braw.env$labelSize
   characterWidth=font_size/20
@@ -17,6 +17,7 @@ reportPlot<-function(outputText,nc,nr){
   # now break into blocks separated by empty rows
   blockEnds<-c(0,which(nrT==0),nrow(nT))
   colX<-c()
+  cellSize<-c()
   if (length(blockEnds)>1) {
   for (i in 2:length(blockEnds)){
     block<-nT[(blockEnds[i-1]+1):blockEnds[i],]
@@ -25,14 +26,17 @@ reportPlot<-function(outputText,nc,nr){
       colSize<-block+colSpace
       colOffset<-cumsum(c(0,colSize))
       colX<-c(colX,rep(colOffset[1:length(block)],1))
+      cellSize<-c(cellSize,rep(colSize,length(block)))
     }
     else     {
       colSize<-apply(block,2,max)+colSpace
       colOffset<-cumsum(c(0,colSize))
       colX<-c(colX,rep(colOffset[1:ncol(block)],nrow(block)))
+      cellSize<-c(cellSize,rep(colSize,nrow(block)))
     }
   }
   }
+  cellSize<-cellSize*characterWidth
   x_gap1<-colX*characterWidth
   
   d<-expand.grid(x=1:nc,y=1:nr)
@@ -67,7 +71,8 @@ reportPlot<-function(outputText,nc,nr){
     if (italiclabels[i]) fontface<-"italic" 
     if (boldlabels[i] && italiclabels[i]) fontface<-"bold.italic" 
     if (rightlabels[i]) hjust<- 1 else hjust<- 0
-    if (rightlabels[i]) x<- x_gap1[i+1]+1-characterWidth
+    if (rightlabels[i]) 
+      x<-x+cellSize[i]-characterWidth
     fill<-bg
     if (redlabels[i]) fill="red"
     if (redlabels[i]) fill="green"
