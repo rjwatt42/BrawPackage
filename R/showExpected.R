@@ -22,25 +22,26 @@ showExpected<-function(expectedResult=braw.res$expected,showType="Basic",
   if (is.null(expectedResult)) expectedResult=doExpected(autoShow=FALSE)
   if (is.numeric(expectedResult)) expectedResult=doExpected(expectedResult,autoShow=FALSE)
 
-  if (showType=="tDR") showType<-"fDR"
-  if (!expectedResult$hypothesis$effect$world$worldOn && is.element(showType,c("NHST","fDR","fMR"))) {
-    if (expectedResult$nullcount<expectedResult$count) {
-      expectedResult<-doExpected(0,expectedResult,doingNull=TRUE)
+    if (showType=="tDR") showType<-"fDR"
+    if (!expectedResult$hypothesis$effect$world$worldOn && is.element(showType,c("NHST","fDR","fMR"))) {
+      if (expectedResult$nullcount<expectedResult$count) {
+        expectedResult<-doExpected(0,expectedResult,doingNull=TRUE)
+      }
     }
-  }
+    
+    if (expectedResult$hypothesis$effect$world$worldOn) {
+      fullResult<-mergeExpected(expectedResult$result,expectedResult$nullresult)
+    } else {
+      switch (showType,
+              "NHST"={fullResult<-mergeExpected(expectedResult$result,expectedResult$nullresult)},
+              "fDR"={fullResult<-mergeExpected(expectedResult$result,expectedResult$nullresult)},
+              "fMR"={fullResult<-mergeExpected(expectedResult$result,expectedResult$nullresult)},
+              "e1"={fullResult<-expectedResult$nullresult},
+              "e2"={fullResult<-expectedResult$result},
+              {fullResult<-expectedResult$result}
+      )
+    }
 
-  if (expectedResult$hypothesis$effect$world$worldOn) {
-    fullResult<-mergeExpected(expectedResult$result,expectedResult$nullresult)
-  } else {
-    switch (showType,
-            "NHST"={fullResult<-mergeExpected(expectedResult$result,expectedResult$nullresult)},
-            "fDR"={fullResult<-mergeExpected(expectedResult$result,expectedResult$nullresult)},
-            "fMR"={fullResult<-mergeExpected(expectedResult$result,expectedResult$nullresult)},
-            "e1"={fullResult<-expectedResult$nullresult},
-            "e2"={fullResult<-expectedResult$result},
-            {fullResult<-expectedResult$result}
-    )
-  }
   fullResult<-c(fullResult,list(hypothesis=expectedResult$hypothesis,
                                 design=expectedResult$design,
                                 evidence=expectedResult$evidence)

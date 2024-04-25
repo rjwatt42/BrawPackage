@@ -31,7 +31,9 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic"){
            "NHST"={pars<-c("e2","e1")},
            "tDR"=       {pars<-c("e1","e2")},
            "fDR"=       {pars<-c("e1","e2")},
-           {pars<-c(showType,NA)}
+           { pars<-strsplit(showType,";")[[1]]
+           if (length(pars)==1) pars<-c(pars,NA)
+           }
     )
   } else pars<-showType
   
