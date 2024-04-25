@@ -474,15 +474,17 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
     while (mean(log10(analysis$pIV)>ylim[1])<0.75) ylim[1]<-ylim[1]-1
   
   if (orient=="vert") ylim[2]<-ylim[2]+diff(ylim)/5
-  else                ylim<-ylim+c(-1,1)*diff(ylim)/5
+  else                ylim<-ylim+c(-1,1)*diff(ylim)/25
   
-  if (is.null(hypothesis$IV2)) box<-"y" else box<-"both"
+  box<-"Y" 
   top<-is.element(showType,c("e1","e2","e1d","e2d"))
   
   g<-startPlot(xlim,ylim,box=box,top=top,orientation=orient,g=g)
   g<-g+yAxisTicks(logScale=yaxis$logScale)
   g<-g+yAxisLabel(ylabel)
-  if (!is.null(hypothesis$IV2)) g<-g+xAxisTicks(breaks=c(0,2,4),c("Main1","Main2","Interaction"))
+  if (!is.null(hypothesis$IV2) && effectType=="direct") g<-g+xAxisTicks(breaks=c(0,2,4),c("Main1","Main2","Interaction"))
+  if (!is.null(hypothesis$IV2)) 
+    g<-g+dataText(data.frame(x=min(xlim),y=max(ylim)),label=effectType,hjust=-0.1,vjust=1,fontface="bold")
   
   if (!all(is.na(analysis$rIV))) {
     data<-collectData(analysis,effectType)
@@ -818,14 +820,14 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
                 labelPt1<-paste0("p(sig correct) = ",brawFormat(s1/n*100,digits=npct),"%")
               }
       )
-      lpts1<-data.frame(y = xoff[i]+ylim[2], x = xlim[1])
-      if (labelSig)
+      lpts1<-data.frame(y = ylim[2], x = xoff[i]+xlim[1])
+      if (labelSig && is.null(analysis$hypothesis$IV2))
         g<-g+dataLabel(data=lpts1,label = labelPt1,vjust=1)
-      lpts1a<-data.frame(y = xoff[i]+ylim[1], x = xlim[1])
+      lpts1a<-data.frame(y = ylim[1], x = xoff[i]+xlim[1])
       if (labelNSig)
         g<-g+dataLabel(data=lpts1a,label = labelPt1a,vjust=0)
       if (is.element(showType,c("e1d","e2d"))) {
-        lpts1<-data.frame(y = xoff[i]+mean(ylim), x = xlim[1])
+        lpts1<-data.frame(y = mean(ylim), x = xoff[i]+xlim[1])
         g<-g+dataLabel(data=lpts1,label = labelPt1b,vjust=0.5)
       }
     }

@@ -115,19 +115,23 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
   } else {
     if (!is.null(analysis$hypothesis$IV2) && effectType=="all") {
       effectType<-c("direct","unique","total")
-      area.y<-0.25
-    } else area.y<-1
+      area.y<-c(1,1,1)*0.37
+      area.off<-c(0,0.333,0.666)
+    } else {
+      area.off<-0
+      area.y<-1
+    }
     
     g1<-ggplot()+braw.env$plotRect
     
     nplots<-sum(!is.na(showType))
     if (orientation=="vert") nplots<-2
     for (fi in 1:length(effectType)) {
-      braw.env$plotArea<-c(0.0,0.33*(fi-1),1/nplots,area.y)
+      braw.env$plotArea<-c(0.0,area.off[fi],1/nplots,area.y[fi])
         g1<-plotInference(analysis1,otheranalysis=other1,
                           disp=showType[1],effectType=effectType[fi],orientation=orientation,showTheory=showTheory,g=g1)
         if (!is.na(showType[2])) {
-        braw.env$plotArea<-c(0.5,0.33*(fi-1),1/nplots,area.y,area.y)
+          braw.env$plotArea<-c(0.5,area.off[fi],1/nplots,area.y[fi])
         g1<-plotInference(analysis2,otheranalysis=other2,
                             disp=showType[2],effectType=effectType[fi],orientation=orientation,showTheory=showTheory,g=g1)
       } 

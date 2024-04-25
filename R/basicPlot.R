@@ -46,8 +46,10 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),box="both",top=FALSE,backC=braw.env$
   switch(box,
          "X"=gaps<-c(0,maxGap),
          "x"=gaps<-c(minGap,maxGap),
+         "Y"=gaps<-c(maxGap,0),
          "y"=gaps<-c(maxGap,minGap*1.2),
          "both"=gaps<-c(maxGap*1.2,maxGap),
+         "Both"=gaps<-c(maxGap,maxGap),
          "none"=gaps<-c(0,0),
          {gaps<-c(minGap,minGap)}
   )
@@ -247,24 +249,25 @@ dataLabel<-function(data,label, hjust=0, vjust=0, fill="white",colour="black") {
   )
   
 }
-dataText<-function(data,label, hjust=0, vjust=0, colour="black",size=1) {
+dataText<-function(data,label, hjust=0, vjust=0, colour="black",size=1,fontface="plain") {
   mathlabel<-grepl("['^']{1}",label) | grepl("['[']{1}",label)
   if (any(mathlabel)) {
     label<-deparse(label)
   } else {
-    label<-deparse(bquote(.(label)))
+    if (fontface=="bold")    label<-deparse(bquote(bold(.(label))))
+      else     label<-deparse(bquote(.(label)))
   }
   data<-reRangeXY(data)
   
   switch(braw.env$plotLimits$orientation,
          "horz"=
            geom_text(data=data,aes(x = x, y = y), label=label, hjust=hjust, vjust=vjust, 
-               color=colour,
+               color=colour,fontface=fontface,
                size=size*braw.env$labelSize,parse=TRUE),
          "vert"=   
            geom_text(data=data,aes(x = x, y = y), label=label, hjust=vjust, 
                vjust=hjust, 
-               color=colour,
+               color=colour,fontface=fontface,
                size=size*braw.env$labelSize),parse=TRUE
   )
   
