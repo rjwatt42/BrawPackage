@@ -5,11 +5,11 @@ reportPlot<-function(outputText,nc,nr){
   margin=0.5
   colSpace=2.5
   
-  font_size=braw.env$labelSize*0.8
-  characterWidth=font_size/14
+  font_size=braw.env$labelSize
+  characterWidth=font_size/20
   
   top=max(nr,14)
-    edge=80*characterWidth
+  edge=80*characterWidth
 
   oT<-matrix(outputText,ncol=nc,byrow=TRUE)
   nT<-nchar(oT) # no of characters per cell

@@ -7,7 +7,9 @@
 #'                   "w","wp","wn", ro","po"
 #' @return ggplot2 object - and printed
 #' @export
-reportExpected<-function(expectedResult=doExpected(100),showType="Basic"){
+reportExpected<-function(expectedResult=braw.res$expected,showType="Basic"){
+  if (is.null(expectedResult)) expectedResult=doExpected(autoShow=FALSE)
+  
   IV<-expectedResult$hypothesis$IV
   IV2<-expectedResult$hypothesis$IV2
   DV<-expectedResult$hypothesis$DV

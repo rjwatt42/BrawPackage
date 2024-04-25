@@ -16,7 +16,9 @@ iqr<-function(s) {
 #' @examples
 #' reportSample(sample=doSample())
 #' @export
-reportSample<-function(sample=doAnalysis()){
+reportSample<-function(sample=braw.res$result){
+  if (is.null(sample)) sample<-doResult(autoShow=FALSE)
+  
   hypothesis<-sample$hypothesis
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2

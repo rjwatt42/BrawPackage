@@ -5,7 +5,9 @@
 #' @examples
 #' reportInference(analysis=doAnalysis())
 #' @export
-reportInference<-function(analysis=doAnalysis(),analysisType="Anova"){
+reportInference<-function(analysis=braw.res$result,analysisType="Anova"){
+  if (is.null(analysis)) analysis<-doResult(autoShow=FALSE)
+  
   IV<-analysis$hypothesis$IV
   IV2<-analysis$hypothesis$IV2
   DV<-analysis$hypothesis$DV

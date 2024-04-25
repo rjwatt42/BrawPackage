@@ -8,9 +8,11 @@
 #'                        showType="r",
 #'                        whichEffect="All",effectType="All")
 #' @export
-reportExplore<-function(exploreResult,showType="r",
+reportExplore<-function(exploreResult=braw.res$explore,showType="r",
                         whichEffect="All",effectType="All"
                         ){
+  if (is.null(exploreResult)) exploreResult<-doExplore(autoShow=FALSE)
+  
   explore<-exploreResult$explore
   hypothesis<-explore$hypothesis
   effect<-hypothesis$effect
@@ -304,11 +306,13 @@ reportExplore<-function(exploreResult,showType="r",
   }
 
   outputText<-rep("",nc+1)
-  outputText[1]<-"\bExplore:"
-  outputText[2]<-explore$exploreType
+  outputText[1]<-paste0("!j\bExplore: ",explore$exploreType)
   outputText[3]<-paste("nsims = ",format(nrow(exploreResult$result$rval)),sep="")
+  outputText<-c(outputText,paste0("!j\bshow: ", extra_y_label))
+  outputText<-c(outputText,rep("",nc))
   outputText<-c(outputText,rep("",nc+1))
-
+  
+  
   if (showType=="NHST" || showType=="FDR;FMR") {
     switch (braw.env$STMethod,
             "NHST"={outputText<-c(outputText,"NHST")},
@@ -320,16 +324,15 @@ reportExplore<-function(exploreResult,showType="r",
     outputText<-c(outputText,rep("",nc))
   }
   
-  outputText<-c(outputText," ")
+  outputText<-c(outputText,paste0("!j\b",explore$exploreType," ="))
   if (explore$exploreType=="rIV" && braw.env$RZ=="z") {
     vals<-atanh(vals)
   }
   for (i in 1:nc) {
     outputText<-c(outputText,paste("\b",brawFormat(vals[use[i]],digits=braw.env$report_precision),sep=""))
   }
-
-  outputText<-c(outputText,paste0("!j\b", extra_y_label))
-  outputText<-c(outputText,rep("",nc))
+  outputText<-c(outputText,rep(" ",nc+1))
+  
   outputText<-c(outputText,"!jlower 25%")
   for (i in 1:nc) {
     outputText<-c(outputText,brawFormat(y25[use[i]],digits=braw.env$report_precision))
