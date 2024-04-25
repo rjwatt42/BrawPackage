@@ -39,6 +39,8 @@ reportPlot<-function(outputText,nc,nr){
 
   boldlabels<-grepl("\b",outputText)
   outputText<-sub("\b","",outputText)
+  italiclabels<-grepl("!i",outputText)
+  outputText<-sub("!i","",outputText)
   rightlabels<-grepl("!j",outputText)
   outputText<-sub("!j","",outputText)
   
@@ -60,7 +62,10 @@ reportPlot<-function(outputText,nc,nr){
            "k"={label<-deparse(braw.env$Llabel)},
            "p(sig)"={label<-deparse(braw.env$pSigLabel)}
            )
-    if (boldlabels[i]) fontface<-"bold" else fontface<-"plain"
+    fontface<-"plain"
+    if (boldlabels[i]) fontface<-"bold" 
+    if (italiclabels[i]) fontface<-"italic" 
+    if (boldlabels[i] && italiclabels[i]) fontface<-"bold.italic" 
     if (rightlabels[i]) hjust<- 1 else hjust<- 0
     if (rightlabels[i]) x<- x_gap1[i+1]+1-characterWidth
     fill<-bg

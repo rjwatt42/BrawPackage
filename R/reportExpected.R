@@ -247,53 +247,53 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic"){
       }
       if (!is.na(pars[2])) {
       ot1<-c(ot1,
-             "!jmean",
+             "!j!i\bmean",
              brawFormat(mean(a,na.rm=TRUE),digits=braw.env$report_precision),
              brawFormat(mean(b,na.rm=TRUE),digits=braw.env$report_precision)
       )
       ot2<-c(ot2,
-             "!jsd",
+             "!j!isd",
              brawFormat(sd(a,na.rm=TRUE),digits=braw.env$report_precision),
              brawFormat(sd(b,na.rm=TRUE),digits=braw.env$report_precision)
       )
       ot4<-c(ot4,
-             "!jquant75",
+             "!j!iquant75",
              brawFormat(quantile(a,0.75,na.rm=TRUE,names=FALSE),digits=braw.env$report_precision),
              brawFormat(quantile(b,0.75,na.rm=TRUE,names=FALSE),digits=braw.env$report_precision)
       )
       ot5<-c(ot5,
-             "!jmedian",
+             "!j!i\bmedian",
              brawFormat(quantile(a,0.5,na.rm=TRUE,names=FALSE),digits=braw.env$report_precision),
              brawFormat(quantile(b,0.5,na.rm=TRUE,names=FALSE),digits=braw.env$report_precision)
       )
       ot6<-c(ot6,
-             "!jquant25",
+             "!j!iquant25",
              brawFormat(quantile(a,0.25,na.rm=TRUE,names=FALSE),digits=braw.env$report_precision),
              brawFormat(quantile(b,0.25,na.rm=TRUE,names=FALSE),digits=braw.env$report_precision)
       )
       } else {
         ot1<-c(ot1,
-               "!jmean",
+               "!j!i\bmean",
                brawFormat(mean(a,na.rm=TRUE),digits=braw.env$report_precision),
                " "
         )
         ot2<-c(ot2,
-               "!jsd",
+               "!j!isd",
                brawFormat(sd(a,na.rm=TRUE),digits=braw.env$report_precision),
                " "
         )
         ot4<-c(ot4,
-               "!jquant75",
+               "!j!iquant75",
                brawFormat(quantile(a,0.75,na.rm=TRUE,names=FALSE),digits=braw.env$report_precision),
                " "
         )
         ot5<-c(ot5,
-               "!jmedian",
+               "!j!i\bmedian",
                brawFormat(quantile(a,0.5,na.rm=TRUE,names=FALSE),digits=braw.env$report_precision),
                " "
         )
         ot6<-c(ot6,
-               "!jquant25",
+               "!j!iquant25",
                brawFormat(quantile(a,0.25,na.rm=TRUE,names=FALSE),digits=braw.env$report_precision),
                " "
         )
@@ -306,7 +306,7 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic"){
         ot6[length(ot1)-2]<-""
       }
     }
-    outputText<-c(outputText,ot1,ot2,rep("  ",nc),ot4,ot5,ot6)
+    outputText<-c(outputText,ot4,ot5,ot6,rep("  ",nc),ot1,ot2)
     if (pars[1]=="p") {
       outputText<-c(outputText,rep("  ",nc),"p(sig)",paste0(brawFormat(mean(p<braw.env$alphaSig)*100,digits=braw.env$report_precision),"%"),rep(" ",nc-2))
     }
