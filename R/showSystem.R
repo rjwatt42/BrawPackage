@@ -4,13 +4,27 @@
 # population diagram
 # prediction diagram
 
+
+#' show a system - hypothesis & design
+#' 
+#' @return ggplot2 object - and printed
+#' @examples
+#' showSystem(hypothesis=makeHypothesis(),design=makeDesign())
+#' @export
+showSystem<-function(hypothesis=braw.def$hypothesis,design=braw.def$design) {
+  g<-showHypothesis(hypothesis=hypothesis,doWorld=TRUE)
+  g<-showDesign(design=design,plotArea=c(0.5,0.25,0.5,0.5),g)
+  g<-g+geom_vline(xintercept=0.5,linetype="dotted")
+  return(g)
+}
+
 #' show a hypothesis
 #' 
 #' @return ggplot2 object - and printed
 #' @examples
 #' showHypothesis(hypothesis=makeHypothesis())
 #' @export
-showHypothesis<-function(hypothesis=braw.def$hypothesis,doWorld=TRUE,scale=0.5) {
+showHypothesis<-function(hypothesis=braw.def$hypothesis,doWorld=TRUE,g=NULL) {
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV
@@ -20,25 +34,25 @@ showHypothesis<-function(hypothesis=braw.def$hypothesis,doWorld=TRUE,scale=0.5) 
     
   doWorld<-doWorld && effect$world$worldOn
   if (doWorld) {
-    xoff<-0.025
+    xoff<-0.05
     effect$rIV<-NULL
-  } else xoff<-0.2
-  g<-NULL
+  } else xoff<-0.1
   switch(no_ivs,
          { 
-           g<-showVariable(IV,plotArea=c(xoff*scale,0.6,0.6*scale,0.4),g)
-           g<-showVariable(DV,plotArea=c(xoff*scale,0.0,0.6*scale,0.4),g)
-           g<-showEffect(effect$rIV,plotArea=c(xoff*scale,0.37,0.65*scale,0.3),1,g)
-           if (doWorld) g<-showWorld(hypothesis,plotArea=c(0.4*scale,0.27,0.55*scale,0.38),g=g)
+           g<-showVariable(IV,plotArea=c(xoff,0.6,0.3,0.4),g)
+           g<-showVariable(DV,plotArea=c(xoff,0.0,0.3,0.4),g)
+           g<-showEffect(effect$rIV,plotArea=c(xoff,0.36,0.3,0.3),1,g)
+           if (doWorld) g<-showWorld(hypothesis,plotArea=c(xoff+0.15,0.3,0.275,0.38),g=g)
          },
          {
-           g<-showVariable(IV,plotArea=c(0.0,0.6,0.4,0.4),g)
-           g<-showVariable(IV2,plotArea=c(0.6,0.6,0.4,0.4),g)
-           g<-showVariable(DV,plotArea=c(0.3,0.0,0.4,0.4),g)
-           g<-showEffect(effect$rIV,2,plotArea=c(0.1,0.4,0.4,0.22),g)
-           g<-showEffect(effect$rIV2,3,plotArea=c(0.5,0.4,0.4,0.22),g)
-           g<-showEffect(effect$rIVIV2,4,plotArea=c(0.3,0.7,0.4,0.22),g)
-           g<-showEffect(effect$rIVIV2DV,5,plotArea=c(0.3,0.4,0.4,0.22),g)
+           w<-0.25
+           g<-showVariable(IV,plotArea=c(0.0,0.6,w,0.4),g)
+           g<-showVariable(IV2,plotArea=c(w,0.6,w,0.4),g)
+           g<-showVariable(DV,plotArea=c(w/2,0.0,w,0.4),g)
+           g<-showEffect(effect$rIV,2,plotArea=c(0,0.4,w,0.22),g)
+           g<-showEffect(effect$rIV2,3,plotArea=c(w,0.4,w,0.22),g)
+           g<-showEffect(effect$rIVIV2,4,plotArea=c(w/2,0.7,w,0.22),g)
+           g<-showEffect(effect$rIVIV2DV,5,plotArea=c(w/2,0.4,w,0.22),g)
          })
   return(g)
 }
@@ -103,7 +117,7 @@ showWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),g=NULL) {
 #' @examples
 #' showDesign(design=makeDesign())
 #' @export
-showDesign<-function(design=braw.def$design) {
+showDesign<-function(design=braw.def$design,plotArea=c(0,0,1,1),g=NULL) {
   nRange<-showAxis("n")
   binRange<-nRange$lim
   
@@ -123,8 +137,9 @@ showDesign<-function(design=braw.def$design) {
   y<-c(0,ndens,0)*0.8
   pts=data.frame(x=log10(x),y=y)
   
-  braw.env$plotArea<-c(0,0,1,1)
-  g<-ggplot()+coord_cartesian(xlim = c(0,1)+c(-1,1)*0.1, ylim = c(0,1)+c(-1,1)*0.1) + braw.env$blankTheme()
+  braw.env$plotArea<-plotArea
+  if (is.null(g))
+    g<-ggplot()+coord_cartesian(xlim = c(0,1)+c(-1,1)*0.1, ylim = c(0,1)+c(-1,1)*0.1) + braw.env$blankTheme()
   g<-startPlot(xlim=binRange, ylim=c(0,1),
                box="x",g=g)
   g<-g+xAxisLabel(nRange$label)+xAxisTicks(nRange$ticks,10^nRange$ticks)

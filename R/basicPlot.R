@@ -44,6 +44,7 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),box="both",top=FALSE,backC=braw.env$
   minGap<-0.05
   maxGap<-0.125
   switch(box,
+         "X"=gaps<-c(0,maxGap),
          "x"=gaps<-c(minGap,maxGap),
          "y"=gaps<-c(maxGap,minGap*1.2),
          "both"=gaps<-c(maxGap*1.2,maxGap),
