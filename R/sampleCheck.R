@@ -222,6 +222,5 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
   res$no<-resOriginal$nval
   res$df1o<-resOriginal$df1
   res$poIV<-resOriginal$pIV
-  
   res
 }

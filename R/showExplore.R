@@ -369,6 +369,12 @@ showExplore<-function(exploreResult=braw.res$explore,showType="r",showTheory=FAL
                   showVals<-log10(showVals)
                 }
               },
+              "n"={
+                showVals<-nVals
+                if (braw.env$nPlotScale=="log10"){
+                  showVals<-log10(showVals)
+                }
+              },
               "wn"={
                 showVals<-rw2n(rVals,0.8,2)
                 if (braw.env$nPlotScale=="log10"){

@@ -77,7 +77,7 @@ mergeExploreResult<-function(res1,res2) {
 #'                     "Dependence","Outliers","IVRange","DVRange" \cr
 #'                     "Cheating","CheatingAmount" \cr
 #'                     "Alpha","Transform" \cr
-#'                     "Power","SigOnly","Repeats" \cr
+#'                     "Power","Keep","Repeats" \cr
 #' @returns exploreResult object
 #' @seealso showExplore() 
 #' @seealso reportExplore()
@@ -226,7 +226,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
             }
           },
           
-          "SigOnly"={vals<-c(FALSE,TRUE)},
+          "Keep"={vals<-c("cautious", "last", "largeN", "smallP", "median")},
           "Power"={vals<-seq(0.1,0.9,length.out=npoints)},
           "Repeats" ={
             if (design$Replication$Keep=="median") vals<-seq(0,explore$Explore_nrRange,by=2)
@@ -574,8 +574,8 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
                   design$sCheatingAttempts<-vals[vi]
                 },
                 
-                "SigOnly"={
-                  design$Replication$SigOnly<-vals[vi]
+                "Keep"={
+                  design$Replication$Keep<-vals[vi]
                 },
                 "Power"={
                   design$Replication$Power<-vals[vi]

@@ -329,7 +329,10 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="r",
     vals<-atanh(vals)
   }
   for (i in 1:nc) {
-    outputText<-c(outputText,paste0("!j\b",brawFormat(vals[use[i]],digits=braw.env$report_precision)," "))
+    if (is.numeric(vals[use[i]]))
+      outputText<-c(outputText,paste0("!j\b",brawFormat(vals[use[i]],digits=braw.env$report_precision)," "))
+    else 
+      outputText<-c(outputText,paste0("!j\b",vals[use[i]]," "))
   }
   # outputText<-c(outputText,rep(" ",nc+1))
   
@@ -390,7 +393,10 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="r",
 
     outputText<-c(outputText,paste("!j\b", extra_y_label))
     for (i in 1:nc) {
-      outputText<-c(outputText,paste0("!j\b",brawFormat(vals[use[i]],digits=braw.env$report_precision)," "))
+      if (is.numeric(vals[use[i]]))
+        outputText<-c(outputText,paste0("!j\b",brawFormat(vals[use[i]],digits=braw.env$report_precision)," "))
+      else 
+        outputText<-c(outputText,paste0("!j\b",vals[use[i]]," "))
     }
     outputText<-c(outputText,"!jlower 25%")
     for (i in 1:nc) {
