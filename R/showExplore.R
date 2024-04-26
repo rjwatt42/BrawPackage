@@ -528,7 +528,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="r",showTheory=FAL
           }
           pts0f<-data.frame(x=vals,y=y50)
           g<-g+dataLine(data=pts0f)
-          g<-g+dataPoint(data=pts0f,fill=col)
+          g<-g+dataPoint(data=pts0f,fill=col,size=4)
         } else {
           pts0f<-data.frame(x=vals,y=y50)
           g<-g+dataLine(data=pts0f,linewidth=0.25)
@@ -539,7 +539,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="r",showTheory=FAL
                                data.frame(x=vals[i],y1=showVals[,i],y2=sigVals[,i]),
                                showType=showType,ylim=ylim,scale=2.25/(length(vals)+1),col=col)
           }
-          g<-g+dataPoint(data=pts0f,fill=col)
+          g<-g+dataPoint(data=pts0f,fill=col,size=4)
           if (!is.null(y75)) {
           pts1f<-data.frame(x=vals,ymin=y25,ymax=y75)
           g<-g+dataErrorBar(pts1f)

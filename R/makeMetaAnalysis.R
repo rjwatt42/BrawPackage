@@ -9,7 +9,7 @@
 #' sig_only=FALSE,
 #' includeNulls=TRUE)
 #' @export
-makeMetaAnalysis<-function(nstudies=100,
+makeMetaAnalysis<-function(nstudies=10,
                            analysisType="random",
                            modelPDF="All",
                            sig_only=FALSE,
