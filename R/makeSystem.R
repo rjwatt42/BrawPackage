@@ -121,29 +121,29 @@ makeSampling<-function(type="Random") {
 }
 #' make a replication object
 #' 
-#' @param ReplKeep         "last", "cautious", "largeN", "smallP", "median"
-#' @param ReplBudgetType "Fixed", "Budget"
-#' @param ReplCorrection "None", "World", "Prior"
+#' @param Keep         "cautious", "last", "largeN", "smallP", "median"
+#' @param BudgetType "Fixed", "Unlimited"
+#' @param Correction "None", "World", "Prior"
 #' @returns a replication object
 #' @examples
 #' makeReplication(On=FALSE,Repeats=1,Keep="last",
 #'                 PowerOn=TRUE,Power=0.8,Tails=2,
-#'                 SigOnly="No",
-#'                 BudgetType="Fixed",Budget=1000,
+#'                 forceSigOriginal="No",
+#'                 BudgetType="Unlimited",Budget=1000,
 #'                 Correction="None",
 #'                 VarAlpha=FALSE,AlphaChange=2
 #'                 )
 #' @export
-makeReplication<-function(On=FALSE,Repeats=1,Keep="last",
+makeReplication<-function(On=FALSE,Repeats=1,Keep="cautious",
                           PowerOn=TRUE,Power=0.8,Tails=2,
-                          ignoreNS=FALSE,forceSig=FALSE,
-                          BudgetType="Fixed",Budget=1000,
+                          forceSigOriginal=FALSE,
+                          BudgetType="Unlimited",Budget=1000,
                           Correction="None",
-                          VarAlpha=FALSE,AlphaChange=2) {
+                          VarAlpha=FALSE,AlphaChange=0.5) {
   
   replication<-list(On=On,Repeats=Repeats,Keep=Keep,
                     PowerOn=PowerOn,Power=Power,Tails=Tails,
-                    ignoreNS=ignoreNS,forceSig=forceSig,
+                    forceSigOriginal=forceSigOriginal,
                     BudgetType=BudgetType,Budget=Budget,
                     Correction=Correction,
                     VarAlpha=VarAlpha,AlphaChange=AlphaChange)

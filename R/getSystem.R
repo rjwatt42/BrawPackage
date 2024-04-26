@@ -181,6 +181,9 @@ getDesign<-function(name,design=braw.def$design) {
          "Within"={
            design$sIV1Use<-"Within"
          },
+         "Replication"={
+           design$Replication<-makeReplication(TRUE)
+         },
          {}
   )
   return(design)
