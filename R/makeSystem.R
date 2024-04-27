@@ -121,32 +121,28 @@ makeSampling<-function(type="Random") {
 }
 #' make a replication object
 #' 
-#' @param Keep         "cautious", "last", "largeN", "smallP", "median"
+#' @param Keep       "cautious", "last", "largeN", "smallP", "median"
+#' @param PowerPrior "None", "World", "Prior"
 #' @param BudgetType "Fixed", "Unlimited"
-#' @param Correction "None", "World", "Prior"
 #' @returns a replication object
 #' @examples
-#' makeReplication(On=FALSE,Repeats=1,Keep="last",
-#'                 PowerOn=TRUE,Power=0.8,Tails=2,
+#' makeReplication(On=FALSE,Repeats=1,Keep="last",RepAlpha=0.05,
+#'                 PowerOn=TRUE,Power=0.8,Tails=2,PowerPrior="None",
 #'                 forceSigOriginal="No",
-#'                 BudgetType="Unlimited",Budget=1000,
-#'                 Correction="None",
-#'                 VarAlpha=FALSE,AlphaChange=2
+#'                 BudgetType="Unlimited",Budget=1000
 #'                 )
 #' @export
-makeReplication<-function(On=FALSE,Repeats=1,Keep="cautious",
-                          PowerOn=TRUE,Power=0.8,Tails=2,
+makeReplication<-function(On=FALSE,Repeats=1,Keep="cautious",RepAlpha=0.05,
+                          PowerOn=TRUE,Power=0.8,Tails=2,PowerPrior="None",
                           forceSigOriginal=FALSE,
-                          BudgetType="Unlimited",Budget=1000,
-                          Correction="None",
-                          VarAlpha=FALSE,AlphaChange=0.5) {
+                          BudgetType="Unlimited",Budget=1000
+                          ) {
   
-  replication<-list(On=On,Repeats=Repeats,Keep=Keep,
-                    PowerOn=PowerOn,Power=Power,Tails=Tails,
+  replication<-list(On=On,Repeats=Repeats,Keep=Keep,RepAlpha=RepAlpha,
+                    PowerOn=PowerOn,Power=Power,Tails=Tails,PowerPrior=PowerPrior,
                     forceSigOriginal=forceSigOriginal,
-                    BudgetType=BudgetType,Budget=Budget,
-                    Correction=Correction,
-                    VarAlpha=VarAlpha,AlphaChange=AlphaChange)
+                    BudgetType=BudgetType,Budget=Budget
+                    )
 }
 
 #' make a design

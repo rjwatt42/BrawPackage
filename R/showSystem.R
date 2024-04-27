@@ -13,7 +13,7 @@
 #' @export
 showSystem<-function(hypothesis=braw.def$hypothesis,design=braw.def$design) {
   g<-showHypothesis(hypothesis=hypothesis,doWorld=TRUE)
-  g<-showDesign(design=design,plotArea=c(0.5,0.25,0.5,0.5),g)
+  g<-showDesign(design=design,hypothesis=hypothesis,plotArea=c(0.5,0.25,0.5,0.5),g)
   g<-g+geom_vline(xintercept=0.5,linetype="dotted")
   return(g)
 }
@@ -117,7 +117,7 @@ showWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),g=NULL) {
 #' @examples
 #' showDesign(design=makeDesign())
 #' @export
-showDesign<-function(design=braw.def$design,plotArea=c(0,0,1,1),g=NULL) {
+showDesign<-function(design=braw.def$design,hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),g=NULL) {
   nRange<-showAxis("n")
   binRange<-nRange$lim
   
@@ -146,6 +146,20 @@ showDesign<-function(design=braw.def$design,plotArea=c(0,0,1,1),g=NULL) {
   g<-g+dataPolygon(data=pts,fill=braw.env$plotColours$descriptionC)
   g<-g+dataLine(data=pts)
 
+  if (design$Replication$On) {
+    if (!hypothesis$effect$world$worldOn) {
+      hypothesis$effect$world$worldOn<-TRUE
+      hypothesis$effect$world$populationPDF<-"Single"
+      hypothesis$effect$world$populationPDFk<-hypothesis$effect$rIV
+      hypothesis$effect$world$populationRZ<-"r"
+      hypothesis$effect$world$populationNullp<-0
+    }
+    nRepDens<-fullRSamplingDist(nbin,hypothesis$effect$world,design,"wn",logScale=(braw.env$nPlotScale=="log10"),sigOnly=FALSE)
+    y<-c(0,nRepDens,0)/max(nRepDens)*0.4
+    pts=data.frame(x=log10(x),y=y)
+    g<-g+dataPolygon(data=pts,fill=braw.env$plotColours$descriptionC,alpha=0.5)
+    g<-g+dataLine(data=pts)
+  }
   return(g)
 }
 

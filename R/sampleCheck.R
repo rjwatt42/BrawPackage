@@ -130,7 +130,6 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
   ResultHistory<-list(n=res$nval,df1=res$df1,r=res$rIV,rp=res$rpIV,p=res$pIV)
   
   if (Replication$On && Replication$Repeats>0) {
-    # if (Replication$VarAlpha) braw.env$alphaSig<-oldalpha*Replication$AlphaChange
     # are we asked to start with a significant first result?
     while (Replication$forceSigOriginal && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
       if (!evidence$shortHand) {
@@ -143,7 +142,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
       ResultHistory<-list(n=res$nval,df1=res$df1,r=res$rIV,rp=res$rpIV,p=res$pIV)
     }
     
-    if (Replication$VarAlpha) braw.env$alphaSig<-(oldalpha*Replication$AlphaChange)
+    braw.env$alphaSig<-Replication$RepAlpha
     resPrevious<-res
     
     # now we freeze the population effect size
@@ -163,7 +162,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
       }
       # get the relevant sample effect size for the power calc
       if (Replication$PowerOn && (Replication$Power>0)) {
-        switch(Replication$Correction,
+        switch(Replication$PowerPrior,
                "None"={r<-res$rIV},
                "World"={r<-rSamp2Pop(res$rIV,res$nval,hypothesis$effect$world)},
                "Prior"={r<-rSamp2Pop(res$rIV,res$nval,evidence$prior)}

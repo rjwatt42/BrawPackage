@@ -14,7 +14,7 @@ makeReplication(
   ReplSigOnly = FALSE,
   ReplBudgetType = "Fixed",
   ReplBudget = 1000,
-  ReplCorrection = "None",
+  ReplPowerPrior = "None",
   ReplVarAlpha = FALSE,
   ReplAlphaChange = 2
 )
@@ -24,7 +24,7 @@ makeReplication(
 
 \item{ReplBudgetType}{"Fixed", "Budget"}
 
-\item{ReplCorrection}{"None", "World", "Prior"}
+\item{ReplPowerPrior}{"None", "World", "Prior"}
 }
 \value{
 a replication object
@@ -37,7 +37,7 @@ makeReplication(ReplicationOn=FALSE,ReplRepeats=1,ReplKeep="last",
                 ReplPowerOn=TRUE,ReplPower=0.8,ReplTails=2,
                 ReplSigOnly="No",
                 ReplBudgetType="Fixed",ReplBudget=1000,
-                ReplCorrection="None",
+                ReplPowerPrior="None",
                 ReplVarAlpha=FALSE,ReplAlphaChange=2
                 )
 }
