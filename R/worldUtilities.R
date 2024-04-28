@@ -143,11 +143,20 @@ getNDist<-function(design,world=NULL,logScale=FALSE,sigOnly=FALSE,HQ=FALSE) {
   list(nvals=nvals,ndens=ng,ndensSig=nsig)
 }
 
-getNList<-function(design,HQ=FALSE) {
-  if (!design$sNRand) {
-    return(list(nvals=design$sN,ndens=1,ndensSig=1))
+getNList<-function(design,world,HQ=FALSE) {
+  if (design$Replication$On) {
+    if (HQ) npt<-101 else npt=21
+    nmax<-5
+    nvals<-braw.env$minN+seq(0,nmax*design$sN,length.out=npt)
+    design$Replication$On<-FALSE
+    ndens<-fullRSamplingDist(nvals,world=world,design=design,"wn",logScale=FALSE,sigOnly=FALSE)
+    return(list(nvals=nvals,ndens=ndens,ndensSig=ndens))
+  } else {
+    if (!design$sNRand) {
+      return(list(nvals=design$sN,ndens=1,ndensSig=1))
+    }
+    return(getNDist(design,world=NULL,logScale=FALSE,sigOnly=FALSE,HQ=HQ))
   }
-  return(getNDist(design,world=NULL,logScale=FALSE,sigOnly=FALSE,HQ=HQ))
 }
 
 rPopulationDist<-function(rvals,world) {
@@ -215,7 +224,7 @@ fullPSig<-function(world,design,HQ=FALSE,alpha=braw.env$alphaSig) {
   }
   
   # distribution of sample sizes
-  ndist<-getNList(design,HQ=HQ)
+  ndist<-getNList(design,world,HQ=HQ)
   nvals<-ndist$nvals
   ndens<-ndist$ndens
   if (length(nvals)>1) ndens<-ndens*c(diff(nvals),0)
@@ -254,7 +263,7 @@ fullRSamplingDist<-function(vals,world,design,doStat="r",logScale=FALSE,sigOnly=
   }
   
   # distribution of sample sizes
-  ndist<-getNList(design,HQ=HQ)
+  ndist<-getNList(design,world,HQ=HQ)
   nvals<-ndist$nvals
   ndens<-ndist$ndens
   if (length(nvals)>1) ndens<-ndens*c(diff(nvals),0)

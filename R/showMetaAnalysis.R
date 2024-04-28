@@ -28,23 +28,24 @@ worldLabel<-function(metaResult,whichMeta=NULL) {
 #' 
 #' @return ggplot2 object - and printed
 #' @examples
-#' showSingleMeta(metaResult=doMetaAnalysis(1,makeMetaAnalysis(500)),showTheory=FALSE)
+#' showSingleMeta(metaResult=doMetaAnalysis(1),showTheory=FALSE)
 #' @export
-showSingleMeta<-function(metaResult=doMetaAnalysis(1,makeMetaAnalysis(500)),showTheory=FALSE) {
-
+showSingleMeta<-function(metaResult=braw.res$metaAnalysis,showTheory=FALSE) {
+  if (is.null(metaResult)) metaResult<-doMetaAnalysis(1)
+  
   metaAnalysis<-metaResult$metaAnalysis
   hypothesis<-metaResult$hypothesis
   design<-metaResult$design
   
   d1<-metaResult$result$rIV
   d1n<-(metaResult$result$rpIV==0)
-  x<-showAxis("r",hypothesis$effect)
+  x<-plotAxis("r",hypothesis$effect)
   xlim<-x$lim
   disp1<-x$label
   if (all(d1>=0)) xlim[1]<-0
   
   d2<-metaResult$result$nval
-  y<-showAxis("n",hypothesis$effect)
+  y<-plotAxis("n",hypothesis$effect)
   disp2<-y$label
   ylim<-y$lim
   
@@ -81,9 +82,9 @@ showSingleMeta<-function(metaResult=doMetaAnalysis(1,makeMetaAnalysis(500)),show
   g<-g+xAxisLabel(disp1)+xAxisTicks(x$ticks)+yAxisLabel(disp2)+yAxisTicks(y$ticks)
   
   lb<-worldLabel(metaResult)
-  # pts_lb<-data.frame(x=mean(xlim),y=ylim[2]-diff(ylim)*0.1)
-  # g<-g+dataLabel(data=pts_lb,label=lb, hjust=0.5,colour="black",fill=braw.env$plotColours$descriptionC)
-  g<-g+plotTitle(lb,"left",size=1)
+  pts_lb<-data.frame(x=mean(xlim),y=ylim[2]-diff(ylim)*0.2)
+  g<-g+dataLabel(data=pts_lb,label=lb, hjust=0.5,colour="black",fill=braw.env$plotColours$descriptionC,parser=FALSE)
+  # g<-g+plotTitle(lb,"left",size=1)
   
   return(g)
   
@@ -93,16 +94,23 @@ showSingleMeta<-function(metaResult=doMetaAnalysis(1,makeMetaAnalysis(500)),show
 #' 
 #' @return ggplot2 object - and printed
 #' @examples
-#' showMetaAnalysis<-function(metaResult=doMetaAnalysis(),showType="n-k")
+#' showMultipleMeta<-function(metaResult=doMetaAnalysis(),showType="n-k")
 #' @export
-showMetaAnalysis<-function(metaResult=doMetaAnalysis(),showType="n-k") {
+showMultipleMeta<-function(metaResult=braw.res$metaAnalysis,showType="n-k") {
+  if (is.null(metaResult)) metaResult<-doMetaAnalysis()
+
   g<-ggplot()+braw.env$plotRect
-  braw.env$plotArea<-c(0,0,0.48,1)
-  g<-drawMeta(metaResult=doMetaAnalysis(),whichMeta="Single",showType=showType,g)
-  braw.env$plotArea<-c(0.39,0,0.36,1)
-  g<-drawMeta(metaResult=doMetaAnalysis(),whichMeta="Gauss",showType=showType,g)
-  assign("plotArea",c(0.66,0,0.36,1),braw.env)
-  g<-drawMeta(metaResult=doMetaAnalysis(),whichMeta="Exp",showType=showType,g)
+  if (showType=="S-S") {
+    braw.env$plotArea<-c(0,0,1,1)
+    g<-drawMeta(metaResult=metaResult,showType=showType,g=g)
+  } else {
+    braw.env$plotArea<-c(0,0,0.48,1)
+    g<-drawMeta(metaResult=metaResult,whichMeta="Single",showType=showType,g)
+    braw.env$plotArea<-c(0.39,0,0.36,1)
+    g<-drawMeta(metaResult=metaResult,whichMeta="Gauss",showType=showType,g)
+    assign("plotArea",c(0.66,0,0.36,1),braw.env)
+    g<-drawMeta(metaResult=metaResult,whichMeta="Exp",showType=showType,g)
+  }
   print(g)
 }
 
@@ -117,8 +125,21 @@ drawMeta<-function(metaResult=doMetaAnalysis(),whichMeta="Single",showType="n-k"
   
   xlim<-c(-1,1)
   xticks<-seq(-1,1,0.5)
-  switch (whichMeta,
-          "Single"={
+  if (showType=="S-S") {
+    use<-order(c(n1,n2,n3))
+    use1<-c("Single","Gauss","Exp")[use[2]]
+    use2<-c("Single","Gauss","Exp")[use[3]]
+    metaX<-metaResult[[tolower(use1)]]
+    metaY<-metaResult[[tolower(use2)]]
+    x<-metaX$Smax
+    yS<-metaY$Smax
+    y1<-yS
+    xlim<-c(min(x),max(x))
+    xlim<-xlim+c(-1,1)*diff(xlim)/10
+    xticks<-c()
+  } else {
+    switch (whichMeta,
+            "Single"={
               x<-metaResult$single$Kmax
               yS<-metaResult$single$Smax
               y1<-metaResult$single$Nullmax
@@ -132,16 +153,9 @@ drawMeta<-function(metaResult=doMetaAnalysis(),whichMeta="Single",showType="n-k"
               x<-metaResult$exp$Kmax
               yS<-metaResult$exp$Smax
               y1<-metaResult$exp$Nullmax
-            },
-            "S-S"={
-              x<-metaResult$gauss$Smax
-              yS<-metaResult$exp$Smax
-              y1<-yS
-              xlim<-c(min(x),max(x))
-              xlim<-xlim+c(-1,1)*diff(xlim)/10
-              xticks<-c()
             }
     )
+  }
     keep<- !is.na(x) & !is.na(yS)
     best<-metaResult$bestS[keep]
     yS<-yS[keep]
@@ -168,10 +182,10 @@ drawMeta<-function(metaResult=doMetaAnalysis(),whichMeta="Single",showType="n-k"
             "S-S"={
               y<-yS
               xlim<-c(min(sAll,na.rm=TRUE),max(sAll,na.rm=TRUE))+c(-1,1)*(max(sAll,na.rm=TRUE)-min(sAll,na.rm=TRUE))/4
-              xlabel<-"log(lk Gauss)"
+              xlabel<-paste0("log(lk ",use1,")")
               ylim<-xlim
-              ylabel<-"log(lk Exp)"
-              useBest<- (y>x & metaResult$effect$world$populationPDF=="Exp") | (y<x & metaResult$effect$world$populationPDF=="Gauss")
+              ylabel<-paste0("log(lk ",use2,")")
+              useBest<- (y>x & metaResult$hypothesis$effect$world$populationPDF==use2) | (y<x & metaResult$hypothesis$effect$world$populationPDF==use1)
             }
     )
     pts<-data.frame(x=x,y=y)
@@ -199,41 +213,41 @@ drawMeta<-function(metaResult=doMetaAnalysis(),whichMeta="Single",showType="n-k"
         vj<-1
         }
     if (showType=="S-S") {
-      fullText<-paste0("Exp","(",format(mean(metaResult$exp$Kmax),digits=3),"\u00B1",format(std(metaResult$exp$Kmax),digits=2),")")
+      fullText<-paste0(use2,"(",format(mean(metaY$Kmax),digits=3),"\u00B1",format(std(metaY$Kmax),digits=2),")")
       if (metaAnalysis$includeNulls) {
-        fullText<-paste0(fullText,"\nnull=",format(mean(metaResult$exp$Nullmax),digits=3),"\u00B1",format(std(metaResult$exp$Nullmax),digits=2))
+        fullText<-paste0(fullText,"\nnull=",format(mean(metaY$Nullmax),digits=3),"\u00B1",format(std(metaY$Nullmax),digits=2))
       }
-      fullText<-paste0(fullText,"\nS= ",format(mean(metaResult$exp$Smax),digits=2),"\u00B1",format(std(metaResult$exp$Smax),digits=2)," (",format(sum(y>x)),"/",length(metaResult$bestDist),")")
-      pts_lb<-data.frame(x=xlim[1], y=ylim[2], lb=fullText)
+      fullText<-paste0(fullText,"\nS= ",format(mean(metaY$Smax),digits=2),"\u00B1",format(std(metaY$Smax),digits=2)," (",format(sum(y>x)),"/",length(metaResult$bestDist),")")
+      pts_lb<-data.frame(x=xlim[1], y=ylim[2])
       if (mean(y>x)) {
-      g<-g+geom_label(data=pts_lb,aes(x=x,y=y,label=lb),hjust=0,vjust=1,size=labelSize,fill="yellow")
+      g<-g+dataLabel(data=pts_lb,label=fullText,hjust=0,vjust=1,fill="yellow",parser=FALSE)
       } else {
-        g<-g+geom_label(data=pts_lb,aes(x=x,y=y,label=lb),hjust=0,vjust=1,size=labelSize,fill="grey")
+        g<-g+dataLabel(data=pts_lb,label=fullText,hjust=0,vjust=1,fill="grey",parser=FALSE)
       }
-      fullText<-paste0("Gauss","(",format(metaResult$gauss$Kmax,digits=3),"\u00B1",format(std(metaResult$gauss$Kmax),digits=2),")")
+      fullText<-paste0(use1,"(",format(mean(metaX$Kmax),digits=3),"\u00B1",format(std(metaX$Kmax),digits=2),")")
       if (metaAnalysis$includeNulls) {
-        fullText<-paste0(fullText,"\nnull=",format(mean(metaResult$gauss$Nullmax),digits=3),"\u00B1",format(std(metaResult$gauss$Nullmax),digits=2))
+        fullText<-paste0(fullText,"\nnull=",format(mean(metaX$Nullmax),digits=3),"\u00B1",format(std(metaX$Nullmax),digits=2))
       }
-      fullText<-paste0(fullText,"\nS= ",format(mean(metaResult$gauss$Smax),digits=2),"\u00B1",format(std(metaResult$gauss$Smax),digits=2)," (",format(sum(x>y)),"/",length(metaResult$bestDist),")")
-      pts_lb<-data.frame(x=xlim[2], y=ylim[1], lb=fullText)
+      fullText<-paste0(fullText,"\nS= ",format(mean(metaX$Smax),digits=2),"\u00B1",format(std(metaX$Smax),digits=2)," (",format(sum(x>y)),"/",length(metaResult$bestDist),")")
+      pts_lb<-data.frame(x=xlim[2], y=ylim[1])
       if (mean(y>x)) {
-        g<-g+geom_label(data=pts_lb,aes(x=x,y=y,label=lb),hjust=1,vjust=0,size=labelSize,fill="grey")
+        g<-g+dataLabel(data=pts_lb,label=fullText,hjust=1,vjust=0,fill="grey",parser=FALSE)
       } else {
-        g<-g+geom_label(data=pts_lb,aes(x=x,y=y,label=lb),hjust=1,vjust=0,size=labelSize,fill="yellow")
+        g<-g+dataLabel(data=pts_lb,label=fullText,hjust=1,vjust=0,fill="yellow",parser=FALSE)
       }
     } else {
       
       lb<-worldLabel(metaResult,whichMeta)
-      pts_lb<-data.frame(x=mean(x), y=yp)
+      pts_lb<-data.frame(x=min(xlim), y=max(ylim))
       
       use<-which.max(c(n1,n2,n3))
       bestD<-c("Single","Gauss","Exp")[use]
-      g<-g+plotTitle(lb,"left",size=1)
-      # if (whichMeta==bestD) {
-        # g<-g+dataLabel(data=pts_lb,lb,hjust=0.5,vjust=vj,fill="yellow")
-      # } else {
-      #   g<-g+dataLabel(data=pts_lb,lb,hjust=0.5,vjust=vj,fill="grey")
-      # }
+      # g<-g+dataLabel(lb,"left",size=1)
+      if (whichMeta==bestD) {
+        g<-g+dataLabel(data=pts_lb,lb,hjust=0,vjust=0,fill="yellow",parser=FALSE)
+      } else {
+        g<-g+dataLabel(data=pts_lb,lb,hjust=0,vjust=0,fill="grey",parser=FALSE)
+      }
     }
     return(g)
 
@@ -286,6 +300,10 @@ makeWorldDist<-function(design,world,x,y,sigOnly=FALSE) {
 
 drawWorld<-function(hypothesis,design,metaResult,g,colour="white",showTheory=FALSE) {
   world<-hypothesis$effect$world
+  if (!world$worldOn) {
+    world<-makeWorld(worldOn=TRUE,populationPDF="Single",populationRZ="r",
+                     populationPDFk=hypothesis$effect$rIV,populationNullp=0)
+  }
   
   x<-seq(-1,1,length.out=101)*braw.env$r_range
   y<-seq(5,braw.env$maxN,length.out=101)
@@ -315,8 +333,8 @@ drawWorld<-function(hypothesis,design,metaResult,g,colour="white",showTheory=FAL
   # white is the actual world
   # black is the best fit world
   if (showTheory) {
-    g<-g+dataContour(data=ptsa,colour="white")
+    g<-g+dataContour(data=ptsa,colour="white",linetype="dotted")
   }
-  g<-g+dataContour(data=ptsb)
+  g<-g+dataContour(data=ptsb,colour=colour,linewidth=0.5)
   return(g)
 }

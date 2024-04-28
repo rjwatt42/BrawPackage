@@ -76,8 +76,8 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
   nvals<-analysis$nval
   df1vals<-analysis$df1
 
-  xaxis<-showAxis(disp1,analysis$hypothesis$effect)
-  yaxis<-showAxis(disp2,analysis$hypothesis$effect)
+  xaxis<-plotAxis(disp1,analysis$hypothesis$effect)
+  yaxis<-plotAxis(disp2,analysis$hypothesis$effect)
   switch (disp1,
           "r"={
             d1<-analysis$rIV

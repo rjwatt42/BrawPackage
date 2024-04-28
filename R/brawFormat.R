@@ -13,7 +13,8 @@ brawFormat<-function(numbers,digits=braw.env$report_precision) {
   }
   change<-numbers<0
   if (any(change)) r[change]<-unname(sapply(r[change],pad))
-  change<-numbers!=0 && numbers!=round(numbers)
+  
+  change<- r!="0" && numbers!=round(numbers,digits)
   if (any(change)) r[change]<-unname(sapply(r[change],trim))
   r
 }

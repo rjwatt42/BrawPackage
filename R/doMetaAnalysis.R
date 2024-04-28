@@ -21,6 +21,8 @@ doMetaAnalysis<-function(nsims=100,metaAnalysis=makeMetaAnalysis(),
   }
   metaResult$hypothesis<-hypothesis
   metaResult$design<-design
+  setBrawRes("metaAnalysis",metaResult)
+  
   metaResult
 }
 

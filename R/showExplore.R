@@ -93,7 +93,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="r",showTheory=FAL
     doLine=TRUE
   }
   
-  yaxis<-showAxis(showType,effect)
+  yaxis<-plotAxis(showType,effect)
   ylim<-yaxis$lim
   ylabel<-yaxis$label
   ycols<-yaxis$cols

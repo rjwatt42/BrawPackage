@@ -1,4 +1,4 @@
-showAxis<-function(showType,effect) {
+plotAxis<-function(showType,effect) {
   
   logScale<-(is.element(showType,c("p","e1","e2")) && braw.env$pPlotScale=="log10") ||
     (is.element(showType,c("w","wp")) && braw.env$wPlotScale=="log10") ||
@@ -61,7 +61,7 @@ showAxis<-function(showType,effect) {
   )
   switch(braw.env$nPlotScale,
          "log10"={
-           nlim<-log10(c(5,1000))
+           nlim<-log10(c(5,2000))
            nticks<-seq(1,3,1)
            nmins<-log10(c(seq(5,10),seq(1,10)*10,seq(1,10)*100))
            nlabel<-bquote(bold(log['10'](n)))
@@ -149,7 +149,7 @@ showAxis<-function(showType,effect) {
             use_cols<-c(hsv(0.65,1,1),hsv(0.65+0.075,1,1),hsv(0.65+0.15,1,1))
           },
           "wn"={
-            ylim<-log10(c(5,1000))
+            ylim<-log10(c(5,2000))
             yticks<-seq(0,3,1)
             ylabel<-bquote(bold(log['10'](n[w=80])))
             logScale<-TRUE

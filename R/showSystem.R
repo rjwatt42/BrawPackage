@@ -13,7 +13,8 @@
 #' @export
 showSystem<-function(hypothesis=braw.def$hypothesis,design=braw.def$design) {
   g<-showHypothesis(hypothesis=hypothesis,doWorld=TRUE)
-  g<-showDesign(design=design,hypothesis=hypothesis,plotArea=c(0.5,0.25,0.5,0.5),g)
+  g<-showDesign(hypothesis=hypothesis,design=design,plotArea=c(0.525,0.55,0.45,0.45),g)
+  g<-showWorldSampling(hypothesis=hypothesis,design=design,sigOnly=FALSE,plotArea=c(0.525,0.0,0.45,0.45),g)
   g<-g+geom_vline(xintercept=0.5,linetype="dotted")
   return(g)
 }
@@ -118,7 +119,7 @@ showWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),g=NULL) {
 #' showDesign(design=makeDesign())
 #' @export
 showDesign<-function(design=braw.def$design,hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),g=NULL) {
-  nRange<-showAxis("n")
+  nRange<-plotAxis("n")
   binRange<-nRange$lim
   
   nbin<-seq(binRange[1],binRange[2],length.out=braw.env$worldNPoints)
@@ -157,7 +158,7 @@ showDesign<-function(design=braw.def$design,hypothesis=braw.def$hypothesis,plotA
     nRepDens<-fullRSamplingDist(nbin,hypothesis$effect$world,design,"wn",logScale=(braw.env$nPlotScale=="log10"),sigOnly=FALSE)
     y<-c(0,nRepDens,0)/max(nRepDens)*0.4
     pts=data.frame(x=log10(x),y=y)
-    g<-g+dataPolygon(data=pts,fill=braw.env$plotColours$descriptionC,alpha=0.5)
+    g<-g+dataPolygon(data=pts,fill=braw.env$plotColours$replicationC,alpha=0.5)
     g<-g+dataLine(data=pts)
   }
   return(g)
@@ -261,8 +262,14 @@ showPrediction <- function(hypothesis=braw.def$hypothesis,design=braw.def$design
 #' @examples
 #' showWorldSampling(hypothesis=makeHypothesis(),design=makeDesign(),sigOnly=FALSE)
 #' @export
-showWorldSampling<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,sigOnly=FALSE) {
+showWorldSampling<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,sigOnly=FALSE,plotArea=c(0,0,1,1),g=NULL) {
   world<-hypothesis$effect$world
+  if (!world$worldOn) 
+    world<-list(worldOn=TRUE,
+                populationPDF="Single",
+                populationPDFk=hypothesis$effect$rIV,
+                populationRZ="r",
+                populationNullp=0)
   
   np<-braw.env$worldNPoints
   # if (world$worldAbs) np<-braw.env$worldNPoints*2+1
@@ -272,12 +279,10 @@ showWorldSampling<-function(hypothesis=braw.def$hypothesis,design=braw.def$desig
     vals<-tanh(seq(-1,1,length=np*2)*braw.env$z_range*2)
   }
   
-  dens<-fullRSamplingDist(vals,world,design,sigOnly=sigOnly) 
-  # if (world$worldAbs) {
-  #   vals<-vals[braw.env$worldNPoints+(1:braw.env$worldNPoints)]
-  #   dens<-dens[braw.env$worldNPoints+(1:braw.env$worldNPoints)]
-  # }
+  design1<-design
+  design$Replication$On<-FALSE
   
+  dens<-fullRSamplingDist(vals,world,design,sigOnly=sigOnly) 
   if (braw.env$RZ=="z") {
     dens<-rdens2zdens(dens,vals)
     vals<-atanh(vals)
@@ -285,22 +290,39 @@ showWorldSampling<-function(hypothesis=braw.def$hypothesis,design=braw.def$desig
     dens<-dens[use]
     vals<-vals[use]
   }
-  dens<-dens/max(dens)
+  dens<-dens/sum(dens)
+  if (design1$Replication$On) {
+    dens1<-fullRSamplingDist(vals,world,design1,sigOnly=sigOnly) 
+    dens1<-dens1/sum(dens1)
+  } else dens1<-NA
+  gain<-max(max(dens),max(dens1),na.rm=TRUE)
+  dens<-dens/gain
+  dens1<-dens1/gain
   
   x<-c(vals[1],vals,vals[length(vals)])
   y<-c(0,dens,0)
   pts=data.frame(x=x,y=y)
   
-  braw.env$plotArea<-c(0,0,1,1)
-  g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
+  braw.env$plotArea<-plotArea
+  if (is.null(g))
+    g<-ggplot()+coord_cartesian(xlim = c(0,1)+c(-1,1)*0.1, ylim = c(0,1)+c(-1,1)*0.1) + braw.env$blankTheme()
+  
   g<-startPlot(xlim=c(-1,1), ylim=c(0,1.05),box="x",g=g)
   switch(braw.env$RZ,
          "r"={g<-g+xAxisLabel(braw.env$rsLabel)},
          "z"={g<-g+xAxisLabel(braw.env$zsLabel)}
   )
-  g<-g+xAxisTicks()
+  g<-g+xAxisTicks(seq(-1,1,0.5))
   g<-g+dataPolygon(data=pts,fill=braw.env$plotColours$descriptionC)
   g<-g+dataLine(data=pts)
+  
+  if (!is.na(dens1[1])) {
+    y<-c(0,dens1,0)
+    pts=data.frame(x=x,y=y)
+    g<-g+dataPolygon(data=pts,fill=braw.env$plotColours$replicationC,alpha=0.5)
+    g<-g+dataLine(data=pts)
+    
+  }
   return(g)
 }
 

@@ -12,9 +12,9 @@ drawVar<-function(pts,ticks,var,plotArea=c(0,0,1,1),g){
   g<-startPlot(xlim=c(min(pts$x),max(pts$x)),ylim=c(0,1),box="X",g=g)
   g<-g+xAxisLabel(bquote(bold(.(var$name))))
   g<-g+xAxisTicks(ticks$breaks,ticks$labels)
-  g<-g+dataPolygon(pts,fill=braw.env$plotColours$sampleC,colour=braw.env$plotColours$sampleC)
-  g<-g+dataLine(pts,colour="black",linewidth=0.5)
-  g<-g+dataLine(data.frame(x=braw.env$plotLimits$xlim,y=braw.env$plotLimits$ylim[1]),colour="black")
+  g<-g+dataPolygon(pts,fill=braw.env$plotColours$sampleC,colour=braw.env$plotColours$sampleC,linewidth=0.25)
+  g<-g+dataLine(pts,colour="black",linewidth=0.25)
+  g<-g+dataLine(data.frame(x=braw.env$plotLimits$xlim,y=braw.env$plotLimits$ylim[1]),colour="black",linewidth=0.25)
 }
 
 shrinkString<-function(s,n) {return(substr(s,1,n))}

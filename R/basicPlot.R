@@ -225,13 +225,14 @@ horzLine<-function(intercept=NULL,linetype="solid",colour="black",alpha=1,linewi
   data<-data.frame(x=braw.env$plotLimits$xlim,y=intercept)
   geom_line(data=reRangeXY(data),aes(x=x,y=y),linetype=linetype, color=colour, alpha=alpha, linewidth=linewidth)
 }
-dataLabel<-function(data,label, hjust=0, vjust=0, fill="white",colour="black") {
+dataLabel<-function(data,label, hjust=0, vjust=0, fill="white",colour="black",parser=TRUE) {
   mathlabel<-grepl("['^']{1}",label) | grepl("['[']{1}",label)
   if (any(mathlabel)) {
     label<-deparse(label)
+    parser<-TRUE
     voff<-1
   } else {
-    label<-deparse(bquote(.(label)))
+    if (parser) label<-deparse(bquote(.(label)))
     voff<-0
   }
   data<-reRangeXY(data)
@@ -240,7 +241,7 @@ dataLabel<-function(data,label, hjust=0, vjust=0, fill="white",colour="black") {
            geom_label(data=data,aes(x = x, y = y), label=label, 
                       hjust=hjust, vjust=vjust, nudge_y=voff,
                fill=fill,color=colour,
-               size=braw.env$labelSize*braw.env$plotLimits$fontScale,parse=TRUE),
+               size=braw.env$labelSize*braw.env$plotLimits$fontScale,parse=parser),
          "vert"=   
            geom_label(data=data,aes(x = x, y = y), label=label, 
                       hjust=vjust,vjust=hjust,  nudge_y=voff,
@@ -299,15 +300,15 @@ dataBar<-function(data,colour="black",fill="white",alpha=1,barwidth=0.85) {
   }
   return(output)
 }
-dataPolygon<-function(data,colour="black",fill="white",alpha=1) {
+dataPolygon<-function(data,colour="black",fill="white",alpha=1,linewidth=0.25) {
   data<-reRangeXY(data)
   if (!is.null(data$ids)) {
-    geom_polygon(data=data,aes(x=x,y=y,group=ids,alpha=alpha*value),colour = colour, fill = fill)
+    geom_polygon(data=data,aes(x=x,y=y,group=ids,alpha=alpha*value),colour = colour, fill = fill,linewidth=linewidth)
   } else {
     if (!is.null(data$fill)) {
-      geom_polygon(data=data,aes(x=x,y=y, fill = fill),colour = colour,alpha=alpha)
+      geom_polygon(data=data,aes(x=x,y=y, fill = fill),colour = colour,alpha=alpha,linewidth=linewidth)
     } else {
-      geom_polygon(data=data,aes(x=x,y=y),colour = colour, fill = fill,alpha=alpha)
+      geom_polygon(data=data,aes(x=x,y=y),colour = colour, fill = fill,alpha=alpha,linewidth=linewidth)
     }
   }
 }
@@ -358,9 +359,9 @@ dataLegend<-function(data,title="title",fontsize=3.5) {
   )
 }
 
-dataContour<-function(data,colour="black",breaks=c(0.1,0.3,0.5,0.7,0.9),lwd=0.25) {
+dataContour<-function(data,colour="black",breaks=c(0.1,0.3,0.5,0.7,0.9),linewidth=0.25,linetype="solid") {
   data<-reRangeXY(data)
-  geom_contour(data=data,aes(x=x,y=y,z=z),colour=colour,breaks=breaks,lwd=lwd)
+  geom_contour(data=data,aes(x=x,y=y,z=z),colour=colour,breaks=breaks,lwd=linewidth,lty=linetype)
 }
 
 darken <- function(col,gain=1,off=0) {

@@ -157,7 +157,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
     }
     
     for (i in 1:Replication$Repeats) {
-      if (Replication$Keep=="cautious" && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
+      if (Replication$Keep=="Cautious" && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
         break
       }
       # get the relevant sample effect size for the power calc
@@ -194,9 +194,9 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
       ResultHistory$p<-c(ResultHistory$p,res$pIV)
       
       # is this result "better" than the previous ones
-      if ((Replication$Keep=="largeN" && res$nval>resPrevious$nval) || 
-          (Replication$Keep=="smallP" && res$pIV<resPrevious$pIV) || 
-          Replication$Keep=="last")
+      if ((Replication$Keep=="LargeN" && res$nval>resPrevious$nval) || 
+          (Replication$Keep=="SmallP" && res$pIV<resPrevious$pIV) || 
+          Replication$Keep=="Last")
       { resPrevious<-res }
       
       if (Replication$BudgetType=="Fixed") {
@@ -206,7 +206,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
     }
     res<-resPrevious
 
-    if (Replication$Keep=="median") {
+    if (Replication$Keep=="Median") {
       use<-which(ResultHistory$p==sort(ResultHistory$p)[ceil(length(ResultHistory$p)/2)])
       use<-use[1]
         res$rIV<-ResultHistory$r[use]

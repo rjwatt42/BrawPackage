@@ -465,7 +465,7 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
          }
   )
   
-  yaxis<-showAxis(showType,effect)
+  yaxis<-plotAxis(showType,effect)
   ylim<-yaxis$lim
   ylabel<-yaxis$label
   ylines<-yaxis$lines
