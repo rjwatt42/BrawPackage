@@ -134,8 +134,6 @@ drawMeta<-function(metaResult=doMetaAnalysis(),whichMeta="Single",showType="n-k"
     x<-metaX$Smax
     yS<-metaY$Smax
     y1<-yS
-    xlim<-c(min(x),max(x))
-    xlim<-xlim+c(-1,1)*diff(xlim)/10
     xticks<-c()
   } else {
     switch (whichMeta,
@@ -181,7 +179,9 @@ drawMeta<-function(metaResult=doMetaAnalysis(),whichMeta="Single",showType="n-k"
             },
             "S-S"={
               y<-yS
-              xlim<-c(min(sAll,na.rm=TRUE),max(sAll,na.rm=TRUE))+c(-1,1)*(max(sAll,na.rm=TRUE)-min(sAll,na.rm=TRUE))/4
+              xlim<-c(min(sAll,na.rm=TRUE),max(sAll,na.rm=TRUE))
+              if (length(x)==1) xlim<-xlim+c(-1,1)
+              else xlim=xlim+c(-1,1)*(max(sAll,na.rm=TRUE)-min(sAll,na.rm=TRUE))/4
               xlabel<-paste0("log(lk ",use1,")")
               ylim<-xlim
               ylabel<-paste0("log(lk ",use2,")")
@@ -213,22 +213,35 @@ drawMeta<-function(metaResult=doMetaAnalysis(),whichMeta="Single",showType="n-k"
         vj<-1
         }
     if (showType=="S-S") {
-      fullText<-paste0(use2,"(",format(mean(metaY$Kmax),digits=3),"\u00B1",format(std(metaY$Kmax),digits=2),")")
+      fullText<-paste0(use2,"(",format(mean(metaY$Kmax),digits=3))
+      if (length(metaY$Kmax)>1) fullText<-paste0(fullText,"\u00B1",format(std(metaY$Kmax),digits=2),")")
+      else fullText<-paste0(fullText,")")
       if (metaAnalysis$includeNulls) {
-        fullText<-paste0(fullText,"\nnull=",format(mean(metaY$Nullmax),digits=3),"\u00B1",format(std(metaY$Nullmax),digits=2))
+        fullText<-paste0(fullText,"\nnull=",format(mean(metaY$Nullmax),digits=3))
+        if (length(metaY$Nullmax)>1) fullText<-paste0(fullText,"\u00B1",format(std(metaY$Nullmax),digits=2),")")
       }
-      fullText<-paste0(fullText,"\nS= ",format(mean(metaY$Smax),digits=2),"\u00B1",format(std(metaY$Smax),digits=2)," (",format(sum(y>x)),"/",length(metaResult$bestDist),")")
+      fullText<-paste0(fullText,"\nS= ",format(mean(metaY$Smax),digits=2))
+      if (length(metaY$Smax)>1) fullText<-paste0(fullText,"\u00B1",format(std(metaY$Smax),digits=2),")")
+      fullText<-paste0(fullText," (",format(sum(y>x)),"/",length(metaResult$bestDist),")")
+      
       pts_lb<-data.frame(x=xlim[1], y=ylim[2])
       if (mean(y>x)) {
       g<-g+dataLabel(data=pts_lb,label=fullText,hjust=0,vjust=1,fill="yellow",parser=FALSE)
       } else {
         g<-g+dataLabel(data=pts_lb,label=fullText,hjust=0,vjust=1,fill="grey",parser=FALSE)
       }
-      fullText<-paste0(use1,"(",format(mean(metaX$Kmax),digits=3),"\u00B1",format(std(metaX$Kmax),digits=2),")")
+      
+      fullText<-paste0(use1,"(",format(mean(metaX$Kmax),digits=3))
+      if (length(metaX$Kmax)>1) fullText<-paste0(fullText,"\u00B1",format(std(metaX$Kmax),digits=2),")")
+      else fullText<-paste0(fullText,")")
       if (metaAnalysis$includeNulls) {
-        fullText<-paste0(fullText,"\nnull=",format(mean(metaX$Nullmax),digits=3),"\u00B1",format(std(metaX$Nullmax),digits=2))
+        fullText<-paste0(fullText,"\nnull=",format(mean(metaX$Nullmax),digits=3))
+        if (length(metaX$Nullmax)>1) fullText<-paste0(fullText,"\u00B1",format(std(metaX$Nullmax),digits=2),")")
       }
-      fullText<-paste0(fullText,"\nS= ",format(mean(metaX$Smax),digits=2),"\u00B1",format(std(metaX$Smax),digits=2)," (",format(sum(x>y)),"/",length(metaResult$bestDist),")")
+      fullText<-paste0(fullText,"\nS= ",format(mean(metaX$Smax),digits=2))
+      if (length(metaX$Smax)>1) fullText<-paste0(fullText,"\u00B1",format(std(metaX$Smax),digits=2),")")
+      fullText<-paste0(fullText," (",format(sum(x>y)),"/",length(metaResult$bestDist),")")
+      
       pts_lb<-data.frame(x=xlim[2], y=ylim[1])
       if (mean(y>x)) {
         g<-g+dataLabel(data=pts_lb,label=fullText,hjust=1,vjust=0,fill="grey",parser=FALSE)

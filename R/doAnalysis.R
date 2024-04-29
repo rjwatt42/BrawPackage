@@ -879,7 +879,7 @@ runSimulation<-function(hypothesis,design,evidence,sig_only=FALSE,onlyAnalysis=F
     res<-doAnalysis(oldResult,evidence,autoShow=FALSE)
     return(res)
   }
-  
+
   ntrials<-0
   p_min<-1
   while (1==1) {

@@ -23,7 +23,7 @@ makeWorld<-function(worldOn=FALSE,populationPDF="Single",populationRZ="r",
 # PREDICTION & DESIGN & EVIDENCE
 #' make an effect object
 #' 
-#' @param ResidDistr   "normal","skewed","uniform","Cauchy","t(3)"
+#' @param ResidDistr   "normal","skewed","uniform","cauchy","t(3)"
 #' @returns an effect object
 #' @examples
 #' makeEffect(rIV=0.3,rIV2=0,rIVIV2=0,rIVIV2DV=0,Heteroscedasticity=0,
