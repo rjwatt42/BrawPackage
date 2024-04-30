@@ -29,7 +29,7 @@ showExpected<-function(expectedResult=braw.res$expected,showType="Basic",
       }
     }
     
-    if (!expectedResult$hypothesis$effect$world$worldOn) {
+    if (!expectedResult$hypothesis$effect$world$worldOn && !all(is.na(expectedResult$nullresult$rIV))) {
       fullResult<-mergeExpected(expectedResult$result,expectedResult$nullresult)
     } else fullResult<-expectedResult$result
     # switch (showType,
