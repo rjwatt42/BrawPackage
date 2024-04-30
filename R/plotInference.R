@@ -103,6 +103,10 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
             d1<-analysis$nval
             if (braw.env$nPlotScale=="log10") d1<-log10(d1)
           },
+          "no"={
+            d1<-analysis$noval
+            if (braw.env$nPlotScale=="log10") d1<-log10(d1)
+          },
           "log(lrs)"=d1<-res2llr(analysis,"sLLR"),
           "log(lrd)"=d1<-res2llr(analysis,"dLLR"),
           "w"={
@@ -141,6 +145,10 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
           },
           "n"={
             d2<-analysis$nval
+            if (braw.env$nPlotScale=="log10") d2<-log10(d2)
+          },
+          "no"={
+            d2<-analysis$noval
             if (braw.env$nPlotScale=="log10") d2<-log10(d2)
           },
           "log(lrs)"=d2<-res2llr(analysis,"sLLR"),
@@ -196,11 +204,11 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
     pts2=pts[!use,]
     g<-g+dataPoint(data=pts2,shape=braw.env$plotShapes$study, colour = "black", fill = c1, size = dotSize)
   } else {
-      use<-!isSignificant(braw.env$STMethod,pvals,rvals,nvals,df1vals,analysis$evidence)
-      pts1=pts[use,]
-      g<-g+dataPoint(data=pts1,shape=braw.env$plotShapes$study, colour = c2, fill = c2, size = dotSize/4)
-      pts2=pts[!use,]
-      g<-g+dataPoint(data=pts2,shape=braw.env$plotShapes$study, colour = c1, fill = c1, size = dotSize/4)
+    use<-!isSignificant(braw.env$STMethod,pvals,rvals,nvals,df1vals,analysis$evidence)
+    pts1=pts[use,]
+    g<-g+dataPoint(data=pts1,shape=braw.env$plotShapes$study, colour = c2, fill = c2, size = dotSize/4)
+    pts2=pts[!use,]
+    g<-g+dataPoint(data=pts2,shape=braw.env$plotShapes$study, colour = c1, fill = c1, size = dotSize/4)
   }
   return(g)
 }

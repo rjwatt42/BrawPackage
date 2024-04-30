@@ -9,6 +9,7 @@ mergeExpected<-function(r1,r2) {
     roIV=rbind(r1$roIV,r2$roIV),
     poIV=rbind(r1$poIV,r2$poIV),
     nval=rbind(r1$nval,r2$nval),
+    noval=rbind(r1$noval,r2$noval),
     df1=rbind(r1$df1,r2$df1)
   )
   if (!is.null(r1$rIV2)) {
@@ -40,7 +41,7 @@ resetExpected<-function(nsims=0,expectedResult=NULL){
     bm<-NA
   }
   newResult<-list(
-    rIV=b,pIV=b,rpIV=b,roIV=b,poIV=b,nval=b,df1=b
+    rIV=b,pIV=b,rpIV=b,roIV=b,poIV=b,nval=b,noval=b,df1=b
   )
   newResult<-c(newResult,list(
     rIV2=b,pIV2=b,rIVIV2DV=b,pIVIV2DV=b,

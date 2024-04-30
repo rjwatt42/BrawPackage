@@ -143,8 +143,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
     }
     
     braw.env$alphaSig<-Replication$RepAlpha
-    resPrevious<-res
-    
+        
     # now we freeze the population effect size
     hypothesis$effect$rIV<-res$rpIV
     hypothesis$effect$world$worldOn<-FALSE
@@ -193,32 +192,50 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
       ResultHistory$rp<-c(ResultHistory$rp,res$rpIV)
       ResultHistory$p<-c(ResultHistory$p,res$pIV)
       
-      # is this result "better" than the previous ones
-      if ((Replication$Keep=="LargeN" && res$nval>resPrevious$nval) || 
-          (Replication$Keep=="SmallP" && res$pIV<resPrevious$pIV) || 
-          Replication$Keep=="Last")
-      { resPrevious<-res }
-      
       if (Replication$BudgetType=="Fixed") {
         budgetUse<-budgetUse+res$nval
         if (budgetUse>=Replication$Budget) break;
       }
     }
-    res<-resPrevious
-
-    if (Replication$Keep=="Median") {
-      use<-which(ResultHistory$p==sort(ResultHistory$p)[ceil(length(ResultHistory$p)/2)])
-      use<-use[1]
-        res$rIV<-ResultHistory$r[use]
-        res$nval<-ResultHistory$n[use]
-        res$df1<-ResultHistory$df1[use]
-        res$pIV<-ResultHistory$p[use]
-    }
+    # is this result "better" than the previous ones
+    if ((Replication$Keep=="LargeN" && res$nval>resPrevious$nval) || 
+        (Replication$Keep=="SmallP" && res$pIV<resPrevious$pIV) || 
+        Replication$Keep=="Last")
+    { resPrevious<-res }
+    
+    
+    switch(Replication$Keep,
+           "Median"={
+             use<-which(ResultHistory$p==sort(ResultHistory$p)[ceil(length(ResultHistory$p)/2)])
+             use<-use[1]
+           },
+           "LargeN"={
+             use<-which.max(ResultHistory$n)
+           },
+           "SmallP"={
+             use<-which.min(ResultHistory$p)
+           },
+           "Last"={
+             use<-length(ResultHistory$p)
+           },
+           "Cautious"={
+             sigs<-isSignificant(braw.env$STMethod,ResultHistory$p,ResultHistory$r,ResultHistory$n,ResultHistory$df1,evidence)
+             if (!any(!sigs)) use<-length(ResultHistory$p)
+             else            {
+               use<-which(!sigs)
+               use<-use[1]
+             }
+           }
+    )
+    res$rIV<-ResultHistory$r[use]
+    res$nval<-ResultHistory$n[use]
+    res$df1<-ResultHistory$df1[use]
+    res$pIV<-ResultHistory$p[use]
   }
-
+  
   res$ResultHistory<-ResultHistory
   res$roIV<-resOriginal$rIV
-  res$no<-resOriginal$nval
+  res$noval<-resOriginal$nval
   res$df1o<-resOriginal$df1
   res$poIV<-resOriginal$pIV
   res

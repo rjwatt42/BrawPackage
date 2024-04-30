@@ -2,7 +2,7 @@ plotAxis<-function(showType,effect) {
   
   logScale<-(is.element(showType,c("p","e1","e2")) && braw.env$pPlotScale=="log10") ||
     (is.element(showType,c("w","wp")) && braw.env$wPlotScale=="log10") ||
-    (is.element(showType,c("n")) && braw.env$nPlotScale=="log10") ||
+    (is.element(showType,c("n","no")) && braw.env$nPlotScale=="log10") ||
     (is.element(showType,c("wn")))
   
   switch(braw.env$RZ,
@@ -159,6 +159,12 @@ plotAxis<-function(showType,effect) {
             yticks<-nticks
             ymins<-nmins
             ylabel<-nlabel
+          },
+          "no"={
+            ylim<-nlim
+            yticks<-nticks
+            ymins<-nmins
+            ylabel<-bquote(bold(log['10'](no)))
           },
           "wp"={
             ylim<-wlim

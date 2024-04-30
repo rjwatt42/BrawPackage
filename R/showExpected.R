@@ -29,19 +29,15 @@ showExpected<-function(expectedResult=braw.res$expected,showType="Basic",
       }
     }
     
-    if (expectedResult$hypothesis$effect$world$worldOn) {
+    if (!expectedResult$hypothesis$effect$world$worldOn) {
       fullResult<-mergeExpected(expectedResult$result,expectedResult$nullresult)
-    } else {
-      switch (showType,
-              "NHST"={fullResult<-mergeExpected(expectedResult$result,expectedResult$nullresult)},
-              "fDR"={fullResult<-mergeExpected(expectedResult$result,expectedResult$nullresult)},
-              "fMR"={fullResult<-mergeExpected(expectedResult$result,expectedResult$nullresult)},
-              "e1"={fullResult<-expectedResult$nullresult},
-              "e2"={fullResult<-expectedResult$result},
-              {fullResult<-expectedResult$result}
-      )
-    }
-
+    } else fullResult<-expectedResult$result
+    # switch (showType,
+    #         "e1"={fullResult<-fullResult[nulls]},
+    #         "e2"={fullResult<-fullResult[!nulls]},
+    #         {}
+    # )
+    
   fullResult<-c(fullResult,list(hypothesis=expectedResult$hypothesis,
                                 design=expectedResult$design,
                                 evidence=expectedResult$evidence)

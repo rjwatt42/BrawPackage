@@ -18,7 +18,7 @@ getWorld<-function(name) {
            world<-list(worldOn=TRUE,
                        populationPDF="Single",
                        populationRZ="r",
-                       populationPDFk=0.3,
+                       populationPDFk=0.5,
                        populationNullp=0)
          },
          "Double"={
