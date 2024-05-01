@@ -84,11 +84,12 @@ doExpected <- function(nsims=10,expectedResult=NULL,hypothesis=braw.def$hypothes
     design<-expectedResult$design
     evidence<-expectedResult$evidence
   }
-  expectedResult<-c(resetExpected(nsims,expectedResult),
-                    list(hypothesis=hypothesis,
-                         design=design,
-                         evidence=evidence)
-  )
+  if (nsims>0)
+    expectedResult<-c(resetExpected(nsims,expectedResult),
+                      list(hypothesis=hypothesis,
+                           design=design,
+                           evidence=evidence)
+    )
   #
   if (doingNull && !hypothesis$effect$world$worldOn) {
     hypothesisNull<-hypothesis

@@ -1,7 +1,7 @@
 
 #' show the estimated population characteristics from multiple simulated sample
 #' 
-#' @param showType "Basic", "CILimits", "NHST", "tDR", "fDR" \cr
+#' @param showType "Basic", "CILimits", "NHST", "Hits" \cr
 #'        \emph{ or one or two of:} \cr
 #'         "r","p","ci1","ci2", "rp","n" \cr
 #'          "w","wp","wn", ro","po"
@@ -22,22 +22,17 @@ showExpected<-function(expectedResult=braw.res$expected,showType="Basic",
   if (is.null(expectedResult)) expectedResult=doExpected(autoShow=FALSE)
   if (is.numeric(expectedResult)) expectedResult=doExpected(expectedResult,autoShow=FALSE)
 
-    if (showType=="tDR") showType<-"fDR"
-    if (!expectedResult$hypothesis$effect$world$worldOn && is.element(showType,c("NHST","fDR","fMR"))) {
+    if (!expectedResult$hypothesis$effect$world$worldOn && is.element(showType,c("NHST","Hits","Misses"))) {
       if (expectedResult$nullcount<expectedResult$count) {
         expectedResult<-doExpected(0,expectedResult,doingNull=TRUE)
       }
     }
     
     if (!expectedResult$hypothesis$effect$world$worldOn && !all(is.na(expectedResult$nullresult$rIV))) {
+      if (all(expectedResult$result$rpIV==0)) expectedResult$result$rpIV<-expectedResult$result$rpIV+0.0000000001
       fullResult<-mergeExpected(expectedResult$result,expectedResult$nullresult)
     } else fullResult<-expectedResult$result
-    # switch (showType,
-    #         "e1"={fullResult<-fullResult[nulls]},
-    #         "e2"={fullResult<-fullResult[!nulls]},
-    #         {}
-    # )
-    
+
   fullResult<-c(fullResult,list(hypothesis=expectedResult$hypothesis,
                                 design=expectedResult$design,
                                 evidence=expectedResult$evidence)

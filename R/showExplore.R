@@ -47,7 +47,7 @@ trimExploreResult<-function(result,nullresult) {
 #' show the estimated population characteristics from varying parameter
 #' 
 #' @param showType        "r","p","w","wn", "p(sig)" \cr
-#' "NHST", "tDR","fDR","fMR"
+#' "NHST", "Hits","Misses"
 #' @return ggplot2 object - and printed
 #' @examples
 #' showExplore(exploreResult=doExplore(),
@@ -59,14 +59,21 @@ showExplore<-function(exploreResult=braw.res$explore,showType="r",showTheory=FAL
 
   if (is.null(exploreResult)) exploreResult=doExplore()
   
+  if (!exploreResult$hypothesis$effect$world$worldOn && is.element(showType,c("NHST","Hits","Misses"))) {
+    if (exploreResult$nullcount<exploreResult$count) {
+      exploreResult<-doExplore(0,exploreResult,doingNull=TRUE)
+    }
+  }
+  
   quants<-0.25
   showPower<-FALSE
   
   explore<-exploreResult$explore
-  hypothesis<-explore$hypothesis
+  hypothesis<-exploreResult$hypothesis
   effect<-hypothesis$effect
-  design<-explore$design
-  evidence<-explore$evidence
+  design<-exploreResult$design
+  evidence<-exploreResult$evidence
+  
   
   oldAlpha<-braw.env$alphaSig
   on.exit(braw.env$alphaSig<-oldAlpha)
@@ -117,6 +124,47 @@ showExplore<-function(exploreResult=braw.res$explore,showType="r",showTheory=FAL
       )
     else whichEffect<-1
   }
+  
+  
+  col2<-braw.env$plotColours$infer_miss
+  col3<-braw.env$plotColours$infer_miss
+  col5<-braw.env$plotColours$infer_sigNull
+  switch (braw.env$STMethod,
+          "NHST"={
+            col1<-NULL
+            col0<-braw.env$plotColours$infer_sigNonNull
+            col4<-NULL
+          },
+          "sLLR"={
+            col1<-NULL
+            col0<-braw.env$plotColours$infer_nsNonNull
+            col4<-NULL
+          },
+          "dLLR"={
+            col1<-braw.env$plotColours$infer_isigNonNull
+            col0<-braw.env$plotColours$infer_nsdNonNull
+            col4<-braw.env$plotColours$infer_isigNull
+          }
+  )
+  lb0<-braw.env$nonNullPositive
+  lb1<-braw.env$nonNullNegative
+  lb2<-braw.env$nonNullNS
+  lb3<-braw.env$nullNS
+  lb4<-braw.env$nullNegative
+  lb5<-braw.env$nullPositive
+  
+  yn<-0.5
+  lb0xy<-data.frame(x=max(xlim),y=1-yn/10)
+  yn<-yn+1
+  lb1xy<-data.frame(x=max(xlim),y=1-yn/10)
+  yn<-yn+1
+  lb2xy<-data.frame(x=max(xlim),y=1-yn/10)
+  yn<-0.5
+  lb5xy<-data.frame(x=max(xlim),y=0+yn/10)
+  yn<-yn+1
+  lb4xy<-data.frame(x=max(xlim),y=0+yn/10)
+  yn<-yn+1
+  lb3xy<-data.frame(x=max(xlim),y=0+yn/10)
   
   g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
   for (whichEffect in 1:length(plots)) {
@@ -237,7 +285,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="r",showTheory=FAL
           theoryVals<-c(theoryVals,r)
         }
       }
-      if (is.element(showType,c("NHST","tDR","fDR","fMR"))) {
+      if (is.element(showType,c("NHST","Hits","Misses"))) {
         Nullp<-hypothesis$effect$world$populationNullp
         hypothesis$effect$world$populationNullp<-0
         theoryVals1<-c()
@@ -254,60 +302,16 @@ showExplore<-function(exploreResult=braw.res$explore,showType="r",showTheory=FAL
                  theoryVals0<-theoryVals1*0+alphas*nullPs
                  theoryVals2<-theoryVals0*0+nullPs
                },
-               "fDR"={
-                 theoryVals<-alphas*nullPs/(theoryVals1*(1-nullPs)+alphas*nullPs)
+               "Hits"={
+                 theoryVals<-theoryVals1*(1-nullPs)/(theoryVals1*(1-nullPs)+alphas*nullPs)
                  theoryVals1<-c()
                },
-               "tDR"={
-                 theoryVals<-1-alphas*nullPs/(theoryVals1*(1-nullPs)+alphas*nullPs)
-                 theoryVals1<-c()
-               },
-               "fMR"={
+               "Misses"={
                  theoryVals<-(1-theoryVals1)*(1-nullPs)/((1-theoryVals1)*(1-nullPs)+(1-alphas)*nullPs)
                  theoryVals1<-c()
                }
         )
         hypothesis$effect$world$populationNullp<-Nullp
-        
-        switch (braw.env$STMethod,
-                "NHST"={
-                  col1<-NULL
-                  col0<-braw.env$plotColours$infer_sigNonNull
-                  col4<-NULL
-                  },
-                "sLLR"={
-                  col1<-NULL
-                  col0<-braw.env$plotColours$infer_nsNonNull
-                  col4<-NULL
-                },
-                "dLLR"={
-                  col1<-braw.env$plotColours$infer_isigNonNull
-                  col0<-braw.env$plotColours$infer_nsdNonNull
-                  col4<-braw.env$plotColours$infer_isigNull
-                }
-        )
-        lb0<-braw.env$nonNullPositive
-        lb1<-braw.env$nonNullNegative
-        lb2<-braw.env$nonNullNS
-        lb3<-braw.env$nullNS
-        lb4<-braw.env$nullNegative
-        lb5<-braw.env$nullPositive
-
-        col2<-braw.env$plotColours$infer_miss
-        col3<-braw.env$plotColours$infer_miss
-        col5<-braw.env$plotColours$infer_sigNull
-        yn<-0.5
-        lb0xy<-data.frame(x=max(xlim),y=1-yn/10)
-        yn<-yn+1
-        lb1xy<-data.frame(x=max(xlim),y=1-yn/10)
-        yn<-yn+1
-        lb2xy<-data.frame(x=max(xlim),y=1-yn/10)
-        yn<-0.5
-        lb5xy<-data.frame(x=max(xlim),y=0+yn/10)
-        yn<-yn+1
-        lb4xy<-data.frame(x=max(xlim),y=0+yn/10)
-        yn<-yn+1
-        lb3xy<-data.frame(x=max(xlim),y=0+yn/10)
       }
       
       if (explore$xlog) newvals<-log10(newvals)
@@ -442,17 +446,17 @@ showExplore<-function(exploreResult=braw.res$explore,showType="r",showTheory=FAL
                 showMeans<-1-colMeans(abs(sigs & nulls))/colMeans(abs(sigs))
                 showSE<-NULL
               },
-              "fDR"={
+              "Hits"={
                 showVals<-NULL
                 if (explore$exploreType=="Alpha") {
                   braw.env$alphaSig<-exploreResult$vals
                 }
                 nulls<-result$rpval==0
                 sigs<-isSignificant(braw.env$STMethod,pVals,rVals,nVals,df1Vals,evidence,braw.env$alphaSig)
-                showMeans<-colMeans(abs(sigs & nulls))/colMeans(abs(sigs))
+                showMeans<-colMeans(abs(sigs & !nulls))/colMeans(abs(sigs))
                 showSE<-NULL
               },
-              "fMR"={
+              "Misses"={
                 showVals<-NULL
                 if (explore$exploreType=="Alpha") {
                   braw.env$alphaSig<-exploreResult$vals
@@ -493,7 +497,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="r",showTheory=FAL
       
       if (!is.element(showType,c("NHST"))) {
         # draw the basic line and point data
-        if (is.element(showType,c("p(sig)","tDR","fDR","fMR"))) {
+        if (is.element(showType,c("p(sig)","Hits","Misses"))) {
           y50<-showMeans
           y75<-NULL
         } else {
@@ -557,7 +561,10 @@ showExplore<-function(exploreResult=braw.res$explore,showType="r",showTheory=FAL
           if (showTheory) pts0<-data.frame(x=vals,y=ybottom)
           else            pts0<-data.frame(x=c(vals,rev(vals)),y=c(ybottom,rev(ytop)))
           ytop<-ybottom
-        } else {pts0<-NULL}
+        } else {
+          ybottom<-ytop
+          pts0<-NULL
+          }
         
         # error Z+
         if (any(isigNonNulls!=0)) {

@@ -206,18 +206,11 @@ plotAxis<-function(showType,effect) {
             ylines<-plines
             use_cols<-c(hsv(0,1,1),hsv(0+0.075,1,1),hsv(0+0.15,1,1))
           },
-          "fDR"={
+          "Hits"={
             ylim<-c(0,1)
             ytick<-seq(0,1,0.2)
             ymins<-seq(0,1,0.1)
-            ylabel<-"False Discovery"
-            use_cols<-braw.env$plotColours$fdr
-          },
-          "tDR"={
-            ylim<-c(0,1)
-            ytick<-seq(0,1,0.2)
-            ymins<-seq(0,1,0.1)
-            ylabel<-"True Discovery"
+            ylabel<-"True Hits"
             use_cols<-braw.env$plotColours$fdr
           },
           "NHST"={
@@ -238,7 +231,7 @@ plotAxis<-function(showType,effect) {
                         braw.env$plotColours$infer_nsigNull)
             
             },
-          "fMR"={
+          "Misses"={
             ylim<-c(0,1)
             ytick<-seq(0,1,0.2)
             ymins<-seq(0,1,0.1)

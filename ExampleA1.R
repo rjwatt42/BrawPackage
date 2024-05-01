@@ -22,7 +22,7 @@ showExpected(expect,dimension="2D")
 
 hypothesis=getHypothesis("Psych")
 expect<-doExpected(nsims=1000,hypothesis=hypothesis)
-showExpected(expect,"fDR")
+showExpected(expect,"Hits")
 
 hypothesis=getHypothesis("III")
 explore<-doExplore(nsims=1000,NULL,"rIVIV2",hypothesis=hypothesis)

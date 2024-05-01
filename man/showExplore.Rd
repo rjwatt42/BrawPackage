@@ -14,7 +14,7 @@ showExplore(
 }
 \arguments{
 \item{showType}{"r","p","w","wn", "p(sig)" \cr
-"NHST", "fDR","fMR"}
+"NHST", "Hits","Misses"}
 }
 \value{
 ggplot2 object - and printed

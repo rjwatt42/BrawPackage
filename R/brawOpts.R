@@ -270,6 +270,7 @@ braw.def$hypothesis<-makeHypothesis(IV=braw.def$IV,IV2=braw.def$IV2,DV=braw.def$
 braw.def$design<-makeDesign()
 braw.def$evidence<-makeEvidence()
 braw.def$metaAnalysis<-makeMetaAnalysis()
+braw.def$explore<-makeExplore()
 
 braw.def<<-braw.def
 

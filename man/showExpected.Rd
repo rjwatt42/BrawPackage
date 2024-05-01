@@ -14,7 +14,7 @@ showExpected(
 )
 }
 \arguments{
-\item{showType}{"Basic", "CILimits", "NHST", "fDR", "FDR:FMR" \cr
+\item{showType}{"Basic", "CILimits", "NHST", "Hits", "FDR:FMR" \cr
 \emph{ or one or two of:} \cr
  "r","p","ci1","ci2", "rp","n" \cr
   "w","wp","wn", ro","po"}

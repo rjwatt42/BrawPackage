@@ -48,7 +48,7 @@ showExpected(doExpected(0,hypothesis=getHypothesis("Psych"),design=getDesign("Ps
 showExpected(doExpected(0,hypothesis=getHypothesis("Psych"),design=getDesign("Psych")),showType="NHST")
 
 showExpected(doExpected(0,hypothesis=getHypothesis("Psych"),design=getDesign("Psych")),showType="tDR")
-showExpected(doExpected(0,hypothesis=getHypothesis("Psych"),design=getDesign("Psych")),showType="fMR")
+showExpected(doExpected(0,hypothesis=getHypothesis("Psych"),design=getDesign("Psych")),showType="Misses")
 
 ####################################
 ##

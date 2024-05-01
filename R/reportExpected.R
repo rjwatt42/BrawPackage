@@ -1,7 +1,7 @@
 
 #' show the estimated population characteristics from multiple simulated sample
 #' 
-#' @param showType "Basic", "CILimits", "NHST", "fDR", "tDR" \cr
+#' @param showType "Basic", "CILimits", "NHST", "Hits" \cr
 #'        \emph{ or one or two of:} \cr
 #'                   "r","p","ci1","ci2", "rp","n" \cr 
 #'                   "w","wp","wn", ro","po"
@@ -29,8 +29,7 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic"){
            "2D"=     {pars<-c("r","p")},
            "CILimits"=  {pars<-c("ci1","ci2")},
            "NHST"={pars<-c("e2","e1")},
-           "tDR"=       {pars<-c("e1","e2")},
-           "fDR"=       {pars<-c("e1","e2")},
+           "Hits"=       {pars<-c("e1","e2")},
            { pars<-strsplit(showType,";")[[1]]
            if (length(pars)==1) pars<-c(pars,NA)
            }
@@ -41,7 +40,7 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic"){
   else{
     if (is.na(result$rIVIV2DV[1])) {nc=6} else {nc=9}
   }
-  if (is.element(showType,c("NHST","tDR","fDR","fMR"))) {nc=4}
+  if (is.element(showType,c("NHST","Hits","Misses"))) {nc=4}
   
   # header
   if (sum(!is.na(nullresult$rIV))>0) {
@@ -82,7 +81,7 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic"){
   }
 
   # column labels
-  if (is.element(showType,c("NHST","tDR","fDR","fMR"))) {
+  if (is.element(showType,c("NHST","tDR","Hits","Misses"))) {
     outputText1<-c("!j\bErrors:","\bI","\bII"," ")
     } else {
     if (showType=="CILimits") {outputText1<-c("   ","lower","upper")}
@@ -112,7 +111,7 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic"){
     }
   outputText<-c(outputText,rep(outputText1,nc/3))
 
-  if (is.element(showType,c("NHST","tDR","fDR","fMR"))){
+  if (is.element(showType,c("NHST","Hits","Misses"))){
     nullSig<-isSignificant(braw.env$STMethod,nullresult$pIV,nullresult$rIV,nullresult$nval,nullresult$df1,nullresult$evidence)
     resSig<-isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,result$evidence)
     if (braw.env$STMethod=="dLLR") {

@@ -873,6 +873,17 @@ n_plot<-function(analysis,ntype,orientation="vert",showTheory=TRUE,g=NULL){
 }
 
 e2_plot<-function(analysis,disp,otheranalysis=NULL,orientation="vert",showTheory=TRUE,g=NULL){
+  if (!analysis$hypothesis$effect$world$worldOn) {
+    lambda<-brawFormat(analysis$hypothesis$effect$rIV,digits=3)
+    switch (braw.env$RZ,
+            "r"={
+              lab<-bquote(bold("Non-null: " ~ r["p"] ~ "=" ~ .(lambda)))
+            },
+            "z"={
+              lab<-bquote(bold("Non-null: " ~ z["p"] ~ "=" ~ .(lambda)))
+            }
+    )
+  } else {
   distr<-tolower(analysis$hypothesis$effect$world$populationPDF)
   rz<-analysis$hypothesis$effect$world$populationRZ
   lambda<-brawFormat(analysis$hypothesis$effect$world$populationPDFk,digits=3)
@@ -884,6 +895,8 @@ e2_plot<-function(analysis,disp,otheranalysis=NULL,orientation="vert",showTheory
             lab<-bquote(bold("Non-null: " ~ z["p"] ~ "~" ~ .(distr) (.(rz)/.(lambda))))
           }
   )
+  
+  }
   
   switch (braw.env$STMethod,
           "NHST"={

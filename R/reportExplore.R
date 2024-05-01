@@ -1,7 +1,7 @@
 #' report the estimated population characteristics from varying parameter
 #' 
 #' @param showType        "r","p","n","w", "p(sig)" \cr
-#'                        "NHST", "fDR", "tDR", "FMR"
+#'                        "NHST", "Hits", "Misses"
 #' @return ggplot2 object - and printed
 #' @examples
 #' showExplore(exploreResult=doExplore(),
@@ -146,7 +146,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="r",
               }
             }
           },
-          "tDR"={
+          "Hits"={
             y50<-c()
             y25<-c()
             y75<-c()
@@ -171,34 +171,6 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="r",
                 y50[i]<-1-p
                 y75[i]<-1-p+sqrt(p*(1-p)/length(pVals[,i]))
                 y25[i]<-1-p-sqrt(p*(1-p)/length(pVals[,i]))
-              }
-            }
-          },
-          "fDR"={
-            y50<-c()
-            y25<-c()
-            y75<-c()
-            if (effect$world$worldOn) {
-              for (i in 1:length(exploreResult$vals)){
-                if (explore$exploreType=="Alpha") {
-                  braw.env$alphaSig<-exploreResult$vals[i]
-                }
-                sigs<-isSignificant(braw.env$STMethod,pVals[,i],rVals[,i],nVals[,i],df1Vals[,i],exploreResult$evidence)
-                nulls<-exploreResult$result$rpval[,i]==0
-                p<-sum(sigs & nulls,na.rm=TRUE)/sum(sigs)
-                y50[i]<-p
-                y75[i]<-p+sqrt(p*(1-p)/length(pVals[,i]))
-                y25[i]<-p-sqrt(p*(1-p)/length(pVals[,i]))
-              }
-            } else {
-              for (i in 1:length(exploreResult$vals)){
-                if (explore$exploreType=="Alpha") {
-                  braw.env$alphaSig<-exploreResult$vals[i]
-                }
-                p<-mean(isSignificant(braw.env$STMethod,pVals[,i],rVals[,i],nVals[,i],df1Vals[,i],exploreResult$evidence),na.rm=TRUE)
-                y50[i]<-p
-                y75[i]<-p+sqrt(p*(1-p)/length(pVals[,i]))
-                y25[i]<-p-sqrt(p*(1-p)/length(pVals[,i]))
               }
             }
           },
@@ -250,7 +222,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="r",
                 y25e[i]<-p-sqrt(p*(1-p)/length(peVals[,i]))
               }
             }
-            extra_y_label<-"fMR"
+            extra_y_label<-"Misses"
           },
           "log(lrs)"={
             ns<-exploreResult$result$nval
@@ -364,7 +336,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="r",
   if (showType=="NHST" || showType=="FDR;FMR") {
     switch(showType,
            "NHST"={extra_y_label<-"Type I errors"},
-           "FDR;FMR"={extra_y_label<-"fDR"}
+           "FDR;FMR"={extra_y_label<-"Hits"}
     )
     if (is.null(hypothesis$IV2)){
       rVals<-exploreResult$nullresult$rIVs

@@ -1,4 +1,35 @@
-abind<-function(a,b) array(c(a, b), dim = c(dim(a)[1], dim(a)[2], dim(a)[3]+dim(b)[3]))
+#' make multiple samples whilst varying a parameter
+#' 
+#' @param exploreType "rIV","Heteroscedasticity","rIV2","rIVIV2","rIVIV2DV" \cr
+#'                    "pNull","k" \cr
+#'                    "n","Method","Usage","WithinCorr","ClusterRad","SampleGamma" \cr
+#'                     "Dependence","Outliers","IVRange","DVRange" \cr
+#'                     "Cheating","CheatingAmount" \cr
+#'                     "Alpha","Transform" \cr
+#'                     "Power","Keep","Repeats" \cr
+#' @returns explore object
+#' @seealso doExplore() 
+#' @seealso showExplore() 
+#' @seealso reportExplore()
+#' @examples
+#' exploreResult<-makeExplore(exploreType="n",exploreNPoints=13,
+#'                              min_n=10,max_n=250,max_r=0.9,max_anom=1,
+#'                              xlog=FALSE,xabs=FALSE,mx_log=FALSE,
+#'                              hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
+#'                              doingNull=FALSE,autoShow=braw.env$autoShow,showType="Basic")
+#' @export
+makeExplore<-function(exploreType="n",exploreNPoints=13,
+                    min_n=10,max_n=250,max_r=0.9,max_anom=1,
+                    xlog=FALSE,xabs=FALSE
+) {
+  if (exploreType=="alpha") exploreType<-"Alpha"
+  explore<-list(exploreType=exploreType,
+                exploreNPoints=exploreNPoints,
+                min_n=min_n,max_n=max_n,max_r=max_r,max_anom=max_anom,
+                xlog=xlog,xabs=xabs
+  )
+  return(explore)
+}
 
 
 resetExploreResult<-function(nsims,n_vals,oldResult=NULL) {
@@ -48,6 +79,8 @@ storeExploreResult<-function(result,res,ri,vi) {
 }
 
 mergeExploreResult<-function(res1,res2) {
+  abind<-function(a,b) array(c(a, b), dim = c(dim(a)[1], dim(a)[2], dim(a)[3]+dim(b)[3]))
+  
   result<-res1
   result$rval<-rbind(res1$rval,res2$rval)
   result$pval<-rbind(res1$pval,res2$pval)
@@ -82,38 +115,40 @@ mergeExploreResult<-function(res1,res2) {
 #' @seealso showExplore() 
 #' @seealso reportExplore()
 #' @examples
-#' exploreResult<-doExplore(nsims=10,exploreResult=NULL,exploreType="n",exploreNPoints=13,
-#'                              min_n=10,max_n=250,max_r=0.9,max_anom=1,
-#'                              xlog=FALSE,xabs=FALSE,mx_log=FALSE,
-#'                              hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
+#' exploreResult<-doExplore(nsims=10,exploreResult=NULL,explore=braw.def$explore,
 #'                              doingNull=FALSE,autoShow=braw.env$autoShow,showType="Basic")
 #' @export
-doExplore<-function(nsims=10,exploreResult=NULL,exploreType="n",exploreNPoints=13,
-                      min_n=10,max_n=250,max_r=0.9,max_anom=1,
-                      xlog=FALSE,xabs=FALSE,
-                      hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=makeEvidence(),
+doExplore<-function(nsims=10,exploreResult=NULL,explore=braw.def$explore,
+                    hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,
                       doingNull=FALSE,autoShow=braw.env$autoShow,showType="r"
 ) {
   autoShowLocal<-autoShow
   assign("autoShow",FALSE,braw.env)
   
-  if (exploreType=="alpha") exploreType<-"Alpha"
-  explore<-list(exploreType=exploreType,
-                exploreNPoints=exploreNPoints,
-                min_n=min_n,max_n=max_n,max_r=max_r,max_anom=max_anom,
-                xlog=xlog,xabs=xabs,
-                hypothesis=hypothesis,
-                design=design,
-                evidence=evidence
-  )
   if (is.null(exploreResult)) {
-    exploreResult<-list(count=0,
+    exploreResult<-list(type="explore",
+                        count=0,
                         result=NULL,
                         nullcount=0,
                         nullresult=NULL,
                         vals=NA,
-                        explore=explore
+                        explore=explore,
+                        hypothesis=hypothesis,
+                        design=design,
+                        evidence=evidence
     )
+  }
+  explore<-exploreResult$explore
+
+  if (doingNull && !hypothesis$effect$world$worldOn) {
+    hypothesisNull<-hypothesis
+    hypothesisNull$effect$rIV<-0
+    # catch up - make enough null results to match results
+    if (exploreResult$nullcount<exploreResult$count) {
+      ns<-exploreResult$count-exploreResult$nullcount
+      exploreResult <- runExplore(nsims=ns,exploreResult,doingNull=TRUE,autoShow=FALSE)
+      exploreResult$nullcount<-exploreResult$nullcount+ns
+    }
   }
   
   exploreResult <- runExplore(nsims=nsims,exploreResult,doingNull=doingNull,
@@ -127,9 +162,9 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
                        autoShow=braw.env$autoShow,showType="r"){
   
   explore<-exploreResult$explore
-  hypothesis<-explore$hypothesis
-  design<-explore$design
-  evidence<-explore$evidence
+  hypothesis<-exploreResult$hypothesis
+  design<-exploreResult$design
+  evidence<-exploreResult$evidence
   
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2
@@ -138,6 +173,13 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
   
   if (hypothesis$effect$world$worldOn && hypothesis$effect$world$populationNullp>0) 
     doingNull<-FALSE
+  
+  if (nsims==0) doingNonNUll<-FALSE
+  else          doingNonNUll<-TRUE
+  
+  if (doingNull && exploreResult$nullcount<exploreResult$count) {
+    nsims<-exploreResult$count-exploreResult$nullcount
+  }
   
   npoints<-explore$exploreNPoints
   min_n<-explore$min_n
@@ -240,11 +282,12 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
   result<-resetExploreResult(nsims,length(vals),exploreResult$result)
   
   if (doingNull) {
-    nullhypothesis<-hypothesis
-    nullhypothesis$effect$rIV<-0
     nullresult<-resetExploreResult(nsims,length(vals),exploreResult$nullresult)
   } else nullresult<-NULL
-  nsims<-exploreResult$count+nsims
+
+  if (doingNull && exploreResult$nullcount<exploreResult$count)
+    nsims<-min(exploreResult$count,exploreResult$nullcount)+nsims
+  else   nsims<-exploreResult$count+nsims
   
   while (exploreResult$count<nsims){
     if (!autoShow) ns<-nsims
@@ -255,7 +298,8 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
     ns<-min(ns,100)
     if (exploreResult$count+ns>nsims) ns<-nsims-exploreResult$count
     for (ni in 1:ns) {
-      ri<-exploreResult$count+ni
+      if (doingNonNUll)      ri<-exploreResult$count+ni
+      else                   ri<-exploreResult$nullcount+ni
       for (vi in 1:length(vals)){
         
         switch (explore$exploreType,
@@ -596,10 +640,14 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
         hypothesis$DV<-DV
         hypothesis$effect<-effect
         
-        res<-multipleAnalysis(1,hypothesis,design,evidence)
-        result<-storeExploreResult(result,res,ri,vi)
+        if (doingNonNUll) {
+          res<-multipleAnalysis(1,hypothesis,design,evidence)
+          result<-storeExploreResult(result,res,ri,vi)
+        }
         
         if (doingNull) {
+          nullhypothesis<-hypothesis
+          nullhypothesis$effect$rIV<-0
           res_null<-multipleAnalysis(1,nullhypothesis,design,evidence)
           nullresult<-storeExploreResult(nullresult,res_null,ri,vi)
         }
@@ -614,7 +662,6 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
     if (autoShow) print(showExplore(exploreResult,showType=showType))
   }
 
-  exploreResult<-c(list(type="explore"),exploreResult)
   setBrawRes("explore",exploreResult)
   return(exploreResult)
 }

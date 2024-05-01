@@ -366,7 +366,7 @@ rp.radiogroup(panel,action=setSingle,variable=single,
 rp.button(panel,action=doSingle,title="New Sample",
           background=backB,foreground="white",parentname="single")
 rp.radiogroup(panel,action=setMultiple,variable=multiple,
-           vals=c("Basic","NHST","fDR","fMR"),initval="Basic",title="Multiple",
+           vals=c("Basic","NHST","Hits","Misses"),initval="Basic",title="Multiple",
            background=evidenceC,parentname="multiple")
 rp.button(panel,action=doMultiple,title="Make",
           background=backB,foreground="white",parentname="multiple")
@@ -382,7 +382,7 @@ rp.radiogroup(panel,action=setExploreTypeD,variable=exploreTypeD,
 rp.button(panel,action=doExploreD,title="Explore",
           background=backB,foreground="white",parentname="exploreDesign")
 rp.radiogroup(panel,action=setExplore,variable=exploreShow,
-           vals=c("r","p","p(sig)","NHST","fDR"),initval=exploreShow,title="Show",
+           vals=c("r","p","p(sig)","NHST","Hits"),initval=exploreShow,title="Show",
            background=exploreC,parentname="explore3")
 
 rp.button(panel,action=doPossible,title="Possible",
