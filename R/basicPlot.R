@@ -40,9 +40,10 @@ plotLimits<-function(xlim,ylim,orientation,gaps=c(1,1,0,0),fontScale=1) {
          )
 }
 
-startPlot<-function(xlim=c(0,1),ylim=c(0,1),box="both",top=FALSE,backC=braw.env$plotColours$graphBack,orientation="horz",fontScale=1,g=NULL) {
+startPlot<-function(xlim=c(0,1),ylim=c(0,1),box="both",top=FALSE,tight=FALSE,backC=braw.env$plotColours$graphBack,orientation="horz",fontScale=1,g=NULL) {
   minGap<-0.05
   maxGap<-0.125
+  if (tight) maxGap<-0.075
   switch(box,
          "X"=gaps<-c(0,maxGap),
          "x"=gaps<-c(minGap,maxGap),
