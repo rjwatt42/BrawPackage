@@ -114,7 +114,7 @@ BrawOpts<-function(BW=FALSE,fontScale=1,newDev=FALSE,height=576,aspect=1.736) {
           #########################
           # display choices
           
-          braw.env$report_precision<-2
+          braw.env$report_precision<-3
           braw.env$graph_precision<-2
           
           braw.env$RZ<-"r"
