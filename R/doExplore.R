@@ -12,23 +12,57 @@
 #' @seealso showExplore() 
 #' @seealso reportExplore()
 #' @examples
-#' exploreResult<-makeExplore(exploreType="n",exploreNPoints=13,
-#'                              min_n=10,max_n=250,max_r=0.9,max_anom=1,
-#'                              xlog=FALSE,xabs=FALSE,mx_log=FALSE)
+#' explore<-makeExplore(exploreType="n",exploreNPoints=13,
+#'                              minVal=10,maxVal=250,xlog=FALSE)
 #' @export
 makeExplore<-function(exploreType="n",exploreNPoints=13,
-                    min_n=10,max_n=250,max_r=0.9,max_anom=1,
-                    xlog=FALSE,xabs=FALSE
+                    minVal=NA,maxVal=NA,xlog=NA
 ) {
   if (exploreType=="alpha") exploreType<-"Alpha"
   explore<-list(exploreType=exploreType,
                 exploreNPoints=exploreNPoints,
-                min_n=min_n,max_n=max_n,max_r=max_r,max_anom=max_anom,
-                xlog=xlog,xabs=xabs
+                minVal=minVal,maxVal=maxVal,xlog=xlog
   )
+  range<-getExploreRange(explore)
+  if (is.na(explore$minVal)) explore$minVal<-range$minVal
+  if (is.na(explore$maxVal)) explore$maxVal<-range$maxVal
+  if (is.na(explore$xlog)) explore$xlog<-range$logScale
+  
   return(explore)
 }
 
+getExploreRange<-function(explore) {
+  
+  exploreType<-explore$exploreType
+  if (is.element(exploreType,c("rIV","rIV2","rIVIV2","rIVIV2DV"))) exploreType<-"r"
+  if (is.element(exploreType,c("IVskew","DVskew","Heteroscedasticity","Dependence","Outliers","IVRange","DVRange"))) exploreType<-"anom"
+  if (is.element(exploreType,c("IVkurtosis","DVkurtosis"))) exploreType<-"kurt"
+  
+  switch(explore$exploreType,
+         "n"=range<-list(minVal=10,maxVal=250,logScale=FALSE),
+         "r"=range<-list(minVal=-0.9,maxVal=0.9,logScale=FALSE),
+         "anom"=range<-list(minVal=0,maxVal=1,logScale=FALSE),
+         "kurt"=range<-list(minVal=1.5,maxVal=10^5,logScale=TRUE),
+         "IVprop"=range<-list(minVal=0.2,maxVal=0.8,logScale=FALSE),
+         "DVprop"=range<-list(minVal=0.2,maxVal=0.8,logScale=FALSE),
+         "IVlevels"=range<-list(minVal=3,maxVal=10,logScale=FALSE),
+         "DVlevels"=range<-list(minVal=3,maxVal=10,logScale=FALSE),
+         "IVcats"=range<-list(minVal=2,maxVal=6,logScale=FALSE),
+         "DVcats"=range<-list(minVal=2,maxVal=6,logScale=FALSE),
+         "WithinCorr"=range<-list(minVal=0,maxVal=1,logScale=FALSE),
+         "Alpha"=range<-list(minVal=0.001,maxVal=0.5,logScale=TRUE),
+         "Power"=range<-list(minVal=0.1,maxVal=0.9,logScale=FALSE),
+         "Repeats"=range<-list(minVal=0,maxVal=8,logScale=FALSE),
+         "pNull"=range<-list(minVal=0,maxVal=1,logScale=FALSE),
+         "k"=range<-list(minVal=0.1,maxVal=1,logScale=FALSE),
+         "CheatingAmount"=range<-list(minVal=0, maxVal=0.8,logScale=FALSE),
+         "ClusterRad"=range<-list(minVal=0, maxVal=1,logScale=FALSE),
+         "SampleGamma"=range<-list(minVal=1, maxVal=10,logScale=FALSE),
+         {range<-list(minVal=0,maxVal=1,logScale=FALSE)}
+  )
+  
+  return(range)
+}
 
 resetExploreResult<-function(nsims,n_vals,oldResult=NULL) {
   
@@ -180,36 +214,31 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
   }
   
   npoints<-explore$exploreNPoints
-  min_n<-explore$min_n
-  max_n<-explore$max_n
-  max_r<-explore$max_r
-  if (braw.env$RZ=="z") {max_r<-max_r*braw.env$z_range}
-  max_anom<-explore$max_anom
-  kurtRange<-10^5
-  
+
+  minVal<-explore$minVal
+  maxVal<-explore$maxVal
   xlog<-explore$xlog
-  if (explore$xabs) {vals<-seq(0,1,length.out=npoints)}
-  else              {vals<-seq(-1,1,length.out=npoints)}
+  if (xlog) {
+    minVal<-log10(minVal)
+    maxVal<-log10(maxVal)
+  }
   
   switch (explore$exploreType,
           "IVType"={vals<-c("Interval","Ord7","Ord4","Cat2","Cat3")},
           "DVType"={vals<-c("Interval","Ord7","Ord4","Cat2")},
           "IVIV2Type"={vals<-c("IntInt","Cat2Int","Cat3Int","IntCat","Cat2Cat","Cat3Cat")},
           "IVDVType"={vals<-c("IntInt","Ord7Int","Cat2Int","Cat3Int","IntOrd","Ord7Ord","Cat2Ord","Cat3Ord","IntCat","Ord7Cat","Cat2Cat","Cat3Cat")},
-          "IVcats"={vals<-2:7},
-          "IVlevels"={vals<-2:10},
-          "IVprop"={vals<-seq(0.2,1,length.out=npoints)},
-          "IVskew"={vals<-vals},
-          "IVkurtosis"={vals<-seq(0,log10(kurtRange),length.out=npoints)},
-          "DVcats"={vals<-2:7},
-          "DVlevels"={vals<-2:10},
-          "DVprop"={vals<-seq(0.2,1,length.out=npoints)},
-          "DVskew"={vals<-vals},
-          "DVkurtosis"={vals<-seq(0,log10(kurtRange),length.out=npoints)},
-          "rIV"={
-            vals<-seq(0,1,length.out=npoints)*max_r
-            if (braw.env$RZ=="z") vals<-tanh(vals)
-          },
+          "IVcats"={vals<-minVal:maxVal},
+          "IVlevels"={vals<-minVal:maxVal},
+          "IVprop"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "IVskew"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "IVkurtosis"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "DVcats"={vals<-minVal:maxVal},
+          "DVlevels"={vals<-minVal:maxVal},
+          "DVprop"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "DVskew"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "DVkurtosis"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "rIV"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "rIV2"={
             b<-2*effect$rIV*effect$rIVIV2
             c<-effect$rIV^2+effect$rIVIV2DV^2-max_r
@@ -223,56 +252,33 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
             maxCov<-min(maxCov,max_r)
             vals<-seq(-maxCov,maxCov,length.out=npoints)
           },
-          "rIVIV2DV"={
-            vals<-vals*max_r
-          },
+          "rIVIV2DV"={vals<-seq(minVal,maxVal,length.out=npoints)},
           
           "PDF"={vals<-c("Single","Double","Uniform","Gauss","Exp",">","<")},
-          "k"={vals<-10^seq(-1,-0.1,length.out=npoints)},
-          "pNull"={vals<-seq(0,1,length.out=npoints)},
-          
-          "n"={
-            if (xlog){
-              vals<-round(10^seq(log10(min_n),log10(max_n),length.out=npoints))
-            }else{
-              vals<-round(seq(min_n,max_n,length.out=npoints))
-            }
-          },
+          "k"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "pNull"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "n"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Method"={vals<-c("Random","Stratified","Cluster","Snowball","Convenience")},
-          "ClusterRad"={vals<-seq(0,1,length.out=npoints)},
+          "ClusterRad"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Usage"={vals<-c("Between","Within")},
-          "WithinCorr"={vals<-seq(0,0.8,length.out=npoints)},
-          "SampleGamma"={vals<-seq(1,10,length.out=npoints)},
-          "Alpha"={
-            if (xlog) {
-              vals<-vals<-10^seq(log10(0.001),log10(0.5),length.out=npoints)
-            } else {
-              vals<-vals<-seq(0.001,0.1,length.out=npoints)
-            }
-          },
-          "Dependence"={vals<-seq(0,max_anom,length.out=npoints)},
-          "Outliers"={vals<-seq(0,max_anom,length.out=npoints)},
-          "Heteroscedasticity"={vals<-seq(0,1,length.out=npoints)},
+          "WithinCorr"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "SampleGamma"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "Alpha"={vals<-vals<-seq(minVal,maxVal,length.out=npoints)},
+          "Dependence"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "Outliers"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "Heteroscedasticity"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Transform"={vals<-c("None","Log","Exp")},
-          "IVRange"={vals<-seq(3,0.5,length.out=npoints)},
-          "DVRange"={vals<-seq(3,0.5,length.out=npoints)},
+          "IVRange"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "DVRange"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Cheating"={vals<-c("None","Grow","Prune","Replace","Retry","Add")},
-          "CheatingAmount"={
-            if (xlog){
-              vals<-round(10^seq(log10(1),log10(design$sN),length.out=npoints))
-            }else{
-              if ((design$sN+1)<npoints) vals<-0:design$sN
-              else vals<-round(seq(0,design$sN,length.out=npoints))
-            }
-          },
+          "CheatingAmount"={vals<-seq(minVal*design$sN,maxVal*design$sN,length.out=npoints)},
           
           "Keep"={vals<-c("cautious", "last", "largeN", "smallP", "median")},
-          "Power"={vals<-seq(0.1,0.9,length.out=npoints)},
-          "Repeats" ={
-            if (design$Replication$Keep=="median") vals<-seq(0,explore$Explore_nrRange,by=2)
-            else vals<-seq(0,explore$Explore_nrRange)
-          }
+          "Power"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "Repeats" ={ vals<-minVal:maxVal }
   )
+  if (substr(explore$exploreType,1,1)=="r" && braw.env$RZ=="z") vals<-tanh(vals)
+  if (xlog) vals<-10^vals
   
   exploreResult$vals<-vals
   exploreResult$explore<-explore
