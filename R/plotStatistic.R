@@ -608,7 +608,11 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
              },
              "n"={
                ndist<-getNDist(analysis$design,effectTheory$world,logScale=logScale,sigOnly=TRUE)
-               yv<-ndist$nvals
+               if (logScale) {
+                 yv<-log10(ndist$nvals)
+               } else {
+                 yv<-ndist$nvals
+               }
                xd<-ndist$ndens
                xdsig<-ndist$ndensSig
              },

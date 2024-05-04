@@ -129,6 +129,7 @@ getNDist<-function(design,world=NULL,logScale=FALSE,sigOnly=FALSE,HQ=FALSE) {
   if (sigOnly) {
     nsig<-ng
     pR<-getRList(world)
+    pR$pRhogain<-pR$pRhogain/sum(pR$pRhogain)
     for (ni in 1:length(nvals)) {
       psig<-sum(rn2w(pR$pRho,nvals[ni])*pR$pRhogain)
       nsig[ni]<-nsig[ni]*psig
