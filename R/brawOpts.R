@@ -17,7 +17,9 @@ newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
   print(startPlot(box="none",backC=braw.env$plotColours$graphC))
 }
 
-BrawOpts<-function(BW=FALSE,fontScale=1,newDev=FALSE,height=576,aspect=1.736) {
+BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,newDev=FALSE,height=576,aspect=1.736) {
+  if (graphC=="white") graphC<-"#FFFFFF"
+  if (graphC=="normal") graphC<-"#BFECFF"
   braw.env <- new.env(parent = emptyenv())
   braw.def <- new.env(parent = emptyenv())
   braw.res <- new.env(parent = emptyenv())
@@ -38,7 +40,7 @@ BrawOpts<-function(BW=FALSE,fontScale=1,newDev=FALSE,height=576,aspect=1.736) {
   # graph design
   
   # graph themes
-  plotColours<-list(graphC="#BFECFF",graphBack="#999999",
+  plotColours<-list(graphC=graphC,graphBack="#999999",
                     maineffectES="#FFCC00",covariationES="#FF1100",interactionES="#0011FF",
                     sampleC="#FFCC00",descriptionC="#FF9955",replicationC="#FF7755",
                     descriptionC1="#FF5533",descriptionC2="#CCBB33",

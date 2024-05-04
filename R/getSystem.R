@@ -171,7 +171,6 @@ getDesign<-function(name,design=braw.def$design) {
          "simple"={
            design$sN<-42
            design$sNRand<-FALSE
-           design$sNRandK<-1.56
          },
          "Psych"={
            design$sN<-52
