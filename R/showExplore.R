@@ -418,7 +418,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="r",showTheory=FAL
                 df1<-result$df1
                 showVals<-r2llr(rVals,ns,df1,"dLLR",evidence$llr,evidence$prior)
               },
-              "k"={
+              "Lambda"={
                 showVals<-result$k
               },
               "pNull"={

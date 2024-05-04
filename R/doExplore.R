@@ -1,7 +1,7 @@
 #' make multiple samples whilst varying a parameter
 #' 
 #' @param exploreType "rIV","Heteroscedasticity","rIV2","rIVIV2","rIVIV2DV" \cr
-#'                    "pNull","k" \cr
+#'                    "pNull","Lambda" \cr
 #'                    "n","Method","Usage","WithinCorr","ClusterRad","SampleGamma" \cr
 #'                     "Dependence","Outliers","IVRange","DVRange" \cr
 #'                     "Cheating","CheatingAmount" \cr
@@ -54,7 +54,7 @@ getExploreRange<-function(explore) {
          "Power"=range<-list(minVal=0.1,maxVal=0.9,logScale=FALSE),
          "Repeats"=range<-list(minVal=0,maxVal=8,logScale=FALSE),
          "pNull"=range<-list(minVal=0,maxVal=1,logScale=FALSE),
-         "k"=range<-list(minVal=0.1,maxVal=1,logScale=FALSE),
+         "Lambda"=range<-list(minVal=0.1,maxVal=1,logScale=FALSE),
          "CheatingAmount"=range<-list(minVal=0, maxVal=0.8,logScale=FALSE),
          "ClusterRad"=range<-list(minVal=0, maxVal=1,logScale=FALSE),
          "SampleGamma"=range<-list(minVal=1, maxVal=10,logScale=FALSE),
@@ -137,7 +137,7 @@ mergeExploreResult<-function(res1,res2) {
 #' make multiple samples whilst varying a parameter
 #' 
 #' @param exploreType "rIV","Heteroscedasticity","rIV2","rIVIV2","rIVIV2DV" \cr
-#'                    "pNull","k" \cr
+#'                    "pNull","Lambda" \cr
 #'                    "n","Method","Usage","WithinCorr","ClusterRad","SampleGamma" \cr
 #'                     "Dependence","Outliers","IVRange","DVRange" \cr
 #'                     "Cheating","CheatingAmount" \cr
@@ -255,7 +255,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
           "rIVIV2DV"={vals<-seq(minVal,maxVal,length.out=npoints)},
           
           "PDF"={vals<-c("Single","Double","Uniform","Gauss","Exp",">","<")},
-          "k"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "Lambda"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "pNull"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "n"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Method"={vals<-c("Random","Stratified","Cluster","Snowball","Convenience")},
@@ -560,7 +560,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
                   effect$world$worldOn<-TRUE
                   effect$world$populationPDF<-vals[vi]
                 },
-                "k"={
+                "Lambda"={
                   effect$world$worldOn<-TRUE
                   effect$world$populationPDFk<-vals[vi]
                 },

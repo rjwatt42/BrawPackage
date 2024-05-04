@@ -63,7 +63,7 @@ reportPlot<-function(outputText,nc,nr){
     switch(label,
            "Alpha"={label<-braw.env$alphaChar},
            "pNull"={label<-deparse(braw.env$Plabel)},
-           "k"={label<-deparse(braw.env$Llabel)},
+           "Lambda"={label<-deparse(braw.env$Llabel)},
            "p(sig)"={label<-deparse(braw.env$pSigLabel)}
            )
     fontface<-"plain"

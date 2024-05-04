@@ -234,7 +234,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="r",
             df1<-exploreResult$result$df1
             showVals<-r2llr(rVals,ns,df1,"dLLR",exploreResult$evidence$llr,exploreResult$evidence$prior)
           },
-          "k"={
+          "Lambda"={
             showVals<-exploreResult$result$k
           },
           "pNull"={
@@ -262,7 +262,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="r",
           
   )
 
-  if (is.element(showType,c("r","p","w","n","log(lrs)","log(lrd)","k","pNull","S"))) {
+  if (is.element(showType,c("r","p","w","n","log(lrs)","log(lrd)","Lambda","pNull","S"))) {
     y75<-c()
     y50<-c()
     y25<-c()
@@ -321,7 +321,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="r",
     outputText<-c(outputText,paste0("!j",brawFormat(y75[use[i]],digits=braw.env$report_precision)))
   }
   
-  if (is.element(showType,c("r","p","w","n","log(lrs)","log(lrd)","k","pNull","S"))) {
+  if (is.element(showType,c("r","p","w","n","log(lrs)","log(lrd)","Lambda","pNull","S"))) {
     outputText<-c(outputText,rep(" ",nc+1))
     outputText<-c(outputText,"!j!i\bmean")
     for (i in 1:nc) {
