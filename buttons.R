@@ -28,7 +28,7 @@ showing<-"none"
 
 singleShow<-"data"
 multipleShow<-"Basic"
-exploreShow<-"r"
+exploreShow<-"rs"
 exploreDone<-"H"
 
 IV<-"Interval"
@@ -382,7 +382,7 @@ rp.radiogroup(panel,action=setExploreTypeD,variable=exploreTypeD,
 rp.button(panel,action=doExploreD,title="Explore",
           background=backB,foreground="white",parentname="exploreDesign")
 rp.radiogroup(panel,action=setExplore,variable=exploreShow,
-           vals=c("r","p","p(sig)","NHST","Hits"),initval=exploreShow,title="Show",
+           vals=c("rs","p","p(sig)","NHST","Hits"),initval=exploreShow,title="Show",
            background=exploreC,parentname="explore3")
 
 rp.button(panel,action=doPossible,title="Possible",

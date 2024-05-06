@@ -11,7 +11,7 @@ showEffect<-function(r,t=1,plotArea=NULL,g=NULL){
           {start=c(0,0.92)
           direction=0
           len=0.9
-          labelpts<-data.frame(x=0.05,y=0.6)
+          labelpts<-data.frame(x=0.1,y=0.5)
           ends="last"
           col=braw.env$plotColours$maineffectES},
           
@@ -77,10 +77,11 @@ showEffect<-function(r,t=1,plotArea=NULL,g=NULL){
   
   if (braw.env$simData && !is.null(r)) {
     if (t==1){
-      lbl=paste("r=",as.character(r),sep="")
+      lbl=paste("rp=",as.character(r),sep="")
+      lbl=bquote(bold(r[p] ~ "=" ~ .(r)))
     }else{ lbl=as.character(r)
     }
-    g<-g+dataLabel(data=labelpts, label = lbl)
+    g<-g+dataText(data=labelpts, label = lbl, size=1.3)
   }
   
   return(g)

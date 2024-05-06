@@ -28,15 +28,16 @@ trimanalysis<-function(analysis) {
   analysis
 }
 
-plotInference<-function(analysis,otheranalysis=NULL,disp="r",orientation="vert",effectType="direct",showTheory=braw.env$showTheory,g=NULL){
+plotInference<-function(analysis,otheranalysis=NULL,disp="rs",orientation="vert",effectType="direct",showTheory=braw.env$showTheory,g=NULL){
   if (length(disp)==2) {
     return(plot2Inference(analysis,disp[1],disp[2]))
   } 
   analysis<-trimanalysis(analysis)
   
   switch (disp,
-          "r"= {g<-r_plot(analysis,disp,orientation=orientation,effectType=effectType,showTheory=showTheory,g=g)},
+          "rs"= {g<-r_plot(analysis,disp,orientation=orientation,effectType=effectType,showTheory=showTheory,g=g)},
           "rp"={g<-r_plot(analysis,disp,orientation=orientation,effectType=effectType,showTheory=showTheory,g=g)},
+          "re"= {g<-r_plot(analysis,disp,orientation=orientation,effectType=effectType,showTheory=showTheory,g=g)},
           "ro"={g<-r_plot(analysis,disp,orientation=orientation,effectType=effectType,showTheory=showTheory,g=g)},
           "ci1"={g<-r_plot(analysis,disp,orientation=orientation,effectType=effectType,showTheory=showTheory,g=g)},
           "ci2"={g<-r_plot(analysis,disp,orientation=orientation,effectType=effectType,showTheory=showTheory,g=g)},
@@ -47,10 +48,10 @@ plotInference<-function(analysis,otheranalysis=NULL,disp="r",orientation="vert",
           "log(lrs)"={g<-l_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
           "log(lrd)"={g<-l_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
           
-          "w"= {g<-w_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
+          "ws"= {g<-w_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
           "wp"={g<-w_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
           
-          "wn"={g<-n_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
+          "nw"={g<-n_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
           "n"= {g<-n_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
           
           "e1"={g<-e1_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
@@ -79,7 +80,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
   xaxis<-plotAxis(disp1,analysis$hypothesis$effect)
   yaxis<-plotAxis(disp2,analysis$hypothesis$effect)
   switch (disp1,
-          "r"={
+          "rs"={
             d1<-analysis$rIV
             if (braw.env$RZ=="z") d1<-atanh(d1)
           },
@@ -90,6 +91,10 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
           "rp"={
             d1<-analysis$rpIV
             if (braw.env$RZ=="z") d1<-atanh(d1)
+          },
+          "re"={
+            d1<-analysis$rIV-analysis$rpIV
+            if (braw.env$RZ=="z") d1<-atanh(analysis$rIV)-atanh(analysis$rpIV)
           },
           "ro"={
             d1<-analysis$roIV
@@ -109,7 +114,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
           },
           "log(lrs)"=d1<-res2llr(analysis,"sLLR"),
           "log(lrd)"=d1<-res2llr(analysis,"dLLR"),
-          "w"={
+          "ws"={
             d1<-rn2w(analysis$rIV,analysis$nval)
             if (braw.env$wPlotScale=="log10") d1<-log10(d1)
           },
@@ -117,13 +122,13 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
             d1<-rn2w(analysis$rp,analysis$nval)
             if (braw.env$wPlotScale=="log10") d1<-log10(d1)
           },
-          "wn"={
+          "nw"={
             d1<-rw2n(analysis$rIV,0.8,analysis$design$Replication$Tails)
             if (braw.env$wPlotScale=="log10") d1<-log10(d1)
           }
   )
   switch (disp2,
-          "r"={
+          "rs"={
             d2<-analysis$rIV
             if (braw.env$RZ=="z") d2<-atanh(d2)
           },
@@ -134,6 +139,10 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
           "rp"={
             d2<-analysis$rpIV
             if (braw.env$RZ=="z") d2<-atanh(d2)
+          },
+          "re"={
+            d2<-analysis$rIV-analysis$rpIV
+            if (braw.env$RZ=="z") d2<-atanh(analysis$rIV)-atanh(analysis$rpIV)
           },
           "ro"={
             d2<-analysis$roIV
@@ -153,7 +162,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
           },
           "log(lrs)"=d2<-res2llr(analysis,"sLLR"),
           "log(lrd)"=d2<-res2llr(analysis,"dLLR"),
-          "w"={
+          "ws"={
             d2<-rn2w(analysis$rIV,analysis$nval)
             if (braw.env$wPlotScale=="log10") d2<-log10(d2)
           },
@@ -161,7 +170,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
             d2<-rn2w(analysis$rp,analysis$nval)
             if (braw.env$wPlotScale=="log10") d2<-log10(d2)
           },
-          "wn"={
+          "nw"={
             d2<-rw2n(analysis$rIV,0.8,analysis$design$Replication$Tails)
             if (braw.env$wPlotScale=="log10") d2<-log10(d2)
           }
@@ -176,7 +185,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
   g<-g+yAxisTicks(logScale=yaxis$logScale)
   g<-g+yAxisLabel(yaxis$label)
   
-  if (disp1=="r" && disp2=="p") {
+  if (disp1=="rs" && disp2=="p") {
     rs<-seq(-braw.env$r_range,braw.env$r_range,length.out=51)
     ps<-r2p(rs,analysis$nval[1])
     if (braw.env$pPlotScale=="log10")  ps<-log10(ps)

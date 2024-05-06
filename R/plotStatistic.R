@@ -126,13 +126,16 @@ getBins<-function(vals,nsvals,target,minVal,maxVal,fixed=FALSE) {
     targetRange<-target_high-target_low
     nbs<-ceiling(nb*targetRange/(high_p-low_p))
     binStep<-targetRange/nbs
-    bins<-seq(target_low,target_high,binStep)
-    if (target<high_p) {
-      bins<-c(bins,seq(target+binStep,high_p+binStep,binStep))
-    }
-    if (-target>low_p) {                                
-      bins<-c(rev(seq(-target-binStep,low_p-binStep,-binStep)),bins)
-    }
+    if (target_low<target_high)   {
+      bins<-seq(target_low,target_high,binStep)
+      if (target<high_p)  bins<-c(bins,seq(target+binStep,high_p+binStep,binStep))
+      if (-target>low_p)  bins<-c(rev(seq(-target-binStep,low_p-binStep,-binStep)),bins)
+    } 
+    else  {
+      bins<-seq(target_high,target_low,binStep)
+      if (-target<high_p)  bins<-c(bins,seq(-target+binStep,high_p+binStep,binStep))
+      if (target>low_p)  bins<-c(rev(seq(target-binStep,low_p-binStep,-binStep)),bins)
+    }                         
     return(bins)
   } 
   
@@ -178,14 +181,19 @@ getBins<-function(vals,nsvals,target,minVal,maxVal,fixed=FALSE) {
 
 expected_hist<-function(vals,svals,valType,ylim,histGain,histGainrange){
   
-  if (is.null(valType)) valType<-"r"
-  if (is.element(valType,c("ro","ci1","ci2"))) valType<-"r"
+  if (is.null(valType)) valType<-"rs"
+  if (is.element(valType,c("ro","ci1","ci2"))) valType<-"rs"
   if (is.element(valType,c("e1","e2","po"))) valType<-"p"
-  if (is.element(valType,c("wp"))) valType<-"w"
+  if (is.element(valType,c("wp","ws"))) valType<-"ws"
   
   switch (valType,
-          "r"=  { # ns is small
+          "rs"=  { # ns is small
             target<-get_upperEdge(abs(vals),abs(svals))
+            bins<-getBins(vals,svals,target,NULL,NULL,fixed=TRUE)
+          },
+          
+          "re"=  { # ns is small
+            target<-get_upperEdge(vals,svals)
             bins<-getBins(vals,svals,target,NULL,NULL,fixed=TRUE)
           },
           
@@ -225,7 +233,7 @@ expected_hist<-function(vals,svals,valType,ylim,histGain,histGainrange){
             bins<-getBins(vals,svals,target*c(-1,1),-braw.env$lrRange,braw.env$lrRange)
           },
           
-          "w"=  { # ns is small
+          "ws"=  { # ns is small
             target<-get_upperEdge(abs(vals),abs(svals))
             bins<-getBins(vals,svals,target,log10(braw.env$min_p),NULL)
           },
@@ -240,7 +248,7 @@ expected_hist<-function(vals,svals,valType,ylim,histGain,histGainrange){
             }
           },
           
-          "wn"= { # ns is large
+          "nw"= { # ns is large
             target<-get_lowerEdge(vals,svals)
             bins<-getBins(vals,svals,target,NULL,braw.env$max_nw)
           }
@@ -306,7 +314,7 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
   }
   
   if (length(pts$y1)<=250) {
-    if (!is.null(analysis) && is.element(showType,c("r","p")) && length(pts$y1)==1) {
+    if (!is.null(analysis) && is.element(showType,c("rs","p")) && length(pts$y1)==1) {
       switch(i,
              {rCI<-analysis$rIVCI
              pCI<-analysis$pIVCI
@@ -322,7 +330,7 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
              }
       )
       if (is.null(analysis$hypothesis$IV2)) {
-        if (showType=="r" && !is.null(rCI)){
+        if (showType=="rs" && !is.null(rCI)){
           x<-pts$x
           if (length(x)<length(rCI)) x<-rep(x,length(rCI))
           pts1se<-data.frame(y=rCI[1,],x=x)
@@ -363,7 +371,7 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
         g<-g+dataPoint(data=data.frame(x=pts_wsig$x,y=pts_wsig$y1),shape=braw.env$plotShapes$study, colour = co1, fill = c3, size = dotSize)
       }
     
-  } else { # more than 50 points
+  } else { # more than 250 points
     if (is.logical(pts$y2)) {
       hist1<-expected_hist(pts$y1,pts$y1[pts$y2],showType,ylim,histGain,histGainrange)
     } else {
@@ -390,7 +398,7 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
   g
 }
 
-r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orientation="vert",effectType="direct",showTheory=TRUE,g=NULL){
+r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,orientation="vert",effectType="direct",showTheory=TRUE,g=NULL){
   
   npct<-1
   labelSig<-TRUE
@@ -434,12 +442,10 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
     r<-c(r,effect$rIV2,effect$rIVIV2DV)
   }
   rlims<-c(-1,1)
-  rlab<-"r"
-  
+
   if (braw.env$RZ=="z") {
     r<-atanh(r)
     rlims<-c(-1,1)*braw.env$z_range
-    rlab<-"z"
   }
   rActual<-r
   rActual[is.na(r)]<-0
@@ -495,9 +501,10 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
     }
     
     switch (showType,
-            "r"={showVals<-data$rs},
+            "rs"={showVals<-data$rs},
             "rp"={showVals<-data$rp},
             "ro"={showVals<-data$ro},
+            "re"={showVals<-data$rs-data$rp},
             "p"={showVals<-data$ps},
             "po"={showVals<-data$po},
             "log(lrs)"={showVals<-cbind(res2llr(analysis,"sLLR"))},
@@ -505,9 +512,9 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
             "e1d"={showVals<-cbind(res2llr(analysis,"dLLR"))},
             "e2d"={showVals<-cbind(res2llr(analysis,"dLLR"))},
             "n"={showVals<-data$ns},
-            "w"={showVals<-rn2w(data$rs,data$ns)},
+            "ws"={showVals<-rn2w(data$rs,data$ns)},
             "wp"={showVals<-rn2w(data$rp,data$ns)},
-            "wn"={showVals<-rw2n(data$rs,0.8,design$Replication$Tails)},
+            "nw"={showVals<-rw2n(data$rs,0.8,design$Replication$Tails)},
             "ci1"={showVals<-r2ci(data$rs,data$ns,-1)},
             "ci2"={showVals<-r2ci(data$rs,data$ns,+1)},
             "e1"={showVals<-data$ps},
@@ -571,14 +578,16 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
         effectTheory<-oldEffect
       }
       
-      if (is.element(showType,c("r","ro","ci1","ci2"))) {
+      if (is.element(showType,c("rs","re","ro","ci1","ci2"))) {
         npt<-101
+        if (showType=="re") rOff<-"re"
+        else rOff<-"rs"
         if (braw.env$RZ=="z") {
           zvals<-seq(-1,1,length.out=npt*2)*braw.env$z_range*2
           rvals<-tanh(zvals)
           # rvals<-seq(-1,1,length.out=npt)*0.99
-          xd<-fullRSamplingDist(rvals,effectTheory$world,design,"r",logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
-          xdsig<-fullRSamplingDist(rvals,effectTheory$world,design,"r",logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
+          xd<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
+          xdsig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
           xd<-rdens2zdens(xd,rvals)
           xdsig<-rdens2zdens(xdsig,rvals)
           yv<-atanh(rvals)
@@ -588,8 +597,8 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
           xdsig<-xdsig[use]
         } else {
           rvals<-seq(-1,1,length.out=npt)*0.99
-          xd<-fullRSamplingDist(rvals,effectTheory$world,design,"r",logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
-          xdsig<-fullRSamplingDist(rvals,effectTheory$world,design,"r",logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
+          xd<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
+          xdsig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
           yv<-rvals
         }
       }
@@ -616,9 +625,9 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
                xd<-ndist$ndens
                xdsig<-ndist$ndensSig
              },
-             "w"={
+             "ws"={
                yv<-seq(braw.env$alphaSig*1.01,1/1.01,length.out=npt)
-               xd<-fullRSamplingDist(yv,effectTheory$world,design,"w",logScale=logScale,sigOnly=sigOnly)
+               xd<-fullRSamplingDist(yv,effectTheory$world,design,"ws",logScale=logScale,sigOnly=sigOnly)
              },
              "log(lrs)"={
                yv<-seq(0,braw.env$lrRange,length.out=npt)
@@ -636,7 +645,7 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
                yv<-seq(-braw.env$lrRange,braw.env$lrRange,length.out=npt)
                xd<-fullRSamplingDist(yv,effectTheory$world,design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
              },
-             "wn"={
+             "nw"={
                if (logScale) {
                  yv<-seq(log10(5),log10(braw.env$max_nw),length.out=npt)
                  yvUse<-10^yv
@@ -644,7 +653,7 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
                  yv<-5+seq(0,braw.env$max_nw,length.out=npt)
                  yvUse<-yv
                }
-               xd<-fullRSamplingDist(yvUse,effectTheory$world,design,"wn",logScale=logScale,sigOnly=sigOnly)
+               xd<-fullRSamplingDist(yvUse,effectTheory$world,design,"nw",logScale=logScale,sigOnly=sigOnly)
                xd<-abs(xd)
              },
              "wp"={
@@ -669,7 +678,7 @@ r_plot<-function(analysis,showType="r",logScale=FALSE,otheranalysis=NULL,orienta
       histGain<-abs(sum(xd*c(0,diff(yv))))
       histGainrange<-sort(c(yv[1],yv[length(yv)]))
       ptsp<-data.frame(y=c(yv,rev(yv)),x=c(xd,-rev(xd))+xoff[i])
-      if (is.element(showType,c("r","n","p","e1","e2"))) {
+      if (is.element(showType,c("rs","n","p","e1","e2"))) {
         xdsig<-xdsig*theoryGain
         xdsig[is.na(xdsig)]<-0
         if (!all(xd==xdsig))

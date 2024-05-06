@@ -150,7 +150,7 @@ getNList<-function(design,world,HQ=FALSE) {
     nmax<-5
     nvals<-braw.env$minN+seq(0,nmax*design$sN,length.out=npt)
     design$Replication$On<-FALSE
-    ndens<-fullRSamplingDist(nvals,world=world,design=design,"wn",logScale=FALSE,sigOnly=FALSE)
+    ndens<-fullRSamplingDist(nvals,world=world,design=design,"nw",logScale=FALSE,sigOnly=FALSE)
     return(list(nvals=nvals,ndens=ndens,ndensSig=ndens))
   } else {
     if (!design$sNRand) {
@@ -243,7 +243,7 @@ fullPSig<-function(world,design,HQ=FALSE,alpha=braw.env$alphaSig) {
   return(pSig)
 }
 
-fullRSamplingDist<-function(vals,world,design,doStat="r",logScale=FALSE,sigOnly=FALSE,HQ=FALSE,separate=FALSE,quantiles=NULL) {
+fullRSamplingDist<-function(vals,world,design,doStat="rs",logScale=FALSE,sigOnly=FALSE,HQ=FALSE,separate=FALSE,quantiles=NULL) {
   # sampling distribution from specified populations (pRho)
   if (is.null(vals)) 
     vals<-seq(-1,1,length=braw.env$worldNPoints)*braw.env$r_range
@@ -275,9 +275,14 @@ fullRSamplingDist<-function(vals,world,design,doStat="r",logScale=FALSE,sigOnly=
       d1<-0
       for (ni in 1:length(nvals)) {
         switch (doStat,
-                "r"={
+                "rs"={
                   rp<-vals
                   addition<-rSamplingDistr(vals,rvals[ei],nvals[ni])
+                  addition<-addition*(vals[2]-vals[1])
+                },
+                "re"={
+                  rp<-vals
+                  addition<-rSamplingDistr(vals+rvals[ei],rvals[ei],nvals[ni])
                   addition<-addition*(vals[2]-vals[1])
                 },
                 "p"={
@@ -285,7 +290,7 @@ fullRSamplingDist<-function(vals,world,design,doStat="r",logScale=FALSE,sigOnly=
                   addition<-pSamplingDistr(vals,rvals[ei],nvals[ni])
                   addition<-addition*(vals[2]-vals[1])
                 },
-                "w"={
+                "ws"={
                   rp<-tanh(wn2z(vals,nvals[ni]))
                   addition<-wSamplingDistr(vals,rvals[ei],nvals[ni])
                   addition<-addition*(vals[2]-vals[1])
@@ -310,7 +315,7 @@ fullRSamplingDist<-function(vals,world,design,doStat="r",logScale=FALSE,sigOnly=
                   addition<-addition/dzs*(1-rp^2)
                   addition[1]<-a
                 },
-                "wn"={ 
+                "nw"={ 
                   zp<-(qnorm(0.8)-qnorm(braw.env$alphaSig))/sqrt(vals-3)
                   rp<-tanh(zp)
                   addition<-rSamplingDistr(rp,rvals[ei],nvals[ni])+

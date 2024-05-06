@@ -3,8 +3,8 @@
 #' 
 #' @param showType "Basic", "CILimits", "NHST", "Hits" \cr
 #'        \emph{ or one or two of:} \cr
-#'                   "r","p","ci1","ci2", "rp","n" \cr 
-#'                   "w","wp","wn", ro","po"
+#'                   "rs","p","ci1","ci2", "rp","n" \cr 
+#'                   "ws","wp","nw", ro","po"
 #' @return ggplot2 object - and printed
 #' @export
 reportExpected<-function(expectedResult=braw.res$expected,showType="Basic"){
@@ -25,8 +25,8 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic"){
   
   if (length(showType)==1) {
     switch(showType,
-           "Basic"=     {pars<-c("r","p")},
-           "2D"=     {pars<-c("r","p")},
+           "Basic"=     {pars<-c("rs","p")},
+           "2D"=     {pars<-c("rs","p")},
            "CILimits"=  {pars<-c("ci1","ci2")},
            "NHST"={pars<-c("e2","e1")},
            "Hits"=       {pars<-c("e1","e2")},
@@ -91,15 +91,17 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic"){
       par2<-pars[2]
       if (braw.env$RZ=="z") {
         switch(par1,
-               "r"={par1="z"},
+               "rs"={par1="zs"},
                "rp"={par1="zp"},
                "ro"={par1="zo"},
+               "re"={par1="ze"},
                {par1=par1}
         )
         switch(par2,
-               "r"={par2="z"},
+               "rs"={par2="zs"},
                "rp"={par2="zp"},
                "ro"={par2="zo"},
+               "re"={par2="ze"},
                {par2=par2}
         )
       }
@@ -200,7 +202,7 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic"){
         b<-r2ci(r,result$nval[1],+1)
       } else {
         switch (pars[1],
-                "r"={
+                "rs"={
                   a<-r
                   if (braw.env$RZ=="z") a<-atanh(a)
                 },
@@ -213,16 +215,20 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic"){
                   a<-result$roIV
                   if (braw.env$RZ=="z") a<-atanh(a)
                 },
+                "re"={
+                  a<-result$rIV-result$rpIV
+                  if (braw.env$RZ=="z") a<-atanh(a)
+                },
                 "po"={a<-result$poIV},
                 "log(lrs)"={a<-res2llr(result,"sLLR")},
                 "log(lrd)"={a<-res2llr(result,"dLLR")},
                 "n"={a<-result$nval},
-                "w"={a<-rn2w(r,result$nval)},
-                "wn"={a<-rw2n(r,0.8,result$design$Replication$Tails)},
+                "ws"={a<-rn2w(r,result$nval)},
+                "nw"={a<-rw2n(r,0.8,result$design$Replication$Tails)},
                 "wp"={a<-rn2w(result$rpIV,result$nval)}
         )
         switch (pars[2],
-                "r"={
+                "rs"={
                   b<-r
                   if (braw.env$RZ=="z") b<-atanh(b)
                 },
@@ -235,13 +241,17 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic"){
                   b<-result$roIV
                   if (braw.env$RZ=="z") b<-atanh(b)
                 },
+                "re"={
+                  b<-result$rIV-result$rpIV
+                  if (braw.env$RZ=="z") b<-atanh(b)
+                },
                 "po"={b<-result$poIV},
                 "log(lrs)"={b<-res2llr(result,"sLLR")},
                 "log(lrd)"={b<-res2llr(result,"dLLR")},
                 "n"={b<-result$nval},
-                "w"={b<-rn2w(r,result$nval)},
-                "wn"={b<-rw2n(r,0.8,result$design$Replication$Tails)},
-                "wp"={b<-rn2w(result$rpIV,result$nval)}
+                "ws"={b<-rn2w(r,result$nval)},
+                "wp"={b<-rn2w(result$rpIV,result$nval)},
+                "nw"={b<-rw2n(r,0.8,result$design$Replication$Tails)}
         )
       }
       if (!is.na(pars[2])) {

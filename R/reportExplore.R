@@ -1,14 +1,14 @@
 #' report the estimated population characteristics from varying parameter
 #' 
-#' @param showType        "r","p","n","w", "p(sig)" \cr
+#' @param showType        "rs","p","n","ws", "p(sig)" \cr
 #'                        "NHST", "Hits", "Misses"
 #' @return ggplot2 object - and printed
 #' @examples
 #' showExplore(exploreResult=doExplore(),
-#'                        showType="r",
+#'                        showType="rs",
 #'                        whichEffect="All",effectType="All")
 #' @export
-reportExplore<-function(exploreResult=braw.res$explore,showType="r",
+reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                         whichEffect="All",effectType="All"
                         ){
   if (is.null(exploreResult)) exploreResult<-doExplore(autoShow=FALSE)
@@ -62,14 +62,14 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="r",
   df1Vals<-exploreResult$result$df1
   
   switch (showType,
-          "r"={
+          "rs"={
             showVals<-rVals
             if (braw.env$RZ=="z") showVals<-atanh(showVals)
           },
           "p"={
             showVals<-pVals
           },
-          "w"={
+          "ws"={
             showVals<-rn2w(rVals,exploreResult$result$nval)
           },
           "n"={
@@ -262,7 +262,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="r",
           
   )
 
-  if (is.element(showType,c("r","p","w","n","log(lrs)","log(lrd)","Lambda","pNull","S"))) {
+  if (is.element(showType,c("rs","p","ws","n","log(lrs)","log(lrd)","Lambda","pNull","S"))) {
     y75<-c()
     y50<-c()
     y25<-c()
@@ -321,7 +321,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="r",
     outputText<-c(outputText,paste0("!j",brawFormat(y75[use[i]],digits=braw.env$report_precision)))
   }
   
-  if (is.element(showType,c("r","p","w","n","log(lrs)","log(lrd)","Lambda","pNull","S"))) {
+  if (is.element(showType,c("rs","p","ws","n","log(lrs)","log(lrd)","Lambda","pNull","S"))) {
     outputText<-c(outputText,rep(" ",nc+1))
     outputText<-c(outputText,"!j!i\bmean")
     for (i in 1:nc) {

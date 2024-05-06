@@ -39,7 +39,7 @@ showSingleMeta<-function(metaResult=braw.res$metaAnalysis,showTheory=FALSE) {
   
   d1<-metaResult$result$rIV
   d1n<-(metaResult$result$rpIV==0)
-  x<-plotAxis("r",hypothesis$effect)
+  x<-plotAxis("rs",hypothesis$effect)
   xlim<-x$lim
   disp1<-x$label
   if (all(d1>=0)) xlim[1]<-0

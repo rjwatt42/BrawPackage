@@ -155,7 +155,7 @@ showDesign<-function(design=braw.def$design,hypothesis=braw.def$hypothesis,plotA
       hypothesis$effect$world$populationRZ<-"r"
       hypothesis$effect$world$populationNullp<-0
     }
-    nRepDens<-fullRSamplingDist(nbin,hypothesis$effect$world,design,"wn",logScale=(braw.env$nPlotScale=="log10"),sigOnly=FALSE)
+    nRepDens<-fullRSamplingDist(nbin,hypothesis$effect$world,design,"nw",logScale=(braw.env$nPlotScale=="log10"),sigOnly=FALSE)
     y<-c(0,nRepDens,0)/max(nRepDens)*0.4
     pts=data.frame(x=log10(x),y=y)
     g<-g+dataPolygon(data=pts,fill=braw.env$plotColours$replicationC,alpha=0.5)

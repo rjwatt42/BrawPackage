@@ -47,19 +47,19 @@ trimExploreResult<-function(result,nullresult) {
 #' show the estimated population characteristics from varying parameter
 #' 
 #' @param showType        "Basic","p(sig)","NHST", "Hits","Misses" \cr
-#'  or one or two of: "r","p","w","wn" eg "p;w"
+#'  or one or two of: "rs","p","wp","ws","nw" eg "p;ws"
 #' @return ggplot2 object - and printed
 #' @examples
 #' showExplore(exploreResult=doExplore(),
-#'                        showType="r",
+#'                        showType="Basic",
 #'                        effectType="unique",whichEffect="All")
 #' @export
-showExplore<-function(exploreResult=braw.res$explore,showType="r",showTheory=FALSE,
+showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension="1D",showTheory=FALSE,
                       effectType="unique",whichEffect="All"){
 
   if (is.null(exploreResult)) exploreResult=doExplore()
-  
-  if (showType=="Basic") showType<-"r;p"
+
+  if (showType=="Basic") showType<-"rs;p"
   showType<-strsplit(showType,";")[[1]]
 
   if (!exploreResult$hypothesis$effect$world$worldOn && is.element(showType[1],c("NHST","Hits","Misses"))) {
@@ -68,8 +68,14 @@ showExplore<-function(exploreResult=braw.res$explore,showType="r",showTheory=FAL
     }
   }
   
+  if (dimension=="2D") {
+    g<-showExplore2D(exploreResult=exploreResult,showType=showType,showTheory=showTheory,
+                     effectType=effectType,whichEffect=whichEffect)
+    return(g)
+  }
+  
   quants<-0.25
-  showPower<-FALSE
+  showPower<-TRUE # show power calculations?
   
   explore<-exploreResult$explore
   hypothesis<-exploreResult$hypothesis
@@ -232,9 +238,9 @@ showExplore<-function(exploreResult=braw.res$explore,showType="r",showTheory=FAL
              }
       )
       basenpts<-51
-      if (is.element(showType[si],c("r","p","w","wp","wn"))) {
+      if (is.element(showType[si],c("rs","p","ws","wp","nw"))) {
         switch(showType[si],
-               "r"={
+               "rs"={
                  basevals<-seq(-1,1,length.out=basenpts)*braw.env$r_range
                  logScale<-FALSE
                },
@@ -247,7 +253,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="r",showTheory=FAL
                    basevals<-seq(1,0,length.out=basenpts)
                  }
                },
-               "w"={
+               "ws"={
                  basevals<-seq(braw.env$alphaSig*1.01,1/1.01,length.out=basenpts)
                  logScale<-FALSE
                },
@@ -255,7 +261,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="r",showTheory=FAL
                  basevals<-seq(braw.env$alphaSig*1.01,1/1.01,length.out=basenpts)
                  logScale<-FALSE
                },
-               "wn"={ 
+               "nw"={ 
                  logScale<-braw.env$nPlotScale=="log10"
                  if (logScale) {
                    basevals<-seq(log10(5),log10(braw.env$max_nw),length.out=basenpts)
@@ -371,8 +377,16 @@ showExplore<-function(exploreResult=braw.res$explore,showType="r",showTheory=FAL
       df1Vals<-result$df1
       
       switch (showType[si],
-              "r"={
+              "rs"={
                 showVals<-rVals
+                if (braw.env$RZ=="z") {showVals<-atanh(showVals)}
+              },
+              "rp"={
+                showVals<-rpVals
+                if (braw.env$RZ=="z") {showVals<-atanh(showVals)}
+              },
+              "re"={
+                showVals<-rVals-rpVals
                 if (braw.env$RZ=="z") {showVals<-atanh(showVals)}
               },
               "p"={
@@ -381,7 +395,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="r",showTheory=FAL
                   showVals<-log10(showVals)
                 }
               },
-              "w"={
+              "ws"={
                 showVals<-rn2w(rVals,result$nval)
                 if (braw.env$wPlotScale=="log10"){
                   showVals<-log10(showVals)
@@ -399,7 +413,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="r",showTheory=FAL
                   showVals<-log10(showVals)
                 }
               },
-              "wn"={
+              "nw"={
                 showVals<-rw2n(rVals,0.8,2)
                 if (braw.env$nPlotScale=="log10"){
                   showVals<-log10(showVals)
@@ -753,3 +767,115 @@ showExplore<-function(exploreResult=braw.res$explore,showType="r",showTheory=FAL
   g
 }
 
+showExplore2D<-function(exploreResult=braw.res$explore,showType=c("rs","p"),showTheory=FALSE,
+                 effectType="unique",whichEffect="All") {
+  
+  explore<-exploreResult$explore
+  effect<-exploreResult$hypothesis$effect
+  
+  result<-trimExploreResult(exploreResult$result,exploreResult$nullresult)
+  if (is.null(hypothesis$IV2)){
+    rVals<-result$rval
+    pVals<-result$pval
+  } else {
+    rVals<-result$r[[effectType]][,,whichEffect]
+    pVals<-result$p[[effectType]][,,whichEffect]
+  }
+  rpVals<-result$rpval
+  nVals<-result$nval
+  df1Vals<-result$df1
+  
+  for (si in 1:2) {
+  switch (showType[si],
+          "rs"={
+            showVals<-rVals
+            if (braw.env$RZ=="z") {showVals<-atanh(showVals)}
+          },
+          "rp"={
+            showVals<-rpVals
+            if (braw.env$RZ=="z") {showVals<-atanh(showVals)}
+          },
+          "re"={
+            showVals<-rVals-rpVals
+            if (braw.env$RZ=="z") {showVals<-atanh(showVals)}
+          },
+          "p"={
+            showVals<-pVals
+            if (braw.env$pPlotScale=="log10"){
+              showVals<-log10(showVals)
+            }
+          },
+          "ws"={
+            showVals<-rn2w(rVals,result$nval)
+            if (braw.env$wPlotScale=="log10"){
+              showVals<-log10(showVals)
+            }
+          },
+          "wp"={
+            showVals<-rn2w(rpVals,result$nval)
+            if (braw.env$wPlotScale=="log10"){
+              showVals<-log10(showVals)
+            }
+          },
+          "n"={
+            showVals<-nVals
+            if (braw.env$nPlotScale=="log10"){
+              showVals<-log10(showVals)
+            }
+          },
+          "nw"={
+            showVals<-rw2n(rVals,0.8,2)
+            if (braw.env$nPlotScale=="log10"){
+              showVals<-log10(showVals)
+            }
+          }
+  )
+    switch (si,
+            xVals<-apply(showVals,2,median),
+            yVals<-apply(showVals,2,median)
+    )
+  }
+
+  g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
+  
+  xaxis<-plotAxis(showType[1],effect)
+  xlim<-xaxis$lim
+  xlabel<-xaxis$label
+  xcols<-xaxis$cols
+  xlines<-xaxis$lines
+  xSecond<-NULL
+  
+  yaxis<-plotAxis(showType[2],effect)
+  ylim<-yaxis$lim
+  ylabel<-yaxis$label
+  ycols<-yaxis$cols
+  ylines<-yaxis$lines
+  ySecond<-NULL
+  
+  if (showType[1]=="p" && braw.env$pPlotScale=="log10") 
+    while (mean(log10(exploreResult$result$pval)>xlim[1])<0.75) xlim[1]<-xlim[1]-1
+  if (showType[2]=="p" && braw.env$pPlotScale=="log10") 
+    while (mean(log10(exploreResult$result$pval)>ylim[1])<0.75) ylim[1]<-ylim[1]-1
+  
+  braw.env$plotArea<-c(0,0,1,1)
+  g<-startPlot(xlim,ylim,box="both",top=TRUE,tight=TRUE,g=g)
+  g<-g+plotTitle(bquote(bold("explore: " ~ .(explore$exploreType))))
+  g<-g+xAxisLabel(xlabel)+xAxisTicks(logScale=xaxis$logScale)
+  g<-g+yAxisLabel(ylabel)+yAxisTicks(logScale=yaxis$logScale)
+  
+  lineCol<-"black"
+  if (is.element(showType[1],c("p","e1","e2","e1d","e2d"))) lineCol<-"green"
+  for (xl in xlines) {
+    g<-g+vertLine(xl,linetype="dotted",colour=lineCol,linewidth=0.5)
+  }
+  lineCol<-"black"
+  if (is.element(showType[2],c("p","e1","e2","e1d","e2d"))) lineCol<-"green"
+  for (yl in ylines) {
+    g<-g+horzLine(yl,linetype="dotted",colour=lineCol,linewidth=0.5)
+  }
+  
+  g<-g+dataLine(data.frame(x=xVals,y=yVals))
+  g<-g+dataPoint(data.frame(x=xVals,y=yVals))
+  
+  
+}

@@ -17,7 +17,7 @@ newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
   print(startPlot(box="none",backC=braw.env$plotColours$graphC))
 }
 
-BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,newDev=FALSE,height=576,aspect=1.736) {
+BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,newDev=FALSE,height=576,aspect=1.736,timeLimit=Inf) {
   if (graphC=="white") graphC<-"#FFFFFF"
   if (graphC=="normal") graphC<-"#BFECFF"
   braw.env <- new.env(parent = emptyenv())
@@ -103,6 +103,7 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,newDev=FALSE,height=576,
           
           braw.env$autoShow<-FALSE
           braw.env$plotRect<-coord_cartesian(xlim=c(0,1),ylim=c(0,1))
+          
           ##########################
           # NHST constants
           
@@ -261,6 +262,8 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,newDev=FALSE,height=576,
           braw.env$allPositive<-bquote(.(Zchar) ~"+ve")
           braw.env$allNegative<-bquote(.(Zchar) ~"ns")
 
+          braw.env$timeLimit<-timeLimit # seconds
+          
 braw.env<<-braw.env          
 
 braw.def$IV<-makeVariable("IV")

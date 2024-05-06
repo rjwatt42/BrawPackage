@@ -1,14 +1,13 @@
 plotAxis<-function(showType,effect) {
   
   logScale<-(is.element(showType,c("p","e1","e2")) && braw.env$pPlotScale=="log10") ||
-    (is.element(showType,c("w","wp")) && braw.env$wPlotScale=="log10") ||
+    (is.element(showType,c("ws","wp")) && braw.env$wPlotScale=="log10") ||
     (is.element(showType,c("n","no")) && braw.env$nPlotScale=="log10") ||
-    (is.element(showType,c("wn")))
+    (is.element(showType,c("nw")))
   
   switch(braw.env$RZ,
          "r"={
            rlims<-c(-1,1)
-           rlab<-"r"
            rslab<-braw.env$rsLabel 
            rplab<-braw.env$rpLabel 
            rticks<-seq(-1,1,0.5)
@@ -16,7 +15,6 @@ plotAxis<-function(showType,effect) {
          },
          "z"={    
            rlims<-c(-1,1)*braw.env$z_range
-           rlab<-"z"
            rslab<-braw.env$zsLabel
            rplab<-braw.env$zpLabel
            rticks<-seq(-1.5,1.5,0.5)
@@ -36,8 +34,8 @@ plotAxis<-function(showType,effect) {
            plim<-c(braw.env$min_p, 1)
            pticks<-seq(0,1,0.2)
            pmins<-seq(0,1,0.1)
-           plabel<-bquote(p)
-           polabel<-bquote(p[o])
+           plabel<-bquote(bold(p))
+           polabel<-bquote(bold(p[o]))
            plines<-c(0.05)
          }
          )
@@ -54,8 +52,8 @@ plotAxis<-function(showType,effect) {
             wlim<-c(0, 1)
             wticks<-seq(0,1,0.2)
             wmins<-seq(0,1,0.1)
-            wslabel<-bquote(w[s])
-            wplabel<-bquote(w[p])
+            wslabel<-bquote(bold(w[s]))
+            wplabel<-bquote(bold(w[p]))
             wlines<-c(0.05,0.8)
           }
   )
@@ -80,7 +78,7 @@ plotAxis<-function(showType,effect) {
   yticks<-c()
   
   switch (showType,
-          "r"={
+          "rs"={
             ylim<-rlims
             yticks<-rticks
             ymins<-rmins
@@ -96,11 +94,19 @@ plotAxis<-function(showType,effect) {
             use_cols<-c(hsv(0.1,1,1),hsv(0.1+0.075,1,1),hsv(0.1+0.15,1,1))
             ylines<-c(0)
           },
+          "re"={
+            ylim<-rlims
+            yticks<-rticks
+            ymins<-rmins
+            ylabel<-bquote(bold(r[e]))
+            use_cols<-c(hsv(0.1,1,1),hsv(0.1+0.075,1,1),hsv(0.1+0.15,1,1))
+            ylines<-c(0)
+          },
           "ro"={
             ylim<-rlims
             yticks<-rticks
             ymins<-rmins
-            ylabel<-bquote(r[o])
+            ylabel<-bquote(bold(r[o]))
             use_cols<-c(hsv(0.1,1,1),hsv(0.1+0.075,1,1),hsv(0.1+0.15,1,1))
             ylines<-c(0,effect$rIV)
           },
@@ -140,7 +146,7 @@ plotAxis<-function(showType,effect) {
             ylabel<-bquote(log[e](lr[d]))
             use_cols<-c(hsv(0,1,1),hsv(0+0.075,1,1),hsv(0+0.15,1,1))
           },
-          "w"={
+          "ws"={
             ylim<-wlim
             yticks<-wticks
             ymins<-wmins
@@ -148,7 +154,7 @@ plotAxis<-function(showType,effect) {
             ylines<-wlines
             use_cols<-c(hsv(0.65,1,1),hsv(0.65+0.075,1,1),hsv(0.65+0.15,1,1))
           },
-          "wn"={
+          "nw"={
             ylim<-log10(c(5,2000))
             yticks<-seq(0,3,1)
             ylabel<-bquote(bold(log['10'](n[w=80])))

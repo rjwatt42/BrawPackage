@@ -181,7 +181,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
         res<-sampleShortCut(hypothesis,design1,evidence,1,FALSE)
       }
       # if the result has the wrong sign, 
-      if (sign(res$rIV)!=sign(resOriginal$rIV)) {
+      if (Replication$forceSign && sign(res$rIV)!=sign(resOriginal$rIV)) {
         res$pIV<-1
         res$rIV<-0
       }

@@ -34,13 +34,13 @@ makeExplore<-function(exploreType="n",exploreNPoints=13,
 getExploreRange<-function(explore) {
   
   exploreType<-explore$exploreType
-  if (is.element(exploreType,c("rIV","rIV2","rIVIV2","rIVIV2DV"))) exploreType<-"r"
+  if (is.element(exploreType,c("rIV","rIV2","rIVIV2","rIVIV2DV"))) exploreType<-"rs"
   if (is.element(exploreType,c("IVskew","DVskew","Heteroscedasticity","Dependence","Outliers","IVRange","DVRange"))) exploreType<-"anom"
   if (is.element(exploreType,c("IVkurtosis","DVkurtosis"))) exploreType<-"kurt"
   
   switch(explore$exploreType,
          "n"=range<-list(minVal=10,maxVal=250,logScale=FALSE),
-         "r"=range<-list(minVal=-0.9,maxVal=0.9,logScale=FALSE),
+         "rs"=range<-list(minVal=-0.9,maxVal=0.9,logScale=FALSE),
          "anom"=range<-list(minVal=0,maxVal=1,logScale=FALSE),
          "kurt"=range<-list(minVal=1.5,maxVal=10^5,logScale=TRUE),
          "IVprop"=range<-list(minVal=0.2,maxVal=0.8,logScale=FALSE),
@@ -152,7 +152,7 @@ mergeExploreResult<-function(res1,res2) {
 #' @export
 doExplore<-function(nsims=10,exploreResult=NULL,explore=braw.def$explore,
                     hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,
-                      doingNull=FALSE,autoShow=braw.env$autoShow,showType="r"
+                      doingNull=FALSE,autoShow=braw.env$autoShow,showType="rs"
 ) {
   autoShowLocal<-autoShow
   assign("autoShow",FALSE,braw.env)
@@ -191,7 +191,7 @@ doExplore<-function(nsims=10,exploreResult=NULL,explore=braw.def$explore,
 }
 
 runExplore <- function(nsims,exploreResult,doingNull=FALSE,
-                       autoShow=braw.env$autoShow,showType="r"){
+                       autoShow=braw.env$autoShow,showType="rs"){
   
   explore<-exploreResult$explore
   hypothesis<-exploreResult$hypothesis
@@ -293,12 +293,14 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
     nsims<-min(exploreResult$count,exploreResult$nullcount)+nsims
   else   nsims<-exploreResult$count+nsims
   
-  while (exploreResult$count<nsims){
+  time.at.start<-Sys.time()
+  while (exploreResult$count<nsims && Sys.time()-time.at.start<braw.env$timeLimit){
     if (!autoShow) ns<-nsims
     else {
       if (exploreResult$count==0) ns<-1
       else                        ns<-10^floor(log10(exploreResult$count))
     }
+    if (braw.env$timeLimit<100) ns<-1
     ns<-min(ns,100)
     if (exploreResult$count+ns>nsims) ns<-nsims-exploreResult$count
     for (ni in 1:ns) {

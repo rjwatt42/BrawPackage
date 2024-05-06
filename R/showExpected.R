@@ -3,8 +3,8 @@
 #' 
 #' @param showType "Basic", "CILimits", "NHST", "Hits" \cr
 #'        \emph{ or one or two of:} \cr
-#'         "r","p","ci1","ci2", "rp","n" \cr
-#'          "w","wp","wn", ro","po"
+#'         "rs","p","ci1","ci2", "rp","n" \cr
+#'          "ws","wp","nw", ro","po"
 #' @param dimension "1D", "2D"
 #' @param orientation "vert", "horz"
 #' @return ggplot2 object - and printed

@@ -48,7 +48,7 @@ getNulls<-function(analysis,useSig=FALSE,useNSig=FALSE) {
 #' @param showType "Basic", "CILimits", \cr
 #' "NHST","Hits","Misses",
 #'        \emph{ or one or two of:} \cr
-#' "r","p","ci1","ci2", "rp","n"
+#' "rs","p","ci1","ci2", "rp","n"
 #' @param dimension "1D", "2D"
 #' @param orientation "vert", "horz"
 #' @return ggplot2 object - and printed
@@ -77,8 +77,8 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
   other2<-NULL
   if (length(showType)==1) {
     switch(showType,
-           "Basic"=     {showType<-c("r","p")},
-           "Power"=     {showType<-c("w","wp")},
+           "Basic"=     {showType<-c("rs","p")},
+           "Power"=     {showType<-c("ws","wp")},
            "CILimits"=  {showType<-c("ci1","ci2")},
            "NHST"={
              showType<-c("e2","e1")
