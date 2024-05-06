@@ -282,7 +282,8 @@ braw.def<<-braw.def
 braw.res$result<-NULL 
 braw.res$expected<-NULL 
 braw.res$explore<-NULL 
-braw.res$metaAnalysis<-NULL
+braw.res$metaResult<-NULL
+braw.res$metaMultiple<-NULL
 
 braw.res<<-braw.res
 }

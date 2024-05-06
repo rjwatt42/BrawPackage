@@ -341,5 +341,6 @@ showDescription<-function(analysis=braw.res$result) {
             "Categorical"=g<-plotCatInterDescription(analysis,g)
     )
   }
+  g<-g+plotTitle(bquote(bold(r[s] ~ "=" ~ .(round(analysis$rIV,3)))))
   g
 }

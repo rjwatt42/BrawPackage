@@ -30,7 +30,7 @@ worldLabel<-function(metaResult,whichMeta=NULL) {
 #' @examples
 #' showSingleMeta(metaResult=doMetaAnalysis(1),showTheory=FALSE)
 #' @export
-showSingleMeta<-function(metaResult=braw.res$metaAnalysis,showTheory=FALSE) {
+showMetaSingle<-function(metaResult=braw.res$metaResult,showTheory=FALSE) {
   if (is.null(metaResult)) metaResult<-doMetaAnalysis(1)
   
   metaAnalysis<-metaResult$metaAnalysis
@@ -96,20 +96,25 @@ showSingleMeta<-function(metaResult=braw.res$metaAnalysis,showTheory=FALSE) {
 #' @examples
 #' showMultipleMeta<-function(metaResult=doMetaAnalysis(),showType="n-k")
 #' @export
-showMultipleMeta<-function(metaResult=braw.res$metaAnalysis,showType="n-k") {
+showMetaMultiple<-function(metaResult=braw.res$metaMultiple,showType="n-k") {
   if (is.null(metaResult)) metaResult<-doMetaAnalysis()
 
+  if (metaResult$metaAnalysis$analysisType=="fixed") showType<-"S-k"
   g<-ggplot()+braw.env$plotRect
   if (showType=="S-S") {
     braw.env$plotArea<-c(0,0,1,1)
     g<-drawMeta(metaResult=metaResult,showType=showType,g=g)
   } else {
-    braw.env$plotArea<-c(0,0,0.48,1)
-    g<-drawMeta(metaResult=metaResult,whichMeta="Single",showType=showType,g)
+    if (metaResult$metaAnalysis$analysisType=="fixed") braw.env$plotArea<-c(0,0,1,1)
+    else braw.env$plotArea<-c(0,0,0.48,1)
+    if (!all(is.na(metaResult$single$Smax)))
+      g<-drawMeta(metaResult=metaResult,whichMeta="Single",showType=showType,g)
     braw.env$plotArea<-c(0.39,0,0.36,1)
-    g<-drawMeta(metaResult=metaResult,whichMeta="Gauss",showType=showType,g)
-    assign("plotArea",c(0.66,0,0.36,1),braw.env)
-    g<-drawMeta(metaResult=metaResult,whichMeta="Exp",showType=showType,g)
+    if (!all(is.na(metaResult$gauss$Smax)))
+      g<-drawMeta(metaResult=metaResult,whichMeta="Gauss",showType=showType,g)
+    braw.env$plotArea<-c(0.66,0,0.36,1)
+    if (!all(is.na(metaResult$exp$Smax)))
+      g<-drawMeta(metaResult=metaResult,whichMeta="Exp",showType=showType,g)
   }
   print(g)
 }
@@ -160,7 +165,7 @@ drawMeta<-function(metaResult=doMetaAnalysis(),whichMeta="Single",showType="n-k"
     y1<-y1[keep]
     x<-x[keep]
     
-    if (isempty(x)) {return(ggplot()+plotBlankTheme)}
+    if (isempty(x)) {return(ggplot()+braw.env$blankTheme())}
     
     yticks<-c()
     useBest<-yS==best

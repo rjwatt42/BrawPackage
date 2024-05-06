@@ -11,9 +11,12 @@
 #'                          hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,
 #'                          metaResult=NULL) {
 #' @export
-doMetaAnalysis<-function(nsims=100,metaAnalysis=makeMetaAnalysis(),
-                         hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,
-                         metaResult=NULL) {
+doMetaAnalysis<-function(nsims=100,metaResult=braw.res$metaMultiple,metaAnalysis=braw.def$metaAnalysis,
+                         hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence
+                         ) {
+  if (is.null(metaAnalysis)) metaAnalysis<-makeMetaAnalysis()
+  
+  evidence$sig_only<-metaAnalysis$sig_only
   
   for (i in 1:nsims) {
     studies<-multipleAnalysis(metaAnalysis$nstudies,hypothesis,design,evidence)
@@ -21,8 +24,8 @@ doMetaAnalysis<-function(nsims=100,metaAnalysis=makeMetaAnalysis(),
   }
   metaResult$hypothesis<-hypothesis
   metaResult$design<-design
-  setBrawRes("metaAnalysis",metaResult)
-  
+  if (nsims==1) setBrawRes("metaMultiple",metaResult)
+  else          setBrawRes("metaSingle",metaResult)
   metaResult
 }
 
@@ -82,6 +85,7 @@ runMetaAnalysis<-function(metaAnalysis,studies,metaResult){
   df1<-studies$df1
   
   if (metaAnalysis$analysisType=="fixed") {
+    metaAnalysis$includeNulls<-FALSE
     single<-getMaxLikelihood(zs,ns,df1,"Single",metaAnalysis)
     gauss<-list(Kmax=NA,Nullmax=NA,Smax=NA)
     exp<-list(Kmax=NA,Nullmax=NA,Smax=NA)
