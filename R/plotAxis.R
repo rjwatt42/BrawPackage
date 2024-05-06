@@ -1,5 +1,7 @@
 plotAxis<-function(showType,effect) {
   
+  explicitLog<-FALSE
+  
   logScale<-(is.element(showType,c("p","e1","e2")) && braw.env$pPlotScale=="log10") ||
     (is.element(showType,c("ws","wp")) && braw.env$wPlotScale=="log10") ||
     (is.element(showType,c("n","no")) && braw.env$nPlotScale=="log10") ||
@@ -21,54 +23,60 @@ plotAxis<-function(showType,effect) {
            rmins<-seq(-1.5,1.5,0.1)
          }
   )
+  plabel<-bquote(bold(p))
+  polabel<-bquote(bold(p[o]))
   switch(braw.env$pPlotScale,
          "log10"={
            plim<-c(-4,0)
            pticks<-seq(-4,0,1)
            pmins<-log10(c(seq(1,10)/10000,seq(1,10)/1000,seq(1,10)/100,seq(1,10)/10))
            plines<-log10(c(0.05,0.01,0.005,0.001))
-           plabel<-bquote(bold(log['10'](p)))
-           polabel<-bquote(bold(log['10'](p[o])))
+           if (explicitLog) {
+             plabel<-bquote(bold(log['10'](p)))
+             polabel<-bquote(bold(log['10'](p[o])))
+           }
          },
          "linear"={
            plim<-c(braw.env$min_p, 1)
            pticks<-seq(0,1,0.2)
            pmins<-seq(0,1,0.1)
-           plabel<-bquote(bold(p))
-           polabel<-bquote(bold(p[o]))
            plines<-c(0.05)
          }
          )
+  wslabel<-bquote(bold(w[s]))
+  wplabel<-bquote(bold(w[p]))
   switch (braw.env$wPlotScale,
           "log10"={
             wlim<-c(-2,0)
             wticks<-seq(-2,0,1)
             wmins<-log10(c(seq(1,10)/100,seq(1,10)/10))
-            wslabel<-bquote(bold(log['10'](w[s])))
-            wplabel<-bquote(bold(log['10'](w[p])))
+            if (explicitLog) {
+              wslabel<-bquote(bold(log['10'](w[s])))
+              wplabel<-bquote(bold(log['10'](w[p])))
+            }
             wlines<-log10(c(0.05,0.8))
           },
           "linear"={
             wlim<-c(0, 1)
             wticks<-seq(0,1,0.2)
             wmins<-seq(0,1,0.1)
-            wslabel<-bquote(bold(w[s]))
-            wplabel<-bquote(bold(w[p]))
             wlines<-c(0.05,0.8)
           }
   )
+  nlabel<-bquote(bold(n))
   switch(braw.env$nPlotScale,
          "log10"={
            nlim<-log10(c(5,2000))
            nticks<-seq(1,3,1)
            nmins<-log10(c(seq(5,10),seq(1,10)*10,seq(1,10)*100))
-           nlabel<-bquote(bold(log['10'](n)))
+           if (explicitLog) {
+             nlabel<-bquote(bold(log['10'](n)))
+           }
          },
          "linear"={
            nlim<-c(1, 50*5*1.1)
            nticks<-seq(0,250,50)
            nmins<-seq(0,250,10)
-           nlabel<-"n"
          }
   )
   
@@ -157,7 +165,10 @@ plotAxis<-function(showType,effect) {
           "nw"={
             ylim<-log10(c(5,2000))
             yticks<-seq(0,3,1)
-            ylabel<-bquote(bold(log['10'](n[w=80])))
+            if (explicitLog)
+              ylabel<-bquote(bold(log['10'](n[w=80])))
+            else
+              ylabel<-bquote(bold(n[w=80]))
             logScale<-TRUE
           },
           "n"={
@@ -170,7 +181,10 @@ plotAxis<-function(showType,effect) {
             ylim<-nlim
             yticks<-nticks
             ymins<-nmins
-            ylabel<-bquote(bold(log['10'](no)))
+            if (explicitLog)
+              ylabel<-bquote(bold(log['10'](no)))
+            else
+              ylabel<-bquote(bold(no))
           },
           "wp"={
             ylim<-wlim

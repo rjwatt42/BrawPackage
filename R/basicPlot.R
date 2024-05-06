@@ -147,15 +147,15 @@ yAxisLabel<-function(label){
   mn<-1
   switch(braw.env$plotLimits$orientation,
          "vert"={
-           yoff<-0.1*braw.env$plotArea[4]
-           yoff<-0
+           yoff<-0.075*braw.env$plotArea[4]
+           # yoff<-0
            geom_text(data=axis,aes(x=x,y=y-yoff),label=label, parse = TRUE,
                      hjust=0.5,vjust=voff/1.5*mn,
                      size=braw.env$labelSize*1.25*braw.env$plotLimits$fontScale,angle=0,fontface="bold")      
          },
          "horz"={
-           xoff<-0.1*braw.env$plotArea[3]
-           xoff<-0
+           xoff<-0.075*braw.env$plotArea[3]
+           # xoff<-0
            geom_text(data=axis,aes(x=x-xoff,y=y),label=label, parse = TRUE,
                      hjust=0.5,vjust=-2.5/1.5*mn,
                      size=braw.env$labelSize*1.25*braw.env$plotLimits$fontScale,angle=90,fontface="bold")      
