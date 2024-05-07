@@ -204,18 +204,20 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
     c1=braw.env$plotColours$descriptionC
     c2=braw.env$plotColours$descriptionC
   }
-  if (length(d1)<200) {
+  if (length(d1)<=200) {
     use<-!isSignificant(braw.env$STMethod,pvals,rvals,nvals,df1vals,analysis$evidence)
     pts1=pts[use,]
     g<-g+dataPoint(data=pts1,shape=braw.env$plotShapes$study, colour = "black", fill = c2, size = dotSize)
     pts2=pts[!use,]
     g<-g+dataPoint(data=pts2,shape=braw.env$plotShapes$study, colour = "black", fill = c1, size = dotSize)
   } else {
+    gain<-(length(d1)-200)/500
+    dotSize<-dotSize/(1+gain)
     use<-!isSignificant(braw.env$STMethod,pvals,rvals,nvals,df1vals,analysis$evidence)
     pts1=pts[use,]
-    g<-g+dataPoint(data=pts1,shape=braw.env$plotShapes$study, colour = c2, fill = c2, size = dotSize/4)
+    g<-g+dataPoint(data=pts1,shape=braw.env$plotShapes$study, colour = darken(c2,off=-1+min(3,gain)/3), fill = c2, size = dotSize)
     pts2=pts[!use,]
-    g<-g+dataPoint(data=pts2,shape=braw.env$plotShapes$study, colour = c1, fill = c1, size = dotSize/4)
+    g<-g+dataPoint(data=pts2,shape=braw.env$plotShapes$study, colour = darken(c1,off=-1+min(3,gain)/3), fill = c1, size = dotSize)
   }
   return(g)
 }
