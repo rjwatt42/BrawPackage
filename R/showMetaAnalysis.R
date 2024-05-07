@@ -79,7 +79,8 @@ showMetaSingle<-function(metaResult=braw.res$metaResult,showTheory=FALSE) {
     g<-g+dataPoint(data=ptsAll, shape=braw.env$plotShapes$study, colour = darken(col1,off=-colgain), fill = col1, size = dotSize)
     g<-g+dataPoint(data=ptsNull,shape=braw.env$plotShapes$study, colour = darken(col2,off=-colgain), fill = col2,  size = dotSize)
   }
-  g<-g+xAxisLabel(disp1)+xAxisTicks(x$ticks)+yAxisLabel(disp2)+yAxisTicks(y$ticks)
+  g<-g+xAxisTicks(x$ticks)+xAxisLabel(disp1)
+  g<-g+yAxisTicks(y$ticks)+yAxisLabel(disp2)
   
   lb<-worldLabel(metaResult)
   pts_lb<-data.frame(x=mean(xlim),y=ylim[2]-diff(ylim)*0.2)
@@ -195,10 +196,11 @@ drawMeta<-function(metaResult=doMetaAnalysis(),whichMeta="Single",showType="n-k"
     )
     pts<-data.frame(x=x,y=y)
       
-      if (braw.env$plotArea[1]==0)  
-            g<-startPlot(xlim,ylim,box="both",top=TRUE,g=g)+yAxisLabel(ylabel)+yAxisTicks(yticks)
-      else  g<-startPlot(xlim,ylim,box="x",top=TRUE,g=g)
-      g<-g+xAxisLabel(xlabel)+xAxisTicks(xticks)
+      if (braw.env$plotArea[1]==0)  {
+        g<-startPlot(xlim,ylim,box="both",top=TRUE,g=g)
+        g<-g+yAxisTicks(yticks)+yAxisLabel(ylabel)
+      }  else  g<-startPlot(xlim,ylim,box="x",top=TRUE,g=g)
+      g<-g+xAxisTicks(xticks)+xAxisLabel(xlabel)
       
       dotSize=min(4,max(4,sqrt(50/length(x))))
       

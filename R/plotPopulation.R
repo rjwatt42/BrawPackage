@@ -340,8 +340,8 @@ plotPopulation<-function(IV,DV,effect,alpha=1,g=NULL){
   )
   
   g<-startPlot(xlim,ylim,g=g)
-  g<-g+xAxisLabel(bquote(bold(.(IV$name))))+xAxisTicks(xtick,xticklabel)
-  g<-g+yAxisLabel(bquote(bold(.(DV$name))))+yAxisTicks(ytick,yticklabel)
+  g<-g+xAxisTicks(xtick,xticklabel)+xAxisLabel(bquote(bold(.(IV$name))))
+  g<-g+yAxisTicks(ytick,yticklabel)+yAxisLabel(bquote(bold(.(DV$name))))
 
   switch (hypothesisType,
           "Interval Interval"={

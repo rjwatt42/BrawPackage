@@ -186,8 +186,8 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   for (whichEffect in whichEffects) {
     braw.env$plotArea<-c(plots[si,whichEffect],0,plotWidth,1)
     g<-startPlot(xlim,ylim,box="Both",top=TRUE,tight=TRUE,g=g)
-    g<-g+xAxisLabel(bquote(bold(.(explore$exploreType))))+xAxisTicks(xbreaks,xnames,logScale=explore$xlog)
-    g<-g+yAxisLabel(ylabel)+yAxisTicks(logScale=yaxis$logScale)
+    g<-g+xAxisTicks(xbreaks,xnames,logScale=explore$xlog)+xAxisLabel(bquote(bold(.(explore$exploreType))))
+    g<-g+yAxisTicks(logScale=yaxis$logScale)+yAxisLabel(ylabel)
     col<-ycols[1]
     
     theoryVals<-NULL
@@ -860,8 +860,8 @@ showExplore2D<-function(exploreResult=braw.res$explore,showType=c("rs","p"),show
   braw.env$plotArea<-c(0,0,1,1)
   g<-startPlot(xlim,ylim,box="both",top=TRUE,tight=TRUE,g=g)
   g<-g+plotTitle(bquote(bold("explore: " ~ .(explore$exploreType))))
-  g<-g+xAxisLabel(xlabel)+xAxisTicks(logScale=xaxis$logScale)
-  g<-g+yAxisLabel(ylabel)+yAxisTicks(logScale=yaxis$logScale)
+  g<-g+xAxisTicks(logScale=xaxis$logScale)+xAxisLabel(xlabel)
+  g<-g+yAxisTicks(logScale=yaxis$logScale)+yAxisLabel(ylabel)
   
   lineCol<-"black"
   if (is.element(showType[1],c("p","e1","e2","e1d","e2d"))) lineCol<-"green"

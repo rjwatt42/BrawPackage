@@ -1,6 +1,6 @@
 g<-startPlot(c(-3,3),c(-1,1),"both","horz")
-g<-g+xAxisLabel("x")+xAxisTicks(seq(-3,3,1))
-g<-g+yAxisLabel("y")+yAxisTicks(seq(-1,1,0.5))
+g<-g+xAxisTicks(seq(-3,3,1))+xAxisLabel("x")
+g<-g+yAxisTicks(seq(-1,1,0.5))+yAxisLabel("y")
 
 x<-seq(-3,3,length.out=201)
 y<-sin(x/3*2*pi)

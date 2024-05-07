@@ -180,11 +180,9 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
   braw.env$plotArea<-c(0,0,1,1)
   g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
   g<-startPlot(xaxis$lim,yaxis$lim,box="both",top=FALSE,g=g)
-  g<-g+xAxisTicks(logScale=xaxis$logScale)
-  g<-g+xAxisLabel(xaxis$label)
-  g<-g+yAxisTicks(logScale=yaxis$logScale)
-  g<-g+yAxisLabel(yaxis$label)
-  
+  g<-g+xAxisTicks(logScale=xaxis$logScale)+xAxisLabel(xaxis$label)
+  g<-g+yAxisTicks(logScale=yaxis$logScale)+yAxisLabel(yaxis$label)
+
   if (disp1=="rs" && disp2=="p") {
     rs<-seq(-braw.env$r_range,braw.env$r_range,length.out=51)
     ps<-r2p(rs,analysis$nval[1])

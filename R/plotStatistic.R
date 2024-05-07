@@ -486,9 +486,9 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,orient
   top<-is.element(showType,c("e1","e2","e1d","e2d"))
   
   g<-startPlot(xlim,ylim,box=box,top=top,orientation=orient,g=g)
-  g<-g+yAxisTicks(logScale=yaxis$logScale)
-  g<-g+yAxisLabel(ylabel)
-  if (!is.null(hypothesis$IV2) && effectType=="direct") g<-g+xAxisTicks(breaks=c(0,2,4),c("Main1","Main2","Interaction"))
+  g<-g+yAxisTicks(logScale=yaxis$logScale)+yAxisLabel(ylabel)
+  if (!is.null(hypothesis$IV2) && effectType=="direct") 
+    g<-g+xAxisTicks(breaks=c(0,2,4),c("Main1","Main2","Interaction"))
   if (!is.null(hypothesis$IV2)) 
     g<-g+dataText(data.frame(x=min(xlim),y=max(ylim)),label=effectType,hjust=-0.1,vjust=1,fontface="bold")
   

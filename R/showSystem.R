@@ -105,8 +105,8 @@ showWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),g=NULL) {
   g<-g+dataPolygon(pts,fill=braw.env$plotColours$descriptionC,colour=NA)
   g<-g+dataLine(pts)
   switch(braw.env$RZ,
-         "r"={ g<-g+xAxisLabel(braw.env$rpLabel)+xAxisTicks(seq(-1,1,0.5))},
-         "z"={ g<-g+xAxisLabel(braw.env$zpLabel)+xAxisTicks(seq(-2,2,1))}
+         "r"={ g<-g+xAxisTicks(seq(-1,1,0.5))+xAxisLabel(braw.env$rpLabel)},
+         "z"={ g<-g+xAxisTicks(seq(-2,2,1))+xAxisLabel(braw.env$zpLabel)}
   )
   
   return(g)
@@ -143,7 +143,7 @@ showDesign<-function(design=braw.def$design,hypothesis=braw.def$hypothesis,plotA
     g<-ggplot()+coord_cartesian(xlim = c(0,1)+c(-1,1)*0.1, ylim = c(0,1)+c(-1,1)*0.1) + braw.env$blankTheme()
   g<-startPlot(xlim=binRange, ylim=c(0,1),
                box="x",g=g)
-  g<-g+xAxisLabel(nRange$label)+xAxisTicks(nRange$ticks,10^nRange$ticks)
+  g<-g+xAxisTicks(nRange$ticks,10^nRange$ticks)+xAxisLabel(nRange$label)
   g<-g+dataPolygon(data=pts,fill=braw.env$plotColours$descriptionC)
   g<-g+dataLine(data=pts)
 
@@ -309,10 +309,9 @@ showWorldSampling<-function(hypothesis=braw.def$hypothesis,design=braw.def$desig
   
   g<-startPlot(xlim=c(-1,1), ylim=c(0,1.05),box="x",g=g)
   switch(braw.env$RZ,
-         "r"={g<-g+xAxisLabel(braw.env$rsLabel)},
-         "z"={g<-g+xAxisLabel(braw.env$zsLabel)}
+         "r"={g<-g+xAxisTicks(seq(-1,1,0.5))+xAxisLabel(braw.env$rsLabel)},
+         "z"={g<-g+xAxisTicks(seq(-1,1,0.5))+xAxisLabel(braw.env$zsLabel)}
   )
-  g<-g+xAxisTicks(seq(-1,1,0.5))
   g<-g+dataPolygon(data=pts,fill=braw.env$plotColours$descriptionC)
   g<-g+dataLine(data=pts)
   

@@ -34,9 +34,11 @@ reOrientXY<-function(data,orientation=braw.env$plotLimits$orientation) {
 plotLimits<-function(xlim,ylim,orientation,gaps=c(1,1,0,0),fontScale=1) {
   switch(orientation,
          "horz"={braw.env$plotLimits<-list(xlim=xlim,ylim=ylim,xsc=xlim,ysc=ylim,
-                                           orientation=orientation,gap=gaps,fontScale=fontScale)},
+                                           orientation=orientation,gap=gaps,fontScale=fontScale,
+                                           xAxisTickSize=5,yAxisTickSize=5)},
          "vert"={braw.env$plotLimits<-list(xlim=xlim,ylim=ylim,xsc=ylim,ysc=xlim,
-                                           orientation=orientation,gap=gaps[c(2,1,4,3)],fontScale=fontScale)}
+                                           orientation=orientation,gap=gaps[c(2,1,4,3)],fontScale=fontScale,
+                                           xAxisTickSize=5,yAxisTickSize=5)}
          )
 }
 
@@ -106,28 +108,22 @@ xAxisLabel<-function(label) {
   mathlabel<-grepl("['^']{1}",label) | grepl("['[']{1}",label)
   if (any(mathlabel)) {
     label<-deparse(label)
-    voff<-3
   } else {
     label<-deparse(bquote(bold(.(label))))
-    voff<-4
   }
+  voff<-braw.env$plotLimits$xAxisTickSize
   
   axis<-data.frame(x=mean(braw.env$plotLimits$xlim),y=braw.env$plotLimits$ylim[1])
   axis<-reRangeXY(axis)
-  mn<-1
   switch(braw.env$plotLimits$orientation,
          "vert"={
-           xoff<-0.1*braw.env$plotArea[3]
-           xoff<-0
-           geom_text(data=axis,aes(x=x-xoff,y=y),label=label, parse = TRUE,
-                     hjust=0.5,vjust=-voff/1.5*mn,
+           geom_text(data=axis,aes(x=x,y=y),label=label, parse = TRUE,
+                     hjust=0.5,vjust=-voff/1.5,
                      size=braw.env$labelSize*1.25*braw.env$plotLimits$fontScale,angle=90,fontface="bold")      
          },
          "horz"={
-           yoff<-0.1*braw.env$plotArea[4]
-           yoff<-0
-           geom_text(data=axis,aes(x=x,y=y-yoff),label=label, parse = TRUE,
-                     hjust=0.5,vjust=voff/1.5*mn,
+           geom_text(data=axis,aes(x=x,y=y),label=label, parse = TRUE,
+                     hjust=0.5,vjust=4/1.5,
                      size=braw.env$labelSize*1.25*braw.env$plotLimits$fontScale,angle=0,fontface="bold")      
          }
   )
@@ -136,28 +132,22 @@ yAxisLabel<-function(label){
   mathlabel<-grepl("['^']{1}",label) | grepl("['[']{1}",label)
   if (any(mathlabel)) {
     label<-deparse(label)
-    voff<-3
   } else {
     label<-deparse(bquote(bold(.(label))))
-    voff<-4
   }
-  
+  voff<-braw.env$plotLimits$yAxisTickSize
+  print(voff)
   axis<-data.frame(x=braw.env$plotLimits$xlim[1],y=mean(braw.env$plotLimits$ylim))
   axis<-reRangeXY(axis)
-  mn<-1
   switch(braw.env$plotLimits$orientation,
          "vert"={
-           yoff<-0.075*braw.env$plotArea[4]
-           yoff<-0
-           geom_text(data=axis,aes(x=x,y=y-yoff),label=label, parse = TRUE,
-                     hjust=0.5,vjust=voff/1.5*mn,
+           geom_text(data=axis,aes(x=x,y=y),label=label, parse = TRUE,
+                     hjust=0.5,vjust=2/1.5,
                      size=braw.env$labelSize*1.25*braw.env$plotLimits$fontScale,angle=0,fontface="bold")      
          },
          "horz"={
-           xoff<-0.075*braw.env$plotArea[3]
-           xoff<-0
-           geom_text(data=axis,aes(x=x-xoff,y=y),label=label, parse = TRUE,
-                     hjust=0.5,vjust=-voff/1.5*mn,
+           geom_text(data=axis,aes(x=x,y=y),label=label, parse = TRUE,
+                     hjust=0.5,vjust=-voff/1.5,
                      size=braw.env$labelSize*1.25*braw.env$plotLimits$fontScale,angle=90,fontface="bold")      
          }
   )
@@ -177,6 +167,8 @@ yAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE){
   
   ticks<-reRangeXY(data.frame(x=braw.env$plotLimits$xlim[1],y=breaks))
   mn<-5/max(5,max(nchar(labels)))
+  braw.env$plotLimits$yAxisTickSize<-min(5,max(nchar(labels)))
+  
   switch(braw.env$plotLimits$orientation,
          "vert"={
            geom_text(data=ticks,aes(x=x,y=y),label=labels,hjust=0.5,vjust=1.1,
@@ -206,6 +198,8 @@ xAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE){
   
   sz<-100/length(breaks)
   mn<-sz*0.9/max(sz,max(nchar(labels)))
+  braw.env$plotLimits$xAxisTickSize<-min(5,max(nchar(labels)))
+  
   switch(braw.env$plotLimits$orientation,
          "vert"={
            geom_text(data=ticksTop,aes(x=x,y=y),label=labels,hjust=1.1,vjust=0.5,
