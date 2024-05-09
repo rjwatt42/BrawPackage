@@ -1,4 +1,4 @@
-readSample<-function(raw_data, doOrdinals=FALSE, maxOrdinal=9, header=c()){
+prepareSample<-function(raw_data, doOrdinals=FALSE, maxOrdinal=9, header=c()){
   if (is.null(raw_data)) {return(NULL)}
   if (nrow(raw_data)==0) {return(NULL)}
 
@@ -177,11 +177,12 @@ readSample<-function(raw_data, doOrdinals=FALSE, maxOrdinal=9, header=c()){
   return(allData)
 }
 
-prepareSample<-function(data,DV,IV,IV2=NULL) {
+readSample<-function(data,DV,IV,IV2=NULL) {
 
+  if (is.character(data)) data<-read.csv(data)
   if (length(IV)>1) IV2<-IV[2]
   
-  data1<-readSample(data)
+  data1<-prepareSample(data)
   
   dvUse<-as.list(data1$variables[which(names(data)==DV),])
   ivUse<-as.list(data1$variables[which(names(data)==IV[1]),])
