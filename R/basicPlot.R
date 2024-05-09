@@ -210,7 +210,7 @@ horzLine<-function(intercept=NULL,linetype="solid",colour="black",alpha=1,linewi
   data<-data.frame(x=braw.env$plotLimits$xlim,y=intercept)
   geom_line(data=reRangeXY(data),aes(x=x,y=y),linetype=linetype, color=colour, alpha=alpha, linewidth=linewidth)
 }
-dataLabel<-function(data,label, hjust=0, vjust=0, fill="white",colour="black",parser=TRUE) {
+dataLabel<-function(data,label, hjust=0, vjust=0, fill="white",colour="black",parser=TRUE,fontface="plain",size=1,label.size=0.25) {
   mathlabel<-grepl("['^']{1}",label) | grepl("['[']{1}",label)
   if (any(mathlabel)) {
     label<-deparse(label)
@@ -225,13 +225,14 @@ dataLabel<-function(data,label, hjust=0, vjust=0, fill="white",colour="black",pa
          "horz"=
            geom_label(data=data,aes(x = x, y = y), label=label, 
                       hjust=hjust, vjust=vjust, nudge_y=voff,
-               fill=fill,color=colour,
-               size=braw.env$labelSize*braw.env$plotLimits$fontScale,parse=parser),
+               fill=fill,color=colour,fontface=fontface,
+               label.size=label.size,
+               size=size*braw.env$labelSize*braw.env$plotLimits$fontScale,parse=parser),
          "vert"=   
            geom_label(data=data,aes(x = x, y = y), label=label, 
                       hjust=vjust,vjust=hjust,  nudge_y=voff,
-               fill=fill,color=colour,
-               size=braw.env$labelSize),parse=TRUE
+               fill=fill,color=colour,fontface=fontface,
+               size=size*braw.env$labelSize),parse=TRUE
   )
   
 }
@@ -347,6 +348,13 @@ dataLegend<-function(data,title="title",fontsize=3.5) {
 dataContour<-function(data,colour="black",breaks=c(0.1,0.3,0.5,0.7,0.9),linewidth=0.25,linetype="solid") {
   data<-reRangeXY(data)
   geom_contour(data=data,aes(x=x,y=y,z=z),colour=colour,breaks=breaks,lwd=linewidth,lty=linetype)
+}
+
+desat <- function(col,gain=1) {
+  col<-(col2rgb(col)/255-0.5)*gain+0.5
+  col[col<0]<-0
+  col[col>1]<-1
+  rgb(col[1],col[2],col[3])
 }
 
 darken <- function(col,gain=1,off=0) {

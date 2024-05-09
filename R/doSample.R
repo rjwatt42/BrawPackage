@@ -206,14 +206,14 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
       id<-1:n
       if (is.null(braw.env$lastSample)) {
         useIV<-match(IV$name,variables$name)
-        iv<-importedData[[useIV+1]]    
+        iv<-braw.res$importedData[[useIV+1]]    
         
         useDV<-match(DV$name,variables$name)
-        dv<-importedData[[useDV+1]] 
+        dv<-braw.res$importedData[[useDV+1]] 
         
         if (!is.null(IV2)) {
           useIV2<-match(IV2$name,variables$name)
-          iv2<-importedData[[useIV2+1]]    
+          iv2<-braw.res$importedData[[useIV2+1]]    
         } else {
           iv2<-rep(0,length(iv))
         }
@@ -239,9 +239,9 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
       useIV<-match(IV$name,variables$name)
       useDV<-match(DV$name,variables$name)
 
-      id<-importedData[[1]]
-      iv<-importedData[[useIV+1]]    
-      dv<-importedData[[useDV+1]]    
+      id<-braw.res$importedData[[1]]
+      iv<-braw.res$importedData[[useIV+1]]    
+      dv<-braw.res$importedData[[useDV+1]]    
       sampleRho<-0
       samplePval<-0
       
@@ -249,7 +249,7 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
 
       if (!is.null(IV2)) {
         useIV2<-match(IV2$name,variables$name)
-        iv2<-importedData[[useIV2+1]]    
+        iv2<-braw.res$importedData[[useIV2+1]]    
         waste<-waste | is.na(iv2)
       } else {
         iv2<-rep(0,length(iv))
