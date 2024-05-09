@@ -236,20 +236,22 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
     } else {
       
     if (IV$process=="data" && DV$process=="data"){
-      useIV<-match(IV$name,variables$name)
-      useDV<-match(DV$name,variables$name)
+      variables<-braw.res$importedData$variables
+      importedData<-braw.res$importedData$data
+      useIV<-match(IV$name,variables[,"name"])
+      useDV<-match(DV$name,variables[,"name"])
 
-      id<-braw.res$importedData[[1]]
-      iv<-braw.res$importedData[[useIV+1]]    
-      dv<-braw.res$importedData[[useDV+1]]    
+      id<-importedData[[1]]
+      iv<-importedData[[useIV+1]]    
+      dv<-importedData[[useDV+1]]    
       sampleRho<-0
       samplePval<-0
       
       waste<-(is.na(iv) | is.na(dv))
 
       if (!is.null(IV2)) {
-        useIV2<-match(IV2$name,variables$name)
-        iv2<-braw.res$importedData[[useIV2+1]]    
+        useIV2<-match(IV2$name,variables[,"name"])
+        iv2<-importedData[[useIV2+1]]    
         waste<-waste | is.na(iv2)
       } else {
         iv2<-rep(0,length(iv))
@@ -756,7 +758,7 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
   
   sample<-list(participant=id, iv=iv,iv2=iv2, dv=dv,ivplot=xplot,iv2plot=x2plot,dvplot=yplot,
                sampleRho=sampleRho,samplePval=samplePval,effectRho=rho,nval=design$sN,
-               hypothesis=hypothesis, effect=effect, design=design)
+               hypothesis=hypothesis, design=design)
   if (autoShow) print(showSample(sample))
   sample
 }

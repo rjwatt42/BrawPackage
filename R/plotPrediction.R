@@ -5,6 +5,7 @@ getAxisPrediction<-function(hypothesis) {
           "Interval"={
             xlim = c(-1,1)*braw.env$fullRange*IV$sd+IV$mu
             xticks=seq(-2,2)*IV$sd+IV$mu
+            xticks<-NULL
             xlabels=xticks
           },
           "Ordinal"={
@@ -22,6 +23,7 @@ getAxisPrediction<-function(hypothesis) {
           "Interval"={
             ylim = c(-1,1)*braw.env$fullRange*DV$sd+DV$mu
             yticks=seq(-2,2)*DV$sd+DV$mu
+            yticks<-NULL
             ylabels=yticks
           },
           "Ordinal"={

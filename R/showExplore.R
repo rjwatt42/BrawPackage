@@ -140,7 +140,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   ylines<-yaxis$lines
   ySecond<-NULL
   
-  if (showType[si]=="p" && braw.env$pPlotScale=="log10") 
+  if (showType[si]=="p" && braw.env$pPlotScale=="log10" && any(exploreResult$result$pval>0)) 
     while (mean(log10(exploreResult$result$pval)>ylim[1])<0.75) ylim[1]<-ylim[1]-1
   
   col2<-braw.env$plotColours$infer_miss
@@ -852,9 +852,9 @@ showExplore2D<-function(exploreResult=braw.res$explore,showType=c("rs","p"),show
   ylines<-yaxis$lines
   ySecond<-NULL
   
-  if (showType[1]=="p" && braw.env$pPlotScale=="log10") 
+  if (showType[1]=="p" && braw.env$pPlotScale=="log10" && any(exploreResult$result$pval>0)) 
     while (mean(log10(exploreResult$result$pval)>xlim[1])<0.75) xlim[1]<-xlim[1]-1
-  if (showType[2]=="p" && braw.env$pPlotScale=="log10") 
+  if (showType[2]=="p" && braw.env$pPlotScale=="log10" && any(exploreResult$result$pval>0)) 
     while (mean(log10(exploreResult$result$pval)>ylim[1])<0.75) ylim[1]<-ylim[1]-1
   
   braw.env$plotArea<-c(0,0,1,1)

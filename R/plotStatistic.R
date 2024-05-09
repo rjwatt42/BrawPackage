@@ -476,7 +476,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,orient
   ylabel<-yaxis$label
   ylines<-yaxis$lines
   
-  if (showType=="p" && braw.env$pPlotScale=="log10" && any(is.numeric(analysis$pIV))) 
+  if (showType=="p" && braw.env$pPlotScale=="log10" && any(is.numeric(analysis$pIV)) && any(analysis$pIV>0)) 
     while (mean(log10(analysis$pIV)>ylim[1])<0.75) ylim[1]<-ylim[1]-1
   
   if (orient=="vert") ylim[2]<-ylim[2]+diff(ylim)/5

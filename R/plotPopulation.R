@@ -308,6 +308,7 @@ plotPopulation<-function(IV,DV,effect,alpha=1,g=NULL){
          "Interval"=    {
            xlim <- c(-1,1)*braw.env$fullRange*IV$sd+IV$mu
            xtick<-seq(-braw.env$fullRange,braw.env$fullRange,1)*IV$sd+IV$mu
+           xtick<-NULL
            xticklabel<-xtick
          },
          "Ordinal"=     {
@@ -325,6 +326,7 @@ plotPopulation<-function(IV,DV,effect,alpha=1,g=NULL){
          "Interval"=    {
            ylim <- c(-1,1)*braw.env$fullRange*DV$sd+DV$mu
            ytick<-seq(-braw.env$fullRange,braw.env$fullRange,1)*DV$sd+DV$mu
+           ytick<-NULL
            yticklabel<-ytick
          },
          "Ordinal"=     {

@@ -96,10 +96,10 @@ reportPlot<-function(outputText,nc,nr){
     mathlabel<-grepl("['^']{1}",label) || grepl("['[']{1}",label)
     if (any(mathlabel)) parse<-TRUE
     pts<-data.frame(x=x,y=top+1-y)
-    g<-g+geom_label(data=pts,aes(x=x, y=y), label=label, 
+    g<-g+geom_label(data=pts,aes(x=x, y=y), label=label,fontface=fontface, 
                                          hjust=hjust, vjust=0, 
                                          size=font_size*sz, 
-                                         col=col,fontface=fontface,
+                                         col=col,fill=fill,
                                          parse=parse,
                                          label.size=NA,label.padding=unit(0,"lines"))
   }
