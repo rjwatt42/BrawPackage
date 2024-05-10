@@ -59,27 +59,27 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova"){
 
       outputText<-c(outputText,"!j\btest-statistic","\b(df) ","\bvalue   ","\bp",f1,rep("",nc-5))
       outputText<-c(outputText,paste0("!j",t_name),df,brawFormat(tval,digits=braw.env$report_precision),pvalText,f2,rep("",nc-5))
+      outputText<-c(outputText,rep("",nc))
     }
     
-    outputText<-c(outputText,rep("",nc))
     
-    outputText<-c(outputText,paste0("\b",analysisType),sub("^","\b",colnames(anova)))
+    outputText<-c(outputText," ",sub("^","\b",colnames(anova)))
     total_done<-FALSE
     
     for (i in 1:nrow(anova)){
       vn<-rownames(anova)[i]
       if (vn!="(Intercept)") {
-        if (vn=="NULL") vn<-"!jTotal"
-        if (vn=="iv1"){vn<-paste("!j",analysis$hypothesis$IV$name,sep="")}
-        if (vn=="iv2"){vn<-paste("!j",analysis$hypothesis$IV2$name,sep="")}
-        if (vn=="iv1:iv2"){vn<-paste("!j",analysis$hypothesis$IV$name,":",analysis$hypothesis$IV2$name,sep="")}
-        if (vn=="Residuals"){vn<-"!jError"}
+        if (vn=="NULL") vn<-"Total"
+        if (vn=="iv1"){vn<-paste("",analysis$hypothesis$IV$name,sep="")}
+        if (vn=="iv2"){vn<-paste("",analysis$hypothesis$IV2$name,sep="")}
+        if (vn=="iv1:iv2"){vn<-paste("",analysis$hypothesis$IV$name,":",analysis$hypothesis$IV2$name,sep="")}
+        if (vn=="Residuals"){vn<-"Error"}
         if (vn=="Total"){
-          vn<-"!jTotal"
+          vn<-"Total"
           total_done<-TRUE
           }
         
-        outputText<-c(outputText,vn)
+        outputText<-c(outputText,paste0("!j!i",vn,":"))
         for (j in 1:ncol(anova)){
           if (is.na(anova[i,j])){
             outputText<-c(outputText,"")
@@ -96,11 +96,11 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova"){
     
     df<-sum(anova[,2])-anova[1,2]
     if (!is.na(df)) {df<-brawFormat(df,digits=braw.env$report_precision)} else {df<-""}
-    outputText<-c(outputText,"!jTotal",ssq,df,rep("",nc-3))
+    outputText<-c(outputText,"!j!iTotal:",ssq,df,rep("",nc-3))
     }
-    outputText<-c(outputText,rep(" ",nc))
+    outputText<-c(outputText,rep("",nc))
 
-    outputText<-c(outputText,"\bPower(w)", "\bObserved","\bActual",rep("",nc-3))   
+    outputText<-c(outputText,"\bPower(w)", "\bPost Hoc","\bActual",rep("",nc-3))   
     if (is.na(effect$rIV)) {effect$rIV<-0}
     outputText<-c(outputText," ",brawFormat(rn2w(analysis$rIV,analysis$nval),digits=3),
                                  brawFormat(rn2w(effect$rIV,analysis$nval),digits=3),

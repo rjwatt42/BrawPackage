@@ -435,9 +435,11 @@ generalAnalysis<-function(allData,InteractionOn,withins,ssqType="Type3",caseOrde
   # get linear model and anova
   if (catVars[1]) {
     if (doingWithin) {
+      lmRawC<-glmer(formula=as.formula(formula),data=analysisRawData,family="binomial",contrasts=contrasts)
       lmNormC<-glmer(formula=as.formula(formula),data=analysisNormData,family="binomial",contrasts=contrasts)
       braw.env$anovaMethod<-"Chisq"
     } else {
+      lmRawC<-glm(formula=as.formula(formula),data=analysisRawData,family="binomial",contrasts=contrasts)
       lmNormC<-glm(formula=as.formula(formula),data=analysisNormData,family="binomial",contrasts=contrasts)
       braw.env$anovaMethod<-"F"
     }
@@ -446,8 +448,10 @@ generalAnalysis<-function(allData,InteractionOn,withins,ssqType="Type3",caseOrde
   } else { # Interval DV
     # lmRaw to report model
     if (doingWithin) {
+      lmRawC<-lmer(formula=as.formula(formula),data=analysisRawData,contrasts=contrasts)
       lmNormC<-lmer(formula=as.formula(formula),data=analysisNormData,contrasts=contrasts)
     } else {
+      lmRawC<-lm(formula=as.formula(formula),data=analysisRawData,contrasts=contrasts)
       lmNormC<-lm(formula=as.formula(formula),data=analysisNormData,contrasts=contrasts)
     }
     braw.env$anovaMethod<-"F"
@@ -497,6 +501,7 @@ generalAnalysis<-function(allData,InteractionOn,withins,ssqType="Type3",caseOrde
               p.total=p.total,
               
               lmNormC=lmNormC,
+              lmRawC=lmRawC,
               
               df=df,
               
@@ -620,6 +625,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
     anResult$anRaw<-anRaw
   }
   
+  lmRawC<-anResult$lmRawC
   lmNormC<-anResult$lmNormC
   anNormC<-anResult$anNormC
   
@@ -751,7 +757,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
               an_name<-"Logistic Regression"
               t_name<-"chi2"
               df<-paste("(",format(anRaw$Df[2]),",","n=",format(lmNormC$df.null+1),")",sep="")
-              tval<-lmRaw$null.deviance-lmRaw$deviance
+              tval<-lmNormC$null.deviance-lmNormC$deviance
               analysis$pIV<-1-pchisq(tval,1) # noCases-1
               
             },
@@ -759,7 +765,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
               an_name<-"Logistic Regression"
               t_name<-"chi2"
               df<-paste("(",format(anRaw$Df[2]),",","n=",format(lmNormC$df.null+1),")",sep="")
-              tval<-lmRaw$null.deviance-lmRaw$deviance
+              tval<-lmNormC$null.deviance-lmNormC$deviance
               analysis$pIV<-1-pchisq(tval,1) # noCases-1
             },
             "Categorical Categorical"={
@@ -817,7 +823,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
             analysis$anova<-anResult$anRawC
           },
           "Norm"={
-            analysis$model<-anResult$lmNormC
+            analysis$model<-anResult$lmRawC
             analysis$anova<-anResult$anNormC
           }
   )

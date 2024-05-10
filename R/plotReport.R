@@ -81,8 +81,9 @@ reportPlot<-function(outputText,nc,nr){
     if (italiclabels[i]) fontface<-"italic" 
     if (boldlabels[i] && italiclabels[i]) fontface<-"bold.italic" 
     if (rightlabels[i]) hjust<- 1 else hjust<- 0
-    if (rightlabels[i]) 
+    if (rightlabels[i]) {
       x<-x+cellSize[i]-characterWidth
+    }
     fill<-bg
     col<-"black"
     if (bluelabels[i]) col="#0000DD"

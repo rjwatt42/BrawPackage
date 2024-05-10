@@ -310,7 +310,7 @@ dataErrorBar<-function(data,colour="black",linewidth=0.25) {
     geom_errorbarh(data=data,aes(y=y, xmin=xmin, xmax=xmax),width=width,linewidth=linewidth)
   }
 }
-dataLegend<-function(data,title="title",fontsize=3.5) {
+dataLegend<-function(data,title="title",fontsize=1.2) {
   mathlabel<-grepl("['^']{1}",title) | grepl("['[']{1}",title)
   if (any(mathlabel)) {
     title<-deparse(title)
@@ -318,9 +318,10 @@ dataLegend<-function(data,title="title",fontsize=3.5) {
     title<-deparse(bquote(bold(.(title))))
   }
   
+  fontsize<-fontsize*braw.env$labelSize
   names<-data$names
-  width<-max(nchar(names)+4)*0.0045*fontsize
-  height<-(length(names)+1)*0.018*fontsize
+  width<-(max(nchar(names))*fontsize + 4*3.2)*braw.env$graphicsSize[1]/3200
+  height<-(length(names)*fontsize + 1*3.2)*braw.env$graphicsSize[1]/800
   colours<-data$colours
   
   x<-braw.env$plotArea[c(1,3)]
