@@ -127,18 +127,18 @@ prepareSample<-function(raw_data, doOrdinals=FALSE, maxOrdinal=9, header=c()){
     varnprop<-paste(c(1,1),collapse=",")
     ordProportions<-NA
     
-    if ((is.character(data[[1]]) || 
-         is.element(dataTypes[i],c("Categorical","categorical"))) &&
-        !is.element(dataTypes[i],c("Interval","interval"))
+    if (is.factor(data[[1]]) || 
+        ((is.character(data[[1]]) || is.element(dataTypes[i],c("Categorical","categorical"))) &&
+        !is.element(dataTypes[i],c("Interval","interval")))
     ) {
-      if (!is.character(data)){data<-data[[1]]}
+      if (!is.character(data) && !is.factor(data)){data<-data[[1]]}
       importedData[[ivar+1]]<-factor(importedData[[i]])
       vartype<-"Categorical"
-      varcases<-sort(unique(data))
+      if (is.factor(data)) varcases<-levels(data)
+      else varcases<-sort(unique(data))
       varncats<-length(varcases)
-      proportions<-hist(as.numeric(factor(data)),(0:varncats)+0.5,plot=FALSE)$density
-      # proportions<-proportions/max(proportions)
-      varnprop<-paste(format(proportions,digits=2),collapse=",")
+      varnprop<-hist(as.numeric(factor(data)),(0:varncats)+0.5,plot=FALSE)$density
+      varnprop<-paste(format(varnprop,digits=2),collapse=",")
     } else {
       data<-sapply(data,as.numeric)
       data<-data[!is.na(data)]
@@ -165,9 +165,11 @@ prepareSample<-function(raw_data, doOrdinals=FALSE, maxOrdinal=9, header=c()){
     var<-makeVariable(name=varname,type=vartype,
                  mu=varmu,sd=varsd,skew=varskew,kurtosis=varkurt,
                  median=varMedian,iqr=varIQR,nlevs=varnlevs,ordProportions=ordProportions,
-                 ncats=varncats,cases=paste(varcases,collapse=","),proportions=varnprop,
+                 ncats=varncats,cases=varcases,proportions=varnprop,
                  deploy=deploys[i],targetDeploys=targets[i],
                  process="data")
+    var$cases<-paste(var$cases,collapse=",")
+    var$proportions<-varnprop
     if (ivar==1) newVariables<-data.frame(var)
     else newVariables<-rbind(newVariables,var)
     ivar<-ivar+1
@@ -186,8 +188,18 @@ readSample<-function(data,DV,IV,IV2=NULL) {
   
   dvUse<-as.list(data1$variables[which(names(data)==DV),])
   ivUse<-as.list(data1$variables[which(names(data)==IV[1]),])
-  if (!is.null(IV2)) as.list(iv2Use<-data1$variables[which(names(data)==IV2),])
+  if (!is.null(IV2)) iv2Use<-as.list(data1$variables[which(names(data)==IV2),])
   else iv2Use<-NULL
+  
+  dvUse$cases<-str_split(dvUse$cases,",")[[1]]
+  dvUse$proportions<-as.numeric(unlist(str_split(dvUse$proportions,",")))
+  ivUse$cases<-str_split(ivUse$cases,",")[[1]]
+  ivUse$proportions<-as.numeric(unlist(str_split(ivUse$proportions,",")))
+  if (!is.null(IV2)) {
+    iv2Use$cases<-str_split(iv2Use$cases,",")[[1]]
+    iv2Use$proportions<-as.numeric(unlist(str_split(iv2Use$proportions,",")))
+  }
+  
   setBrawDef("hypothesis",makeHypothesis(DV=dvUse,IV=ivUse,IV2=iv2Use))
   setBrawDef("design",makeDesign(sN=length(data1$data$participant)))
   

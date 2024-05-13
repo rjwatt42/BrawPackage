@@ -71,9 +71,6 @@ getHypothesis<-function(name,hypothesis=braw.def$hypothesis) {
          "PsychF"={
            hypothesis$effect$world<-getWorld("PsychF")
          },
-         "3"={
-           hypothesis$IV2<-makeVariable("IV2")
-         },
          "2C"={
            hypothesis$IV<-makeVariable("IV","Categorical")
          },

@@ -5,7 +5,7 @@ reportPlot<-function(outputText,nc,nr){
   margin=0.5
   colSpace=1.5
   
-  font_size=braw.env$labelSize
+  font_size=braw.env$labelSize*0.85
   characterWidth=font_size/20
   
   top=max(nr,14)

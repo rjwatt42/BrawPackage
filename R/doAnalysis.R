@@ -365,7 +365,7 @@ convert2Interval<-function(var) {
   var$sd<-var$iqr*qnorm(0.75)
 }
 
-generalAnalysis<-function(allData,InteractionOn,withins,ssqType="Type3",caseOrder="Alphabetic") {
+generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",caseOrder="Alphabetic") {
   
   if (ncol(allData)<3) {
     return(NULL)

@@ -1,7 +1,7 @@
 
 makeFormula<-function(IV,IV2,DV,design,evidence,analysis,an_vars){
 
-  assign_string = "<<"  
+  assign_string = " <<"  
   when_string = "="
   times_string = "x"
   
@@ -19,14 +19,14 @@ makeFormula<-function(IV,IV2,DV,design,evidence,analysis,an_vars){
           }
   )
   
-  if (coeffs[1]>=0){join<-" +"}else{join<-" -"}
+  if (coeffs[1]>=0){join<-" "}else{join<-" -"}
   an_model<-paste(an_model, join, brawFormat(abs(coeffs[1]),digits=braw.env$report_precision)   ,sep="")
   
   
   for (i in 2:length(coeffs)){
     if (!is.na(coeffs[i])) {
       if (coeffs[i]>=0){join<-" +"}else{join<-" -"}
-      an_model<-paste(an_model, join, brawFormat(abs(coeffs[i]),digits=braw.env$report_precision)   ,times_string,an_vars[i])
+      an_model<-paste(an_model, join, brawFormat(abs(coeffs[i]),digits=braw.env$report_precision)   ,times_string,an_vars[i],sep="")
     }
   }
   

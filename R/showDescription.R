@@ -258,28 +258,36 @@ plotParInterDescription<-function(analysis,g=NULL){
   # long-winded but ensures that means are above the raw data
             use1<-analysis$iv2<median(analysis$iv2)
         analysis1<-analysis
+        analysis1$participant<-analysis$participant[use1]
         analysis1$iv<-analysis$iv[use1]
+        analysis1$iv2<-NULL
         analysis1$dv<-analysis$dv[use1]
         analysis1$ivplot<-analysis$ivplot[use1]
+        analysis1$iv2plot<-NULL
         analysis1$dvplot<-analysis$dvplot[use1]
-        analysis1$rIV<-rho[1]
+        # analysis1$rIV<-rho[1]
         
         analysis1$hypothesis$IV$vals<-Ivals[use1]
         analysis1$hypothesis$DV$vals<-Dvals[use1]
-        # analysis1$hypothesis$DV$mu<-mean(analysis$dv[use1],na.rm=TRUE)
+        analysis1$hypothesis$DV$mu<-mean(analysis$dv[use1],na.rm=TRUE)
+        analysis1<-doAnalysis(analysis1)
         
             use2<-analysis$iv2>=median(analysis$iv2)
         analysis2<-analysis
+        analysis2$participant<-analysis$participant[use2]
         analysis2$iv<-analysis$iv[use2]
+        analysis2$iv2<-NULL
         analysis2$dv<-analysis$dv[use2]
         analysis2$ivplot<-analysis$ivplot[use2]
+        analysis2$iv2plot<-NULL
         analysis2$dvplot<-analysis$dvplot[use2]
-        analysis2$rIV<-rho[2]
+        # analysis2$rIV<-rho[2]
         
         analysis2$hypothesis$IV$vals<-Ivals[use2]
         analysis2$hypothesis$DV$vals<-Dvals[use2]
-        # analysis2$hypothesis$DV$mu<-mean(analysis$dv[use2],na.rm=TRUE)
-
+        analysis2$hypothesis$DV$mu<-mean(analysis$dv[use2],na.rm=TRUE)
+        analysis2<-doAnalysis(analysis2)
+        
         if (analysis1$hypothesis$DV$type=="Categorical") {
           g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,2,g)
           g<-plotPrediction(analysis2$hypothesis$IV,NULL,analysis2$hypothesis$DV,analysis2,analysis$design,3,g)
