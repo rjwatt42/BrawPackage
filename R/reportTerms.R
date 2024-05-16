@@ -4,7 +4,7 @@ reportTerms<-function() {
   terms<-c("\bStandard", "","\bSymbol "," ",
            "rs","sample effect size","!j!>>>\u25CF","data point",
            "rp","population effect size"," "," ",
-           "re","sample error","!j!>>>\u25A0","sample effect",
+           "re","sample error","!j!>>>\u25A0","sample effect size",
            "n","sample size"," "," ",
            "p","p-value","!j!>\u25B2","metaAnalysis",
            " "," "," "," ",

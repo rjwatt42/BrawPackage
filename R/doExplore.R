@@ -38,7 +38,7 @@ getExploreRange<-function(explore) {
   if (is.element(exploreType,c("IVskew","DVskew","Heteroscedasticity","Dependence","Outliers","IVRange","DVRange"))) exploreType<-"anom"
   if (is.element(exploreType,c("IVkurtosis","DVkurtosis"))) exploreType<-"kurt"
   
-  switch(explore$exploreType,
+  switch(exploreType,
          "n"=range<-list(minVal=10,maxVal=250,logScale=FALSE),
          "rs"=range<-list(minVal=-0.9,maxVal=0.9,logScale=FALSE),
          "anom"=range<-list(minVal=0,maxVal=1,logScale=FALSE),
@@ -60,7 +60,6 @@ getExploreRange<-function(explore) {
          "SampleGamma"=range<-list(minVal=1, maxVal=10,logScale=FALSE),
          {range<-list(minVal=0,maxVal=1,logScale=FALSE)}
   )
-  
   return(range)
 }
 
