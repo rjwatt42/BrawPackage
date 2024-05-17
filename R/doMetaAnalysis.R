@@ -15,7 +15,7 @@ doMetaAnalysis<-function(nsims=100,metaResult=braw.res$metaMultiple,metaAnalysis
                          hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence
                          ) {
   if (is.null(metaAnalysis)) metaAnalysis<-makeMetaAnalysis()
-  
+  if (nsims==1) metaResult<-NULL
   evidence$sig_only<-metaAnalysis$sig_only
   
   for (i in 1:nsims) {
@@ -24,8 +24,8 @@ doMetaAnalysis<-function(nsims=100,metaResult=braw.res$metaMultiple,metaAnalysis
   }
   metaResult$hypothesis<-hypothesis
   metaResult$design<-design
-  if (nsims==1) setBrawRes("metaMultiple",metaResult)
-  else          setBrawRes("metaSingle",metaResult)
+  if (nsims>1) setBrawRes("metaMultiple",metaResult)
+  else         setBrawRes("metaSingle",metaResult)
   metaResult
 }
 

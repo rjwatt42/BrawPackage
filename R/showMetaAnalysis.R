@@ -80,7 +80,7 @@ showMetaSingle<-function(metaResult=braw.res$metaResult,showTheory=FALSE) {
     g<-g+dataPoint(data=ptsNull,shape=braw.env$plotShapes$study, colour = darken(col2,off=-colgain), fill = col2,  size = dotSize)
   }
   g<-g+xAxisTicks(x$ticks)+xAxisLabel(disp1)
-  g<-g+yAxisTicks(y$ticks)+yAxisLabel(disp2)
+  g<-g+yAxisTicks(y$ticks,10^y$ticks)+yAxisLabel(disp2)
   
   lb<-worldLabel(metaResult)
   pts_lb<-data.frame(x=mean(xlim),y=ylim[2]-diff(ylim)*0.2)

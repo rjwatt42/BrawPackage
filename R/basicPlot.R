@@ -147,7 +147,7 @@ yAxisLabel<-function(label){
          },
          "horz"={
            geom_text(data=axis,aes(x=x,y=y),label=label, parse = TRUE,
-                     hjust=0.5,vjust=-voff/1.5,
+                     hjust=0.5,vjust=-voff,
                      size=braw.env$labelSize*1.25*braw.env$plotLimits$fontScale,angle=90,fontface="bold")      
          }
   )
