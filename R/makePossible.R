@@ -18,7 +18,7 @@
 makePossible<-function(typePossible="Samples",
                        possibleResult=NULL,
                        UseSource="world",targetSample=0.3,
-                       UsePrior="none",prior=getWorld("Psych"),targetPopulation=0.2,
+                       UsePrior="none",prior=getWorld("Psych"),targetPopulation=NA,
                        hypothesis=braw.def$hypothesis,design=braw.def$design,
                        simSlice=0.1,correction=TRUE,
                        appendSim=FALSE,possibleLength="10"
@@ -148,7 +148,7 @@ runPossible <- function(possible=makePossible(),possibleResult=NULL){
   # likelihood function for each sample (there's usually only 1)
   sampleSampDens_r<-1
   sampleLikelihood_r<-c()
-  if (!is.null(sRho)) {
+  if (!is.null(sRho) && !is.na(sRho)) {
     for (ei in 1:length(sRho)){
       rDens<-0
       for (ci in 1:length(correction)) {

@@ -6,7 +6,7 @@ r2z<-function(r) atanh(r)
 zn2p<-function(z,n)  2*pnorm(-abs(z)*sqrt(n-3))
 pn2z<-function(p,n)  -qnorm(p/2)/sqrt(n-3)
 
-zn2w<-function(z,n,alpha=0.05)  pnorm(qnorm(alpha/2),z*sqrt(n-3))+pnorm(qnorm(alpha/2),-z*sqrt(n-3))
+zn2w<-function(z,n,alpha=braw.env$alphaSig)  pnorm(qnorm(alpha/2),z*sqrt(n-3))+pnorm(qnorm(alpha/2),-z*sqrt(n-3))
 
 quant_z <- function(quant,Z,n)   qnorm(quant,Z,1/sqrt(n-3))
 quant_r <- function(quant,R,n)   z2r(quant_z(quant,atanh(R),n))

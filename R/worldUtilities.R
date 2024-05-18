@@ -254,14 +254,14 @@ fullRSamplingDist<-function(vals,world,design,doStat="rs",logScale=FALSE,sigOnly
   rdens<-pR$pRhogain
   if (length(rvals)>1) rdens<-rdens*diff(rvals[1:2])
   if (!world$worldOn) world$populationNullp<-0
-  if (any(rvals==0)) {
-    use<-which(rvals==0)
-    rdens<-rdens/sum(rdens)*(1-world$populationNullp)
-    rdens[use]<-rdens[use]+world$populationNullp
-  } else {
+  # if (any(rvals==0)) {
+  #   use<-which(rvals==0)
+  #   rdens<-rdens/sum(rdens)*(1-world$populationNullp)
+  #   rdens[use]<-rdens[use]+world$populationNullp
+  # } else {
     rvals<-c(rvals,0)
     rdens<-c(rdens/sum(rdens)*(1-world$populationNullp),world$populationNullp)
-  }
+  # }
   
   # distribution of sample sizes
   ndist<-getNList(design,world,HQ=HQ)
@@ -355,10 +355,12 @@ fullRSamplingDist<-function(vals,world,design,doStat="rs",logScale=FALSE,sigOnly
   if (separate) {
     r<-sourceSampDens_r
     rn<-nrow(r)
+    use<-which(rvals==0)
     if (rn==2) 
       return(list(vals=rvals[1:(rn-1)],dens=colSums(sourceSampDens_r,na.rm=TRUE),
                   densPlus=rbind(r[1:(rn-1),]),densNull=r[rn,]))
     else 
+      
       return(list(vals=rvals[1:(rn-1)],dens=colSums(sourceSampDens_r,na.rm=TRUE),
                   densPlus=r[1:(rn-1),],densNull=r[rn,]))
   } else {

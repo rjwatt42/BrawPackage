@@ -157,7 +157,7 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,newDev=FALSE,graphicsSiz
           
           braw.env$useSignificanceCols<-TRUE
 
-          braw.env$includeSingle<-FALSE  # in "All" meta-analysis
+          braw.env$includeSingle<-TRUE  # in "All" meta-analysis
           
           braw.env$alphaChar<-'\u03B1'
           

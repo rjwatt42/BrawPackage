@@ -16,14 +16,16 @@ doMetaAnalysis<-function(nsims=100,metaResult=braw.res$metaMultiple,metaAnalysis
                          ) {
   if (is.null(metaAnalysis)) metaAnalysis<-makeMetaAnalysis()
   if (nsims==1) metaResult<-NULL
-  evidence$sig_only<-metaAnalysis$sig_only
+  evidence$sigOnly<-metaAnalysis$sigOnlySource
   
   for (i in 1:nsims) {
     studies<-multipleAnalysis(metaAnalysis$nstudies,hypothesis,design,evidence)
     metaResult<-runMetaAnalysis(metaAnalysis,studies,metaResult)
   }
+  metaResult$count<-length(metaResult$bestDist)
   metaResult$hypothesis<-hypothesis
   metaResult$design<-design
+  setBrawRes("metaResult",metaResult)
   if (nsims>1) setBrawRes("metaMultiple",metaResult)
   else         setBrawRes("metaSingle",metaResult)
   metaResult
@@ -49,8 +51,9 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis) {
     kvals<-seq(0.01,1,length.out=nkpoints)
   }
   
+  remove_nonsig<-metaAnalysis$includeBias
   for (re in 1:niterations) {
-    S<-getLogLikelihood(zs,ns,df1,dist,kvals,nullvals)
+    S<-getLogLikelihood(zs,ns,df1,dist,kvals,nullvals,remove_nonsig)
     Smax<-max(S,na.rm=TRUE)
     
     use<-which(S==Smax, arr.ind = TRUE)
@@ -68,7 +71,7 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis) {
   }
   
   if (niterations==1) {      
-    fun<-function(x) { -getLogLikelihood(zs,ns,df1,dist,x[1],x[2])}
+    fun<-function(x) { -getLogLikelihood(zs,ns,df1,dist,x[1],x[2],remove_nonsig)}
     result<-fmincon(c(Kmax,Nullmax),fun,ub=c(ub1,ub2),lb=c(lb1,lb2))
     Kmax<-result$par[1]
     Nullmax<-result$par[2]

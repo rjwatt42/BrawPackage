@@ -97,7 +97,7 @@ showMetaSingle<-function(metaResult=braw.res$metaResult,showTheory=FALSE) {
 #' @examples
 #' showMultipleMeta<-function(metaResult=doMetaAnalysis(),showType="n-k")
 #' @export
-showMetaMultiple<-function(metaResult=braw.res$metaMultiple,showType="n-k") {
+showMetaMultiple<-function(metaResult=braw.res$metaResult,showType="n-k") {
   if (is.null(metaResult)) metaResult<-doMetaAnalysis()
 
   if (metaResult$metaAnalysis$analysisType=="fixed") showType<-"S-k"

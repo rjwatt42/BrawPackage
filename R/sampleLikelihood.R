@@ -2,7 +2,7 @@
 SingleSamplingPDF<-function(z,lambda,sigma,shape,remove_nonsig=FALSE,df1=1) {
   d1<-exp(-0.5*((z-lambda)^2/sigma^2))/sqrt(2*pi*sigma^2)
   if (remove_nonsig) {
-    zcrit<-atanh(p2r(alpha,1/sigma^2+3,df1))
+    zcrit<-atanh(p2r(braw.env$alphaSig,1/sigma^2+3,df1))
     d0<-1-(pnorm(zcrit,lambda,sigma)-pnorm(-zcrit,lambda,sigma))
   } else {
     d0<-1
@@ -16,7 +16,7 @@ GaussSamplingPDF<-function(z,lambda,sigma,shape=NA,remove_nonsig=FALSE,df1=1) {
   d1<-exp(-0.5*z^2/sigma2^2)/sqrt(2*pi*sigma2^2)
   
   if (remove_nonsig) {
-    zcrit<-atanh(p2r(alpha,1/sigma^2+3,df1))
+    zcrit<-atanh(p2r(braw.env$alphaSig,1/sigma^2+3,df1))
     d0<-GaussSamplingCDF(zcrit,lambda,sigma)
   } else {
     d0<-1
@@ -55,7 +55,7 @@ ExpSamplingPDF<-function(z,lambda,sigma,shape=NA,remove_nonsig=FALSE,df1=1) {
   d1<-d1/lambda/2
   
   if (remove_nonsig) {
-    zcrit<-atanh(p2r(alpha,1/sigma^2+3,df1))
+    zcrit<-atanh(p2r(braw.env$alphaSig,1/sigma^2+3,df1))
     d0<-ExpSamplingCDF(zcrit,lambda,sigma)
   } else {
     d0<-1
@@ -90,7 +90,7 @@ convolveWith<-function(zi,zpd,z,sigma) {
 }
 
 removeNonSig<-function(zi,zpd,sigma,df1) {
-  zcrit<-atanh(p2r(alpha,1/sigma^2+3,df1))
+  zcrit<-atanh(p2r(braw.env$alphaSig,1/sigma^2+3,df1))
   # d2<-GammaSamplingCDF(zcrit,lambda,sigma,gamma_shape)
   d2<-zcrit*0
   zcritUnique<-unique(zcrit)

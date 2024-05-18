@@ -636,8 +636,8 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
                 "NoStudies"={
                   metaAnalysis$nstudies<-vals[vi]
                 },
-                "sig_only"={
-                  metaAnalysis$sig_only<-vals[vi]
+                "sigOnly"={
+                  metaAnalysis$sigOnly<-vals[vi]
                 }
         )
         hypothesis$IV<-IV

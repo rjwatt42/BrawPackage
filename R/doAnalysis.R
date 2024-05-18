@@ -881,7 +881,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
   
 }
 
-runSimulation<-function(hypothesis,design,evidence,sig_only=FALSE,onlyAnalysis=FALSE,oldResult=NULL,autoShow=FALSE) {
+runSimulation<-function(hypothesis,design,evidence,sigOnly=FALSE,onlyAnalysis=FALSE,oldResult=NULL,autoShow=FALSE) {
     if (onlyAnalysis && !is.null(oldResult)) {
     res<-doAnalysis(oldResult,evidence,autoShow=FALSE)
     return(res)
@@ -915,7 +915,7 @@ runSimulation<-function(hypothesis,design,evidence,sig_only=FALSE,onlyAnalysis=F
   }
   
   # sig only
-  while (sig_only && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
+  while (sigOnly && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
     if (!evidence$shortHand) {
       # sample<-doSample(IV,IV2,DV,effect,design)
       # res<-doAnalysis(IV,IV2,DV,effect,design,evidence,sample)
