@@ -15,14 +15,27 @@
 #' simSlice=0.1,correction=TRUE,
 #' appendSim=FALSE,possibleLength="10")
 #' @export
-makePossible<-function(typePossible="Samples",
-                       possibleResult=NULL,
-                       UseSource="world",targetSample=0.3,
+makePossible<-function(typePossible="Samples",targetSample=NULL,
+                       UseSource="world",
                        UsePrior="none",prior=getWorld("Psych"),targetPopulation=NA,
                        hypothesis=braw.def$hypothesis,design=braw.def$design,
                        simSlice=0.1,correction=TRUE,
-                       appendSim=FALSE,possibleLength="10"
+                       possibleResult=NULL,appendSim=FALSE,possibleLength="10"
 ) {
+  if (is.null(targetSample)) {
+    if (is.null(braw.res$result)) {
+      targetSample<-0.3
+    } else {
+      targetSample<-braw.res$result
+    }
+  }
+  if (!is.numeric(targetSample)) {
+    result<-targetSample
+    targetSample<-result$rIV
+    targetPopulation<-result$rpIV
+    hypothesis=result$hypothesis
+    design=result$design
+  }
   
   if (hypothesis$effect$world$worldOn==FALSE) {
     hypothesis$effect$world$populationPDF<-"Single"
@@ -30,6 +43,8 @@ makePossible<-function(typePossible="Samples",
     hypothesis$effect$world$populationPDFk<-hypothesis$effect$rIV
     hypothesis$effect$world$populationNullp<-0
   }
+  
+  if (typePossible=="Samples") UsePrior<-UseSource
   
   possible<-
   list(type=typePossible,
@@ -105,10 +120,10 @@ runPossible <- function(possible=makePossible(),possibleResult=NULL){
          "world"={ prior<-world },
          "prior"={ prior<-possible$prior }
   )
-  if (possible$type=="Populations") source<-prior
+  # if (possible$type=="Populations") source<-prior
   
   priorPopDens_r<-rPopulationDist(rp,prior)
-  priorPopDens_r<-priorPopDens_r/max(priorPopDens_r)
+  priorPopDens_r<-priorPopDens_r/mean(priorPopDens_r)/2
   priorPopDens_r_full<-priorPopDens_r*(1-prior$populationNullp)
   priorPopDens_r_full[rp==0]<-priorPopDens_r_full[rp==0]+prior$populationNullp
   if (prior$populationPDF=="Single" || prior$populationPDF=="Double") {
@@ -168,14 +183,20 @@ runPossible <- function(possible=makePossible(),possibleResult=NULL){
       sampleLikelihood_r<-rbind(sampleLikelihood_r,rDens/length(correction))
       sampleSampDens_r <- sampleSampDens_r * rDens/length(correction)
     }
+    sampleLikelihood_r_show<-sampleLikelihood_r
+    
     # times the a-priori distribution
     sampleSampDens_r<-sampleSampDens_r*priorPopDens_r_full
     for (ei in 1:length(sRho)){
       sampleLikelihood_r[ei,]<-sampleLikelihood_r[ei,]*priorPopDens_r_full
     }
     
-    dr_gain<-max(sourceSampDens_r,na.rm=TRUE)
-    sourceSampDens_r<-sourceSampDens_r/dr_gain
+    for (ei in 1:length(sRho)){
+      sampleLikelihood_r_show[ei,]<-sampleLikelihood_r_show[ei,]*priorPopDens_r
+    }
+    
+    # dr_gain<-max(sourceSampDens_r,na.rm=TRUE)
+    # sourceSampDens_r<-sourceSampDens_r/dr_gain
     
     if (any(!is.na(priorSampDens_r))) {
       dr_gain<-max(priorSampDens_r,na.rm=TRUE)
@@ -205,7 +226,7 @@ runPossible <- function(possible=makePossible(),possibleResult=NULL){
                                  source=source,prior=prior,
                                  Theory=list(
                                    rs=rs,sourceSampDens_r=sourceSampDens_r,sourceSampDens_r_plus=sourceSampDens_r_plus,sourceSampDens_r_null=sourceSampDens_r_null,
-                                   rp=rp,priorSampDens_r=sourceSampDens_r,sampleLikelihood_r=sampleLikelihood_r,priorPopDens_r=priorPopDens_r,sourcePopDens_r=sourcePopDens_r
+                                   rp=rp,priorSampDens_r=sourceSampDens_r,sampleLikelihood_r=sampleLikelihood_r,sampleLikelihood_r_show=sampleLikelihood_r_show,priorPopDens_r=priorPopDens_r,sourcePopDens_r=sourcePopDens_r
                                  )
             )
           },
@@ -216,7 +237,7 @@ runPossible <- function(possible=makePossible(),possibleResult=NULL){
                                  source=source,prior=prior,
                                  Theory=list(
                                    rs=rs,sourceSampDens_r=sourceSampDens_r,sourceSampDens_r_plus=sourceSampDens_r_plus,sourceSampDens_r_null=sourceSampDens_r_null,
-                                   rp=rp,priorSampDens_r=priorSampDens_r,sampleLikelihood_r=sampleLikelihood_r,priorPopDens_r=priorPopDens_r,sourcePopDens_r=sourcePopDens_r,priorSampDens_r_null=priorSampDens_r_null,priorSampDens_r_plus=priorSampDens_r_plus
+                                   rp=rp,priorSampDens_r=priorSampDens_r,sampleLikelihood_r=sampleLikelihood_r,sampleLikelihood_r_show=sampleLikelihood_r_show,priorPopDens_r=priorPopDens_r,sourcePopDens_r=sourcePopDens_r,priorSampDens_r_null=priorSampDens_r_null,priorSampDens_r_plus=priorSampDens_r_plus
                                  )
             )
           }
