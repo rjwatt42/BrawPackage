@@ -284,13 +284,14 @@ model2fulleffect<-function(mF,anU) {
       r.full<-sd(predict(mF))/sd(attributes(mF)$frame$dv)
     }
   } else {
-    r.full<-sd(mF$fitted.values)/sd(mF$fitted.values+mF$residuals)
-    # if (class(mF)[1]=="lm") r.full<-sd(mF$fitted.values)/sd(mF$model$dv)
-    # else {
+    # r.full<-sd(mF$fitted.values)/sd(mF$fitted.values+mF$residuals)
+    if (class(mF)[1]=="lm") r.full<-sd(mF$fitted.values)/sd(mF$model$dv)
+    else {
+    r.full<-sqrt(with(summary(mF), 1 - deviance/null.deviance))
     #   if (grepl("Intercept",rownames(anU)[[1]])) {n1<-2} else {n1<-1}
     #   n2<-nrow(anU)-1
     #   r.full<-sqrt(sum(anU$`Sum Sq`[n1:n2])/sum(anU$`Sum Sq`))
-    # }
+    }
   }
   return(r.full)
 }
@@ -490,7 +491,8 @@ generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",ca
     r.total<-matrix(model2totaleffect(lmNormC),nrow=1)
   }
   r.full<-matrix(model2fulleffect(lmNormC,anNormC),nrow=1)
-
+  aic<-AIC(lmNormC)
+  
   p.direct<-r2p(r.direct,n,df)
   p.unique<-r2p(r.unique,n,df)
   p.total<-r2p(r.total,n,df)
@@ -499,6 +501,7 @@ generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",ca
               r.unique=r.unique,
               r.total=r.total,
               r.full=r.full,
+              aic=aic,
               
               p.direct=p.direct,
               p.unique=p.unique,
@@ -580,6 +583,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
   }
   analysis$rIVIV2<-0
   
+  analysis$aic<-anResult$aic
   analysis$rFull<-anResult$r.full
   analysis$rFullse<-r2se(analysis$rFull,n)
   analysis$rFullCI<-r2ci(analysis$rFull,n)
