@@ -59,13 +59,13 @@ makePossible<-function(typePossible="Samples",targetSample=NULL,
        simSlice=simSlice,correction=correction
   )
   
-  possibleResult<-runPossible(possible,possibleResult=possibleResult)
-  return(possibleResult)
+  return(possible)
 }
 
 
-runPossible <- function(possible=makePossible(),possibleResult=NULL){
+doPossible <- function(possible=braw.def$possible,possibleResult=NULL){
   
+  if (is.null(possible)) possible<-makePossible()
   npoints=201
 
   design<-possible$design
@@ -124,6 +124,7 @@ runPossible <- function(possible=makePossible(),possibleResult=NULL){
   
   priorPopDens_r<-rPopulationDist(rp,prior)
   priorPopDens_r<-priorPopDens_r/mean(priorPopDens_r)/2
+  if (max(priorPopDens_r)>0.9) priorPopDens_r<-priorPopDens_r/max(priorPopDens_r)*0.9
   priorPopDens_r_full<-priorPopDens_r*(1-prior$populationNullp)
   priorPopDens_r_full[rp==0]<-priorPopDens_r_full[rp==0]+prior$populationNullp
   if (prior$populationPDF=="Single" || prior$populationPDF=="Double") {
@@ -242,4 +243,6 @@ runPossible <- function(possible=makePossible(),possibleResult=NULL){
             )
           }
   )
+  setBrawRes("possibleResult",possibleResult)
+  return(possibleResult)
 }

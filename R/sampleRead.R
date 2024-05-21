@@ -186,9 +186,9 @@ readSample<-function(data,DV,IV,IV2=NULL) {
   
   data1<-prepareSample(data)
   
-  dvUse<-as.list(data1$variables[which(names(data)==DV),])
-  ivUse<-as.list(data1$variables[which(names(data)==IV[1]),])
-  if (!is.null(IV2)) iv2Use<-as.list(data1$variables[which(names(data)==IV2),])
+  dvUse<-as.list(data1$variables[which(data1$variables$name==DV),])
+  ivUse<-as.list(data1$variables[which(data1$variables$name==IV[1]),])
+  if (!is.null(IV2)) iv2Use<-as.list(data1$variables[which(data1$variables$name==IV2),])
   else iv2Use<-NULL
   
   dvUse$cases<-str_split(dvUse$cases,",")[[1]]

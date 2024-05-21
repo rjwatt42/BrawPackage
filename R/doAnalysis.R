@@ -284,9 +284,13 @@ model2fulleffect<-function(mF,anU) {
       r.full<-sd(predict(mF))/sd(attributes(mF)$frame$dv)
     }
   } else {
-    if (grepl("Intercept",rownames(anU)[[1]])) {n1<-2} else {n1<-1}
-    n2<-nrow(anU)-1
-    r.full<-sqrt(sum(anU$`Sum Sq`[n1:n2])/sum(anU$`Sum Sq`))
+    r.full<-sd(mF$fitted.values)/sd(mF$fitted.values+mF$residuals)
+    # if (class(mF)[1]=="lm") r.full<-sd(mF$fitted.values)/sd(mF$model$dv)
+    # else {
+    #   if (grepl("Intercept",rownames(anU)[[1]])) {n1<-2} else {n1<-1}
+    #   n2<-nrow(anU)-1
+    #   r.full<-sqrt(sum(anU$`Sum Sq`[n1:n2])/sum(anU$`Sum Sq`))
+    # }
   }
   return(r.full)
 }
@@ -486,7 +490,7 @@ generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",ca
     r.total<-matrix(model2totaleffect(lmNormC),nrow=1)
   }
   r.full<-matrix(model2fulleffect(lmNormC,anNormC),nrow=1)
-  
+
   p.direct<-r2p(r.direct,n,df)
   p.unique<-r2p(r.unique,n,df)
   p.total<-r2p(r.total,n,df)

@@ -17,7 +17,8 @@ newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
   print(startPlot(box="none",backC=braw.env$plotColours$graphC))
 }
 
-BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,newDev=FALSE,graphicsSize=dev.size("cm"),height=576,aspect=1.736,timeLimit=Inf) {
+BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,graphicsSize=dev.size("cm"),
+                   newDev=FALSE,height=576,aspect=1.736,timeLimit=Inf) {
   if (graphC=="white") graphC<-"#FFFFFF"
   if (graphC=="normal") graphC<-"#BFECFF"
   braw.env <- new.env(parent = emptyenv())
@@ -98,9 +99,9 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,newDev=FALSE,graphicsSiz
   }
           # braw.env$reportTheme<-braw.env$blankTheme()+theme(plot.margin=margin(0.15,0.8,0,0.25,"cm"))
           
-          braw.env$graphicsSize<-dev.size("cm")
+          braw.env$graphicsSize<-graphicsSize
           braw.env$labelSize<-3.2*fontScale
-          braw.env$dotSize<-16/3
+          braw.env$dotSize<-3.2*5/3
           
           braw.env$autoShow<-FALSE
           braw.env$plotRect<-coord_cartesian(xlim=c(0,1),ylim=c(0,1))
@@ -277,6 +278,8 @@ braw.def$design<-makeDesign()
 braw.def$evidence<-makeEvidence()
 braw.def$metaAnalysis<-makeMetaAnalysis()
 braw.def$explore<-makeExplore()
+braw.def$possible<-makePossible(targetSample=0.3,
+                                hypothesis=braw.def$hypothesis,design=braw.def$design)
 
 braw.def<<-braw.def
 
@@ -285,6 +288,7 @@ braw.res$expected<-NULL
 braw.res$explore<-NULL 
 braw.res$metaResult<-NULL
 braw.res$metaMultiple<-NULL
+braw.res$possibleResult<-NULL
 
 braw.res<<-braw.res
 }

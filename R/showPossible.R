@@ -148,12 +148,15 @@ describePossiblePopulations<-function(possibleResult) {
 #' showPossible <- function(possibleResult=makePossible(),
 #'                        cutaway=FALSE,walls=TRUE,showP=0,
 #'                        view="3D",axisScale=1,
-#'                        azimuth=50,elevation=5,distance=2)
+#'                        azimuth=30,elevation=5,distance=2)
 #' @export
-showPossible <- function(possibleResult=makePossible(),
+showPossible <- function(possibleResult=braw.res$possibleResult,
                          cutaway=FALSE,walls=TRUE,showP=0,
                          view="3D",axisScale=1,
                          azimuth=30,elevation=5,distance=2){
+  
+  if (is.null(possibleResult)) possibleResult<-doPossible()
+  if (is.null(possibleResult$possible)) possibleResult<-doPossible(possible=possibleResult)
   
   BoxCol<-"#666666"
   
@@ -834,15 +837,17 @@ showPossible <- function(possibleResult=makePossible(),
                           if (doTextResult && walls) {
                             # llr 
                             if (possible$UsePrior!="none") {
-                              text(trans3d(x=xlim[1],y=mean(ylim),z=zlim[2]*1.05,pmat=mapping),
-                                   labels=bquote(llr(italic(.(braw.env$RZ))["+"]/italic(.(braw.env$RZ))[0])==bold(.(format(-llrNull,digits=3)))),
-                                   col=colSdark,adj=c(0.5,-0.5),cex=0.9)
+                              text(trans3d(x=xlim[2],y=ylim[2],z=zlim[2]*1.1,pmat=mapping),
+                                   labels=bquote(
+                                     llr(bold(.(braw.env$RZ)["+"]/.(braw.env$RZ)[0]==.(format(-llrNull,digits=3))))
+                                         ),
+                                   col=colSdark,adj=c(1,0),cex=0.9)
                             }
                             # mle population
                             llr_0_mle<-log(approx(rp,sampleLikelihood_r,rp_peak)$y/approx(rp,sampleLikelihood_r,0)$y)
-                            text(trans3d(x=mean(xlim),y=ylim[2],z=zlim[2]*1.05,pmat=mapping),labels=bquote(
-                              llr(italic(.(braw.env$RZ))[mle]/italic(.(braw.env$RZ))[0])==bold(.(format(llr_0_mle,digits=3)))
-                            ),col=colPdark,adj=c(0.5,-0.5),cex=0.9)
+                            text(trans3d(x=xlim[2],y=ylim[2],z=zlim[2]*1.0,pmat=mapping),labels=bquote(
+                              llr(bold(.(braw.env$RZ)[mle]/.(braw.env$RZ)[0]==.(format(llr_0_mle,digits=3))))
+                            ),col=colPdark,adj=c(1,0),cex=0.9)
                           }
                         }
                       }
@@ -850,12 +855,12 @@ showPossible <- function(possibleResult=makePossible(),
             )
             if (doTextResult && walls) {
               # mle population
-              text(trans3d(x=mean(xlim),y=ylim[2],z=zlim[2]*0.9,pmat=mapping),
-                   labels=bquote(italic(.(braw.env$RZ))[mle]== bold(.(format(rp_peak,digits=3)))),
-                   col=colPdark,adj=-0.02,cex=0.9)
-              text(trans3d(x=mean(xlim),y=ylim[2],z=zlim[2]*0.8,pmat=mapping),
-                   labels=bquote(italic(.(braw.env$RZ))['s    ']== bold(.(format(sRho[1],digits=3)))),
-                   col=colPdark,adj=-0.02,cex=0.9)
+              text(trans3d(x=xlim[2],y=ylim[2],z=zlim[2]*0.9,pmat=mapping),
+                        labels=bquote(bold(.(braw.env$RZ)[mle]== .(format(rp_peak,digits=3)))),
+                   col=colPdark,adj=1,cex=0.9)
+              text(trans3d(x=xlim[2],y=ylim[2],z=zlim[2]*0.8,pmat=mapping),
+                   labels=bquote(bold(.(braw.env$RZ)['s    ']== .(format(sRho[1],digits=3)))),
+                   col=colPdark,adj=1,cex=0.9)
             }
             
             

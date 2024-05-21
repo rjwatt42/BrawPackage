@@ -75,80 +75,80 @@ getHypothesis<-function(name,hypothesis=braw.def$hypothesis) {
            hypothesis$IV<-makeVariable("IV","Categorical")
          },
          "II"={
-           hypothesis$IV<-makeVariable("IV","Interval")
            hypothesis$DV<-makeVariable("DV","Interval")
+           hypothesis$IV<-makeVariable("IV","Interval")
          },
          "IO"={
-           hypothesis$IV<-makeVariable("IV","Ordinal")
            hypothesis$DV<-makeVariable("DV","Interval")
+           hypothesis$IV<-makeVariable("IV","Ordinal")
          },
          "IC"={
-           hypothesis$IV<-makeVariable("IV","Categorical")
            hypothesis$DV<-makeVariable("DV","Interval")
+           hypothesis$IV<-makeVariable("IV","Categorical")
          },
          "OI"={
-           hypothesis$IV<-makeVariable("IV","Interval")
            hypothesis$DV<-makeVariable("DV","Ordinal")
+           hypothesis$IV<-makeVariable("IV","Interval")
          },
          "OO"={
-           hypothesis$IV<-makeVariable("IV","Ordinal")
            hypothesis$DV<-makeVariable("DV","Ordinal")
+           hypothesis$IV<-makeVariable("IV","Ordinal")
          },
          "OC"={
-           hypothesis$IV<-makeVariable("IV","Categorical")
            hypothesis$DV<-makeVariable("DV","Ordinal")
+           hypothesis$IV<-makeVariable("IV","Categorical")
          },
          "CI"={
-           hypothesis$IV<-makeVariable("IV","Interval")
            hypothesis$DV<-makeVariable("DV","Categorical")
+           hypothesis$IV<-makeVariable("IV","Interval")
          },
          "CO"={
-           hypothesis$IV<-makeVariable("IV","Ordinal")
            hypothesis$DV<-makeVariable("DV","Categorical")
+           hypothesis$IV<-makeVariable("IV","Ordinal")
          },
          "CC"={
-           hypothesis$IV<-makeVariable("IV","Categorical")
            hypothesis$DV<-makeVariable("DV","Categorical")
+           hypothesis$IV<-makeVariable("IV","Categorical")
          },
          "III"={
+           hypothesis$DV<-makeVariable("DV","Interval")
            hypothesis$IV<-makeVariable("IV","Interval")
            hypothesis$IV2<-makeVariable("IV2","Interval")
-           hypothesis$DV<-makeVariable("DV","Interval")
          },
          "IIC"={
+           hypothesis$DV<-makeVariable("DV","Interval")
            hypothesis$IV<-makeVariable("IV","Interval")
            hypothesis$IV2<-makeVariable("IV2","Categorical")
-           hypothesis$DV<-makeVariable("DV","Interval")
          },
          "ICI"={
+           hypothesis$DV<-makeVariable("DV","Interval")
            hypothesis$IV<-makeVariable("IV","Categorical")
            hypothesis$IV2<-makeVariable("IV2","Interval")
-           hypothesis$DV<-makeVariable("DV","Interval")
          },
          "ICC"={
+           hypothesis$DV<-makeVariable("DV","Interval")
            hypothesis$IV<-makeVariable("IV","Categorical")
            hypothesis$IV2<-makeVariable("IV2","Categorical")
-           hypothesis$DV<-makeVariable("DV","Interval")
          },
          "CII"={
+           hypothesis$DV<-makeVariable("DV","Categorical")
            hypothesis$IV<-makeVariable("IV","Interval")
            hypothesis$IV2<-makeVariable("IV2","Interval")
-           hypothesis$DV<-makeVariable("DV","Categorical")
          },
          "CCI"={
+           hypothesis$DV<-makeVariable("DV","Categorical")
            hypothesis$IV<-makeVariable("IV","Categorical")
            hypothesis$IV2<-makeVariable("IV2","Interval")
-           hypothesis$DV<-makeVariable("DV","Categorical")
          },
          "CIC"={
+           hypothesis$DV<-makeVariable("DV","Categorical")
            hypothesis$IV<-makeVariable("IV","Interval")
            hypothesis$IV2<-makeVariable("IV2","Categorical")
-           hypothesis$DV<-makeVariable("DV","Categorical")
          },
          "CCC"={
+           hypothesis$DV<-makeVariable("DV","Categorical")
            hypothesis$IV<-makeVariable("IV","Categorical")
            hypothesis$IV2<-makeVariable("IV2","Categorical")
-           hypothesis$DV<-makeVariable("DV","Categorical")
          },
          {}
          )

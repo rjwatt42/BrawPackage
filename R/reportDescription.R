@@ -4,6 +4,7 @@ makeFormula<-function(IV,IV2,DV,design,evidence,analysis,an_vars){
   assign_string = " <<"  
   when_string = "="
   times_string = "x"
+  interaction_char = "\u2217"
   
   coeffs<-analysis$coefficients
   
@@ -26,6 +27,7 @@ makeFormula<-function(IV,IV2,DV,design,evidence,analysis,an_vars){
   for (i in 2:length(coeffs)){
     if (!is.na(coeffs[i])) {
       if (coeffs[i]>=0){join<-" +"}else{join<-" -"}
+      an_vars[i]<-gsub(":",interaction_char,an_vars[i])
       an_model<-paste(an_model, join, brawFormat(abs(coeffs[i]),digits=braw.env$report_precision)   ,times_string,an_vars[i],sep="")
     }
   }
