@@ -43,6 +43,7 @@ plotInference<-function(analysis,otheranalysis=NULL,disp="rs",orientation="vert"
           "ci2"={g<-r_plot(analysis,disp,orientation=orientation,effectType=effectType,showTheory=showTheory,g=g)},
 
           "p"= {g<-p_plot(analysis,disp,orientation=orientation,effectType=effectType,showTheory=showTheory,g=g)},
+          "ps"= {g<-ps_plot(analysis,disp,showTheory=showTheory,g=g)},
           "po"= {g<-p_plot(analysis,disp,orientation=orientation,effectType=effectType,showTheory=showTheory,g=g)},
           
           "log(lrs)"={g<-l_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},

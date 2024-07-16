@@ -835,13 +835,13 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,orient
       )
       lpts1<-data.frame(y = ylim[2], x = xoff[i]+xlim[1])
       if (labelSig && is.null(analysis$hypothesis$IV2))
-        g<-g+dataLabel(data=lpts1,label = labelPt1,vjust=1)
+        g<-g+dataLabel(data=lpts1,label = labelPt1,vjust=1,size=0.9,label.size=0)
       lpts1a<-data.frame(y = ylim[1], x = xoff[i]+xlim[1])
       if (labelNSig)
-        g<-g+dataLabel(data=lpts1a,label = labelPt1a,vjust=0)
+        g<-g+dataLabel(data=lpts1a,label = labelPt1a,vjust=0,size=0.9,label.size=0)
       if (is.element(showType,c("e1d","e2d"))) {
         lpts1<-data.frame(y = mean(ylim), x = xoff[i]+xlim[1])
-        g<-g+dataLabel(data=lpts1,label = labelPt1b,vjust=0.5)
+        g<-g+dataLabel(data=lpts1,label = labelPt1b,vjust=0.5,size=0.9,label.size=0)
       }
     }
   }
@@ -951,6 +951,29 @@ e1_plot<-function(nullanalysis,disp,otheranalysis=NULL,orientation="vert",showTh
             g<-g+plotTitle(lab)
           }
   )
+  return(g)
+}
+
+ps_plot<-function(analysis,disp,showTheory=TRUE,g=NULL){
+  psig<-mean(isSignificant(braw.env$STMethod,analysis$pIV,analysis$rIV,analysis$nval,analysis$df1,analysis$evidence))
+  
+  if (is.null(analysis$hypothesis$IV2)) {
+    g<-startPlot(xlim=c(-2,2),ylim=c(0,1),top=TRUE,orientation="horz",g=g)
+    g<-g+dataBar(data=data.frame(x=0,y=psig),fill=braw.env$plotColours$infer_sigC)
+    g<-g+xAxisTicks(breaks=c(0),labels=c("DV~IV"))
+  } else {
+    g<-startPlot(xlim=c(-2,4),ylim=c(0,1),top=TRUE,orientation="horz",g=g)
+    g<-g+dataBar(data=data.frame(x=0,y=psig),fill=braw.env$plotColours$infer_sigC)
+    
+    psig<-mean(isSignificant(braw.env$STMethod,analysis$pIV,analysis$rIV2,analysis$nval,analysis$df1,analysis$evidence))
+    g<-g+dataBar(data=data.frame(x=1,y=psig),fill=braw.env$plotColours$infer_sigC)
+    
+    psig<-mean(isSignificant(braw.env$STMethod,analysis$pIV,analysis$rIVIV2,analysis$nval,analysis$df1,analysis$evidence))
+    g<-g+dataBar(data=data.frame(x=2,y=psig),fill=braw.env$plotColours$infer_sigC)
+    
+    g<-g+xAxisTicks(breaks=c(0,1,2),labels=c("DV~IV","DV~IV2","DV~IVxIV2"))
+  }
+  g<-g+yAxisLabel("p(sig)")+yAxisTicks()
   return(g)
 }
 

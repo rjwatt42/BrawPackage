@@ -26,14 +26,15 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic"){
   if (length(showType)==1) {
     switch(showType,
            "Basic"=     {pars<-c("rs","p")},
+           "p(sig)"= {pars<-c("p")},
            "2D"=     {pars<-c("rs","p")},
            "CILimits"=  {pars<-c("ci1","ci2")},
            "NHST"={pars<-c("e2","e1")},
            "Hits"=       {pars<-c("e1","e2")},
            { pars<-strsplit(showType,";")[[1]]
-           if (length(pars)==1) pars<-c(pars,NA)
            }
     )
+    if (length(pars)==1) pars<-c(pars,NA)
   } else pars<-showType
   
   if (is.null(IV2) | is.null(result$rIVIV2DV)){nc=3}
@@ -86,7 +87,7 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic"){
     } else {
     if (showType=="CILimits") {outputText1<-c("   ","lower","upper")}
     else {
-      outputText1<-
+      outputText1<-c()
       par1<-pars[1]
       par2<-pars[2]
       if (braw.env$RZ=="z") {

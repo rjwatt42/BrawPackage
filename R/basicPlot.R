@@ -226,11 +226,12 @@ dataLabel<-function(data,label, hjust=0, vjust=0, fill="white",colour="black",pa
            geom_label(data=data,aes(x = x, y = y), label=label, 
                       hjust=hjust, vjust=vjust, nudge_y=voff,
                fill=fill,color=colour,fontface=fontface,
-               label.size=label.size,
+               label.padding=unit(0.1, "lines"),label.size=label.size,
                size=size*braw.env$labelSize*braw.env$plotLimits$fontScale,parse=parser),
          "vert"=   
            geom_label(data=data,aes(x = x, y = y), label=label, 
                       hjust=vjust,vjust=hjust,  nudge_y=voff,
+                      label.padding=unit(0.1, "lines"),label.size=label.size,
                fill=fill,color=colour,fontface=fontface,
                size=size*braw.env$labelSize),parse=TRUE
   )
@@ -281,8 +282,9 @@ dataBar<-function(data,colour="black",fill="white",alpha=1,barwidth=0.85) {
   )
   output<-c()
   for (i in 1:length(data$x)) {
+    if (length(fill)==length(data$x)) fi<-i else fi<-1
     databar<-data.frame(x=bar$x+data$x[i],y=bar$y*data$y[i])
-    output<-c(output,dataPolygon(databar,colour=colour,fill=fill[i],alpha=alpha))
+    output<-c(output,dataPolygon(databar,colour=colour,fill=fill[fi],alpha=alpha))
   }
   return(output)
 }

@@ -78,6 +78,7 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
   if (length(showType)==1) {
     switch(showType,
            "Basic"=     {showType<-c("rs","p")},
+           "p(sig)"= {showType<-"ps"},
            "Power"=     {showType<-c("ws","wp")},
            "CILimits"=  {showType<-c("ci1","ci2")},
            "NHST"={

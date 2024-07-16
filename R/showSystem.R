@@ -12,10 +12,15 @@
 #' showSystem(hypothesis=makeHypothesis(),design=makeDesign())
 #' @export
 showSystem<-function(hypothesis=braw.def$hypothesis,design=braw.def$design) {
-  g<-showHypothesis(hypothesis=hypothesis,doWorld=TRUE)
-  g<-showDesign(hypothesis=hypothesis,design=design,plotArea=c(0.525,0.55,0.45,0.45),g)
-  g<-showWorldSampling(hypothesis=hypothesis,design=design,sigOnly=FALSE,plotArea=c(0.525,0.0,0.45,0.45),g)
+  ygain<-0.95
+  g<-showHypothesis(hypothesis=hypothesis,doWorld=TRUE,ygain=ygain)
+  g<-showDesign(hypothesis=hypothesis,design=design,plotArea=c(0.525,0.5*ygain,0.45,0.525*ygain),g)
+  g<-showWorldSampling(hypothesis=hypothesis,design=design,sigOnly=FALSE,plotArea=c(0.525,0.0,0.45,0.525*ygain),g)
   g<-g+geom_vline(xintercept=0.5,linetype="dotted")
+  g<-g+geom_text(data=data.frame(x=0.22,y=0.99),aes(x = x, y = y), label="Hypothesis",
+                 vjust=0,fontface="bold",size=1.3*braw.env$labelSize)
+  g<-g+geom_text(data=data.frame(x=0.75,y=0.99),aes(x = x, y = y), label="Design",
+                 vjust=0,fontface="bold",size=1.3*braw.env$labelSize)
   return(g)
 }
 
@@ -25,7 +30,7 @@ showSystem<-function(hypothesis=braw.def$hypothesis,design=braw.def$design) {
 #' @examples
 #' showHypothesis(hypothesis=makeHypothesis())
 #' @export
-showHypothesis<-function(hypothesis=braw.def$hypothesis,doWorld=TRUE,g=NULL) {
+showHypothesis<-function(hypothesis=braw.def$hypothesis,doWorld=TRUE,ygain=1,g=NULL) {
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV
@@ -40,20 +45,20 @@ showHypothesis<-function(hypothesis=braw.def$hypothesis,doWorld=TRUE,g=NULL) {
   } else xoff<-0.1
   switch(no_ivs,
          { 
-           g<-showVariable(IV,plotArea=c(xoff,0.6,0.3,0.4),g)
-           g<-showVariable(DV,plotArea=c(xoff,0.0,0.3,0.4),g)
-           g<-showEffect(effect$rIV,plotArea=c(xoff,0.36,0.3,0.3),1,g)
-           if (doWorld) g<-showWorld(hypothesis,plotArea=c(xoff+0.15,0.3,0.275,0.38),g=g)
+           g<-showVariable(IV,plotArea=c(xoff,0.6*ygain,0.3,0.4*ygain),g)
+           g<-showVariable(DV,plotArea=c(xoff,0.0,0.3,0.4*ygain),g)
+           g<-showEffect(effect$rIV,plotArea=c(xoff,0.36*ygain,0.3,0.3*ygain),1,g)
+           if (doWorld) g<-showWorld(hypothesis,plotArea=c(xoff+0.15,0.3*ygain,0.275,0.38*ygain),g=g)
          },
          {
            w<-0.25
-           g<-showVariable(IV,plotArea=c(0.0,0.6,w,0.4),g)
-           g<-showVariable(IV2,plotArea=c(w,0.6,w,0.4),g)
-           g<-showVariable(DV,plotArea=c(w/2,0.0,w,0.4),g)
-           g<-showEffect(effect$rIV,2,plotArea=c(0,0.4,w,0.22),g)
-           g<-showEffect(effect$rIV2,3,plotArea=c(w,0.4,w,0.22),g)
-           g<-showEffect(effect$rIVIV2,4,plotArea=c(w/2,0.7,w,0.22),g)
-           g<-showEffect(effect$rIVIV2DV,5,plotArea=c(w/2,0.4,w,0.22),g)
+           g<-showVariable(IV,plotArea=c(0.0,0.6*ygain,w,0.4*ygain),g)
+           g<-showVariable(IV2,plotArea=c(w,0.6*ygain,w,0.4*ygain),g)
+           g<-showVariable(DV,plotArea=c(w/2,0.0,w,0.4*ygain),g)
+           g<-showEffect(effect$rIV,2,plotArea=c(0,0.4*ygain,w,0.22*ygain),g)
+           g<-showEffect(effect$rIV2,3,plotArea=c(w,0.4*ygain,w,0.22*ygain),g)
+           g<-showEffect(effect$rIVIV2,4,plotArea=c(w/2,0.7*ygain,w,0.22*ygain),g)
+           g<-showEffect(effect$rIVIV2DV,5,plotArea=c(w/2,0.4*ygain,w,0.22*ygain),g)
          })
   return(g)
 }

@@ -1,7 +1,7 @@
 
 #' show the estimated population characteristics from multiple simulated sample
 #' 
-#' @param showType "Basic", "CILimits", "NHST", "Hits" \cr
+#' @param showType "Basic", "p(sig)", "CILimits", "NHST", "Hits" \cr
 #'        \emph{ or one or two of:} \cr
 #'         "rs","p","ci1","ci2", "rp","n" \cr
 #'          "ws","wp","nw", ro","po"
@@ -37,10 +37,11 @@ showExpected<-function(expectedResult=braw.res$expected,showType="Basic",
                                 design=expectedResult$design,
                                 evidence=expectedResult$evidence)
   )
+  
   g<-showInference(fullResult,showType=showType,dimension=dimension,orientation=orientation,
-                effectType=effectType,showTheory=showTheory
+                   effectType=effectType,showTheory=showTheory
   ) 
-  g<-g+plotTitle(paste0("Expected: ",brawFormat(expectedResult$count)),"right")
+  g<-g+plotTitle(paste0("Expected: ",brawFormat(expectedResult$count)),"right",size=0.85)
   g
 }
 

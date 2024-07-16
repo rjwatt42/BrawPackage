@@ -68,7 +68,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     }
   }
   
-  if (dimension=="2D") {
+  if (length(showType)>1 && dimension=="2D") {
     g<-showExplore2D(exploreResult=exploreResult,showType=showType,showTheory=showTheory,
                      effectType=effectType,whichEffect=whichEffect)
     return(g)
@@ -763,7 +763,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   }
   }
   if (exploreResult$count>0)
-  g<-g+plotTitle(paste0("Explore: ",brawFormat(exploreResult$count)),"right")
+  g<-g+plotTitle(paste0("Explore: ",brawFormat(exploreResult$count)),"right",size=0.85)
   g
 }
 
@@ -771,7 +771,8 @@ showExplore2D<-function(exploreResult=braw.res$explore,showType=c("rs","p"),show
                  effectType="unique",whichEffect="All") {
   
   explore<-exploreResult$explore
-  effect<-exploreResult$hypothesis$effect
+  hypothesis<-exploreResult$hypothesis
+  effect<-hypothesis$effect
   
   result<-trimExploreResult(exploreResult$result,exploreResult$nullresult)
   if (is.null(hypothesis$IV2)){
@@ -877,5 +878,7 @@ showExplore2D<-function(exploreResult=braw.res$explore,showType=c("rs","p"),show
   g<-g+dataLine(data.frame(x=xVals,y=yVals))
   g<-g+dataPoint(data.frame(x=xVals,y=yVals))
   
+  if (exploreResult$count>0)
+    g<-g+plotTitle(paste0("Explore: ",brawFormat(exploreResult$count)),"right",size=0.85)
   
 }
