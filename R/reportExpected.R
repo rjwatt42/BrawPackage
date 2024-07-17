@@ -59,6 +59,7 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic"){
     rs<-matrix(result$rIV,ncol=1)
     ps<-matrix(result$pIV,ncol=1)
   } else {
+    result$effectType<-"direct"
     switch (result$effectType,
             "direct"={rs<-result$r$direct
                       ps<-result$p$direct},
@@ -318,7 +319,22 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic"){
     }
     outputText<-c(outputText,ot4,ot5,ot6,rep("  ",nc),ot1,ot2)
     if (pars[1]=="p" || pars[2]=="p") {
-      outputText<-c(outputText,rep("  ",nc),paste0("!j\bp(sig) = ",brawFormat(mean(p<braw.env$alphaSig)*100,digits=braw.env$report_precision),"%"),rep(" ",nc-1))
+      if (is.null(IV2)) {
+        outputText<-c(outputText,rep("  ",nc),"!j\bp(sig) = ",paste0("!j",brawFormat(mean(p<braw.env$alphaSig)*100,digits=braw.env$report_precision),"%"),rep(" ",nc-2))
+      } else {
+        if (is.na(result$rIVIV2DV[1])) {
+          outputText<-c(outputText,rep("  ",nc),"!j\bp(sig) = ",
+                        paste0("!j",brawFormat(mean(ps[,1]<braw.env$alphaSig)*100,digits=braw.env$report_precision),"%"),
+                        " "," ",paste0("!j",brawFormat(mean(ps[,2]<braw.env$alphaSig)*100,digits=braw.env$report_precision),"%"),
+                        rep(" ",nc-5))
+        } else {
+          outputText<-c(outputText,rep("  ",nc),"!j\bp(sig) = ",
+                        paste0("!j",brawFormat(mean(ps[,1]<braw.env$alphaSig)*100,digits=braw.env$report_precision),"%"),
+                        " "," ",paste0("!j",brawFormat(mean(ps[,2]<braw.env$alphaSig)*100,digits=braw.env$report_precision),"%"),
+                        " "," ",paste0("!j",brawFormat(mean(ps[,3]<braw.env$alphaSig)*100,digits=braw.env$report_precision),"%"),
+                        rep(" ",nc-8))
+        }
+      }
     }
   }
   nr<-length(outputText)/nc

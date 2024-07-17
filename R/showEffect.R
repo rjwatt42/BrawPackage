@@ -33,7 +33,7 @@ drawArrow<-function(start,len,direction,ends,col="black",fill="white",width=0.08
 
 
 #' export
-showEffect<-function(r,t=1,plotArea=NULL,g=NULL){
+showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
 
   if (is.null(g))
     g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
@@ -46,13 +46,15 @@ showEffect<-function(r,t=1,plotArea=NULL,g=NULL){
           direction=0
           len=0.9
           labelpts<-data.frame(x=0.1,y=0.5)
+          hjust<-1
           ends="last"
           fill=braw.env$plotColours$maineffectES},
           
           {start=c(0,0.92)
           len=sqrt(0.9^2+0.55^2)
           direction=atan(0.55/0.9)*57.296
-          labelpts<-data.frame(x=0.15,y=0.6)
+          labelpts<-data.frame(x=0,y=0.3)
+          hjust<- 0.35
           ends="last"
           fill=braw.env$plotColours$maineffectES
           },
@@ -60,7 +62,8 @@ showEffect<-function(r,t=1,plotArea=NULL,g=NULL){
           {start=c(0,0.92)
           len=sqrt(0.9^2+0.55^2)
           direction=-atan(0.55/0.9)*57.296
-          labelpts<-data.frame(x=-0.15,y=0.6)
+          labelpts<-data.frame(x=0,y=0.3)
+          hjust<- 0.65
           ends="last"
           fill=braw.env$plotColours$maineffectES
           },
@@ -69,26 +72,29 @@ showEffect<-function(r,t=1,plotArea=NULL,g=NULL){
           direction=-90
           len=1.2
           labelpts<-data.frame(x=0,y=0.6)
+          hjust<-0.5
           ends="both"
           fill=braw.env$plotColours$covariationES},
           
           {start=c(0,0.46)
           direction=0
           len=0.45
-          labelpts<-data.frame(x=0,y=0.6)
+          labelpts<-data.frame(x=0,y=0.7)
+          hjust<-0.5
           ends="join"
           fill=braw.env$plotColours$interactionES}
   )
   g<-g+drawArrow(start,len,direction,ends,fill=fill)
   
   
-  if (braw.env$simData && !is.null(r)) {
+  if (showValue && braw.env$simData && !is.null(r)) {
     if (t==1){
       lbl=paste("rp=",as.character(r),sep="")
       lbl=bquote(bold(r[p] ~ "=" ~ .(r)))
-    }else{ lbl=as.character(r)
+    }else{ 
+      if (r==0) lbl<-"0.0" else lbl<-as.character(r)
     }
-    g<-g+dataText(data=labelpts, label = lbl, size=1.3)
+    g<-g+dataText(data=labelpts, label = lbl, size=1, hjust=hjust)
   }
   
   return(g)

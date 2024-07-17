@@ -958,20 +958,20 @@ ps_plot<-function(analysis,disp,showTheory=TRUE,g=NULL){
   psig<-mean(isSignificant(braw.env$STMethod,analysis$pIV,analysis$rIV,analysis$nval,analysis$df1,analysis$evidence))
   
   if (is.null(analysis$hypothesis$IV2)) {
-    g<-startPlot(xlim=c(-2,2),ylim=c(0,1),top=TRUE,orientation="horz",g=g)
-    g<-g+dataBar(data=data.frame(x=0,y=psig),fill=braw.env$plotColours$infer_sigC)
+    g<-startPlot(xlim=c(-1,1),ylim=c(0,1),top=TRUE,orientation="horz",g=g)
+    g<-g+dataBar(data=data.frame(x=0,y=psig),fill=braw.env$plotColours$infer_sigC,barwidth=0.4)
     g<-g+xAxisTicks(breaks=c(0),labels=c("DV~IV"))
   } else {
-    g<-startPlot(xlim=c(-2,4),ylim=c(0,1),top=TRUE,orientation="horz",g=g)
-    g<-g+dataBar(data=data.frame(x=0,y=psig),fill=braw.env$plotColours$infer_sigC)
+    g<-startPlot(xlim=c(-1,3),ylim=c(0,1),top=TRUE,orientation="horz",g=g)
+    g<-g+dataBar(data=data.frame(x=0,y=psig),fill=braw.env$plotColours$infer_sigC,barwidth=0.4)
     
-    psig<-mean(isSignificant(braw.env$STMethod,analysis$pIV,analysis$rIV2,analysis$nval,analysis$df1,analysis$evidence))
-    g<-g+dataBar(data=data.frame(x=1,y=psig),fill=braw.env$plotColours$infer_sigC)
+    psig<-mean(isSignificant(braw.env$STMethod,analysis$pIV2,analysis$rIV2,analysis$nval,analysis$df1,analysis$evidence))
+    g<-g+dataBar(data=data.frame(x=1,y=psig),fill=braw.env$plotColours$infer_sigC,barwidth=0.4)
     
-    psig<-mean(isSignificant(braw.env$STMethod,analysis$pIV,analysis$rIVIV2,analysis$nval,analysis$df1,analysis$evidence))
-    g<-g+dataBar(data=data.frame(x=2,y=psig),fill=braw.env$plotColours$infer_sigC)
+    psig<-mean(isSignificant(braw.env$STMethod,analysis$pIVIV2,analysis$rIVIV2,analysis$nval,analysis$df1,analysis$evidence))
+    g<-g+dataBar(data=data.frame(x=2,y=psig),fill=braw.env$plotColours$infer_sigC,barwidth=0.4)
     
-    g<-g+xAxisTicks(breaks=c(0,1,2),labels=c("DV~IV","DV~IV2","DV~IVxIV2"))
+    g<-g+xAxisTicks(breaks=c(0,1,2),labels=c("DV~IV","DV~IV2","DV~IVxIV2"),angle=90)
   }
   g<-g+yAxisLabel("p(sig)")+yAxisTicks()
   return(g)

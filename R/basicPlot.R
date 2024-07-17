@@ -135,7 +135,7 @@ yAxisLabel<-function(label){
   } else {
     label<-deparse(bquote(bold(.(label))))
   }
-  voff<-braw.env$plotLimits$yAxisTickSize
+  voff<-braw.env$plotLimits$yAxisTickSize-0.25
   
   axis<-data.frame(x=braw.env$plotLimits$xlim[1],y=mean(braw.env$plotLimits$ylim))
   axis<-reRangeXY(axis)
@@ -162,7 +162,7 @@ yAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE){
   
   ticks<-reRangeXY(data.frame(x=braw.env$plotLimits$xlim[1],y=breaks))
   mn<-5/max(5,max(nchar(labels)))
-  braw.env$plotLimits$yAxisTickSize<-min(5,max(nchar(labels)))
+  braw.env$plotLimits$yAxisTickSize<-min(3,median(nchar(labels)))
   
   switch(braw.env$plotLimits$orientation,
          "vert"={
@@ -175,7 +175,7 @@ yAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE){
          }
   )
 }
-xAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE){
+xAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE,angle=0){
   if (is.null(breaks)) {
       breaks<-axisTicks(usr=braw.env$plotLimits$xlim, log=logScale, axp = NULL, nint = 7)
   }
@@ -196,8 +196,16 @@ xAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE){
                      size=braw.env$labelSize*mn*braw.env$plotLimits$fontScale)
          },
          "horz"={
-           geom_text(data=ticksTop,aes(x=x,y=y),label=labels,hjust=0.5,vjust=1.1,
-                     size=braw.env$labelSize*mn*braw.env$plotLimits$fontScale)
+           if (angle==0) {
+             hjust=0.5
+           vjust=1.1
+           } else {
+             hjust=1.1
+             vjust=0.5
+             mn<-mn*0.75
+           }
+           geom_text(data=ticksTop,aes(x=x,y=y),label=labels,hjust=hjust,vjust=vjust,
+                     size=braw.env$labelSize*mn*braw.env$plotLimits$fontScale,angle=angle)
          }
   )
 }
