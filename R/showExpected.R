@@ -1,7 +1,7 @@
 
 #' show the estimated population characteristics from multiple simulated sample
 #' 
-#' @param showType "Basic", "p(sig)", "CILimits", "NHST", "Hits" \cr
+#' @param showType "Basic", "p(sig)", "CILimits", "NHST", "Hits", "Misses" \cr
 #'        \emph{ or one or two of:} \cr
 #'         "rs","p","ci1","ci2", "rp","n" \cr
 #'          "ws","wp","nw", ro","po"

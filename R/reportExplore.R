@@ -13,6 +13,17 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                         ){
   if (is.null(exploreResult)) exploreResult<-doExplore(autoShow=FALSE)
   
+  showType<-strsplit(showType,";")[[1]]
+  if (length(showType)==1) {
+    switch(showType,
+           "Basic"=     {showType<-c("rs","p")},
+           "Power"=     {showType<-c("ws","wp")},
+           "CILimits"=  {showType<-c("ci1","ci2")},
+           {}
+    )
+  }
+  showType<-showType[1]
+  
   explore<-exploreResult$explore
   hypothesis<-explore$hypothesis
   effect<-hypothesis$effect
@@ -282,8 +293,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
   outputText[3]<-paste("nsims = ",format(nrow(exploreResult$result$rval)),sep="")
   outputText<-c(outputText,paste0("!j\bshow: ", extra_y_label))
   outputText<-c(outputText,rep("",nc))
-  outputText<-c(outputText,rep("",nc+1))
-  
+
   
   if (showType=="NHST" || showType=="FDR;FMR") {
     switch (braw.env$STMethod,

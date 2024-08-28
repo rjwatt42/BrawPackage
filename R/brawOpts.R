@@ -270,7 +270,7 @@ braw.env<<-braw.env
 
 braw.def$IV<-makeVariable("IV")
 braw.def$IV2<-NULL
-braw.def$DV<-makeVariable("DV")
+braw.def$DV<-makeVariable("DV",cases="E1,E2")
 braw.def$world<-makeWorld()
 braw.def$effect<-makeEffect(world=braw.def$world)
 braw.def$hypothesis<-makeHypothesis(IV=braw.def$IV,IV2=braw.def$IV2,DV=braw.def$DV,effect=braw.def$effect)

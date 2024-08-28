@@ -116,7 +116,9 @@ plotCatParPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha,g){
   for (id in 1:ncats) {
     use<-mu_order[id]
     y<-mv2dens(x,rho,ebreaks[use],ebreaks[use+1])*pp[use]
-    pts<-rbind(pts,plotRibbon(x,y,id))
+    newPts<-plotRibbon(x,y,id)
+    newPts$x<-newPts$x*sdv[id]+muv[id]
+    pts<-rbind(pts,newPts)
   }
   pts$value<-pts$value/max(pts$value)
   pts1<-pts

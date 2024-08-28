@@ -88,6 +88,7 @@ makeVariable<-function(name,type="Interval",
   if (var$type=="Ordinal") {
     var$mu<-var$median
     var$sd<-var$iqr/2
+  }
     if (!is.na(ordProportions)) {
       pp<-strsplit(var$ordProportions,",")
       pp<-pp[[1]]
@@ -101,9 +102,9 @@ makeVariable<-function(name,type="Interval",
     } else {
       var$ordProportions<-NA
     }
-  }
+  
   # check for cases
-  if (var$type=="Categorical") {
+  # if (var$type=="Categorical") {
     # sort the cases
     if (length(var$cases)==1) {
       cs<-strsplit(var$cases,",")
@@ -128,7 +129,7 @@ makeVariable<-function(name,type="Interval",
       }
       var$proportions<-pp
     }
-  }
+  # }
   # return var
   var
 }

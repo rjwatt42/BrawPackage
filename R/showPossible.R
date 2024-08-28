@@ -157,7 +157,7 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
   
   if (is.null(possibleResult)) possibleResult<-doPossible()
   if (is.null(possibleResult$possible)) possibleResult<-doPossible(possible=possibleResult)
-  
+
   BoxCol<-"#666666"
   
   colS<-"yellow"

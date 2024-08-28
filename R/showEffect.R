@@ -45,8 +45,8 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
           {start=c(0,0.92)
           direction=0
           len=0.9
-          labelpts<-data.frame(x=0.1,y=0.5)
-          hjust<-1
+          labelpts<-data.frame(x=0,y=0.5)
+          hjust<-1.3
           ends="last"
           fill=braw.env$plotColours$maineffectES},
           

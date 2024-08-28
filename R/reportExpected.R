@@ -27,10 +27,12 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic"){
     switch(showType,
            "Basic"=     {pars<-c("rs","p")},
            "p(sig)"= {pars<-c("p")},
+           "Power"=     {pars<-c("ws","wp")},
            "2D"=     {pars<-c("rs","p")},
            "CILimits"=  {pars<-c("ci1","ci2")},
            "NHST"={pars<-c("e2","e1")},
-           "Hits"=       {pars<-c("e1","e2")},
+           "Hits"=       {pars<-c("e1a","e2a")},
+           "Misses"=       {pars<-c("e1b","e2b")},
            { pars<-strsplit(showType,";")[[1]]
            }
     )

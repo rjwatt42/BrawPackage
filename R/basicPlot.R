@@ -112,7 +112,7 @@ xAxisLabel<-function(label) {
     label<-deparse(bquote(bold(.(label))))
   }
   voff<-braw.env$plotLimits$xAxisTickSize
-  
+
   axis<-data.frame(x=mean(braw.env$plotLimits$xlim),y=braw.env$plotLimits$ylim[1])
   axis<-reRangeXY(axis)
   switch(braw.env$plotLimits$orientation,

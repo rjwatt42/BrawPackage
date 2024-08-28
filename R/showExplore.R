@@ -59,8 +59,15 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
 
   if (is.null(exploreResult)) exploreResult=doExplore()
 
-  if (showType=="Basic") showType<-"rs;p"
   showType<-strsplit(showType,";")[[1]]
+  if (length(showType)==1) {
+    switch(showType,
+           "Basic"=     {showType<-c("rs","p")},
+           "Power"=     {showType<-c("ws","wp")},
+           "CILimits"=  {showType<-c("ci1","ci2")},
+           {}
+    )
+  }
 
   if (!exploreResult$hypothesis$effect$world$worldOn && is.element(showType[1],c("NHST","Hits","Misses"))) {
     if (exploreResult$nullcount<exploreResult$count) {
@@ -704,7 +711,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
         g<-g+dataLine(data=ptsn,colour="black",linetype="dotted",linewidth=0.25)
         
         minnw<-function(n,r,w){sum(abs(w-rn2w(r,n)),na.rm=TRUE)}
-        n80<-optimize(minnw,c(explore$min_n,explore$max_n),w=0.8,r=r_est)
+        n80<-optimize(minnw,c(min(n),max(n)),w=0.8,r=r_est)
         
         if (sum(n<n80$minimum)>=2 && sum(n>n80$minimum)>=2){
           label<-paste("n80 =",format(round(n80$minimum),digits=2))

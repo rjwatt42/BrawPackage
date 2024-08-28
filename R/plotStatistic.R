@@ -813,7 +813,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,orient
                 labelPt1a<-paste0("p(sig error) = ",brawFormat(s*100,digits=npct),"% ")
               },
               "e2"={
-                labelPt1<-paste0("p(ns miss) = ",brawFormat(ns*100,digits=npct),"% ")
+                labelPt1<-paste0("p(ns error) = ",brawFormat(ns*100,digits=npct),"% ")
                 labelPt1a<-paste0("p(sig correct) = ",brawFormat(s*100,digits=npct),"% ")
               },
               "e1d"={

@@ -15,7 +15,7 @@
 #' )
 #' @export
 makeWorld<-function(worldOn=FALSE,populationPDF="Single",populationRZ="r",
-                    populationPDFk=0.2,populationNullp=0,worldAbs=FALSE) {
+                    populationPDFk=0.0,populationNullp=0,worldAbs=FALSE) {
  world<-list(worldOn=worldOn,populationPDF=populationPDF,populationPDFk=populationPDFk,populationRZ=populationRZ,populationNullp=populationNullp,worldAbs=worldAbs)
  world  
 }
