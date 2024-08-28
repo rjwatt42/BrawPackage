@@ -262,15 +262,16 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
           "Usage"={vals<-c("Between","Within")},
           "WithinCorr"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "SampleGamma"={vals<-seq(minVal,maxVal,length.out=npoints)},
-          "Alpha"={vals<-vals<-seq(minVal,maxVal,length.out=npoints)},
           "Dependence"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Outliers"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Heteroscedasticity"={vals<-seq(minVal,maxVal,length.out=npoints)},
-          "Transform"={vals<-c("None","Log","Exp")},
           "IVRange"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "DVRange"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Cheating"={vals<-c("None","Grow","Prune","Replace","Retry","Add")},
           "CheatingAmount"={vals<-seq(minVal*design$sN,maxVal*design$sN,length.out=npoints)},
+          "Alpha"={vals<-vals<-seq(minVal,maxVal,length.out=npoints)},
+          "Transform"={vals<-c("None","Log","Exp")},
+          "EqualVar"={vals<-c(FALSE,TRUE)},
           
           "Keep"={vals<-c("cautious", "last", "largeN", "smallP", "median")},
           "Power"={vals<-seq(minVal,maxVal,length.out=npoints)},
@@ -572,7 +573,6 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
                 },
                 
                 "Heteroscedasticity"={effect$Heteroscedasticity<-vals[vi]},
-                "Transform"={evidence$Transform<-vals[vi]},
                 "n"={design$sN<-round(vals[vi])},
                 "Method"={design$sMethod<-makeSampling(vals[vi])},
                 "ClusterRad"={design$sMethod$Cluster_rad<-vals[vi]},
@@ -603,9 +603,6 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
                   design$sNRand<-TRUE
                   design$sNRandK<-vals[vi]
                 },
-                "Alpha"={
-                  evidence$alphaSig<-vals[vi]
-                },
                 "Dependence"={design$sDependence<-vals[vi]},
                 "Outliers"={design$sOutliers<-vals[vi]},
                 "IVRange"={
@@ -622,7 +619,14 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
                 "CheatingAmount"={
                   design$sCheatingAttempts<-vals[vi]
                 },
-                
+                "Alpha"={
+                  evidence$alphaSig<-vals[vi]
+                },
+                "EqualVar"={
+                  evidence$Welch<-!vals[vi]
+                },
+                "Transform"={evidence$Transform<-vals[vi]},
+
                 "Keep"={
                   design$Replication$Keep<-vals[vi]
                 },

@@ -278,7 +278,7 @@ expected_hist<-function(vals,svals,valType,ylim,histGain,histGainrange){
 }
 
 expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
-                        i=1,scale=1,col="white",orientation="vert",ylim,histGain=NA,histGainrange=NA){
+                        i=1,scale=1,col="white",orientation="vert",ylim,histGain=NA,histGainrange=NA,npointsMax=200){
   se_arrow<-0.3
   se_size<-0.75
   
@@ -313,7 +313,7 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
     c2=col
   }
   
-  if (length(pts$y1)<=250) {
+  if (length(pts$y1)<=npointsMax) {
     if (!is.null(analysis) && is.element(showType,c("rs","p")) && length(pts$y1)==1) {
       switch(i,
              {rCI<-analysis$rIVCI
@@ -731,7 +731,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,orient
       }
       
       g<-expected_plot(g,pts,showType,analysis,IV,DV,i,orientation=orientation,
-                       ylim=ylim,histGain=histGain,histGainrange=histGainrange)
+                       ylim=ylim,histGain=histGain,histGainrange=histGainrange,npointsMax=200)
       
       ns<-c()
       s<-c()

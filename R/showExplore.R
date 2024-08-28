@@ -582,7 +582,8 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
             for (i in 1:length(vals))
               g<-expected_plot(g,
                                data.frame(x=vals[i],y1=showVals[,i],y2=sigVals[,i]),
-                               showType=showType[si],ylim=ylim,scale=2.25/(length(vals)+1),col=col)
+                               showType=showType[si],ylim=ylim,scale=2.25/(length(vals)+1),col=col,
+                               npointsMax=200/length(vals))
           }
           g<-g+dataPoint(data=pts0f,fill=col,size=4)
           if (!is.null(y75)) {
