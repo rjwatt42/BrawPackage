@@ -183,7 +183,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
       # if the result has the wrong sign, 
       if (Replication$forceSign && sign(res$rIV)!=sign(resOriginal$rIV)) {
         res$pIV<-1
-        res$rIV<-0
+        # res$rIV<-0
       }
       # save this result
       ResultHistory$n<-c(ResultHistory$n,res$nval)

@@ -25,7 +25,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
   showType<-showType[1]
   
   explore<-exploreResult$explore
-  hypothesis<-explore$hypothesis
+  hypothesis<-exploreResult$hypothesis
   effect<-hypothesis$effect
   
   oldAlpha<-braw.env$alphaSig
@@ -139,7 +139,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
               }
             } else {
               for (i in 1:length(exploreResult$vals)){
-                p<-mean(isSignificant(braw.env$STMethod,pVals[,i],rVals[,i],nVals[,i],df1Vals[,i],exploreResult$evidence),na.rm=TRUE)
+                p<-mean(!isSignificant(braw.env$STMethod,pVals[,i],rVals[,i],nVals[,i],df1Vals[,i],exploreResult$evidence),na.rm=TRUE)
                 y50[i]<-p
                 y75[i]<-p+sqrt(p*(1-p)/length(pVals[,i]))
                 y25[i]<-p-sqrt(p*(1-p)/length(pVals[,i]))
@@ -291,33 +291,33 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
   outputText<-rep("",nc+1)
   outputText[1]<-paste0("!j\bExplore: ",explore$exploreType)
   outputText[3]<-paste("nsims = ",format(nrow(exploreResult$result$rval)),sep="")
-  outputText<-c(outputText,paste0("!j\bshow: ", extra_y_label))
-  outputText<-c(outputText,rep("",nc))
 
-  
   if (showType=="NHST" || showType=="FDR;FMR") {
     switch (braw.env$STMethod,
-            "NHST"={outputText<-c(outputText,"NHST")},
-            "sLLR"={outputText<-c(outputText,"sLLR")},
+            "NHST"={outputText<-c(outputText," ","STMethod: ","NHST")},
+            "sLLR"={outputText<-c(outputText," ","STMethod: ","sLLR")},
             "dLLR"={
-              outputText<-c(outputText,paste0("dLLR",": ","prior=","(",exploreResult$evidence$prior$populationPDF,")" ))
+              outputText<-c(outputText," ","STMethod: ",paste0("dLLR",": ","prior=","(",exploreResult$evidence$prior$populationPDF,")" ))
             }
             )
-    outputText<-c(outputText,rep("",nc))
+    outputText<-c(outputText,rep("",nc-2))
   }
+  outputText<-c(outputText,rep("",nc+1))
   
-  outputText<-c(outputText,paste0("!j\b",explore$exploreType))
+  outputText<-c(outputText,paste0("\b", extra_y_label))
+  outputText<-c(outputText,rep("",nc))
+  
   if (explore$exploreType=="rIV" && braw.env$RZ=="z") {
     vals<-atanh(vals)
   }
+  outputText<-c(outputText,paste0("!j\b",explore$exploreType))
   for (i in 1:nc) {
     if (is.numeric(vals[use[i]]))
       outputText<-c(outputText,paste0("!j\b",brawFormat(vals[use[i]],digits=braw.env$report_precision)," "))
     else 
       outputText<-c(outputText,paste0("!j\b",vals[use[i]]," "))
   }
-  # outputText<-c(outputText,rep(" ",nc+1))
-  
+
   outputText<-c(outputText,"!j!ilower 25%")
   for (i in 1:nc) {
     outputText<-c(outputText,paste0("!j",brawFormat(y25[use[i]],digits=braw.env$report_precision)))
@@ -330,7 +330,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
   for (i in 1:nc) {
     outputText<-c(outputText,paste0("!j",brawFormat(y75[use[i]],digits=braw.env$report_precision)))
   }
-  
+
   if (is.element(showType,c("rs","p","ws","n","log(lrs)","log(lrd)","Lambda","pNull","S"))) {
     outputText<-c(outputText,rep(" ",nc+1))
     outputText<-c(outputText,"!j!i\bmean")
@@ -373,7 +373,11 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
       )
     }
 
-    outputText<-c(outputText,paste("!j\b", extra_y_label))
+    outputText<-c(outputText,rep(" ",nc+1))
+    outputText<-c(outputText,paste("\b", extra_y_label))
+    outputText<-c(outputText,rep("",nc))
+    
+    outputText<-c(outputText,paste0("!j\b",explore$exploreType))
     for (i in 1:nc) {
       if (is.numeric(vals[use[i]]))
         outputText<-c(outputText,paste0("!j\b",brawFormat(vals[use[i]],digits=braw.env$report_precision)," "))
@@ -393,7 +397,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
       outputText<-c(outputText,paste0("!j",brawFormat(y75e[use[i]],digits=braw.env$report_precision)))
     }
   }
-  
+
   nc=nc+1
   nr=length(outputText)/nc
   reportPlot(outputText,nc,nr)        

@@ -28,7 +28,9 @@ showExpected<-function(expectedResult=braw.res$expected,showType="Basic",
       }
     }
     
-    if (!expectedResult$hypothesis$effect$world$worldOn && !all(is.na(expectedResult$nullresult$rIV))) {
+  if (is.element(showType,c("NHST","Hits","Misses")) &&
+      !expectedResult$hypothesis$effect$world$worldOn && 
+      !all(is.na(expectedResult$nullresult$rIV))) {
       if (all(expectedResult$result$rpIV==0)) expectedResult$result$rpIV<-expectedResult$result$rpIV+0.0000000001
       fullResult<-mergeExpected(expectedResult$result,expectedResult$nullresult)
     } else fullResult<-expectedResult$result

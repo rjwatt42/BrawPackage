@@ -150,8 +150,8 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   if (showType[si]=="p" && braw.env$pPlotScale=="log10" && any(exploreResult$result$pval>0)) 
     while (mean(log10(exploreResult$result$pval)>ylim[1])<0.75) ylim[1]<-ylim[1]-1
   
-  col2<-braw.env$plotColours$infer_miss
-  col3<-braw.env$plotColours$infer_miss
+  col2<-braw.env$plotColours$infer_nsNonNull
+  col3<-braw.env$plotColours$infer_nsigNull
   col5<-braw.env$plotColours$infer_sigNull
   switch (braw.env$STMethod,
           "NHST"={
