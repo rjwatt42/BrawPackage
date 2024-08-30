@@ -296,7 +296,7 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
     }
     if (showType=="e2") {
       c1=braw.env$plotColours$infer_sigNonNull
-      c2=braw.env$plotColours$infer_nsNonNull
+      c2=braw.env$plotColours$infer_nsigNonNull
     }
     if (showType=="e1d") {
       c1=braw.env$plotColours$infer_sigNull

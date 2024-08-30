@@ -185,6 +185,34 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
               }
             }
           },
+          "Misses"={
+            y50<-c()
+            y25<-c()
+            y75<-c()
+            if (effect$world$worldOn) {
+              for (i in 1:length(exploreResult$vals)){
+                if (explore$exploreType=="Alpha") {
+                  braw.env$alphaSig<-exploreResult$vals[i]
+                }
+                sigs<-isSignificant(braw.env$STMethod,pVals[,i],rVals[,i],nVals[,i],df1Vals[,i],exploreResult$evidence)
+                nulls<-exploreResult$result$rpval[,i]==0
+                p<-sum(!sigs & nulls,na.rm=TRUE)/sum(!sigs)
+                y50[i]<-1-p
+                y75[i]<-1-p+sqrt(p*(1-p)/length(pVals[,i]))
+                y25[i]<-1-p-sqrt(p*(1-p)/length(pVals[,i]))
+              }
+            } else {
+              for (i in 1:length(exploreResult$vals)){
+                if (explore$exploreType=="Alpha") {
+                  braw.env$alphaSig<-exploreResult$vals[i]
+                }
+                p<-mean(!isSignificant(braw.env$STMethod,pVals[,i],rVals[,i],nVals[,i],df1Vals[,i],exploreResult$evidence),na.rm=TRUE)
+                y50[i]<-1-p
+                y75[i]<-1-p+sqrt(p*(1-p)/length(pVals[,i]))
+                y25[i]<-1-p-sqrt(p*(1-p)/length(pVals[,i]))
+              }
+            }
+          },
           "FDR;FMR"={
             y50<-c()
             y25<-c()
@@ -292,16 +320,16 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
   outputText[1]<-paste0("!j\bExplore: ",explore$exploreType)
   outputText[3]<-paste("nsims = ",format(nrow(exploreResult$result$rval)),sep="")
 
-  if (showType=="NHST" || showType=="FDR;FMR") {
-    switch (braw.env$STMethod,
-            "NHST"={outputText<-c(outputText," ","STMethod: ","NHST")},
-            "sLLR"={outputText<-c(outputText," ","STMethod: ","sLLR")},
-            "dLLR"={
-              outputText<-c(outputText," ","STMethod: ",paste0("dLLR",": ","prior=","(",exploreResult$evidence$prior$populationPDF,")" ))
-            }
-            )
-    outputText<-c(outputText,rep("",nc-2))
-  }
+  # if (showType=="NHST" || showType=="FDR;FMR") {
+  #   switch (braw.env$STMethod,
+  #           "NHST"={outputText<-c(outputText," ","STMethod: ","NHST")},
+  #           "sLLR"={outputText<-c(outputText," ","STMethod: ","sLLR")},
+  #           "dLLR"={
+  #             outputText<-c(outputText," ","STMethod: ",paste0("dLLR",": ","prior=","(",exploreResult$evidence$prior$populationPDF,")" ))
+  #           }
+  #           )
+  #   outputText<-c(outputText,rep("",nc-2))
+  # }
   outputText<-c(outputText,rep("",nc+1))
   
   outputText<-c(outputText,paste0("\b", extra_y_label))

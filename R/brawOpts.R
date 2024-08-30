@@ -46,8 +46,8 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,graphicsSize=dev.size("c
                     sampleC="#FFCC00",descriptionC="#FF9955",replicationC="#FF7755",
                     descriptionC1="#FF5533",descriptionC2="#CCBB33",
                     infer_sigC="#11CC00",infer_nsigC="#FF4400",infer_none="#AAAAAA",infer_miss=NULL,
-                    infer_sigNonNull="#11CC00",infer_isigNonNull="#881100",infer_nsNonNull="#881100",infer_nsdNonNull="#DDCCCC",
-                    infer_sigNull="#118800",infer_isigNull="#FF4400",infer_nsigNull="#FF4400",infer_nsdNull="#CCDDCC",
+                    infer_sigNonNull="#11CC00",infer_isigNonNull="#881100",infer_nsigNonNull="#881100",infer_siglsNonNull="#AABB99",infer_nsdNonNull="#DDCCCC",
+                    infer_sigNull="#118800",infer_isigNull="#FF4400",infer_nsigNull="#FF4400",infer_nsiglsNull="#CC9988",infer_nsdNull="#CCDDCC",
                     psig="#FFAA00",alpha="#44FF22",
                     fdr="#227700",fmr="#BB5555")
 
@@ -57,7 +57,7 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,graphicsSize=dev.size("c
                       sampleC="#FFFFFF",descriptionC="#FFFFFF",
                       descriptionC1="#888888",descriptionC2="#111111",
                       infer_sigC="#FFFFFF",infer_nsigC="#111111",infer_none="#AAAAAA",
-                      infer_sigNonNull="#FFFFFF",infer_isigNonNull="#555555",infer_nsNonNull="#555555",infer_nsdNonNull="#333333",
+                      infer_sigNonNull="#FFFFFF",infer_isigNonNull="#555555",infer_nsigNonNull="#555555",infer_nsdNonNull="#333333",
                       infer_sigNull="#BBBBBB",infer_isigNull="#111111",infer_nsigNull="#FFFFFF",infer_nsdNull="#DDDDDD",
                       psig="#FFFFFF",alpha="#FFFFFF",
                       fdr="#BBBBBB",fmr="#555555")
