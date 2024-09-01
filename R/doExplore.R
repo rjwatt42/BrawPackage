@@ -96,21 +96,22 @@ storeExploreResult<-function(result,res,ri,vi) {
     result$rIV2[ri,vi]<-res$rIV2
     result$pIV2[ri,vi]<-res$pIV2
     result$rIVIV2DV[ri,vi]<-res$rIVIV2DV
-    result$pIVIV2DV[ri,vi]<-res$rIVIV2DV
+    result$pIVIV2DV[ri,vi]<-res$pIVIV2DV
     
-    result$r$direct[ri,vi,]<-res$r$direct
-    result$r$unique[ri,vi,]<-res$r$unique
-    result$r$total[ri,vi,]<-res$r$total
+    n<-length(res$r$direct)
+    result$r$direct[ri,vi,1:n]<-res$r$direct
+    result$r$unique[ri,vi,1:n]<-res$r$unique
+    result$r$total[ri,vi,1:n]<-res$r$total
 
-    result$p$direct[ri,vi,]<-res$p$direct
-    result$p$unique[ri,vi,]<-res$p$unique
-    result$p$total[ri,vi,]<-res$p$total
+    result$p$direct[ri,vi,1:n]<-res$p$direct
+    result$p$unique[ri,vi,1:n]<-res$p$unique
+    result$p$total[ri,vi,1:n]<-res$p$total
   }
   return(result)
 }
 
 mergeExploreResult<-function(res1,res2) {
-  abind<-function(a,b) array(c(a, b), dim = c(dim(a)[1], dim(a)[2], dim(a)[3]+dim(b)[3]))
+  # abind<-function(a,b) array(c(a, b), dim = c(dim(a)[1]+dim(b)[1], dim(a)[2], dim(a)[3]))
   
   result<-res1
   result$rval<-rbind(res1$rval,res2$rval)
@@ -121,15 +122,22 @@ mergeExploreResult<-function(res1,res2) {
   result$poval<-rbind(res1$poval,res2$poval)
   result$nval<-rbind(res1$nval,res2$nval)
   result$df1<-rbind(res1$df1,res2$df1)
-  # if (!is.null(res1$r)) {
-    result$r$direct<-abind(res1$r$direct,res2$r$direct)
-    result$r$unique<-abind(res1$r$unique,res2$r$unique)
-    result$r$total<-abind(res1$r$total,res2$r$total)
 
-    result$p$direct<-abind(res1$p$direct,res2$p$direct)
-    result$p$unique<-abind(res1$p$unique,res2$p$unique)
-    result$p$total<-abind(res1$p$total,res2$p$total)
-  # }
+    result$r$direct<-abind(res1$r$direct,res2$r$direct,along=1)
+    result$r$unique<-abind(res1$r$unique,res2$r$unique,along=1)
+    result$r$total<-abind(res1$r$total,res2$r$total,along=1)
+
+    result$p$direct<-abind(res1$p$direct,res2$p$direct,along=1)
+    result$p$unique<-abind(res1$p$unique,res2$p$unique,along=1)
+    result$p$total<-abind(res1$p$total,res2$p$total,along=1)
+    
+  if (!is.null(res1$rIV2)) {
+    result$rIV2<-rbind(res1$rIV2,res2$rIV2)
+    result$pIV2<-rbind(res1$pIV2,res2$pIV2)
+    result$rIVIV2DV<-rbind(res1$rIVIV2DV,res2$rIVIV2DV)
+    result$pIVIV2DV<-rbind(res1$pIVIV2DV,res2$pIVIV2DV)
+  }
+    
   return(result)
 }
 

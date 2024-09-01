@@ -492,7 +492,13 @@ generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",ca
   }
   r.full<-matrix(model2fulleffect(lmNormC,anNormC),nrow=1)
   aic<-AIC(lmNormC)
-  
+  # if (length(r.direct)<3) {
+  #   r.direct<-c(r.direct,0)
+  #   r.unique<-c(r.unique,0)
+  #   r.total<-c(r.total,0)
+  #   df<-c(df,1)
+  # }
+
   p.direct<-r2p(r.direct,n,df)
   p.unique<-r2p(r.unique,n,df)
   p.total<-r2p(r.total,n,df)

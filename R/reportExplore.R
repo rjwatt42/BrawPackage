@@ -9,7 +9,7 @@
 #'                        whichEffect="All",effectType="All")
 #' @export
 reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
-                        whichEffect="All",effectType="All"
+                        whichEffect="All",effectType="all"
                         ){
   if (is.null(exploreResult)) exploreResult<-doExplore(autoShow=FALSE)
   

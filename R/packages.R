@@ -6,7 +6,7 @@
 list.of.packages<-c("ggplot2","grDevices",
                     "mnormt","lme4",
                     "readxl","writexl","stringr","clipr",
-                    "car","pracma"
+                    "car","pracma","abind"
 )
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)>0) install.packages(new.packages,repos="http://cran.fhcrc.org")
@@ -22,3 +22,4 @@ library(stringr)     # for str_* functions
 library(clipr)       # for clipboard functions
 library(car)         # Anova type 3 correct
 library(pracma)      # for meshgrid & fmincon
+library(abind)       # for abind
