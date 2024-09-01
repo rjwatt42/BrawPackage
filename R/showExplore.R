@@ -100,25 +100,46 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     vals<-atanh(vals)
   }
   
-  if (!is.null(hypothesis$IV2) && whichEffect=="All") {
-    plots<-matrix(c(0,0.33,0.65),nrow=1,byrow=TRUE)
-    plotWidth<-0.35
-    whichEffects<-1:3
+  if (length(showType)==1) {
+    plots<-matrix(0)
+    plotWidth<-1
+    plotHeight<-1
+    if (!is.null(hypothesis$IV2) && whichEffect=="All") {
+      plots<-matrix(c(0.65,0.33,0),nrow=1,byrow=TRUE)
+      plotWidth<-0.35
+      plotHeight<-1
+    }
+    if (!is.null(hypothesis$IV2) && whichEffect=="Mains") {
+      plots<-matrix(c(0.5,0),nrow=1,byrow=TRUE)
+      plotWidth<-0.5
+      plotHeight<-1
+    }
   } else {
-    switch (length(showType),
-            {plots<-matrix(0)
-            plotWidth<-1},
-            {plots<-matrix(c(0,0.5),nrow=2)
-            plotWidth<-0.5}
-    )
-    if (!is.null(hypothesis$IV2)) 
-      switch (whichEffect,
-              "Main 1"=whichEffects<-1,
-              "Main 2"=whichEffects<-2,
-              "rIVIV2DV"=whichEffects<-3
-      )
-    else whichEffects<-1
+    plots<-matrix(0)
+    plotWidth<-0.5
+    plotHeight<-1
+    if (!is.null(hypothesis$IV2) && whichEffect=="All") {
+      plots<-matrix(c(0.65,0.33,0),nrow=1,byrow=TRUE)
+      plotWidth<-0.5
+      plotHeight<-0.35
+    }
+    if (!is.null(hypothesis$IV2) && whichEffect=="Mains") {
+      plots<-matrix(c(0.5,0),nrow=1,byrow=TRUE)
+      plotWidth<-0.5
+      plotHeight<-0.5
+    }
   }
+  
+  switch (whichEffect,
+          "Main 1"=whichEffects<-1,
+          "Main 2"=whichEffects<-2,
+          "Interaction"=whichEffects<-3,
+          "rIV"=whichEffects<-1,
+          "rIV2"=whichEffects<-2,
+          "rIVIV2DV"=whichEffects<-3,
+          "Mains"=whichEffects<-1:2,
+          "All"=whichEffects<-1:3
+  )
   
   if (is.character(vals[1]) || length(vals)<10) {
     xlim<-c(0,length(vals)+1)
@@ -135,6 +156,13 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     xnames<-NULL
     doLine=TRUE
   }
+  
+  if (effectType=="all") {
+    if (!is.null(hypothesis$IV2)) effectTypes<-c("direct","unique","total")
+    else effectTypes<-"direct"
+  } 
+  else effectTypes<-effectType
+  
   
   g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
   
@@ -191,12 +219,17 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   lb3xy<-data.frame(x=max(xlim),y=0+yn/10)
   
   for (whichEffect in whichEffects) {
-    braw.env$plotArea<-c(plots[si,whichEffect],0,plotWidth,1)
+    # print(c(whichEffect,size(plots)))
+    if (plotHeight==1) braw.env$plotArea<-c(0.5*(si-1),0,plotWidth,plotHeight)
+    else               braw.env$plotArea<-c(0.5*(si-1),plots[1,whichEffect],plotWidth,plotHeight)
     g<-startPlot(xlim,ylim,box="Both",top=TRUE,tight=TRUE,g=g)
     g<-g+xAxisTicks(xbreaks,xnames,logScale=explore$xlog)+xAxisLabel(bquote(bold(.(explore$exploreType))))
+    if ((showType[si]=="rs") && (!is.null(hypothesis$IV2))) switch(whichEffect,ylabel<-"rIV",ylabel<-"rIV2",ylabel<-"rIVIV2DV")
     g<-g+yAxisTicks(logScale=yaxis$logScale)+yAxisLabel(ylabel)
-    col<-ycols[1]
+    col<-darken(ycols[1],off=-0.2)
     
+    for (effectType in effectTypes) {
+      col<-darken(col,off=0.1)
     theoryVals<-NULL
     theoryUpper<-NULL
     theoryLower<-NULL
@@ -708,6 +741,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     }
   }
   }
+  }
   if (exploreResult$count>0)
   g<-g+plotTitle(paste0("Explore: ",brawFormat(exploreResult$count)),"right",size=0.85)
   g
@@ -799,6 +833,7 @@ showExplore2D<-function(exploreResult=braw.res$explore,showType=c("rs","p"),show
   ylines<-yaxis$lines
   ySecond<-NULL
   
+  if ((showType[2]=="rs") && (!is.null(IV2))) switch(whichEffect,ylabel<-"rIV",ylabel<-"rIV2",ylabel<-"rIVIV2DV")
   if (showType[1]=="p" && braw.env$pPlotScale=="log10" && any(exploreResult$result$pval>0)) 
     while (mean(log10(exploreResult$result$pval)>xlim[1])<0.75) xlim[1]<-xlim[1]-1
   if (showType[2]=="p" && braw.env$pPlotScale=="log10" && any(exploreResult$result$pval>0)) 

@@ -199,6 +199,7 @@ doExplore<-function(nsims=10,exploreResult=NULL,explore=braw.def$explore,
 
 runExplore <- function(nsims,exploreResult,doingNull=FALSE,
                        autoShow=braw.env$autoShow,showType="rs"){
+  max_r<-0.9
   
   explore<-exploreResult$explore
   hypothesis<-exploreResult$hypothesis

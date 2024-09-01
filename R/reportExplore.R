@@ -51,6 +51,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
   } else {
     if (effectType=="all") {effectType<-"direct"}
     if (whichEffect=="All") {whichEffect<-"Main 1"}
+    if (whichEffect=="Mains") {whichEffect<-"Main 1"}
     switch (whichEffect,
             "Main 1"={
               rVals<-exploreResult$result$r[[effectType]][,,1]
@@ -58,8 +59,23 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
               extra_y_label<-paste("Main Effect 1:",effectType)
             },
             "Main 2"={
+              rVals<-exploreResult$result$r[[effectType]][,,2]
+              pVals<-exploreResult$result$p[[effectType]][,,2]
+              extra_y_label<-paste("Main Effect 2:",effectType)
+            },
+            "Interaction"={
+              rVals<-exploreResult$result$r[[effectType]][,,3]
+              pVals<-exploreResult$result$p[[effectType]][,,3]
+              extra_y_label<-paste("Interaction:",effectType)
+            },
+            "rIV"={
               rVals<-exploreResult$result$r[[effectType]][,,1]
               pVals<-exploreResult$result$p[[effectType]][,,1]
+              extra_y_label<-paste("Main Effect 1:",effectType)
+            },
+            "rIV2"={
+              rVals<-exploreResult$result$r[[effectType]][,,2]
+              pVals<-exploreResult$result$p[[effectType]][,,2]
               extra_y_label<-paste("Main Effect 2:",effectType)
             },
             "rIVIV2DV"={
