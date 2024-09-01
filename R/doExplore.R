@@ -5,7 +5,7 @@
 #'                    "n","Method","Usage","WithinCorr","ClusterRad","SampleGamma" \cr
 #'                     "Dependence","Outliers","IVRange","DVRange" \cr
 #'                     "Cheating","CheatingAmount" \cr
-#'                     "Alpha","Transform" \cr
+#'                     "Alpha","Transform","InteractionOn" \cr
 #'                     "Power","Keep","Repeats" \cr
 #' @returns explore object
 #' @seealso doExplore() 
@@ -140,7 +140,7 @@ mergeExploreResult<-function(res1,res2) {
 #'                    "n","Method","Usage","WithinCorr","ClusterRad","SampleGamma" \cr
 #'                     "Dependence","Outliers","IVRange","DVRange" \cr
 #'                     "Cheating","CheatingAmount" \cr
-#'                     "Alpha","Transform" \cr
+#'                     "Alpha","Transform","InteractionOn" \cr
 #'                     "Power","Keep","Repeats" \cr
 #' @returns exploreResult object
 #' @seealso showExplore() 
@@ -271,6 +271,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
           "CheatingAmount"={vals<-seq(minVal*design$sN,maxVal*design$sN,length.out=npoints)},
           "Alpha"={vals<-vals<-seq(minVal,maxVal,length.out=npoints)},
           "Transform"={vals<-c("None","Log","Exp")},
+          "InteractionOn"={vals<-c(FALSE,TRUE)},
           "EqualVar"={vals<-c(FALSE,TRUE)},
           
           "Keep"={vals<-c("cautious", "last", "largeN", "smallP", "median")},
@@ -626,7 +627,8 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
                   evidence$Welch<-!vals[vi]
                 },
                 "Transform"={evidence$Transform<-vals[vi]},
-
+                "InteractionOn"={evidence$rInteractionOn<-vals[vi]},
+                
                 "Keep"={
                   design$Replication$Keep<-vals[vi]
                 },
