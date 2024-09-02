@@ -7,8 +7,10 @@
 #'                   "ws","wp","nw", ro","po"
 #' @return ggplot2 object - and printed
 #' @export
-reportExpected<-function(expectedResult=braw.res$expected,showType="Basic"){
+reportExpected<-function(expectedResult=braw.res$expected,showType="Basic",
+                         whichEffect="All",effectType="direct"){
   if (is.null(expectedResult)) expectedResult=doExpected(autoShow=FALSE)
+  if (is.element(whichEffect,c("All","Mains"))) whichEffect<-"Main 1"
   
   IV<-expectedResult$hypothesis$IV
   IV2<-expectedResult$hypothesis$IV2
@@ -52,17 +54,17 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic"){
     outputText<-c("\bExpected  ",paste("nsims = ",format(sum(!is.na(result$rIV))),sep=""),rep("",nc-2))
   }
   outputText<-c(outputText,rep("",nc))
+  
+  outputText<-c(outputText,paste0("\b",whichEffect),rep("",nc-1))
   if (!(is.null(IV2) | is.null(result$rIVIV2DV))){
-    outputText<-c(outputText,"","\b Main Effect 1","","","\b Main Effect 2","")
-    if (!is.na(result$rIVIV2DV[1])) outputText<-c(outputText,"","\bInteraction","")
+    outputText<-c(outputText,"","\bdirect","","","\bunique","","","\btotal","")
     }
 
   if (is.null(IV2)) {
     rs<-matrix(result$rIV,ncol=1)
     ps<-matrix(result$pIV,ncol=1)
   } else {
-    result$effectType<-"direct"
-    switch (result$effectType,
+    switch (effectType,
             "direct"={rs<-result$r$direct
                       ps<-result$p$direct},
             "unique"={rs<-result$r$unique

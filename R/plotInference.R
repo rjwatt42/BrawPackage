@@ -28,23 +28,24 @@ trimanalysis<-function(analysis) {
   analysis
 }
 
-plotInference<-function(analysis,otheranalysis=NULL,disp="rs",orientation="vert",effectType="direct",showTheory=braw.env$showTheory,g=NULL){
+plotInference<-function(analysis,otheranalysis=NULL,disp="rs",orientation="vert",
+                        whichEffect="Main 1",effectType="all",showTheory=braw.env$showTheory,g=NULL){
   if (length(disp)==2) {
     return(plot2Inference(analysis,disp[1],disp[2]))
   } 
   analysis<-trimanalysis(analysis)
   
   switch (disp,
-          "rs"= {g<-r_plot(analysis,disp,orientation=orientation,effectType=effectType,showTheory=showTheory,g=g)},
-          "rp"={g<-r_plot(analysis,disp,orientation=orientation,effectType=effectType,showTheory=showTheory,g=g)},
-          "re"= {g<-r_plot(analysis,disp,orientation=orientation,effectType=effectType,showTheory=showTheory,g=g)},
-          "ro"={g<-r_plot(analysis,disp,orientation=orientation,effectType=effectType,showTheory=showTheory,g=g)},
-          "ci1"={g<-r_plot(analysis,disp,orientation=orientation,effectType=effectType,showTheory=showTheory,g=g)},
-          "ci2"={g<-r_plot(analysis,disp,orientation=orientation,effectType=effectType,showTheory=showTheory,g=g)},
+          "rs"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,g=g)},
+          "rp"={g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,g=g)},
+          "re"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,g=g)},
+          "ro"={g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,g=g)},
+          "ci1"={g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,g=g)},
+          "ci2"={g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,g=g)},
 
-          "p"= {g<-p_plot(analysis,disp,orientation=orientation,effectType=effectType,showTheory=showTheory,g=g)},
+          "p"= {g<-p_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,g=g)},
           "ps"= {g<-ps_plot(analysis,disp,showTheory=showTheory,g=g)},
-          "po"= {g<-p_plot(analysis,disp,orientation=orientation,effectType=effectType,showTheory=showTheory,g=g)},
+          "po"= {g<-p_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,g=g)},
           
           "log(lrs)"={g<-l_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
           "log(lrd)"={g<-l_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},

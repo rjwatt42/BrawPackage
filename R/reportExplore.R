@@ -9,7 +9,7 @@
 #'                        whichEffect="All",effectType="All")
 #' @export
 reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
-                        whichEffect="All",effectType="all"
+                        whichEffect="All",effectType="all",quantileShow=0.5
                         ){
   if (is.null(exploreResult)) exploreResult<-doExplore(autoShow=FALSE)
   
@@ -323,10 +323,11 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
     y25<-c()
     ymn<-c()
     ysd<-c()
+    quants=(1-quantileShow)/2
     for (i in 1:length(exploreResult$vals)) {
-      y75[i]<-quantile(showVals[,i],0.75,na.rm=TRUE)
-      y50[i]<-quantile(showVals[,i],0.50,na.rm=TRUE)
-      y25[i]<-quantile(showVals[,i],0.25,na.rm=TRUE)
+      y75[i]<-quantile(showVals[,i],0.5+quants,na.rm=TRUE)
+      y50[i]<-quantile(showVals[,i],0.5,na.rm=TRUE)
+      y25[i]<-quantile(showVals[,i],0.5-quants,na.rm=TRUE)
       ymn[i]<-mean(showVals[,i],na.rm=TRUE)
       ysd[i]<-sd(showVals[,i],na.rm=TRUE)
     }
@@ -362,7 +363,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
       outputText<-c(outputText,paste0("!j\b",vals[use[i]]," "))
   }
 
-  outputText<-c(outputText,"!j!ilower 25%")
+  outputText<-c(outputText,paste0("!j!ilower ",format(quants*100),"%"))
   for (i in 1:nc) {
     outputText<-c(outputText,paste0("!j",brawFormat(y25[use[i]],digits=braw.env$report_precision)))
   }
@@ -370,7 +371,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
   for (i in 1:nc) {
     outputText<-c(outputText,paste0("!j",brawFormat(y50[use[i]],digits=braw.env$report_precision)))
   }
-  outputText<-c(outputText,"!j!iupper 25%")
+  outputText<-c(outputText,paste0("!j!iupper ",format(quants*100),"%"))
   for (i in 1:nc) {
     outputText<-c(outputText,paste0("!j",brawFormat(y75[use[i]],digits=braw.env$report_precision)))
   }
@@ -428,7 +429,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
       else 
         outputText<-c(outputText,paste0("!j\b",vals[use[i]]," "))
     }
-    outputText<-c(outputText,"!jlower 25%")
+    outputText<-c(outputText,paste0("!j!ilower ",format(quants*100),"%"))
     for (i in 1:nc) {
       outputText<-c(outputText,paste0("!j",brawFormat(y25e[use[i]],digits=braw.env$report_precision)))
     }
@@ -436,7 +437,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
     for (i in 1:nc) {
       outputText<-c(outputText,paste0("!j",brawFormat(y50e[use[i]],digits=braw.env$report_precision)))
     }
-    outputText<-c(outputText,"!jupper 25%")
+    outputText<-c(outputText,paste0("!j!iupper ",format(quants*100),"%"))
     for (i in 1:nc) {
       outputText<-c(outputText,paste0("!j",brawFormat(y75e[use[i]],digits=braw.env$report_precision)))
     }

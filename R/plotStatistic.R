@@ -1,6 +1,6 @@
 
 
-collectData<-function(analysis,effectType) {
+collectData<-function(analysis,whichEffect) {
   use<-(!is.na(analysis$rIV))
   ns<-cbind(analysis$nval[use])
   df1<-cbind(analysis$df1[use])
@@ -12,20 +12,23 @@ collectData<-function(analysis,effectType) {
     rs<-cbind(analysis$rIV[use])
     ps<-cbind(analysis$pIV[use])
   } else {
-    switch (effectType,
-            "direct"={
-              rs<-rbind(analysis$r$direct[use,])
-              ps<-rbind(analysis$p$direct[use,])
+    switch (whichEffect,
+            "Main 1"={
+              column<-1
+              rs<-rbind(cbind(analysis$r$direct[use,column],analysis$r$unique[use,column],analysis$r$total[use,column]))
+              ps<-rbind(cbind(analysis$p$direct[use,column],analysis$p$unique[use,column],analysis$p$total[use,column]))
             },
-            "unique"={
-              rs<-rbind(analysis$r$unique[use,])
-              ps<-rbind(analysis$p$unique[use,])
+            "Main 2"={
+              column<-2
+              rs<-rbind(cbind(analysis$r$direct[use,column],analysis$r$unique[use,column],analysis$r$total[use,column]))
+              ps<-rbind(cbind(analysis$p$direct[use,column],analysis$p$unique[use,column],analysis$p$total[use,column]))
             },
-            "total"={
-              rs<-rbind(analysis$r$total[use,])
-              ps<-rbind(analysis$p$total[use,])
+            "Interaction"={
+              column<-3
+              rs<-rbind(cbind(analysis$r$direct[use,column],analysis$r$unique[use,column],analysis$r$total[use,column]))
+              ps<-rbind(cbind(analysis$p$direct[use,column],analysis$p$unique[use,column],analysis$p$total[use,column]))
             },
-            "all"={
+            "All"={
               rs<-c()
               ps<-c()
               ysc=1/3
@@ -398,8 +401,9 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
   g
 }
 
-r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,orientation="vert",effectType="direct",showTheory=TRUE,g=NULL){
-  
+r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
+                 orientation="vert",whichEffect="Main 1",effectType="all",showTheory=TRUE,g=NULL){
+
   npct<-1
   labelSig<-TRUE
   labelNSig<-TRUE
@@ -450,16 +454,9 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,orient
   rActual<-r
   rActual[is.na(r)]<-0
   
-  if (all(is.na(analysis$rIVIV2DV)) && is.null(hypothesis$IV2)){
-    xoff=0
-  } else {
-    if (is.na(analysis$rIVIV2DV[1])){
-      xoff=c(0,2)
-    } else {
-      xoff=c(0,2,4)
-    }
-  }
-  
+  if (is.null(hypothesis$IV2) || effectType!="all")  xoff=0
+  else  xoff=c(0,2,4)
+
   switch(orientation,
          "horz"={
            xlim<-c(0,max(xoff))+c(0,1)
@@ -475,6 +472,12 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,orient
   ylim<-yaxis$lim
   ylabel<-yaxis$label
   ylines<-yaxis$lines
+  if ((showType=="rs") && (!is.null(hypothesis$IV2))) 
+    switch(whichEffect,"Main 1"=ylabel<-"rIV",
+                       "Main 2"=ylabel<-"rIV2",
+                       "Interaction"=ylabel<-"rIVIV2DV"
+           )
+  
   
   if (showType=="p" && braw.env$pPlotScale=="log10" && any(is.numeric(analysis$pIV)) && any(analysis$pIV>0)) 
     while (mean(log10(analysis$pIV)>ylim[1])<0.75) ylim[1]<-ylim[1]-1
@@ -487,19 +490,17 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,orient
   
   g<-startPlot(xlim,ylim,box=box,top=top,orientation=orient,g=g)
   g<-g+yAxisTicks(logScale=yaxis$logScale)+yAxisLabel(ylabel)
-  if (!is.null(hypothesis$IV2) && effectType=="direct") 
-    g<-g+xAxisTicks(breaks=c(0,2,4),c("Main1","Main2","Interaction"))
-  if (!is.null(hypothesis$IV2)) 
-    g<-g+dataText(data.frame(x=min(xlim),y=max(ylim)),label=effectType,hjust=-0.1,vjust=1,fontface="bold")
   
+  if (!is.null(hypothesis$IV2) && effectType=="all") 
+    g<-g+xAxisTicks(breaks=c(0,2,4),c("direct","unique","total"))
+
   if (!all(is.na(analysis$rIV))) {
-    data<-collectData(analysis,effectType)
+    data<-collectData(analysis,whichEffect)
     if (braw.env$RZ=="z") {
       data$rs<-atanh(data$rs)
       data$rp<-atanh(data$rp)
       data$ro<-atanh(data$ro)
     }
-    
     switch (showType,
             "rs"={showVals<-data$rs},
             "rp"={showVals<-data$rp},
@@ -550,10 +551,10 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,orient
         effectTheory$world$worldOn<-TRUE
         effectTheory$world$populationPDF<-"Single"
         effectTheory$world$populationRZ<-"r"
-        switch(i,
-               effectTheory$world$populationPDFk<-effect$rIV,
-               effectTheory$world$populationPDFk<-effect$rIV2,
-               effectTheory$world$populationPDFk<-effect$rIVIV2DV
+        switch(whichEffect,
+               "Main 1"=effectTheory$world$populationPDFk<-effect$rIV,
+               "Main 2"=effectTheory$world$populationPDFk<-effect$rIV2,
+               "Interaction"=effectTheory$world$populationPDFk<-effect$rIVIV2DV
         )
         effectTheory$world$populationNullp<-0
       }
@@ -805,8 +806,13 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,orient
     if (is.element(showType,c("p","e1","e2","e1d","e2d"))) {
       switch (showType,
               "p"={
-                labelPt1<-paste0("p(ns) = ",brawFormat(ns*100,digits=npct),"% ")
-                labelPt1a<-paste0("p(sig) = ",brawFormat(s*100,digits=npct),"% ")
+                if (!is.null(hypothesis$IV2) && effectType=="all") {
+                  labelPt1<-paste0(brawFormat(ns*100,digits=npct),"% ")
+                  labelPt1a<-paste0(brawFormat(s*100,digits=npct),"% ")
+                } else {
+                  labelPt1<-paste0("p(ns) = ",brawFormat(ns*100,digits=npct),"% ")
+                  labelPt1a<-paste0("p(sig) = ",brawFormat(s*100,digits=npct),"% ")
+                }
               },
               "e1"={
                 labelPt1<-paste0("p(ns correct) = ",brawFormat(ns*100,digits=npct),"% ")
@@ -846,23 +852,23 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,orient
     }
   }
   
-  if (length(xoff)>1) {
-    if (rem(i,3)==1)
-      switch (xoff[i]/2+1,
-              {g<-g+annotate("text",x=xoff[i],y=xlim[2]-diff(xlim)/20,label="Main Effect 1",color="white",size=3)},
-              {g<-g+annotate("text",x=xoff[i],y=xlim[2]-diff(xlim)/20,label="Main Effect 2",color="white",size=3)},
-              {g<-g+annotate("text",x=xoff[i],y=xlim[2]-diff(xlim)/20,label="Interaction",color="white",size=3)}
-      )
-    
-    if (effectType=="all") {
-      for (i in 1:3) {
-        g<-g+horzLine(intercept=(-1+1)*ysc*0.9+(i-1)*ysc*2-1, colour="black", linewidth=1)
-        g<-g+horzLine(intercept=(0.0+1)*ysc*0.9+(i-1)*ysc*2-1, linetype="dotted", colour="black", linewidth=0.5)
-        g<-g+horzLine(intercept=(1+1)*ysc*0.9+(i-1)*ysc*2-1, colour="black", linewidth=1)
-      }
-      g<-g+xAxisTicks(breaks=(c(-1,0,1,-1,0,1,-1,0,1)+1)*ysc*0.9+(c(1,1,1,2,2,2,3,3,3)-1)*ysc*2-1,labels=c(-1,0,1,-1,0,1,-1,0,1))
-    }
-  }
+  # if (length(xoff)>1) {
+  #   if (rem(i,3)==1)
+  #     switch (xoff[i]/2+1,
+  #             {g<-g+annotate("text",x=xoff[i],y=xlim[2]-diff(xlim)/20,label="Main Effect 1",color="white",size=3)},
+  #             {g<-g+annotate("text",x=xoff[i],y=xlim[2]-diff(xlim)/20,label="Main Effect 2",color="white",size=3)},
+  #             {g<-g+annotate("text",x=xoff[i],y=xlim[2]-diff(xlim)/20,label="Interaction",color="white",size=3)}
+  #     )
+  #   
+  #   if (effectType=="all") {
+  #     for (i in 1:3) {
+  #       g<-g+horzLine(intercept=(-1+1)*ysc*0.9+(i-1)*ysc*2-1, colour="black", linewidth=1)
+  #       g<-g+horzLine(intercept=(0.0+1)*ysc*0.9+(i-1)*ysc*2-1, linetype="dotted", colour="black", linewidth=0.5)
+  #       g<-g+horzLine(intercept=(1+1)*ysc*0.9+(i-1)*ysc*2-1, colour="black", linewidth=1)
+  #     }
+  #     g<-g+xAxisTicks(breaks=(c(-1,0,1,-1,0,1,-1,0,1)+1)*ysc*0.9+(c(1,1,1,2,2,2,3,3,3)-1)*ysc*2-1,labels=c(-1,0,1,-1,0,1,-1,0,1))
+  #   }
+  # }
   g
 }
 
@@ -871,8 +877,10 @@ l_plot<-function(analysis,ptype=NULL,otheranalysis=NULL,orientation="vert",showT
   g
 }
 
-p_plot<-function(analysis,ptype="p",otheranalysis=NULL,PlotScale=braw.env$pPlotScale,orientation="vert",effectType="direct",showTheory=TRUE,g=NULL){
-  g<-r_plot(analysis,ptype,PlotScale=="log10",otheranalysis,orientation=orientation,effectType=effectType,showTheory=showTheory,g=g)
+p_plot<-function(analysis,ptype="p",otheranalysis=NULL,PlotScale=braw.env$pPlotScale,orientation="vert",
+                 whichEffect="Main 1",effectType="all",showTheory=TRUE,g=NULL){
+  g<-r_plot(analysis,ptype,PlotScale=="log10",otheranalysis,orientation=orientation,
+            whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,g=g)
   g
 }
 

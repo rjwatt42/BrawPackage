@@ -55,7 +55,7 @@ trimExploreResult<-function(result,nullresult) {
 #'                        effectType="unique",whichEffect="All")
 #' @export
 showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension="1D",showTheory=FALSE,
-                      effectType="unique",whichEffect="All"){
+                      effectType="unique",whichEffect="All",quantileShow=0.5){
 
   if (is.null(exploreResult)) exploreResult=doExplore()
 
@@ -81,7 +81,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     return(g)
   }
   
-  quants<-0.25
+  quants<-(1-quantileShow)/2
   showPower<-TRUE # show power calculations?
   
   explore<-exploreResult$explore
@@ -105,7 +105,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     plotWidth<-1
     plotHeight<-1
     if (!is.null(hypothesis$IV2) && whichEffect=="All") {
-      plots<-matrix(c(0.65,0.33,0),nrow=1,byrow=TRUE)
+      plots<-matrix(c(0.666,0.333,0),nrow=1,byrow=TRUE)
       plotWidth<-0.35
       plotHeight<-1
     }
@@ -119,14 +119,14 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     plotWidth<-0.5
     plotHeight<-1
     if (!is.null(hypothesis$IV2) && whichEffect=="All") {
-      plots<-matrix(c(0.65,0.33,0),nrow=1,byrow=TRUE)
+      plots<-matrix(c(0.666,0.333,0),nrow=1,byrow=TRUE)
       plotWidth<-0.5
-      plotHeight<-0.35
+      plotHeight<-0.32
     }
     if (!is.null(hypothesis$IV2) && whichEffect=="Mains") {
       plots<-matrix(c(0.5,0),nrow=1,byrow=TRUE)
       plotWidth<-0.5
-      plotHeight<-0.5
+      plotHeight<-0.47
     }
   }
   
@@ -322,7 +322,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
           design$sN<-nVals[i]
           hypothesis$effect$world$populationNullp<-nullPs[i]
           r<-fullRSamplingDist(basevals,hypothesis$effect$world,design,
-                               doStat=showType[si],logScale=logScale,quantiles=c(0.25,0.5,0.75))
+                               doStat=showType[si],logScale=logScale,quantiles=c(quants,0.5,1-quants))
           if (length(r)==1) theoryVals<-c(theoryVals,r)
           else {
             theoryLower<-c(theoryLower,r[1])

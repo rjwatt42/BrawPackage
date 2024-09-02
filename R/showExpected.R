@@ -17,7 +17,7 @@
 #' @export
 showExpected<-function(expectedResult=braw.res$expected,showType="Basic",
                        dimension="1D",orientation="vert",
-                       effectType="direct",showTheory=braw.env$showTheory
+                       whichEffect="Main 1",effectType="direct",showTheory=braw.env$showTheory
 ) {
   if (is.null(expectedResult)) expectedResult=doExpected(autoShow=FALSE)
   if (is.numeric(expectedResult)) expectedResult=doExpected(expectedResult,autoShow=FALSE)
@@ -41,9 +41,10 @@ showExpected<-function(expectedResult=braw.res$expected,showType="Basic",
   )
   
   g<-showInference(fullResult,showType=showType,dimension=dimension,orientation=orientation,
-                   effectType=effectType,showTheory=showTheory
+                   whichEffect=whichEffect,effectType=effectType,showTheory=showTheory
   ) 
-  g<-g+plotTitle(paste0("Expected: ",brawFormat(expectedResult$count)),"right",size=0.85)
+  if (is.null(expectedResult$hypothesis$IV2) || !is.element(whichEffect,c("All","Mains")))
+    g<-g+plotTitle(paste0("Expected: ",brawFormat(expectedResult$count)),"right",size=0.85)
   g
 }
 
