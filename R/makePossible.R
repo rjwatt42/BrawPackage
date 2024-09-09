@@ -15,7 +15,7 @@
 #' simSlice=0.1,correction=TRUE,
 #' appendSim=FALSE,possibleLength="10")
 #' @export
-makePossible<-function(typePossible="Samples",targetSample=NULL,
+makePossible<-function(typePossible="Populations",targetSample=NULL,
                        UseSource="world",
                        UsePrior="none",prior=getWorld("Psych"),targetPopulation=NA,
                        hypothesis=braw.def$hypothesis,design=braw.def$design,
@@ -35,6 +35,7 @@ makePossible<-function(typePossible="Samples",targetSample=NULL,
     targetPopulation<-result$rpIV
     hypothesis=result$hypothesis
     design=result$design
+    design$sN<-result$nval
   }
   
   if (hypothesis$effect$world$worldOn==FALSE) {
@@ -44,7 +45,7 @@ makePossible<-function(typePossible="Samples",targetSample=NULL,
     hypothesis$effect$world$populationNullp<-0
   }
   
-  if (typePossible=="Samples") UsePrior<-UseSource
+  if (typePossible=="Samples") UsePrior<-"hypothesis"
   
   possible<-
   list(type=typePossible,
@@ -97,7 +98,7 @@ doPossible <- function(possible=braw.def$possible,possibleResult=NULL){
                                     populationPDF="Single",
                                     populationPDFk=hypothesis$effect$rIV,
                                     populationRZ="r",
-                                    populationNullp=0
+                                    populationNullp=0.5
          )},
          "world"={source<-world},
          "prior"={source<-possible$prior}
@@ -117,6 +118,11 @@ doPossible <- function(possible=braw.def$possible,possibleResult=NULL){
                               populationPDFk=1,
                               populationRZ="r",
                               populationNullp=0.0) },
+         "hypothesis"={prior<-list(worldOn=FALSE,
+                                    populationPDF="Single",
+                                    populationPDFk=hypothesis$effect$rIV,
+                                    populationRZ="r",
+                                    populationNullp=0.5) },
          "world"={ prior<-world },
          "prior"={ prior<-possible$prior }
   )

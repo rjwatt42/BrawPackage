@@ -182,8 +182,8 @@ rPopulationDist<-function(rvals,world) {
             rdens[which.min(abs(tanh(k)+rvals))]<-1/2
           },
           "Uniform_r"={
-            rdens<-rvals*0
-            rdens[abs(rvals)<0.75]<-0.5
+            rdens<-rvals*0+0.5
+            # rdens[abs(rvals)<0.75]<-0.5
           },
           "Uniform_z"={
             zvals<-atanh(rvals)

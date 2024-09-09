@@ -473,9 +473,9 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   ylabel<-yaxis$label
   ylines<-yaxis$lines
   if ((showType=="rs") && (!is.null(hypothesis$IV2))) 
-    switch(whichEffect,"Main 1"=ylabel<-"rIV",
-                       "Main 2"=ylabel<-"rIV2",
-                       "Interaction"=ylabel<-"rIVIV2DV"
+    switch(whichEffect,"Main 1"=ylabel<-"Main 1",
+                       "Main 2"=ylabel<-"Main 2",
+                       "Interaction"=ylabel<-"Interaction"
            )
   
   

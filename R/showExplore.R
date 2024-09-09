@@ -101,31 +101,31 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   }
   
   if (length(showType)==1) {
-    plots<-matrix(0)
-    plotWidth<-1
+    plotYOffset<-matrix(0)
+    plotWidth<-0.9
     plotHeight<-1
     if (!is.null(hypothesis$IV2) && whichEffect=="All") {
-      plots<-matrix(c(0.666,0.333,0),nrow=1,byrow=TRUE)
+      plotYOffset<-matrix(c(0.666,0.333,0),nrow=1,byrow=TRUE)
       plotWidth<-0.35
       plotHeight<-1
     }
     if (!is.null(hypothesis$IV2) && whichEffect=="Mains") {
-      plots<-matrix(c(0.5,0),nrow=1,byrow=TRUE)
+      plotYOffset<-matrix(c(0.5,0),nrow=1,byrow=TRUE)
       plotWidth<-0.5
       plotHeight<-1
     }
   } else {
-    plots<-matrix(0)
-    plotWidth<-0.5
+    plotYOffset<-matrix(0)
+    plotWidth<-0.475
     plotHeight<-1
     if (!is.null(hypothesis$IV2) && whichEffect=="All") {
-      plots<-matrix(c(0.666,0.333,0),nrow=1,byrow=TRUE)
-      plotWidth<-0.5
+      plotYOffset<-matrix(c(0.666,0.333,0),nrow=1,byrow=TRUE)
+      plotWidth<-0.475
       plotHeight<-0.32
     }
     if (!is.null(hypothesis$IV2) && whichEffect=="Mains") {
-      plots<-matrix(c(0.5,0),nrow=1,byrow=TRUE)
-      plotWidth<-0.5
+      plotYOffset<-matrix(c(0.5,0),nrow=1,byrow=TRUE)
+      plotWidth<-0.475
       plotHeight<-0.47
     }
   }
@@ -219,12 +219,12 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   lb3xy<-data.frame(x=max(xlim),y=0+yn/10)
   
   for (whichEffect in whichEffects) {
-    # print(c(whichEffect,size(plots)))
-    if (plotHeight==1) braw.env$plotArea<-c(0.5*(si-1),0,plotWidth,plotHeight)
-    else               braw.env$plotArea<-c(0.5*(si-1),plots[1,whichEffect],plotWidth,plotHeight)
+    # print(c(whichEffect,size(plotYOffset)))
+    if (plotHeight==1) braw.env$plotArea<-c(0.475*(si-1)+0.025*si,0,plotWidth,plotHeight)
+    else               braw.env$plotArea<-c(0.475*(si-1)+0.025*si,plotYOffset[1,whichEffect],plotWidth,plotHeight)
     g<-startPlot(xlim,ylim,box="Both",top=TRUE,tight=TRUE,g=g)
     g<-g+xAxisTicks(xbreaks,xnames,logScale=explore$xlog)+xAxisLabel(bquote(bold(.(explore$exploreType))))
-    if ((showType[si]=="rs") && (!is.null(hypothesis$IV2))) switch(whichEffect,ylabel<-"rIV",ylabel<-"rIV2",ylabel<-"rIVIV2DV")
+    if ((showType[si]=="rs") && (!is.null(hypothesis$IV2))) switch(whichEffect,ylabel<-"Main 1",ylabel<-"Main 2",ylabel<-"Interaction")
     g<-g+yAxisTicks(logScale=yaxis$logScale)+yAxisLabel(ylabel)
     col<-darken(ycols[1],off=-0.2)
     
@@ -833,7 +833,7 @@ showExplore2D<-function(exploreResult=braw.res$explore,showType=c("rs","p"),show
   ylines<-yaxis$lines
   ySecond<-NULL
   
-  if ((showType[2]=="rs") && (!is.null(IV2))) switch(whichEffect,ylabel<-"rIV",ylabel<-"rIV2",ylabel<-"rIVIV2DV")
+  if ((showType[2]=="rs") && (!is.null(IV2))) switch(whichEffect,ylabel<-"Main 1",ylabel<-"Main 2",ylabel<-"Interaction")
   if (showType[1]=="p" && braw.env$pPlotScale=="log10" && any(exploreResult$result$pval>0)) 
     while (mean(log10(exploreResult$result$pval)>xlim[1])<0.75) xlim[1]<-xlim[1]-1
   if (showType[2]=="p" && braw.env$pPlotScale=="log10" && any(exploreResult$result$pval>0)) 
