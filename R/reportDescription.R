@@ -4,6 +4,9 @@ makeFormula<-function(IV,IV2,DV,design,evidence,analysis,an_vars){
   assign_string = " <<"  
   when_string = "="
   times_string = "x"
+  times_string = "\u22c5"
+  minus_string = " \u2212 "
+  plus_string = " + "
   interaction_char = "\u2217"
   
   coeffs<-analysis$coefficients
@@ -20,14 +23,15 @@ makeFormula<-function(IV,IV2,DV,design,evidence,analysis,an_vars){
           }
   )
   
-  if (coeffs[1]>=0){join<-" "}else{join<-" -"}
+  if (coeffs[1]>=0){join<-" "}else{join<-minus_string}
   an_model<-paste(an_model, join, brawFormat(abs(coeffs[1]),digits=braw.env$report_precision)   ,sep="")
   
   
   for (i in 2:length(coeffs)){
     if (!is.na(coeffs[i])) {
-      if (coeffs[i]>=0){join<-" +"}else{join<-" -"}
+      if (coeffs[i]>=0){join<-plus_string}else{join<-minus_string}
       an_vars[i]<-gsub(":",interaction_char,an_vars[i])
+      an_vars[i]<-gsub("=",when_string,an_vars[i])
       an_model<-paste(an_model, join, brawFormat(abs(coeffs[i]),digits=braw.env$report_precision)   ,times_string,an_vars[i],sep="")
     }
   }
@@ -97,10 +101,10 @@ reportDescription<-function(analysis=braw.res$result){
   }
   
   an_vars<-sub("iv1:",paste(IV$name,":",sep=""),an_vars)
-  an_vars<-sub("iv1",paste(IV$name,"|",sep=""),an_vars)
+  an_vars<-sub("iv1",paste(IV$name,"=",sep=""),an_vars)
   if (!is.null(IV2)) {
     an_vars<-sub("iv2$",IV2$name,an_vars)
-    an_vars<-sub("iv2",paste(IV2$name,"|",sep=""),an_vars)
+    an_vars<-sub("iv2",paste(IV2$name,"=",sep=""),an_vars)
   } 
   
   an_model<-makeFormula(IV,IV2,DV,design,evidence,analysis,an_vars)

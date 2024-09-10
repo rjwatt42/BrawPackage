@@ -68,11 +68,18 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova"){
       
       for (i in 1:nrow(anova)){
         vn<-rownames(anova)[i]
+        if (analysisType=="Model") {
+          vn<-gsub("(iv1)([^:].)(*)","\\1=\\2",vn)
+          vn<-gsub("(iv2)([^:].)(*)","\\1=\\2",vn)
+        }
         if (vn!="(Intercept)") {
           if (vn=="NULL") vn<-"Total"
-          if (vn=="iv1"){vn<-paste("",analysis$hypothesis$IV$name,sep="")}
-          if (vn=="iv2"){vn<-paste("",analysis$hypothesis$IV2$name,sep="")}
-          if (vn=="iv1:iv2"){vn<-paste("",analysis$hypothesis$IV$name,":",analysis$hypothesis$IV2$name,sep="")}
+          vn<-gsub("iv1",analysis$hypothesis$IV$name,vn)
+          vn<-gsub("iv2",analysis$hypothesis$IV2$name,vn)
+          vn<-gsub(":","\u2217",vn)
+          # if (vn=="iv1"){vn<-paste("",analysis$hypothesis$IV$name,sep="")}
+          # if (vn=="iv2"){vn<-paste("",analysis$hypothesis$IV2$name,sep="")}
+          # if (vn=="iv1:iv2"){vn<-paste("",analysis$hypothesis$IV$name,":",analysis$hypothesis$IV2$name,sep="")}
           if (vn=="Residuals"){vn<-"Error"}
           if (vn=="Total"){
             vn<-"Total"
