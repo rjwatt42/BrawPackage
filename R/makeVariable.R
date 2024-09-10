@@ -137,7 +137,7 @@ makeVariable<-function(name,type="Interval",
 #' make a specific variable
 #' 
 #' @param name  "Psych","Treatment","Treatment?","IQ","Diligence","Perfectionism", \cr
-#'              "Happiness","Grade","RiskTaking","Interesting","Coffee?","Smoker?", \cr
+#'              "Happiness","ExamGrade","RiskTaking","Interesting","Coffee?","Smoker?", \cr
 #'              "RiskTaker?","Musician?","StudySubject","BirthOrder"
 #' @returns a Variable structure
 #' @seealso showVariable(variable=makeVariable("test"))
@@ -177,7 +177,7 @@ makeDefaultVariables<-function() {
     Diligence=makeVariable(name="Diligence",type="Interval",mu=0,sd=2),
     Perfectionism=makeVariable(name="Perfectionism",type="Interval",mu=0,sd=2),
     Happiness=makeVariable(name="Happiness",type="Interval",mu=50,sd=12),
-    Grade=makeVariable(name="Grade",type="Interval",mu=65,sd=10),
+    ExamGrade=makeVariable(name="ExamGrade",type="Interval",mu=65,sd=10,skew=-0.6),
     RiskTaking=makeVariable(name="RiskTaking",type="Interval",mu=30,sd=6),
     Interesting=makeVariable(name="Interesting",type="Interval",mu=10,sd=2),
     

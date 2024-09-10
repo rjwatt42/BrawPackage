@@ -132,7 +132,7 @@ r2llr<-function(r,n,df1,method=braw.env$STMethod,llr=list(e1=c(),e2=0),world=NUL
       world$populationPDF<-"Single"
       world$populationNullp<-0.5
     }
-    lk<-getLogLikelihood(z,n,df1,world$populationPDF,world$populationPDFk,worldDistNullP=c(0,1),remove_nonsig=FALSE,doSeparate=TRUE)
+    lk<-getLogLikelihood(z,n,df1,world$populationPDF,world$populationPDFk,worldDistNullP=c(0,1),remove_nonsig=FALSE)
     lk1<-lk[,,1]+log(1-world$populationNullp)
     lk2<-lk[,,2]+log(world$populationNullp)
     llk<-lk1-lk2
@@ -440,10 +440,12 @@ generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",ca
   # get linear model and anova
   if (catVars[1]) {
     if (doingWithin) {
+      lmRaw<-glmer(formula=as.formula(formula),data=analysisRawData,family="binomial")
       lmRawC<-glmer(formula=as.formula(formula),data=analysisRawData,family="binomial",contrasts=contrasts)
       lmNormC<-glmer(formula=as.formula(formula),data=analysisNormData,family="binomial",contrasts=contrasts)
       braw.env$anovaMethod<-"Chisq"
     } else {
+      lmRaw<-glm(formula=as.formula(formula),data=analysisRawData,family="binomial")
       lmRawC<-glm(formula=as.formula(formula),data=analysisRawData,family="binomial",contrasts=contrasts)
       lmNormC<-glm(formula=as.formula(formula),data=analysisNormData,family="binomial",contrasts=contrasts)
       braw.env$anovaMethod<-"F"
@@ -453,9 +455,11 @@ generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",ca
   } else { # Interval DV
     # lmRaw to report model
     if (doingWithin) {
+      lmRaw<-lmer(formula=as.formula(formula),data=analysisRawData)
       lmRawC<-lmer(formula=as.formula(formula),data=analysisRawData,contrasts=contrasts)
       lmNormC<-lmer(formula=as.formula(formula),data=analysisNormData,contrasts=contrasts)
     } else {
+      lmRaw<-lm(formula=as.formula(formula),data=analysisRawData)
       lmRawC<-lm(formula=as.formula(formula),data=analysisRawData,contrasts=contrasts)
       lmNormC<-lm(formula=as.formula(formula),data=analysisNormData,contrasts=contrasts)
     }
@@ -515,6 +519,7 @@ generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",ca
               
               lmNormC=lmNormC,
               lmRawC=lmRawC,
+              lmRaw=lmRaw,
               
               df=df,
               
@@ -644,7 +649,6 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
   anNormC<-anResult$anNormC
   
   anRaw<-anNormC
-  lmRaw<-lmNormC
   # simulate the single IV analyses
   if (is.null(IV2)) {
     hypothesisType=paste(IV$type,DV$type,sep=" ")
@@ -831,13 +835,13 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
   }
   
   # adding fields to existing analysis
+  if (is.null(IV2)) analysis$model<-anResult$lmRaw
+  else              analysis$model<-anResult$lmRawC
   switch (braw.env$modelType,
           "Raw"={
-            analysis$model<-anResult$lmRawC
             analysis$anova<-anResult$anRawC
           },
           "Norm"={
-            analysis$model<-anResult$lmRawC
             analysis$anova<-anResult$anNormC
           }
   )

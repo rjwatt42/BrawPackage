@@ -15,7 +15,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14){
   nT<-nchar(oT) # no of characters per cell
   nrT<-rowSums(nT) # no characters per row
   # now break into blocks separated by empty rows
-  blockEnds<-c(0,which(nrT==0),nrow(nT))
+  blockEnds<-unique(c(0,which(nrT==0),nrow(nT)))
   colX<-c()
   cellSize<-c()
   if (length(blockEnds)>1) {
@@ -26,7 +26,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14){
       colSize<-block+colSpace
       colOffset<-cumsum(c(0,colSize))
       colX<-c(colX,rep(colOffset[1:length(block)],1))
-      cellSize<-c(cellSize,rep(colSize,length(block)))
+      cellSize<-c(cellSize,colSize)
     }
     else     {
       colSize<-apply(block,2,max)+colSpace
