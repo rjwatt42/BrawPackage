@@ -69,14 +69,14 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova"){
       for (i in 1:nrow(anova)){
         vn<-rownames(anova)[i]
         if (analysisType=="Model") {
-          vn<-gsub("(iv1)([^:].)(*)","\\1=\\2",vn)
-          vn<-gsub("(iv2)([^:].)(*)","\\1=\\2",vn)
+          vn<-gsub("(iv1)([^:].)(*)",paste0("\\1",braw.env$when_string,"\\2"),vn)
+          vn<-gsub("(iv2)([^:].)(*)",paste0("\\1",braw.env$when_string,"\\2"),vn)
         }
         if (vn!="(Intercept)") {
           if (vn=="NULL") vn<-"Total"
           vn<-gsub("iv1",analysis$hypothesis$IV$name,vn)
           vn<-gsub("iv2",analysis$hypothesis$IV2$name,vn)
-          vn<-gsub(":","\u2217",vn)
+          vn<-gsub(":",braw.env$interaction_string,vn)
           # if (vn=="iv1"){vn<-paste("",analysis$hypothesis$IV$name,sep="")}
           # if (vn=="iv2"){vn<-paste("",analysis$hypothesis$IV2$name,sep="")}
           # if (vn=="iv1:iv2"){vn<-paste("",analysis$hypothesis$IV$name,":",analysis$hypothesis$IV2$name,sep="")}
@@ -86,7 +86,7 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova"){
             total_done<-TRUE
           }
           
-          outputText<-c(outputText,paste0("!j!i",vn,": "))
+          outputText<-c(outputText,paste0("!j!i",vn," "))
           for (j in 1:ncol(anova)){
             if (is.na(anova[i,j])){
               outputText<-c(outputText,"")
@@ -103,7 +103,7 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova"){
         
         df<-sum(anova[,2])-anova[1,2]
         if (!is.na(df)) {df<-paste0("!j",brawFormat(df,digits=braw.env$report_precision))} else {df<-""}
-        outputText<-c(outputText,"!j!iTotal: ",ssq,df,rep(" ",nc-3))
+        outputText<-c(outputText,"!j!iTotal ",ssq,df,rep(" ",nc-3))
       }
       outputText<-c(outputText,rep("",nc))
     }

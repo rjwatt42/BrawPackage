@@ -777,7 +777,8 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
               df<-paste("(",format(anRaw$Df[2]),",","n=",format(lmNormC$df.null+1),")",sep="")
               tval<-lmNormC$null.deviance-lmNormC$deviance
               analysis$pIV<-1-pchisq(tval,1) # noCases-1
-              
+              if (evidence$McFaddens)
+              analysis$rIV<-sign(analysis$rIV)*sqrt((lmNormC$null.deviance-lmNormC$deviance)/lmNormC$null.deviance)
             },
             "Ordinal Categorical"={
               an_name<-"Logistic Regression"
@@ -785,6 +786,8 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
               df<-paste("(",format(anRaw$Df[2]),",","n=",format(lmNormC$df.null+1),")",sep="")
               tval<-lmNormC$null.deviance-lmNormC$deviance
               analysis$pIV<-1-pchisq(tval,1) # noCases-1
+              if (evidence$McFaddens)
+                analysis$rIV<-sign(analysis$rIV)*sqrt((lmNormC$null.deviance-lmNormC$deviance)/lmNormC$null.deviance)
             },
             "Categorical Categorical"={
               an_name<-"Chi-square test of independence"
@@ -803,6 +806,8 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
               analysis$rFull<-analysis$rIV
               analysis$rFullse<-r2se(analysis$rFull,n)
               tval<-chiResult$statistic
+              if (evidence$McFaddens)
+                analysis$rIV<-sign(analysis$rIV)*sqrt((lmNormC$null.deviance-lmNormC$deviance)/lmNormC$null.deviance)
             }
     )
     if (is.na(analysis$pIV)) {analysis$pIV<-1}
@@ -835,8 +840,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
   }
   
   # adding fields to existing analysis
-  if (is.null(IV2)) analysis$model<-anResult$lmRaw
-  else              analysis$model<-anResult$lmRawC
+  analysis$model<-anResult$lmRaw
   switch (braw.env$modelType,
           "Raw"={
             analysis$anova<-anResult$anRawC

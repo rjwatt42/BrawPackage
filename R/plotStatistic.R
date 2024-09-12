@@ -455,7 +455,10 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   rActual[is.na(r)]<-0
   
   if (is.null(hypothesis$IV2) || effectType!="all")  xoff=0
-  else  xoff=c(0,2,4)
+  else  {
+    if (evidence$rInteractionOn) xoff=c(0,2,4)
+    else xoff=c(0,2)
+    }
 
   switch(orientation,
          "horz"={

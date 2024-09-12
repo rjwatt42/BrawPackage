@@ -173,6 +173,10 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,graphicsSize=c(16,10),
           
           braw.env$variables<-makeDefaultVariables()
           
+          braw.env$when_string <- "="
+          braw.env$interaction_string <- "\u2217"
+          
+          
           ##################################
           # notation for effect sizes
           

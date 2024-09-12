@@ -2,13 +2,11 @@
 makeFormula<-function(IV,IV2,DV,design,evidence,analysis,an_vars){
 
   assign_string = " <<"  
-  when_string = "="
   times_string = "x"
   times_string = "\u22c5"
   minus_string = " \u2212 "
   plus_string = " + "
-  interaction_char = "\u2217"
-  
+
   coeffs<-analysis$coefficients
   
   switch (DV$type,
@@ -19,7 +17,7 @@ makeFormula<-function(IV,IV2,DV,design,evidence,analysis,an_vars){
             an_model<-paste(DV$name,assign_string,sep="")
           },
           "Categorical"={
-            an_model<-paste("logit(", DV$name, when_string, DV$cases[2], ") ", assign_string, sep="")
+            an_model<-paste("logit(", DV$name, braw.env$when_string, DV$cases[2], ") ", assign_string, sep="")
           }
   )
   
@@ -30,8 +28,8 @@ makeFormula<-function(IV,IV2,DV,design,evidence,analysis,an_vars){
   for (i in 2:length(coeffs)){
     if (!is.na(coeffs[i])) {
       if (coeffs[i]>=0){join<-plus_string}else{join<-minus_string}
-      an_vars[i]<-gsub(":",interaction_char,an_vars[i])
-      an_vars[i]<-gsub("=",when_string,an_vars[i])
+      an_vars[i]<-gsub(":",braw.env$interaction_string,an_vars[i])
+      an_vars[i]<-gsub("=",braw.env$when_string,an_vars[i])
       an_model<-paste(an_model, join, brawFormat(abs(coeffs[i]),digits=braw.env$report_precision)   ,times_string,an_vars[i],sep="")
     }
   }
@@ -124,33 +122,40 @@ reportDescription<-function(analysis=braw.res$result){
     outputText<-c(outputText,"!jAIC",paste(brawFormat(analysis$aic,digits=braw.env$report_precision),sep=""),rep("",nc-2))
   }  
   outputText<-c(outputText,rep("",nc))
-  outputText<-c(outputText,"\bEffect Size ","Normalized",rep("",nc-2))
+  if (evidence$McFaddens && DV$type=="Categorical") McF="McFaddens R2"
+  else McF=" "
+    outputText<-c(outputText,"\bEffect Size ","Normalized",McF,rep("",nc-3))
   
   switch (no_ivs,
           { analysis$rIVse<-r2se(analysis$rIV,analysis$nval)
-          outputText<-c(outputText,paste0("\b!j",IV$name,":"),
+          if (evidence$McFaddens && DV$type=="Categorical") McF<-brawFormat(analysis$rIV^2,digits=braw.env$report_precision)
+          outputText<-c(outputText,paste0("!j!i",IV$name," "),
                                    paste(brawFormat(analysis$rIV,digits=braw.env$report_precision),
                                                              " +/- ",brawFormat(analysis$rIVse,digits=braw.env$report_precision),
                                                              sep=""),
+                        McF,
+                        rep("",nc-3)
+          )
+          outputText<-c(outputText," ",
                         paste0("CI = (",brawFormat(analysis$rFullCI[1],digits=braw.env$report_precision),
                                ",",brawFormat(analysis$rFullCI[2],digits=braw.env$report_precision),
                                ")"),
-                        rep("",nc-3)
+                        rep(" ",nc-2)
           )
           },{
             outputText<-c(outputText," ","\b!jdirect","\b!junique","\b!jtotal",rep("",nc-4))
-            outputText<-c(outputText,paste0("!j!i",IV$name,":"),
+            outputText<-c(outputText,paste0("!j!i",IV$name," "),
                           paste0("!j",brawFormat(analysis$r$direct[1],digits=braw.env$report_precision)),
                           paste0("!j",brawFormat(analysis$r$unique[1],digits=braw.env$report_precision)),
                           paste0("!j",brawFormat(analysis$r$total[1],digits=braw.env$report_precision)),
                           rep("",nc-4))
-            outputText<-c(outputText,paste0("!j!i",IV2$name,":"),
+            outputText<-c(outputText,paste0("!j!i",IV2$name," "),
                           paste0("!j",brawFormat(analysis$r$direct[2],digits=braw.env$report_precision)),
                           paste0("!j",brawFormat(analysis$r$unique[2],digits=braw.env$report_precision)),
                           paste0("!j",brawFormat(analysis$r$total[2],digits=braw.env$report_precision)),
                           rep("",nc-4))
             if (evidence$rInteractionOn) {
-              outputText<-c(outputText,paste0("!j!i",IV$name,"*",IV2$name,":"),
+              outputText<-c(outputText,paste0("!j!i",IV$name,"*",IV2$name," "),
                             paste0("!j",brawFormat(analysis$r$direct[3],digits=braw.env$report_precision)),
                             paste0("!j",brawFormat(analysis$r$unique[3],digits=braw.env$report_precision)),
                             paste0("!j",brawFormat(analysis$r$total[3],digits=braw.env$report_precision)),
@@ -162,7 +167,7 @@ reportDescription<-function(analysis=braw.res$result){
             an_rt<-brawFormat(analysis$rFull,digits=braw.env$report_precision) 
             an_rset<-brawFormat(analysis$rFullse,digits=braw.env$report_precision)
             outputText<-c(outputText,
-                          "\b!jFull model:",
+                          "!j!iFull model:",
                           paste(an_rt,"+/-",an_rset),
                           paste0("CI = (",brawFormat(analysis$rFullCI[1],digits=braw.env$report_precision),
                                  ",",brawFormat(analysis$rFullCI[2],digits=braw.env$report_precision),

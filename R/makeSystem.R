@@ -210,13 +210,14 @@ makeEvidence<-function(shortHand=FALSE,sigOnly=FALSE,
                        caseOrder="Alphabetic",
                        llr=list(e1=c(),e2=0),
                        Welch=FALSE,Transform="None",
+                       McFaddens=TRUE,
                        prior=makeWorld(TRUE,"Uniform","r")
                        ){
   
   evidence<-list(rInteractionOn=rInteractionOn,rInteractionOnly=rInteractionOnly,ssqType=ssqType,
                  caseOrder=caseOrder,shortHand=shortHand,sigOnly=sigOnly,
                  llr=llr,
-                 Welch=Welch,Transform=Transform,
+                 Welch=Welch,Transform=Transform,McFaddens=McFaddens,
                  prior=prior
   )
 
