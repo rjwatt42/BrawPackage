@@ -19,7 +19,7 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova"){
           "Model"= {anova<-analysis$model}
   )
   nc<-ncol(anova)+1
-  if (nc<5) nc<-5
+  if (nc<6) nc<-6
   
   an_name<-analysis$an_name
     outputText<-rep("",nc*2)
@@ -30,10 +30,10 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova"){
     
     if (is.null(IV2)){
       pval<-analysis$pIV
-      if (pval>=0.0001) {
-        pvalText<-paste("p = ",brawFormat(pval,digits=braw.env$report_precision),sep="")
+      if (pval>=10^(-braw.env$report_precision-1)) {
+        pvalText<-paste("p = ",brawFormat(pval,digits=braw.env$report_precision+1),sep="")
       } else {
-        pvalText<-"p < 0.0001"
+        pvalText<-paste0("p < ",10^(-braw.env$report_precision-1))
       }
       
       t_name<-analysis$test_name
@@ -57,8 +57,12 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova"){
         f2<-paste("d=",brawFormat(analysis$dIV,digits=braw.env$report_precision),sep="")
       }
 
-      outputText<-c(outputText,"!j\btest-statistic","\b(df) ","\bvalue   ","\bp",f1,rep("",nc-5))
-      outputText<-c(outputText,paste0("!j",t_name),df,brawFormat(tval,digits=braw.env$report_precision),pvalText,f2,rep("",nc-5))
+      rvalText<-paste0(brawFormat(analysis$rIV,digits=braw.env$report_precision),
+                       "+/-",brawFormat(analysis$rIVse,digits=braw.env$report_precision))
+
+      outputText<-c(outputText,"!j\btest-statistic","\b(df) ","\bvalue   ","\bp",f1,"\brs",rep("",nc-6))
+      outputText<-c(outputText,paste0("!j",t_name),df,brawFormat(tval,digits=braw.env$report_precision),pvalText,
+                    f2,rvalText,rep("",nc-6))
     }
     
     if (!(braw.env$reducedOutput && is.null(IV2))) {

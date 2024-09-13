@@ -122,7 +122,7 @@ reportDescription<-function(analysis=braw.res$result){
     outputText<-c(outputText,"!jAIC",paste(brawFormat(analysis$aic,digits=braw.env$report_precision),sep=""),rep("",nc-2))
   }  
   outputText<-c(outputText,rep("",nc))
-  if (evidence$McFaddens && DV$type=="Categorical") McF="McFaddens R2"
+  if (evidence$McFaddens && DV$type=="Categorical") McF="McFaddens Pseudo-R2"
   else McF=" "
     outputText<-c(outputText,"\bEffect Size ","Normalized",McF,rep("",nc-3))
   
@@ -131,15 +131,15 @@ reportDescription<-function(analysis=braw.res$result){
           if (evidence$McFaddens && DV$type=="Categorical") McF<-brawFormat(analysis$rIV^2,digits=braw.env$report_precision)
           outputText<-c(outputText,paste0("!j!i",IV$name," "),
                                    paste(brawFormat(analysis$rIV,digits=braw.env$report_precision),
-                                                             " +/- ",brawFormat(analysis$rIVse,digits=braw.env$report_precision),
+                                                             " \u00B1 ",brawFormat(analysis$rIVse,digits=braw.env$report_precision),
                                                              sep=""),
                         McF,
                         rep("",nc-3)
           )
           outputText<-c(outputText," ",
-                        paste0("CI = (",brawFormat(analysis$rFullCI[1],digits=braw.env$report_precision),
-                               ",",brawFormat(analysis$rFullCI[2],digits=braw.env$report_precision),
-                               ")"),
+                        paste0("\u3008",brawFormat(analysis$rFullCI[1],digits=braw.env$report_precision-1),
+                               ",",brawFormat(analysis$rFullCI[2],digits=braw.env$report_precision-1),
+                               "\u3009"),
                         rep(" ",nc-2)
           )
           },{
@@ -168,10 +168,10 @@ reportDescription<-function(analysis=braw.res$result){
             an_rset<-brawFormat(analysis$rFullse,digits=braw.env$report_precision)
             outputText<-c(outputText,
                           "!j!iFull model:",
-                          paste(an_rt,"+/-",an_rset),
-                          paste0("CI = (",brawFormat(analysis$rFullCI[1],digits=braw.env$report_precision),
-                                 ",",brawFormat(analysis$rFullCI[2],digits=braw.env$report_precision),
-                                 ")"),
+                          paste(an_rt,"\u00B1",an_rset),
+                          paste0("\u3008",brawFormat(analysis$rFullCI[1],digits=braw.env$report_precision-1),
+                                 ",",brawFormat(analysis$rFullCI[2],digits=braw.env$report_precision-1),
+                                 "\u3009"),
                           rep("",nc-3)
             )
           }
