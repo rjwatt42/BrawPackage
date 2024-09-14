@@ -273,9 +273,10 @@ dataLine<-function(data,arrow=NULL,colour="black",linetype="solid",linewidth=0.2
   geom_path(data=data,aes(x=x,y=y),arrow=arrow,colour=colour,alpha=alpha,
             linetype=linetype,linewidth=linewidth)
 }
-dataPath<-function(data,arrow=NULL,colour="black",linetype="solid",linewidth=0.25) {
+dataPath<-function(data,arrow=NULL,colour="black",linetype="solid",linewidth=0.25,alpha=1) {
   data<-reRangeXY(data)
-  geom_path(data=data,aes(x=x,y=y),arrow=arrow,colour=colour,linewidth=linewidth)
+  geom_path(data=data,aes(x=x,y=y),arrow=arrow,colour=colour,alpha=alpha,
+            linetype=linetype,linewidth=linewidth)
 }
 dataPoint<-function(data,shape=21,colour="black",fill="white",alpha=1,size=3) {
   data<-reRangeXY(data)
