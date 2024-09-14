@@ -602,7 +602,11 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
             pts1f<-data.frame(x=c(vals,rev(vals)),y=c(y25,rev(y75)))
             pts2f<-data.frame(x=c(vals,rev(vals)),y=c(y38,rev(y62)))
             g<-g+dataPolygon(data=pts1f,fill=col,alpha=0.2,colour=NA)
+            g<-g+dataLine(data.frame(x=vals,y=y25),colour="white",alpha=0.3)
+            g<-g+dataLine(data.frame(x=vals,y=y75),colour="white",alpha=0.3)
             g<-g+dataPolygon(data=pts2f,fill=col,alpha=0.4,colour=NA)
+            g<-g+dataLine(data.frame(x=vals,y=y38),colour="white",alpha=0.6)
+            g<-g+dataLine(data.frame(x=vals,y=y62),colour="white",alpha=0.6)
           }
           pts0f<-data.frame(x=vals,y=y50)
           g<-g+dataLine(data=pts0f)

@@ -514,7 +514,7 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
       if (design$sOutliers>0) {
         outlierValue=4
         change<-round(n*design$sOutliers)
-        dvr[1:change]<-sign(dvr[1:change])*outlierValue
+        dvr[1:change]<-sign(runif(change,-1,1))*outlierValue
       }
       
       # trim DV values
