@@ -159,7 +159,7 @@ makeReplication<-function(On=FALSE,Repeats=1,Keep="Cautious",RepAlpha=0.05,
 #'            sIV1Use="Between",sIV2Use="Between",  sWithinCor=0.5,
 #'            
 #'            sRangeOn=FALSE, sIVRange=c(-3,3), sDVRange=c(-3,3), 
-#'            sDependence=0, sOutliers=0,
+#'            sDependence=0, sOutliers=0, sNonResponse=0,
 #'            
 #'            sCheating="None", sCheatingAttempts=5,
 #'            sCheatingLimit="Fixed", sCheatingBudget=1000,
@@ -172,7 +172,7 @@ makeDesign<-function(sN=42, sMethod=makeSampling("Random") ,sNRand=FALSE,sNRandK
                      sWithinCor=0.5,
                      sBudgetOn=FALSE,sNBudget=1000,
                      sRangeOn=FALSE, sIVRange=c(-3,3), sDVRange=c(-3,3), 
-                     sDependence=0, sOutliers=0, 
+                     sDependence=0, sOutliers=0, sNonResponse=0,
                      sCheating="None",sCheatingAttempts=5,sCheatingLimit="Fixed",sCheatingBudget=1000,
                      Replication=makeReplication()
 ) {
@@ -182,7 +182,7 @@ makeDesign<-function(sN=42, sMethod=makeSampling("Random") ,sNRand=FALSE,sNRandK
                sWithinCor=sWithinCor,
                sBudgetOn=sBudgetOn,sNBudget=sNBudget,
                sRangeOn=sRangeOn, sIVRange=sIVRange, sDVRange=sDVRange, 
-               sDependence=sDependence, sOutliers=sOutliers,
+               sDependence=sDependence, sOutliers=sOutliers,sNonResponse=sNonResponse,
                sCheating=sCheating,sCheatingLimit=sCheatingLimit,sCheatingAttempts=sCheatingAttempts,sCheatingBudget=sCheatingBudget,
                Replication=Replication
                )

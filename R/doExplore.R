@@ -3,7 +3,7 @@
 #' @param exploreType "rIV","Heteroscedasticity","rIV2","rIVIV2","rIVIV2DV" \cr
 #'                    "pNull","Lambda" \cr
 #'                    "n","Method","Usage","WithinCorr","ClusterRad","SampleGamma" \cr
-#'                     "Dependence","Outliers","IVRange","DVRange" \cr
+#'                     "Dependence","Outliers","NonResponse","IVRange","DVRange" \cr
 #'                     "Cheating","CheatingAmount" \cr
 #'                     "Alpha","Transform","InteractionOn" \cr
 #'                     "Power","Keep","Repeats" \cr
@@ -35,7 +35,7 @@ getExploreRange<-function(explore) {
   
   exploreType<-explore$exploreType
   if (is.element(exploreType,c("rIV","rIV2","rIVIV2","rIVIV2DV"))) exploreType<-"rs"
-  if (is.element(exploreType,c("IVskew","DVskew","Heteroscedasticity","Dependence","Outliers","IVRange","DVRange"))) exploreType<-"anom"
+  if (is.element(exploreType,c("IVskew","DVskew","Heteroscedasticity","Dependence","Outliers","NonResponse","IVRange","DVRange"))) exploreType<-"anom"
   if (is.element(exploreType,c("IVkurtosis","DVkurtosis"))) exploreType<-"kurt"
   
   switch(exploreType,
@@ -146,7 +146,7 @@ mergeExploreResult<-function(res1,res2) {
 #' @param exploreType "rIV","Heteroscedasticity","rIV2","rIVIV2","rIVIV2DV" \cr
 #'                    "pNull","Lambda" \cr
 #'                    "n","Method","Usage","WithinCorr","ClusterRad","SampleGamma" \cr
-#'                     "Dependence","Outliers","IVRange","DVRange" \cr
+#'                     "Dependence","Outliers","NonResponse","IVRange","DVRange" \cr
 #'                     "Cheating","CheatingAmount" \cr
 #'                     "Alpha","Transform","InteractionOn" \cr
 #'                     "Power","Keep","Repeats" \cr
@@ -273,6 +273,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
           "SampleGamma"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Dependence"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Outliers"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "NonResponse"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Heteroscedasticity"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "IVRange"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "DVRange"={vals<-seq(minVal,maxVal,length.out=npoints)},
@@ -615,6 +616,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
                 },
                 "Dependence"={design$sDependence<-vals[vi]},
                 "Outliers"={design$sOutliers<-vals[vi]},
+                "NonResponse"={design$sNonResponse<-vals[vi]},
                 "IVRange"={
                   design$sRangeOn<-TRUE
                   design$sIVRange<-vals[vi]*c(-1,1)

@@ -509,6 +509,11 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
       # p<-cor.test(ivr,dvr)
       # samplePval<-p$p.value
 
+      # non-responders
+      if (design$sNonResponse>0) {
+        change<-round(n*design$sNonResponse)
+        dvr[1:change]<-residual[1:change]
+      }
       
       # outliers - as errors
       if (design$sOutliers>0) {
