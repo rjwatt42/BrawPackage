@@ -171,7 +171,7 @@ makeDesign<-function(sN=42, sMethod=makeSampling("Random") ,sNRand=FALSE,sNRandK
                      sIV1Use="Between",sIV2Use="Between", 
                      sWithinCor=0.5,
                      sBudgetOn=FALSE,sNBudget=1000,
-                     sRangeOn=FALSE, sIVRange=c(-3,3), sDVRange=c(-3,3), 
+                     sRangeOn=FALSE, sIVRange=c(-1,1)*4, sDVRange=c(-1,1)*4, 
                      sDependence=0, sOutliers=0, sNonResponse=0,
                      sCheating="None",sCheatingAttempts=5,sCheatingLimit="Fixed",sCheatingBudget=1000,
                      Replication=makeReplication()

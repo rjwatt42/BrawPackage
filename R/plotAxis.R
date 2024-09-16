@@ -1,6 +1,10 @@
 plotAxis<-function(showType,effect) {
   
   explicitLog<-FALSE
+  base_hue_r<-0.1
+  base_hue_p<-0.15
+  base_hue_w<-0.65
+  hue_diff<-0.03
   
   logScale<-(is.element(showType,c("p","e1","e2")) && braw.env$pPlotScale=="log10") ||
     (is.element(showType,c("ws","wp")) && braw.env$wPlotScale=="log10") ||
@@ -91,7 +95,7 @@ plotAxis<-function(showType,effect) {
             yticks<-rticks
             ymins<-rmins
             ylabel<-rslab
-            use_cols<-c(hsv(0.1,1,1),hsv(0.1+0.075,1,1),hsv(0.1+0.15,1,1))
+            use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
             ylines<-c(0,effect$rIV)
           },
           "rp"={
@@ -99,7 +103,7 @@ plotAxis<-function(showType,effect) {
             yticks<-rticks
             ymins<-rmins
             ylabel<-rplab
-            use_cols<-c(hsv(0.1,1,1),hsv(0.1+0.075,1,1),hsv(0.1+0.15,1,1))
+            use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
             ylines<-c(0)
           },
           "re"={
@@ -107,7 +111,7 @@ plotAxis<-function(showType,effect) {
             yticks<-rticks
             ymins<-rmins
             ylabel<-bquote(bold(r[e]))
-            use_cols<-c(hsv(0.1,1,1),hsv(0.1+0.075,1,1),hsv(0.1+0.15,1,1))
+            use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
             ylines<-c(0)
           },
           "ro"={
@@ -115,7 +119,7 @@ plotAxis<-function(showType,effect) {
             yticks<-rticks
             ymins<-rmins
             ylabel<-bquote(bold(r[o]))
-            use_cols<-c(hsv(0.1,1,1),hsv(0.1+0.075,1,1),hsv(0.1+0.15,1,1))
+            use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
             ylines<-c(0,effect$rIV)
           },
           "p"={
@@ -124,7 +128,7 @@ plotAxis<-function(showType,effect) {
             ymins<-pmins
             ylabel<-plabel
             ylines<-plines
-            use_cols<-c(hsv(0,1,1),hsv(0+0.075,1,1),hsv(0+0.15,1,1))
+            use_cols<-c(hsv(base_hue_p,1,1),hsv(base_hue_p+hue_diff,1,1),hsv(base_hue_p+hue_diff*2,1,1))
           },
           "po"={
             ylim<-plim
@@ -132,27 +136,27 @@ plotAxis<-function(showType,effect) {
             ymins<-pmins
             ylines<-plines
             ylabel<-polabel
-            use_cols<-c(hsv(0,1,1),hsv(0+0.075,1,1),hsv(0+0.15,1,1))
+            use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_p+hue_diff,1,1),hsv(base_hue_p+hue_diff*2,1,1))
           },
           "log(lrs)"={
             ylim<-c(0, braw.env$lrRange)
             ylabel<-bquote(log[e](lr[s]))
-            use_cols<-c(hsv(0,1,1),hsv(0+0.075,1,1),hsv(0+0.15,1,1))
+            use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
           },
           "log(lrd)"={
             ylim<-c(-braw.env$lrRange, braw.env$lrRange)
             ylabel<-bquote(log[e](lr[d]))
-            use_cols<-c(hsv(0,1,1),hsv(0+0.075,1,1),hsv(0+0.15,1,1))
+            use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
           },
           "e1d"={
             ylim<-c(-braw.env$lrRange, braw.env$lrRange)
             ylabel<-bquote(log[e](lr[d]))
-            use_cols<-c(hsv(0,1,1),hsv(0+0.075,1,1),hsv(0+0.15,1,1))
+            use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
           },
           "e2d"={
             ylim<-c(-braw.env$lrRange, braw.env$lrRange)
             ylabel<-bquote(log[e](lr[d]))
-            use_cols<-c(hsv(0,1,1),hsv(0+0.075,1,1),hsv(0+0.15,1,1))
+            use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
           },
           "ws"={
             ylim<-wlim
@@ -160,7 +164,7 @@ plotAxis<-function(showType,effect) {
             ymins<-wmins
             ylabel<-wslabel
             ylines<-wlines
-            use_cols<-c(hsv(0.65,1,1),hsv(0.65+0.075,1,1),hsv(0.65+0.15,1,1))
+            use_cols<-c(hsv(base_hue_w,1,1),hsv(base_hue_w+hue_diff,1,1),hsv(base_hue_w+hue_diff*2,1,1))
           },
           "nw"={
             ylim<-log10(c(5,2000))
@@ -192,14 +196,14 @@ plotAxis<-function(showType,effect) {
             ymins<-log10(c(seq(1,10),seq(1,10)*10,seq(1,10)*100))
             ylabel<-wplabel
             ylines<-wlines
-            use_cols<-c(hsv(0.65,1,1),hsv(0.65+0.075,1,1),hsv(0.65+0.15,1,1))
+            use_cols<-c(hsv(base_hue_w,1,1),hsv(base_hue_w+hue_diff,1,1),hsv(base_hue_w+hue_diff*2,1,1))
           },
           "ci1"={
             ylim<-rlims
             yticks<-rticks
             ymins<-rmins
             ylabel<-rslab
-            use_cols<-c(hsv(0.1,1,1),hsv(0.1+0.075,1,1),hsv(0.1+0.15,1,1))
+            use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
             ylines<-c(0,effect$rIV)
           },
           "ci2"={
@@ -207,7 +211,7 @@ plotAxis<-function(showType,effect) {
             yticks<-rticks
             ymins<-rmins
             ylabel<-rslab
-            use_cols<-c(hsv(0.1,1,1),hsv(0.1+0.075,1,1),hsv(0.1+0.15,1,1))
+            use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
             ylines<-c(0,effect$rIV)
           },
           "e1"={
@@ -216,7 +220,7 @@ plotAxis<-function(showType,effect) {
             ymins<-pmins
             ylabel<-plabel
             ylines<-plines
-            use_cols<-c(hsv(0,1,1),hsv(0+0.075,1,1),hsv(0+0.15,1,1))
+            use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
           },
           "e2"={
             ylim<-plim
@@ -224,7 +228,7 @@ plotAxis<-function(showType,effect) {
             ymins<-pmins
             ylabel<-plabel
             ylines<-plines
-            use_cols<-c(hsv(0,1,1),hsv(0+0.075,1,1),hsv(0+0.15,1,1))
+            use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
           },
           "Hits"={
             ylim<-c(0,1)

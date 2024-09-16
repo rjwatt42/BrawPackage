@@ -109,7 +109,7 @@ makeSampleVar<-function(design,n,MV){
             }
     )
 
-    if (design$sRangeOn && ((design$sIVRange[1]>-braw.env$fullRange) || (design$sIVRange[2]<braw.env$fullRange))) {
+    if (design$sRangeOn) {
       ivr<-c(ivr, ivr1[ivr1>design$sIVRange[1] & ivr1<design$sIVRange[2]])
       dvr_m<-c(dvr_m, dvr1_m[ivr1>design$sIVRange[1] & ivr1<design$sIVRange[2]])
       dvr_s<-c(dvr_s, dvr1_s[ivr1>design$sIVRange[1] & ivr1<design$sIVRange[2]])
@@ -523,11 +523,11 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
       }
       
       # trim DV values
-      if (design$sRangeOn && ((design$sDVRange[1]>-braw.env$fullRange) || (design$sDVRange[2]<braw.env$fullRange))) {
+      if (design$sRangeOn) {
         keep<-dvr<=design$sDVRange[2] & dvr>=design$sDVRange[1]
         dvr<-dvr[keep]
         ivr<-ivr[keep]
-        ivr2<-ivr2[keep]
+        if (!is.null(IV2))  ivr2<-ivr2[keep]
         id<-id[keep]
       }
     
