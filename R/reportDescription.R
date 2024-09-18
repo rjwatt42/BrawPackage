@@ -122,13 +122,13 @@ reportDescription<-function(analysis=braw.res$result){
     outputText<-c(outputText,"!jAIC",paste(brawFormat(analysis$aic,digits=braw.env$report_precision),sep=""),rep("",nc-2))
   }  
   outputText<-c(outputText,rep("",nc))
-  if (evidence$McFaddens && DV$type=="Categorical") McF="McFaddens Pseudo-R2"
+  if (evidence$McFaddens && DV$type=="Categorical") McF="\bMcFaddens Pseudo-R^2"
   else McF=" "
-    outputText<-c(outputText,"\bEffect Size ","Normalized",McF,rep("",nc-3))
+  outputText<-c(outputText,"\bEffect Size","\b!cNormalized",McF,rep("",nc-3))
   
   switch (no_ivs,
           { analysis$rIVse<-r2se(analysis$rIV,analysis$nval)
-          if (evidence$McFaddens && DV$type=="Categorical") McF<-brawFormat(analysis$rIV^2,digits=braw.env$report_precision)
+          if (evidence$McFaddens && DV$type=="Categorical") McF<-paste0("!j",brawFormat(analysis$rIV^2,digits=braw.env$report_precision))
           outputText<-c(outputText,paste0("!j!i",IV$name," "),
                                    paste(brawFormat(analysis$rIV,digits=braw.env$report_precision),
                                                              " \u00B1 ",brawFormat(analysis$rIVse,digits=braw.env$report_precision),
@@ -167,7 +167,7 @@ reportDescription<-function(analysis=braw.res$result){
             an_rt<-brawFormat(analysis$rFull,digits=braw.env$report_precision) 
             an_rset<-brawFormat(analysis$rFullse,digits=braw.env$report_precision)
             outputText<-c(outputText,
-                          "!j!iFull model:",
+                          "!j!iFull model",
                           paste(an_rt,"\u00B1",an_rset),
                           paste0("\u3008",brawFormat(analysis$rFullCI[1],digits=braw.env$report_precision-1),
                                  ",",brawFormat(analysis$rFullCI[2],digits=braw.env$report_precision-1),

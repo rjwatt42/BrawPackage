@@ -11,17 +11,12 @@ reportLikelihood<-function(possibleResult=braw.res$possibleResult){
 
   targetSample<-possibleResult$possible$targetSample
   n<-possibleResult$possible$design$sN
-  z<-atanh(targetSample)
+  zsample<-atanh(targetSample)
 
-  llrA<-dnorm(z,mean=z,sd=1/sqrt(n-3))
-  llr0<-dnorm(0,mean=z,sd=1/sqrt(n-3))
-  
   t<-possibleResult$Theory
   rs<-t$rs
-  llr0P<-approx(rs,t$priorSampDens_r_null,targetSample)$y
-  llrAP<-approx(rs,colMeans(t$priorSampDens_r_plus),targetSample)$y
-
   rp<-t$rp
+  
   sampleLikelihood_r<-t$sampleLikelihood_r
   rp_stats<-densityFunctionStats(sampleLikelihood_r,rp)
   rp_peak_full<-rp_stats$peak
@@ -29,20 +24,29 @@ reportLikelihood<-function(possibleResult=braw.res$possibleResult){
   rp_stats<-densityFunctionStats(sampleLikelihood_r_show,rp)
   rp_peak_plus<-rp_stats$peak
   
+  llrA<-dnorm(zsample,mean=zsample,sd=1/sqrt(n-3))
+  llr0<-dnorm(0,mean=zsample,sd=1/sqrt(n-3))
+  # zsample<-atanh(rp_peak_plus)
+  # llrAmle<-dnorm(zsample,mean=zsample,sd=1/sqrt(n-3))
+  # llr0mle<-dnorm(0,mean=zsample,sd=1/sqrt(n-3))
+  
+  llr0P<-approx(rp,t$priorSampDens_r_null,targetSample)$y
+  llrAP<-approx(rp,colSums(t$priorSampDens_r_plus),targetSample)$y
+
   nc<-4
   nr<-12
-  
   outputText<-rep("  ",nc*nr)
   
   row<-1
   outputText[1+nc*row]<-"\bEstimates  "
-  outputText[2+nc*row]<-"\br[s]        "
-  outputText[3+nc*row]<-"\br[mle](plus)"
-  outputText[4+nc*row]<-"\br[mle](full)"
   row<-row+1
-  outputText[2+nc*row]<-brawFormat(targetSample)
-  outputText[3+nc*row]<-brawFormat(rp_peak_plus)
-  outputText[4+nc*row]<-brawFormat(rp_peak_full)
+  outputText[2+nc*row]<-"\b!cr[s]       "
+  outputText[3+nc*row]<-"\b!cr[mle](+)  "
+  outputText[4+nc*row]<-"\b!cr[mle](+/0)"
+  row<-row+1
+  outputText[2+nc*row]<-paste0("!j",brawFormat(targetSample))
+  outputText[3+nc*row]<-paste0("!j",brawFormat(rp_peak_plus))
+  outputText[4+nc*row]<-paste0("!j",brawFormat(rp_peak_full))
   
   row<-row+1
   outputText[1+nc*row]<-""
@@ -51,29 +55,36 @@ reportLikelihood<-function(possibleResult=braw.res$possibleResult){
   outputText[4+nc*row]<-""
   
   row<-row+1
-  outputText[2+nc*row]<-"\bPlus "
-  outputText[3+nc*row]<-"\bNull "
-  outputText[4+nc*row]<-"\bLLR "
+  outputText[1+nc*row]<-"\bLikelihoods"
+  row<-row+1
+  # outputText[2+nc*row]<-"\b!cplus "
+  # outputText[3+nc*row]<-"\b!cnull "
+  outputText[2+nc*row]<-"\b!cLLR "
   
   row<-row+1
-  outputText[1+nc*row]<-"\b!jEvidential sLLR   "
-  outputText[2+nc*row]<-brawFormat(log(llrA))
-  outputText[3+nc*row]<-brawFormat(log(llr0))
-  outputText[4+nc*row]<-brawFormat(log(llrA/llr0))
+  outputText[1+nc*row]<-"!jsLLR(r[s]/0 | r[s])"
+  # outputText[2+nc*row]<-paste0("!j",brawFormat(log(llrA)))
+  # outputText[3+nc*row]<-paste0("!j",brawFormat(log(llr0)))
+  outputText[2+nc*row]<-paste0("!j",brawFormat(log(llrA/llr0)))
+  # row<-row+1
+  # outputText[1+nc*row]<-"\b!jsLLR(r[mle])"
+  # outputText[2+nc*row]<-paste0("!j",brawFormat(log(llrAmle)))
+  # outputText[3+nc*row]<-paste0("!j",brawFormat(log(llr0mle)))
+  # outputText[4+nc*row]<-paste0("!j",brawFormat(log(llrAmle/llr0mle)))
   
   if (possibleResult$possible$UsePrior!="none" && possibleResult$prior$populationNullp>0) {
     
   row<-row+1
-  outputText[1+nc*row]<-"\b!jPrior LLR   "
-  outputText[2+nc*row]<-brawFormat(log(llrAP)-log(llrA))
-  outputText[3+nc*row]<-brawFormat(log(llr0P)-log(llr0))
-  outputText[4+nc*row]<-brawFormat((log(llrAP)-log(llrA))-(log(llr0P)-log(llr0)))
+  outputText[1+nc*row]<-"!jPrior(r[+]/0 | r[s])"
+  # outputText[2+nc*row]<-paste0("!j",brawFormat(log(llrAP)-log(llrA)))
+  # outputText[3+nc*row]<-paste0("!j",brawFormat(log(llr0P)-log(llr0)))
+  outputText[2+nc*row]<-paste0("!j",brawFormat((log(llrAP)-log(llrA))-(log(llr0P)-log(llr0))))
 
   row<-row+1
-  outputText[1+nc*row]<-"\b!jEvidential*Prior dLLR   "
-  outputText[2+nc*row]<-brawFormat(log(llrAP))
-  outputText[3+nc*row]<-brawFormat(log(llr0P))
-  outputText[4+nc*row]<-brawFormat(log(llrAP/llr0P))
+  outputText[1+nc*row]<-"!jdLLR(r[+]/0 | r[s])"
+  # outputText[2+nc*row]<-paste0("!j",brawFormat(log(llrAP)))
+  # outputText[3+nc*row]<-paste0("!j",brawFormat(log(llr0P)))
+  outputText[2+nc*row]<-paste0("!j",brawFormat(log(llrAP/llr0P)))
   }
   
   reportPlot(outputText,nc,nr)

@@ -226,6 +226,7 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
   
   sourceRVals<-possibleResult$sourceRVals
   sRho<-possibleResult$sRho
+  n<-possibleResult$possible$design$sN
   
   rs<-possibleResult$Theory$rs
   sourceSampDens_r<-possibleResult$Theory$sourceSampDens_r
@@ -835,55 +836,49 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
                           # text annotations
                           if (doTextResult && walls) {
                               # mle population
-                              xoff<-diff(zlim)*1.7
+                              xoff<-diff(zlim)*1.2
                               text(trans3d(x=xlim[2],y=ylim[2],z=zlim[1]+xoff,pmat=mapping),
                                    labels=bquote(bold(.(braw.env$RZ)['s    ']== .(brawFormat(sRho[1],digits=3)))),
                                    col=colPdark,adj=1,cex=0.9)
-                              xoff<-xoff-diff(zlim)*0.1
-                              text(trans3d(x=xlim[2],y=ylim[2],z=zlim[1]+xoff,pmat=mapping),
-                                   labels=bquote(bold(.(braw.env$RZ)[mle]== .(brawFormat(rp_peak,digits=3)))),
-                                   col=colPdark,adj=1,cex=0.9)
-                              xoff<-xoff-diff(zlim)*0.1
-                              text(trans3d(x=xlim[2],y=ylim[2],z=zlim[1]+xoff,pmat=mapping),
-                                   labels=bquote(bold(.(braw.env$RZ)['p   ']== .(brawFormat(possible$targetPopulation,digits=3)))),
-                                   col=colPdark,adj=1,cex=0.9)
-                              xoff<-xoff-diff(zlim)*0.1
-                              text(trans3d(x=xlim[2],y=ylim[2],z=zlim[1]+xoff,pmat=mapping),
-                                   labels=bquote(bold(.('n')== .(brawFormat(possible$design$sN)))),
-                                   col=colPdark,adj=1,cex=0.9)
-                              xoff<-xoff-diff(zlim)*0.2
-                              if (possible$UsePrior=="none")
-                                lb<- "prior: none"
-                              else {
-                                lb<-"prior: "
-                                switch(possibleResult$prior$populationPDF,
-                                       "Uniform"=lb<-paste0(lb,"Uniform(",possibleResult$prior$populationRZ,")"),
-                                       "Single"=lb<-paste0(lb,"Single(",possibleResult$prior$populationRZ,"=",brawFormat(possibleResult$prior$populationPDFk),")"),
-                                       "Double"=lb<-paste0(lb,"Double(",possibleResult$prior$populationRZ,"=",brawFormat(possibleResult$prior$populationPDFk),")"),
-                                       "Exp"=lb<-paste0(lb,"Exp(",possibleResult$prior$populationRZ,"/",brawFormat(possibleResult$prior$populationPDFk),")"),
-                                       "Gauss"=lb<-paste0(lb,"Gauss(",possibleResult$prior$populationRZ,"/",brawFormat(possibleResult$prior$populationPDFk),")")
-                                )
-                                lb<-paste0(lb,";p(null)=",brawFormat(possibleResult$prior$populationNullp,digits=3))
-                              }
-                              text(trans3d(x=xlim[2],y=ylim[2],z=zlim[1]+xoff,pmat=mapping),
-                                   labels=lb,
-                                   col=colPdark,adj=1,cex=0.9)
-                            }
+                              xoff<-xoff-diff(zlim)*0.075
+                              llrA<-dnorm(atanh(sRho),mean=atanh(sRho),sd=1/sqrt(n-3))
+                              llr0<-dnorm(0,mean=atanh(sRho),sd=1/sqrt(n-3))
+                              llr_0_rs<-log(llrA/llr0)
+                              text(trans3d(x=xlim[2],y=ylim[2],z=zlim[1]+xoff,pmat=mapping),labels=bquote(
+                                bold(sLLR(.(braw.env$RZ)[s]/.(braw.env$RZ)[0])==.(brawFormat(llr_0_rs,digits=3)))
+                              ),col=colPdark,adj=1,cex=0.9)
+                              if (possible$UsePrior!="none") {
+                                xoff<-xoff-diff(zlim)*0.075
+                                # lb<-"prior: "
+                                # switch(possibleResult$prior$populationPDF,
+                                #        "Uniform"=lb<-paste0(lb,"Uniform(",possibleResult$prior$populationRZ,")"),
+                                #        "Single"=lb<-paste0(lb,"Single(",possibleResult$prior$populationRZ,"=",brawFormat(possibleResult$prior$populationPDFk),")"),
+                                #        "Double"=lb<-paste0(lb,"Double(",possibleResult$prior$populationRZ,"=",brawFormat(possibleResult$prior$populationPDFk),")"),
+                                #        "Exp"=lb<-paste0(lb,"Exp(",possibleResult$prior$populationRZ,"/",brawFormat(possibleResult$prior$populationPDFk),")"),
+                                #        "Gauss"=lb<-paste0(lb,"Gauss(",possibleResult$prior$populationRZ,"/",brawFormat(possibleResult$prior$populationPDFk),")")
+                                # )
+                                # lb<-paste0(lb,";p(null)=",brawFormat(possibleResult$prior$populationNullp,digits=3))
+                                # xoff<-xoff-diff(zlim)*0.06*2
+                                # text(trans3d(x=xlim[2],y=ylim[2],z=zlim[1]+xoff,pmat=mapping),
+                                #      labels=lb,
+                                #      col=colPdark,adj=1,cex=0.9)
                             
                           # llr 
                           # mle population
-                          xoff<-xoff-diff(zlim)*0.1
-                          llr_0_mle<-log(approx(rp,sampleLikelihood_r,rp_peak)$y/approx(rp,sampleLikelihood_r,0)$y)
-                          text(trans3d(x=xlim[2],y=ylim[2],z=zlim[1]+xoff,pmat=mapping),labels=bquote(
-                            llr(bold(.(braw.env$RZ)[mle]/.(braw.env$RZ)[0]==.(format(llr_0_mle,digits=3))))
-                          ),col=colPdark,adj=1,cex=0.9)
-                          if (possible$UsePrior!="none") {
-                            xoff<-xoff-diff(zlim)*0.1
-                            text(trans3d(x=xlim[2],y=ylim[2],z=zlim[1]+xoff,pmat=mapping),
-                                 labels=bquote(
-                                   llr(bold(.(braw.env$RZ)["+"]/.(braw.env$RZ)[0]==.(format(-llrNull,digits=3))))
-                                 ),
-                                 col=colSdark,adj=1,cex=0.9)
+                                xoff<-xoff-diff(zlim)*0.075
+                                text(trans3d(x=xlim[2],y=ylim[2],z=zlim[1]+xoff,pmat=mapping),
+                                     labels=bquote(bold(.(braw.env$RZ)[mle]== .(brawFormat(rp_peak,digits=3)))),
+                                     col=colPdark,adj=1,cex=0.9)
+                                xoff<-xoff-diff(zlim)*0.075
+                          llr_0_mle<-log(approx(rs,colSums(priorSampDens_r_plus),sRho)$y/approx(rs,priorSampDens_r_null,sRho)$y)
+                          text(trans3d(x=xlim[2],y=ylim[2],z=zlim[1]+xoff,pmat=mapping),
+                                 labels=bquote(bold(dLLR(.(braw.env$RZ)["+"]/.(braw.env$RZ)[0])==.(brawFormat(llr_0_mle,digits=3)))),
+                                 col=colPdark,adj=1,cex=0.9)
+                          # xoff<-xoff-diff(zlim)*0.07
+                          # text(trans3d(x=xlim[2],y=ylim[2],z=zlim[1]+xoff,pmat=mapping),
+                          #        labels=bquote(bold(dLLR(.(braw.env$RZ)["+"]/.(braw.env$RZ)[0])==.(brawFormat(-llrNull,digits=3)))),
+                          #        col=colSdark,adj=1,cex=0.9)
+                              }
                           }
                         }
                       }

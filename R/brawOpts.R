@@ -1,9 +1,9 @@
-braw.env<-c()
-braw.def<-c()
-braw.res<-c()
-.onLoad<- function(...) {
-  BrawOpts()
-}
+# braw.env<-c()
+# braw.def<-c()
+# braw.res<-c()
+# .onLoad<- function(...) {
+#   BrawOpts()
+# }
 
 newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
   while (dev.cur()!=1) dev.off()
@@ -18,6 +18,7 @@ newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
 }
 
 BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,graphicsSize=c(16,10),
+                   reportHTML=FALSE,
                    newDev=FALSE,height=576,aspect=1.736,timeLimit=Inf,
                    reducedOutput=FALSE) {
   if (graphC=="white") graphC<-"#FFFFFF"
@@ -120,6 +121,7 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,graphicsSize=c(16,10),
           #########################
           # display choices
           
+          braw.env$reportHTML<-reportHTML
           braw.env$report_precision<-3
           braw.env$graph_precision<-2
           

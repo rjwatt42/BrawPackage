@@ -1,6 +1,61 @@
 
-reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14){
+reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw.env$reportHTML){
+  
+  if (renderAsHTML) {
+    mainStyle<-paste0("font-size:",format(braw.env$labelSize*fontSize*3) ,"px;font-weight:normal;text-align: left;")
+    
+    preText<-""
+    outputFront<-paste0("<div style=padding:10px;",mainStyle,">")
+    outputBack<-'</div>'
+    if (!is.null(outputText)) {
+      outputFront<-paste0(outputFront,"<table>")
+      index<-0
+      topLine<-TRUE
+      for (j in 1:nr) {paste0(outputFront,"<tr>")
+          for (i in 1:nc) {
+            index<-index+1
+            localStyle<-paste0(" style=font-size:",format(braw.env$labelSize*fontSize*3),"px;")
+            if (grepl("\b",outputText[index])) {
+              localStyle<-paste0(localStyle,"font-weight:bold;")
+              outputText[index]<-sub("\b","",outputText[index])
+            }
+            if (grepl("!i",outputText[index])) {
+              localStyle<-paste0(localStyle,"font-style:italic;")
+              outputText[index]<-sub("!i","",outputText[index])
+            }
+            if (grepl("!j",outputText[index])) {
+              localStyle<-paste0(localStyle,"text-align:right;")
+              outputText[index]<-sub("!j","",outputText[index])
+            }
+            if (grepl("!c",outputText[index])) {
+              localStyle<-paste0(localStyle,"text-align:center;")
+              outputText[index]<-sub("!c","",outputText[index])
+            }
+            localStyle<-paste0(localStyle,"padding:5px;padding-top:0px;padding-bottom:0px;")
 
+            outputText[index]<-gsub("\\[([a-zA-Z0-9_+-]*)\\]","<sub>\\1</sub>",outputText[index])
+            outputText[index]<-gsub("\\^([a-zA-Z0-9_+-]*)([a-zA-Z0-9_]*)","<sup>\\1</sup>",outputText[index])
+            
+            outputFront<-paste0(outputFront,"<td",localStyle,">")
+            outputFront<-paste0(outputFront,outputText[index])
+            outputFront<-paste0(outputFront,"</td>")
+          }
+        outputFront<-paste0(outputFront,"</tr>")
+        topLine<-FALSE
+        if (index+nc<=length(outputText))
+        if (all(sapply(outputText[index+(1:nc)],nchar)==0)) {
+          outputFront<-paste0(outputFront,"</table><p> </p><table>")
+          topLine<-TRUE
+        }
+      }
+        outputBack<-paste0("</table>",outputBack)
+    }
+
+    return(paste0(preText,outputFront,outputBack))
+  }
+  
+  if (is.null(outputText)) return(ggplot()+braw.env$blankTheme())
+  
   bg<-braw.env$plotColours$graphC
   margin=0.5
   colSpace=1.5

@@ -30,8 +30,8 @@ reportSample<-function(sample=braw.res$result){
   s2<-sample$dv
   
   nc=7
-  outputText<-c("\bVariables","","","","","","")
 
+  outputText<-c()
   outputTextI<-c()
   # Interval variables first
   done_interval<-FALSE
@@ -72,7 +72,8 @@ reportSample<-function(sample=braw.res$result){
     done_interval<-TRUE
   }
   if (done_interval){
-    outputText<-c(outputText,"\b!jInterval","\b!jmean","\b!jsd","\b!jskew","\b!jkurtosis","\b!jmedian","\b!jiqr",
+    outputText<-c(outputText,"\b!jInterval Variables",rep("",nc-1))
+    outputText<-c(outputText,"","\b!cmean","\b!csd","\b!cskew","\b!ckurtosis","\b!cmedian","\b!ciqr",
                   outputTextI,rep("",nc))
   }
 
@@ -112,7 +113,8 @@ reportSample<-function(sample=braw.res$result){
     done_ordinal<-TRUE
   }
   if (done_ordinal){
-    outputText<-c(outputText,"\b!jOrdinal","\b!jmedian","\b!jiqr","\bmean","\b!jsd","","",
+    outputText<-c(outputText,"\b!jOrdinal Variables",rep("",nc-1))
+    outputText<-c(outputText,"","\b!jmedian","\b!jiqr","\bmean","\b!jsd","","",
                   outputTextO,rep("",nc))
   }
 
@@ -174,15 +176,15 @@ reportSample<-function(sample=braw.res$result){
     done_categorical<-TRUE
   }
   if (done_categorical){
-    outputText<-c(outputText,"\b!jCategorical","\b!jcounts","\b!jmode","\b!jdeviance","","","",
+    outputText<-c(outputText,"\b!jCategorical Variables",rep("",nc-1))
+    outputText<-c(outputText,"","\b!ccounts","\b!cmode","\b!cdeviance","","","",
                   outputTextC,rep("",nc))
   }
   
   outputText<-c(outputText,
                 "\bDesign","","","","","","",
-                "!jSample Size: ",sample$nval,"","","","","",
-                "!jMethod: ",design$sMethod$type,"","","","","",
-                "!jUsage: ",design$sIV1Use,"","","","",""
+                "","\b!cSample Size","\b!cMethod","\b!cUsage","","","",
+                "",paste0("!c",sample$nval),paste0("!c",design$sMethod$type),paste0("!c",design$sIV1Use),"","",""
   )
   
   nr=length(outputText)/nc

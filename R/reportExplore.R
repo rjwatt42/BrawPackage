@@ -358,9 +358,9 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
   outputText<-c(outputText,paste0("!j\b",explore$exploreType))
   for (i in 1:nc) {
     if (is.numeric(vals[use[i]]))
-      outputText<-c(outputText,paste0("!j\b",brawFormat(vals[use[i]],digits=braw.env$report_precision)," "))
+      outputText<-c(outputText,paste0("!c\b",brawFormat(vals[use[i]],digits=braw.env$report_precision)," "))
     else 
-      outputText<-c(outputText,paste0("!j\b",vals[use[i]]," "))
+      outputText<-c(outputText,paste0("!c\b",vals[use[i]]," "))
   }
 
   outputText<-c(outputText,paste0("!j!ilower ",format(quants*100),"%"))
