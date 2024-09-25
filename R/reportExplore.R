@@ -31,7 +31,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
   oldAlpha<-braw.env$alphaSig
   on.exit(braw.env$alphaSig<-oldAlpha)
 
-  max_cols<-8
+  max_cols<-7
   
   vals<-exploreResult$vals
   if (explore$exploreType=="pNull" && braw.env$pPlus) vals<-1-vals
@@ -41,7 +41,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
   } else {
     use<-1:length(vals)
   }
-  nc<-length(use)
+  nc<-length(use)+1
 
   extra_y_label<-showType
 
@@ -350,14 +350,15 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
   # }
   outputText<-c(outputText,rep("",nc+1))
   
+  extra_y_label<-gsub("^([rz]{1})([spoe]{1})$","\\1\\[\\2\\]",extra_y_label)
   outputText<-c(outputText,paste0("\b", extra_y_label))
   outputText<-c(outputText,rep("",nc))
   
   if (explore$exploreType=="rIV" && braw.env$RZ=="z") {
     vals<-atanh(vals)
   }
-  outputText<-c(outputText,paste0("!j\b",explore$exploreType))
-  for (i in 1:nc) {
+  outputText<-c(outputText,"",paste0("!j\b",explore$exploreType))
+  for (i in 1:length(use)) {
     if (is.numeric(vals[use[i]]))
       outputText<-c(outputText,paste0("!c\b",brawFormat(vals[use[i]],digits=braw.env$report_precision)," "))
     else 
@@ -365,35 +366,35 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
   }
 
   if (quantsMade) 
-    outputText<-c(outputText,paste0("!j!ilower ",format(quants*100),"%"))
+    outputText<-c(outputText,"",paste0("!j!ilower ",format(quants*100),"%"))
   else
-    outputText<-c(outputText,"!j!i-se ")
+    outputText<-c(outputText,"","!j!i-se ")
   
-  for (i in 1:nc) {
+  for (i in 1:length(use)) {
     outputText<-c(outputText,paste0("!j",brawFormat(y25[use[i]],digits=braw.env$report_precision)))
   }
-  outputText<-c(outputText,"!j!i\bmedian")
-  for (i in 1:nc) {
+  outputText<-c(outputText,"","!j!i\bmedian")
+  for (i in 1:length(use)) {
     outputText<-c(outputText,paste0("!j",brawFormat(y50[use[i]],digits=braw.env$report_precision)))
   }
   if (quantsMade) 
-    outputText<-c(outputText,paste0("!j!iupper ",format(quants*100),"%"))
+    outputText<-c(outputText,"",paste0("!j!iupper ",format(quants*100),"%"))
   else
-    outputText<-c(outputText,"!j!i+se ")
+    outputText<-c(outputText,"","!j!i+se ")
   
-  for (i in 1:nc) {
+  for (i in 1:length(use)) {
     outputText<-c(outputText,paste0("!j",brawFormat(y75[use[i]],digits=braw.env$report_precision)))
   }
 
   
   if (is.element(showType,c("rs","p","ws","n","log(lrs)","log(lrd)","Lambda","pNull","S"))) {
     outputText<-c(outputText,rep(" ",nc+1))
-    outputText<-c(outputText,"!j!i\bmean")
-    for (i in 1:nc) {
+    outputText<-c(outputText,"","!j!i\bmean")
+    for (i in 1:length(use)) {
       outputText<-c(outputText,paste0("!j",brawFormat(ymn[use[i]],digits=braw.env$report_precision)))
     }
-    outputText<-c(outputText,"!j!isd")
-    for (i in 1:nc) {
+    outputText<-c(outputText,"","!j!isd")
+    for (i in 1:length(use)) {
       outputText<-c(outputText,paste0("!j",brawFormat(ysd[use[i]],digits=braw.env$report_precision)))
     }
   }    
@@ -432,23 +433,29 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
     outputText<-c(outputText,paste("\b", extra_y_label))
     outputText<-c(outputText,rep("",nc))
     
-    outputText<-c(outputText,paste0("!j\b",explore$exploreType))
-    for (i in 1:nc) {
+    outputText<-c(outputText,"",paste0("!j\b",explore$exploreType))
+    for (i in 1:length(use)) {
       if (is.numeric(vals[use[i]]))
         outputText<-c(outputText,paste0("!j\b",brawFormat(vals[use[i]],digits=braw.env$report_precision)," "))
       else 
         outputText<-c(outputText,paste0("!j\b",vals[use[i]]," "))
     }
-    outputText<-c(outputText,paste0("!j!ilower ",format(quants*100),"%"))
-    for (i in 1:nc) {
+    if (quantsMade) 
+      outputText<-c(outputText,"",paste0("!j!ilower ",format(quants*100),"%"))
+    else
+      outputText<-c(outputText,"","!j!i+se ")
+    for (i in 1:length(use)) {
       outputText<-c(outputText,paste0("!j",brawFormat(y25e[use[i]],digits=braw.env$report_precision)))
     }
-    outputText<-c(outputText,"!j\bmedian")
-    for (i in 1:nc) {
+    outputText<-c(outputText,"","!j\bmedian")
+    for (i in 1:length(use)) {
       outputText<-c(outputText,paste0("!j",brawFormat(y50e[use[i]],digits=braw.env$report_precision)))
     }
-    outputText<-c(outputText,paste0("!j!iupper ",format(quants*100),"%"))
-    for (i in 1:nc) {
+    if (quantsMade) 
+      outputText<-c(outputText,"",paste0("!j!iupper ",format(quants*100),"%"))
+    else
+      outputText<-c(outputText,"","!j!i+se ")
+    for (i in 1:length(use)) {
       outputText<-c(outputText,paste0("!j",brawFormat(y75e[use[i]],digits=braw.env$report_precision)))
     }
   }

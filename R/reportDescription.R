@@ -208,12 +208,13 @@ reportDescription<-function(analysis=braw.res$result){
               fitted<-analysis$fitted
               residuals<-analysis$residuals
               rsd<-sd(residuals,na.rm=TRUE)
-              rsd1<-sqrt(sd(residuals[analysis$iv==cases[1]])^2+sd(residuals[analysis$iv==cases[2]])^2)/sqrt(2)
+              rsd1<-sqrt(mean(analysis$iv==cases[1])*sd(residuals[analysis$iv==cases[1]])^2+
+                         mean(analysis$iv==cases[2])*sd(residuals[analysis$iv==cases[2]])^2)
               outputText<-c(outputText,rep("",nc))
               if (IV$ncats==2){
                 outputText<-c(outputText,"Difference(means):",brawFormat(diff(mn),digits=braw.env$report_precision),
                               "sd(residuals):",brawFormat(rsd,digits=braw.env$report_precision),
-                              "Cohens d:",brawFormat(diff(mn)/rsd1,digits=braw.env$report_precision),
+                              "Cohen's d:",brawFormat(diff(mn)/rsd1,digits=braw.env$report_precision),
                               rep("",nc-2))
               } else {
                 outputText<-c(outputText,"sd(means):",brawFormat(sd(fitted),digits=braw.env$report_precision),"sd(residuals):",brawFormat(rsd,digits=braw.env$report_precision),

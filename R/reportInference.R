@@ -18,8 +18,8 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova"){
           "Anova"= {anova<-analysis$anova},
           "Model"= {anova<-analysis$model}
   )
-  nc<-ncol(anova)+1
-  if (nc<6) nc<-6
+  nc<-ncol(anova)+2
+  if (nc<7) nc<-7
   
   an_name<-analysis$an_name
     outputText<-rep("",nc*2)
@@ -60,9 +60,24 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova"){
       rvalText<-paste0(brawFormat(analysis$rIV,digits=braw.env$report_precision),
                        " \u00B1 ",brawFormat(r2se(analysis$rIV,analysis$nval),digits=braw.env$report_precision))
 
-      outputText<-c(outputText,"!j\btest-statistic","\b(df) ","\bvalue   ","\bp",f1,"\brs",rep("",nc-6))
-      outputText<-c(outputText,paste0("!j",t_name),df,brawFormat(tval,digits=braw.env$report_precision),pvalText,
-                    f2,rvalText,rep("",nc-6))
+      if (IV$type=="Categorical" && IV$ncats==2 && DV$type=="Interval") {
+        use1<-analysis$iv==IV$cases[1]
+        use2<-analysis$iv==IV$cases[2]
+        dval<-(mean(analysis$dv[use2],na.rm=TRUE)-mean(analysis$dv[use1],na.rm=TRUE))/
+              sqrt(
+                (
+                  mean(use2,na.rm=TRUE)*sd(analysis$dv[use2],na.rm=TRUE)^2+
+                    mean(use1,na.rm=TRUE)*sd(analysis$dv[use1],na.rm=TRUE)^2
+                  )
+                )
+        outputText<-c(outputText,"!j\btest-statistic","\b(df) ","\bvalue   ","\bp",f1,"\br[s]","\bCohen's d",rep("",nc-7))
+        outputText<-c(outputText,paste0("!j",t_name),df,brawFormat(tval,digits=braw.env$report_precision),pvalText,
+                      f2,rvalText,brawFormat(dval,digits=braw.env$report_precision),rep("",nc-7))
+      } else {
+        outputText<-c(outputText,"!j\btest-statistic","\b(df) ","\bvalue   ","\bp",f1,"\br[s]",rep("",nc-6))
+        outputText<-c(outputText,paste0("!j",t_name),df,brawFormat(tval,digits=braw.env$report_precision),pvalText,
+                      f2,rvalText,rep("",nc-6))
+      }
     }
     
     if (!(braw.env$reducedOutput && is.null(IV2))) {

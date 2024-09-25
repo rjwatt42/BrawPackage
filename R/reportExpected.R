@@ -111,6 +111,8 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic",
                {par2=par2}
         )
       }
+      par1<-gsub("^([rz]{1})([spoe]{1})$","\\1\\[\\2\\]",par1)
+      par2<-gsub("^([rz]{1})([spoe]{1})$","\\1\\[\\2\\]",par2)
       if (!is.na(pars[2]))
         outputText1<-c("   ",paste0("!j\b",par1,"  "),paste0("!j\b",par2,"  "))
       else 
