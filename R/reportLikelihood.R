@@ -40,13 +40,13 @@ reportLikelihood<-function(possibleResult=braw.res$possibleResult){
   row<-1
   outputText[1+nc*row]<-"\bEstimates  "
   row<-row+1
-  outputText[2+nc*row]<-"\b!cr[s]       "
-  outputText[3+nc*row]<-"\b!cr[mle](+)  "
-  outputText[4+nc*row]<-"\b!cr[mle](+/0)"
+  outputText[2+nc*row]<-"\b!cr[s]     "
+  outputText[3+nc*row]<-"\b!cr[mle]   "
+  outputText[4+nc*row]<-"\b!cr[mle](+)"
   row<-row+1
   outputText[2+nc*row]<-paste0("!j",brawFormat(targetSample))
-  outputText[3+nc*row]<-paste0("!j",brawFormat(rp_peak_plus))
-  outputText[4+nc*row]<-paste0("!j",brawFormat(rp_peak_full))
+  outputText[3+nc*row]<-paste0("!j",brawFormat(rp_peak_full))
+  outputText[4+nc*row]<-paste0("!j",brawFormat(rp_peak_plus))
   
   row<-row+1
   outputText[1+nc*row]<-""
@@ -62,7 +62,7 @@ reportLikelihood<-function(possibleResult=braw.res$possibleResult){
   outputText[2+nc*row]<-"\b!cLLR "
   
   row<-row+1
-  outputText[1+nc*row]<-"!jsLLR(r[s]/0 | r[s])"
+  outputText[1+nc*row]<-"!jsLLR(r[s]/r[0] | r[s])"
   # outputText[2+nc*row]<-paste0("!j",brawFormat(log(llrA)))
   # outputText[3+nc*row]<-paste0("!j",brawFormat(log(llr0)))
   outputText[2+nc*row]<-paste0("!j",brawFormat(log(llrA/llr0)))
@@ -75,13 +75,13 @@ reportLikelihood<-function(possibleResult=braw.res$possibleResult){
   if (possibleResult$possible$UsePrior!="none" && possibleResult$prior$populationNullp>0) {
     
   row<-row+1
-  outputText[1+nc*row]<-"!jPrior(r[+]/0 | r[s])"
+  outputText[1+nc*row]<-"!jPrior(r[+]/r[0] | r[s])"
   # outputText[2+nc*row]<-paste0("!j",brawFormat(log(llrAP)-log(llrA)))
   # outputText[3+nc*row]<-paste0("!j",brawFormat(log(llr0P)-log(llr0)))
   outputText[2+nc*row]<-paste0("!j",brawFormat((log(llrAP)-log(llrA))-(log(llr0P)-log(llr0))))
 
   row<-row+1
-  outputText[1+nc*row]<-"!jdLLR(r[+]/0 | r[s])"
+  outputText[1+nc*row]<-"!jdLLR(r[+]/r[0] | r[s])"
   # outputText[2+nc*row]<-paste0("!j",brawFormat(log(llrAP)))
   # outputText[3+nc*row]<-paste0("!j",brawFormat(log(llr0P)))
   outputText[2+nc*row]<-paste0("!j",brawFormat(log(llrAP/llr0P)))

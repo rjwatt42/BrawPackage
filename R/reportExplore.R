@@ -331,7 +331,8 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
       ymn[i]<-mean(showVals[,i],na.rm=TRUE)
       ysd[i]<-sd(showVals[,i],na.rm=TRUE)
     }
-  }
+    quantsMade<-TRUE
+  } else quantsMade<-FALSE
 
   outputText<-rep("",nc+1)
   outputText[1]<-paste0("!j\bExplore: ",explore$exploreType)
@@ -363,7 +364,11 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
       outputText<-c(outputText,paste0("!c\b",vals[use[i]]," "))
   }
 
-  outputText<-c(outputText,paste0("!j!ilower ",format(quants*100),"%"))
+  if (quantsMade) 
+    outputText<-c(outputText,paste0("!j!ilower ",format(quants*100),"%"))
+  else
+    outputText<-c(outputText,"!j!i-se ")
+  
   for (i in 1:nc) {
     outputText<-c(outputText,paste0("!j",brawFormat(y25[use[i]],digits=braw.env$report_precision)))
   }
@@ -371,11 +376,16 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
   for (i in 1:nc) {
     outputText<-c(outputText,paste0("!j",brawFormat(y50[use[i]],digits=braw.env$report_precision)))
   }
-  outputText<-c(outputText,paste0("!j!iupper ",format(quants*100),"%"))
+  if (quantsMade) 
+    outputText<-c(outputText,paste0("!j!iupper ",format(quants*100),"%"))
+  else
+    outputText<-c(outputText,"!j!i+se ")
+  
   for (i in 1:nc) {
     outputText<-c(outputText,paste0("!j",brawFormat(y75[use[i]],digits=braw.env$report_precision)))
   }
 
+  
   if (is.element(showType,c("rs","p","ws","n","log(lrs)","log(lrd)","Lambda","pNull","S"))) {
     outputText<-c(outputText,rep(" ",nc+1))
     outputText<-c(outputText,"!j!i\bmean")
