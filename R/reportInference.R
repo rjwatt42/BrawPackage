@@ -5,7 +5,7 @@
 #' @examples
 #' reportInference(analysis=doAnalysis())
 #' @export
-reportInference<-function(analysis=braw.res$result,analysisType="Anova"){
+reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowerN=TRUE){
   if (is.null(analysis)) analysis<-doResult(autoShow=FALSE)
   
   IV<-analysis$hypothesis$IV
@@ -22,11 +22,12 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova"){
   if (nc<7) nc<-7
   
   an_name<-analysis$an_name
-    outputText<-rep("",nc*2)
+    outputText<-rep(" ",nc*2)
     outputText[1]<-paste("\b",an_name,sep="")
     if (!is.null(IV2)) {
       outputText[2]<-paste("(",analysisType,"/",braw.env$modelType,")",sep="")
     }
+    outputText<-c(outputText,rep("",nc))
     
     if (is.null(IV2)){
       pval<-analysis$pIV
@@ -58,7 +59,7 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova"){
       }
 
       rvalText<-paste0(brawFormat(analysis$rIV,digits=braw.env$report_precision),
-                       " \u00B1 ",brawFormat(r2se(analysis$rIV,analysis$nval),digits=braw.env$report_precision))
+                       "\u00B1",brawFormat(r2se(analysis$rIV,analysis$nval),digits=braw.env$report_precision))
 
       if (IV$type=="Categorical" && IV$ncats==2 && DV$type=="Interval") {
         use1<-analysis$iv==IV$cases[1]
@@ -70,19 +71,24 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova"){
                     mean(use1,na.rm=TRUE)*sd(analysis$dv[use1],na.rm=TRUE)^2
                   )
                 )
-        outputText<-c(outputText,"!j\btest-statistic","\b(df) ","\bvalue   ","\bp",f1,"\br[s]","\bCohen's d",rep("",nc-7))
+        outputText<-c(outputText,"!j\b!utest-statistic","\b!u(df) ","\b!uvalue   ","\b!up",paste0("!u",f1),"\b!ur[s]","\b!uCohen's d",rep("",nc-7))
         outputText<-c(outputText,paste0("!j",t_name),df,brawFormat(tval,digits=braw.env$report_precision),pvalText,
                       f2,rvalText,brawFormat(dval,digits=braw.env$report_precision),rep("",nc-7))
       } else {
-        outputText<-c(outputText,"!j\btest-statistic","\b(df) ","\bvalue   ","\bp",f1,"\br[s]",rep("",nc-6))
+        outputText<-c(outputText,"!j\b!utest-statistic","\b!u(df) ","\b!uvalue   ","\b!up",paste0("!u",f1),"\b!ur[s]",rep("",nc-6))
         outputText<-c(outputText,paste0("!j",t_name),df,brawFormat(tval,digits=braw.env$report_precision),pvalText,
                       f2,rvalText,rep("",nc-6))
       }
     }
+
+    # if (showPowerN && is.null(IV2)) {
+    #   outputText<-c(outputText,rep("",nc))
+    #   outputText<-c(outputText,"n80=",ceil(rw2n(analysis$rIV,0.8,2)),rep("",nc-2))
+    # }
     
     if (!(braw.env$reducedOutput && is.null(IV2))) {
       outputText<-c(outputText,rep("",nc))
-      outputText<-c(outputText," ",paste0("!j",sub("Pr\\(","p\\(",sub("^","\b",colnames(anova)))),"")
+      outputText<-c(outputText,"!n ",paste0("!j!u",sub("Pr\\(","p\\(",sub("^","\b",colnames(anova)))),"")
       total_done<-FALSE
       
       for (i in 1:nrow(anova)){
@@ -105,7 +111,7 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova"){
             total_done<-TRUE
           }
           
-          outputText<-c(outputText,paste0("!j!i",vn," "))
+          outputText<-c(outputText,"",paste0("!j!i!r",vn," "))
           for (j in 1:ncol(anova)){
             if (is.na(anova[i,j])){
               outputText<-c(outputText,"")
@@ -113,7 +119,8 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova"){
               outputText<-c(outputText,paste0("!j",brawFormat(anova[i,j],digits=braw.env$report_precision)))
             }
           }
-          if (ncol(anova)+1<nc) {outputText<-c(outputText,rep("",nc-(ncol(anova)+1)))}
+          outputText<-c(outputText,"")
+          # if (ncol(anova)+1<nc) {outputText<-c(outputText,rep("",nc-(ncol(anova)+1)))}
         }
       }
       if (!total_done && analysisType=="Anova") {
@@ -122,13 +129,13 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova"){
         
         df<-sum(anova[,2])-anova[1,2]
         if (!is.na(df)) {df<-paste0("!j",brawFormat(df,digits=braw.env$report_precision))} else {df<-""}
-        outputText<-c(outputText,"!j!iTotal ",ssq,df,rep(" ",nc-3))
+        outputText<-c(outputText,"","!j!i!rTotal ",ssq,df,rep(" ",nc-4))
       }
       outputText<-c(outputText,rep("",nc))
     }
     
     if (!braw.env$reducedOutput) {
-      outputText<-c(outputText,"\bPower(w)", "\bPost Hoc","\bActual",rep("",nc-3))   
+      outputText<-c(outputText,"\bPower(w)", "\b!uPost Hoc","\b!uActual",rep("",nc-3))   
       if (is.na(effect$rIV)) {effect$rIV<-0}
       outputText<-c(outputText," ",brawFormat(rn2w(analysis$rIV,analysis$nval),digits=3),
                     brawFormat(rn2w(effect$rIV,analysis$nval),digits=3),

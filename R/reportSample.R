@@ -36,7 +36,7 @@ reportSample<-function(sample=braw.res$result){
   # Interval variables first
   done_interval<-FALSE
   if (IV$type=="Interval"){
-    outputTextI<-c(outputTextI,paste0("!j!i",IV$name," "),
+    outputTextI<-c(outputTextI,paste0("!j!i!r",IV$name," "),
                    paste0("!j",brawFormat(mean(s1,na.rm=TRUE),digits=braw.env$report_precision)),
                    paste0("!j",brawFormat(sd(s1,na.rm=TRUE),digits=braw.env$report_precision)),
                    paste0("!j",brawFormat(skewness(s1,na.rm=TRUE),digits=braw.env$report_precision)),
@@ -49,7 +49,7 @@ reportSample<-function(sample=braw.res$result){
   if (no_ivs>1){
     s1a<-sample$iv2
     if (IV2$type=="Interval"){
-      outputTextI<-c(outputTextI,paste0("!j!i",IV2$name," "),
+      outputTextI<-c(outputTextI,paste0("!j!i!r",IV2$name," "),
                      paste0("!j",brawFormat(mean(s1a,na.rm=TRUE),digits=braw.env$report_precision)),
                      paste0("!j",brawFormat(sd(s1a,na.rm=TRUE),digits=braw.env$report_precision)),
                      paste0("!j",brawFormat(skewness(s1a,na.rm=TRUE),digits=braw.env$report_precision)),
@@ -61,7 +61,7 @@ reportSample<-function(sample=braw.res$result){
     }
   }
   if (DV$type=="Interval"){
-    outputTextI<-c(outputTextI,paste0("!j!i",DV$name," "),
+    outputTextI<-c(outputTextI,paste0("!j!i!r",DV$name," "),
                    paste0("!j",brawFormat(mean(s2,na.rm=TRUE),digits=braw.env$report_precision)),
                    paste0("!j",brawFormat(sd(s2,na.rm=TRUE),digits=braw.env$report_precision)),
                    paste0("!j",brawFormat(skewness(s2,na.rm=TRUE),digits=braw.env$report_precision)),
@@ -73,7 +73,8 @@ reportSample<-function(sample=braw.res$result){
   }
   if (done_interval){
     outputText<-c(outputText,"\b!jInterval Variables",rep("",nc-1))
-    outputText<-c(outputText,"","\b!cmean","\b!csd","\b!cskew","\b!ckurtosis","\b!cmedian","\b!ciqr",
+    outputText<-c(outputText,rep("",nc))
+    outputText<-c(outputText,"!n ","\b!c!umean","\b!c!usd","\b!c!uskew","\b!c!ukurtosis","\b!c!umedian","\b!c!uiqr",
                   outputTextI,rep("",nc))
   }
 
@@ -81,7 +82,7 @@ reportSample<-function(sample=braw.res$result){
   outputTextO=c()
   done_ordinal<-FALSE
   if (IV$type=="Ordinal"){
-    outputTextO<-c(outputTextO,paste0("!j!i",IV$name," "),
+    outputTextO<-c(outputTextO,paste0("!j!i!r",IV$name," "),
                    paste0("!j",brawFormat(median(s1),digits=braw.env$report_precision)),  
                    paste0("!j",brawFormat(iqr(s1),digits=braw.env$report_precision)),
                    paste0("!j",brawFormat(mean(s1),digits=braw.env$report_precision)),  
@@ -92,7 +93,7 @@ reportSample<-function(sample=braw.res$result){
   }
   if (no_ivs>1){
     if (IV2$type=="Ordinal"){
-    outputTextO<-c(outputTextO,paste0("!j!i",IV2$name," "),
+    outputTextO<-c(outputTextO,paste0("!j!i!r",IV2$name," "),
                    paste0("!j",brawFormat(median(s1a),digits=braw.env$report_precision)),  
                    paste0("!j",brawFormat(iqr(s1a),digits=braw.env$report_precision)),
                    paste0("!j",brawFormat(mean(s1a),digits=braw.env$report_precision)),  
@@ -103,7 +104,7 @@ reportSample<-function(sample=braw.res$result){
     }
   }
   if (DV$type=="Ordinal"){
-    outputTextO<-c(outputTextO,paste0("!j!i",DV$name," "),
+    outputTextO<-c(outputTextO,paste0("!j!i!r",DV$name," "),
                    paste0("!j",brawFormat(median(s2),digits=braw.env$report_precision)),  
                    paste0("!j",brawFormat(iqr(s2),digits=braw.env$report_precision)),
                    paste0("!j",brawFormat(mean(s2),digits=braw.env$report_precision)),  
@@ -114,7 +115,8 @@ reportSample<-function(sample=braw.res$result){
   }
   if (done_ordinal){
     outputText<-c(outputText,"\b!jOrdinal Variables",rep("",nc-1))
-    outputText<-c(outputText,"","\b!jmedian","\b!jiqr","\bmean","\b!jsd","","",
+    outputText<-c(outputText,rep("",nc))
+    outputText<-c(outputText,"!n ","\b!j!umedian","\b!j!uiqr","\bmean","\b!j!usd","","",
                   outputTextO,rep("",nc))
   }
 
@@ -131,7 +133,7 @@ reportSample<-function(sample=braw.res$result){
     mode<-which.max(table(s1))
     mode<-mode[1]
     deviance<-(sum(s1!=mode)+(length(s1)-sum(s1==mode)))/length(s1)
-    outputTextC<-c(outputTextC,paste0("!j!i",IV$name," "),
+    outputTextC<-c(outputTextC,paste0("!j!i!r",IV$name," "),
                    paste0("!j",counts),
                    paste0("!j",IV$cases[mode]),
                    paste0("!j",brawFormat(deviance,digits=2)),
@@ -150,7 +152,7 @@ reportSample<-function(sample=braw.res$result){
       mode<-which.max(table(s1a))
       mode<-mode[1]
       deviance<-(sum(s1a!=mode)+(length(s1a)-sum(s1a==mode)))/length(s1a)
-      outputTextC<-c(outputTextC,paste0("!j!i",IV2$name," "),
+      outputTextC<-c(outputTextC,paste0("!j!i!r",IV2$name," "),
                      paste0("!j",counts),
                      paste0("!j",IV2$cases[mode]),
                      paste0("!j",brawFormat(deviance,digits=2)),
@@ -168,7 +170,7 @@ reportSample<-function(sample=braw.res$result){
     mode<-which.max(table(s2))
     mode<-mode[1]
     deviance<-(sum(s2!=mode)+(length(s2)-sum(s2==mode)))/length(s2)
-    outputTextC<-c(outputTextC,paste0("!j!i",DV$name," "),
+    outputTextC<-c(outputTextC,paste0("!j!i!r",DV$name," "),
                    paste0("!j",counts),
                    paste0("!j",DV$cases[mode]),
                    paste0("!j",brawFormat(deviance,digits=2)),
@@ -177,13 +179,16 @@ reportSample<-function(sample=braw.res$result){
   }
   if (done_categorical){
     outputText<-c(outputText,"\b!jCategorical Variables",rep("",nc-1))
-    outputText<-c(outputText,"","\b!ccounts","\b!cmode","\b!cdeviance","","","",
-                  outputTextC,rep("",nc))
+    outputText<-c(outputText,rep("",nc))
+    outputText<-c(outputText,"!n ","\b!c!ucounts","\b!c!umode","\b!c!udeviance","","","",
+                  outputTextC)
   }
+  outputText<-c(outputText,rep(" ",nc))
   
+  outputText<-c(outputText,rep("",nc))
   outputText<-c(outputText,
                 "\bDesign","","","","","","",
-                "","\b!cSample Size","\b!cMethod","\b!cUsage","","","",
+                "!n ","\b!c!uSample Size","\b!c!uMethod","\b!c!uUsage","","","",
                 "",paste0("!c",sample$nval),paste0("!c",design$sMethod$type),paste0("!c",design$sIV1Use),"","",""
   )
   

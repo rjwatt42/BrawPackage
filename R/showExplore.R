@@ -55,7 +55,7 @@ trimExploreResult<-function(result,nullresult) {
 #'                        effectType="unique",whichEffect="All")
 #' @export
 showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension="1D",showTheory=FALSE,
-                      effectType="unique",whichEffect="All",quantileShow=0.5){
+                      effectType="unique",whichEffect="Mains",quantileShow=0.5){
 
   if (is.null(exploreResult)) exploreResult=doExplore()
 
@@ -218,12 +218,24 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   yn<-yn+1
   lb3xy<-data.frame(x=max(xlim),y=0+yn/10)
   
+  exploreTypeShow<-explore$exploreType
+  if (is.element(explore$exploreType,c("rIV","rIV2","rIVIV2","rIVIV2DV"))) {
+    if (is.null(hypothesis$IV2)) {
+      exploreTypeShow<-bquote(bold(r[p]))
+    } else {
+      exploreTypeShow<-bquote(bold(r[p] ~ .(gsub("^r","",explore$exploreType))))
+    }
+  } else exploreTypeShow<-bquote(bold(.(explore$exploreType)))
+  
   for (whichEffect in whichEffects) {
     # print(c(whichEffect,size(plotYOffset)))
     if (plotHeight==1) braw.env$plotArea<-c(0.475*(si-1)+0.025*si,0,plotWidth,plotHeight)
     else               braw.env$plotArea<-c(0.475*(si-1)+0.025*si,plotYOffset[1,whichEffect],plotWidth,plotHeight)
     g<-startPlot(xlim,ylim,box="Both",top=TRUE,tight=TRUE,g=g)
-    g<-g+xAxisTicks(xbreaks,xnames,logScale=explore$xlog)+xAxisLabel(bquote(bold(.(explore$exploreType))))
+    
+    g<-g+xAxisTicks(xbreaks,xnames,logScale=explore$xlog)
+    g<-g+xAxisLabel(exploreTypeShow)
+
     if ((showType[si]=="rs") && (!is.null(hypothesis$IV2))) switch(whichEffect,ylabel<-"Main 1",ylabel<-"Main 2",ylabel<-"Interaction")
     g<-g+yAxisTicks(logScale=yaxis$logScale)+yAxisLabel(ylabel)
     col<-darken(ycols[1],off=-0.2)
@@ -716,7 +728,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
         n80<-optimize(minnw,c(0,0.8),w=0.8,n=n_est)
         
         if (sum(r<n80$minimum)>=2 && sum(r>n80$minimum)>=2){
-          label<-paste("r80 =",format(n80$minimum,digits=2))
+          label<-paste("r80 =",brawFormat(n80$minimum,digits=2))
         } else {
           if (sum(r<n80$minimum)<2) label<-paste("Unsafe result - decrease range")
           if (sum(r>n80$minimum)<2) label<-paste("Unsafe result - increase range")

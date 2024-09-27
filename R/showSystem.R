@@ -88,7 +88,7 @@ showWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),g=NULL) {
   range<-braw.env$r_range
   if (braw.env$RZ=="z"){range<-tanh(braw.env$z_range)}
 
-  g<-startPlot(xlim=c(-1,1)*range,ylim=c(0,1.05),box="x",g=g)
+  g<-startPlot(xlim=c(-1,1)*range,ylim=c(0,1.05),box="x",g=g,fontScale=1)
   # if (world$worldAbs) {
   #   rx<-seq(0,1,length.out=braw.env$worldNPoints)*range
   # } else {
@@ -149,7 +149,7 @@ showDesign<-function(design=braw.def$design,hypothesis=braw.def$hypothesis,plotA
   if (is.null(g))
     g<-ggplot()+coord_cartesian(xlim = c(0,1)+c(-1,1)*0.1, ylim = c(0,1)+c(-1,1)*0.1) + braw.env$blankTheme()
   g<-startPlot(xlim=binRange, ylim=c(0,1),
-               box="x",g=g)
+               box="x",g=g,fontScale=1)
   g<-g+xAxisTicks(nRange$ticks,10^nRange$ticks)+xAxisLabel(nRange$label)
   g<-g+dataPolygon(data=pts,fill=braw.env$plotColours$descriptionC)
   g<-g+dataLine(data=pts)

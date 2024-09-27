@@ -30,8 +30,13 @@ reOrientXY<-function(data,orientation=braw.env$plotLimits$orientation) {
          "horz"={data},
          "vert"={data.frame(x=data$y,y=data$x)})
 }
+reSizeFont<-function(size) {
+  size*braw.env$labelSize*braw.env$plotLimits$fontScale
+}
 
 plotLimits<-function(xlim,ylim,orientation,gaps=c(1,1,0,0),fontScale=1) {
+  if (is.null(fontScale)) fontScale<-min(braw.env$plotArea[3:4])^0.5
+    
   switch(orientation,
          "horz"={braw.env$plotLimits<-list(xlim=xlim,ylim=ylim,xsc=xlim,ysc=ylim,
                                            orientation=orientation,gap=gaps,fontScale=fontScale,
@@ -42,7 +47,7 @@ plotLimits<-function(xlim,ylim,orientation,gaps=c(1,1,0,0),fontScale=1) {
          )
 }
 
-startPlot<-function(xlim=c(0,1),ylim=c(0,1),box="both",top=FALSE,tight=FALSE,backC=braw.env$plotColours$graphBack,orientation="horz",fontScale=1,g=NULL) {
+startPlot<-function(xlim=c(0,1),ylim=c(0,1),box="both",top=FALSE,tight=FALSE,backC=braw.env$plotColours$graphBack,orientation="horz",fontScale=NULL,g=NULL) {
   minGap<-0.05
   maxGap<-0.125
   if (tight) maxGap<-0.075
@@ -119,12 +124,12 @@ xAxisLabel<-function(label) {
          "vert"={
            geom_text(data=axis,aes(x=x,y=y),label=label, parse = TRUE,
                      hjust=0.5,vjust=-voff/1.5,
-                     size=braw.env$labelSize*1.25*braw.env$plotLimits$fontScale,angle=90,fontface="bold")      
+                     size=reSizeFont(1.25),angle=90,fontface="bold")      
          },
          "horz"={
            geom_text(data=axis,aes(x=x,y=y),label=label, parse = TRUE,
                      hjust=0.5,vjust=4/1.5,
-                     size=braw.env$labelSize*1.25*braw.env$plotLimits$fontScale,angle=0,fontface="bold")      
+                     size=reSizeFont(1.25),angle=0,fontface="bold")      
          }
   )
 }
@@ -143,12 +148,12 @@ yAxisLabel<-function(label){
          "vert"={
            geom_text(data=axis,aes(x=x,y=y),label=label, parse = TRUE,
                      hjust=0.5,vjust=2/1.5,
-                     size=braw.env$labelSize*1.25*braw.env$plotLimits$fontScale,angle=0,fontface="bold")      
+                     size=reSizeFont(1.25),angle=0,fontface="bold")      
          },
          "horz"={
            geom_text(data=axis,aes(x=x,y=y),label=label, parse = TRUE,
                      hjust=0.5,vjust=-voff,
-                     size=braw.env$labelSize*1.25*braw.env$plotLimits$fontScale,angle=90,fontface="bold")      
+                     size=reSizeFont(1.25),angle=90,fontface="bold")      
          }
   )
 }
@@ -167,11 +172,11 @@ yAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE){
   switch(braw.env$plotLimits$orientation,
          "vert"={
            geom_text(data=ticks,aes(x=x,y=y),label=labels,hjust=0.5,vjust=1.1,
-                     size=braw.env$labelSize*mn*braw.env$plotLimits$fontScale)
+                     size=reSizeFont(mn))
          },
          "horz"={
            geom_text(data=ticks,aes(x=x,y=y),label=labels,hjust=1.1,vjust=0.5,
-                     size=braw.env$labelSize*mn*braw.env$plotLimits$fontScale)
+                     size=reSizeFont(mn))
          }
   )
 }
@@ -193,7 +198,7 @@ xAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE,angle=0){
   switch(braw.env$plotLimits$orientation,
          "vert"={
            geom_text(data=ticksTop,aes(x=x,y=y),label=labels,hjust=1.1,vjust=0.5,
-                     size=braw.env$labelSize*mn*braw.env$plotLimits$fontScale)
+                     size=reSizeFont(mn))
          },
          "horz"={
            if (angle==0) {
@@ -205,7 +210,7 @@ xAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE,angle=0){
              mn<-mn*0.75
            }
            geom_text(data=ticksTop,aes(x=x,y=y),label=labels,hjust=hjust,vjust=vjust,
-                     size=braw.env$labelSize*mn*braw.env$plotLimits$fontScale,angle=angle)
+                     size=reSizeFont(mn),angle=angle)
          }
   )
 }
@@ -235,13 +240,13 @@ dataLabel<-function(data,label, hjust=0, vjust=0, fill="white",colour="black",pa
                       hjust=hjust, vjust=vjust, nudge_y=voff,
                fill=fill,color=colour,fontface=fontface,
                label.padding=unit(0.1, "lines"),label.size=label.size,
-               size=size*braw.env$labelSize*braw.env$plotLimits$fontScale,parse=parser),
+               size=reSizeFont(size),parse=parser),
          "vert"=   
            geom_label(data=data,aes(x = x, y = y), label=label, 
                       hjust=vjust,vjust=hjust,  nudge_y=voff,
                       label.padding=unit(0.1, "lines"),label.size=label.size,
                fill=fill,color=colour,fontface=fontface,
-               size=size*braw.env$labelSize),parse=TRUE
+               size=reSizeFont(size)),parse=TRUE
   )
   
 }
@@ -259,12 +264,12 @@ dataText<-function(data,label, hjust=0, vjust=0, colour="black",size=1,fontface=
          "horz"=
            geom_text(data=data,aes(x = x, y = y), label=label, hjust=hjust, vjust=vjust, 
                color=colour,fontface=fontface,
-               size=size*braw.env$labelSize,parse=TRUE),
+               size=reSizeFont(size),parse=TRUE),
          "vert"=   
            geom_text(data=data,aes(x = x, y = y), label=label, hjust=vjust, 
                vjust=hjust, 
                color=colour,fontface=fontface,
-               size=size*braw.env$labelSize),parse=TRUE
+               size=reSizeFont(size),parse=TRUE)
   )
   
 }
@@ -330,7 +335,7 @@ dataLegend<-function(data,title="title",fontsize=1.2) {
     title<-deparse(bquote(bold(.(title))))
   }
   
-  fontsize<-fontsize*braw.env$labelSize
+  fontsize<-reSizeFont(fontsize*0.8)
   names<-data$names
   width<-(max(nchar(names))*fontsize + 4*3.2)*braw.env$graphicsSize[1]/3200
   height<-(length(names)*fontsize + 1*3.2)*braw.env$graphicsSize[1]/800
@@ -352,9 +357,9 @@ dataLegend<-function(data,title="title",fontsize=1.2) {
     geom_point(data=data.frame(x=ptsX,y=ptsY),
                aes(x=x,y=y),shape=21,size=fontsize,colour="black",fill=colours),
     geom_text(data=data.frame(x=ptsX+legX[2]*0.025,y=ptsY,label=names),
-              aes(x=x,y=y,label=label),hjust=0,size=fontsize*0.8),
+              aes(x=x,y=y,label=label),hjust=0,size=fontsize),
     geom_text(data=data.frame(x=ptsX[1],y=titleY,label=title),
-              aes(x=x,y=y,label=label),hjust=0,size=fontsize*0.8,parse=TRUE)
+              aes(x=x,y=y,label=label),hjust=0,size=fontsize,parse=TRUE)
   )
 }
 

@@ -40,13 +40,20 @@ reportLikelihood<-function(possibleResult=braw.res$possibleResult){
   row<-1
   outputText[1+nc*row]<-"\bEstimates  "
   row<-row+1
-  outputText[2+nc*row]<-"\b!cr[s]     "
-  outputText[3+nc*row]<-"\b!cr[mle]   "
-  outputText[4+nc*row]<-"\b!cr[mle](+)"
+  outputText[1+nc*row]<-"!n "
+  outputText[2+nc*row]<-"\b!c!ur[s]"
+  outputText[3+nc*row]<-"\b!c!ur[mle]"
+  outputText[4+nc*row]<-"\b!c!ur[mle](+)"
   row<-row+1
   outputText[2+nc*row]<-paste0("!j",brawFormat(targetSample))
   outputText[3+nc*row]<-paste0("!j",brawFormat(rp_peak_full))
   outputText[4+nc*row]<-paste0("!j",brawFormat(rp_peak_plus))
+  
+  row<-row+1
+  outputText[1+nc*row]<-" "
+  outputText[2+nc*row]<-" "
+  outputText[3+nc*row]<-" "
+  outputText[4+nc*row]<-" "
   
   row<-row+1
   outputText[1+nc*row]<-""
@@ -59,10 +66,10 @@ reportLikelihood<-function(possibleResult=braw.res$possibleResult){
   row<-row+1
   # outputText[2+nc*row]<-"\b!cplus "
   # outputText[3+nc*row]<-"\b!cnull "
-  outputText[2+nc*row]<-"\b!cLLR "
+  outputText[2+nc*row]<-"\b!c!uLLR "
   
   row<-row+1
-  outputText[1+nc*row]<-"!jsLLR(r[s]/r[0] | r[s])"
+  outputText[1+nc*row]<-"!j!r!nsLLR(r[s]/r[0] | r[s])"
   # outputText[2+nc*row]<-paste0("!j",brawFormat(log(llrA)))
   # outputText[3+nc*row]<-paste0("!j",brawFormat(log(llr0)))
   outputText[2+nc*row]<-paste0("!j",brawFormat(log(llrA/llr0)))
@@ -75,7 +82,7 @@ reportLikelihood<-function(possibleResult=braw.res$possibleResult){
   if (possibleResult$possible$UsePrior!="none" && possibleResult$prior$populationNullp>0) {
     
   row<-row+1
-  outputText[1+nc*row]<-"!jPrior(r[+]/r[0] | r[s])"
+  outputText[1+nc*row]<-"!j!r!nPrior(r[+]/r[0] | r[s])"
   # outputText[2+nc*row]<-paste0("!j",brawFormat(log(llrAP)-log(llrA)))
   # outputText[3+nc*row]<-paste0("!j",brawFormat(log(llr0P)-log(llr0)))
   outputText[2+nc*row]<-paste0("!j",brawFormat((log(llrAP)-log(llrA))-(log(llr0P)-log(llr0))))

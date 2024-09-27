@@ -17,7 +17,7 @@
 #' @export
 showExpected<-function(expectedResult=braw.res$expected,showType="Basic",
                        dimension="1D",orientation="vert",
-                       whichEffect="Main 1",effectType="direct",showTheory=braw.env$showTheory
+                       whichEffect="Mains",effectType="direct",showTheory=braw.env$showTheory
 ) {
   if (is.null(expectedResult)) expectedResult=doExpected(autoShow=FALSE)
   if (is.numeric(expectedResult)) expectedResult=doExpected(expectedResult,autoShow=FALSE)

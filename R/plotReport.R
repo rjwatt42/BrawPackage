@@ -8,10 +8,10 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
     outputFront<-paste0("<div style=padding:10px;",mainStyle,">")
     outputBack<-'</div>'
     if (!is.null(outputText)) {
-      outputFront<-paste0(outputFront,"<table>")
+      outputFront<-paste0(outputFront,"<table style=padding:1px;>")
       index<-0
       topLine<-TRUE
-      for (j in 1:nr) {paste0(outputFront,"<tr>")
+      for (j in 1:nr) {paste0(outputFront,"<tr style=padding:0px;>")
           for (i in 1:nc) {
             index<-index+1
             localStyle<-paste0(" style=font-size:",format(braw.env$labelSize*fontSize*3),"px;")
@@ -31,7 +31,21 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
               localStyle<-paste0(localStyle,"text-align:center;")
               outputText[index]<-sub("!c","",outputText[index])
             }
-            localStyle<-paste0(localStyle,"padding:5px;padding-top:0px;padding-bottom:0px;")
+            if (grepl("!n",outputText[index])) {
+              localStyle<-paste0(localStyle,"width:100px;")
+              outputText[index]<-sub("!n","",outputText[index])
+            }
+            if (grepl("!u",outputText[index])) {
+              localStyle<-paste0(localStyle,"border-bottom:solid;")
+              outputText[index]<-sub("!u","",outputText[index])
+            }
+            if (grepl("!r",outputText[index])) {
+              localStyle<-paste0(localStyle,"border-right:solid;border-right-color:#888888;border-right-width:1px;")
+              outputText[index]<-sub("!r","",outputText[index])
+            }
+            if (nchar(gsub(" ","",outputText[index]))==0 && nchar(outputText[index])>0) 
+              localStyle<-paste0(localStyle,"padding:5px;")
+            else localStyle<-paste0(localStyle,"padding:5px;padding-top:0px;padding-bottom:0px;")
 
             outputText[index]<-gsub("\\[([a-zA-Z0-9_+-]*)\\]","<sub>\\1</sub>",outputText[index])
             outputText[index]<-gsub("\\^([a-zA-Z0-9_+-]*)([a-zA-Z0-9_]*)","<sup>\\1</sup>",outputText[index])
@@ -44,7 +58,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
         topLine<-FALSE
         if (index+nc<=length(outputText))
         if (all(sapply(outputText[index+(1:nc)],nchar)==0)) {
-          outputFront<-paste0(outputFront,"</table><p> </p><table>")
+          outputFront<-paste0(outputFront,"</table><table style=padding:1px;>")
           topLine<-TRUE
         }
       }

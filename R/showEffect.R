@@ -39,7 +39,7 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
     g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
   if (!is.null(plotArea)) braw.env$plotArea<-plotArea
   
-  g<-startPlot(xlim=c(-1,1),ylim=c(0,1),back="transparent",box="none",g=g)
+  g<-startPlot(xlim=c(-1,1),ylim=c(0,1),back="transparent",box="none",g=g,fontScale=1)
   
   switch (t,
           {start=c(0,0.92)
