@@ -199,6 +199,9 @@ model2directeffect<-function(mF){
             v<-c(v,mean(predict.lm(mF,rawData)))
           }
         }
+        # this next happens when there is a negative correlation between the 
+        # main effect term and the interaction term
+        # if (wsd(v)/DVgain>1) browser()
         ncoeff1<-wsd(v) * sign(sum(diff(v)))
     } else {
       terms<-strsplit(mTerms[iTerm],":")

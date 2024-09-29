@@ -206,7 +206,7 @@ makeDesign<-function(sN=42, sMethod=makeSampling("Random") ,sNRand=FALSE,sNRandK
 #'              prior=makeWorld(TRUE,"Uniform","r"))
 #' @export
 makeEvidence<-function(shortHand=FALSE,sigOnly=FALSE,
-                       rInteractionOn=TRUE,rInteractionOnly=TRUE,ssqType="Type3",
+                       rInteractionOn=FALSE,rInteractionOnly=TRUE,ssqType="Type3",
                        caseOrder="Alphabetic",
                        llr=list(e1=c(),e2=0),
                        Welch=FALSE,Transform="None",

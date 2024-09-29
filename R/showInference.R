@@ -61,7 +61,7 @@ getNulls<-function(analysis,useSig=FALSE,useNSig=FALSE) {
 #'               showTheory=TRUE)
 #' @export
 showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D",orientation="vert",
-                        whichEffect="Main 1",effectType="all",showTheory=braw.env$showTheory
+                        whichEffect="All",effectType="all",showTheory=braw.env$showTheory
 ) {
   if (is.null(analysis)) analysis<-doResult(autoShow=FALSE)
   
@@ -116,6 +116,7 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
   } else {
     area.off<-0
     area.y<-1
+    if (whichEffect=="All" && !analysis$evidence$rInteractionOn) whichEffect<-"Mains"
     if (!is.null(analysis$hypothesis$IV2)) {
       if (whichEffect=="All") {
         whichEffect<-c("Main 1","Main 2","Interaction")

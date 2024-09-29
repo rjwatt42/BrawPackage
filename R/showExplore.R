@@ -55,7 +55,7 @@ trimExploreResult<-function(result,nullresult) {
 #'                        effectType="unique",whichEffect="All")
 #' @export
 showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension="1D",showTheory=FALSE,
-                      effectType="unique",whichEffect="Mains",quantileShow=0.5){
+                      effectType="unique",whichEffect="All",quantileShow=0.5){
 
   if (is.null(exploreResult)) exploreResult=doExplore()
 
@@ -68,7 +68,8 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
            {}
     )
   }
-
+  if (length(showType)>1 && showType[2]==" ") showType<-showType[1]
+  
   if (!exploreResult$hypothesis$effect$world$worldOn && is.element(showType[1],c("NHST","Hits","Misses"))) {
     if (exploreResult$nullcount<exploreResult$count) {
       exploreResult<-doExplore(0,exploreResult,doingNull=TRUE)
@@ -100,46 +101,45 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     vals<-atanh(vals)
   }
   
-  if (length(showType)==1) {
-    plotYOffset<-matrix(0)
-    plotWidth<-0.9
-    plotHeight<-1
-    if (!is.null(hypothesis$IV2) && whichEffect=="All") {
-      plotYOffset<-matrix(c(0.666,0.333,0),nrow=1,byrow=TRUE)
-      plotWidth<-0.35
-      plotHeight<-1
-    }
-    if (!is.null(hypothesis$IV2) && whichEffect=="Mains") {
-      plotYOffset<-matrix(c(0.5,0),nrow=1,byrow=TRUE)
-      plotWidth<-0.5
-      plotHeight<-1
-    }
-  } else {
-    plotYOffset<-matrix(0)
+  if (whichEffect=="All" && !evidence$rInteractionOn) whichEffect<-"Mains"
+  
+  plotYOffset<-matrix(0)
+  plotHeight<-1
+  if (!is.null(hypothesis$IV2) && whichEffect=="All") {
+    plotYOffset<-matrix(c(0.666,0.333,0),nrow=1,byrow=TRUE)
     plotWidth<-0.475
-    plotHeight<-1
-    if (!is.null(hypothesis$IV2) && whichEffect=="All") {
-      plotYOffset<-matrix(c(0.666,0.333,0),nrow=1,byrow=TRUE)
-      plotWidth<-0.475
-      plotHeight<-0.32
-    }
-    if (!is.null(hypothesis$IV2) && whichEffect=="Mains") {
-      plotYOffset<-matrix(c(0.5,0),nrow=1,byrow=TRUE)
-      plotWidth<-0.475
-      plotHeight<-0.47
-    }
+    plotHeight<-0.32
+  }
+  if (!is.null(hypothesis$IV2) && whichEffect=="Mains") {
+    plotYOffset<-matrix(c(0.5,0),nrow=1,byrow=TRUE)
+    plotWidth<-0.475
+    plotHeight<-0.47
   }
   
-  switch (whichEffect,
-          "Main 1"=whichEffects<-1,
-          "Main 2"=whichEffects<-2,
-          "Interaction"=whichEffects<-3,
-          "rIV"=whichEffects<-1,
-          "rIV2"=whichEffects<-2,
-          "rIVIV2DV"=whichEffects<-3,
-          "Mains"=whichEffects<-1:2,
-          "All"=whichEffects<-1:3
-  )
+  if (plotHeight==1) {
+    plotXOffset<-matrix(0)+0.05
+    plotWidth<-0.9
+  } else {
+    plotXOffset<-matrix(0)+0.15
+    plotWidth<-0.7
+  } 
+  if (length(showType)>1) {
+    plotXOffset<-matrix(c(0,0.5)+0.05,nrow=2,byrow=FALSE)
+    plotWidth<-0.475
+  }
+  
+  if (is.null(hypothesis$IV2)) whichEffects<-1
+  else
+    switch (whichEffect,
+            "Main 1"=whichEffects<-1,
+            "Main 2"=whichEffects<-2,
+            "Interaction"=whichEffects<-3,
+            "rIV"=whichEffects<-1,
+            "rIV2"=whichEffects<-2,
+            "rIVIV2DV"=whichEffects<-3,
+            "Mains"=whichEffects<-1:2,
+            "All"=whichEffects<-1:3
+    )
   
   if (is.character(vals[1]) || length(vals)<10) {
     xlim<-c(0,length(vals)+1)
@@ -228,19 +228,26 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   } else exploreTypeShow<-bquote(bold(.(explore$exploreType)))
   
   for (whichEffect in whichEffects) {
-    # print(c(whichEffect,size(plotYOffset)))
-    if (plotHeight==1) braw.env$plotArea<-c(0.475*(si-1)+0.025*si,0,plotWidth,plotHeight)
-    else               braw.env$plotArea<-c(0.475*(si-1)+0.025*si,plotYOffset[1,whichEffect],plotWidth,plotHeight)
+    yi<-which(whichEffect == whichEffects)
+    if (length(showType)==1 && !is.null(hypothesis$IV2))  {
+      useLabel<-c(bquote(bold("Main 1")),bquote(bold("Main 2")),bquote(bold("Interaction")))[whichEffect]
+    } else {
+      useLabel<-""
+    }
+    braw.env$plotArea<-c(plotXOffset[si,1],plotYOffset[1,yi],plotWidth,plotHeight)
+    # if (plotHeight==1) braw.env$plotArea<-c(plotXOffset[si,1],0,plotWidth,plotHeight)
+    # else               braw.env$plotArea<-c(0.475*(si-1)+0.025*si,plotYOffset[1,whichEffect],plotWidth,plotHeight)
     g<-startPlot(xlim,ylim,box="Both",top=TRUE,tight=TRUE,g=g)
     
     g<-g+xAxisTicks(xbreaks,xnames,logScale=explore$xlog)
     g<-g+xAxisLabel(exploreTypeShow)
-
+    if (nchar(useLabel)>0)    g<-g+plotTitle(useLabel,size=1.5)
+    
     if ((showType[si]=="rs") && (!is.null(hypothesis$IV2))) switch(whichEffect,ylabel<-"Main 1",ylabel<-"Main 2",ylabel<-"Interaction")
     g<-g+yAxisTicks(logScale=yaxis$logScale)+yAxisLabel(ylabel)
     col<-darken(ycols[1],off=-0.2)
     
-    for (effectType in effectTypes) {
+      for (effectType in effectTypes) {
       col<-darken(col,off=0.1)
     theoryVals<-NULL
     theoryUpper<-NULL
@@ -621,6 +628,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
             g<-g+dataLine(data.frame(x=vals,y=y62),colour="white",alpha=0.6)
           }
           pts0f<-data.frame(x=vals,y=y50)
+          
           g<-g+dataLine(data=pts0f)
           g<-g+dataPoint(data=pts0f,fill=col,size=4)
         } else {
@@ -686,7 +694,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       }
       
       # find n80
-      if (showType[si]=="p(sig)" && explore$exploreType=="n" && effect$world$populationPDF=="Single" && showPower){
+      if (is.null(hypothesis$IV2) && showType[si]=="p(sig)" && explore$exploreType=="n" && effect$world$populationPDF=="Single" && showPower){
         w<-y50
         n<-exploreResult$vals
         minrw<-function(r,w,n){sum(abs(w-rn2w(r,n)),na.rm=TRUE)}
@@ -713,7 +721,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       }
       
       # find r80
-      if (showType[si]=="p(sig)" && explore$exploreType=="rIV" && showPower){
+      if (is.null(hypothesis$IV2) && showType[si]=="p(sig)" && explore$exploreType=="rIV" && showPower){
         w<-y50
         r<-exploreResult$vals
         minrw<-function(r,w,n){sum(abs(w-rn2w(r,n)),na.rm=TRUE)}

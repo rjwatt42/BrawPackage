@@ -6,14 +6,17 @@
 #' @examples
 #' showExplore(exploreResult=doExplore(),
 #'                        showType="rs",
-#'                        whichEffect="All",effectType="All")
+#'                        whichEffect="All",effectType="all")
 #' @export
 reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                         whichEffect="All",effectType="all",quantileShow=0.5
 ){
   if (is.null(exploreResult)) exploreResult<-doExplore(autoShow=FALSE)
   
+  precision<-braw.env$report_precision-1
+  
   reportQuants<-FALSE
+  reportIQRs<-TRUE
   reportMeans<-FALSE
   
   showType<-strsplit(showType,";")[[1]]
@@ -30,6 +33,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
   explore<-exploreResult$explore
   hypothesis<-exploreResult$hypothesis
   effect<-hypothesis$effect
+  evidence<-exploreResult$evidence
   
   oldAlpha<-braw.env$alphaSig
   on.exit(braw.env$alphaSig<-oldAlpha)
@@ -44,7 +48,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
   } else {
     useVals<-1:length(vals)
   }
-  nc<-length(useVals)+1
+  nc<-length(useVals)+2
 
   exploreTypeShow<-explore$exploreType
   if (is.element(explore$exploreType,c("rIV","rIV2","rIVIV2","rIVIV2DV"))) {
@@ -54,41 +58,52 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
       exploreTypeShow<-paste0("r[p]",gsub("^r","",explore$exploreType))
     }
   } else exploreTypeShow<-explore$exploreType
+
+  outputText<-rep("",nc)
+  outputText[1]<-paste0("!TExplore: ")
+  outputText[2]<-paste0("nsims = ",format(nrow(exploreResult$result$rval)))
+  outputText<-c(outputText,rep("",nc))
   
-  if (effectType=="all") {effectType<-"direct"}
-  if (is.null(hypothesis$IV2)) y_label2<-c()
-  else y_label2<-effectType
-    
-  outputText<-rep("",nc+1)
-  outputText[1]<-paste0("!j\bExplore: ")
-  outputText[2]<-paste("nsims = ",format(nrow(exploreResult$result$rval)),sep="")
   
-  outputText<-c(outputText,rep("",nc+1))
-  
-  place<-ceiling(length(useVals)/2)
-  place<-2
-  outputText<-c(outputText,rep("",place),paste0("\b",exploreTypeShow),rep("",nc-place))
-  outputText<-c(outputText,paste0("\b",y_label2),"")
-  if (explore$exploreType=="rIV" && braw.env$RZ=="z")  vals<-atanh(vals)
-  for (i in 1:length(useVals)) {
-    if (is.numeric(vals[useVals[i]]))
-      outputText<-c(outputText,paste0("!c!i!u",brawFormat(vals[useVals[i]],digits=braw.env$report_precision)," "))
-    else 
-      outputText<-c(outputText,paste0("!c!i!u",vals[useVals[i]]," "))
+  if (is.null(hypothesis$IV2))    {
+    effectTypes<-"direct"
+    whichEffects<-"Main 1"
+  } else {
+    if (effectType=="all") effectTypes<-c("direct","unique","total")
+    else effectTypes<-effectType
+    whichEffects<-whichEffect
+    if (whichEffect=="All" && !evidence$rInteractionOn) whichEffect<-"Mains"
+    if (whichEffect=="All")   {whichEffects<-c("Main 1","Main 2","Interaction")}
+    if (whichEffect=="Mains") {whichEffects<-c("Main 1","Main 2")}
+    if (whichEffect=="rIV") {whichEffects<-"Main 1"}
+    if (whichEffect=="rIV2") {whichEffects<-"Main 2"}
+    if (whichEffect=="rIVIV2DV") {whichEffects<-"Interaction"}
   }
+  if (length(effectTypes)>1) reportIQRs<-FALSE
   
-  
-  if (is.null(hypothesis$IV2))    whichEffects<-"Main 1"
-    else {
-      whichEffects<-whichEffect
-      if (whichEffect=="All")   {whichEffects<-c("Main 1","Main 2","Interaction")}
-      if (whichEffect=="Mains") {whichEffects<-c("Main 1","Main 2")}
-      if (whichEffect=="rIV") {whichEffects<-"Main 1"}
-      if (whichEffect=="rIV2") {whichEffects<-"Main 2"}
-      if (whichEffect=="rIVIV2DV") {whichEffects<-"Interaction"}
-    }
+  tableHeader<-FALSE
   for (whichEffect in whichEffects)  {
-    y_label<-showType
+    for (effectType in effectTypes) {
+      if (!tableHeader) {
+        outputText<-c(outputText,rep(" ",2),paste0("!T",exploreTypeShow),rep(" ",nc-3))
+        headerText<-c(paste0("!H!C"),"!D ")
+        if (explore$exploreType=="rIV" && braw.env$RZ=="z")  vals<-atanh(vals)
+        for (i in 1:length(useVals)) {
+          if (is.numeric(vals[useVals[i]]))
+            headerText<-c(headerText,brawFormat(vals[useVals[i]],digits=precision))
+          else 
+            headerText<-c(headerText,vals[useVals[i]])
+        }
+        outputText<-c(outputText,headerText)
+        tableHeader<-TRUE
+      }
+      
+      # if (!is.null(hypothesis$IV2))  outputText<-c(outputText,y_label2,rep("",nc-1))
+  
+      if (is.null(hypothesis$IV2)) y_label2<-" "
+      else y_label2<-effectType
+      
+      y_label<-showType
     extra_y_label<-NULL
     if (is.null(hypothesis$IV2)){
       rVals<-exploreResult$result$rval
@@ -238,6 +253,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                   yiqr[i]<-sqrt(p*(1-p)/length(pVals[,i]))
                 }
               }
+              y_label<-"True Hits"
             },
             "Misses"={
               if (effect$world$worldOn) {
@@ -265,6 +281,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                   yiqr[i]<-sqrt(p*(1-p)/length(pVals[,i]))
                 }
               }
+              y_label<-"False Misses"
             },
             "FDR;FMR"={
               if (effect$world$worldOn) {
@@ -356,86 +373,98 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
         ysd[i]<-sd(showVals[,i],na.rm=TRUE)
       }
       quantsMade<-TRUE
-    } else quantsMade<-FALSE
-    
+      label1<-"median"
+      label2<-"iqr"
+    } else {
+      quantsMade<-FALSE
+      label1<-" "
+      label2<-"\u00B1se"
+    }
     
     if (reportQuants){
       if (quantsMade) 
-        outputText<-c(outputText,"",paste0("!r!j!ilower ",format(quants*100),"%"))
+        outputText<-c(outputText,"",paste0("lower ",format(quants*100),"%"))
       else
-        outputText<-c(outputText,"","!r!j!i-se ")
+        outputText<-c(outputText,"","-se ")
       for (i in 1:length(useVals)) {
-        outputText<-c(outputText,paste0("!j",brawFormat(y25[useVals[i]],digits=braw.env$report_precision)))
+        outputText<-c(outputText,paste0("!j",brawFormat(y25[useVals[i]],digits=precision)))
       }
     }
     
-    outputText<-c(outputText,paste0("\b", y_label),"!r!j!imedian")
+    if (is.null(hypothesis$IV2)) outputText<-c(outputText,paste0("\b", y_label),"median")
+    else {
+      if (effectType==effectTypes[1]) 
+        outputText<-c(outputText,paste0("\b", y_label),y_label2)
+      else
+        outputText<-c(outputText,"",y_label2)
+    }
+    
     for (i in 1:length(useVals)) {
-      outputText<-c(outputText,paste0("!j",brawFormat(y50[useVals[i]],digits=braw.env$report_precision)))
+      outputText<-c(outputText,paste0("!j",brawFormat(y50[useVals[i]],digits=precision)))
     }
-    if (!reportQuants) {
-      outputText<-c(outputText,"","!r!j!iiqr")
+    if (!reportQuants && reportIQRs) {
+      outputText<-c(outputText,"",label2)
       for (i in 1:length(useVals)) {
-        outputText<-c(outputText,paste0("!j",brawFormat(yiqr[useVals[i]],digits=braw.env$report_precision)))
+        outputText<-c(outputText,paste0("!j",brawFormat(yiqr[useVals[i]],digits=precision)))
       }
     }
     
     if (reportQuants){
       if (quantsMade) 
-        outputText<-c(outputText,"",paste0("!r!j!iupper ",format(quants*100),"%"))
+        outputText<-c(outputText,"",paste0("upper ",format(quants*100),"%"))
       else
-        outputText<-c(outputText,"","!r!j!i+se ")
+        outputText<-c(outputText,"","+se ")
       for (i in 1:length(useVals)) {
-        outputText<-c(outputText,paste0("!j",brawFormat(y75[useVals[i]],digits=braw.env$report_precision)))
+        outputText<-c(outputText,paste0("!j",brawFormat(y75[useVals[i]],digits=precision)))
       }
     }
 
     if (reportMeans){
       if (is.element(showType,c("rs","p","ws","n","log(lrs)","log(lrd)","Lambda","pNull","S"))) {
-        outputText<-c(outputText,rep(" ",nc+1))
-        outputText<-c(outputText,"","!r!j!imean")
+        outputText<-c(outputText,rep(" ",nc))
+        outputText<-c(outputText,"","mean")
         for (i in 1:length(useVals)) {
-          outputText<-c(outputText,paste0("!j",brawFormat(ymn[useVals[i]],digits=braw.env$report_precision)))
+          outputText<-c(outputText,paste0("!j",brawFormat(ymn[useVals[i]],digits=precision)))
         }
-        outputText<-c(outputText,"","!r!j!isd")
+        outputText<-c(outputText,"","sd")
         for (i in 1:length(useVals)) {
-          outputText<-c(outputText,paste0("!j",brawFormat(ysd[useVals[i]],digits=braw.env$report_precision)))
+          outputText<-c(outputText,paste0("!j",brawFormat(ysd[useVals[i]],digits=precision)))
         }
       }    
     }
     
-    if (showType=="NHST" || showType=="FDR;FMR") {
+    if (is.element(showType,c("NHST","FDR;FMR")) ){
       switch(showType,
              "NHST"={extra_y_label<-"\bType I errors"},
              "FDR;FMR"={extra_y_label<-"\bHits"}
       )
 
       if (reportQuants){
-        outputText<-c(outputText,"","!r!j!i-se ")
+        outputText<-c(outputText,"","-se ")
         for (i in 1:length(useVals)) {
-          outputText<-c(outputText,paste0("!j",brawFormat(y25e[useVals[i]],digits=braw.env$report_precision)))
+          outputText<-c(outputText,paste0("!j",brawFormat(y25e[useVals[i]],digits=precision)))
         }
       }
-      outputText<-c(outputText,paste0("",extra_y_label),"!r!jmedian")
+      outputText<-c(outputText,paste0("",extra_y_label),label1)
       for (i in 1:length(useVals)) {
-        outputText<-c(outputText,paste0("!j",brawFormat(y50e[useVals[i]],digits=braw.env$report_precision)))
+        outputText<-c(outputText,paste0("!j",brawFormat(y50e[useVals[i]],digits=precision)))
       }
       if (!reportQuants) {
-        outputText<-c(outputText,"","!r!j!iiqr ")
+        outputText<-c(outputText,"",label2)
         for (i in 1:length(useVals)) {
-          outputText<-c(outputText,paste0("!j",brawFormat(yiqre[useVals[i]],digits=braw.env$report_precision)))
+          outputText<-c(outputText,paste0("!j",brawFormat(yiqre[useVals[i]],digits=precision)))
         }
       }
       if (reportQuants){
-        outputText<-c(outputText,"","!j!i!r+se ")
+        outputText<-c(outputText,"","+se ")
         for (i in 1:length(useVals)) {
-          outputText<-c(outputText,paste0("!j",brawFormat(y75e[useVals[i]],digits=braw.env$report_precision)))
+          outputText<-c(outputText,paste0("!j",brawFormat(y75e[useVals[i]],digits=precision)))
         }
       }
     }
     
   }
-  nc=nc+1
+  }
   nr=length(outputText)/nc
   reportPlot(outputText,nc,nr)        
   

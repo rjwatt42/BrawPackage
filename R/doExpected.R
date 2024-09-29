@@ -31,11 +31,12 @@ mergeExpected<-function(r1,r2) {
   }
 }
 # function to clear 
-resetExpected<-function(nsims=0,expectedResult=NULL){
+resetExpected<-function(nsims=0,evidence,expectedResult=NULL){
   
   if (nsims>0) {
     b<-matrix(NA,nsims,1)
-    bm<-matrix(NA,nsims,3)
+    if (evidence$rInteractionOn) bm<-matrix(NA,nsims,3)
+    else  bm<-matrix(NA,nsims,2)
   } else {
     b<-NA
     bm<-NA
@@ -85,7 +86,7 @@ doExpected <- function(nsims=10,expectedResult=NULL,hypothesis=braw.def$hypothes
     evidence<-expectedResult$evidence
   }
   if (nsims>0)
-    expectedResult<-c(resetExpected(nsims,expectedResult),
+    expectedResult<-c(resetExpected(nsims,evidence,expectedResult),
                       list(hypothesis=hypothesis,
                            design=design,
                            evidence=evidence)

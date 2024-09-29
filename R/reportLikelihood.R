@@ -38,12 +38,10 @@ reportLikelihood<-function(possibleResult=braw.res$possibleResult){
   outputText<-rep("  ",nc*nr)
   
   row<-1
-  outputText[1+nc*row]<-"\bEstimates  "
-  row<-row+1
-  outputText[1+nc*row]<-"!n "
-  outputText[2+nc*row]<-"\b!c!ur[s]"
-  outputText[3+nc*row]<-"\b!c!ur[mle]"
-  outputText[4+nc*row]<-"\b!c!ur[mle](+)"
+  outputText[1+nc*row]<-"!H!CEstimates  "
+  outputText[2+nc*row]<-"r[s]"
+  outputText[3+nc*row]<-"r[mle]"
+  outputText[4+nc*row]<-"r[mle](+)"
   row<-row+1
   outputText[2+nc*row]<-paste0("!j",brawFormat(targetSample))
   outputText[3+nc*row]<-paste0("!j",brawFormat(rp_peak_full))
@@ -62,35 +60,20 @@ reportLikelihood<-function(possibleResult=braw.res$possibleResult){
   outputText[4+nc*row]<-""
   
   row<-row+1
-  outputText[1+nc*row]<-"\bLikelihoods"
-  row<-row+1
-  # outputText[2+nc*row]<-"\b!cplus "
-  # outputText[3+nc*row]<-"\b!cnull "
-  outputText[2+nc*row]<-"\b!c!uLLR "
+  outputText[1+nc*row]<-"!H!CLikelihoods"
+  outputText[2+nc*row]<-"LLR "
   
   row<-row+1
-  outputText[1+nc*row]<-"!j!r!nsLLR(r[s]/r[0] | r[s])"
-  # outputText[2+nc*row]<-paste0("!j",brawFormat(log(llrA)))
-  # outputText[3+nc*row]<-paste0("!j",brawFormat(log(llr0)))
+  outputText[1+nc*row]<-"sLLR(r[s]/r[0] | r[s])"
   outputText[2+nc*row]<-paste0("!j",brawFormat(log(llrA/llr0)))
-  # row<-row+1
-  # outputText[1+nc*row]<-"\b!jsLLR(r[mle])"
-  # outputText[2+nc*row]<-paste0("!j",brawFormat(log(llrAmle)))
-  # outputText[3+nc*row]<-paste0("!j",brawFormat(log(llr0mle)))
-  # outputText[4+nc*row]<-paste0("!j",brawFormat(log(llrAmle/llr0mle)))
-  
+
   if (possibleResult$possible$UsePrior!="none" && possibleResult$prior$populationNullp>0) {
-    
   row<-row+1
-  outputText[1+nc*row]<-"!j!r!nPrior(r[+]/r[0] | r[s])"
-  # outputText[2+nc*row]<-paste0("!j",brawFormat(log(llrAP)-log(llrA)))
-  # outputText[3+nc*row]<-paste0("!j",brawFormat(log(llr0P)-log(llr0)))
+  outputText[1+nc*row]<-"Prior(r[+]/r[0] | r[s])"
   outputText[2+nc*row]<-paste0("!j",brawFormat((log(llrAP)-log(llrA))-(log(llr0P)-log(llr0))))
 
   row<-row+1
-  outputText[1+nc*row]<-"!jdLLR(r[+]/r[0] | r[s])"
-  # outputText[2+nc*row]<-paste0("!j",brawFormat(log(llrAP)))
-  # outputText[3+nc*row]<-paste0("!j",brawFormat(log(llr0P)))
+  outputText[1+nc*row]<-"dLLR(r[+]/r[0] | r[s])"
   outputText[2+nc*row]<-paste0("!j",brawFormat(log(llrAP/llr0P)))
   }
   

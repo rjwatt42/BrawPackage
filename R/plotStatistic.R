@@ -318,34 +318,32 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
   
   if (length(pts$y1)<=npointsMax) {
     if (!is.null(analysis) && is.element(showType,c("rs","p")) && length(pts$y1)==1) {
-      switch(i,
-             {rCI<-analysis$rIVCI
-             pCI<-analysis$pIVCI
-             if (isSignificant(braw.env$STMethod,analysis$pIV,analysis$rIV,analysis$nval,analysis$df1,analysis$evidence)) {c<-c1} else (c<-c2)
-             },
-             {rCI<-analysis$rIV2CI
-             pCI<-analysis$pIV2CI
-             if (isSignificant(braw.env$STMethod,analysis$pIV2,analysis$rIV2,analysis$nval,analysis$df2,analysis$evidence)) {c<-c1} else (c<-c2)
-             },
-             {rCI<-analysis$rIVIV2CI
-             pCI<-analysis$pIVIV2CI
-             if (isSignificant(braw.env$STMethod,analysis$pIVIV2DV,analysis$rIVIV2DV,analysis$nval,analysis$df12,analysis$evidence)) {c<-c1} else (c<-c2)
-             }
-      )
-      if (is.null(analysis$hypothesis$IV2)) {
-        if (showType=="rs" && !is.null(rCI)){
+      # if (is.null(analysis$hypothesis$IV2)) {
+        if (showType=="rs"){
+          n<-pts$n
+          r<-pts$y1
+          rCI<-r2ci(r,n)
+          if (pts$y2) c<-c1 else c=c2
           x<-pts$x
           if (length(x)<length(rCI)) x<-rep(x,length(rCI))
           pts1se<-data.frame(y=rCI[1,],x=x)
           g<-g+dataLine(data=pts1se,arrow=arrow(length=unit(se_arrow,"cm"),ends="both"),colour=c,linewidth=se_size)
         }
-        if (showType=="p" && !is.null(analysis$pIVCI)){
-          x<-pts$x
-          if (length(x)<length(pCI)) x<-rep(x,length(pCI))
-          pts1se<-data.frame(y=log10(pCI[1,]),x=pts$x)
-          g<-g+dataLine(data=pts1se,arrow=arrow(length=unit(se_arrow,"cm"),ends="both"),colour=c,linewidth=se_size)
-        }
-      }
+        # if (showType=="p"){
+        #   browser()
+        #   n<-pts$n
+        #   p<-pts$y1
+        #   r<-p2r(p,n,analysis$df[1])
+        #   rCI<-r2ci(r,n)
+        #   pCI<-r2p(rCI,n,analysis$df[1])
+        #   if (pts$y2) c<-c1 else c=c2
+        #   
+        #   x<-pts$x
+        #   if (length(x)<length(pCI)) x<-rep(x,length(pCI))
+        #   pts1se<-data.frame(y=log10(pCI[1,]),x=pts$x)
+        #   g<-g+dataLine(data=pts1se,arrow=arrow(length=unit(se_arrow,"cm"),ends="both"),colour=c,linewidth=se_size)
+        # }
+      # }
     }
     
     xr<-makeFiddle(pts$y1,2/40,orientation)*scale*scale
@@ -454,11 +452,9 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   rActual<-r
   rActual[is.na(r)]<-0
   
-  if (is.null(hypothesis$IV2) || effectType!="all")  xoff=0
-  else  {
-    if (evidence$rInteractionOn) xoff=c(0,2,4)
-    else xoff=c(0,2)
-    }
+  xoff=0
+  if (!is.null(hypothesis$IV2) && effectType=="all") 
+    xoff=c(0,2,4)
 
   switch(orientation,
          "horz"={
@@ -496,7 +492,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   
   if (!is.null(hypothesis$IV2) && effectType=="all") 
     g<-g+xAxisTicks(breaks=c(0,2,4),c("direct","unique","total"))
-
+ 
   if (!all(is.na(analysis$rIV))) {
     data<-collectData(analysis,whichEffect)
     if (braw.env$RZ=="z") {
@@ -729,9 +725,9 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
         d<-res2llr(analysis,braw.env$STMethod)
         err<-(d<0 & data$rp[,i]!=0) | (d>0 & data$rp[,i]==0)
         resWSig<-resSig & err
-        pts<-data.frame(x=rvals*0+xoff[i],y1=shvals,y2=resSig,y3=resWSig,n<-nvals)
+        pts<-data.frame(x=rvals*0+xoff[i],y1=shvals,y2=resSig,y3=resWSig,n=nvals)
       } else {
-        pts<-data.frame(x=rvals*0+xoff[i],y1=shvals,y2=resSig,n<-nvals)
+        pts<-data.frame(x=rvals*0+xoff[i],y1=shvals,y2=resSig,n=nvals)
       }
       
       g<-expected_plot(g,pts,showType,analysis,IV,DV,i,orientation=orientation,

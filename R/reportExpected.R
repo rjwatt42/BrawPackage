@@ -8,7 +8,7 @@
 #' @return ggplot2 object - and printed
 #' @export
 reportExpected<-function(expectedResult=braw.res$expected,showType="Basic",
-                         whichEffect="All",effectType="direct"){
+                         whichEffect="All",effectType="all"){
   if (is.null(expectedResult)) expectedResult=doExpected(autoShow=FALSE)
   
   reportQuants<-FALSE
@@ -18,6 +18,7 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic",
   IV2<-expectedResult$hypothesis$IV2
   DV<-expectedResult$hypothesis$DV
   effect<-expectedResult$hypothesis$effect
+  evidence<-expectedResult$evidence
   result<-expectedResult$result
   nullresult<-expectedResult$nullresult
   
@@ -30,6 +31,7 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic",
   if (is.null(IV2))    whichEffects<-"Main 1"
   else {
     whichEffects<-whichEffect
+    if (whichEffect=="All" && !evidence$rInteractionOn) whichEffect<-"Mains"
     if (whichEffect=="All")   {whichEffects<-c("Main 1","Main 2","Interaction")}
     if (whichEffect=="Mains") {whichEffects<-c("Main 1","Main 2")}
     if (whichEffect=="rIV") {whichEffects<-"Main 1"}
@@ -54,25 +56,21 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic",
     if (length(pars)==1) pars<-c(pars,NA)
   } else pars<-showType
   
-  if (is.null(IV2) | is.null(result$rIVIV2DV)){nc=3}
-  else{
-    if (is.na(result$rIVIV2DV[1])) {nc=6} else {nc=9}
-  }
+  if (is.null(IV2) || effectType!="all") {nc=3}
+  else { nc=9 }
+  
   if (is.element(showType,c("NHST","Hits","Misses"))) {nc=4}
   nc<-nc+1
   
   # header
   if (is.element(showType,c("NHST","Hits","Misses")) && sum(!is.na(nullresult$rIV))>0) {
-    outputText<-c("\bExpected  ",paste("nsims = ",format(sum(!is.na(result$rIV))),"+",format(sum(!is.na(nullresult$rIV))),sep=""),rep("",nc-2))
+    outputText<-c("!TExpected  ",paste("nsims = ",format(sum(!is.na(result$rIV))),"+",format(sum(!is.na(nullresult$rIV))),sep=""),rep("",nc-2))
   } else {
-    outputText<-c("\bExpected  ",paste("nsims = ",format(sum(!is.na(result$rIV))+sum(!is.na(nullresult$rIV))),sep=""),rep("",nc-2))
+    outputText<-c("!TExpected  ",paste("nsims = ",format(sum(!is.na(result$rIV))+sum(!is.na(nullresult$rIV))),sep=""),rep("",nc-2))
   }
   outputText<-c(outputText,rep("",nc))
   
-  if (!(is.null(IV2) | is.null(result$rIVIV2DV))){
-    outputText<-c(outputText,"","","\bdirect","","","\bunique","","","\btotal","")
-    }
-
+  effectTypes<-1
   if (is.null(IV2)) {
     rs<-matrix(result$rIV,ncol=1)
     ps<-matrix(result$pIV,ncol=1)
@@ -85,6 +83,7 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic",
             "total"={rs<-result$r$total
                      ps<-result$p$total},
             "all"={
+              effectTypes<-3
                   rs<-c()
                   ps<-c()
                   xoff<-c()
@@ -101,10 +100,16 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic",
 
   # column labels
   if (is.element(showType,c("NHST","tDR","Hits","Misses"))) {
-    outputText1<-c("!j\bErrors:","!u\bI","!u\bII"," ")
+    outputText1<-c("!H!CErrors:","I","II"," ","")
     } else {
-    if (showType=="CILimits") {outputText1<-c("   ","!u!blower","!u!bupper")}
+    if (showType=="CILimits") {outputText1<-c("!H!C ","lower","upper")}
     else {
+      
+      if (!is.null(IV2)){
+        if (effectTypes==1) outputText<-c(outputText,"!H!C "," ",effectType," ")
+        else outputText<-c(outputText,"!H!C "," ","direct"," "," ","unique"," "," ","total"," ")
+      }
+      
       outputText1<-c()
       par1<-pars[1]
       par2<-pars[2]
@@ -127,12 +132,14 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic",
       par1<-gsub("^([rz]{1})([spoe]{1})$","\\1\\[\\2\\]",par1)
       par2<-gsub("^([rz]{1})([spoe]{1})$","\\1\\[\\2\\]",par2)
       if (!is.na(pars[2]))
-        outputText1<-c("   ",paste0("!u!c\b",par1,"  "),paste0("!u!c\b",par2,"  "))
+        outputText1<-c(" ",par1,par2)
       else 
-        outputText1<-c("   ",paste0("!u!c\b",par1," "),paste0("!u!c\b"," "))
+        outputText1<-c(" ",par1," ")
     }
     }
-  outputText<-c(outputText,"",rep(outputText1,(nc-1)/3))
+  
+  outputText1<-c("!H ",rep(outputText1,effectTypes))
+  outputText<-c(outputText,outputText1)
 
   for (whichEffect in whichEffects)  {
     
@@ -161,12 +168,12 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic",
         if (braw.env$STMethod=="NHST") {
           e1a<-paste0(brawFormat(sum(nullSig)/nr*100,digits=1),"%")
           e2a<-paste0(brawFormat(sum(!resSig)/nr*100,digits=1),"%")
-          outputText<-c(outputText,"","!jAll",e1a,e2a," ")
+          outputText<-c(outputText,"All",e1a,e2a," ","")
           
           e1=paste0(brawFormat(mean(nullSig)*100,digits=1),"%")
           e2=paste0(brawFormat(mean(!resSig)*100,digits=1),"%")
-          outputText<-c(outputText,"","!jr=0",e1," "," ")
-          outputText<-c(outputText,"",paste0("!jr","\u2260","0")," ",e2," ")
+          outputText<-c(outputText,"r=0",e1," "," ","")
+          outputText<-c(outputText,paste0("r","\u2260","0")," ",e2," ","")
           
           e1b=paste0("\b",brawFormat((sum(nullSig)+sum(!resSig))/nr*100,digits=1),"%")
           e2b=paste0(brawFormat((sum(!nullSig)+sum(resSig))/nr*100,digits=1),"%")
@@ -194,17 +201,17 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic",
           e1p=paste0(brawFormat((sum(nullSigC)+sum(resSigC))/(sum(nullSig)+sum(resSig))*100,digits=1),"%")
         }
         # ea=paste0("Combined: ",brawFormat((sum(nullSig)+sum(!resSig))/nr*100,digits=braw.env$report_precision),"%")
-        outputText<-c(outputText,""," ","","","")
-        outputText<-c(outputText,"","!j\bOutcomes:","\bFalse","\bValid","")
+        outputText<-c(outputText,"","","","","")
+        outputText<-c(outputText,"!H!COutcomes:","False","Valid","","")
         
-        outputText<-c(outputText,"","!jAll:",e1b,e2b,"")
-        outputText<-c(outputText,"",paste0("!jSig ",e1c,":"),e1n,e1p," ")
+        outputText<-c(outputText,"All:",e1b,e2b,"","")
+        outputText<-c(outputText,paste0("Sig ",e1c,":"),e1n,e1p," ","")
         
         if (braw.env$STMethod=="NHST") {
-        outputText<-c(outputText,"",paste0("!jNot Sig ",e2c,":"),e2p,e2n," ")
+        outputText<-c(outputText,paste0("Not Sig ",":"),e2p,e2n," ","")
         }
       } else {
-        outputText<-c(outputText,""," ",e1,e2," ")
+        outputText<-c(outputText," ",e1,e2," ","")
     }
       
   }else{
@@ -216,9 +223,14 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic",
     ot5<-c()
     ot6<-c()
     
-    for (i in 1:(nc/3)) {
-      r<-rs[,i]
-      p<-ps[,i]
+    for (i in 1:effectTypes) {
+      switch(whichEffect,
+             "Main 1"=off<-0,
+             "Main 2"=off<-effectTypes,
+             "Interaction"=off<-effectTypes*2,
+      )
+      r<-rs[,i+off]
+      p<-ps[,i+off]
 
       if (showType=="CILimits"){
         a<-r2ci(r,result$nval[1],-1)
@@ -278,12 +290,12 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic",
         )
       }
       if (i==1) {
-        ot1<-c(ot1,"","!r!j!imean ")
-        ot2<-c(ot2,"","!r!j!isd ")
-        ot3<-c(ot3,"","!r!j!iiqr ")
-        ot4<-c(ot4,"","!r!j!iquant75 ")
-        ot5<-c(ot5,"","!r!j!imedian ")
-        ot6<-c(ot6,"","!r!j!iquant25 ")
+        ot1<-c(ot1,"","mean ")
+        ot2<-c(ot2,"","sd ")
+        ot3<-c(ot3,"","iqr ")
+        ot4<-c(ot4,"","quant75 ")
+        ot5<-c(ot5,"","median ")
+        ot6<-c(ot6,"","quant25 ")
       } else {
         ot1<-c(ot1,"")
         ot2<-c(ot2,"")
@@ -364,23 +376,8 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic",
     
     if (pars[1]=="p" || pars[2]=="p") {
       if (is.null(IV2)) {
-        outputText<-c(outputText,rep("  ",nc),
-                      "!j\bp(sig) = ",paste0("!j",brawFormat(mean(p<braw.env$alphaSig)*100,digits=1),"%"),rep(" ",nc-2))
-      } else {
-        # if (is.na(result$rIVIV2DV[1])) {
-        #   outputText<-c(outputText,rep("  ",nc),
-        #                 "!j\bp(sig) = ",
-        #                 " ",paste0("!j",brawFormat(mean(ps[,1]<braw.env$alphaSig)*100,digits=1),"%"),
-        #                 " "," ",paste0("!j",brawFormat(mean(ps[,2]<braw.env$alphaSig)*100,digits=1),"%"),
-        #                 rep(" ",nc-6))
-        # } else {
-        #   outputText<-c(outputText,rep("  ",nc),
-        #                 "!j\bp(sig) = ",
-        #                 " ",paste0("!j",brawFormat(mean(ps[,1]<braw.env$alphaSig)*100,digits=1),"%"),
-        #                 " "," ",paste0("!j",brawFormat(mean(ps[,2]<braw.env$alphaSig)*100,digits=1),"%"),
-        #                 " "," ",paste0("!j",brawFormat(mean(ps[,3]<braw.env$alphaSig)*100,digits=1),"%"),
-        #                 rep(" ",nc-9))
-        # }
+        outputText<-c(outputText,rep("",nc),
+                      paste0("!j\bp(sig) = ",brawFormat(mean(p<braw.env$alphaSig)*100,digits=1),"%"),rep(" ",nc-1))
       }
     }
   }
