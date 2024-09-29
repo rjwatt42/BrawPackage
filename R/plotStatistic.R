@@ -526,16 +526,6 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   }    
   sigOnly<-evidence$sigOnly
   
-  # make theory
-  effectTheory<-effect
-  if (!effectTheory$world$worldOn) {
-    effectTheory$world$worldOn<-TRUE
-    effectTheory$world$populationPDF<-"Single"
-    effectTheory$world$populationRZ<-"r"
-    effectTheory$world$populationPDFk<-effect$rIV
-    effectTheory$world$populationNullp<-0
-  }
-  
   if (!all(is.na(analysis$rIV))) { theoryAlpha<-0.5} else {theoryAlpha<-1}
   
   for (i in 1:length(xoff)){
