@@ -754,7 +754,7 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
     switch(DV$type,
            "Interval"={yplot<-dv},
            "Ordinal"={yplot<-dv},
-           "Categorical"={yplot<-match(dv,levels(dv))}
+           "Categorical"={yplot<-length(levels(dv))+1-match(dv,levels(dv))}
     )
     
     if (DV$type=="Ordinal" && IV$type=="Ordinal"){
@@ -764,19 +764,19 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
     
     if (DV$type=="Categorical"){
       for (i in 1:DV$ncats) {
-        use1=(yplot==i)
+        use1=(as.numeric(dv)==i)
         if (IV$type=="Interval"){
           mn1<-mean(iv[use1])
           sd1<-sd(iv[use1])
           jitter<-rnorm(length(yplot[use1]),mean=0,sd=exp(-0.5*((iv[use1]-mn1)/sd1)^2))*0.15*2*sum(use1,na.rm=TRUE)/length(yplot)
-          yplot[use1]<-i+jitter
+          yplot[use1]<-yplot[use1]+jitter
         } 
         if (IV$type=="Ordinal") {
           for (j in 1:IV$nlevs) {
             use2=(as.numeric(iv)==j)
             mn1<-mean(use2)
             jitter<-runif(length(yplot[use1&use2]),-1,1)*mean(use1&use2)
-            yplot[use1&use2]<-i+jitter
+            yplot[use1&use2]<-yplot[use1]+jitter
           }
         }
         if (IV$type=="Categorical") {
@@ -784,7 +784,7 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
             use2=(as.numeric(iv)==j)
             mn1<-mean(use2)
             jitter<-runif(length(yplot[use1&use2]),-1,1)*mean(use1&use2)
-            yplot[use1&use2]<-i+jitter
+            yplot[use1&use2]<-yplot[use1]+jitter
           }
         }
       }

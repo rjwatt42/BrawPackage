@@ -341,9 +341,13 @@ plotCatDescription<-function(analysis,g) {
 showDescription<-function(analysis=braw.res$result,g=NULL) {
   if(is.null(analysis)) analysis<-doAnalysis(autoShow=FALSE)
   
-  if (is.null(g)) {
-    braw.env$plotArea<-c(0,0,1,1)
-    g<-getAxisPrediction(analysis$hypothesis) 
+  if (braw.env$newSampleDisplay) {
+    g<-showSample(analysis,marginals=FALSE)
+  } else {
+    if (is.null(g)) {
+      braw.env$plotArea<-c(0,0,1,1)
+      g<-getAxisPrediction(analysis$hypothesis) 
+    }
   }
   
   if (is.null(analysis$hypothesis$IV2)){

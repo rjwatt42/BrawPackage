@@ -225,7 +225,7 @@ plotParCatPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha,g){
   ncats<-DV$ncats
   pp<-CatProportions(DV)
   l=DV$cases
-  b<-(1:ncats)-1
+  b<-(ncats:1)-1
 
   pbreaks<-seq(0,1,1/(ncats))
   ebreaks<-qnorm(pbreaks)
@@ -235,7 +235,7 @@ plotParCatPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha,g){
   pts<-data.frame(x=c(),y=c(),yoff=c(),value=c(),ids=c())
   for (id in 1:ncats) {
     y<-mv2dens(x,rho,ebreaks[id],ebreaks[id+1])*pp[id]
-    pts<-rbind(pts,plotRibbon(x,y,id))
+    pts<-rbind(pts,plotRibbon(x,y,ncats+1-id))
   }
   pts$value<-pts$value/max(pts$value)
   pts$y<-pts$y*pts$value*0.9+pts$yoff
@@ -252,7 +252,7 @@ plotCatCatPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha,g){
   
   ncats2<-DV$ncats
   pp2<-CatProportions(DV)
-  b2<-1:ncats2
+  b2<-ncats2:1
   l2=DV$cases
   
   division<-r2CatProportions(rho,ncats1,ncats2)
@@ -339,7 +339,7 @@ plotPopulation<-function(IV,DV,effect,alpha=1,g=NULL){
          "Categorical"= {
            ylim <- c(0,DV$ncats+1)
            ytick<-seq(1,DV$ncats)
-           yticklabel<-DV$cases
+           yticklabel<-rev(DV$cases)
          }
   )
   

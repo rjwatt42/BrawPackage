@@ -31,8 +31,13 @@ plotSample<-function(IV,DV,effect,ivplot,dvplot,g=NULL) {
 #' @examples
 #' showSample(sample=doSample())
 #' @export
-showSample<-function(sample=braw.res$result){
+showSample<-function(sample=braw.res$result,marginals=braw.env$newSampleDisplay){
   if (is.null(sample)) sample<-doResult(autoShow=FALSE)
+  
+  if (marginals) {
+    g<-showMarginals(sample)
+    return(g)
+  }
   
   IV<-sample$hypothesis$IV
   IV2<-sample$hypothesis$IV2

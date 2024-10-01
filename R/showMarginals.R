@@ -65,7 +65,8 @@ inspectMainGraph<-function(varName,result=braw.res$result,inspect=makeInspect(),
   
   if (!is.null(data)) {
   # prepare data points
-    ptSize<-diff(xlim)/(6*sqrt(n))
+    ptSize<-diff(xlim)/6/sqrt(n)
+    
     switch(inspect$inspectOrder,
            "unsorted"={y<-1:n},
            "sorted"={y<-rank(data,ties.method="first")},
@@ -74,10 +75,11 @@ inspectMainGraph<-function(varName,result=braw.res$result,inspect=makeInspect(),
              y<-pile(data,ptSize)
            }
     )
+    y<-y*aspect
     y<-y+ptSize
-    xc<-ptSize*cos(seq(0,2*pi,length.out=20))
-    yc<-ptSize*sin(seq(0,2*pi,length.out=20))
-    y<-y/max(y)*diff(xlim)*aspect*0.9
+    # xc<-ptSize*cos(seq(0,2*pi,length.out=20))
+    # yc<-ptSize*sin(seq(0,2*pi,length.out=20))
+    # y<-y/max(y)*diff(xlim)*aspect*0.9
     
     
   # show mean
@@ -144,9 +146,11 @@ inspectMainGraph<-function(varName,result=braw.res$result,inspect=makeInspect(),
       }
     
     # show data points
-    for (i in 1:n) {
-      g<-g+dataPolygon(data=data.frame(x=data[i]+xc,y=y[i]+yc),colour="black", fill=braw.env$plotColours$sampleC)
-    }
+    g<-g+dataPoint(data=data.frame(x=data,y=y),colour="black", 
+                   fill=braw.env$plotColours$sampleC,size=24/sqrt(n))
+    # for (i in 1:n) {
+    #   g<-g+dataPolygon(data=data.frame(x=data[i]+xc,y=y[i]+yc),colour="black", fill=braw.env$plotColours$sampleC)
+    # }
     
     
   # wind up
@@ -160,7 +164,7 @@ pile<-function(data,ptSize) {
   x<-c()
   y<-c()
   for (i in 1:length(data)){
-    for (iy in seq(0,10,by=0.001)) {
+    for (iy in seq(0,100,by=0.001)) {
       distances=sqrt((x-data[i])^2+(y-iy)^2)
       found<-any(distances<space)
       if (!found) {

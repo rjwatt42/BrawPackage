@@ -1,9 +1,9 @@
-# braw.env<-c()
-# braw.def<-c()
-# braw.res<-c()
-# .onLoad<- function(...) {
-#   BrawOpts()
-# }
+braw.env<-c()
+braw.def<-c()
+braw.res<-c()
+.onLoad<- function(...) {
+  BrawOpts()
+}
 
 newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
   while (dev.cur()!=1) dev.off()
@@ -103,7 +103,7 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,graphicsSize=c(16,10),
           
           braw.env$graphicsSize<-graphicsSize
           braw.env$labelSize<-3.2*fontScale
-          braw.env$dotSize<-3.2*1
+          braw.env$dotSize<-3.2*2
           
           braw.env$autoShow<-FALSE
           braw.env$plotRect<-coord_cartesian(xlim=c(0,1),ylim=c(0,1))
@@ -122,6 +122,8 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,graphicsSize=c(16,10),
           # display choices
           
           braw.env$reportHTML<-reportHTML
+          braw.env$newSampleDisplay<-TRUE
+          
           braw.env$report_precision<-3
           braw.env$graph_precision<-2
           
@@ -145,7 +147,7 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,graphicsSize=c(16,10),
           braw.env$dist_zi<-0.05
           braw.env$dist_range<-4
           
-          braw.env$allScatter<-TRUE
+          braw.env$allScatter<-FALSE
           braw.env$showMedians<-FALSE
           braw.env$minN<-10
           braw.env$maxN<-250
