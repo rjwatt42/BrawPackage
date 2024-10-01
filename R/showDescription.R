@@ -1,18 +1,20 @@
 
 plotPoints<-function(g,IV,DV,analysis,colindex=1,maxoff=1){
 
-  if (braw.env$allScatter) showRawData<-TRUE
+  if (braw.env$allScatter && !braw.env$newSampleDisplay) showRawData<-TRUE
   else showRawData<-FALSE
   
   if (colindex==1)
           {  col<- braw.env$plotColours$descriptionC
           alphaPoints<-0.95
+          dots<-1
           xoff=0
           off=0
           barwidth=1
           } else { 
           col <-braw.env$plotDescriptionCols[[colindex-1]]
-          alphaPoints<-0.95
+          alphaPoints<-0.55
+          dots<-0.5
           off<-(colindex-2)/(maxoff-1)-0.5
           xoff=0.1
           barwidth=0.5
@@ -23,7 +25,7 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,maxoff=1){
   
   hypothesisType=paste(IV$type,DV$type,sep=" ")
 
-  dotSize<-braw.env$dotSize
+  dotSize<-braw.env$dotSize*dots
   shrinkDots=1
   if (length(x)>100) {
     dotSize<-max(dotSize*sqrt(100/length(x)),2)
@@ -279,6 +281,7 @@ plotParInterDescription<-function(analysis,g=NULL){
         analysis1$hypothesis$DV$vals<-Dvals[use1]
         analysis1$hypothesis$DV$mu<-mean(analysis$dv[use1],na.rm=TRUE)
         analysis1<-doAnalysis(analysis1)
+        print(analysis1$rIV)
         
             use2<-analysis$iv2>=median(analysis$iv2)
         analysis2<-analysis
@@ -341,7 +344,10 @@ plotCatDescription<-function(analysis,g) {
 showDescription<-function(analysis=braw.res$result,g=NULL) {
   if(is.null(analysis)) analysis<-doAnalysis(autoShow=FALSE)
   
-  if (braw.env$newSampleDisplay) {
+  old_newSampleDisplay<-braw.env$newSampleDisplay
+  if (!is.null(analysis$hypothesis$IV2)) braw.env$newSampleDisplay<-FALSE
+  
+  if (braw.env$newSampleDisplay && braw.env$allScatter) {
     g<-showSample(analysis,marginals=FALSE)
   } else {
     if (is.null(g)) {
@@ -363,6 +369,7 @@ showDescription<-function(analysis=braw.res$result,g=NULL) {
             "Categorical"=g<-plotCatInterDescription(analysis,g)
     )
   }
+  braw.env$newSampleDisplay<-old_newSampleDisplay
   g<-g+plotTitle(bquote(bold(r[s] ~ "=" ~ .(round(analysis$rIV,3)))))
   g
 }

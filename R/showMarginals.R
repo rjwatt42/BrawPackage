@@ -1,7 +1,13 @@
 showMarginals<-function(result=braw.res$result) {
   
-  g<-inspectMainGraph(result$hypothesis$IV$name,result,plotArea=c(0,0.25,0.5,0.6))
-  g<-inspectMainGraph(result$hypothesis$DV$name,result,plotArea=c(0.5,0.25,0.5,0.6),g=g)
+  if (!is.null(result$hypothesis$IV2)) {
+    g<-inspectMainGraph(result$hypothesis$IV$name,result,plotArea=c(0.1,0.5,0.4,0.5))
+    g<-inspectMainGraph(result$hypothesis$IV2$name,result,plotArea=c(0.5,0.5,0.4,0.5),g=g)
+    g<-inspectMainGraph(result$hypothesis$DV$name,result,plotArea=c(0.3,0,0.4,0.5),g=g)
+  } else {
+    g<-inspectMainGraph(result$hypothesis$IV$name,result,plotArea=c(0,0.25,0.5,0.6))
+    g<-inspectMainGraph(result$hypothesis$DV$name,result,plotArea=c(0.5,0.25,0.5,0.6),g=g)
+  }
   
   return(g)
 }
@@ -147,7 +153,7 @@ inspectMainGraph<-function(varName,result=braw.res$result,inspect=makeInspect(),
     
     # show data points
     g<-g+dataPoint(data=data.frame(x=data,y=y),colour="black", 
-                   fill=braw.env$plotColours$sampleC,size=24/sqrt(n))
+                   fill=braw.env$plotColours$sampleC,size=20/sqrt(n))
     # for (i in 1:n) {
     #   g<-g+dataPolygon(data=data.frame(x=data[i]+xc,y=y[i]+yc),colour="black", fill=braw.env$plotColours$sampleC)
     # }

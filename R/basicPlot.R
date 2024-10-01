@@ -337,7 +337,7 @@ dataLegend<-function(data,title="title",fontsize=1.2) {
   
   fontsize<-reSizeFont(fontsize*0.8)
   names<-data$names
-  width<-(max(nchar(names))*fontsize + 4*3.2)*braw.env$graphicsSize[1]/3200
+  width<-((max(c(nchar(title),nchar(names)))+2)*fontsize)*braw.env$graphicsSize[1]/5000
   height<-(length(names)*fontsize + 1*3.2)*braw.env$graphicsSize[1]/800
   colours<-data$colours
   
