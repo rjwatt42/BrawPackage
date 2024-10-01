@@ -133,9 +133,9 @@ plotCatParPrediction<-function(g,IV,DV,rho,n,offset=1, within=FALSE){
   se_pts<-data.frame(x=b+xoff,ymin=d-se,ymax=d+se)
   g<-g+dataErrorBar(data=se_pts)
   if (colindex>1) {
-    g<-g+dataPoint(data=mn_pts, shape=braw.env$plotShapes$data, colour = "black", fill=col, size = 7)
+    g<-g+dataPoint(data=mn_pts, shape=braw.env$plotShapes$data, colour = "black", fill=col, size = braw.env$dotSize*1.2)
   }  else {
-    g<-g+dataPoint(data=mn_pts,shape=braw.env$plotShapes$data, colour = "black", fill=col, size = 7)
+    g<-g+dataPoint(data=mn_pts,shape=braw.env$plotShapes$data, colour = "black", fill=col, size = braw.env$dotSize*1.2)
   }
   g
   
@@ -257,8 +257,8 @@ plotParCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
     y_lower<-pnorm(qnorm(y)-se)
     y_upper<-pnorm(qnorm(y)+se)
     
-    pts2<-data.frame(x=x1,y=y)
-    pts1<-data.frame(x=xv,y=c(y_lower,rev(y_upper)))
+    pts2<-data.frame(x=x1,y=y+1)
+    pts1<-data.frame(x=xv,y=c(y_lower,rev(y_upper))+1)
     g<-g+
       dataPolygon(data=pts1,fill = col, colour=NA, alpha=0.5)+
       dataLine(data=pts2,colour=col,linewidth=2)

@@ -702,12 +702,30 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
           mn1=mean(dv[use1])
           sd1=sd(dv[use1])
           xplot[use1]<-i+rnorm(length(xplot[use1]),mean=0,sd=exp(-0.5*((dv[use1]-mn1)/sd1)^2))*0.15*2*sum(use1,na.rm=TRUE)/length(xp)
-        } else {
-          xplot[use1]<-i+rnorm(length(xplot[use1]))*mean(use1)*0.3
-        }
+        } 
+          if (DV$type=="Ordinal") {
+            for (j in 1:DV$nlevs) {
+              use2=(as.numeric(dv)==j)
+              mn1<-mean(use2)
+              jitter<-runif(length(xplot[use1&use2]),-1,1)*mean(use1&use2)
+              xplot[use1&use2]<-i+jitter
+            }
+          }
+          if (DV$type=="Categorical") {
+            for (j in 1:DV$ncats) {
+              use2=(as.numeric(dv)==j)
+              mn1<-mean(use2)
+              jitter<-runif(length(xplot[use1&use2]),-1,1)*mean(use1&use2)
+              xplot[use1&use2]<-i+jitter
+            }
+          }
         }
       }
       # xplot<-xplot-(IV$ncats+1)/2
+    }
+    if (IV$type=="Ordinal"){
+      jitter<-runif(length(xplot),-1,1)*0.25
+      xplot<-xplot+jitter
     }
     
     if (!is.null(IV2)){
@@ -721,12 +739,12 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
         for (i in 1:IV2$ncats) {
           use1=(xp2==i)
           if (sum(use1,na.rm=TRUE)>1) {
-          if (DV$type=="Interval"){
+          if (DV$type=="Interval" || DV$type=="Ordinal"){
             mn1=mean(dv[use1])
             sd1=sd(dv[use1])
             x2plot[use1]<-i+rnorm(length(x2plot[use1]),mean=0,sd=exp(-0.5*((dv[use1]-mn1)/sd1)^2))*0.15*2*sum(use1,na.rm=TRUE)/length(x2plot)
           } else {
-            x2plot[use1]<-i+rnorm(length(x2plot[use1]))*mean(use1)*0.3
+            x2plot[use1]<-i+runif(length(x2plot[use1]),-1,1)*mean(use1)*0.5
           }
           }
         }
@@ -752,9 +770,22 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
           sd1<-sd(iv[use1])
           jitter<-rnorm(length(yplot[use1]),mean=0,sd=exp(-0.5*((iv[use1]-mn1)/sd1)^2))*0.15*2*sum(use1,na.rm=TRUE)/length(yplot)
           yplot[use1]<-i+jitter
-        } else{
-          jitter<-rnorm(length(yplot[use1]),0,1)*mean(use1)*0.3
-          yplot[use1]<-i+jitter
+        } 
+        if (IV$type=="Ordinal") {
+          for (j in 1:IV$nlevs) {
+            use2=(as.numeric(iv)==j)
+            mn1<-mean(use2)
+            jitter<-runif(length(yplot[use1&use2]),-1,1)*mean(use1&use2)
+            yplot[use1&use2]<-i+jitter
+          }
+        }
+        if (IV$type=="Categorical") {
+          for (j in 1:IV$ncats) {
+            use2=(as.numeric(iv)==j)
+            mn1<-mean(use2)
+            jitter<-runif(length(yplot[use1&use2]),-1,1)*mean(use1&use2)
+            yplot[use1&use2]<-i+jitter
+          }
         }
       }
       # yplot<-yplot-(DV$ncats+1)/2

@@ -103,7 +103,7 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,graphicsSize=c(16,10),
           
           braw.env$graphicsSize<-graphicsSize
           braw.env$labelSize<-3.2*fontScale
-          braw.env$dotSize<-3.2*5/3
+          braw.env$dotSize<-3.2*1
           
           braw.env$autoShow<-FALSE
           braw.env$plotRect<-coord_cartesian(xlim=c(0,1),ylim=c(0,1))

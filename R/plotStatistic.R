@@ -51,7 +51,7 @@ collectData<-function(analysis,whichEffect) {
   out<-list(rs=rs,ps=ps,ns=ns,df1=df1,rp=rp,ro=ro,po=po)
 }
 
-makeFiddle<-function(y,yd,orientation){
+makeFiddle<-function(y,yd,orientation="horiz"){
   yz<-c()
   xz<-c()
   xd<-0.15

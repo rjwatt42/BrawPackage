@@ -33,12 +33,16 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,maxoff=1){
   switch (hypothesisType,
           "Interval Interval"={
             pts<-data.frame(x=x,y=y)
+            if (showRawData) {
               g<-g+dataPoint(data=pts,shape=braw.env$plotShapes$data, colour="black", fill=col, alpha=alphaPoints, size =dotSize*shrinkDots)
+            }
           },
           
           "Ordinal Interval"={
             pts<-data.frame(x=x,y=y)
+            if (showRawData) {
               g<-g+dataPoint(data=pts,shape=braw.env$plotShapes$data, colour="black", fill=col, alpha=alphaPoints, size =dotSize*shrinkDots)
+            }
           },
           
           "Categorical Interval"={
@@ -53,16 +57,20 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,maxoff=1){
           
           "Ordinal Ordinal"={
             pts<-data.frame(x=x,y=y)
+            if (showRawData) {
               g<-g+dataPoint(data=pts,shape=braw.env$plotShapes$data, colour="black", fill=col, alpha=alphaPoints, size =dotSize*shrinkDots)
+            }
           },
           
           "Interval Ordinal"={
             pts<-data.frame(x=x,y=y)
-            if (colindex>=2) {
+            if (showRawData) {
+              if (colindex>=2) {
               pts<-data.frame(x=x,y=y,fill=names(braw.env$plotDescriptionCols)[colindex-1])
               g<-g+dataPoint(data=pts,shape=braw.env$plotShapes$data, colour = "black", alpha=alphaPoints, size =dotSize)
             } else
               g<-g+dataPoint(data=pts,shape=braw.env$plotShapes$data, colour="black", fill=col, alpha=alphaPoints, size =dotSize*shrinkDots)
+            }
           },
           
           "Categorical Ordinal"={
@@ -330,11 +338,13 @@ plotCatDescription<-function(analysis,g) {
 #' @examples
 #' showDescription(analysis=doAnalysis())
 #' @export
-showDescription<-function(analysis=braw.res$result) {
+showDescription<-function(analysis=braw.res$result,g=NULL) {
   if(is.null(analysis)) analysis<-doAnalysis(autoShow=FALSE)
   
-  braw.env$plotArea<-c(0,0,1,1)
-  g<-getAxisPrediction(analysis$hypothesis) 
+  if (is.null(g)) {
+    braw.env$plotArea<-c(0,0,1,1)
+    g<-getAxisPrediction(analysis$hypothesis) 
+  }
   
   if (is.null(analysis$hypothesis$IV2)){
     switch (analysis$hypothesis$DV$type,

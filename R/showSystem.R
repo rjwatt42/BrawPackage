@@ -45,20 +45,20 @@ showHypothesis<-function(hypothesis=braw.def$hypothesis,doWorld=TRUE,ygain=1,xga
   } else xoff<-0.1
   switch(no_ivs,
          {  w<-xgain*0.85
-           g<-showVariable(IV,plotArea=c(xoff,0.6*ygain,w,0.4*ygain),g)
-           g<-showVariable(DV,plotArea=c(xoff,0.0,w,0.4*ygain),g)
-           g<-showEffect(effect$rIV,showValue=!doWorld,plotArea=c(xoff,0.36*ygain,w,0.3*ygain),1,g)
+           g<-showVariable(IV,plotArea=c(xoff,0.6*ygain,w,0.4*ygain),g=g)
+           g<-showVariable(DV,plotArea=c(xoff,0.0,w,0.4*ygain),g=g)
+           g<-showEffect(effect$rIV,showValue=!doWorld,plotArea=c(xoff,0.36*ygain,w,0.3*ygain),1,g=g)
            if (doWorld) g<-showWorld(hypothesis,plotArea=c(xoff+0.15,0.3*ygain,w*0.9,0.38*ygain),g=g)
          },
          {
            w<-xgain*0.25/0.3
-           g<-showVariable(IV,plotArea=c(0.0,0.6*ygain,w,0.4*ygain),g)
-           g<-showVariable(IV2,plotArea=c(w,0.6*ygain,w,0.4*ygain),g)
-           g<-showVariable(DV,plotArea=c(w/2,0.0,w,0.4*ygain),g)
-           g<-showEffect(effect$rIV,2,showValue=!doWorld,plotArea=c(0,0.4*ygain,w,0.22*ygain),g)
-           g<-showEffect(effect$rIV2,3,showValue=!doWorld,plotArea=c(w,0.4*ygain,w,0.22*ygain),g)
-           g<-showEffect(effect$rIVIV2,4,showValue=!doWorld,plotArea=c(w/2,0.7*ygain,w,0.22*ygain),g)
-           g<-showEffect(effect$rIVIV2DV,5,showValue=!doWorld,plotArea=c(w/2,0.4*ygain,w,0.22*ygain),g)
+           g<-showVariable(IV,plotArea=c(0.0,0.6*ygain,w,0.4*ygain),g=g)
+           g<-showVariable(IV2,plotArea=c(w,0.6*ygain,w,0.4*ygain),g=g)
+           g<-showVariable(DV,plotArea=c(w/2,0.0,w,0.4*ygain),g=g)
+           g<-showEffect(effect$rIV,2,showValue=!doWorld,plotArea=c(0,0.4*ygain,w,0.22*ygain),g=g)
+           g<-showEffect(effect$rIV2,3,showValue=!doWorld,plotArea=c(w,0.4*ygain,w,0.22*ygain),g=g)
+           g<-showEffect(effect$rIVIV2,4,showValue=!doWorld,plotArea=c(w/2,0.7*ygain,w,0.22*ygain),g=g)
+           g<-showEffect(effect$rIVIV2DV,5,showValue=!doWorld,plotArea=c(w/2,0.4*ygain,w,0.22*ygain),g=g)
            wgain<-0.8
            if (doWorld) g<-showWorld(hypothesis,plotArea=c(xoff+0.27,0.3*ygain,0.275*wgain,0.38*wgain*ygain),g=g)
          })

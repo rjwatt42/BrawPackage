@@ -109,26 +109,29 @@ makeVariable<-function(name,type="Interval",
     if (length(var$cases)==1) {
       cs<-strsplit(var$cases,",")
       cs<-cs[[1]]
-      if (length(cs)<var$ncats){
-        cs<-c(cs,paste("C",(length(cs)+1):var$ncats,sep=""))
-      }
-      if (length(cs)>var$ncats){
-        cs<-cs[1:var$ncats]
-      }
-      var$cases<-cs
+    } else cs<-var$cases
+    if (length(cs)<var$ncats){
+      cs<-c(cs,paste("C",(length(cs)+1):var$ncats,sep=""))
     }
-    # check for proportions
+    if (length(cs)>var$ncats){
+      cs<-cs[1:var$ncats]
+    }
+    var$cases<-cs
+  # check for proportions
     if (is.character(var$proportions)) {
       pp<-strsplit(var$proportions,",")
       pp<-as.numeric(pp[[1]])
-      if (length(pp)<var$ncats) {
-        pp<-c(pp,rep(1,var$ncats-length(pp)))
-      }
-      if (length(pp)>var$ncats){
-        pp<-pp[1:var$ncats]
-      }
-      var$proportions<-pp
+    } else {
+      pp<-var$proportions
     }
+    if (length(pp)<var$ncats) {
+      pp<-c(pp,rep(1,var$ncats-length(pp)))
+    }
+    if (length(pp)>var$ncats){
+      pp<-pp[1:var$ncats]
+    }
+    var$proportions<-pp
+    
   # }
   # return var
   var

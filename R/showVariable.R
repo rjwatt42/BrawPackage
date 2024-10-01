@@ -18,13 +18,14 @@ drawVar<-function(pts,ticks,var,plotArea=c(0,0,1,1),g){
 
 shrinkString<-function(s,n) {return(substr(s,1,n))}
 
-drawCategorical<-function(var,plotArea=c(0,0,1,1),g){
+makedrawCategorical<-function(var,plotArea=c(0,0,1,1),g){
   ng<-var$ncats
   pp<-CatProportions(var)
   b<-(1:ng)*2-(ng+1)
+  b<-1:ng
   bt<-b
   
-  r1<-c(-1, -1, 1, 1)*0.6
+  r1<-c(-1, -1, 1, 1)*0.3
   d1<-c(0,1,1,0)
   
   r<-c()
@@ -39,18 +40,22 @@ drawCategorical<-function(var,plotArea=c(0,0,1,1),g){
     lt<-sapply(lt,shrinkString,ceil(12/ng))
   }
 
-  xlim<-c(-ng,ng)+c(-1,1)*ng/10
+  xlim<-c(0,ng+1)+c(-1,1)*ng/10
   r<-c(xlim[1],r,xlim[2])
   dens<-c(0,dens,0)
   pts=data.frame(r=r,dens=dens)
   ticks<-data.frame(breaks=bt,labels=lt)
   
-  g<-drawVar(pts,ticks,var,plotArea,g)
-  
-  return(g)
+  a<-list(pts=pts,ticks=ticks)
+  return(a)
 }
 
-drawOrdinal<-function(var,plotArea=c(0,0,1,1),g){
+drawCategorical<-function(var,plotArea=c(0,0,1,1),g){
+  d<-makedrawCategorical(var)
+  drawVar(d$pts,d$ticks,var,plotArea,g)
+}
+
+makedrawOrdinal<-function(var) {
   r1<-c(-1, -1, 1, 1)*0.5
   d1<-c(0,1,1,0)
   
@@ -75,11 +80,17 @@ drawOrdinal<-function(var,plotArea=c(0,0,1,1),g){
   dens<-c(0,dens,0)
   pts=data.frame(r=r,dens=dens)
   ticks<-data.frame(breaks=bt,labels=lt)
-  drawVar(pts,ticks,var,plotArea,g)
   
+  a<-list(pts=pts,ticks=ticks)
+  return(a)
 }
 
-drawInterval<-function(var,plotArea=c(0,0,1,1),g){
+drawOrdinal<-function(var,plotArea=c(0,0,1,1),g){
+    d<-makedrawOrdinal(var)
+    drawVar(d$pts,d$ticks,var,plotArea,g)
+}
+
+makedrawInterval<-function(var) {
   r<-seq(-braw.env$fullRange,braw.env$fullRange,length.out=braw.env$varNPoints)*var$sd+var$mu
   if (var$skew!=0 || var$kurtosis!=0) {
     a<-f_johnson_M(var$mu,var$sd,var$skew,var$kurtosis)
@@ -95,8 +106,13 @@ drawInterval<-function(var,plotArea=c(0,0,1,1),g){
   bt<-c(-2,-1,0,1,2)*var$sd+var$mu
   lt<-bt
   ticks<-data.frame(breaks=bt,labels=lt)
-  
-  drawVar(pts,ticks,var,plotArea,g)
+
+  a<-list(pts=pts,ticks=ticks)
+  return(a)
+}
+drawInterval<-function(var,plotArea=c(0,0,1,1),g){
+  d<-makedrawInterval(var)
+  drawVar(d$pts,d$ticks,var,plotArea,g)
 }
 
 #' show a variable object
@@ -106,10 +122,11 @@ drawInterval<-function(var,plotArea=c(0,0,1,1),g){
 #' @examples
 #' variable<-showVariable(variable=makeVariable())
 #' @export
-showVariable<-function(variable=makeVariable(),plotArea=NULL,g=NULL){
+showVariable<-function(variable=makeVariable(),sample=NULL,plotArea=NULL,g=NULL){
   if (is.null(g)) 
     g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
   if (!is.null(plotArea)) braw.env$plotArea<-plotArea
+  
   switch(variable$type,
          "Interval"={g<-drawInterval(variable,plotArea,g)},
          "Ordinal"={g<-drawOrdinal(variable,plotArea,g)},

@@ -247,12 +247,12 @@ plotParCatPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha,g){
 plotCatCatPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha,g){
   ncats1<-IV$ncats
   pp1<-CatProportions(IV)
-  b1<-(1:ncats1)
+  b1<-1:ncats1
   l1=IV$cases
   
   ncats2<-DV$ncats
   pp2<-CatProportions(DV)
-  b2<-(1:ncats2)
+  b2<-1:ncats2
   l2=DV$cases
   
   division<-r2CatProportions(rho,ncats1,ncats2)
