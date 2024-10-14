@@ -38,10 +38,9 @@ getAxisPrediction<-function(hypothesis) {
           }
   )
   
-  g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
-  g<-startPlot(xlim,ylim,g=g)
-  g<-g+xAxisTicks(xticks,xlabels)+xAxisLabel(bquote(bold(.(IV$name))))
-  g<-g+yAxisTicks(yticks,ylabels)+yAxisLabel(bquote(bold(.(DV$name))))
+  g<-startPlot(xlim,ylim,g=NULL)
+  g<-addG(g,xAxisTicks(xticks,xlabels),xAxisLabel(IV$name))
+  g<-addG(g,yAxisTicks(yticks,ylabels),yAxisLabel(DV$name))
   
   
 }
@@ -71,11 +70,11 @@ plotParParPrediction<-function(g,IV,DV,rho,n,offset=1){
   
   pts2<-data.frame(x=x,y=y)
   pts1<-data.frame(x=xv,y=c(yv_lower,rev(yv_upper)))
-  g<-g+dataPolygon(data=pts1,fill = col, colour=NA, alpha=0.5)
+  g<-addG(g,dataPolygon(data=pts1,fill = col, colour=NA, alpha=0.5))
   if (offset==1) {
-    g<-g+dataLine(data=pts2,colour=col,linewidth=2)
+    g<-addG(g,dataLine(data=pts2,colour=col,linewidth=2))
   } else {
-    g<-g+dataLine(data=pts2,colour=col,linewidth=2)
+    g<-addG(g,dataLine(data=pts2,colour=col,linewidth=2))
   }
   g
   
@@ -125,17 +124,17 @@ plotCatParPrediction<-function(g,IV,DV,rho,n,offset=1, within=FALSE){
   if (within) {
     se1_pts<-data.frame(x=b+xoff,y=d-se/4)
     se2_pts<-data.frame(x=b+xoff,y=d+se/4)
-    g<-g+dataLine(data=se1_pts,colour="white")
-    g<-g+dataLine(data=se2_pts,colour="white")
+    g<-addG(g,dataLine(data=se1_pts,colour="white"))
+    g<-addG(g,dataLine(data=se2_pts,colour="white"))
   } else
-    g<-g+dataLine(data=mn_pts)
+    g<-addG(g,dataLine(data=mn_pts))
   
   se_pts<-data.frame(x=b+xoff,ymin=d-se,ymax=d+se)
-  g<-g+dataErrorBar(data=se_pts)
+  g<-addG(g,dataErrorBar(data=se_pts))
   if (colindex>1) {
-    g<-g+dataPoint(data=mn_pts, shape=braw.env$plotShapes$data, colour = "black", fill=col, size = braw.env$dotSize*1.2)
+    g<-addG(g,dataPoint(data=mn_pts, shape=braw.env$plotShapes$data, colour = "black", fill=col, size = braw.env$dotSize*1.2))
   }  else {
-    g<-g+dataPoint(data=mn_pts,shape=braw.env$plotShapes$data, colour = "black", fill=col, size = braw.env$dotSize*1.2)
+    g<-addG(g,dataPoint(data=mn_pts,shape=braw.env$plotShapes$data, colour = "black", fill=col, size = braw.env$dotSize*1.2))
   }
   g
   
@@ -168,9 +167,9 @@ plotParOrdPrediction<-function(g,IV,DV,rho,n,offset=1){
   yboth<-c(yv_lower,rev(yv_upper))
   
   pts<-data.frame(x=xv,y=yboth)
-  g<-g+dataPolygon(data=pts,fill = col, colour=NA, alpha=0.5)
+  g<-addG(g,dataPolygon(data=pts,fill = col, colour=NA, alpha=0.5))
   pts<-data.frame(x=xv,y=yv)
-  g<-g+dataLine(data=pts,colour=col,linewidth=2)
+  g<-addG(g,dataLine(data=pts,colour=col,linewidth=2))
   return(g)
 }
 
@@ -209,16 +208,16 @@ plotCatOrdPrediction<-function(g,IV,DV,rho,n,offset= 1,within=FALSE){
   if (within) {
     se1_pts<-data.frame(x=b+xoff,y=d-se/4)
     se2_pts<-data.frame(x=b+xoff,y=d+se/4)
-    g<-g+dataLine(data=se1_pts,colour="white")
-    g<-g+dataLine(data=se2_pts,colour="white")
+    g<-addG(g,dataLine(data=se1_pts,colour="white"))
+    g<-addG(g,dataLine(data=se2_pts,colour="white"))
   } else
-    g<-g+dataLine(data=mn_pts)
+    g<-addG(g,dataLine(data=mn_pts))
   
   se_pts<-data.frame(x=b+xoff,ymin=d-se,ymax=d+se)
-  g<-g+
-    dataErrorBar(data=se_pts)+
+  g<-addG(g,
+    dataErrorBar(data=se_pts),
     dataPoint(data=mn_pts,shape=braw.env$plotShapes$data, colour = "black", fill = col, size = 7)
-  
+  )
   g
   
 }
@@ -259,14 +258,15 @@ plotParCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
     
     pts2<-data.frame(x=x1,y=y+1)
     pts1<-data.frame(x=xv,y=c(y_lower,rev(y_upper))+1)
-    g<-g+
-      dataPolygon(data=pts1,fill = col, colour=NA, alpha=0.5)+
+    g<-addG(g,
+      dataPolygon(data=pts1,fill = col, colour=NA, alpha=0.5),
       dataLine(data=pts2,colour=col,linewidth=2)
+    )
   }
   
   if (plotBaseline) {
     pts1<-data.frame(x=c(-1,1)*braw.env$fullRange*IV$sd+IV$mu,y=c(0,0))
-    g<-g+dataLine(data=pts1,colour="black")
+    g<-addG(g,dataLine(data=pts1,colour="black"))
   }
   
   g
@@ -316,10 +316,10 @@ plotCatCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
   }
 
   pts<-data.frame(x=full_x,y=full_y,fill=factor(full_f))
-  g<-g+dataBar(data=pts,barwidth=barwidth,fill=full_c)
+  g<-addG(g,dataBar(data=pts,barwidth=barwidth,fill=full_c))
 
   pts1<-data.frame(x=c(0,ncats1+1),y=c(0,0))
-  g<-g+dataLine(data=pts1,colour="black")
+  g<-addG(g,dataLine(data=pts1,colour="black"))
   g
   
 }
@@ -380,7 +380,7 @@ plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL){
     )
     if (DV$type=="Categorical") {
       cols<-c(braw.env$plotColours$descriptionC,darken(braw.env$plotColours$descriptionC,0.25,0.75))
-      g<-g+dataLegend(data.frame(names<-DV$cases,colours=cols),title=bquote(bold(.(DV$name))))
+      g<-addG(g,dataLegend(data.frame(names<-DV$cases,colours=cols),title=DV$name))
     }
   } else {
     # more than 1 IV
@@ -426,7 +426,7 @@ plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL){
               }
       )
     }
-    g<-g+dataLegend(data.frame(names=names,colours=cols),title=IV2$name)
+    g<-addG(g,dataLegend(data.frame(names=names,colours=cols),title=IV2$name))
   }
   
   return(g)  

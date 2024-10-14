@@ -44,7 +44,7 @@ showExpected<-function(expectedResult=braw.res$expected,showType="Basic",
                    whichEffect=whichEffect,effectType=effectType,showTheory=showTheory
   ) 
   if (is.null(expectedResult$hypothesis$IV2) || !is.element(whichEffect,c("All","Mains")))
-    g<-g+plotTitle(paste0("Expected: ",brawFormat(expectedResult$count)),"right",size=0.85)
+    g<-addG(g,plotTitle(paste0("Expected: ",brawFormat(expectedResult$count)),"right",size=0.85))
   g
 }
 

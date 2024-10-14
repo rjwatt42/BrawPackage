@@ -46,7 +46,7 @@ getExploreRange<-function(explore) {
          "anom"=range<-list(minVal=0,maxVal=1,logScale=FALSE,np=13),
          "anom1"=range<-list(minVal=0.1,maxVal=3,logScale=FALSE,np=13),
          "anom2"=range<-list(minVal=-3,maxVal=3,logScale=FALSE,np=13),
-         "kurt"=range<-list(minVal=1.5,maxVal=10^5,logScale=TRUE,np=13),
+         "kurt"=range<-list(minVal=-1.5,maxVal=1.3,logScale=FALSE,np=13),
          "IVprops"=range<-list(minVal=0.2,maxVal=0.8,logScale=FALSE,np=13),
          "DVprops"=range<-list(minVal=0.2,maxVal=0.8,logScale=FALSE,np=13),
          "IVlevels"=range<-list(minVal=3,maxVal=10,logScale=FALSE,np=8),
@@ -78,6 +78,9 @@ resetExploreResult<-function(nsims,n_vals,oldResult=NULL) {
   }
   
   result<-list(rval=b,pval=b,rpval=b,raval=b,roval=b,poval=b,nval=b,df1=b,
+               iv=list(mn=b,sd=b,sk=b,kt=b),
+               dv=list(mn=b,sd=b,sk=b,kt=b),
+               rs=list(mn=b,sd=b,sk=b,kt=b),
                rIV2=b,rIVIV2DV=b,pIV2=b,pIVIV2DV=b,
                r=list(direct=bm,unique=bm,total=bm),
                p=list(direct=bm,unique=bm,total=bm)
@@ -95,6 +98,19 @@ storeExploreResult<-function(result,res,ri,vi) {
   result$poval[ri,vi]<-res$poIV
   result$nval[ri,vi]<-res$nval
   result$df1[ri,vi]<-res$df1
+  
+  result$iv$mn[ri,vi]<-res$iv.mn
+  result$iv$sd[ri,vi]<-res$iv.sd
+  result$iv$sk[ri,vi]<-res$iv.sk
+  result$iv$kt[ri,vi]<-res$iv.kt
+  result$dv$mn[ri,vi]<-res$dv.mn
+  result$dv$sd[ri,vi]<-res$dv.sd
+  result$dv$sk[ri,vi]<-res$dv.sk
+  result$dv$kt[ri,vi]<-res$dv.kt
+  result$rs$mn[ri,vi]<-res$rs.mn
+  result$rs$sd[ri,vi]<-res$rs.sd
+  result$rs$sk[ri,vi]<-res$rs.sk
+  result$rs$kt[ri,vi]<-res$rs.kt
   
   if (!is.null(res$rIV2)){
     result$rIV2[ri,vi]<-res$rIV2
@@ -126,8 +142,21 @@ mergeExploreResult<-function(res1,res2) {
   result$poval<-rbind(res1$poval,res2$poval)
   result$nval<-rbind(res1$nval,res2$nval)
   result$df1<-rbind(res1$df1,res2$df1)
-
-    result$r$direct<-abind(res1$r$direct,res2$r$direct,along=1)
+  
+  result$iv$mn<-rbind(res1$iv$mn,res2$iv$mn)
+  result$iv$sd<-rbind(res1$iv$sd,res2$iv$sd)
+  result$iv$sk<-rbind(res1$iv$sk,res2$iv$sk)
+  result$iv$kt<-rbind(res1$iv$kt,res2$iv$kt)
+  result$dv$mn<-rbind(res1$dv$mn,res2$dv$mn)
+  result$dv$sd<-rbind(res1$dv$sd,res2$dv$sd)
+  result$dv$sk<-rbind(res1$dv$sk,res2$dv$sk)
+  result$dv$kt<-rbind(res1$dv$kt,res2$dv$kt)
+  result$rs$mn<-rbind(res1$rs$mn,res2$rs$mn)
+  result$rs$sd<-rbind(res1$rs$sd,res2$rs$sd)
+  result$rs$sk<-rbind(res1$rs$sk,res2$rs$sk)
+  result$rs$kt<-rbind(res1$rs$kt,res2$rs$kt)
+  
+  result$r$direct<-abind(res1$r$direct,res2$r$direct,along=1)
     result$r$unique<-abind(res1$r$unique,res2$r$unique,along=1)
     result$r$total<-abind(res1$r$total,res2$r$total,along=1)
 

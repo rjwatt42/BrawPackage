@@ -25,10 +25,12 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
            "Basic"=     {showType<-c("rs","p")},
            "Power"=     {showType<-c("ws","wp")},
            "CILimits"=  {showType<-c("ci1","ci2")},
+           "DV"= {showType<-c("dv.mn","dv.sd","dv.sk","dv.kt")},
+           "Residuals"= {showType<-c("rs.mn","rs.sd","rs.sk","rs.kt")},
            {}
     )
   }
-  showType<-showType[1]
+  showTypes<-showType
   
   explore<-exploreResult$explore
   hypothesis<-exploreResult$hypothesis
@@ -103,7 +105,8 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
       if (is.null(hypothesis$IV2)) y_label2<-" "
       else y_label2<-effectType
       
-      y_label<-showType
+      for (showType in showTypes) {
+        y_label<-showType
     extra_y_label<-NULL
     if (is.null(hypothesis$IV2)){
       rVals<-exploreResult$result$rval
@@ -360,9 +363,47 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
             },
             "S"={
               showVals<-exploreResult$result$S
+            },
+            "iv.mn"={
+              showVals<-exploreResult$result$iv$mn
+            },
+            "iv.sd"={
+              showVals<-exploreResult$result$iv$sd
+            },
+            "iv.sk"={
+              showVals<-exploreResult$result$iv$sk
+            },
+            "iv.kt"={
+              showVals<-exploreResult$result$iv$kt
+            },
+            "dv.mn"={
+              showVals<-exploreResult$result$dv$mn
+            },
+            "dv.sd"={
+              showVals<-exploreResult$result$dv$sd
+            },
+            "dv.sk"={
+              showVals<-exploreResult$result$dv$sk
+            },
+            "dv.kt"={
+              showVals<-exploreResult$result$dv$kt
+            },
+            "rs.mn"={
+              showVals<-exploreResult$result$rs$mn
+            },
+            "rs.sd"={
+              showVals<-exploreResult$result$rs$sd
+            },
+            "rs.sk"={
+              showVals<-exploreResult$result$rs$sk
+            },
+            "rs.kt"={
+              showVals<-exploreResult$result$rs$kt
             }
     )
-    if (is.element(showType,c("rs","p","ws","n","log(lrs)","log(lrd)","Lambda","pNull","S"))) {
+    if (is.element(showType,c("rs","p","ws","n","log(lrs)","log(lrd)","Lambda","pNull","S",
+                              "iv.mn","iv.sd","iv.sk","iv.kt","dv.mn","dv.sd","dv.sk","dv.kt",
+                              "rs.mn","rs.sd","rs.sk","rs.kt"))) {
       quants=(1-quantileShow)/2
       for (i in 1:length(exploreResult$vals)) {
         y75[i]<-quantile(showVals[,i],0.5+quants,na.rm=TRUE)
@@ -462,7 +503,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
         }
       }
     }
-    
+    }
   }
   }
   nr=length(outputText)/nc

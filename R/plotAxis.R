@@ -1,5 +1,7 @@
-plotAxis<-function(showType,effect) {
+plotAxis<-function(showType,hypothesis,design=NULL) {
+  fixedAxis=TRUE
   
+  effect<-hypothesis$effect
   explicitLog<-FALSE
   base_hue_r<-0.1
   base_hue_p<-0.15
@@ -27,8 +29,8 @@ plotAxis<-function(showType,effect) {
            rmins<-seq(-1.5,1.5,0.1)
          }
   )
-  plabel<-bquote(bold(p))
-  polabel<-bquote(bold(p[o]))
+  plabel<-"p"
+  polabel<-"p[o]"
   switch(braw.env$pPlotScale,
          "log10"={
            plim<-c(-4,0)
@@ -36,8 +38,8 @@ plotAxis<-function(showType,effect) {
            pmins<-log10(c(seq(1,10)/10000,seq(1,10)/1000,seq(1,10)/100,seq(1,10)/10))
            plines<-log10(c(0.05,0.01,0.005,0.001))
            if (explicitLog) {
-             plabel<-bquote(bold(log['10'](p)))
-             polabel<-bquote(bold(log['10'](p[o])))
+             plabel<-"log[10](p)"
+             polabel<-"log[10](p[o])"
            }
          },
          "linear"={
@@ -47,16 +49,16 @@ plotAxis<-function(showType,effect) {
            plines<-c(0.05)
          }
          )
-  wslabel<-bquote(bold(w[s]))
-  wplabel<-bquote(bold(w[p]))
+  wslabel<-"w[s]"
+  wplabel<-"w[p]"
   switch (braw.env$wPlotScale,
           "log10"={
             wlim<-c(-2,0)
             wticks<-seq(-2,0,1)
             wmins<-log10(c(seq(1,10)/100,seq(1,10)/10))
             if (explicitLog) {
-              wslabel<-bquote(bold(log['10'](w[s])))
-              wplabel<-bquote(bold(log['10'](w[p])))
+              wslabel<-"log[10]w[s]"
+              wplabel<-"log[10]w[p]"
             }
             wlines<-log10(c(0.05,0.8))
           },
@@ -67,14 +69,14 @@ plotAxis<-function(showType,effect) {
             wlines<-c(0.05,0.8)
           }
   )
-  nlabel<-bquote(bold(n))
+  nlabel<-"n"
   switch(braw.env$nPlotScale,
          "log10"={
            nlim<-log10(c(5,2000))
            nticks<-seq(1,3,1)
            nmins<-log10(c(seq(5,10),seq(1,10)*10,seq(1,10)*100))
            if (explicitLog) {
-             nlabel<-bquote(bold(log['10'](n)))
+             nlabel<-"log[10](n)"
            }
          },
          "linear"={
@@ -110,7 +112,7 @@ plotAxis<-function(showType,effect) {
             ylim<-rlims
             yticks<-rticks
             ymins<-rmins
-            ylabel<-bquote(bold(r[e]))
+            ylabel<-'r[e]'
             use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
             ylines<-c(0)
           },
@@ -118,7 +120,7 @@ plotAxis<-function(showType,effect) {
             ylim<-rlims
             yticks<-rticks
             ymins<-rmins
-            ylabel<-bquote(bold(r[o]))
+            ylabel<-'r[o]'
             use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
             ylines<-c(0,effect$rIV)
           },
@@ -140,22 +142,22 @@ plotAxis<-function(showType,effect) {
           },
           "log(lrs)"={
             ylim<-c(0, braw.env$lrRange)
-            ylabel<-bquote(log[e](lr[s]))
+            ylabel<-'log[e](lr[s])'
             use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
           },
           "log(lrd)"={
             ylim<-c(-braw.env$lrRange, braw.env$lrRange)
-            ylabel<-bquote(log[e](lr[d]))
+            ylabel<-'log[e](lr[d])'
             use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
           },
           "e1d"={
             ylim<-c(-braw.env$lrRange, braw.env$lrRange)
-            ylabel<-bquote(log[e](lr[d]))
+            ylabel<-'log[e](lr[d])'
             use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
           },
           "e2d"={
             ylim<-c(-braw.env$lrRange, braw.env$lrRange)
-            ylabel<-bquote(log[e](lr[d]))
+            ylabel<-'log[e](lr[d])'
             use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
           },
           "ws"={
@@ -170,9 +172,9 @@ plotAxis<-function(showType,effect) {
             ylim<-log10(c(5,2000))
             yticks<-seq(0,3,1)
             if (explicitLog)
-              ylabel<-bquote(bold(log['10'](n[w=80])))
+              ylabel<-'log[10](n[w=80])'
             else
-              ylabel<-bquote(bold(n[w=80]))
+              ylabel<-'n[w=80]'
             logScale<-TRUE
           },
           "n"={
@@ -186,9 +188,9 @@ plotAxis<-function(showType,effect) {
             yticks<-nticks
             ymins<-nmins
             if (explicitLog)
-              ylabel<-bquote(bold(log['10'](no)))
+              ylabel<-"log[10](no)"
             else
-              ylabel<-bquote(bold(no))
+              ylabel<-"no"
           },
           "wp"={
             ylim<-wlim
@@ -290,6 +292,132 @@ plotAxis<-function(showType,effect) {
             ylim<-c(min(result$Ss),max(result$Ss))
             ylabel<-"S"
             ytick<-seq(ceil(min(result$Ss)),ceil(max(result$Ss)),1)
+          },
+          "iv.mn"={
+            var<-hypothesis$IV
+            if (fixedAxis) gain<-1/6.5 else gain<- 1/sqrt(design$sN)
+            l1<-5*var$sd*gain
+            l2<-floor(l1/0.5)*0.5
+            l3<-floor(l1/0.1)*0.1
+            ylim<-c(-l1,l1)+var$mu
+            yticks<-seq(-l2,l2,0.5)+var$mu
+            ymins<-seq(-l3,l3,0.1)+var$mu
+            ylabel<-"mean"
+          },
+          "iv.sd"={
+            var<-hypothesis$IV
+            if (fixedAxis) gain<-1/6.5 else gain<- 1/sqrt(design$sN)
+            l1<-5*var$sd*gain
+            l2<-floor(l1/0.5)*0.5
+            l3<-floor(l1/0.1)*0.1
+            ylim<-c(-l1,l1)+var$sd
+            yticks<-seq(-l2,l2,0.5)+var$sd
+            ymins<-seq(-l2,l3,0.1)+var$sd
+            ylabel<-"sd"
+          },
+          "iv.sk"={
+            if (fixedAxis) gain<-1/6.5 else gain<- 1/sqrt(design$sN)
+            l1<-2*5*gain
+            l2<-floor(l1/0.5)*0.5
+            l3<-floor(l1/0.1)*0.1
+            ylim<-c(-l1,l1)
+            yticks<-seq(-l2,l2,0.5)
+            ymins<-seq(-l3,l3,0.1)
+            ylabel<-"skew"
+          },
+          "iv.kt"={
+            if (fixedAxis) gain<-1/6.5 else gain<- 1/sqrt(design$sN)
+            l1<-3*5*gain
+            l2<-floor(l1/0.5)*0.5
+            l3<-floor(l1/0.1)*0.1
+            ylim<-c(-l1,l1)
+            yticks<-seq(-l2,l2,0.5)
+            ymins<-seq(-l3,l3,0.1)
+            ylabel<-"kurtosis"
+          },
+          "dv.mn"={
+            var<-hypothesis$DV
+            if (fixedAxis) gain<-1/6.5 else gain<- 1/sqrt(design$sN)
+            l1<-5*var$sd*gain
+            l2<-floor(l1/0.5)*0.5
+            l3<-floor(l1/0.1)*0.1
+            ylim<-c(-l1,l1)+var$mu
+            yticks<-seq(-l2,l2,0.5)+var$mu
+            ymins<-seq(-l3,l3,0.1)+var$mu
+            ylabel<-"mean"
+          },
+          "dv.sd"={
+            var<-hypothesis$DV
+            if (fixedAxis) gain<-1/6.5 else gain<- 1/sqrt(design$sN)
+            l1<-5*var$sd*gain
+            l2<-floor(l1/0.5)*0.5
+            l3<-floor(l1/0.1)*0.1
+            ylim<-c(-l1,l1)+var$sd
+            yticks<-seq(-l2,l2,0.5)+var$sd
+            ymins<-seq(-l2,l3,0.1)+var$sd
+            ylabel<-"sd"
+          },
+          "dv.sk"={
+            if (fixedAxis) gain<-1/6.5 else gain<- 1/sqrt(design$sN)
+            l1<-2*5*gain
+            l2<-floor(l1/0.5)*0.5
+            l3<-floor(l1/0.1)*0.1
+            ylim<-c(-l1,l1)
+            yticks<-seq(-l2,l2,0.5)
+            ymins<-seq(-l3,l3,0.1)
+            ylabel<-"skew"
+          },
+          "dv.kt"={
+            if (fixedAxis) gain<-1/6.5 else gain<- 1/sqrt(design$sN)
+            l1<-3*5*gain
+            l2<-floor(l1/0.5)*0.5
+            l3<-floor(l1/0.1)*0.1
+            ylim<-c(-l1,l1)
+            yticks<-seq(-l2,l2,0.5)
+            ymins<-seq(-l3,l3,0.1)
+            ylabel<-"kurtosis"
+          },
+          "rs.mn"={
+            var<-hypothesis$DV
+            if (fixedAxis) gain<-1/6.5 else gain<- 1/sqrt(design$sN)
+            l1<-5*var$sd*gain
+            l2<-floor(l1/0.5)*0.5
+            l3<-floor(l1/0.1)*0.1
+            ylim<-c(-l1,l1)+0
+            yticks<-seq(-l2,l2,0.5)+0
+            ymins<-seq(-l3,l3,0.1)+0
+            ylabel<-"mean"
+          },
+          "rs.sd"={
+            var<-hypothesis$DV
+            if (fixedAxis) gain<-1/6.5 else gain<- 1/sqrt(design$sN)
+            l1<-5*var$sd*gain
+            l2<-floor(l1/0.5)*0.5
+            l3<-floor(l1/0.1)*0.1
+            ylim<-c(-l1,l1)+var$sd
+            yticks<-seq(-l2,l2,0.5)+var$sd
+            ymins<-seq(-l2,l3,0.1)+var$sd
+            ylabel<-"sd"
+          },
+          "rs.sk"={
+            if (fixedAxis) gain<-1/6.5 else gain<- 1/sqrt(design$sN)
+            l1<-2*5*gain
+            l2<-floor(l1/0.5)*0.5
+            l3<-floor(l1/0.1)*0.1
+            ylim<-c(-l1,l1)
+            yticks<-seq(-l2,l2,0.5)
+            ymins<-seq(-l3,l3,0.1)
+            ylabel<-"skew"
+          },
+          "rs.kt"={
+            if (fixedAxis) gain<-1/6.5 else gain<- 1/sqrt(design$sN)
+            l1<-3*5*gain
+            l2<-floor(l1/0.5)*0.5
+            l3<-floor(l1/0.1)*0.1
+            ylim<-c(-l1,l1)
+            yticks<-seq(-l2,l2,0.5)
+            ymins<-seq(-l3,l3,0.1)
+            ylabel<-"kurtosis"
           }
   )
   

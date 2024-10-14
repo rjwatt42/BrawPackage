@@ -10,10 +10,16 @@ drawVar<-function(pts,ticks,var,plotArea=c(0,0,1,1),g){
 
   pts<-data.frame(x=pts$r,y=pts$dens)
   g<-startPlot(xlim=c(min(pts$x),max(pts$x)),ylim=c(0,1.1),box="X",g=g,fontScale=1)
-  g<-g+xAxisTicks(ticks$breaks,ticks$labels)+xAxisLabel(bquote(bold(.(var$name))))
-  g<-g+dataPolygon(pts,fill=braw.env$plotColours$sampleC,colour=braw.env$plotColours$sampleC,linewidth=0.25)
-  g<-g+dataLine(pts,colour="black",linewidth=0.25)
-  g<-g+dataLine(data.frame(x=braw.env$plotLimits$xlim,y=braw.env$plotLimits$ylim[1]),colour="black",linewidth=0.25)
+  g<-addG(g,xAxisTicks(ticks$breaks,ticks$labels),xAxisLabel(var$name))
+  g<-addG(g,
+    dataPolygon(pts,fill=braw.env$plotColours$sampleC,colour=braw.env$plotColours$sampleC,linewidth=0.25)
+    )
+  g<-addG(g,
+          dataLine(pts,colour="black",linewidth=0.25)
+          )
+  g<-addG(g,
+          dataLine(data.frame(x=braw.env$plotLimits$xlim,y=braw.env$plotLimits$ylim[1]),colour="black",linewidth=0.25)
+    )
 }
 
 shrinkString<-function(s,n) {return(substr(s,1,n))}
@@ -93,7 +99,7 @@ drawOrdinal<-function(var,plotArea=c(0,0,1,1),g){
 makedrawInterval<-function(var) {
   r<-seq(-braw.env$fullRange,braw.env$fullRange,length.out=braw.env$varNPoints)*var$sd+var$mu
   if (var$skew!=0 || var$kurtosis!=0) {
-    a<-f_johnson_M(var$mu,var$sd,var$skew,var$kurtosis)
+    a<-f_johnson_M(var$mu,var$sd,var$skew,var$kurtosis+3)
     dens<-f_Johnson_pdf(r,a$coef,a$type)
     dens[is.na(dens)]<-0
   } else {
@@ -124,14 +130,14 @@ drawInterval<-function(var,plotArea=c(0,0,1,1),g){
 #' @export
 showVariable<-function(variable=makeVariable(),sample=NULL,plotArea=NULL,g=NULL){
   if (is.null(g)) 
-    g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
+    g<-nullPlot()
   if (!is.null(plotArea)) braw.env$plotArea<-plotArea
   
   switch(variable$type,
          "Interval"={g<-drawInterval(variable,plotArea,g)},
          "Ordinal"={g<-drawOrdinal(variable,plotArea,g)},
          "Categorical"={g<-drawCategorical(variable,plotArea,g)},
-         "empty"={g<-g+drawVar(NULL,variable)}
+         "empty"={g<-addG(g,drawVar(NULL,variable))}
   )
   return(g)
       

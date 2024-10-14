@@ -47,7 +47,7 @@ plotParParPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha,g){
   radius<-qnorm(seq(0.55,0.95,0.1))*1.5
   for (ir in 1:length(radius)) {
     pts<-data.frame(x=x*radius[ir]*IV$sd+IV$mu,y=y*radius[ir]*DV$sd+DV$mu)
-    g<-g+dataPolygon(data=pts,fill = braw.env$plotColours$sampleC, colour=NA, alpha=alpha/(length(radius)-2))
+    g<-addG(g,dataPolygon(data=pts,fill = braw.env$plotColours$sampleC, colour=NA, alpha=alpha/(length(radius)-2)))
   }
   return(g)
 }
@@ -75,7 +75,7 @@ plotOrdParPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha,g){
   pts$y<-pts$y+pts$yoff
   
   #aes(x=y,y=x*DV$sd+DV$mu,group=ids,alpha=alpha*value),
-  g<-g+dataPolygon(data=pts,fill=braw.env$plotColours$sampleC,colour=NA)
+  g<-addG(g,dataPolygon(data=pts,fill=braw.env$plotColours$sampleC,colour=NA))
   return(g)
 }
 
@@ -125,7 +125,7 @@ plotCatParPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha,g){
   pts1$x<-pts$y*pts$value*0.9+pts$yoff
   pts1$y<-pts$x
   
-  g<-g+dataPolygon(data=pts1,fill=braw.env$plotColours$sampleC,colour=NA)
+  g<-addG(g,dataPolygon(data=pts1,fill=braw.env$plotColours$sampleC,colour=NA))
   return(g)
 }
 
@@ -150,7 +150,7 @@ plotParOrdPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha,g){
   pts$value<-pts$value/max(pts$value)
   pts$y<-pts$y+pts$yoff
 
-  g<-g+dataPolygon(data=pts,fill=braw.env$plotColours$sampleC,colour=NA)
+  g<-addG(g,dataPolygon(data=pts,fill=braw.env$plotColours$sampleC,colour=NA))
   return(g)
 }
 
@@ -184,8 +184,7 @@ plotCatOrdPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha,g){
   }
   pts$value<-pts$value/max(pts$value)
 
-  g<-g+
-    dataPolygon(data=pts,fill = braw.env$plotColours$sampleC,colour=NA)
+  g<-addG(g,dataPolygon(data=pts,fill = braw.env$plotColours$sampleC,colour=NA))
   return(g)
 }
 
@@ -216,8 +215,7 @@ plotOrdCatPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha,g){
   }
   pts$value<-pts$value/max(pts$value)
   
-  g<-g+
-    dataPolygon(data=pts,fill = braw.env$plotColours$sampleC,colour=NA)
+  g<-addG(g,dataPolygon(data=pts,fill = braw.env$plotColours$sampleC,colour=NA))
   return(g)
 }
 
@@ -240,7 +238,7 @@ plotParCatPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha,g){
   pts$value<-pts$value/max(pts$value)
   pts$y<-pts$y*pts$value*0.9+pts$yoff
   
-  g<-g+dataPolygon(data=pts,fill=braw.env$plotColours$sampleC,colour=NA)
+  g<-addG(g,dataPolygon(data=pts,fill=braw.env$plotColours$sampleC,colour=NA))
   return(g)
 }
 
@@ -264,8 +262,7 @@ plotCatCatPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha,g){
   for (ix in 1:ncats1) {
     for (iy in 1:ncats2) {
       pts<-data.frame(x=x*s[iy,ix]*pp1[ix]*pp2[iy]+b1[ix], y=y*s[iy,ix]*pp1[ix]*pp2[iy]+b2[iy])
-      g<-g+
-        dataPolygon(data=pts,fill = braw.env$plotColours$sampleC,colour=NA,alpha=alpha)
+      g<-addG(g,dataPolygon(data=pts,fill = braw.env$plotColours$sampleC,colour=NA,alpha=alpha))
     }
   }
   return(g)
@@ -289,17 +286,14 @@ plotOrdOrdPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha,g){
   for (ix in 1:nlevs1) {
     for (iy in 1:nlevs2) {
       pts<-data.frame(x=x+b1[ix], y=y+b2[iy])
-      g<-g+
-        dataPolygon(data=pts,fill = braw.env$plotColours$sampleC,colour=NA,alpha=alpha*pp1[ix]*pp2[iy])
+      g<-addG(g,dataPolygon(data=pts,fill = braw.env$plotColours$sampleC,colour=NA,alpha=alpha*pp1[ix]*pp2[iy]))
     }
   }
   return(g)
 }
 
 plotPopulation<-function(IV,DV,effect,alpha=1,g=NULL){
-  if (is.null(g)) 
-    g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
-  
+
   rho<-effect$rIV
   if (is.na(rho)) {rho<-0}
   
@@ -344,8 +338,8 @@ plotPopulation<-function(IV,DV,effect,alpha=1,g=NULL){
   )
   
   g<-startPlot(xlim,ylim,g=g)
-  g<-g+xAxisTicks(xtick,xticklabel)+xAxisLabel(bquote(bold(.(IV$name))))
-  g<-g+yAxisTicks(ytick,yticklabel)+yAxisLabel(bquote(bold(.(DV$name))))
+  g<-addG(g,xAxisTicks(xtick,xticklabel),xAxisLabel(IV$name))
+  g<-addG(g,yAxisTicks(ytick,yticklabel),yAxisLabel(DV$name))
 
   switch (hypothesisType,
           "Interval Interval"={

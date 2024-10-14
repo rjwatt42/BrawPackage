@@ -9,12 +9,12 @@ makeSampleVals<-function(n,mn,sdv,MV,distr="normal"){
   switch (distr,
           "normal"= {
             ivr<-rnorm(n,0,1)
-            if (MV$type=="Interval" && (MV$skew!=0 || MV$kurtosis!=3)){
-              if (MV$kurtosis<1.05) MV$kurtosis<-1.05
-              change<-MV$skew!=0 & (MV$kurtosis-3)>MV$skew^2
-              MV$kurtosis[change]<-MV$skew[change]^2 + 3
+            if (MV$type=="Interval" && (MV$skew!=0 || MV$kurtosis!=0)){
+              if (MV$kurtosis<1.05-3) MV$kurtosis<-1.05-3
+              change<-MV$skew!=0 & (MV$kurtosis)>MV$skew^2
+              MV$kurtosis[change]<-MV$skew[change]^2
               
-              a<-f_johnson_M(0,1,MV$skew,MV$kurtosis)
+              a<-f_johnson_M(0,1,MV$skew,MV$kurtosis+3)
               ivr<-f_johnson_z2y(ivr,a$coef,a$type)
               # ivr<-rJohnson(n,parms=a)
             }
@@ -22,9 +22,9 @@ makeSampleVals<-function(n,mn,sdv,MV,distr="normal"){
           },
           "skewed"={
             skew<-2
-            kurtosis<-3
+            kurtosis<-0
             ivr<-rnorm(n,0,1)
-            a<-f_johnson_M(0,sdv,skew,kurtosis)
+            a<-f_johnson_M(0,sdv,skew,kurtosis+3)
             ivr<-f_johnson_z2y(ivr,a$coef,a$type)
             ivr*sdv+mn
           },

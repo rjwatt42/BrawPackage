@@ -136,7 +136,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
     return(paste0(preText,outputFront,outputBack))
   }
   
-  if (is.null(outputText)) return(ggplot()+braw.env$blankTheme())
+  if (is.null(outputText)) return(nullPlot())
   
   bg<-braw.env$plotColours$graphC
   margin=0.5
@@ -200,7 +200,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
   outputText<-sub("!>","",outputText)
   
   pts<-data.frame(x=x_gap1,y=d$y)
-  g<-ggplot()
+  g<-nullPlot()
 
   for (i in 1:length(outputText)) {
     x<-x_gap1[i]+1
@@ -234,15 +234,16 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
     mathlabel<-grepl("['^']{1}",label) || grepl("['[']{1}",label)
     if (any(mathlabel)) parse<-TRUE
     pts<-data.frame(x=x,y=top+1-y)
-    g<-g+geom_label(data=pts,aes(x=x, y=y), label=label,fontface=fontface, 
+    g<-addG(g,geom_label(data=pts,aes(x=x, y=y), label=label,fontface=fontface, 
                                          hjust=hjust, vjust=0, 
                                          size=font_size*sz, 
                                          col=col,fill=fill,
                                          parse=parse,
                                          label.size=NA,label.padding=unit(0,"lines"))
+    )
   }
   
-  g<-g+labs(x="  ",y="  ")+theme(legend.position = "none")
-  g<-g+coord_cartesian(xlim = c(1-margin,edge+margin), ylim = c(1-margin,top+margin))
-  g+braw.env$blankTheme()
+  g<-addG(g,labs(x="  ",y="  "),theme(legend.position = "none"))
+  g<-addG(g,coord_cartesian(xlim = c(1-margin,edge+margin), ylim = c(1-margin,top+margin)))
+  return(g)
 }

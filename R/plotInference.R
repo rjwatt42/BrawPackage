@@ -61,7 +61,22 @@ plotInference<-function(analysis,otheranalysis=NULL,disp="rs",orientation="vert"
           "e1a"={g<-e1_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
           "e2a"={g<-e2_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
           "e1b"={g<-e1_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
-          "e2b"={g<-e2_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)}
+          "e2b"={g<-e2_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
+          
+          "iv.mn"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
+          "iv.sd"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
+          "iv.sk"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
+          "iv.kt"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
+          
+          "dv.mn"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
+          "dv.sd"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
+          "dv.sk"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
+          "dv.kt"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
+          
+          "rs.mn"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
+          "rs.sd"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
+          "rs.sk"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
+          "rs.kt"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)}
   )
   return(g)
 }
@@ -79,8 +94,8 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
   nvals<-analysis$nval
   df1vals<-analysis$df1
 
-  xaxis<-plotAxis(disp1,analysis$hypothesis$effect)
-  yaxis<-plotAxis(disp2,analysis$hypothesis$effect)
+  xaxis<-plotAxis(disp1,analysis$hypothesis,analysis$design)
+  yaxis<-plotAxis(disp2,analysis$hypothesis,analysis$design)
   switch (disp1,
           "rs"={
             d1<-analysis$rIV
@@ -180,21 +195,20 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
   
   pts<-data.frame(x=d1,y=d2)
   braw.env$plotArea<-c(0,0,1,1)
-  g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
-  g<-startPlot(xaxis$lim,yaxis$lim,box="both",top=FALSE,g=g)
-  g<-g+xAxisTicks(logScale=xaxis$logScale)+xAxisLabel(xaxis$label)
-  g<-g+yAxisTicks(logScale=yaxis$logScale)+yAxisLabel(yaxis$label)
+  g<-startPlot(xaxis$lim,yaxis$lim,box="both",top=FALSE,g=NULL)
+  g<-addG(g,xAxisTicks(logScale=xaxis$logScale),xAxisLabel(xaxis$label))
+  g<-addG(g,yAxisTicks(logScale=yaxis$logScale),yAxisLabel(yaxis$label))
 
   if (disp1=="rs" && disp2=="p") {
     rs<-seq(-braw.env$r_range,braw.env$r_range,length.out=51)
     ps<-r2p(rs,analysis$nval[1])
     if (braw.env$pPlotScale=="log10")  ps<-log10(ps)
-    g<-g+dataLine(data=data.frame(x=rs,y=ps),col="white")
+    g<-addG(g,dataLine(data=data.frame(x=rs,y=ps),col="white"))
   }
  if (disp2=="p") {
    ps<-0.05
    if (braw.env$pPlotScale=="log10")  ps<-log10(ps)
-   g<-g+horzLine(ps,linetype="dotted",colour=braw.env$plotColours$infer_sigC,linewidth=1)
+   g<-addG(g,horzLine(ps,linetype="dotted",colour=braw.env$plotColours$infer_sigC,linewidth=1))
  }
   dotSize=min(8,max(3.5,sqrt(400/length(d1))))
   dotSize<-braw.env$dotSize
@@ -209,17 +223,17 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
   if (length(d1)<=200) {
     use<-!isSignificant(braw.env$STMethod,pvals,rvals,nvals,df1vals,analysis$evidence)
     pts1=pts[use,]
-    g<-g+dataPoint(data=pts1,shape=braw.env$plotShapes$study, colour = "black", fill = c2, size = dotSize)
+    g<-addG(g,dataPoint(data=pts1,shape=braw.env$plotShapes$study, colour = "black", fill = c2, size = dotSize))
     pts2=pts[!use,]
-    g<-g+dataPoint(data=pts2,shape=braw.env$plotShapes$study, colour = "black", fill = c1, size = dotSize)
+    g<-addG(g,dataPoint(data=pts2,shape=braw.env$plotShapes$study, colour = "black", fill = c1, size = dotSize))
   } else {
     gain<-(length(d1)-200)/500
     dotSize<-dotSize/(1+gain)
     use<-!isSignificant(braw.env$STMethod,pvals,rvals,nvals,df1vals,analysis$evidence)
     pts1=pts[use,]
-    g<-g+dataPoint(data=pts1,shape=braw.env$plotShapes$study, colour = darken(c2,off=-1+min(3,gain)/3), fill = c2, size = dotSize)
+    g<-addG(g,dataPoint(data=pts1,shape=braw.env$plotShapes$study, colour = darken(c2,off=-1+min(3,gain)/3), fill = c2, size = dotSize))
     pts2=pts[!use,]
-    g<-g+dataPoint(data=pts2,shape=braw.env$plotShapes$study, colour = darken(c1,off=-1+min(3,gain)/3), fill = c1, size = dotSize)
+    g<-addG(g,dataPoint(data=pts2,shape=braw.env$plotShapes$study, colour = darken(c1,off=-1+min(3,gain)/3), fill = c1, size = dotSize))
   }
   return(g)
 }

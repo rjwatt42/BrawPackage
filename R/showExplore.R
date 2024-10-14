@@ -65,6 +65,8 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
            "Basic"=     {showType<-c("rs","p")},
            "Power"=     {showType<-c("ws","wp")},
            "CILimits"=  {showType<-c("ci1","ci2")},
+           "DV"= {showType<-c("dv.mn","dv.sd","dv.sk","dv.kt")},
+           "Residuals"= {showType<-c("rs.mn","rs.sd","rs.sk","rs.kt")},
            {}
     )
   }
@@ -123,8 +125,15 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     plotXOffset<-matrix(0)+0.15
     plotWidth<-0.7
   } 
-  if (length(showType)>1) {
+  if (length(showType)==2) {
     plotXOffset<-matrix(c(0,0.5)+0.05,nrow=2,byrow=FALSE)
+    plotYOffset<-matrix(c(0,0),nrow=1,byrow=TRUE)
+    plotWidth<-0.475
+  }
+  if (length(showType)==4) {
+    plotXOffset<-matrix(c(0,  0.5, 0, 0.5)+0.05,nrow=4,byrow=FALSE)
+    plotYOffset<-matrix(c(0.5,0.5, 0, 0),nrow=1,byrow=TRUE)
+    plotHeight<-0.475
     plotWidth<-0.475
   }
   
@@ -164,11 +173,11 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   else effectTypes<-effectType
   
   
-  g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
+  g<-NULL
   
   for (si in 1:length(showType)) {
     
-  yaxis<-plotAxis(showType[si],effect)
+  yaxis<-plotAxis(showType[si],hypothesis,design)
   ylim<-yaxis$lim
   ylabel<-yaxis$label
   ycols<-yaxis$cols
@@ -221,30 +230,35 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   exploreTypeShow<-explore$exploreType
   if (is.element(explore$exploreType,c("rIV","rIV2","rIVIV2","rIVIV2DV"))) {
     if (is.null(hypothesis$IV2)) {
-      exploreTypeShow<-bquote(bold(r[p]))
+      # exploreTypeShow<-bquote(bold(r[p]))
+      exploreTypeShow<-"r[p]"
     } else {
-      exploreTypeShow<-bquote(bold(r[p] ~ .(gsub("^r","",explore$exploreType))))
+      # exploreTypeShow<-bquote(bold(r[p] ~ .(gsub("^r","",explore$exploreType))))
+      exploreTypeShow<-paste0("r[p]",gsub("^r","",explore$exploreType))
     }
-  } else exploreTypeShow<-bquote(bold(.(explore$exploreType)))
+  } else exploreTypeShow<-explore$exploreType
   
   for (whichEffect in whichEffects) {
     yi<-which(whichEffect == whichEffects)
     if (length(showType)==1 && !is.null(hypothesis$IV2))  {
-      useLabel<-c(bquote(bold("Main 1")),bquote(bold("Main 2")),bquote(bold("Interaction")))[whichEffect]
+      useLabel<-c("Main 1","Main 2","Interaction")[whichEffect]
     } else {
       useLabel<-""
     }
-    braw.env$plotArea<-c(plotXOffset[si,1],plotYOffset[1,yi],plotWidth,plotHeight)
+    if (length(whichEffects)==1)
+      braw.env$plotArea<-c(plotXOffset[si,1],plotYOffset[1,si],plotWidth,plotHeight)
+    else
+      braw.env$plotArea<-c(plotXOffset[si,1],plotYOffset[1,yi],plotWidth,plotHeight)
     # if (plotHeight==1) braw.env$plotArea<-c(plotXOffset[si,1],0,plotWidth,plotHeight)
     # else               braw.env$plotArea<-c(0.475*(si-1)+0.025*si,plotYOffset[1,whichEffect],plotWidth,plotHeight)
     g<-startPlot(xlim,ylim,box="Both",top=TRUE,tight=TRUE,g=g)
     
-    g<-g+xAxisTicks(xbreaks,xnames,logScale=explore$xlog)
-    g<-g+xAxisLabel(exploreTypeShow)
-    if (nchar(useLabel)>0)    g<-g+plotTitle(useLabel,size=1.5)
+    g<-addG(g,xAxisTicks(xbreaks,xnames,logScale=explore$xlog))
+    g<-addG(g,xAxisLabel(exploreTypeShow))
+    if (nchar(useLabel)>0)    g<-addG(g,plotTitle(useLabel,size=1.5))
     
     if ((showType[si]=="rs") && (!is.null(hypothesis$IV2))) switch(whichEffect,ylabel<-"Main 1",ylabel<-"Main 2",ylabel<-"Interaction")
-    g<-g+yAxisTicks(logScale=yaxis$logScale)+yAxisLabel(ylabel)
+    g<-addG(g,yAxisTicks(logScale=yaxis$logScale),yAxisLabel(ylabel))
     col<-darken(ycols[1],off=-0.2)
     
       for (effectType in effectTypes) {
@@ -396,28 +410,28 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       if (explore$xlog) newvals<-log10(newvals)
       if (!is.null(theoryVals)) {
         theory<-data.frame(x=newvals, y=theoryVals)
-        g<-g+dataLine(theory,colour=darken(col,1,-0.15),linewidth=1)
+        g<-addG(g,dataLine(theory,colour=darken(col,1,-0.15),linewidth=1))
       }
       if (!is.null(theoryUpper)) {
         theory<-data.frame(x=newvals, y=theoryUpper)
-        g<-g+dataLine(theory,colour=darken(col,1,-0.15),linewidth=0.5)
+        g<-addG(g,dataLine(theory,colour=darken(col,1,-0.15),linewidth=0.5))
       }
       if (!is.null(theoryLower)) {
         theory<-data.frame(x=newvals, y=theoryLower)
-        g<-g+dataLine(theory,colour=darken(col,1,-0.15),linewidth=0.5)
+        g<-addG(g,dataLine(theory,colour=darken(col,1,-0.15),linewidth=0.5))
       }
       
       if (!is.null(theoryVals1)) {
         theory<-data.frame(x=c(newvals,rev(newvals)), y=1-c(theoryVals1,theoryVals1*0))
-        g<-g+dataPolygon(theory,colour=braw.env$plotColours$infer_sigNonNull,fill=braw.env$plotColours$infer_sigNonNull)
+        g<-addG(g,dataPolygon(theory,colour=braw.env$plotColours$infer_sigNonNull,fill=braw.env$plotColours$infer_sigNonNull))
       }
       if (!is.null(theoryVals0)) {
         theory<-data.frame(x=c(newvals,rev(newvals)), y=c(theoryVals0,theoryVals0*0))
-        g<-g+dataPolygon(theory,colour=braw.env$plotColours$infer_sigNull,fill=braw.env$plotColours$infer_sigNull)
+        g<-addG(g,dataPolygon(theory,colour=braw.env$plotColours$infer_sigNull,fill=braw.env$plotColours$infer_sigNull))
       }
       if (!is.null(theoryVals2)) {
         theory<-data.frame(x=newvals, y=theoryVals2)
-        g<-g+dataLine(theory,colour="black",linewidth=0.5)
+        g<-addG(g,dataLine(theory,colour="black",linewidth=0.5))
       }
       
     }
@@ -585,6 +599,42 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                 showVals<-NULL
                 showMeans<-colMeans(result$dists==effect$world$populationPDF,na.rm=TRUE)
                 showSE<-sqrt(showMeans*(1-showMeans)/nrow(showVals))
+              },
+              "iv.mn"={
+                showVals<-result$iv$mn
+              },
+              "iv.sd"={
+                showVals<-result$iv$sd
+              },
+              "iv.sk"={
+                showVals<-result$iv$sk
+              },
+              "iv.kt"={
+                showVals<-result$iv$kt
+              },
+              "dv.mn"={
+                showVals<-result$dv$mn
+              },
+              "dv.sd"={
+                showVals<-result$dv$sd
+              },
+              "dv.sk"={
+                showVals<-result$dv$sk
+              },
+              "dv.kt"={
+                showVals<-result$dv$kt
+              },
+              "rs.mn"={
+                showVals<-result$rs$mn
+              },
+              "rs.sd"={
+                showVals<-result$rs$sd
+              },
+              "rs.sk"={
+                showVals<-result$rs$sk
+              },
+              "rs.kt"={
+                showVals<-result$rs$kt
               }
       )
       
@@ -620,20 +670,20 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
           if (!is.null(y75)) {
             pts1f<-data.frame(x=c(vals,rev(vals)),y=c(y25,rev(y75)))
             pts2f<-data.frame(x=c(vals,rev(vals)),y=c(y38,rev(y62)))
-            g<-g+dataPolygon(data=pts1f,fill=col,alpha=0.2,colour=NA)
-            g<-g+dataLine(data.frame(x=vals,y=y25),colour="white",alpha=0.3)
-            g<-g+dataLine(data.frame(x=vals,y=y75),colour="white",alpha=0.3)
-            g<-g+dataPolygon(data=pts2f,fill=col,alpha=0.4,colour=NA)
-            g<-g+dataLine(data.frame(x=vals,y=y38),colour="white",alpha=0.6)
-            g<-g+dataLine(data.frame(x=vals,y=y62),colour="white",alpha=0.6)
+            g<-addG(g,dataPolygon(data=pts1f,fill=col,alpha=0.2,colour=NA))
+            g<-addG(g,dataLine(data.frame(x=vals,y=y25),colour="white",alpha=0.3))
+            g<-addG(g,dataLine(data.frame(x=vals,y=y75),colour="white",alpha=0.3))
+            g<-addG(g,dataPolygon(data=pts2f,fill=col,alpha=0.4,colour=NA))
+            g<-addG(g,dataLine(data.frame(x=vals,y=y38),colour="white",alpha=0.6))
+            g<-addG(g,dataLine(data.frame(x=vals,y=y62),colour="white",alpha=0.6))
           }
           pts0f<-data.frame(x=vals,y=y50)
           
-          g<-g+dataLine(data=pts0f)
-          g<-g+dataPoint(data=pts0f,fill=col,size=4)
+          g<-addG(g,dataLine(data=pts0f))
+          g<-addG(g,dataPoint(data=pts0f,fill=col,size=4))
         } else {
           pts0f<-data.frame(x=vals,y=y50)
-          g<-g+dataLine(data=pts0f,linewidth=0.25)
+          g<-addG(g,dataLine(data=pts0f,linewidth=0.25))
           sigVals<-isSignificant(braw.env$STMethod,pVals,rVals,nVals,df1Vals,exploreResult$evidence,braw.env$alphaSig)
           if (!is.null(showVals)) {
             for (i in 1:length(vals))
@@ -642,10 +692,10 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                                showType=showType[si],ylim=ylim,scale=2.25/(length(vals)+1),col=col,
                                npointsMax=200/length(vals))
           }
-          g<-g+dataPoint(data=pts0f,fill=col,size=4)
+          g<-addG(g,dataPoint(data=pts0f,fill=col,size=4))
           if (!is.null(y75)) {
           pts1f<-data.frame(x=vals,ymin=y25,ymax=y75)
-          g<-g+dataErrorBar(pts1f)
+          g<-addG(g,dataErrorBar(pts1f))
           }
         } # end of line and point
         }
@@ -676,20 +726,20 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
           }
           if (!is.null(colShow) && !is.null(ptsShow)) {
             if (showTheory) {
-              g<-g+dataPoint(data=ptsShow,fill=colShow)
+              g<-addG(g,dataPoint(data=ptsShow,fill=colShow))
             } else {
               if (doLine) {
-                g<-g+dataPolygon(data=ptsShow,fill=colShow,colour=NA)
+                g<-addG(g,dataPolygon(data=ptsShow,fill=colShow,colour=NA))
               } else {
                   npts<-length(vals)
                   bwidth<-0.4*(ptsShow$x[2]-pts1$x[1])
                   for (i in 1:npts) {
-                    g<-g+drawNHSTBar(i,npts,ptsShow,bwidth,colShow)
+                    g<-addG(g,drawNHSTBar(i,npts,ptsShow,bwidth,colShow))
                   }
               }
             }
           }
-          if (is.element(use,splitSequence)) g<-g+dataLine(data.frame(x=vals,y=ybottom),linewidth=1)
+          if (is.element(use,splitSequence)) g<-addG(g,dataLine(data.frame(x=vals,y=ybottom),linewidth=1))
         }
       }
       
@@ -704,7 +754,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
         yvals<-rn2w(r_est,nvals)
         if (braw.env$nPlotScale=="log10") ptsn<-data.frame(x=log10(nvals),y=yvals)
         else          ptsn<-data.frame(x=nvals,y=yvals)
-        g<-g+dataLine(data=ptsn,colour="black",linetype="dotted",linewidth=0.25)
+        g<-addG(g,dataLine(data=ptsn,colour="black",linetype="dotted",linewidth=0.25))
         
         minnw<-function(n,r,w){sum(abs(w-rn2w(r,n)),na.rm=TRUE)}
         n80<-optimize(minnw,c(min(n),max(n)),w=0.8,r=r_est)
@@ -717,7 +767,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
         }
         if (braw.env$nPlotScale=="log10") lpts<-data.frame(x=log10(min(n)),y=0.8,label=label)
         else lpts<-data.frame(x=min(n),y=0.8,label=label)
-        g<-g+dataLabel(data=lpts,label = label)
+        g<-addG(g,dataLabel(data=lpts,label = label))
       }
       
       # find r80
@@ -730,7 +780,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
         rvals<-seq(min(r),max(r),length.out=101)
         yvals<-rn2w(rvals,n_est)
         ptsn<-data.frame(x=rvals,y=yvals)
-        g<-g+dataLine(data=ptsn,colour="white",linetype="dotted",linewidth=0.25)
+        g<-addG(g,dataLine(data=ptsn,colour="white",linetype="dotted",linewidth=0.25))
         
         minnw<-function(n,r,w){sum(abs(w-rn2w(r,n)),na.rm=TRUE)}
         n80<-optimize(minnw,c(0,0.8),w=0.8,n=n_est)
@@ -742,7 +792,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
           if (sum(r>n80$minimum)<2) label<-paste("Unsafe result - increase range")
         }
         lpts<-data.frame(x=0,y=0.8)
-        g<-g+dataLabel(data=lpts,label = label)
+        g<-addG(g,dataLabel(data=lpts,label = label))
       }
     }
     
@@ -750,24 +800,24 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       if (doLine) xoff<-0
       else        xoff<-bwidth
       
-      if (!is.null(col0)) g<-g+drawNHSTLabel(lb0,lb0xy,xoff,col0)
-      if (!is.null(col1)) g<-g+drawNHSTLabel(lb1,lb1xy,xoff,col1)
-      if (!is.null(col2)) g<-g+drawNHSTLabel(lb2,lb2xy,xoff,col2)
-      if (!is.null(col3)) g<-g+drawNHSTLabel(lb3,lb3xy,xoff,col3)
-      if (!is.null(col4)) g<-g+drawNHSTLabel(lb4,lb4xy,xoff,col4)
-      if (!is.null(col5)) g<-g+drawNHSTLabel(lb5,lb5xy,xoff,col5)
+      if (!is.null(col0)) g<-addG(g,drawNHSTLabel(lb0,lb0xy,xoff,col0))
+      if (!is.null(col1)) g<-addG(g,drawNHSTLabel(lb1,lb1xy,xoff,col1))
+      if (!is.null(col2)) g<-addG(g,drawNHSTLabel(lb2,lb2xy,xoff,col2))
+      if (!is.null(col3)) g<-addG(g,drawNHSTLabel(lb3,lb3xy,xoff,col3))
+      if (!is.null(col4)) g<-addG(g,drawNHSTLabel(lb4,lb4xy,xoff,col4))
+      if (!is.null(col5)) g<-addG(g,drawNHSTLabel(lb5,lb5xy,xoff,col5))
     }
 
     lineCol<-"black"
     if (is.element(showType[si],c("p","e1","e2","e1d","e2d"))) lineCol<-"green"
     for (yl in ylines) {
-      g<-g+horzLine(yl,linetype="dotted",colour=lineCol)
+      g<-addG(g,horzLine(yl,linetype="dotted",colour=lineCol))
     }
   }
   }
   }
   if (exploreResult$count>0)
-  g<-g+plotTitle(paste0("Explore: ",brawFormat(exploreResult$count)),"right",size=0.85)
+  g<-addG(g,plotTitle(paste0("Explore: ",brawFormat(exploreResult$count)),"right",size=0.85))
   g
 }
 
@@ -777,6 +827,7 @@ showExplore2D<-function(exploreResult=braw.res$explore,showType=c("rs","p"),show
   explore<-exploreResult$explore
   hypothesis<-exploreResult$hypothesis
   effect<-hypothesis$effect
+  design<-exploreResult$design
   
   result<-trimExploreResult(exploreResult$result,exploreResult$nullresult)
   if (is.null(hypothesis$IV2)){
@@ -841,16 +892,16 @@ showExplore2D<-function(exploreResult=braw.res$explore,showType=c("rs","p"),show
     )
   }
 
-  g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
+  g<-NULL
   
-  xaxis<-plotAxis(showType[1],effect)
+  xaxis<-plotAxis(showType[1],hypothesis,design)
   xlim<-xaxis$lim
   xlabel<-xaxis$label
   xcols<-xaxis$cols
   xlines<-xaxis$lines
   xSecond<-NULL
   
-  yaxis<-plotAxis(showType[2],effect)
+  yaxis<-plotAxis(showType[2],hypothesis,design)
   ylim<-yaxis$lim
   ylabel<-yaxis$label
   ycols<-yaxis$cols
@@ -865,25 +916,25 @@ showExplore2D<-function(exploreResult=braw.res$explore,showType=c("rs","p"),show
   
   braw.env$plotArea<-c(0,0,1,1)
   g<-startPlot(xlim,ylim,box="both",top=TRUE,tight=TRUE,g=g)
-  g<-g+plotTitle(bquote(bold("explore: " ~ .(explore$exploreType))))
-  g<-g+xAxisTicks(logScale=xaxis$logScale)+xAxisLabel(xlabel)
-  g<-g+yAxisTicks(logScale=yaxis$logScale)+yAxisLabel(ylabel)
+  g<-addG(g,plotTitle(paste0("explore: ",explore$exploreType)))
+  g<-addG(g,xAxisTicks(logScale=xaxis$logScale),xAxisLabel(xlabel))
+  g<-addG(g,yAxisTicks(logScale=yaxis$logScale),yAxisLabel(ylabel))
   
   lineCol<-"black"
   if (is.element(showType[1],c("p","e1","e2","e1d","e2d"))) lineCol<-"green"
   for (xl in xlines) {
-    g<-g+vertLine(xl,linetype="dotted",colour=lineCol,linewidth=0.5)
+    g<-addG(g,vertLine(xl,linetype="dotted",colour=lineCol,linewidth=0.5))
   }
   lineCol<-"black"
   if (is.element(showType[2],c("p","e1","e2","e1d","e2d"))) lineCol<-"green"
   for (yl in ylines) {
-    g<-g+horzLine(yl,linetype="dotted",colour=lineCol,linewidth=0.5)
+    g<-addG(g,horzLine(yl,linetype="dotted",colour=lineCol,linewidth=0.5))
   }
   
-  g<-g+dataLine(data.frame(x=xVals,y=yVals))
-  g<-g+dataPoint(data.frame(x=xVals,y=yVals))
+  g<-addG(g,dataLine(data.frame(x=xVals,y=yVals)))
+  g<-addG(g,dataPoint(data.frame(x=xVals,y=yVals)))
   
   if (exploreResult$count>0)
-    g<-g+plotTitle(paste0("Explore: ",brawFormat(exploreResult$count)),"right",size=0.85)
+    g<-addG(g,plotTitle(paste0("Explore: ",brawFormat(exploreResult$count)),"right",size=0.85))
   
 }

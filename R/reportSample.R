@@ -1,9 +1,22 @@
 skewness<-function(s,na.rm=TRUE) {
-  mean((s-mean(s,na.rm=na.rm))^3,na.rm=na.rm)/sd(s,na.rm)^3
+  # https://en.wikipedia.org/wiki/Skewness G1
+  n<-length(s)
+  s<-s-mean(s,na.rm=na.rm)
+  term1<-n*sqrt(n-1)/(n-2)
+  term2<-sum(s^3)
+  term3<-sum(s^2)^1.5
+  return(term1*term2/term3)
 }
 
 kurtosis<-function(s,na.rm=TRUE) {
-  mean((s-mean(s,na.rm=na.rm))^4,na.rm=na.rm)/sd(s,na.rm)^4
+  # https://en.wikipedia.org/wiki/Kurtosis G2
+  n<-length(s)
+  s<-s-mean(s,na.rm=na.rm)
+  term1<-n*(n+1)*(n-1)/(n-2)/(n-3)
+  term2<-sum(s^4)
+  term3<-sum(s^2)^2
+  term4<-3*(n-1)^2/(n-2)/(n-3)
+  return(term1*term2/term3-term4)
 }
 
 iqr<-function(s) {

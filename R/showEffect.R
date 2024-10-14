@@ -35,8 +35,6 @@ drawArrow<-function(start,len,direction,ends,col="black",fill="white",width=0.08
 #' export
 showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
 
-  if (is.null(g))
-    g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
   if (!is.null(plotArea)) braw.env$plotArea<-plotArea
   
   g<-startPlot(xlim=c(-1,1),ylim=c(0,1),back="transparent",box="none",g=g,fontScale=1)
@@ -84,17 +82,17 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
           ends="join"
           fill=braw.env$plotColours$interactionES}
   )
-  g<-g+drawArrow(start,len,direction,ends,fill=fill)
+  g<-addG(g,drawArrow(start,len,direction,ends,fill=fill))
   
   
   if (showValue && braw.env$simData && !is.null(r)) {
     if (t==1){
-      lbl=paste("rp=",as.character(r),sep="")
-      lbl=bquote(bold(r[p] ~ "=" ~ .(r)))
+      lbl=paste("r[p]=",as.character(r),sep="")
+      # lbl=bquote(bold(r[p] ~ "=" ~ .(r)))
     }else{ 
       if (r==0) lbl<-"0.0" else lbl<-as.character(r)
     }
-    g<-g+dataText(data=labelpts, label = lbl, size=1, hjust=hjust)
+    g<-addG(g,dataText(data=labelpts, label = lbl, size=1, hjust=hjust, fontface="bold"))
   }
   
   return(g)

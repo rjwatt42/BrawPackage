@@ -1,9 +1,9 @@
-# braw.env<-c()
-# braw.def<-c()
-# braw.res<-c()
-# .onLoad<- function(...) {
-#   BrawOpts()
-# }
+braw.env<-c()
+braw.def<-c()
+braw.res<-c()
+.onLoad<- function(...) {
+  BrawOpts()
+}
 
 newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
   while (dev.cur()!=1) dev.off()
@@ -18,7 +18,7 @@ newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
 }
 
 BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,graphicsSize=c(16,10),
-                   reportHTML=FALSE,
+                   reportHTML=FALSE, graphHTML=FALSE,
                    newDev=FALSE,height=576,aspect=1.736,timeLimit=Inf,
                    reducedOutput=FALSE) {
   if (graphC=="white") graphC<-"#FFFFFF"
@@ -90,6 +90,7 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,graphicsSize=c(16,10),
     theme(panel.background = element_rect(fill=plotColours$graphC, colour=plotColours$graphC),
           panel.spacing=margin(0,0,0,0,"cm"),plot.margin=margin(-0.2,-0.4,-0.2,-0.5,"cm"),
           panel.grid.major = element_line(linetype="blank"),panel.grid.minor = element_line(linetype="blank"),
+          legend.position = "none",
                     plot.background = element_rect(fill=plotColours$graphC, colour=plotColours$graphC),
                          axis.title.x=element_blank(),
                          axis.text.x=element_blank(),
@@ -122,6 +123,7 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,graphicsSize=c(16,10),
           # display choices
           
           braw.env$reportHTML<-reportHTML
+          braw.env$graphHTML<-graphHTML
           braw.env$newSampleDisplay<-TRUE
           
           braw.env$report_precision<-3
@@ -184,10 +186,14 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,graphicsSize=c(16,10),
           ##################################
           # notation for effect sizes
           
-          braw.env$rpLabel<-bquote(bold(r[p]))
-          braw.env$rsLabel<-bquote(bold(r[s]))
-          braw.env$zpLabel<-bquote(bold(z[p]))
-          braw.env$zsLabel<-bquote(bold(z[s]))
+          # braw.env$rpLabel<-bquote(bold(r[p]))
+          # braw.env$rsLabel<-bquote(bold(r[s]))
+          # braw.env$zpLabel<-bquote(bold(z[p]))
+          # braw.env$zsLabel<-bquote(bold(z[s]))
+          braw.env$rpLabel<-'r[p]'
+          braw.env$rsLabel<-'r[s]'
+          braw.env$zpLabel<-'z[p]'
+          braw.env$zsLabel<-'z[s]'
           
           ###############################
           # notation for world
@@ -200,8 +206,8 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,graphicsSize=c(16,10),
           Lchar<-'\u03BB'
           
           switch(useLabels$psig,
-                 "psig"={pSigLabel<-bquote(bold(p[.('sig')]))},
-                 "w"={pSigLabel<-bquote(bold(w))}
+                 "psig"={pSigLabel<-"p[sig]"},
+                 "w"=   {pSigLabel<-"w"}
           )
           
           posChar<-"+"
@@ -227,26 +233,26 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,graphicsSize=c(16,10),
           
           switch (useLabels$UD, 
                   "U"= {
-                    Plabel<-bquote(bold(.(Pchar)^.(Ptypechar)))
-                    Llabel<-bquote(bold(.(Lchar)^.(Ltypechar)))
+                    Plabel<-paste0(Pchar,"^",Ptypechar)
+                    Llabel<-paste0(Lchar,"^",Ltypechar)
                     
-                    nonNullPositive<-bquote(.(Zchar)^.(posChar)~'+sig')  # "Z+ +ve"
-                    nonNullNS<-bquote(.(Zchar)^.(posChar) ~"ns")  # "Z+ -ve"
-                    nonNullNegative<-bquote(.(Zchar)^.(posChar) ~"-sig")  # "Z+ -ve"
-                    nullPositive<-bquote(.(Zchar)^.(nullChar) ~"+sig")   # "Z0 +ve"
-                    nullNS<-bquote(.(Zchar)^.(nullChar) ~"ns")  # "Z0 -ve"
-                    nullNegative<-bquote(.(Zchar)^.(nullChar) ~"-sig")  # "Z0 -ve"
+                    nullPositive<-paste0(Zchar,"^",nullChar,'+sig')  # "Z+ +ve"
+                    nullNS<-paste0(Zchar,"^",posChar,'ns')  # "Z+ -ve"
+                    nullNegative<-paste0(Zchar,"^",nullChar,'-sig')  # "Z+ -ve"
+                    nonNullPositive<-paste0(Zchar,"^",nullChar,'+sig')  # "Z+ +ve"
+                    nonNullNS<-paste0(Zchar,"^",posChar,'ns')  # "Z+ -ve"
+                    nonNullNegative<-paste0(Zchar,"^",posChar,'-sig')  # "Z+ -ve"
                   },
                   "D"= {
-                    Plabel<-bquote(bold(.(Pchar)[.(Ptypechar)]))
-                    Llabel<-bquote(bold(.(Lchar)[.(Ltypechar)]))
-                    
-                    nonNullPositive<-bquote(.(Zchar)[.(posChar)] ~"+sig")  # "Z+ +ve"
-                    nonNullNS<-bquote(.(Zchar)[.(posChar)] ~"ns")  # "Z+ -ve"
-                    nonNullNegative<-bquote(.(Zchar)[.(posChar)] ~"-sig")  # "Z+ -ve"
-                    nullPositive<-bquote(.(Zchar)[.(nullChar)] ~"+sig")   # "Z0 +ve"
-                    nullNS<-bquote(.(Zchar)[.(nullChar)] ~"ns")  # "Z0 -ve"
-                    nullNegative<-bquote(.(Zchar)[.(nullChar)] ~"-sig")  # "Z0 -ve"
+                    Plabel<-paste0(Pchar,"[",Ptypechar,"]")
+                    Llabel<-paste0(Lchar,"[",Ltypechar,"]")
+
+                    nullPositive<-paste0(Zchar,"[",nullChar,"]",'+sig')  # "Z+ +ve"
+                    nullNS<-paste0(Zchar,"[",posChar,"]",'ns')  # "Z+ -ve"
+                    nullNegative<-paste0(Zchar,"[",nullChar,"]",'-sig')  # "Z+ -ve"
+                    nonNullPositive<-paste0(Zchar,"[",nullChar,"]",'+sig')  # "Z+ +ve"
+                    nonNullNS<-paste0(Zchar,"[",posChar,"]",'ns')  # "Z+ -ve"
+                    nonNullNegative<-paste0(Zchar,"[",posChar,"]",'-sig')  # "Z+ -ve"
                   }
           )
           

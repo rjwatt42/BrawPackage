@@ -1,5 +1,6 @@
 showMarginals<-function(result=braw.res$result) {
-  
+  if (is.null(result)) result<-doAnalysis()
+
   if (!is.null(result$hypothesis$IV2)) {
     g<-inspectMainGraph(result$hypothesis$IV$name,result,plotArea=c(0.1,0.5,0.4,0.5))
     g<-inspectMainGraph(result$hypothesis$IV2$name,result,plotArea=c(0.5,0.5,0.4,0.5),g=g)
@@ -46,8 +47,6 @@ inspectMainGraph<-function(varName,result=braw.res$result,inspect=makeInspect(),
   inspect$n<-n
   
   # start
-  if (is.null(g)) 
-    g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
   if (!is.null(plotArea)) braw.env$plotArea<-plotArea
   
   switch (var$type,
@@ -67,7 +66,7 @@ inspectMainGraph<-function(varName,result=braw.res$result,inspect=makeInspect(),
           }
   )
   g<-startPlot(xlim=xlim,ylim=c(0,diff(xlim)*aspect),box="X",g=g,fontScale=1)
-  g<-g+xAxisTicks(ticks$breaks,ticks$labels)+xAxisLabel(bquote(bold(.(var$name))))
+  g<-addG(g,xAxisTicks(ticks$breaks,ticks$labels),xAxisLabel(var$name))
   
   if (!is.null(data)) {
   # prepare data points
@@ -92,9 +91,9 @@ inspectMainGraph<-function(varName,result=braw.res$result,inspect=makeInspect(),
     if (inspect$showMean) {
       # vertical line
       switch (var$type,
-              "Categorical"= g<-g+geom_vline(xintercept=Mode(data), colour = "red", lwd=2),
-              "Ordinal"= g<-g+geom_vline(xintercept=median(data), colour = "red", lwd=2),
-              "Interval"= g<-g+geom_vline(xintercept=mean(data), colour = "red", lwd=2)
+              "Categorical"= g<-addG(g,geom_vline(xintercept=Mode(data), colour = "red", lwd=2)),
+              "Ordinal"= g<-addG(g,geom_vline(xintercept=median(data), colour = "red", lwd=2)),
+              "Interval"= g<-addG(g,geom_vline(xintercept=mean(data), colour = "red", lwd=2))
       )
     }
   # show sd
@@ -103,12 +102,12 @@ inspectMainGraph<-function(varName,result=braw.res$result,inspect=makeInspect(),
       switch (var$type,
               "Categorical"={},
               "Ordinal"={
-                g<-g+geom_vline(xintercept=quantile(data,0.25), colour = "red", lwd=1)
-                g<-g+geom_vline(xintercept=quantile(data,0.75), colour = "red", lwd=1)
+                g<-addG(g,geom_vline(xintercept=quantile(data,0.25), colour = "red", lwd=1))
+                g<-addG(g,geom_vline(xintercept=quantile(data,0.75), colour = "red", lwd=1))
               },
               "Interval"={
-                g<-g+geom_vline(xintercept=mean(data)+std(data,1), colour = "red", lwd=1)
-                g<-g+geom_vline(xintercept=mean(data)-std(data,1), colour = "red", lwd=1)
+                g<-addG(g,geom_vline(xintercept=mean(data)+std(data,1), colour = "red", lwd=1))
+                g<-addG(g,geom_vline(xintercept=mean(data)-std(data,1), colour = "red", lwd=1))
               }
       )
     }
@@ -146,16 +145,17 @@ inspectMainGraph<-function(varName,result=braw.res$result,inspect=makeInspect(),
                }
         )
         pts<-dT$pts
-        g<-g+dataPolygon(data=data.frame(x=pts$r,y=pts$dens*(max(y)+ptSize)),alpha=0.5, fill="white")
+        g<-addG(g,dataPolygon(data=data.frame(x=pts$r,y=pts$dens*(max(y)+ptSize)),alpha=0.5, fill="white"))
         pts<-d$pts
-        g<-g+dataPolygon(data=data.frame(x=pts$r,y=pts$dens*(max(y)+ptSize)),alpha=0.6, fill=braw.env$plotColours$sampleC)
+        g<-addG(g,dataPolygon(data=data.frame(x=pts$r,y=pts$dens*(max(y)+ptSize)),alpha=0.6, fill=braw.env$plotColours$sampleC))
       }
     
     # show data points
-    g<-g+dataPoint(data=data.frame(x=data,y=y),colour="black", 
+    g<-addG(g,dataPoint(data=data.frame(x=data,y=y),colour="black", 
                    fill=braw.env$plotColours$sampleC,size=20/sqrt(n))
+    )
     # for (i in 1:n) {
-    #   g<-g+dataPolygon(data=data.frame(x=data[i]+xc,y=y[i]+yc),colour="black", fill=braw.env$plotColours$sampleC)
+    #   g<-addG(g,dataPolygon(data=data.frame(x=data[i]+xc,y=y[i]+yc),colour="black", fill=braw.env$plotColours$sampleC))
     # }
     
     
