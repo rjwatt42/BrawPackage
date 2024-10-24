@@ -12,15 +12,13 @@
 #' UseSource="world",targetSample=0.3,
 #' UsePrior="none",prior=getWorld("Psych"),targetPopulation=0.3,
 #' hypothesis=makeHypothesis(),design=makeDesign(),
-#' simSlice=0.1,correction=TRUE,
-#' appendSim=FALSE,possibleLength="10")
+#' simSlice=0.1,correction=TRUE)
 #' @export
-makePossible<-function(typePossible="Populations",targetSample=NULL,
-                       UseSource="world",
-                       UsePrior="none",prior=getWorld("Psych"),targetPopulation=NA,
+makePossible<-function(targetSample=braw.res$result,UseSource="world",
+                       targetPopulation=NULL,UsePrior="none",prior=getWorld("Psych"),
+                       sims=braw.res$expected$result,
                        hypothesis=braw.def$hypothesis,design=braw.def$design,
-                       simSlice=0.1,correction=TRUE,
-                       possibleResult=NULL,appendSim=FALSE,possibleLength="10"
+                       simSlice=0.1,correction=TRUE
 ) {
   if (is.null(targetSample)) {
     if (is.null(braw.res$result)) {
@@ -37,7 +35,9 @@ makePossible<-function(typePossible="Populations",targetSample=NULL,
     design=result$design
     design$sN<-result$nval
   }
-  
+  if (is.null(sims)) {
+      sims<-braw.res$expected$result
+  }
   if (hypothesis$effect$world$worldOn==FALSE) {
     hypothesis$effect$world$populationPDF<-"Single"
     hypothesis$effect$world$populationRZ<-"r"
@@ -45,18 +45,16 @@ makePossible<-function(typePossible="Populations",targetSample=NULL,
     hypothesis$effect$world$populationNullp<-0
   }
   
-  if (typePossible=="Samples") UsePrior<-"hypothesis"
-  
   possible<-
-  list(type=typePossible,
+  list(targetSample=targetSample,
        UseSource=UseSource,
-       targetSample=targetSample,
+       targetPopulation=targetPopulation,
        UsePrior=UsePrior,
        prior=prior,
-       targetPopulation=targetPopulation,
        hypothesis=hypothesis,
        design=design,
        showTheory=TRUE,
+       sims=sims,
        simSlice=simSlice,correction=correction
   )
   
@@ -64,7 +62,7 @@ makePossible<-function(typePossible="Populations",targetSample=NULL,
 }
 
 
-doPossible <- function(possible=braw.def$possible,possibleResult=NULL){
+doPossible <- function(possible=NULL,possibleResult=NULL){
   
   if (is.null(possible)) possible<-makePossible()
   npoints=201
@@ -111,6 +109,8 @@ doPossible <- function(possible=braw.def$possible,possibleResult=NULL){
     sourcePopDens_r[rp==0]<-sourcePopDens_r[rp==0]+source$populationNullp
   }
   
+  pRho<-possible$targetPopulation
+  if (braw.env$RZ=="z") pRho<-tanh(pRho)
   # get the prior population distribution
   switch(possible$UsePrior,
          "none"={ prior<-list(worldOn=TRUE,
@@ -225,30 +225,22 @@ doPossible <- function(possible=braw.def$possible,possibleResult=NULL){
     sampleLikelihood_r<-c()
   }
   
-  switch (possible$type,
-          "Samples"={
-            possibleResult<-list(possible=possible,
-                                 sourceRVals=sourceRVals,
-                                 sRho=sRho,
-                                 source=source,prior=prior,
-                                 Theory=list(
-                                   rs=rs,sourceSampDens_r=sourceSampDens_r,sourceSampDens_r_plus=sourceSampDens_r_plus,sourceSampDens_r_null=sourceSampDens_r_null,
-                                   rp=rp,priorSampDens_r=sourceSampDens_r,sampleLikelihood_r=sampleLikelihood_r,sampleLikelihood_r_show=sampleLikelihood_r_show,priorPopDens_r=priorPopDens_r,sourcePopDens_r=sourcePopDens_r
-                                 )
-            )
-          },
-          "Populations"={
-            possibleResult<-list(possible=possible,
-                                 sourceRVals=sourceRVals,
-                                 sRho=sRho,
-                                 source=source,prior=prior,
-                                 Theory=list(
-                                   rs=rs,sourceSampDens_r=sourceSampDens_r,sourceSampDens_r_plus=sourceSampDens_r_plus,sourceSampDens_r_null=sourceSampDens_r_null,
-                                   rp=rp,priorSampDens_r=priorSampDens_r,sampleLikelihood_r=sampleLikelihood_r,sampleLikelihood_r_show=sampleLikelihood_r_show,priorPopDens_r=priorPopDens_r,sourcePopDens_r=sourcePopDens_r,priorSampDens_r_null=priorSampDens_r_null,priorSampDens_r_plus=priorSampDens_r_plus
-                                 )
-            )
-          }
+  possibleResult<-list(possible=possible,
+                       sourceRVals=sourceRVals,
+                       sRho=sRho,
+                       pRho=pRho,
+                       source=source,prior=prior,
+                       Theory=list(
+                         rs=rs,sourceSampDens_r=sourceSampDens_r,sourceSampDens_r_plus=sourceSampDens_r_plus,sourceSampDens_r_null=sourceSampDens_r_null,
+                         rp=rp,priorSampDens_r=sourceSampDens_r,sampleLikelihood_r=sampleLikelihood_r,sampleLikelihood_r_show=sampleLikelihood_r_show,priorPopDens_r=priorPopDens_r,sourcePopDens_r=sourcePopDens_r,priorSampDens_r_null=priorSampDens_r_null,priorSampDens_r_plus=priorSampDens_r_plus
+                       ),
+                       Sims=list(
+                         r=possible$sims$rIV,
+                         rp=possible$sims$rpIV,
+                         n<-possible$sims$nval
+                       )
   )
+  
   setBrawRes("possibleResult",possibleResult)
   return(possibleResult)
 }

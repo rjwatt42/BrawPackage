@@ -230,10 +230,8 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   exploreTypeShow<-explore$exploreType
   if (is.element(explore$exploreType,c("rIV","rIV2","rIVIV2","rIVIV2DV"))) {
     if (is.null(hypothesis$IV2)) {
-      # exploreTypeShow<-bquote(bold(r[p]))
       exploreTypeShow<-"r[p]"
     } else {
-      # exploreTypeShow<-bquote(bold(r[p] ~ .(gsub("^r","",explore$exploreType))))
       exploreTypeShow<-paste0("r[p]",gsub("^r","",explore$exploreType))
     }
   } else exploreTypeShow<-explore$exploreType
@@ -817,7 +815,8 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   }
   }
   if (exploreResult$count>0)
-  g<-addG(g,plotTitle(paste0("Explore: ",brawFormat(exploreResult$count)),"right",size=0.85))
+    # braw.env$plotArea<-c(0,0,1,1)
+  g<-addG(g,plotTitle(paste0("nsims=",brawFormat(exploreResult$count)),"right",size=1,fontface="plain"))
   g
 }
 
@@ -935,6 +934,6 @@ showExplore2D<-function(exploreResult=braw.res$explore,showType=c("rs","p"),show
   g<-addG(g,dataPoint(data.frame(x=xVals,y=yVals)))
   
   if (exploreResult$count>0)
-    g<-addG(g,plotTitle(paste0("Explore: ",brawFormat(exploreResult$count)),"right",size=0.85))
+    g<-addG(g,plotTitle(paste0("nsims=",brawFormat(exploreResult$count)),"right",size=1))
   
 }

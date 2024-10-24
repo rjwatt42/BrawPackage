@@ -185,14 +185,14 @@ reportSample<-function(sample=braw.res$result){
     # outputText<-c(outputText,rep("",nc))
     outputText<-c(outputText,"!H!CInterval","mean","sd","skew","kurtosis","median","iqr",
                   outputTextI)
-    # outputText<-c(outputText,rep("",nc))
+    outputText<-c(outputText,rep("",nc))
   }
   if (done_ordinal){
     # outputText<-c(outputText,"!T",rep("",nc-1))
     # outputText<-c(outputText,rep("",nc))
     outputText<-c(outputText,"!H!COrdinal","median","iqr","mean","sd","","",
                   outputTextO)
-    # outputText<-c(outputText,rep("",nc))
+    outputText<-c(outputText,rep("",nc))
   }
   if (done_categorical){
     # outputText<-c(outputText,"!TCategorical",rep("",nc-1))

@@ -25,8 +25,13 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
       blankStyle<-blankLineStyle
       headerRow<-FALSE
       for (j in 1:nr) {
-        paste0(outputFront,"<tr>")
+        bgcolor<-"white"
+        startStyle<-""
+        outputFront<-paste0(outputFront,"<tr>")
         rowStyle<-paste0("font-size:",format(braw.env$labelSize*fontSize*3),"px;")
+        if (grepl("!H",outputText[index+1]) && grepl("!C",outputText[index+1]))
+          startStyle<-"font-weight:bold;text-align:right;"
+        
         if (any(grepl("!H",outputText[index+(1:nc)]))) {
           doubleHeaderTop<-FALSE
           doubleHeaderBottom<-headerRow
@@ -37,15 +42,15 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
             if (any(grepl("!H",outputText[index-nc+(1:nc)]))) doubleHeaderBottom<-TRUE
           }
           headerRow<-TRUE
+          bgcolor<-rowColour
           
-          rowStyle<-paste0(rowStyle,"font-weight:bold;")
+          # rowStyle<-paste0(rowStyle,"font-weight:bold;")
           rowStyle<-paste0(rowStyle,"text-align:center;")
           if (!doubleHeaderTop)
           rowStyle<-paste0(rowStyle,"border-bottom:solid;border-bottom-color:",lineColour,";border-bottom-width:1px;")
           if (!doubleHeaderBottom)
             rowStyle<-paste0(rowStyle,"border-top:solid;border-top-color:",lineColour,";border-top-width:1px;")
           rowStyle<-paste0(rowStyle,"padding-top:0px;padding-bottom:0px;")
-          rowStyle<-paste0(rowStyle," bgcolor='",rowColour,"';")
           outputText[index+(1:nc)]<-sub("!H","",outputText[index+(1:nc)])
         } else 
           headerRow<-FALSE
@@ -67,8 +72,10 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
           outputText[index+(1:nc)]<-sub("!T","",outputText[index+(1:nc)])
         }
         for (i in 1:nc) {
+          if (i>1) startStyle<-""
+          cellStyle<-""
+          
             index<-index+1
-            cellStyle<-""
             cellStyle<-paste0(cellStyle,cellPadding)
             if (any(i==col1Use)) cellStyle<-col1Style
             if (any(i==col2Use)) cellStyle<-col2Style
@@ -116,11 +123,12 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
 
             outputText[index]<-gsub("\\[([a-zA-Z0-9_+-]*)\\]","<sub>\\1</sub>",outputText[index])
             outputText[index]<-gsub("\\^([a-zA-Z0-9_+-]*)([a-zA-Z0-9_]*)","<sup>\\1</sup>",outputText[index])
+
             
             if (nchar(outputText[index])>0)
-                 outputFront<-paste0(outputFront,"<td style=",cellStyle,rowStyle,">",outputText[index],"</td>")
-            else outputFront<-paste0(outputFront,"<td style=height:1px;",rowStyle,"></td>")
-          }
+                 outputFront<-paste0(outputFront,"<td bgcolor=",bgcolor," style=",cellStyle,rowStyle,startStyle,">",outputText[index],"</td>")
+            else outputFront<-paste0(outputFront,"<td bgcolor=",bgcolor," style=height:1px;",rowStyle,"></td>")
+        }
         outputFront<-paste0(outputFront,"</tr>")
         if (index+nc<=length(outputText))
         if (all(sapply(outputText[index+(1:nc)],nchar)==0)) {
@@ -130,7 +138,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
           blankStyle<-blankLineStyle
         }
       }
-        outputBack<-paste0("</table>",outputBack)
+        outputBack<-paste0("</table></div>",outputBack)
     }
 
     return(paste0(preText,outputFront,outputBack))
@@ -234,16 +242,16 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
     mathlabel<-grepl("['^']{1}",label) || grepl("['[']{1}",label)
     if (any(mathlabel)) parse<-TRUE
     pts<-data.frame(x=x,y=top+1-y)
-    g<-addG(g,geom_label(data=pts,aes(x=x, y=y), label=label,fontface=fontface, 
+    g<-g+geom_label(data=pts,aes(x=x, y=y), label=label,fontface=fontface, 
                                          hjust=hjust, vjust=0, 
                                          size=font_size*sz, 
                                          col=col,fill=fill,
                                          parse=parse,
-                                         label.size=NA,label.padding=unit(0,"lines"))
+                                         label.size=NA,label.padding=unit(0,"lines")
     )
   }
   
-  g<-addG(g,labs(x="  ",y="  "),theme(legend.position = "none"))
-  g<-addG(g,coord_cartesian(xlim = c(1-margin,edge+margin), ylim = c(1-margin,top+margin)))
+  g<-g+labs(x="  ",y="  ")
+  g<-g+coord_cartesian(xlim = c(1-margin,edge+margin), ylim = c(1-margin,top+margin))
   return(g)
 }

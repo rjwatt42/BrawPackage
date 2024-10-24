@@ -37,14 +37,14 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
 
   if (!is.null(plotArea)) braw.env$plotArea<-plotArea
   
-  g<-startPlot(xlim=c(-1,1),ylim=c(0,1),back="transparent",box="none",g=g,fontScale=1)
+  g<-startPlot(xlim=c(-1,1),ylim=c(0,1),back="transparent",box="none",g=g)
   
   switch (t,
           {start=c(0,0.92)
           direction=0
           len=0.9
-          labelpts<-data.frame(x=0,y=0.5)
-          hjust<-1.3
+          labelpts<-data.frame(x=-0.1,y=0.5)
+          hjust<-1
           ends="last"
           fill=braw.env$plotColours$maineffectES},
           
@@ -88,7 +88,6 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
   if (showValue && braw.env$simData && !is.null(r)) {
     if (t==1){
       lbl=paste("r[p]=",as.character(r),sep="")
-      # lbl=bquote(bold(r[p] ~ "=" ~ .(r)))
     }else{ 
       if (r==0) lbl<-"0.0" else lbl<-as.character(r)
     }

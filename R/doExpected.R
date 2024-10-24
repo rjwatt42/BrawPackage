@@ -10,7 +10,19 @@ mergeExpected<-function(r1,r2) {
     poIV=rbind(r1$poIV,r2$poIV),
     nval=rbind(r1$nval,r2$nval),
     noval=rbind(r1$noval,r2$noval),
-    df1=rbind(r1$df1,r2$df1)
+    df1=rbind(r1$df1,r2$df1),
+    iv.mn=rbind(r1$iv.mn,r2$iv.mn),
+    iv.sd=rbind(r1$iv.sd,r2$iv.sd),
+    iv.sk=rbind(r1$iv.sk,r2$iv.sk),
+    iv.kt=rbind(r1$iv.kt,r2$iv.ky),
+    dv.mn=rbind(r1$dv.mn,r2$dv.mn),
+    dv.sd=rbind(r1$dv.sd,r2$dv.sd),
+    dv.sk=rbind(r1$dv.sk,r2$dv.sk),
+    dv.kt=rbind(r1$dv.kt,r2$dv.ky),
+    rs.mn=rbind(r1$rs.mn,r2$rs.mn),
+    rs.sd=rbind(r1$rs.sd,r2$rs.sd),
+    rs.sk=rbind(r1$rs.sk,r2$rs.sk),
+    rs.kt=rbind(r1$rs.kt,r2$rs.ky)
   )
   if (!is.null(r1$rIV2)) {
     newResult<-c(newResult,list(
@@ -42,7 +54,10 @@ resetExpected<-function(nsims=0,evidence,expectedResult=NULL){
     bm<-NA
   }
   newResult<-list(
-    rIV=b,pIV=b,rpIV=b,roIV=b,poIV=b,nval=b,noval=b,df1=b
+    rIV=b,pIV=b,rpIV=b,roIV=b,poIV=b,nval=b,noval=b,df1=b,
+    iv.mn=b,iv.sd=b,iv.sk=b,iv.kt=b,
+    dv.mn=b,dv.sd=b,dv.sk=b,dv.kt=b,
+    rs.mn=b,rs.sd=b,rs.sk=b,rs.kt=b
   )
   newResult<-c(newResult,list(
     rIV2=b,pIV2=b,rIVIV2DV=b,pIVIV2DV=b,
@@ -77,7 +92,7 @@ resetExpected<-function(nsims=0,evidence,expectedResult=NULL){
 #'                              doingNull=FALSE,autoShow=braw.env$autoShow,showType="Basic")
 #' @seealso showExpected() and reportExpected())
 #' @export
-doExpected <- function(nsims=10,expectedResult=NULL,hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=makeEvidence(),
+doExpected <- function(nsims=10,expectedResult=braw.res$expected,hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=makeEvidence(),
                          doingNull=FALSE,autoShow=braw.env$autoShow,showType="Basic") {
 
   if (!is.null(expectedResult)) {

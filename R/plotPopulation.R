@@ -337,7 +337,7 @@ plotPopulation<-function(IV,DV,effect,alpha=1,g=NULL){
          }
   )
   
-  g<-startPlot(xlim,ylim,g=g)
+  g<-startPlot(xlim,ylim,top=TRUE,g=g)
   g<-addG(g,xAxisTicks(xtick,xticklabel),xAxisLabel(IV$name))
   g<-addG(g,yAxisTicks(ytick,yticklabel),yAxisLabel(DV$name))
 

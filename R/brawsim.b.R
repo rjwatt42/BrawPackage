@@ -5,8 +5,12 @@ BrawSimClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
   "BrawSimClass",
   inherit = BrawSimBase,
   private = list(
+    .htmlwidget = NULL,  # Add instance for HTMLWidget
+    
     .init = function() {
+      private$.htmlwidget <- HTMLWidget$new() # Initialize the HTMLWidget instance 
     },
+    
     .run = function() {
       # debug information
       # self$results$debug$setVisible(TRUE)
@@ -14,7 +18,7 @@ BrawSimClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
 
       # initialization code 
       if (!exists("braw.env")) {
-        BrawOpts(fontScale = 1.5,graphC="white",graphicsSize=17)
+        BrawOpts(fontScale = 1.5,graphC="white",reducedOutput=TRUE,reportHTML=TRUE)
         braw.env$graphicsSize<<-braw.env$graphicsSize*0.6
         statusStore<-list(lastOutput="System",
                           showSampleType="Sample",
@@ -42,7 +46,10 @@ BrawSimClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
         )
         braw.env$statusStore<<-statusStore
       } else       statusStore<-braw.env$statusStore
-      
+
+      # self$results$testHTML$setVisible(TRUE)
+      # self$results$testHTML$setContent(makeSVG())
+
       # get some display parameters for later
       makeSampleNow<-self$options$makeSampleBtn
       showSampleType<-self$options$showSampleType
@@ -134,12 +141,12 @@ BrawSimClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
                        nlevs=self$options$DVnlevs,iqr=self$options$DViqr)
       IV<-makeVariable(self$options$IVname,self$options$IVtype,
                        mu=self$options$IVmu,sd=self$options$IVsd,skew=self$options$IVskew,kurtosis=self$options$IVkurt,
-                       ncats=self$options$IVncats,proportions=self$options$IVprops,
+                       ncats=self$options$IVncats,cases=self$options$IVcases,proportions=self$options$IVprops,
                        nlevs=self$options$IVnlevs,iqr=self$options$IViqr)
-      if (self$options$IV2on) {
+      if (self$options$presetIV2!="none") {
         IV2<-makeVariable(self$options$IV2name,self$options$IV2type,
                           mu=self$options$IV2mu,sd=self$options$IV2sd,skew=self$options$IV2skew,kurtosis=self$options$IV2kurt,
-                          ncats=self$options$IV2ncats,proportions=self$options$IV2props,
+                          ncats=self$options$IV2ncats,cases=self$options$IV2cases,proportions=self$options$IV2props,
                           nlevs=self$options$IV2nlevs,iqr=self$options$IV2iqr)
       } else {
         IV2<-NULL
@@ -166,22 +173,26 @@ BrawSimClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
       # set up the design variable
       oldD<-braw.def$design
       design<-makeDesign(sN=self$options$SampleSize,
-                         sNRand=self$options$SampleSpread=="yes",sNRandK=self$options$SampleGamma,
+                         sNRand=self$options$SampleSpreadOn,sNRandK=self$options$SampleGamma,
                          sMethod=makeSampling(self$options$SampleMethod),
                                 sIV1Use=self$options$SampleUsage1,
                                 sIV2Use=self$options$SampleUsage2,
                                 sDependence=self$options$Dependence,
                                 sOutliers=self$options$Outliers,
+                                sNonResponse=self$options$NonResponse,
+                                sRangeOn=self$options$LimitRange=="yes", 
+                                sIVRange=(c(self$options$RangeMin,self$options$RangeMax)-hypothesis$IV$mu)/hypothesis$IV$sd, 
                                 sCheating=self$options$Cheating,sCheatingAttempts=self$options$CheatingAttempts,
                          Replication=makeReplication(On=self$options$ReplicationOn,
                                                      Power=self$options$ReplicationPower,
                                                      Repeats=self$options$ReplicationAttempts,
                                                      Keep=self$options$ReplicationDecision,
-                                                     forceSigOriginal=FALSE,forceSign=(self$options$ReplicationSign=="yes"),
+                                                     forceSigOriginal=self$options$ReplicationSigOriginal=="yes",forceSign=(self$options$ReplicationSign=="yes"),
                                                      RepAlpha=self$options$ReplicationAlpha,
                                                      PowerPrior=self$options$ReplicationPrior
                                                      )
                          )
+      if (design$sNRand) design$sN<-self$options$SampleSizeM
       changedD<- !identical(oldD,design)
       
       # set up the evidence variable
@@ -211,26 +222,63 @@ BrawSimClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
                                  includeBias=self$options$MetaAnalysisBias=="yes")
       changedM<- !identical(oldM,metaAnalysis)
       
-      oldP<-braw.def$possible
-      possible<-makePossible(typePossible=self$options$likelihoodType,
-                             UsePrior=self$options$likelihoodUsePrior,
-                             prior=makeWorld(worldOn=TRUE,
-                                             populationPDF=self$options$priorPDF,
-                                             populationRZ=self$options$priorRZ,
-                                             populationPDFk=self$options$priorLambda,
-                                             populationNullp=self$options$priorNullP)
-                             )
-      changedP<- !identical(oldP,possible)
-      
-      
       # store the option variables inside the braw package
       braw.def$hypothesis<<-hypothesis
       braw.def$design<<-design
       braw.def$evidence<<-evidence
       braw.def$explore<<-explore
       braw.def$metaAnalysis<<-metaAnalysis
-      braw.def$possible<<-possible
-      
+
+      # now deal with a request for Jamovi instructions
+      # showJamoviNow1<-self$options$showJamovi1Btn
+      if(self$options$showJamovi) {
+        # assign("graphHTML",TRUE,braw.env)
+        # self$results$BrawStatsInstructions$setVisible(TRUE)
+        # self$results$BrawStatsInstructions$setContent(
+        #   paste0(
+        #   private$.htmlwidget$generate_tab(
+        #     title="BrawStats Help",
+        #     tabs=c("Plan","Single Sample","Multiple Samples","Explore","Key"),
+        #     tabContents = c(
+        #       BrawInstructions("Plan"),
+        #       BrawInstructions("Single"),
+        #       BrawInstructions("Multiple"),
+        #       BrawInstructions("Explore"),
+        #       BrawInstructions("Key")
+        #     )
+        #   ),
+        #   private$.htmlwidget$generate_tab(
+        #     title="Plan",
+        #     tabs=c("Hypothesis","Design","Expected"),
+        #     tabContents = c(
+        #       showHypothesis(),
+        #       "",
+        #       ""
+        #     ),
+        #     colours=c("#444444","#bbbbbb"),
+        #     plain=TRUE
+        #   )
+        #   )
+        #   )
+        
+        self$results$JamoviInstructions$setVisible(TRUE)
+        self$results$JamoviInstructions$setContent(
+          private$.htmlwidget$generate_tab(
+            title="Jamovi equivalent",
+            tabs=c("Analysis","Graph","EffectSize"),
+            tabContents = c(
+              JamoviInstructions(hypothesis,design,HelpType="Analysis"),
+              JamoviInstructions(hypothesis,design,HelpType="Graph"),
+              JamoviInstructions(hypothesis,design,HelpType="EffectSize")
+            )
+          )
+        )
+        assign("graphHTML",TRUE,braw.env)
+      } else self$results$JamoviInstructions$setVisible(FALSE)
+        
+        # instructions<-makeInstructions(hypothesis,design,HelpType="Graph")
+        # self$results$JamoviInstructions$setContent(instructions)
+
       # are any of the existing stored results now invalid?
       if (changedH || changedD) {
         braw.res$result<<-NULL
@@ -248,7 +296,7 @@ BrawSimClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
       }
       if (changedX) {
         braw.res$explore<<-NULL
-        outputNow<-"System"
+        # outputNow<-"System"
       }
       if (changedM) {
         braw.res$metaAnalysis<<-NULL
@@ -309,35 +357,49 @@ BrawSimClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
         switch(outputNow,
                "System"={
                  self$results$graphPlot$setState(outputNow)
-                 self$results$reportPlot$setState(NULL)
+                 self$results$reportPlot$setContent(reportPlot(NULL))
+               },
+               "Compact"={
+                 self$results$graphPlot$setState("Describe")
+                 self$results$reportPlot$setContent(reportInference())
                },
                "Sample"={
                  self$results$graphPlot$setState(outputNow)
-                 self$results$reportPlot$setState(outputNow)
+                 self$results$reportPlot$setContent(reportSample())
                },
                "Describe"={
                  self$results$graphPlot$setState(outputNow)
-                 self$results$reportPlot$setState(outputNow)
+                 self$results$reportPlot$setContent(reportDescription())
                },
                "Infer"={
                  self$results$graphPlot$setState(c(outputNow,showInferParam,showInferDimension))
-                 self$results$reportPlot$setState(c(outputNow,showInferParam))
+                 self$results$reportPlot$setContent(reportInference())
                },
                "Likelihood"={
-                 possibleResult<-doPossible()
+                 possible<-makePossible(typePossible=self$options$likelihoodType,
+                                        targetSample=NULL,
+                                        UsePrior=self$options$likelihoodUsePrior,
+                                        prior=makeWorld(worldOn=TRUE,
+                                                        populationPDF=self$options$priorPDF,
+                                                        populationRZ=self$options$priorRZ,
+                                                        populationPDFk=self$options$priorLambda,
+                                                        populationNullp=self$options$priorNullP)
+                 )
+                 possibleResult<-doPossible(possible)
                  self$results$graphPlot$setState(c(outputNow,likelihoodCutaway))
+                 self$results$reportPlot$setContent(reportLikelihood())
                },
                "Multiple"={
                  self$results$graphPlot$setState(c(outputNow,showMultipleParam,showMultipleDimension,whichShowMultipleOut))
-                 self$results$reportPlot$setState(c(outputNow,showMultipleParam))
+                 self$results$reportPlot$setContent(reportExpected(showType=showMultipleParam))
                },
                "Explore"={
                  self$results$graphPlot$setState(c(outputNow,showExploreParam,showExploreDimension,whichShowExploreOut))
-                 # self$results$reportPlot$setState(c(outputNow,showExploreParam))
+                 self$results$reportPlot$setContent(reportExplore(showType=showExploreParam))
                },
                {
                  self$results$graphPlot$setState(outputNow)
-                 self$results$reportPlot$setState(outputNow)
+                 self$results$reportPlot$setContent(NULL)
                }
         )
       
@@ -345,11 +407,11 @@ BrawSimClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
       # single result first
       if (!is.null(braw.res$result)) {
         if (is.null(IV2)) {
-          newVariables<-data.frame(braw.res$result$dv,braw.res$result$iv,braw.res$result$dv+NA)
-          names(newVariables)<-c(DV$name,IV$name,"-")
+          newVariables<-data.frame(braw.res$result$participant,braw.res$result$dv,braw.res$result$iv,braw.res$result$dv+NA)
+          names(newVariables)<-c("ID",DV$name,IV$name,"-")
         } else {
-          newVariables<-data.frame(braw.res$result$dv,braw.res$result$iv,braw.res$result$iv2)
-          names(newVariables)<-c(DV$name,IV$name,IV2$name)
+          newVariables<-data.frame(braw.res$result$participant,braw.res$result$dv,braw.res$result$iv,braw.res$result$iv2)
+          names(newVariables)<-c("ID",DV$name,IV$name,IV2$name)
         }
 
         keys<-1:length(newVariables)

@@ -74,28 +74,37 @@ makeFiddle<-function(y,yd,orientation="horiz"){
   xz<-c()
   xd<-0.15
   
+  d<-0.05
   for (i in 1:length(y)){
-    found<-(abs(yz-y[i])<yd)
+    found<-(abs(reRangeY(yz)-reRangeY(y[i]))<d)
     if (any(found,na.rm=TRUE)) {
-      x_max<-max(xz[found],na.rm=TRUE)
-      x_which<-which.max(xz[found])
-      y_at_max<-yz[found][x_which]
-      x_min<-min(xz[found],na.rm=TRUE)
-      x_which<-which.min(xz[found])
-      y_at_min<-yz[found][x_which]
-      if (orientation=="vert" && abs(x_min)<x_max) {
-        x_inc<-sqrt(1-((y[i]-y_at_min)/yd)^2)
-        xz<-c(xz,x_min-x_inc*xd)
-        yz<-c(yz,y[i])
-      } else {
-        x_inc<-sqrt(1-((y[i]-y_at_max)/yd)^2)
-        xz<-c(xz,x_max+x_inc*xd)
-        yz<-c(yz,y[i])
-      }
+      xdiff<-sqrt(d^2-(reRangeY(yz[found])-reRangeY(y[i]))^2)
+      xpos1<-reRangeX(xz[found])+xdiff
+      xpos2<-reRangeX(xz[found])-xdiff
+      if (all(xpos1<reRangeX(0))) usex1<-reRangeX(0) else usex1<-max(xpos1)
+      if (all(xpos2>reRangeX(0))) usex2<-reRangeX(0) else usex2<-min(xpos2)
+      if (abs(usex1-reRangeX(0))<abs(usex2-reRangeX(0))) usex<-usex1 else usex<-usex2
+      usex<-re2RangeX(usex)
+      # x_max<-max(xz[found],na.rm=TRUE)
+      # x_which<-which.max(xz[found])
+      # y_at_max<-yz[found][x_which]
+      # x_min<-min(xz[found],na.rm=TRUE)
+      # x_which<-which.min(xz[found])
+      # y_at_min<-yz[found][x_which]
+      # if (orientation=="vert" && abs(x_min)<x_max) {
+      #   x_inc<-sqrt(1-((y[i]-y_at_min)/yd)^2)
+      #   xz<-c(xz,x_min-x_inc*xd)
+      #   yz<-c(yz,y[i])
+      # } else {
+      #   x_inc<-sqrt(1-((y[i]-y_at_max)/yd)^2)
+      #   xz<-c(xz,x_max+x_inc*xd)
+      #   yz<-c(yz,y[i])
+      # }
+      xz<-c(xz,usex)
     } else {
       xz<-c(xz,0)
-      yz<-c(yz,y[i])
     }
+    yz<-c(yz,y[i])
   }
   if (orientation=="horz") xz<-xz/2
   return(xz)
@@ -344,6 +353,18 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
   }
   
   if (length(pts$y1)<=npointsMax) {
+    if (is.logical(pts$y2)) {
+      p1<-pts$y1[pts$y2]
+      p2<-pts$y1[!pts$y2]
+      if (!isempty(p1) && !isempty(p2)) {
+        doSort <- any(p1<max(p2) & p1>min(p2)) || any(p2<max(p1) & p2>min(p1))
+        if (doSort) {
+          use<-rev(order(pts$y2))
+          pts<-pts[use,]
+        }
+      }
+    }
+    
     if (!is.null(analysis) && is.element(showType,c("rs","p")) && length(pts$y1)==1) {
       # if (is.null(analysis$hypothesis$IV2)) {
         if (showType=="rs"){
@@ -373,7 +394,7 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
       # }
     }
     
-    xr<-makeFiddle(pts$y1,2/40,orientation)*scale*scale
+    xr<-makeFiddle(pts$y1,2/40/braw.env$plotArea[4],orientation)*scale*scale
     if (max(abs(xr))>0) xr<-xr/max(abs(xr))/1.5
     pts$x<-pts$x+xr
     gain<-7/max(7,sqrt(length(xr)))
@@ -980,15 +1001,15 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                 labelPt1<-paste0("p(sig correct) = ",brawFormat(s1/n*100,digits=npct),"%")
               }
       )
-      lpts1<-data.frame(y = ylim[2], x = xoff[i]+xlim[1])
+      lpts1<-data.frame(y = ylim[2]-diff(ylim)/50, x = xoff[i]+xlim[2])
       if (labelSig && is.null(analysis$hypothesis$IV2))
-        g<-addG(g,dataLabel(data=lpts1,label = labelPt1,vjust=1,size=0.9,label.size=0))
-      lpts1a<-data.frame(y = ylim[1], x = xoff[i]+xlim[1])
+        g<-addG(g,dataLabel(data=lpts1,label = labelPt1,hjust=1,vjust=0.5,size=0.9,label.size=0))
+      lpts1a<-data.frame(y = ylim[1]+diff(ylim)/50, x = xoff[i]+xlim[2])
       if (labelNSig)
-        g<-addG(g,dataLabel(data=lpts1a,label = labelPt1a,vjust=0,size=0.9,label.size=0))
+        g<-addG(g,dataLabel(data=lpts1a,label = labelPt1a,hjust=1,vjust=0.5,size=0.9,label.size=0))
       if (is.element(showType,c("e1d","e2d"))) {
-        lpts1<-data.frame(y = mean(ylim), x = xoff[i]+xlim[1])
-        g<-addG(g,dataLabel(data=lpts1,label = labelPt1b,vjust=0.5,size=0.9,label.size=0))
+        lpts1<-data.frame(y = mean(ylim), x = xoff[i]+xlim[2])
+        g<-addG(g,dataLabel(data=lpts1,label = labelPt1b,hjust=1,vjust=0.5,size=0.9,label.size=0))
       }
     }
   }
@@ -1022,12 +1043,10 @@ e2_plot<-function(analysis,disp,otheranalysis=NULL,orientation="vert",showTheory
     lambda<-brawFormat(analysis$hypothesis$effect$rIV,digits=3)
     switch (braw.env$RZ,
             "r"={
-              # lab<-bquote(bold("Non-null: " ~ r["p"] ~ "=" ~ .(lambda)))
-              lab<-paste0("Non-null: r[p]=",brawFormat(lambda))
+              lab<-paste0("NonNull: r[p]=",lambda)
             },
             "z"={
-              # lab<-bquote(bold("Non-null: " ~ z["p"] ~ "=" ~ .(lambda)))
-              lab<-paste0("Non-null: z[p]=",brawFormat(lambda))
+              lab<-paste0("NonNull: z[p]=",lambda)
             }
     )
   } else {
@@ -1036,12 +1055,10 @@ e2_plot<-function(analysis,disp,otheranalysis=NULL,orientation="vert",showTheory
   lambda<-brawFormat(analysis$hypothesis$effect$world$populationPDFk,digits=3)
   switch (braw.env$RZ,
           "r"={
-            # lab<-bquote(bold("Non-null: " ~ r["p"] ~ "~" ~ .(distr) (.(rz)/.(lambda))))
-            lab<-paste0("Non-null: r[p]=",dist,"(",rz,"/",brawFormat(lambda),")")
+            lab<-paste0("NonNull: r[p]=",dist,"(",rz,"/",lambda,")")
           },
           "z"={
-            # lab<-bquote(bold("Non-null: " ~ z["p"] ~ "~" ~ .(distr) (.(rz)/.(lambda))))
-            lab<-paste0("Non-null: z[p]=",dist,"(",rz,"/",brawFormat(lambda),")")
+            lab<-paste0("NonNull: z[p]=",dist,"(",rz,"/",lambda,")")
           }
   )
   
@@ -1067,11 +1084,9 @@ e2_plot<-function(analysis,disp,otheranalysis=NULL,orientation="vert",showTheory
 e1_plot<-function(nullanalysis,disp,otheranalysis=NULL,orientation="vert",showTheory=TRUE,g=NULL){
   switch (braw.env$RZ,
           "r"={
-            # lab<-bquote(bold("Null: " ~ r["p"] == 0))
             lab<-"Null: r[p]=0"
           },
           "z"={
-            # lab<-bquote(bold("Null: " ~ z["p"] == 0))
             lab<-"Null: z[p]=0"
           }
   )

@@ -51,7 +51,7 @@ makeEffect<-function(rIV=0,rIV2=0,rIVIV2=0,rIVIV2DV=0,Heteroscedasticity=0,
 makeHypothesis<-function(IV=braw.def$IV,IV2=braw.def$IV2,DV=braw.def$DV,effect=braw.def$effect) {
   hypothesis<-list(IV=IV,IV2=IV2,DV=DV,effect=effect)
   # assign("hypothesis",hypothesis,braw.def)
-  braw.def$hypothesis<-hypothesis
+  # braw.def$hypothesis<<-hypothesis
   return(hypothesis)
 }
 
@@ -190,7 +190,7 @@ makeDesign<-function(sN=42, sMethod=makeSampling("Random") ,sNRand=FALSE,sNRandK
                Replication=Replication
                )
   # assign("design",design,braw.def)
-  braw.def$design<-design
+  # braw.def$design<<-design
   
     design
 }
@@ -226,7 +226,7 @@ makeEvidence<-function(shortHand=FALSE,sigOnly=FALSE,
                  prior=prior
   )
 
-  braw.def$evidence<-evidence
+  # braw.def$evidence<<-evidence
   evidence
 }
 

@@ -35,18 +35,20 @@ densityFunctionStats<-function(dens_r,rp){
 
 describePossibleSamples<-function(possibleResult) {
   
+  if (is.null(possibleResult$Sims$r)) return(NULL)
   pRho<-possibleResult$pRho
-  pRhogain<-possibleResult$pRhogain
+  if (is.null(pRho)) pRho<-0
+  pRhogain<-1
   
-  sr_effectR<-possibleResult$Sims$sSims
+  sr_effectR<-matrix(possibleResult$Sims$r,nrow=1)
   sSimDens<-c()
   if (!isempty(sr_effectR)) {
-    if (RZ=="z") {
+    if (braw.env$RZ=="z") {
       use_effects<-atanh(sr_effectR)
-      hist_range<-z_range
+      hist_range<-braw.env$z_range
     } else {
       use_effects<-sr_effectR
-      hist_range<-r_range
+      hist_range<-braw.env$r_range
     }
     binWidth<-2*IQR(use_effects)/length(use_effects)^(1/3)
     nbins=round(2/binWidth)
@@ -56,14 +58,10 @@ describePossibleSamples<-function(possibleResult) {
       h<-hist(use_effects[i,use_data],sSimBins,plot=FALSE)$counts
       sSimDens<-rbind(sSimDens,h*pRhogain[i]/(1-tanh(pRho[i])^2))
     }
-    
-    rsSim_ci=quantile(use_effects,c(0.025,0.975))
-    rsSim_peak=sSimBins[which.max(sSimDens)]+sSimBins[2]-sSimBins[1]
-    rsSim_sd<-sd(use_effects,na.rm=TRUE)
-    
+
     result<-list(sr_effectR=sr_effectR,
-                 sSimBins=sSimBins,sSimDens=sSimDens,
-                 rsSim_peak=rsSim_peak,rsSim_sd=rsSim_sd,rsSim_ci=rsSim_ci)
+                 sSimBins=sSimBins,sSimDens=sSimDens
+                 )
   } else {
     result<-NULL
   }
@@ -71,32 +69,30 @@ describePossibleSamples<-function(possibleResult) {
 }
 
 
-describePossiblePopulations<-function(possibleResult) {
+describePossiblePopulations<-function(possibleResult,possible) {
   
   sRho<-possibleResult$sRho
   
-  pr_effectR<-possibleResult$Sims$pSims
-  pr_effectRP<-possibleResult$Sims$pSimsP
-  pr_effectN<-possibleResult$Sims$pSimsN
+  pr_effectR<-possibleResult$Sims$r
+  pr_effectRP<-possibleResult$Sims$rp
+  pr_effectN<-possibleResult$Sims$n
   
   if (!isempty(pr_effectRP)) {
-    pr_effectW<-rn2w(pr_effectRP,pr_effectN)
-    
+
     # do this in z - for symmetry
     keep<-abs(atanh(pr_effectR)-sRho[1])<possible$simSlice
     pr_effectRP_slice<-pr_effectRP[keep]
-    pr_effectW_slice<-pr_effectW[keep]
-    
-    if (RZ=="z") {
+
+    if (braw.env$RZ=="z") {
       use_effectRP_slice<-atanh(pr_effectRP_slice)
       use_effectR<-atanh(pr_effectR)
       use_effectRP<-atanh(pr_effectRP)
-      hist_range<-z_range
+      hist_range<-braw.env$z_range
     } else {
       use_effectRP_slice<-pr_effectRP_slice
       use_effectR<-pr_effectR
       use_effectRP<-pr_effectRP
-      hist_range<-1
+      hist_range<-braw.env$r_range
     }
     
     if (possible$prior$populationPDF=="Single" || possible$prior$populationPDF=="Double") {
@@ -106,8 +102,7 @@ describePossiblePopulations<-function(possibleResult) {
     }
     nbins=max(10,round(2/binWidth))
     pSimBins<-seq(-1,1,length.out=nbins+1)*hist_range
-    pSimBinsW<-seq(w_range[1],w_range[2],length.out=nbins+1)
-    
+
     keep<-abs(use_effectRP_slice)<hist_range
     pSimDens_slice<-hist(use_effectRP_slice[keep],pSimBins,plot=FALSE)$counts
     
@@ -117,22 +112,10 @@ describePossiblePopulations<-function(possibleResult) {
     keep<-abs(use_effectR)<hist_range
     pSimDensR<-hist(use_effectR[keep],pSimBins,plot=FALSE)$counts
     
-    keep<-pr_effectW_slice>=w_range[1] & pr_effectW_slice<=w_range[2]
-    pSimDensW<-hist(pr_effectW_slice[keep],pSimBinsW,plot=FALSE)$counts
-    
-    rpSim_ci=quantile(use_effectRP_slice,c(0.025,0.975))
-    rpSim_peak=pSimBins[which.max(pSimDens_slice)]+pSimBins[2]-pSimBins[1]
-    rpSim_sd<-sd(use_effectRP_slice,na.rm=TRUE)
-    rpSimWaste<-sum(!keep)
-    wpSim_peak<-pSimBinsW[which.max(pSimDensW)]+pSimBinsW[2]-pSimBinsW[1]
-    wpSim_mean<-mean(pr_effectW_slice,na.rm=TRUE)
-    wpSimWaste<-sum(!keep)
-    
-    result<-list(pr_effectR=pr_effectR,pr_effectRP=pr_effectRP,pr_effectN=pr_effectN,pr_effectW=pr_effectW,
+    result<-list(pr_effectR=pr_effectR,pr_effectRP=pr_effectRP,
                  pSimBins=pSimBins,
-                 pSimDens_slice=pSimDens_slice,pSimDensRP=pSimDensRP,pSimDensR=pSimDensR,pSimDensW=pSimDensW,
-                 rpSim_ci=rpSim_ci,rpSim_peak=rpSim_peak,rpSim_sd=rpSim_sd,rpSimWaste=rpSimWaste,
-                 wpSim_peak=wpSim_peak,wpSim_mean=wpSim_mean,wpSimWaste=wpSimWaste
+                 pSimDens_slice=pSimDens_slice,
+                 pSimDensRP=pSimDensRP,pSimDensR=pSimDensR
     )
   } else {
     result<-NULL
@@ -150,10 +133,11 @@ describePossiblePopulations<-function(possibleResult) {
 #'                        view="3D",axisScale=1,
 #'                        azimuth=30,elevation=5,distance=2)
 #' @export
-showPossible <- function(possibleResult=braw.res$possibleResult,
+showPossible <- function(possibleResult=NULL,
+                         showType="Populations",
                          cutaway=FALSE,walls=TRUE,showP=0,
                          view="3D",axisScale=1,
-                         azimuth=30,elevation=5,distance=2){
+                         azimuth=60,elevation=15,distance=8){
   
   if (is.null(possibleResult)) possibleResult<-doPossible()
   if (is.null(possibleResult$possible)) possibleResult<-doPossible(possible=possibleResult)
@@ -174,7 +158,7 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
   colPdark=darken(colP,off=-0.67)
   colPlight=darken(colP,off=0.25)
   colPsim=darken(colP,off=-0.33)
-  
+
   colPop="#000000"
   colVline="#000000"
   
@@ -187,7 +171,7 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
   zlabelSize=0.7
   tickLabelSize<-0.6
   
-  if (possible$type=="Samples") logZ<-FALSE else logZ<-TRUE 
+  if (showType=="Samples") logZ<-FALSE else logZ<-FALSE 
   if (logZ) wallHeight<-1 else wallHeight<-1.2
   magRange<-0.5
   
@@ -210,9 +194,10 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
           "prior"={possible$source<-possible$prior},
           "null"={possible$source<-list(worldOn=TRUE,populationPDF="Single",populationPDFk=0,populationRZ="r",populationNullp=0)}
   )
+  if (showType=="Samples") possible$UsePrior<-"hypothesis"
   # make the distribution        
   
-  switch (possible$type,
+  switch (showType,
           "Samples"={
             label.z<-"Probability Density"
             col=colP
@@ -242,27 +227,24 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
   priorSampDens_r_plus<-possibleResult$Theory$priorSampDens_r_plus
   
   # make the histograms
-  switch (possible$type,
-          "Samples"={
-            srAnalysis<-describePossibleSamples(possibleResult)
-            sSimBins<-srAnalysis$sSimBins
-            sSimDens<-srAnalysis$sSimDens
-          },
-          "Populations"={
-            prAnalysis<-describePossiblePopulations(possibleResult)
-            pSimBins<-prAnalysis$pSimBins
-            pSimDens_slice<-prAnalysis$pSimDens_slice
-            pSimDensRP<-prAnalysis$pSimDensRP
-            pSimDensR<-prAnalysis$pSimDensR
-            
-            pSimBinsW<-prAnalysis$pSimBinsW
-            pSimDensW<-prAnalysis$pSimDensW
-          }
-  )
+  srAnalysis<-describePossibleSamples(possibleResult)
+  sSimBins<-srAnalysis$sSimBins
+  sSimDens<-srAnalysis$sSimDens
+  prAnalysis<-describePossiblePopulations(possibleResult,possible)
+  pSimBins<-prAnalysis$pSimBins
+  pSimDens_slice<-prAnalysis$pSimDens_slice
+  pSimDensRP<-prAnalysis$pSimDensRP
+  pSimDensR<-prAnalysis$pSimDensR
+  # switch (showType,
+  #         "Samples"={
+  #         },
+  #         "Populations"={
+  #         }
+  # )
   
   # make the back wall population distributions
   rpw<-rp
-  if (possible$type=="Samples") {
+  if (showType=="Samples") {
     rpw_dens<-possibleResult$Theory$sourcePopDens_r
   } else {
     rpw_dens<-possibleResult$Theory$priorPopDens_r
@@ -286,12 +268,12 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
     xlim<-c(min(rp),max(rp))/axisScale+offRange # population
     ylim<-c(min(rs),max(rs))/axisScale+offRange
   }
-  zlim<-c(0,1)*wallHeight
+  zlim<-c(0,1)
   
   if (length(sourceRVals)<8) draw_lower_limit=0.000001
   else                       draw_lower_limit=0.01
   if (logZ) {
-    if (possible$type=="Samples") {
+    if (showType=="Samples") {
       zlim<-c(-2,0)
     } else {
       zlim<-c(-2,0)
@@ -308,7 +290,7 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
   }
   
   rpw_dens[rpw_dens>1 | is.na(rpw_dens)]<-1
-  # if (!(possible$type=="Populations" && possible$UsePrior=="none")) {
+  # if (!(showType=="Populations" && possible$UsePrior=="none")) {
     rsw_dens_plus<-rsw_dens_plus/max(rsw_dens,na.rm=TRUE)
     rsw_dens_null<-rsw_dens_null/max(rsw_dens,na.rm=TRUE)
   # }
@@ -323,78 +305,93 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
   if (is.element(view,c("3D","flat"))) {
     
     # make the floor
-    f <- function(x, y) { x*0+y*0 }
-    z <- outer(xlim, xlim, f)+zlim[1]
-    z[is.na(z)] <- zlim[1]
-    par(bg=braw.env$plotColours$graphC,mar=c(0,1,0,0),font.lab=2)
-    mapping<-persp(xlim,ylim,z, 
-                   xlim=xlim+c(-1,1)*diff(xlim)*0.1,
-                   ylim=ylim+c(-1,1)*diff(ylim)*0.1,
-                   zlim = zlim, 
-                   theta = azimuth, phi = elevation, r=distance, 
-                   ticktype = "simple", 
-                   box = FALSE,
-                   axes = FALSE,
-                   expand = 0.5, col = braw.env$plotColours$graphBack,
-                   cex.axis=0.6,
-                   xlab = "Populations", ylab = "Samples", zlab = label.z
-    )
+    braw.env$plotArea<-c(0,0,1,1)
+    mapping<-mapping3D(azimuth,elevation,distance,xlim,ylim,zlim)
+    g<-startPlot(xlim=c(-1,1),ylim=c(-1,1),gaps=c(0.2,0.1,0,0)/2,box="none",backC=braw.env$plotColours$graphC)
+    pts<-rotate3D(data.frame(x=xlim[c(1,2,2,1)],y=ylim[c(1,1,2,2)],z=c(0,0,0,0)+zlim[1]),mapping)
+    g<-addG(g,dataPolygon(pts,fill=braw.env$plotColours$graphBack))
     # outside box            
     if (boxed){
-      polygon(trans3d(x=c(xlim[1], xlim[1], xlim[1],xlim[1]),
-                      y=c(ylim[1], ylim[1], ylim[2],ylim[2]),
-                      z=zlim[c(1, 2, 2,1)],mapping),
-              col=braw.env$plotColours$graphBack,border=NA
+      g<-addG(g,
+              dataPolygon(rotate3D(data.frame(x=xlim[c(1,1,1,1)],
+                                         y=ylim[c(1,1,2,2)],
+                                         z=zlim[c(1,2,2,1)]
+              ),
+              mapping),
+              fill=braw.env$plotColours$graphBack
+              ),
+              dataPolygon(rotate3D(data.frame(x=xlim[c(1,1,2,2)],
+                                         y=ylim[c(2,2,2,2)],
+                                         z=zlim[c(1,2,2,1)]
+              ),
+              mapping),
+              fill=braw.env$plotColours$graphBack
+              ),
+              dataPath(rotate3D(data.frame(x=xlim[c(1,1,2)],
+                                      y=ylim[c(1,2,2)],
+                                      z=zlim[c(2,2,2)]
+              ),
+              mapping),
+              colour=BoxCol
+              ),
+              dataPath(rotate3D(data.frame(x=xlim[c(1,1)],
+                                      y=ylim[c(1,1)],
+                                      z=zlim[c(1,2)]
+              ),
+              mapping),
+              colour=BoxCol
+              ),
+              dataPath(rotate3D(data.frame(x=xlim[c(1,1)],
+                                      y=ylim[c(2,2)],
+                                      z=zlim[c(1,2)]
+              ),
+              mapping),
+              colour=BoxCol
+              ),
+              dataPath(rotate3D(data.frame(x=xlim[c(2,2)],
+                                      y=ylim[c(2,2)],
+                                      z=zlim[c(1,2)]
+              ),
+              mapping),
+              colour=BoxCol
+              )
       )
-      polygon(trans3d(x=c(xlim[1], xlim[1], xlim[2],xlim[2]),
-                      y=c(ylim[2], ylim[2], ylim[2],ylim[2]),
-                      z=zlim[c(1, 2, 2,1)],mapping),
-              col=braw.env$plotColours$graphBack,border=NA
-      )
-      lines(trans3d(x=c(xlim[1], xlim[1], xlim[2]),
-                    y=c(ylim[1],ylim[2],ylim[2]),
-                    z=c(zlim[2],zlim[2],zlim[2]),pmat=mapping), col=BoxCol)        
-      lines(trans3d(x=c(xlim[1],xlim[1]),
-                    y=c(ylim[1],ylim[1]),
-                    z=zlim,pmat=mapping),col=BoxCol)
-      lines(trans3d(x=c(xlim[1],xlim[1]),
-                    y=c(ylim[2],ylim[2]),
-                    z=zlim,pmat=mapping),col=BoxCol)
-      lines(trans3d(x=c(xlim[2],xlim[2]),
-                    y=c(ylim[2],ylim[2]),
-                    z=zlim,pmat=mapping),col=BoxCol)
     }
     
-    tick_grow<-2
-    xtick_length<-0.02*diff(xlim)
-    ytick_length<-0.02*diff(ylim)
+    tick_grow<-3
+    tick_more<-2
+    xtick_length<-0.03*diff(xlim)
+    ytick_length<-0.03*diff(ylim)
     
     if (!is.null(label.z)) {
       # z-axis
-      lines(trans3d(x=c(xlim[1],xlim[1]),
+      g<-addG(g,dataPath(rotate3D(data.frame(x=c(xlim[1],xlim[1]),
                     y=c(ylim[1],ylim[1]),
-                    z=zlim,pmat=mapping),col="black")
+                    z=zlim),mapping),colour="black")
+      )
       # short ticks
       if (boxed) {
         plot_ticks<-seq(zlim[1],zlim[2],diff(zlim)/10)
       } else {
         plot_ticks<-seq(zlim[1],zlim[2],diff(zlim)/10)
       }
-      tick.z.start <- trans3d(xlim[1],ylim[1],plot_ticks, mapping)
-      tick.z.end <- trans3d(xlim[1],ylim[1]-ytick_length,plot_ticks, mapping)
-      segments(tick.z.start$x, tick.z.start$y, tick.z.end$x, tick.z.end$y)
+      tick.z.start <- rotate3D(data.frame(x=xlim[1],y=ylim[1],z=plot_ticks), mapping)
+      tick.z.end <- rotate3D(data.frame(x=xlim[1],y=ylim[1]-ytick_length,z=plot_ticks), mapping)
+      for (i in 1:length(tick.z.start$x))
+      g<-addG(g,dataPath(data.frame(x=c(tick.z.start$x[i],tick.z.end$x[i]),y=c(tick.z.start$y[i],tick.z.end$y[i]))))
       # long ticks
       long_ticks<-seq(zlim[1],zlim[2],diff(zlim)/2)
-      tick.z.start <- trans3d(xlim[1],ylim[1],long_ticks, mapping)
-      tick.z.end <- trans3d(xlim[1],ylim[1]-ytick_length*tick_grow,long_ticks, mapping)
-      segments(tick.z.start$x, tick.z.start$y, tick.z.end$x, tick.z.end$y)
+      tick.z.start <- rotate3D(data.frame(x=xlim[1],y=ylim[1],z=long_ticks), mapping)
+      tick.z.end <- rotate3D(data.frame(x=xlim[1],y=ylim[1]-ytick_length,z=long_ticks), mapping)
+      for (i in 1:length(tick.z.start$x))
+        g<-addG(g,dataPath(data.frame(x=c(tick.z.start$x[i],tick.z.end$x[i]),y=c(tick.z.start$y[i],tick.z.end$y[i]))))
       # label
-      pos.z<-trans3d(xlim[1],ylim[1]-diff(ylim)*0.08,mean(zlim),mapping)
-      rotate.z=trans3d(x=c(xlim[1],xlim[1]),
+      pos.z<-rotate3D(data.frame(x=xlim[1],y=ylim[1]-diff(ylim)*0.08,z=mean(zlim)),mapping)
+      rotate.z=rotate3D(data.frame(x=c(xlim[1],xlim[1]),
                        y=c(ylim[1],ylim[1]),
-                       z=zlim,pmat=mapping)
+                       z=zlim),mapping)
       rotate.z<-180+atan(diff(rotate.z$y)/diff(rotate.z$x))*57.296
-      text(pos.z$x,pos.z$y,label.z,srt=rotate.z,font=2,cex=char3D*zlabelSize)
+      g<-addG(g,dataText(data.frame(x=pos.z$x,y=pos.z$y),label=label.z,angle=rotate.z,hjust=0.5,size=0.7,fontface="bold"))
     }
     
     # x ticks
@@ -406,17 +403,19 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
       long_ticks<-seq(ceil(xlim[1]*10),floor(xlim[2]*10))/10
     
     # short ticks  
-    tick.x.start <- trans3d(plot_ticks, ylim[1], zlim[1], mapping)
-    tick.x.end <- trans3d(plot_ticks , ylim[1]-ytick_length, zlim[1], mapping)
-    segments(tick.x.start$x, tick.x.start$y, tick.x.end$x, tick.x.end$y)
+    tick.x.start <- rotate3D(data.frame(x=plot_ticks, y=ylim[1], z=zlim[1]), mapping)
+    tick.x.end <- rotate3D(data.frame(x=plot_ticks, y=ylim[1]-ytick_length, z=zlim[1]), mapping)
+    for (i in 1:length(tick.x.start$x))
+      g<-addG(g,dataPath(data.frame(x=c(tick.x.start$x[i],tick.x.end$x[i]),y=c(tick.x.start$y[i],tick.x.end$y[i]))))
     # long ticks
-    tick.x.start <- trans3d(long_ticks, ylim[1], zlim[1], mapping)
-    tick.x.end <- trans3d(long_ticks , ylim[1]-ytick_length*tick_grow, zlim[1], mapping)
-    segments(tick.x.start$x, tick.x.start$y, tick.x.end$x, tick.x.end$y)
+    tick.x.start <- rotate3D(data.frame(x=long_ticks, y=ylim[1], z=zlim[1]), mapping)
+    tick.x.end <- rotate3D(data.frame(x=long_ticks, y=ylim[1]-ytick_length*tick_more, z=zlim[1]), mapping)
+    for (i in 1:length(tick.x.start$x))
+      g<-addG(g,dataPath(data.frame(x=c(tick.x.start$x[i],tick.x.end$x[i]),y=c(tick.x.start$y[i],tick.x.end$y[i]))))
     # tick labels
-    ticks.x<-trans3d(long_ticks+xtick_length,ylim[1]- ytick_length*tick_grow*2.5,zlim[1],mapping)
-    text(ticks.x$x,ticks.x$y,long_ticks,cex=char3D*tickLabelSize,adj=c(0.5,0.5))
-    
+    ticks.x<-rotate3D(data.frame(x=long_ticks,y=ylim[1]-ytick_length*tick_grow,z=zlim[1]),mapping)
+    g<-addG(g,dataText(data.frame(x=ticks.x$x,y=ticks.x$y),long_ticks,hjust=1,vjust=0.5,size=0.7))
+
     # y ticks
     plot_ticks<-seq(ceil(ylim[1]*10),floor(ylim[2]*10))/10
     long_ticks<-seq(ceil(xlim[1]*2),floor(xlim[2]*2))/2
@@ -424,17 +423,19 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
       long_ticks<-seq(ceil(xlim[1]*5),floor(xlim[2]*5))/5
     if (length(long_ticks)==1)
       long_ticks<-seq(ceil(xlim[1]*10),floor(xlim[2]*10))/10
-    
-    tick.y.start <- trans3d(xlim[2], plot_ticks, zlim[1], mapping)
-    tick.y.end <- trans3d(xlim[2]+xtick_length, plot_ticks , zlim[1], mapping)
-    segments(tick.y.start$x, tick.y.start$y, tick.y.end$x, tick.y.end$y)
+    # short ticks  
+    tick.y.start <- rotate3D(data.frame(x=xlim[2], y=plot_ticks, z=zlim[1]), mapping)
+    tick.y.end <- rotate3D(data.frame(x=xlim[2]+xtick_length, y=plot_ticks, z=zlim[1]), mapping)
+    for (i in 1:length(tick.y.start$x))
+      g<-addG(g,dataPath(data.frame(x=c(tick.y.start$x[i],tick.y.end$x[i]),y=c(tick.y.start$y[i],tick.y.end$y[i]))))
     # long ticks
-    tick.y.start <- trans3d(xlim[2], long_ticks, zlim[1], mapping)
-    tick.y.end <- trans3d(xlim[2]+xtick_length*tick_grow, long_ticks , zlim[1], mapping)
-    segments(tick.y.start$x, tick.y.start$y, tick.y.end$x, tick.y.end$y)
+    tick.y.start <- rotate3D(data.frame(x=xlim[2], y=long_ticks, z=zlim[1]), mapping)
+    tick.y.end <- rotate3D(data.frame(x=xlim[2]+xtick_length*tick_more, y=long_ticks, z=zlim[1]), mapping)
+    for (i in 1:length(tick.y.start$x))
+      g<-addG(g,dataPath(data.frame(x=c(tick.y.start$x[i],tick.y.end$x[i]),y=c(tick.y.start$y[i],tick.y.end$y[i]))))
     # tick labels
-    ticks.y<-trans3d(xlim[2]+xtick_length*tick_grow*2.5,long_ticks,zlim[1],mapping)
-    text(ticks.y$x,ticks.y$y,long_ticks,cex=char3D*tickLabelSize,adj=c(0.5,0.5))
+    ticks.y<-rotate3D(data.frame(x=xlim[2]+xtick_length*tick_grow,y=long_ticks,z=zlim[1]),mapping)
+    g<-addG(g,dataText(data.frame(x=ticks.y$x,y=ticks.y$y),long_ticks,hjust=0.5,vjust=0.5,size=0.7))
     
     if (braw.env$RZ=="r") {
       label.x<-"r[p]"
@@ -444,33 +445,39 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
       label.y<-"z[s]"
     }
     
-    pos.x<-trans3d(sum(xlim)/2,ylim[1]-ytick_length*tick_grow*5,zlim[1]-0.1,mapping)
-    text(pos.x$x,pos.x$y,label.x,adj=c(0.5,0.5),font=2,cex=char3D*xylabelSize)
-    
-    pos.y<-trans3d(xlim[2]+xtick_length*tick_grow*5,sum(ylim)/2,zlim[1]-0.1,mapping)
-    text(pos.y$x,pos.y$y,label.y,adj=c(0.5,0.5),font=2,cex=char3D*xylabelSize)
-    
+    pos.x<-rotate3D(data.frame(x=sum(xlim)/2,y=ylim[1]-ytick_length*tick_grow*2,z=zlim[1]-0.1),mapping)
+    g<-addG(g,dataText(pos.x,label.x,hjust=0.5,vjust=0.5,fontface="bold"))
+
+    pos.y<-rotate3D(data.frame(x=xlim[2]+xtick_length*tick_grow*2,y=sum(ylim)/2,z=zlim[1]-0.1),mapping)
+    g<-addG(g,dataText(pos.y,label.y,hjust=0.5,vjust=0.5,fontface="bold"))
   }
-  # graph frame
+
+    # graph frame
   switch (view,
           "3D"= {
             
             # lines on the floor
             # general 
             if (doFloorLines) {
-              lines(trans3d(x=xlim,y=c(0,0),z=c(0,0)+zlim[1],pmat=mapping),col="black",lty=3)
-              lines(trans3d(x=c(0,0),y=ylim,z=c(0,0)+zlim[1],pmat=mapping),col="black",lty=3)
+              g<-addG(g,
+                      dataPath(rotate3D(data.frame(x=xlim,y=c(0,0),z=c(0,0)+zlim[1]),mapping),linetype="dotted"),
+                      dataPath(rotate3D(data.frame(x=c(0,0),y=ylim,z=c(0,0)+zlim[1]),mapping),linetype="dotted")
+              )
             }
             # populations 
             # if (!cutaway && !is.null(possible$targetSample)) {
             #   lines(trans3d(x=xlim,y=c(0,0)+possible$targetSample,z=c(0,0)+zlim[1],pmat=mapping),col=colVline,lwd=1,lty=3)
             # }
-            if (possible$type=="Populations" && !is.na(possible$targetPopulation)) {
-              lines(trans3d(x=c(0,0)+possible$targetPopulation,y=ylim,z=c(0,0)+zlim[1],pmat=mapping),col=colPop,lwd=1,lty=3)
+            if (showType=="Populations" && !is.null(possible$targetPopulation)) {
+              g<-addG(g,
+                      dataPath(rotate3D(data.frame(x=c(0,0)+possible$targetPopulation,y=ylim,z=c(0,0)+zlim[1]),mapping),colour=colPop,linetype="dotted")
+              )
             }
-            if (possible$type=="Samples" && !any(is.na(sourceRVals)) && length(sourceRVals)<8) {
+            if (showType=="Samples" && !any(is.na(sourceRVals)) && length(sourceRVals)<8) {
               for (s in sourceRVals)
-              lines(trans3d(x=c(0,0)+s,y=ylim,z=c(0,0)+zlim[1],pmat=mapping),col=colVline,lwd=1,lty=3)
+                g<-addG(g,
+                        dataPath(rotate3D(data.frame(x=c(0,0)+s,y=ylim,z=c(0,0)+zlim[1]),mapping),colour=colVline,linetype="dotted")
+                )
             }
             
             # populations 
@@ -478,11 +485,15 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
               # show peak and CIs on floor
               if (doFloorCILines) {
                 if (rp_peak==0 && possible$UsePrior!="none") colHere<-colNullS else colHere<-colDistS
-                lines(trans3d(x=c(rp_peak,rp_peak),y=c(ylim[1],ylim[2]),z=c(0,0)+zlim[1],pmat=mapping),col=colHere,lwd=1)
+                g<-addG(g,
+                        dataPath(rotate3D(data.frame(x=c(rp_peak,rp_peak),y=ylim,z=c(0,0)+zlim[1]),mapping),colour=colHere)
+                )
                 # lines(trans3d(x=c(0,0),y=ylim,z=c(0,0)+zlim[1],pmat=mapping),col=colVline,lwd=1,lty=3)
                 if (doCILines) {
-                  lines(trans3d(x=c(rp_ci[1],rp_ci[1]),y=ylim,z=c(0,0)+zlim[1],pmat=mapping),col=colHere,lty=3,lwd=1)
-                  lines(trans3d(x=c(rp_ci[2],rp_ci[2]),y=ylim,z=c(0,0)+zlim[1],pmat=mapping),col=colHere,lty=3,lwd=1)
+                  g<-addG(g,
+                          dataPath(rotate3D(data.frame(x=c(rp_ci[1],rp_ci[1]),y=ylim,z=c(0,0)+zlim[1]),mapping),colour=colHere),
+                          dataPath(rotate3D(data.frame(x=c(rp_ci[2],rp_ci[2]),y=ylim,z=c(0,0)+zlim[1]),mapping),colour=colHere)
+                  )
                 }
               }
               # show rp==rs on floor
@@ -507,7 +518,9 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
               z<-populationBackwall$rpw_dens
               if (logZ) z<-log10(z)
               use<- which((x>=xlim[1]) & (x<=xlim[2]) & (z>=zlim[1]))
-              polygon(trans3d(x=c(x[use[1]],x[use],x[use[length(use)]]),y=c(y[use[1]],y[use],y[use[length(use)]]),z=c(zlim[1],z[use],zlim[1])*wallHeight,pmat=mapping),col=addTransparency(colP,0.25))
+              g<-addG(g,
+                      dataPolygon(rotate3D(data.frame(x=c(x[use[1]],x[use],x[use[length(use)]]),y=c(y[use[1]],y[use],y[use[length(use)]]),z=c(zlim[1],z[use],zlim[1])*wallHeight),mapping),fill=colP,alpha=0.25)
+              )
               
               if (showJointLk && !any(is.na(populationBackwall$priorSampDens_r))) {
                 # show the joint likelihood function
@@ -516,19 +529,26 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
                 z<-populationBackwall$priorSampDens_r
                 if (logZ) z<-log10(z)
                 use<- which((x>=xlim[1]) & (x<=xlim[2]) & (z>=zlim[1]))
-                polygon(trans3d(x=c(x[use[1]],x[use],x[use[length(use)]]),y=c(y[use[1]],y[use],y[use[length(use)]]),z=c(zlim[1],z[use],zlim[1])*wallHeight,pmat=mapping),col=addTransparency(colP,0.25))
-                # polygon(trans3d(x=c(x[1],x,x[length(x)]),y=c(y[1],y,y[length(y)]),z=c(zlim[1],z,zlim[1])*wallHeight,pmat=mapping),col = addTransparency(colPdark,0.5),border=NA)
+                g<-addG(g,
+                        dataPolygon(rotate3D(data.frame(x=c(x[use[1]],x[use],x[use[length(use)]]),y=c(y[use[1]],y[use],y[use[length(use)]]),z=c(zlim[1],z[use],zlim[1])*wallHeight),mapping),fill=colP,alpha=0.25)
+                )
               }
-              if (possible$type=="Populations" && !is.null(possible$targetSample)) {
+              if (showType=="Populations" && !is.null(possible$targetSample)) {
                 # show peak likelihood on population back wall
                 if (rp_peak==0) colHere<-colNullS else colHere<-colDistS
                 dens_rp_peak<-approx(populationBackwall$rpw,populationBackwall$rpw_dens,rp_peak)$y
                 if (logZ)  dens_rp_peak<-log10(dens_rp_peak)
-                lines(trans3d(x=c(0,0)+rp_peak,y=c(0,0)+ylim[2],z=c(zlim[1],dens_rp_peak)*wallHeight,pmat=mapping),col=colHere,lwd=2)
+                g<-addG(g,
+                        dataPath(rotate3D(data.frame(x=c(0,0)+rp_peak,y=c(0,0)+ylim[2],z=c(zlim[1],dens_rp_peak)*wallHeight),mapping),colour=colHere,linewidth=0.5)
+                )
                 # show population likelihood on population back wall
+                if (!is.null(possible$targetPopulation)) {
                 dens_target<-approx(populationBackwall$rpw,populationBackwall$rpw_dens,possible$targetPopulation)$y
                 if (logZ)  dens_target<-log10(dens_target)
-                lines(trans3d(x=c(0,0)+possible$targetPopulation,y=c(0,0)+ylim[2],z=c(zlim[1],dens_target)*wallHeight,pmat=mapping),col=colPop,lwd=1,lty=3)
+                g<-addG(g,
+                        dataPath(rotate3D(data.frame(x=c(0,0)+possible$targetPopulation,y=c(0,0)+ylim[2],z=c(zlim[1],dens_target)*wallHeight),mapping),colour=colPop,linetype="dotted")
+                )
+                }
               }
               
               # sample wall
@@ -546,8 +566,13 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
                 ztotal[ztotal<zlim[1]]<-zlim[1]
               }
               use<- which((y>=ylim[1]) & (y<=ylim[2]))
-              # if (!(possible$type=="Populations" && possible$UsePrior=="none")) {
-              polygon(trans3d(x=c(x[use[1]],x[use],x[use[length(use)]]),y=c(y[use[1]],y[use],y[use[length(use)]]),z=c(zlim[1],ztotal[use],zlim[1])*wallHeight,pmat=mapping),col=addTransparency(colS,0.25))
+              # if (!(showType=="Populations" && possible$UsePrior=="none")) {
+              g<-addG(g,
+                      dataPolygon(rotate3D(data.frame(x=c(x[use[1]],x[use],x[use[length(use)]]),
+                                                      y=c(y[use[1]],y[use],y[use[length(use)]]),
+                                                      z=c(zlim[1],ztotal[use],zlim[1])*wallHeight),mapping),
+                                  fill=colS,alpha=0.25)
+              )
                 # split into 2 parts  
                 if (possible$source$worldOn && possible$source$populationNullp>0){
                   if (!any(is.na(sampleBackwall$rsw_dens_null))) {
@@ -569,12 +594,16 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
                     zplus[zplus<zlim[1]]<-zlim[1]
                   }
                   if (possible$source$populationNullp>0 ) {
-                    lines(trans3d(x=x[use],y=y[use],z=znull[use]*wallHeight,pmat=mapping),col=colNullS,lwd=2)
+                    g<-addG(g,
+                            dataPath(rotate3D(data.frame(x=x[use],y=y[use],z=znull[use]*wallHeight),mapping),colour=colNullS,linewidth=0.5)
+                    )
                   }
-                  lines(trans3d(x=x[use],y=y[use],z=zplus[use]*wallHeight,pmat=mapping),col=colDistS,lwd=2)
+                  g<-addG(g,
+                          dataPath(rotate3D(data.frame(x=x[use],y=y[use],z=zplus[use]*wallHeight),mapping),colour=colDistS,linewidth=0.5)
+                  )
                 }
               # }
-              
+
               # vertical lines
               if (possible$showTheory) {
                 # show probability density on sample back wall
@@ -583,7 +612,10 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
                     z<-approx(sampleBackwall$rsw,ztotal,sRho[si])$y
                     z[z<0]<-0
                     if (logZ) z<-log10(z)
-                    lines(trans3d(x=c(0,0)+xlim[1],y=c(sRho[si],sRho[si]),z=c(zlim[1],z)*wallHeight,pmat=mapping),col=colVline,lwd=1)
+                    if (z>=zlim[1])
+                    g<-addG(g,
+                            dataPath(rotate3D(data.frame(x=c(0,0)+xlim[1],y=c(sRho[si],sRho[si]),z=c(zlim[1],z)*wallHeight),mapping),colour=colVline)
+                    )
                   }
                 }
                 si=1;
@@ -597,11 +629,15 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
                   zb[zb<zlim[1]]<-zlim[1]
                 }
                 if (za>=zb) {
-                  lines(trans3d(x=c(0,0)+xlim[1],y=c(sRho[si],sRho[si]),z=c(zlim[1],za)*wallHeight,pmat=mapping),col=colNullS,lwd=2)
-                  lines(trans3d(x=c(0,0)+xlim[1],y=c(sRho[si],sRho[si]),z=c(zlim[1],zb)*wallHeight,pmat=mapping),col=colDistS,lwd=2)
+                  g<-addG(g,
+                          dataPath(rotate3D(data.frame(x=c(0,0)+xlim[1],y=c(sRho[si],sRho[si]),z=c(zlim[1],za)*wallHeight),mapping),colour=colNullS,linewidth=0.5),
+                          dataPath(rotate3D(data.frame(x=c(0,0)+xlim[1],y=c(sRho[si],sRho[si]),z=c(zlim[1],zb)*wallHeight),mapping),colour=colDistS,linewidth=0.5)
+                  )
                 } else {
-                  lines(trans3d(x=c(0,0)+xlim[1],y=c(sRho[si],sRho[si]),z=c(zlim[1],zb)*wallHeight,pmat=mapping),col=colDistS,lwd=2)
-                  lines(trans3d(x=c(0,0)+xlim[1],y=c(sRho[si],sRho[si]),z=c(zlim[1],za)*wallHeight,pmat=mapping),col=colNullS,lwd=2)
+                  g<-addG(g,
+                          dataPath(rotate3D(data.frame(x=c(0,0)+xlim[1],y=c(sRho[si],sRho[si]),z=c(zlim[1],zb)*wallHeight),mapping),colour=colDistS,linewidth=0.5),
+                          dataPath(rotate3D(data.frame(x=c(0,0)+xlim[1],y=c(sRho[si],sRho[si]),z=c(zlim[1],za)*wallHeight),mapping),colour=colNullS,linewidth=0.5)
+                  )
                 }
               }
             }
@@ -610,9 +646,26 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
             # main distributions            
             theoryAlpha=0.8
             simAlpha<-1
-            switch (possible$type,
+            switch (showType,
                     "Samples"={
                       # draw simulations
+                      
+                      # sample wall
+                      if (!is.null(pSimDensR)) {
+                      x<-as.vector(matrix(c(pSimBins,pSimBins),2,byrow=TRUE))
+                      gainSim<-sum(pSimDensR)*diff(pSimBins[1:2])
+                      gainTheory<-sum(rsw_dens)*(rsw[2]-rsw[1])
+                      densS<-pSimDensR/(gainSim/gainTheory)
+                      if (max(densS)>1.2) {densS<-densS/max(densS)*1.2}
+                      yS<-c(0,as.vector(matrix(c(densS,densS),2,byrow=TRUE)),0)
+                      if (logZ) yS<-log10(yS)
+                      g<-addG(g,
+                              dataPolygon(rotate3D(data.frame(x=x*0+xlim[1],y=x,z=yS*wallHeight),
+                                                   mapping),fill=colSdark,alpha=0.25,colour="none")
+                      )
+                      }
+                      
+                      
                       if (length(sourceRVals)>1 && length(sourceRVals)<8) {
                         theoryAlpha<-0.45
                         simAlpha<-0.95
@@ -625,13 +678,13 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
                       if (!is.null(sSimDens)) {
                         theoryAlpha<-0.25
                         
-                        simgain<-mean(sourceSampDens_r)/mean(sSimDens)
+                        simgain<-mean(sourceSampDens_r_plus)/mean(sSimDens)
                         sSimDens<-sSimDens*simgain*pgain
                         if (cutaway) {
                           waste<-sum(sSimBins<=min(sRho))
                           use_s<-(waste):length(sSimBins)
-                          simBins<-simBins[use_s]
-                          simBins[1]<-min(sRho)
+                          sSimBins<-sSimBins[use_s]
+                          sSimBins[1]<-min(sRho)
                           use_s<-use_s[1:(length(use_s)-1)]
                         } else {
                           if (!is.matrix(sSimDens)) {
@@ -655,7 +708,12 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
                           z1<-c(zlim[1],z1,zlim[1])
                           z1[z1<zlim[1]]<-zlim[1]
                           use<-which(y1>=ylim[1] & y1<=ylim[2])
-                          polygon(trans3d(x=rep(sourceRVals[i],length(use)),y=y1[use],z=z1[use],pmat=mapping),col=addTransparency(colSsim,simAlpha))
+                          g<-addG(g,
+                                  dataPolygon(rotate3D(data.frame(x=rep(sourceRVals[i],length(use)),
+                                                                  y=y1[use],
+                                                                  z=z1[use]),mapping),
+                                              fill=colSsim,alpha=simAlpha)
+                          )
                         }
                         
                         # draw theory
@@ -669,6 +727,7 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
                             } 
 
                           r_use<-rs
+                          z_use[z_use<draw_lower_limit]<-0
                           while (length(z_use)>0 && any(z_use>0)) {
                             use1<-which(z_use>0)[1]
                             z_use<-z_use[use1:length(z_use)]
@@ -677,12 +736,17 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
                             rs_draw<-r_use[1:use2]
                             z_draw<-z_use[1:use2]
                             if (logZ) z_draw<-log10(z_draw)
-                            z_draw[z_draw<draw_lower_limit]<-NA
+                            # z_draw[z_draw<draw_lower_limit]<-0
                             use<-rs_draw>=ylim[1] & rs_draw<=ylim[2]
                             rs_use<-rs_draw[use]
                             if (sourceRVals[i]>=xlim[1] & sourceRVals[i]<=xlim[2]) {
-                              polygon (trans3d(x = rep(sourceRVals[i],length(rs_use)+2), y = c(rs_use[1],rs_use,rs_use[length(rs_use)]), z = c(zlim[1],z_draw[use],zlim[1]), pmat = mapping), col = addTransparency(colS,theoryAlpha), lty=0, lwd=1)
-                              lines (trans3d(x = rep(sourceRVals[i],length(rs_use)+2), y = c(rs_use[1],rs_use,rs_use[length(rs_use)]), z = c(zlim[1],z_draw[use],zlim[1]), pmat = mapping), col = addTransparency("#000000",theoryAlpha), lwd=1)
+                              dL<-data.frame(x = rep(sourceRVals[i],length(rs_use)+2), 
+                                             y = c(rs_use[1],rs_use,rs_use[length(rs_use)]), 
+                                             z = c(zlim[1],z_draw[use],zlim[1]))
+                              g<-addG(g,
+                                      dataPolygon(rotate3D(dL,mapping),fill=colS,alpha=theoryAlpha),
+                                      dataPath(rotate3D(dL,mapping),alpha=theoryAlpha)
+                              )
                             }
                             if (use2==length(z_use)) break
                             z_use<-z_use[(use2+1):length(z_use)]
@@ -692,19 +756,26 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
                             rcrit<-sRho
                             if (sRho>0)  use<-which(rs>=rcrit)
                             else         use<-which(rs<=rcrit)
-                            polygon(trans3d(x = rep(sourceRVals[i],length(use)+2), 
-                                            y = rs[use[c(1,1:length(use),length(use))]], 
-                                            z = c(0,z_use[use],0), pmat = mapping), col = braw.env$plotColours$infer_sigC, lwd=1)
+                            g<-addG(g,
+                                    dataPolygon(rotate3D(data.frame(x = rep(sourceRVals[i],length(use)+2), 
+                                                                    y = rs[use[c(1,1:length(use),length(use))]], 
+                                                                    z = c(0,z_use[use],0)),
+                                                         mapping),fill=braw.env$plotColours$infer_sigC)
+                            )
                             if (showP>1) {
                               if (sRho>0)  use<-which(rs<= -rcrit)
                               else         use<-which(rs>= -rcrit)
-                            polygon(trans3d(x = rep(sourceRVals[i],length(use)+2), 
-                                            y = rs[use[c(1,1:length(use),length(use))]], 
-                                            z = c(0,z_use[use],0), pmat = mapping), col = braw.env$plotColours$infer_sigC, lwd=1)
+                              g<-addG(g,
+                                      dataPolygon(rotate3D(data.frame(x = rep(sourceRVals[i],length(use)+2), 
+                                                                      y = rs[use[c(1,1:length(use),length(use))]], 
+                                                                      z = c(0,z_use[use],0)),
+                                                           mapping),fill=braw.env$plotColours$infer_sigC)
+                              )
                             }
                           }
                           }
                         }
+
                         # vertical lines on main distribution
                         if (!isempty(sRho)){
                           for (si in 1:length(sRho)) {
@@ -717,9 +788,9 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
                             cutZ<-c(cutZ,z)
                           }
                           for (si in 1:length(sRho)) {
-                            if (any(i==useVals) && (showP==0) && (cutaway || length(sourceRVals)<8) && z>=draw_lower_limit)  {
-                            # lines(trans3d(x=c(sourceRVals[i],sourceRVals[i]),y=c(sRho[si],sRho[si]),z=c(zlim[1],z),pmat=mapping),col="black", lwd=1)
-                            }
+                            # if (any(i==useVals) && (showP==0) && (cutaway || length(sourceRVals)<8) && z>=draw_lower_limit)  {
+                            #   lines(trans3d(x=c(sourceRVals[i],sourceRVals[i]),y=c(sRho[si],sRho[si]),z=c(zlim[1],z),pmat=mapping),col="black", lwd=1)
+                            # }
                             # connecting lines
                             if (!cutaway && doConnecting && length(sourceRVals)>5 && i<length(sourceRVals)) {
                               z1<-approx(rs,sourceSampDens_r_plus[i+1,],sRho[si])$y
@@ -728,11 +799,12 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
                                 z1<-log10(z1)
                                 z1[z1<zlim[1]]<-zlim[1]
                               }
-                              polygon(trans3d(x=c(sourceRVals[i],sourceRVals[i+1],sourceRVals[i+1],sourceRVals[i]),
-                                              y=c(sRho[si],sRho[si],sRho[si],sRho[si]),
-                                              z=c(z,z1,zlim[1],zlim[1]),pmat=mapping),
-                                      col=colP,lty=0)
-                              lines(trans3d(x=c(sourceRVals[i],sourceRVals[i+1]),y=c(sRho[si],sRho[si]),z=c(z,z1),pmat=mapping),col=colVline, lwd=1)
+                              g<-addG(g,
+                                      dataPolygon(rotate3D(data.frame(x=c(sourceRVals[i],sourceRVals[i+1],sourceRVals[i+1],sourceRVals[i]),
+                                                                      y=c(sRho[si],sRho[si],sRho[si],sRho[si]),
+                                                                      z=c(z,z1,zlim[1],zlim[1])),mapping),fill=colP),
+                                      dataPath(rotate3D(data.frame(x=c(sourceRVals[i],sourceRVals[i+1]),y=c(sRho[si],sRho[si]),z=c(z,z1)),mapping),colour=colVline)
+                              )
                             }
                           }
                           }
@@ -740,13 +812,15 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
                       if (cutaway && endFace) {
                         # main distribution
                         cutZ[cutZ<draw_lower_limit]<-zlim[1]
-                        polygon (trans3d(x = c(sourceRVals[1],sourceRVals,sourceRVals[length(sourceRVals)]),
-                                         y = c(0,sourceRVals*0,0)+sRho[1], 
-                                         z = c(zlim[1],cutZ,zlim[1]), pmat = mapping), col = addTransparency(colP,0.8), lty=0, lwd=1)
                         use<-which(cutZ>zlim[1])
-                        lines (trans3d(x = c(sourceRVals[use[1]],sourceRVals[use],sourceRVals[use[length(use)]]),
-                                         y = c(0,use*0,0)+sRho[1], 
-                                         z = c(zlim[1],cutZ[use],zlim[1]), pmat = mapping), col = "black", lwd=1)
+                        g<-addG(g,
+                                dataPolygon(rotate3D(data.frame(x = c(sourceRVals[1],sourceRVals,sourceRVals[length(sourceRVals)]),
+                                                                y = c(0,sourceRVals*0,0)+sRho[1], 
+                                                                z = c(zlim[1],cutZ,zlim[1])),mapping),fill=colP,alpha=0.8),
+                                dataPath(rotate3D(data.frame(x = c(sourceRVals[use[1]],sourceRVals[use],sourceRVals[use[length(use)]]),
+                                                             y = c(0,use*0,0)+sRho[1], 
+                                                             z = c(zlim[1],cutZ[use],zlim[1])),mapping),colour="black")
+                        )
                       }
                     },
                     "Populations"={
@@ -755,13 +829,18 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
                         x<-as.vector(matrix(c(pSimBins,pSimBins),2,byrow=TRUE))
                         
                         # population wall
+                        if (sum(pSimDensRP>0)>1) {
                         gainSim<-sum(pSimDensRP)*diff(pSimBins[1:2])
                         gainTheory<-sum(rpw_dens)*diff(rpw[1:2])
                         densP<-pSimDensRP/(gainSim/gainTheory)
                         if (max(densP)>1.2) {densP<-densP/max(densP)*1.2}
                         yP<-c(0,as.vector(matrix(c(densP,densP),2,byrow=TRUE)),0)
                         if (logZ) yP<-log10(yP)
-                        polygon(trans3d(x=x,y=x*0+ylim[2],z=yP*wallHeight,pmat=mapping),col = addTransparency(colPdark,0.35),border=NA)
+                        g<-addG(g,
+                                dataPolygon(rotate3D(data.frame(x=x,y=x*0+ylim[2],z=yP*wallHeight),
+                                                     mapping),fill=colPdark,alpha=0.35,colour="none")
+                        )
+                        }
                         
                         # sample wall
                         gainSim<-sum(pSimDensR)*diff(pSimBins[1:2])
@@ -770,8 +849,11 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
                         if (max(densS)>1.2) {densS<-densS/max(densS)*1.2}
                         yS<-c(0,as.vector(matrix(c(densS,densS),2,byrow=TRUE)),0)
                         if (logZ) yS<-log10(yS)
-                        polygon(trans3d(x=x*0+xlim[1],y=x,z=yS*wallHeight,pmat=mapping),col = addTransparency(colSdark,0.25),border=NA)
-                        
+                        g<-addG(g,
+                                dataPolygon(rotate3D(data.frame(x=x*0+xlim[1],y=x,z=yS*wallHeight),
+                                                     mapping),fill=colSdark,alpha=0.25,colour="none")
+                        )
+
                         #slice of interest
                         si=1
                         gainSim<-sum(pSimDens_slice)*diff(pSimBins[1:2])
@@ -781,9 +863,13 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
                         # if (max(dens)>1.2) {dens<-dens/max(dens)*1.2}
                         yRS<-c(0,as.vector(matrix(c(densRS,densRS),2,byrow=TRUE)),0)
                         if (logZ) yRS<-log10(yRS)
-                        polygon(trans3d(x=x,y=x*0+sRho[si],z=yRS,pmat=mapping),col=colPsim,border=NA)
+                        if (sum(pSimDensRP>0)>1) {
+                          g<-addG(g,
+                                dataPolygon(rotate3D(data.frame(x=x,y=x*0+sRho[si],z=yRS),
+                                                     mapping),fill=colPsim,colour=colPsim)
+                        )
+                        }
                       }
-                      
                       # draw theory main distribution & lines
                       if (possible$showTheory){
                         theoryAlpha=0.5
@@ -805,13 +891,19 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
                               rp_use<-rp[use]
                               dens_use<-rd[si,use]
                               if (is.null(prAnalysis)) {
-                                polygon (trans3d(x = c(rp_use[1],rp_use,rp_use[length(rp_use)]),
-                                                 y = c(0,rp_use*0,0)+sRho[si], 
-                                                 z = c(zlim[1],dens_use,zlim[1]), pmat = mapping), col = addTransparency(colP,theoryAlpha), lwd=1)
+                                g<-addG(g,
+                                        dataPolygon(rotate3D(data.frame(x = c(rp_use[1],rp_use,rp_use[length(rp_use)]),
+                                                                        y = c(0,rp_use*0,0)+sRho[si], 
+                                                                        z = c(zlim[1],dens_use,zlim[1])),
+                                                             mapping),fill=colP,alpha=theoryAlpha)
+                                )
                               } else {
-                                polygon (trans3d(x = c(rp_use[1],rp_use,rp_use[length(rp_use)]), 
-                                                 y = c(0,rp_use*0,0)+sRho[si], 
-                                                 z = c(zlim[1],dens_use,zlim[1]), pmat = mapping), col = addTransparency(colP,highTransparency), lwd=1)
+                                g<-addG(g,
+                                        dataPolygon(rotate3D(data.frame(x = c(rp_use[1],rp_use,rp_use[length(rp_use)]), 
+                                                                        y = c(0,rp_use*0,0)+sRho[si], 
+                                                                        z = c(zlim[1],dens_use,zlim[1])),
+                                                                        mapping),fill=colP,alpha=highTransparency)
+                                        )
                               }
                             }
                           }
@@ -820,35 +912,59 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
                           if (doPeakLine && length(sRho)==1) {
                             if (showNull && possible$UsePrior!="none") {
                               znullLk<-zlim[1]+(max(rd[si,])-zlim[1])*(za-zlim[1])/(zb-zlim[1])
-                              lines(trans3d(x=c(0,0),y=c(sRho[si],sRho[si]),z=c(zlim[1],znullLk),pmat=mapping),col=colNullS,lwd=2)
+                              g<-addG(g,
+                                      dataPath(rotate3D(data.frame(x=c(0,0),y=c(sRho[si],sRho[si]),z=c(zlim[1],znullLk)),
+                                                           mapping),colour=colNullS,linewidth=0.5)
+                              )
                             }
                             si<-1
-                            lines(trans3d(x=c(rp_peak,rp_peak),y=c(sRho[si],sRho[si]),z=c(zlim[1],approx(rp,rd[si,],rp_peak)$y-0.01),pmat=mapping),col=colDistS, lwd=2)
+                            g<-addG(g,
+                                    dataPath(rotate3D(data.frame(x=c(rp_peak,rp_peak),y=c(sRho[si],sRho[si]),z=c(zlim[1],approx(rp,rd[si,],rp_peak)$y-0.01)),
+                                                      mapping),colour=colDistS,linewidth=0.5)
+                            )
                             if (doCILines) {
-                              lines(trans3d(x=c(rp_ci[1],rp_ci[1]),y=c(sRho[si],sRho[si]),z=c(zlim[1],approx(rp,rd[si,],rp_ci[1])$y-0.01),pmat=mapping),col=colP, lwd=2,lty=3)
-                              lines(trans3d(x=c(rp_ci[2],rp_ci[2]),y=c(sRho[si],sRho[si]),z=c(zlim[1],approx(rp,rd[si,],rp_ci[2])$y-0.01),pmat=mapping),col=colP, lwd=2,lty=3)
+                              g<-addG(g,
+                                      dataPath(rotate3D(data.frame(x=c(rp_ci[1],rp_ci[1]),y=c(sRho[si],sRho[si]),z=c(zlim[1],approx(rp,rd[si,],rp_ci[1])$y-0.01)),
+                                                        mapping),colour=colP,linewidth=0.5,linetype="dotted"),
+                                      dataPath(rotate3D(data.frame(x=c(rp_ci[2],rp_ci[2]),y=c(sRho[si],sRho[si]),z=c(zlim[1],approx(rp,rd[si,],rp_ci[2])$y-0.01)),
+                                                        mapping),colour=colP,linewidth=0.5,linewidth=0.5,linetype="dotted")
+                              )
                             }
-                            lines(trans3d(x=c(possible$targetPopulation,possible$targetPopulation),y=c(sRho[si],sRho[si]),z=c(zlim[1],approx(rp,rd[si,],possible$targetPopulation)$y-0.01),pmat=mapping),col=colPop, lwd=1, lty=3)
+                            if (!is.null(possible$targetPopulation)) {
+                            g<-addG(g,
+                                    dataPath(rotate3D(data.frame(x=c(possible$targetPopulation,possible$targetPopulation),y=c(sRho[si],sRho[si]),z=c(zlim[1],approx(rp,rd[si,],possible$targetPopulation)$y-0.01)),
+                                                      mapping),colour=colPop,linetype="dotted")
+                            )
+                            }
                             if (doSampleLine && world$populationPDF!="Single"){
-                              lines(trans3d(x=c(sRho[si],sRho[si]),y=c(sRho[si],sRho[si]),z=c(zlim[1],approx(rp,rd[si,],sRho[si])$y-0.01),pmat=mapping),col=colP,lty=3,lwd=2)
+                              g<-addG(g,
+                                      dataPath(rotate3D(data.frame(x=c(sRho[si],sRho[si]),y=c(sRho[si],sRho[si]),z=c(zlim[1],approx(rp,rd[si,],sRho[si])$y-0.01)),
+                                                        mapping),colour=colP,linewidth=0.5,linetype="dotted")
+                              )
                             }
                           }
                           # text annotations
                           if (doTextResult && walls) {
                               # mle population
                               xoff<-diff(zlim)*1.2
-                              text(trans3d(x=xlim[2],y=ylim[2],z=zlim[1]+xoff,pmat=mapping),
-                                   labels=paste0(braw.env$RZ,"[s]=",brawFormat(sRho[1],digits=3)),
-                                   col=colPdark,adj=1,cex=0.9)
-                              xoff<-xoff-diff(zlim)*0.075
+                              g<-addG(g,
+                                      dataText(rotate3D(data.frame(x=xlim[2],y=ylim[2],z=zlim[1]+xoff),
+                                                        mapping),
+                                               paste0(braw.env$RZ,"[s]=",brawFormat(sRho[1],digits=3)),
+                                               hjust=1,size=0.8,colour=colPdark)
+                              )
+                              xoff<-xoff-diff(zlim)*0.085
                               llrA<-dnorm(atanh(sRho),mean=atanh(sRho),sd=1/sqrt(n-3))
                               llr0<-dnorm(0,mean=atanh(sRho),sd=1/sqrt(n-3))
                               llr_0_rs<-log(llrA/llr0)
-                              text(trans3d(x=xlim[2],y=ylim[2],z=zlim[1]+xoff,pmat=mapping),
-                                   labels=paste0("sLLR(",braw.env$RZ,"[s]/",braw.env$RZ,"[0])=",brawFormat(llr_0_rs,digits=3),
-                                   col=colPdark,adj=1,cex=0.9)
+                              g<-addG(g,
+                                      dataText(rotate3D(data.frame(x=xlim[2],y=ylim[2],z=zlim[1]+xoff),
+                                                        mapping),
+                                               paste0("sLLR(",braw.env$RZ,"[s]/",braw.env$RZ,"[0])=",brawFormat(llr_0_rs,digits=3)),
+                                               hjust=1,size=0.8,colour=colPdark)
+                              )
                               if (possible$UsePrior!="none") {
-                                xoff<-xoff-diff(zlim)*0.075
+                                xoff<-xoff-diff(zlim)*0.085
                                 # lb<-"prior: "
                                 # switch(possibleResult$prior$populationPDF,
                                 #        "Uniform"=lb<-paste0(lb,"Uniform(",possibleResult$prior$populationRZ,")"),
@@ -865,19 +981,21 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
                             
                           # llr 
                           # mle population
-                                xoff<-xoff-diff(zlim)*0.075
-                                text(trans3d(x=xlim[2],y=ylim[2],z=zlim[1]+xoff,pmat=mapping),
-                                     labels=paste0(braw.env$RZ,"[mle]=",brawFormat(rp_peak,digits=3)),
-                                     col=colPdark,adj=1,cex=0.9)
-                                xoff<-xoff-diff(zlim)*0.075
-                          llr_0_mle<-log(approx(rs,colSums(priorSampDens_r_plus),sRho)$y/approx(rs,priorSampDens_r_null,sRho)$y)
-                          text(trans3d(x=xlim[2],y=ylim[2],z=zlim[1]+xoff,pmat=mapping),
-                                 labels=paste0("dLLR(",braw.env$RZ,"[+]/",braw.env$RZ,"[0])=",brawFormat(llr_0_mle,digits=3)),
-                                 col=colPdark,adj=1,cex=0.9)
-                          # xoff<-xoff-diff(zlim)*0.07
-                          # text(trans3d(x=xlim[2],y=ylim[2],z=zlim[1]+xoff,pmat=mapping),
-                          #        labels=bquote(bold(dLLR(.(braw.env$RZ)["+"]/.(braw.env$RZ)[0])==.(brawFormat(-llrNull,digits=3)))),
-                          #        col=colSdark,adj=1,cex=0.9)
+                                xoff<-xoff-diff(zlim)*0.085
+                                g<-addG(g,
+                                        dataText(rotate3D(data.frame(x=xlim[2],y=ylim[2],z=zlim[1]+xoff),
+                                                          mapping),
+                                                 paste0(braw.env$RZ,"[mle]=",brawFormat(rp_peak,digits=3)),
+                                                 hjust=1,size=0.8,colour=colPdark)
+                                )
+                                xoff<-xoff-diff(zlim)*0.085
+                                llr_0_mle<-log(approx(rs,colSums(priorSampDens_r_plus),sRho)$y/approx(rs,priorSampDens_r_null,sRho)$y)
+                                g<-addG(g,
+                                        dataText(rotate3D(data.frame(x=xlim[2],y=ylim[2],z=zlim[1]+xoff),
+                                                          mapping),
+                                                 paste0("dLLR(",braw.env$RZ,"[+]/",braw.env$RZ,"[0])=",brawFormat(llr_0_mle,digits=3)),
+                                                 hjust=1,size=0.8,colour=colPdark)
+                                )
                               }
                           }
                         }
@@ -887,17 +1005,22 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
             
             # finish off plot box
             if (boxed){
-              lines(trans3d(x=c(xlim[1], xlim[2], xlim[2]),
-                            y=c(ylim[1], ylim[1], ylim[2]),
-                            z=c(1,1,1)*zlim[2],pmat=mapping), col=BoxCol, lty=3)        
-              lines(trans3d(x=c(xlim[2],xlim[2]),y=c(ylim[1],ylim[1]),z=zlim,pmat=mapping),col=BoxCol,lty=3)
+              g<-addG(g,
+                      dataPath(rotate3D(data.frame(x=c(xlim[1], xlim[2], xlim[2]),
+                                                   y=c(ylim[1], ylim[1], ylim[2]),
+                                                   z=c(1,1,1)*zlim[2]),
+                                        mapping),colour=BoxCol),
+                      dataPath(rotate3D(data.frame(x=c(xlim[2],xlim[2]),y=c(ylim[1],ylim[1]),z=zlim),
+                                        mapping),colour=BoxCol)
+              )
             }
+            return(g)
           },
           "2D"={
             par(bg=braw.env$plotColours$graphC,pin=c(1.33,1)*3,mar=c(5,5,1,1))
             
             # show the back wall
-            switch (possible$type,
+            switch (showType,
                     "Populations"={
                       rw<-rpw
                       rw_dens<-rpw_dens
@@ -916,7 +1039,7 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
             
             rwd<-c(rw[1],rw,rw[length(rw)])
             rwd_dens<-c(0,rw_dens,0)
-            if (possible$type=="Samples") xlim<-ylim
+            if (showType=="Samples") xlim<-ylim
             plot(x=rwd,y=rwd_dens,xlab=xlabel,ylab=label.z,type="n",yaxt="n",font.lab=2, cex.lab=char3D,
                  xlim=xlim,ylim=zlim)
             axis(side = 2,  at=0, labels = FALSE, tck=-0.05)
@@ -926,7 +1049,7 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
             rect(u[1], u[3], u[2], u[4], col=braw.env$plotColours$graphBack, border=NA)
             lines(xlim,c(0,0),col="black")
             
-            if (possible$type=="Populations") {
+            if (showType=="Populations") {
               # make the back wall
               polygon(x=rwd,y=rwd_dens,col=addTransparency(col,0.2))
               lines(x=rw,y=rw_dens,col=colDistS,lwd=2)
@@ -940,7 +1063,7 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
             
             theoryAlpha=0.8
             # simulations
-            switch (possible$type,
+            switch (showType,
                     "Populations"={
                       if (!is.null(pSimDens_slice)) {
                         pSimDens_slice<-pSimDens_slice/max(pSimDens_slice)
@@ -965,7 +1088,7 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
             )
             
             if (possible$showTheory){
-              switch (possible$type,
+              switch (showType,
                       "Samples"={
                         if (!all(is.na(sourceSampDens_r_total))){
                           # main distributions
@@ -1017,12 +1140,10 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
                                 
                                 lines(x=c(sRho[1],sRho[1]),y=c(0,l_at_sample-0.01),col=colSdark,lwd=2)
                                 
-                                text(0,1.05,labels=bquote(
-                                  bolditalic(p)[.(braw.env$RZ)]== bold(.(format(p_at_sample,digits=3)))
-                                ),col=colPdark,adj=-0.1,cex=0.9)
-                                text(0,1.05,labels=bquote(
-                                  bolditalic(l)[.(braw.env$RZ)]==bold(.(format(l_at_sample/gain,digits=3)))
-                                ),col=colPdark,adj=1.1,cex=0.9)
+                                text(0,1.05,labels=paste0("p[",braw.env$RZ,"]=",format(p_at_sample,digits=3)),
+                                            col=colPdark,adj=-0.1,cex=0.9)
+                                text(0,1.05,labels=paste0("l[",braw.env$RZ,"]=",format(l_at_sample,digits=3)),
+                                            col=colPdark,adj=1.1,cex=0.9)
                               }
                             }
                             if (length(sRho)>1) {
@@ -1062,20 +1183,17 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
                             lines(x=c(0,0)+rp_ci[2],y=c(0,dens_at_ci[2]-0.01),col="white",lwd=2)
                             lines(x=c(0,0)+rp_ci[2],y=c(0,dens_at_ci[2]-0.01),col="red",lty=3,lwd=2)
                           }
-                          text(rp_peak,1.05,labels=bquote(
-                            bolditalic(.(braw.env$RZ))[mle]== bold(.(format(rp_peak,digits=3)))
-                          ),col=colPdark,adj=(sign(rp_peak)+1)/2,cex=0.9)
-                          text(x=rp_peak,1.15,labels=bquote(
-                            bold(llr)(bolditalic(.(braw.env$RZ))[mle]/bolditalic(.(braw.env$RZ))[0])==bold(.(format(log(1/dens_at_zero),digits=3)))
-                          ),col=colPdark,adj=(sign(rp_peak)+1)/2,cex=0.9)
+                          text(rp_peak,1.05,labels=paste0(braw.env$RZ,"[mle]=",format(rp_peak,digits=3)),
+                                  col=colPdark,adj=(sign(rp_peak)+1)/2,cex=0.9)
+                          text(x=rp_peak,1.15,labels=paste0("llr(",braw.env$RZ,"[mle]/",braw.env$RZ,"[0])=",format(log(1/dens_at_zero),digits=3)),
+                               col=colPdark,adj=(sign(rp_peak)+1)/2,cex=0.9)
                           
                           if (possible$prior$worldOn && possible$prior$populationNullp>0) {
                             ln_at_sample<-approx(rs,priorSampDens_r_null,sRho[1])$y
                             ld_at_sample<-approx(rs,colMeans(priorSampDens_r_plus),sRho[1])$y
                             llrNull<-log(ln_at_sample/ld_at_sample)
-                            text(xlim[1],1.15,labels=bquote(
-                              bold(llr)(bolditalic(.(braw.env$RZ))["+"]/bolditalic(.(braw.env$RZ))[0])==bold(.(format(-llrNull,digits=3)))),
-                              col=colPdark,adj=c(0),cex=0.9)
+                            text(xlim[1],1.15,labels=paste0("llr(",braw.env$RZ,"[+]/",braw.env$RZ,"[0])=",format(-llrNull,digits=3)),
+                                  col=colPdark,adj=c(0),cex=0.9)
                           }
                         }
                       }
@@ -1084,7 +1202,7 @@ showPossible <- function(possibleResult=braw.res$possibleResult,
             }
           },
           "flat"={
-            if (!is.null(possible$targetSample) && !is.na(possible$targetPopulation)) {
+            if (!is.null(possible$targetSample) && !is.null(possible$targetPopulation)) {
               lines(trans3d(x=xlim,y=c(0,0)+possible$targetSample,z=c(0,0)+zlim[1],pmat=mapping),col=colVline,lwd=1)
               lines(trans3d(x=c(0,0)+possible$targetPopulation,y=ylim,z=c(0,0)+zlim[1],pmat=mapping),col=colVline,lwd=1,lty=2)
               points(trans3d(x=possible$targetPopulation,

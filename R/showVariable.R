@@ -9,7 +9,7 @@ reRange<-function(r,plotRange,rRange=NULL) {
 drawVar<-function(pts,ticks,var,plotArea=c(0,0,1,1),g){
 
   pts<-data.frame(x=pts$r,y=pts$dens)
-  g<-startPlot(xlim=c(min(pts$x),max(pts$x)),ylim=c(0,1.1),box="X",g=g,fontScale=1)
+  g<-startPlot(xlim=c(min(pts$x),max(pts$x)),ylim=c(0,1.1),box="X",g=g)
   g<-addG(g,xAxisTicks(ticks$breaks,ticks$labels),xAxisLabel(var$name))
   g<-addG(g,
     dataPolygon(pts,fill=braw.env$plotColours$sampleC,colour=braw.env$plotColours$sampleC,linewidth=0.25)

@@ -255,7 +255,7 @@ plotCatInterDescription<-function(analysis,g=NULL){
 
 plotParInterDescription<-function(analysis,g=NULL){
   col<-c( braw.env$plotColours$descriptionC1, braw.env$plotColours$descriptionC2)
-  names<-c(paste(analysis$hypothesis$IV2$name,"<median",sep=""), paste(analysis$hypothesis$IV2$name,">median",sep=""))
+  names<-c(paste(analysis$hypothesis$IV2$name," < median",sep=""), paste(analysis$hypothesis$IV2$name," > median",sep=""))
   # col<-as.list(col)
   braw.env$plotDescriptionCols <- col
 
@@ -339,21 +339,21 @@ plotCatDescription<-function(analysis,g) {
 #' @examples
 #' showDescription(analysis=doAnalysis())
 #' @export
-showDescription<-function(analysis=braw.res$result,g=NULL) {
+showDescription<-function(analysis=braw.res$result,plotArea=c(0,0,1,1),g=NULL) {
   if(is.null(analysis)) analysis<-doAnalysis(autoShow=FALSE)
+  
+  braw.env$plotArea<-plotArea
   
   old_newSampleDisplay<-braw.env$newSampleDisplay
   if (!is.null(analysis$hypothesis$IV2)) braw.env$newSampleDisplay<-FALSE
-  
+
   if (braw.env$newSampleDisplay && braw.env$allScatter) {
     g<-showSample(analysis,marginals=FALSE)
   } else {
     if (is.null(g)) {
-      braw.env$plotArea<-c(0,0,1,1)
       g<-getAxisPrediction(analysis$hypothesis) 
     }
   }
-  
   if (is.null(analysis$hypothesis$IV2)){
     switch (analysis$hypothesis$DV$type,
             "Interval"=g<-plotParDescription(analysis,g),
@@ -368,6 +368,6 @@ showDescription<-function(analysis=braw.res$result,g=NULL) {
     )
   }
   braw.env$newSampleDisplay<-old_newSampleDisplay
-  g<-addG(g,plotTitle(paste0("r[s]=",round(analysis$rIV,3))))
+  g<-addG(g,plotTitle(paste0("r[s]=",round(analysis$rIV,3)),position="right",size=1,fontface="plain"))
   g
 }

@@ -186,10 +186,6 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,graphicsSize=c(16,10),
           ##################################
           # notation for effect sizes
           
-          # braw.env$rpLabel<-bquote(bold(r[p]))
-          # braw.env$rsLabel<-bquote(bold(r[s]))
-          # braw.env$zpLabel<-bquote(bold(z[p]))
-          # braw.env$zsLabel<-bquote(bold(z[s]))
           braw.env$rpLabel<-'r[p]'
           braw.env$rsLabel<-'r[s]'
           braw.env$zpLabel<-'z[p]'
@@ -278,12 +274,21 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,graphicsSize=c(16,10),
           braw.env$nullNS<-nullNS
           braw.env$nullNegative<-nullNegative
           
-          braw.env$allPositive<-bquote(.(Zchar) ~"+ve")
-          braw.env$allNegative<-bquote(.(Zchar) ~"ns")
+          braw.env$allPositive<-paste0(Zchar,"+ve")
+          braw.env$allNegative<-paste0(Zchar,"ns")
 
           braw.env$timeLimit<-timeLimit # seconds
           
 braw.env<<-braw.env          
+
+braw.res$result<-NULL 
+braw.res$expected<-NULL 
+braw.res$explore<-NULL 
+braw.res$metaResult<-NULL
+braw.res$metaMultiple<-NULL
+braw.res$possibleResult<-NULL
+
+braw.res<<-braw.res
 
 braw.def$IV<-makeVariable("IV")
 braw.def$IV2<-NULL
@@ -295,19 +300,10 @@ braw.def$design<-makeDesign()
 braw.def$evidence<-makeEvidence()
 braw.def$metaAnalysis<-makeMetaAnalysis()
 braw.def$explore<-makeExplore()
-braw.def$possible<-makePossible(targetSample=0.3,
+braw.def$possible<-makePossible(targetSample=0.3,sims=NULL,
                                 hypothesis=braw.def$hypothesis,design=braw.def$design)
 
 braw.def<<-braw.def
-
-braw.res$result<-NULL 
-braw.res$expected<-NULL 
-braw.res$explore<-NULL 
-braw.res$metaResult<-NULL
-braw.res$metaMultiple<-NULL
-braw.res$possibleResult<-NULL
-
-braw.res<<-braw.res
 }
 
 setBrawEnv<-function(which,value) {
