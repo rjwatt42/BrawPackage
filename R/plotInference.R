@@ -195,9 +195,12 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
   
   pts<-data.frame(x=d1,y=d2)
   braw.env$plotArea<-c(0,0,1,1)
-  g<-startPlot(xaxis$lim,yaxis$lim,box="both",top=FALSE,g=NULL)
-  g<-addG(g,xAxisTicks(logScale=xaxis$logScale),xAxisLabel(xaxis$label))
-  g<-addG(g,yAxisTicks(logScale=yaxis$logScale),yAxisLabel(yaxis$label))
+  g<-startPlot(xaxis$lim,yaxis$lim,
+               xticks=makeTicks(logScale=xaxis$logScale),xlabel=makeLabel(xaxis$label),
+               yticks=makeTicks(logScale=yaxis$logScale),ylabel=makeLabel(yaxis$label),
+               top=FALSE,g=NULL)
+  # g<-addG(g,xAxisTicks(logScale=xaxis$logScale),xAxisLabel(xaxis$label))
+  # g<-addG(g,yAxisTicks(logScale=yaxis$logScale),yAxisLabel(yaxis$label))
 
   if (disp1=="rs" && disp2=="p") {
     rs<-seq(-braw.env$r_range,braw.env$r_range,length.out=51)
@@ -210,8 +213,8 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
    if (braw.env$pPlotScale=="log10")  ps<-log10(ps)
    g<-addG(g,horzLine(ps,linetype="dotted",colour=braw.env$plotColours$infer_sigC,linewidth=1))
  }
-  dotSize=min(8,max(3.5,sqrt(400/length(d1))))
-  dotSize<-braw.env$dotSize
+  gain<-7/max(7,sqrt(length(d1)))
+  dotSize<-braw.env$dotSize*gain
 
   if (!metaPlot && braw.env$useSignificanceCols){
     c1=braw.env$plotColours$infer_sigC

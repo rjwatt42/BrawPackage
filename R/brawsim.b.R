@@ -9,6 +9,39 @@ BrawSimClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
     
     .init = function() {
       private$.htmlwidget <- HTMLWidget$new() # Initialize the HTMLWidget instance 
+      
+      # assign("graphHTML",TRUE,braw.env)
+      # self$results$BrawStatsInstructions$setVisible(TRUE)
+      self$results$BrawStatsInstructions$setContent(
+        paste0(
+          private$.htmlwidget$generate_tab(
+            title="BrawStats Help",
+            tabs=c("Plan","Single Sample","Multiple Samples","Explore","Key"),
+            tabContents = c(
+              BrawInstructions("Plan"),
+              BrawInstructions("Single"),
+              BrawInstructions("Multiple"),
+              BrawInstructions("Explore"),
+              BrawInstructions("Key")
+            ),
+            open=0
+          )
+          # ,private$.htmlwidget$generate_tab(
+          #   title="Plan",
+          #   tabs=c("Hypothesis","Design","Population","Expected"),
+          #   tabContents = c(
+          #     showHypothesis(),
+          #     addG(showDesign(plotArea=c(0.2,0.5,0.6,0.5)),showWorldSampling(plotArea=c(0.2,0,0.6,0.5))),
+          #     showPopulation(plotArea=c(0.2,0.2,0.6,0.6)),
+          #     showPrediction(plotArea=c(0.2,0.2,0.6,0.6))
+          #   ),
+          #   colours=c("#444444","#bbbbbb"),
+          #   plain=TRUE,
+          #   width=svgBoxX(),height=svgBoxY()
+          # )
+        )
+      )
+      # assign("graphHTML",FALSE,braw.env)
     },
     
     .run = function() {
@@ -19,7 +52,6 @@ BrawSimClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
       # initialization code 
       if (!exists("braw.env")) {
         BrawOpts(fontScale = 1.5,graphC="white",reducedOutput=TRUE,reportHTML=TRUE)
-        braw.env$graphicsSize<<-braw.env$graphicsSize*0.6
         statusStore<-list(lastOutput="System",
                           showSampleType="Sample",
                           showInferParam="Basic",
@@ -27,7 +59,10 @@ BrawSimClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
                           showMultipleParam="Basic",
                           showMultipleDimension="1D",
                           showExploreParam="Basic",
-                          showExploreDimension="1D"
+                          showExploreDimension="1D",
+                          exploreMode="Design",
+                          showJamovi=FALSE,
+                          graphHTML=FALSE
         )
         braw.env$statusStore<<-statusStore
         braw.env$table<<-NULL
@@ -42,13 +77,13 @@ BrawSimClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
                           showMultipleParam="Basic",
                           showMultipleDimension="1D",
                           showExploreParam="Basic",
-                          showExploreDimension="1D"
+                          showExploreDimension="1D",
+                          exploreMode="Design",
+                          showJamovi=FALSE,
+                          graphHTML=FALSE
         )
         braw.env$statusStore<<-statusStore
       } else       statusStore<-braw.env$statusStore
-
-      # self$results$testHTML$setVisible(TRUE)
-      # self$results$testHTML$setContent(makeSVG())
 
       # get some display parameters for later
       makeSampleNow<-self$options$makeSampleBtn
@@ -110,8 +145,10 @@ BrawSimClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
       outputNow<-statusStore$lastOutput
       
       # we pressed the "show" hypothesis button
-      if (self$options$showHypothesisBtn) outputNow<-"System"
-
+      if (self$options$showHypothesisBtn) {
+        outputNow<-"System"
+      }
+      
       # are we asking for a different display of the current explore?
       if (!is.null(braw.res$explore)) {
         if (showExploreParam != statusStore$showExploreParam ||
@@ -211,8 +248,8 @@ BrawSimClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
                            exploreNPoints=exploreNPoints,
                            minVal=minV,maxVal=maxV,
                            xlog=xlog)
-      changedX<- !identical(oldX,explore)
-      
+      changedX<- !identical(oldX,explore) && (self$options$exploreMode!=statusStore$exploreMode)
+
       oldM<-braw.def$metaAnalysis
       metaAnalysis<-makeMetaAnalysis(nstudies=self$options$MetaAnalysisNStudies,
                                  analysisType=self$options$MetaAnalysisType,
@@ -232,36 +269,10 @@ BrawSimClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
       # now deal with a request for Jamovi instructions
       # showJamoviNow1<-self$options$showJamovi1Btn
       if(self$options$showJamovi) {
-        # assign("graphHTML",TRUE,braw.env)
-        # self$results$BrawStatsInstructions$setVisible(TRUE)
-        # self$results$BrawStatsInstructions$setContent(
-        #   paste0(
-        #   private$.htmlwidget$generate_tab(
-        #     title="BrawStats Help",
-        #     tabs=c("Plan","Single Sample","Multiple Samples","Explore","Key"),
-        #     tabContents = c(
-        #       BrawInstructions("Plan"),
-        #       BrawInstructions("Single"),
-        #       BrawInstructions("Multiple"),
-        #       BrawInstructions("Explore"),
-        #       BrawInstructions("Key")
-        #     )
-        #   ),
-        #   private$.htmlwidget$generate_tab(
-        #     title="Plan",
-        #     tabs=c("Hypothesis","Design","Expected"),
-        #     tabContents = c(
-        #       showHypothesis(),
-        #       "",
-        #       ""
-        #     ),
-        #     colours=c("#444444","#bbbbbb"),
-        #     plain=TRUE
-        #   )
-        #   )
-        #   )
-        
+        if (!statusStore$showJamovi){
         self$results$JamoviInstructions$setVisible(TRUE)
+        statusStore$showJamovi<-TRUE
+        }
         self$results$JamoviInstructions$setContent(
           private$.htmlwidget$generate_tab(
             title="Jamovi equivalent",
@@ -270,15 +281,17 @@ BrawSimClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
               JamoviInstructions(hypothesis,design,HelpType="Analysis"),
               JamoviInstructions(hypothesis,design,HelpType="Graph"),
               JamoviInstructions(hypothesis,design,HelpType="EffectSize")
-            )
+            ),
+            open=1
           )
         )
-        assign("graphHTML",TRUE,braw.env)
-      } else self$results$JamoviInstructions$setVisible(FALSE)
-        
-        # instructions<-makeInstructions(hypothesis,design,HelpType="Graph")
-        # self$results$JamoviInstructions$setContent(instructions)
-
+      } else {
+        if (statusStore$showJamovi){
+          self$results$JamoviInstructions$setVisible(FALSE)
+          statusStore$showJamovi<-FALSE
+        }
+      }
+      
       # are any of the existing stored results now invalid?
       if (changedH || changedD) {
         braw.res$result<<-NULL
@@ -311,7 +324,7 @@ BrawSimClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
           outputNow<-"MetaSingle"
         } else {
           # make a sample
-          result<-doResult()
+          doResult()
           outputNow<-showSampleType
         }
       }
@@ -323,7 +336,7 @@ BrawSimClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
           metaResult<-doMetaAnalysis(numberSamples,braw.res$metaAnalysis)
           outputNow<-"MetaMultiple"
         } else {
-          expectedResult<-doExpected(nsims=numberSamples,expectedResult=braw.res$expected)
+          doExpected(nsims=numberSamples,expectedResult=braw.res$expected)
           outputNow<-"Multiple"
         }
       }
@@ -339,6 +352,70 @@ BrawSimClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
       # self$results$debug$setVisible(TRUE)
       # self$results$debug$setContent(c(is.logical(likelihoodCutaway),likelihoodCutaway,self$options$likelihoodCutaway))
       
+      if (outputNow=="Likelihood") {
+      possible<-makePossible(UsePrior=self$options$likelihoodUsePrior,
+                             prior=makeWorld(worldOn=TRUE,
+                                             populationPDF=self$options$priorPDF,
+                                             populationRZ=self$options$priorRZ,
+                                             populationPDFk=self$options$priorLambda,
+                                             populationNullp=self$options$priorNullP)
+      )
+      possibleResult<-doPossible(possible)
+      }
+      
+      # what are we showing?
+      # main results graphs/reports
+      if (self$options$showHTML && !statusStore$graphHTML) {
+        self$results$graphHTML$setVisible(TRUE)
+        self$results$graphPlot$setVisible(FALSE)
+        statusStore$graphHTML<-TRUE
+      } 
+      if (!self$options$showHTML && statusStore$graphHTML) {
+        self$results$graphHTML$setVisible(FALSE)
+        self$results$graphPlot$setVisible(TRUE)
+        statusStore$graphHTML<-FALSE
+      } 
+      if (!is.null(outputNow))  {   
+          if (self$options$showHTML) {
+            assign("graphHTML",TRUE,braw.env)
+          switch(outputNow,
+                 "System"= self$results$graphHTML$setContent(showSystem()),
+                 "Compact"= self$results$graphHTML$setContent(showDescription()),
+                 "Sample"= self$results$graphHTML$setContent(showSample()),
+                 "Describe"= self$results$graphHTML$setContent(showDescription()),
+                 "Infer"= self$results$graphHTML$setContent(showInference(showType=showInferParam,dimension=showInferDimension)),
+                 "Likelihood"=self$results$graphHTML$setContent(showPossible(showType=self$options$likelihoodType,cutaway=likelihoodCutaway)),
+                 "Multiple"= self$results$graphHTML$setContent(showExpected(showType=showMultipleParam,dimension=showMultipleDimension,effectType=whichShowMultipleOut)),
+                 "Explore"= self$results$graphHTML$setContent(showExplore(showType=showExploreParam,dimension=showExploreDimension,effectType=whichShowExploreOut)),
+                 self$results$reportPlot$graphHTML(NULL)
+          )
+          } else {
+          assign("graphHTML",FALSE,braw.env)
+          switch(outputNow,
+                 "System"= self$results$graphPlot$setState(outputNow),
+                 "Compact"= self$results$graphPlot$setState("Describe"),
+                 "Sample"= self$results$graphPlot$setState(outputNow),
+                 "Describe"= self$results$graphPlot$setState(outputNow),
+                 "Infer"= self$results$graphPlot$setState(c(outputNow,showInferParam,showInferDimension)),
+                 "Likelihood"= self$results$graphPlot$setState(c(outputNow,self$options$likelihoodType,likelihoodCutaway)),
+                 "Multiple"= self$results$graphPlot$setState(c(outputNow,showMultipleParam,showMultipleDimension,whichShowMultipleOut)),
+                 "Explore"= self$results$graphPlot$setState(c(outputNow,showExploreParam,showExploreDimension,whichShowExploreOut)),
+                 self$results$graphPlot$setState(outputNow)
+          )
+        }
+        switch(outputNow,
+               "System"= self$results$reportPlot$setContent(reportPlot(NULL)),
+               "Compact"= self$results$reportPlot$setContent(reportInference()),
+             "Sample"= self$results$reportPlot$setContent(reportSample()),
+             "Describe"= self$results$reportPlot$setContent(reportDescription()),
+             "Infer"= self$results$reportPlot$setContent(reportInference()),
+             "Likelihood"=self$results$reportPlot$setContent(reportLikelihood()),
+             "Multiple"= self$results$reportPlot$setContent(reportExpected(showType=showMultipleParam)),
+             "Explore"= self$results$reportPlot$setContent(reportExplore(showType=showExploreParam)),
+               self$results$reportPlot$setContent(NULL)
+      )
+      }
+      
       # save everything for the next round      
       statusStore$showSampleType<-showSampleType
       statusStore$showInferParam<-showInferParam
@@ -348,60 +425,7 @@ BrawSimClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
       statusStore$showExploreParam<-showExploreParam
       statusStore$showExploreDimension<-showExploreDimension
       statusStore$lastOutput<-outputNow
-      
       braw.env$statusStore<<-statusStore
-      
-      # what are we showing?
-      # main results graphs/reports
-      if (!is.null(outputNow))     
-        switch(outputNow,
-               "System"={
-                 self$results$graphPlot$setState(outputNow)
-                 self$results$reportPlot$setContent(reportPlot(NULL))
-               },
-               "Compact"={
-                 self$results$graphPlot$setState("Describe")
-                 self$results$reportPlot$setContent(reportInference())
-               },
-               "Sample"={
-                 self$results$graphPlot$setState(outputNow)
-                 self$results$reportPlot$setContent(reportSample())
-               },
-               "Describe"={
-                 self$results$graphPlot$setState(outputNow)
-                 self$results$reportPlot$setContent(reportDescription())
-               },
-               "Infer"={
-                 self$results$graphPlot$setState(c(outputNow,showInferParam,showInferDimension))
-                 self$results$reportPlot$setContent(reportInference())
-               },
-               "Likelihood"={
-                 possible<-makePossible(typePossible=self$options$likelihoodType,
-                                        targetSample=NULL,
-                                        UsePrior=self$options$likelihoodUsePrior,
-                                        prior=makeWorld(worldOn=TRUE,
-                                                        populationPDF=self$options$priorPDF,
-                                                        populationRZ=self$options$priorRZ,
-                                                        populationPDFk=self$options$priorLambda,
-                                                        populationNullp=self$options$priorNullP)
-                 )
-                 possibleResult<-doPossible(possible)
-                 self$results$graphPlot$setState(c(outputNow,likelihoodCutaway))
-                 self$results$reportPlot$setContent(reportLikelihood())
-               },
-               "Multiple"={
-                 self$results$graphPlot$setState(c(outputNow,showMultipleParam,showMultipleDimension,whichShowMultipleOut))
-                 self$results$reportPlot$setContent(reportExpected(showType=showMultipleParam))
-               },
-               "Explore"={
-                 self$results$graphPlot$setState(c(outputNow,showExploreParam,showExploreDimension,whichShowExploreOut))
-                 self$results$reportPlot$setContent(reportExplore(showType=showExploreParam))
-               },
-               {
-                 self$results$graphPlot$setState(outputNow)
-                 self$results$reportPlot$setContent(NULL)
-               }
-        )
       
       # now we save any results to the Jamovi spreadsheet
       # single result first
@@ -454,7 +478,7 @@ BrawSimClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
                "Sample"    =outputGraph<-showSample(),
                "Describe"  =outputGraph<-showDescription(),
                "Infer"     =outputGraph<-showInference(showType=image$state[2],dimension=image$state[3]),
-               "Likelihood"=outputGraph<-showPossible(cutaway=as.logical(image$state[2])),
+               "Likelihood"=outputGraph<-showPossible(showType=image$state[2],cutaway=as.logical(image$state[3])),
                "Multiple"  =outputGraph<-showExpected(showType=image$state[2],dimension=image$state[3],effectType=image$state[4]),
                "MetaSingle"  =outputGraph<-showMetaSingle(),
                "MetaMultiple"  =outputGraph<-showMetaMultiple(),
@@ -472,6 +496,7 @@ BrawSimClass <- if (requireNamespace('jmvcore', quietly=TRUE)) R6::R6Class(
       if (!is.null(outputGraph)) {
         switch(outputGraph,
                "System"    =outputGraph<-reportTerms(),
+               "Prediction"    =outputGraph<-reportTerms(),
                "Sample"    =outputGraph<-reportSample(),
                "Describe"  =outputGraph<-reportDescription(),
                "Infer"     =outputGraph<-reportInference(),

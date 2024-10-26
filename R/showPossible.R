@@ -307,7 +307,8 @@ showPossible <- function(possibleResult=NULL,
     # make the floor
     braw.env$plotArea<-c(0,0,1,1)
     mapping<-mapping3D(azimuth,elevation,distance,xlim,ylim,zlim)
-    g<-startPlot(xlim=c(-1,1),ylim=c(-1,1),gaps=c(0.2,0.1,0,0)/2,box="none",backC=braw.env$plotColours$graphC)
+    g<-startPlot(xlim=c(-1,1),ylim=c(-1,1),
+                 box="none",backC=braw.env$plotColours$graphC)
     pts<-rotate3D(data.frame(x=xlim[c(1,2,2,1)],y=ylim[c(1,1,2,2)],z=c(0,0,0,0)+zlim[1]),mapping)
     g<-addG(g,dataPolygon(pts,fill=braw.env$plotColours$graphBack))
     # outside box            
@@ -927,7 +928,7 @@ showPossible <- function(possibleResult=NULL,
                                       dataPath(rotate3D(data.frame(x=c(rp_ci[1],rp_ci[1]),y=c(sRho[si],sRho[si]),z=c(zlim[1],approx(rp,rd[si,],rp_ci[1])$y-0.01)),
                                                         mapping),colour=colP,linewidth=0.5,linetype="dotted"),
                                       dataPath(rotate3D(data.frame(x=c(rp_ci[2],rp_ci[2]),y=c(sRho[si],sRho[si]),z=c(zlim[1],approx(rp,rd[si,],rp_ci[2])$y-0.01)),
-                                                        mapping),colour=colP,linewidth=0.5,linewidth=0.5,linetype="dotted")
+                                                        mapping),colour=colP,linewidth=0.5,linetype="dotted")
                               )
                             }
                             if (!is.null(possible$targetPopulation)) {

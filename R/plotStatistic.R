@@ -544,12 +544,17 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   
   box<-"Y" 
   top<-is.element(showType,c("e1","e2","e1d","e2d"))
-  
-  g<-startPlot(xlim,ylim,box=box,top=top,orientation=orient,g=g)
-  g<-addG(g,yAxisTicks(logScale=yaxis$logScale),yAxisLabel(ylabel))
-  
   if (!is.null(hypothesis$IV2) && effectType=="all") 
-    g<-addG(g,xAxisTicks(breaks=c(0,2,4),c("direct","unique","total")))
+    xticks<-makeTicks(breaks=c(0,2,4),c("direct","unique","total"))
+  else
+    xticks<-NULL
+  
+  g<-startPlot(xlim,ylim,
+               xticks=xticks,
+               yticks=makeTicks(logScale=yaxis$logScale),ylabel=makeLabel(ylabel),
+               box=box,top=top,orientation=orient,g=g)
+  # g<-addG(g,yAxisTicks(logScale=yaxis$logScale),yAxisLabel(ylabel))
+    # g<-addG(g,xAxisTicks(breaks=c(0,2,4),c("direct","unique","total")))
  
   if (!all(is.na(analysis$rIV))) {
     data<-collectData(analysis,whichEffect)
@@ -1111,11 +1116,16 @@ ps_plot<-function(analysis,disp,showTheory=TRUE,g=NULL){
   psig<-mean(isSignificant(braw.env$STMethod,analysis$pIV,analysis$rIV,analysis$nval,analysis$df1,analysis$evidence))
   
   if (is.null(analysis$hypothesis$IV2)) {
-    g<-startPlot(xlim=c(-1,1),ylim=c(0,1),top=TRUE,orientation="horz",g=g)
+    g<-startPlot(xlim=c(-1,1),ylim=c(0,1),
+                 xticks=makeTicks(breaks=c(0),labels=c("DV~IV")),
+                 yticks=makeTicks(),ylabel=makeLabel("p(sig)"),
+                 top=TRUE,orientation="horz",g=g)
     g<-addG(g,dataBar(data=data.frame(x=0,y=psig),fill=braw.env$plotColours$infer_sigC,barwidth=0.4))
-    g<-addG(g,xAxisTicks(breaks=c(0),labels=c("DV~IV")))
   } else {
-    g<-startPlot(xlim=c(-1,3),ylim=c(0,1),top=TRUE,orientation="horz",g=g)
+    g<-startPlot(xlim=c(-1,3),ylim=c(0,1),
+                 xticks=makeTicks(breaks=c(0,1,2),labels=c("DV~IV","DV~IV2","DV~IVxIV2")),
+                 yticks=makeTicks(),ylabel=makeLabel("p(sig)"),
+                 top=TRUE,orientation="horz",g=g)
     g<-addG(g,dataBar(data=data.frame(x=0,y=psig),fill=braw.env$plotColours$infer_sigC,barwidth=0.4))
     
     psig<-mean(isSignificant(braw.env$STMethod,analysis$pIV2,analysis$rIV2,analysis$nval,analysis$df1,analysis$evidence))
@@ -1124,9 +1134,7 @@ ps_plot<-function(analysis,disp,showTheory=TRUE,g=NULL){
     psig<-mean(isSignificant(braw.env$STMethod,analysis$pIVIV2,analysis$rIVIV2,analysis$nval,analysis$df1,analysis$evidence))
     g<-addG(g,dataBar(data=data.frame(x=2,y=psig),fill=braw.env$plotColours$infer_sigC,barwidth=0.4))
     
-    g<-addG(g,xAxisTicks(breaks=c(0,1,2),labels=c("DV~IV","DV~IV2","DV~IVxIV2"),angle=90))
   }
-  g<-addG(g,yAxisLabel("p(sig)"),yAxisTicks())
   return(g)
 }
 

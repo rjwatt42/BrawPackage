@@ -18,9 +18,9 @@ showSystem<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,evide
     g<-showHypothesis(hypothesis=hypothesis,doWorld=TRUE,plotArea=c(0.0,0.05,0.45,0.8),g=g)
   else
     g<-showHypothesis(hypothesis=hypothesis,doWorld=TRUE,plotArea=c(0.0,0.05,0.33,0.8),g=g)
-  g<-showDesign(hypothesis=hypothesis,design=design,plotArea=c(0.33,0.3,0.33,0.33),g=g)
+  g<-showDesign(hypothesis=hypothesis,design=design,plotArea=c(0.33,0.3,0.28,0.33),g=g)
   g<-showPrediction(hypothesis=hypothesis,design=design,evidence=evidence,plotArea=c(0.65,0.55,0.33,0.4),g=g)
-  g<-showWorldSampling(hypothesis=hypothesis,design=design,sigOnly=FALSE,plotArea=c(0.65,0.05,0.33,0.4),g=g)
+  g<-showWorldSampling(hypothesis=hypothesis,design=design,sigOnly=FALSE,plotArea=c(0.7,0.05,0.28,0.4),g=g)
   
   braw.env$plotArea<-c(0,0,1,1)
   g<-addG(g,axisText(data=data.frame(x=0.02,y=1),"Hypothesis",vjust=1,size=1.5,fontface="bold"))
@@ -98,7 +98,13 @@ showWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),g=NULL) {
   range<-braw.env$r_range
   if (braw.env$RZ=="z"){range<-tanh(braw.env$z_range)}
 
-  g<-startPlot(xlim=c(-1,1)*range,ylim=c(0,1.05),box="x",g=g)
+  switch(braw.env$RZ,
+         "r"={ xticks<-makeTicks(seq(-1,1,0.5));xlabel<-makeLabel(braw.env$rpLabel)},
+         "z"={ xticks<-makeTicks(seq(-2,2,1));xlabel<-makeLabel(braw.env$zpLabel)}
+  )
+  g<-startPlot(xlim=c(-1,1)*range,ylim=c(0,1.05),
+               xticks=xticks,xlabel=xlabel,
+               box="x",g=g)
   # if (world$worldAbs) {
   #   rx<-seq(0,1,length.out=braw.env$worldNPoints)*range
   # } else {
@@ -121,10 +127,6 @@ showWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),g=NULL) {
   pts=data.frame(x=rx,y=rdens)
   g<-addG(g,dataPolygon(pts,fill=braw.env$plotColours$descriptionC,colour=NA))
   g<-addG(g,dataLine(pts))
-  switch(braw.env$RZ,
-         "r"={ g<-addG(g,xAxisTicks(seq(-1,1,0.5)),xAxisLabel(braw.env$rpLabel))},
-         "z"={ g<-addG(g,xAxisTicks(seq(-2,2,1)),xAxisLabel(braw.env$zpLabel))}
-  )
   
   return(g)
 }
@@ -157,8 +159,8 @@ showDesign<-function(design=braw.def$design,hypothesis=braw.def$hypothesis,plotA
   
   braw.env$plotArea<-plotArea
   g<-startPlot(xlim=binRange, ylim=c(0,1),
-               gaps=c(0,1,1.2,1),box="x",g=g,fontScale=1)
-  g<-addG(g,xAxisTicks(nRange$ticks,10^nRange$ticks),xAxisLabel(nRange$label))
+               xticks=makeTicks(nRange$ticks,10^nRange$ticks),xlabel=makeLabel(nRange$label),
+               box="x",g=g)
   g<-addG(g,dataPolygon(data=pts,fill=braw.env$plotColours$descriptionC))
   g<-addG(g,dataLine(data=pts))
 
@@ -326,11 +328,13 @@ showWorldSampling<-function(hypothesis=braw.def$hypothesis,design=braw.def$desig
   
   braw.env$plotArea<-plotArea
 
-  g<-startPlot(xlim=c(-1,1), ylim=c(0,1.05),top=TRUE,fontScale=1,g=g)
   switch(braw.env$RZ,
-         "r"={g<-addG(g,xAxisTicks(seq(-1,1,0.5)),xAxisLabel(braw.env$rsLabel))},
-         "z"={g<-addG(g,xAxisTicks(seq(-1,1,0.5)),xAxisLabel(braw.env$zsLabel))}
+         "r"={ xticks<-makeTicks(seq(-1,1,0.5));xlabel<-makeLabel(braw.env$rsLabel)},
+         "z"={ xticks<-makeTicks(seq(-2,2,1));xlabel<-makeLabel(braw.env$zsLabel)}
   )
+  g<-startPlot(xlim=c(-1,1),ylim=c(0,1.05),
+               xticks=xticks,xlabel=xlabel,
+               top=TRUE,box="x",g=g)
   g<-addG(g,dataPolygon(data=pts,fill=braw.env$plotColours$descriptionC))
   g<-addG(g,dataLine(data=pts))
   

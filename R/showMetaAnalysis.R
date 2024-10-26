@@ -56,7 +56,7 @@ showMetaSingle<-function(metaResult=braw.res$metaResult,showTheory=FALSE) {
   ptsNull<-data.frame(x=d1[useNull],y=d2[useNull])
   
   assign("plotArea",c(0,0,1,1),braw.env)
-  g<-startPlot(xlim,ylim,box="both",top=FALSE,g=NULL)
+  g<-startPlot(xlim,ylim,top=FALSE,g=NULL)
   
   if (length(d1)>=1200) {
     nbins<-diff(ylim)/(2*IQR(d2[use])*length(d2[use])^(-0.33))*2
@@ -195,7 +195,7 @@ drawMeta<-function(metaResult=doMetaAnalysis(),whichMeta="Single",showType="n-k"
     pts<-data.frame(x=x,y=y)
       
       if (braw.env$plotArea[1]==0)  {
-        g<-startPlot(xlim,ylim,box="both",top=TRUE,g=g)
+        g<-startPlot(xlim,ylim,top=TRUE,g=g)
         g<-addG(g,yAxisTicks(yticks),yAxisLabel(ylabel))
       }  else  g<-startPlot(xlim,ylim,box="x",top=TRUE,g=g)
       g<-addG(g,xAxisTicks(xticks),xAxisLabel(xlabel))

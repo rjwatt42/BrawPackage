@@ -337,9 +337,12 @@ plotPopulation<-function(IV,DV,effect,alpha=1,g=NULL){
          }
   )
   
-  g<-startPlot(xlim,ylim,top=TRUE,g=g)
-  g<-addG(g,xAxisTicks(xtick,xticklabel),xAxisLabel(IV$name))
-  g<-addG(g,yAxisTicks(ytick,yticklabel),yAxisLabel(DV$name))
+  g<-startPlot(xlim,ylim,
+               xticks=makeTicks(xtick,xticklabel),xlabel=makeLabel(IV$name),
+               yticks=makeTicks(ytick,yticklabel),ylabel=makeLabel(DV$name),
+               top=TRUE,g=g)
+  # g<-addG(g,xAxisTicks(xtick,xticklabel),xAxisLabel(IV$name))
+  # g<-addG(g,yAxisTicks(ytick,yticklabel),yAxisLabel(DV$name))
 
   switch (hypothesisType,
           "Interval Interval"={

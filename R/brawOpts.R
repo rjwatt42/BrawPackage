@@ -17,9 +17,9 @@ newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
   print(startPlot(box="none",backC=braw.env$plotColours$graphC))
 }
 
-BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,graphicsSize=c(16,10),
+BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1.5,graphicsSize=c(16,10),
                    reportHTML=FALSE, graphHTML=FALSE,
-                   newDev=FALSE,height=576,aspect=1.736,timeLimit=Inf,
+                   newDev=FALSE,height=300,aspect=1.5,timeLimit=Inf,
                    reducedOutput=FALSE) {
   if (graphC=="white") graphC<-"#FFFFFF"
   if (graphC=="normal") graphC<-"#BFECFF"
@@ -32,6 +32,8 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,graphicsSize=c(16,10),
     dev.new(width=height*aspect/144, height=height/144, noRStudioGD = TRUE)
     fontScale<-min(dev.size(units="px"))/200
   }
+  
+  braw.env$plotSize<-c(aspect,1)*height
   # genuine globals (for now)
   braw.env$plotDescriptionCols<-c()
   braw.env$CatCatCols<-c()
@@ -103,8 +105,8 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1,graphicsSize=c(16,10),
           # braw.env$reportTheme<-braw.env$blankTheme()+theme(plot.margin=margin(0.15,0.8,0,0.25,"cm"))
           
           braw.env$graphicsSize<-graphicsSize
-          braw.env$labelSize<-3.2*fontScale
-          braw.env$dotSize<-3.2*2
+          braw.env$labelSize<-height/100*fontScale
+          braw.env$dotSize<-braw.env$labelSize*1.25
           
           braw.env$autoShow<-FALSE
           braw.env$plotRect<-coord_cartesian(xlim=c(0,1),ylim=c(0,1))

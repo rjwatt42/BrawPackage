@@ -1,6 +1,6 @@
 
-svgBoxX<-function() {return(550)}
-svgBoxY<-function() {return(400)}
+svgBoxX<-function() {return(braw.env$plotSize[1])}
+svgBoxY<-function() {return(braw.env$plotSize[2])}
 svgX<-function(x) {return(x*svgBoxX())}
 svgY<-function(y) {return((1-y)*svgBoxY())}
 
@@ -18,13 +18,13 @@ addG<-function(g,...) {
 reRangeY<-function(y) {
   if (!is.null(braw.env$plotLimits)) {
     y<-(y-braw.env$plotLimits$ysc[1])/diff(braw.env$plotLimits$ysc)
-    gap0<-braw.env$plotLimits$gap[2]+braw.env$plotLimits$gap[4]
-    gap1<-braw.env$plotLimits$gap[2]
+    gap0<-braw.env$plotLimits$gap[2]
+    gap1<-braw.env$plotLimits$gap[4]
   } else {
     gap0<-0
     gap1<-0
   }
-  y<-(y*(1-gap0)+gap1)*braw.env$plotArea[4]+braw.env$plotArea[2]
+  y<-(gap0+y*(braw.env$plotArea[4]-gap0-gap1))+braw.env$plotArea[2]
   return(y)
 }
 rangeY<-function(y) {
@@ -34,13 +34,13 @@ rangeY<-function(y) {
 reRangeX<-function(x) {
   if (!is.null(braw.env$plotLimits)){
     x<-(x-braw.env$plotLimits$xsc[1])/diff(braw.env$plotLimits$xsc)
-    gap0<-braw.env$plotLimits$gap[1]+braw.env$plotLimits$gap[3]
-    gap1<-braw.env$plotLimits$gap[1]
+    gap0<-braw.env$plotLimits$gap[1]
+    gap1<-braw.env$plotLimits$gap[3]
   } else {
     gap0<-0
     gap1<-0
   }
-  x<-(x*(1-gap0)+gap1)*braw.env$plotArea[3]+braw.env$plotArea[1]
+  x<-(gap0+x*(braw.env$plotArea[3]-gap0-gap1))+braw.env$plotArea[1]
   return(x)
 }
 re2RangeX<-function(x) {
@@ -51,7 +51,6 @@ re2RangeX<-function(x) {
     gap0<-0
     gap1<-0
   }
-  # x<-(x*(1-gap0)+gap1)*braw.env$plotArea[3]+braw.env$plotArea[1]
   x<-((x-braw.env$plotArea[1])/braw.env$plotArea[3]-gap1)/(1-gap0)
   if (!is.null(braw.env$plotLimits)){
     x<-x*diff(braw.env$plotLimits$xsc)+braw.env$plotLimits$xsc[1]
@@ -93,15 +92,14 @@ reOrientXY<-function(data,orientation=braw.env$plotLimits$orientation) {
   return(data)
 }
 reSizeFont<-function(size) {
-  size*braw.env$labelSize*braw.env$plotLimits$fontScale
+  size*braw.env$plotLimits$fontScale
 }
 
 plotLimits<-function(xlim,ylim,orientation="horz",gaps=c(1,1,0,0),fontScale=1) {
     ez<-2
-    fS<-1.2*fontScale*max(0.3,min(braw.env$plotArea[3:4]))^(1/ez)
-    magnification<-max(0.3,min(braw.env$plotArea[3:4]))^(1/ez)/max(0.3,min(braw.env$plotArea[3:4]))
-    gaps<-gaps*magnification
-    
+    fS<-braw.env$labelSize*fontScale*max(0.3,min(braw.env$plotArea[3:4]))^(1/ez)
+    gaps<-gaps*fS/120/c(braw.env$plotSize[1]/braw.env$plotSize[2],1,braw.env$plotSize[1]/braw.env$plotSize[2],1)
+
   switch(orientation,
          "horz"={braw.env$plotLimits<-list(xlim=xlim,ylim=ylim,xsc=xlim,ysc=ylim,
                                            orientation=orientation,gap=gaps,fontScale=fS,
@@ -116,7 +114,7 @@ nullPlot<-function() {
   if (braw.env$graphHTML) {
     g<-paste0(
       '<svg width=',format(svgBoxX()),' height=',format(svgBoxY()),
-      # ' style=background-color:','#BFECFF','',
+      ' style=background-color:','"black"','',
       ' xmlns="http://www.w3.org/2000/svg">'
     )
   } else {
@@ -125,33 +123,54 @@ nullPlot<-function() {
   return(g)
 }
 
-startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="Both",top=FALSE,tight=FALSE,
+containsSubscript<-function(label) any(grepl('\\[([^ ]*)\\]',label))
+containsSuperscript<-function(label) any(grepl('[\\^].',label))
+
+makeTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE,angle=0) {
+    return(list(breaks=breaks,labels=labels,logScale=logScale,angle=angle))
+}
+makeLabel<-function(label=NULL) {
+    return(list(label=label))
+}
+startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=FALSE,
+                    xticks=NULL,xlabel=NULL,yticks=NULL,ylabel=NULL,
                     backC=braw.env$plotColours$graphBack,orientation="horz",fontScale=1,g=NULL) {
-  minGap<-0.025
-  topGap<-0.1
-  bottomGap<-0.1
-  leftGap<-0.12
-  if (tight) maxGap<-0.075
-  # gaps is left, bottom, right, top
-  if (is.null(gaps)) {
-    switch(box,
-           "X"=gaps<-c(0,bottomGap),
-           "x"=gaps<-c(minGap,bottomGap),
-           "Y"=gaps<-c(leftGap,0),
-           "y"=gaps<-c(leftGap,minGap),
-           "both"=gaps<-c(minGap,minGap),
-           "Both"=gaps<-c(leftGap,bottomGap),
-           "none"=gaps<-c(0,0),
-           {gaps<-c(minGap,minGap)}
-    )
-    if (top) gaps<-c(gaps,minGap,topGap)
-    else gaps<-c(gaps,minGap,minGap)
+  minGap<-0.1
+  unitGap<-1
+  labelGapx<-labelGapy<-unitGap*1.25
+  if (containsSubscript(xlabel$xlabel) || containsSuperscript(xlabel$xlabel)) labelGapx<-labelGapx*1.02
+  if (containsSubscript(ylabel$ylabel) || containsSuperscript(ylabel$ylabel)) labelGapy<-labelGapy*1.02
+  tickGap<-unitGap
+  
+  bottomGap<-labelGapx+1.5*tickGap
+  if (top) topGap<-labelGapy*1.5 else topGap<-minGap
+  leftGap<-labelGapy+4*tickGap
+  rightGap<-minGap
+  
+  if (!is.null(xticks)) {
+    if (is.null(xticks$breaks))
+      xticks$breaks<-axisTicks(usr=xlim, log=xticks$logScale, axp = NULL, nint = 5)
+    if (is.null(xticks$labels))
+      xticks$labels<-xticks$breaks
+    maxtick<-max(nchar(xticks$labels))
   } else {
-    gaps<-gaps*c(leftGap,bottomGap,leftGap,bottomGap)
+    maxtick<-0
+    bottomGap<-minGap
   }
-  ratio<-svgBoxX()/svgBoxY()*braw.env$plotArea[3]/braw.env$plotArea[4]
-  if (ratio>1) gaps[c(1,3)]<-gaps[c(1,3)]/ratio
-  if (ratio<1) gaps[c(2,4)]<-gaps[c(2,4)]*ratio
+  if (!is.null(yticks)) {
+    if (is.null(yticks$breaks))
+      yticks$breaks<-axisTicks(usr=ylim, log=yticks$logScale, axp = NULL, nint = 5)
+    if (is.null(yticks$labels))
+      yticks$labels<-yticks$breaks
+    leftGap<-labelGapy+max(nchar(yticks$labels))*tickGap
+    maxtick<-max(c(maxtick,nchar(yticks$labels)))
+  } else {
+    leftGap<-minGap
+  }
+
+  tickSize<-4/max(5,maxtick)
+  
+  gaps<-c(leftGap,bottomGap,rightGap,topGap)
   plotLimits(xlim = xlim, ylim = ylim,orientation=orientation,gaps,fontScale=fontScale)
   
   if (is.null(g)) g<-nullPlot()
@@ -167,6 +186,7 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="Both",top=FALSE,tight
   
   if (!(is.character(backC) && backC=="transparent")) {
     back<-data.frame(x=xlim[c(1,2,2,1)],y=ylim[c(1,1,2,2)])
+    # g<-addG(g,axisPath(data=data.frame(x=c(0,1,1,0,0),y=c(0,0,1,1,0)),colour="black"))
     g<-addG(g,dataPolygon(data=back, fill=backC, colour=backC))
   }
 
@@ -185,11 +205,19 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="Both",top=FALSE,tight
            g<-addG(g,dataLine(data=yaxis,colour="black",linewidth=0.25))
          }
          )
+  if (!is.null(xticks)) 
+    g<-addG(g,xAxisTicks(breaks=xticks$breaks,labels=xticks$labels,logScale=xticks$logScale,angle=xticks$angle,size=tickSize))
+  if (!is.null(xlabel))
+    g<-addG(g,xAxisLabel(label=xlabel$label))
+  if (!is.null(yticks)) 
+    g<-addG(g,yAxisTicks(breaks=yticks$breaks,labels=yticks$labels,logScale=yticks$logScale,angle=yticks$angle,size=tickSize))
+  if (!is.null(ylabel))
+    g<-addG(g,yAxisLabel(label=ylabel$label))
   return(g)  
 }
 
 plotTitle<-function(label,position="centre",size=1.25,fontface="bold") {
-  ypos<-1-braw.env$plotLimits$gap[4]
+  ypos<-1-braw.env$plotLimits$gap[4]*0.8
     switch(position,
            "left"={
              data<-data.frame(x=(braw.env$plotLimits$gap[1]), y=ypos)
@@ -208,7 +236,7 @@ plotTitle<-function(label,position="centre",size=1.25,fontface="bold") {
 }
 
 xAxisLabel<-function(label) {
-  voff<-braw.env$plotLimits$gap[2]*0.05
+  voff<-braw.env$plotLimits$gap[2]*0.0
 
   axis<-data.frame(x=reRangeX(mean(braw.env$plotLimits$xlim)),y=rangeY(voff))
   switch(braw.env$plotLimits$orientation,
@@ -220,7 +248,7 @@ xAxisLabel<-function(label) {
          }
   )
 }
-xAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE,angle=0){
+xAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE,angle=0,size=NULL){
   if (is.null(breaks)) {
     breaks<-axisTicks(usr=braw.env$plotLimits$xlim, log=logScale, axp = NULL, nint = 5)
   }
@@ -228,43 +256,38 @@ xAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE,angle=0){
   if (logScale) breaks<-log10(breaks)
   # labels<-as.character(labels)
   
-  mn<-5/max(5,max(nchar(labels)))
+  if (is.null(size)) size<-5/max(5,max(nchar(labels)))
   
-  voff<-braw.env$plotLimits$gap[2]
-  ticksBottom<-data.frame(x=reRangeX(breaks),y=rangeY(voff))
+  voff<-braw.env$plotLimits$ylim[1]
+  ticksBottom<-data.frame(x=reRangeX(breaks),y=reRangeY(voff))
   
   switch(braw.env$plotLimits$orientation,
          "vert"={
-           axisText(ticksBottom,label=labels, hjust=1.1, vjust=0.5, colour="black",size=mn,fontface="plain")
-           # geom_text(data=ticksTop,aes(x=x,y=y),label=labels,hjust=1.1,vjust=0.5,
-           #         size=mn)
+           axisText(ticksBottom,label=labels, hjust=1.1, vjust=0.5, colour="black",size=size,fontface="plain")
          },
          "horz"={
            if (angle==0) {
              hjust=0.5
            } else {
              hjust=1.1
-             # mn<-mn*0.75
            }
-           axisText(ticksBottom,label=labels, hjust=hjust, vjust=1, dy=-2, colour="black",size=mn,fontface="plain")
-           # geom_text(data=ticksTop,aes(x=x,y=y),label=labels,hjust=hjust,vjust=vjust,
-           #           size=reSizeFont(mn),angle=angle)
+           axisText(ticksBottom,label=labels, hjust=hjust, vjust=1, dy=-2, colour="black",size=size,fontface="plain")
          }
   )
 }
 yAxisLabel<-function(label){
 
-  axis<-data.frame(x=rangeX(0.035),y=reRangeY(mean(braw.env$plotLimits$ylim)))
+  axis<-data.frame(x=rangeX(0.0),y=reRangeY(mean(braw.env$plotLimits$ylim)))
   switch(braw.env$plotLimits$orientation,
          "vert"={
            axisText(axis,label=label, hjust=0.5, vjust=2/1.5, colour="black",size=1.2,fontface="bold")
          },
          "horz"={
-           axisText(axis,label=label, hjust=0.5, colour="black",size=1.2,angle=90,fontface="bold")
+           axisText(axis,label=label, hjust=0.5, vjust=1, colour="black",size=1.2,angle=90,fontface="bold")
          }
   )
 }
-yAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE){
+yAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE,angle=0,size=NULL){
   if (is.null(breaks)) {
       breaks<-axisTicks(usr=braw.env$plotLimits$ylim, log=logScale, axp = NULL, nint = 5)
   }
@@ -273,17 +296,22 @@ yAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE){
   if (logScale) breaks<-log10(breaks)
   # labels<-as.character(labels)
   
-  ticks<-data.frame(x=rangeX(braw.env$plotLimits$gap[1]),y=reRangeY(breaks))
-  mn<-4/max(4,max(nchar(labels)))
+  ticks<-data.frame(x=reRangeX(braw.env$plotLimits$xlim[1]),y=reRangeY(breaks))
+  if (is.null(size)) size<-4/max(4,max(nchar(labels)))
 
   switch(braw.env$plotLimits$orientation,
          "vert"={
-           axisText(ticks,label=labels, hjust=0.5, vjust=1.1, colour="black",size=mn,fontface="plain")
+           axisText(ticks,label=labels, hjust=0.5, vjust=1.1, colour="black",size=size,fontface="plain")
            # geom_text(data=ticks,aes(x=x,y=y),label=labels,hjust=0.5,vjust=1.1,
            #           size=reSizeFont(mn))
          },
          "horz"={
-           axisText(ticks,label=labels, hjust=1.0, vjust=0.5, colour="black",size=mn,dx=-2,fontface="plain")
+           if (angle==0) {
+             hjust=1.1
+           } else {
+             hjust=1.1
+           }
+           axisText(ticks,label=labels, hjust=hjust, vjust=0.5, colour="black",size=size,dx=-2,fontface="plain")
            # geom_text(data=ticks,aes(x=x,y=y),label=labels,hjust=1.1,vjust=0.5,
            #           size=reSizeFont(mn))
          }
@@ -383,7 +411,7 @@ axisText<-function(data,label, hjust=0, vjust=0, colour="black",size=1,angle=0,d
     
     x<-svgX(data$x)
     y<-svgY(data$y)
-    if (any(grepl('\\[([^ ]*)\\]',label))) y<-y-0.025*braw.env$plotArea[4]*svgBoxY()
+    if (containsSubscript(label)) y<-y-0.025*braw.env$plotArea[4]*svgBoxY()
     labels<-""
     for (i in 1:length(x)) {
       thisLabel<-label[i]
@@ -597,40 +625,6 @@ dataLegend<-function(data,title="title",fontsize=0.65) {
     )
   }
   return(g)
-  
-  mathlabel<-grepl("['^']{1}",title) | grepl("['[']{1}",title)
-  if (any(mathlabel)) {
-    title<-deparse(title)
-  } else {
-    title<-deparse(bquote(bold(.(title))))
-  }
-  
-  fontsize<-reSizeFont(fontsize*0.8)
-  names<-data$names
-  width<-((max(c(nchar(title),nchar(names)))+2)*fontsize*2)*braw.env$graphicsSize[1]/5000
-  height<-(length(names)*fontsize + 1*3.2)*braw.env$graphicsSize[1]/800
-  colours<-data$colours
-  
-  x<-braw.env$plotArea[c(1,3)]
-  y<-braw.env$plotArea[c(2,4)]
-  top<-1.01
-  legX<-x[1]+x[2]*c(top-width,top)
-  legY<-y[1]+y[2]*c(top-height,top)
-  ptsX<-rep(legX[1]+legX[2]*0.025,length(colours))
-  ptsY<-legY[1]+seq(1,length(colours))*0.25*(legY[2]-legY[1])
-  
-  titleY<-legY[1]+0.8*(legY[2]-legY[1])
-  
-  list(
-    geom_polygon(data=data.frame(x=legX[c(1,2,2,1)],y=legY[c(1,1,2,2)]),
-                 aes(x=x,y=y),color="black",fill="white",alpha=1),
-    geom_point(data=data.frame(x=ptsX,y=ptsY),
-               aes(x=x,y=y),shape=21,size=fontsize,colour="black",fill=colours),
-    geom_text(data=data.frame(x=ptsX+legX[2]*0.025,y=ptsY,label=names),
-              aes(x=x,y=y,label=label),hjust=0,size=fontsize),
-    geom_text(data=data.frame(x=ptsX[1],y=titleY,label=title),
-              aes(x=x,y=y,label=label),hjust=0,size=fontsize,parse=TRUE)
-  )
 }
 
 dataContour<-function(data,colour="black",breaks=c(0.1,0.3,0.5,0.7,0.9),linewidth=0.25,linetype="solid") {

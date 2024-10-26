@@ -247,16 +247,17 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       braw.env$plotArea<-c(plotXOffset[si,1],plotYOffset[1,si],plotWidth,plotHeight)
     else
       braw.env$plotArea<-c(plotXOffset[si,1],plotYOffset[1,yi],plotWidth,plotHeight)
-    # if (plotHeight==1) braw.env$plotArea<-c(plotXOffset[si,1],0,plotWidth,plotHeight)
-    # else               braw.env$plotArea<-c(0.475*(si-1)+0.025*si,plotYOffset[1,whichEffect],plotWidth,plotHeight)
-    g<-startPlot(xlim,ylim,box="Both",top=TRUE,tight=TRUE,g=g)
-    
-    g<-addG(g,xAxisTicks(xbreaks,xnames,logScale=explore$xlog))
-    g<-addG(g,xAxisLabel(exploreTypeShow))
+    print(braw.env$plotArea)
+    if ((showType[si]=="rs") && (!is.null(hypothesis$IV2))) switch(whichEffect,ylabel<-"Main 1",ylabel<-"Main 2",ylabel<-"Interaction")
+
+    g<-startPlot(xlim,ylim,
+                 xticks=makeTicks(breaks=xbreaks,labels=xnames,logScale=explore$xlog),
+                 xlabel=makeLabel(label=exploreTypeShow),
+                 yticks=makeTicks(logScale=yaxis$logScale),
+                 ylabel=makeLabel(label=ylabel),
+                 top=TRUE,g=g)
     if (nchar(useLabel)>0)    g<-addG(g,plotTitle(useLabel,size=1.5))
     
-    if ((showType[si]=="rs") && (!is.null(hypothesis$IV2))) switch(whichEffect,ylabel<-"Main 1",ylabel<-"Main 2",ylabel<-"Interaction")
-    g<-addG(g,yAxisTicks(logScale=yaxis$logScale),yAxisLabel(ylabel))
     col<-darken(ycols[1],off=-0.2)
     
       for (effectType in effectTypes) {
@@ -814,9 +815,8 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   }
   }
   }
-  if (exploreResult$count>0)
-    # braw.env$plotArea<-c(0,0,1,1)
-  g<-addG(g,plotTitle(paste0("nsims=",brawFormat(exploreResult$count)),"right",size=1,fontface="plain"))
+  # if (exploreResult$count>0)
+  # g<-addG(g,plotTitle(paste0("nsims=",brawFormat(exploreResult$count)),"right",size=1,fontface="plain"))
   g
 }
 
@@ -914,10 +914,13 @@ showExplore2D<-function(exploreResult=braw.res$explore,showType=c("rs","p"),show
     while (mean(log10(exploreResult$result$pval)>ylim[1])<0.75) ylim[1]<-ylim[1]-1
   
   braw.env$plotArea<-c(0,0,1,1)
-  g<-startPlot(xlim,ylim,box="both",top=TRUE,tight=TRUE,g=g)
-  g<-addG(g,plotTitle(paste0("explore: ",explore$exploreType)))
-  g<-addG(g,xAxisTicks(logScale=xaxis$logScale),xAxisLabel(xlabel))
-  g<-addG(g,yAxisTicks(logScale=yaxis$logScale),yAxisLabel(ylabel))
+  g<-startPlot(xlim,ylim,
+               xticks=makeTicks(logScale=xaxis$logScale),xlabel=makeLabel(xlabel),
+               yticks=makeTicks(logScale=xaxis$logScale),ylabel=makeLabel(ylabel),
+               box="both",top=TRUE,g=g)
+  g<-addG(g,plotTitle(paste0("explore: ",explore$exploreType),size=1,fontface="plain",position="left"))
+  # g<-addG(g,xAxisTicks(logScale=xaxis$logScale),xAxisLabel(xlabel))
+  # g<-addG(g,yAxisTicks(logScale=yaxis$logScale),yAxisLabel(ylabel))
   
   lineCol<-"black"
   if (is.element(showType[1],c("p","e1","e2","e1d","e2d"))) lineCol<-"green"
@@ -933,7 +936,7 @@ showExplore2D<-function(exploreResult=braw.res$explore,showType=c("rs","p"),show
   g<-addG(g,dataLine(data.frame(x=xVals,y=yVals)))
   g<-addG(g,dataPoint(data.frame(x=xVals,y=yVals)))
   
-  if (exploreResult$count>0)
-    g<-addG(g,plotTitle(paste0("nsims=",brawFormat(exploreResult$count)),"right",size=1))
-  
+  # if (exploreResult$count>0)
+  #   g<-addG(g,plotTitle(paste0("nsims=",brawFormat(exploreResult$count)),"right",size=1))
+  return(g)  
 }

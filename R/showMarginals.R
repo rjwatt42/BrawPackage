@@ -65,9 +65,11 @@ inspectMainGraph<-function(varName,result=braw.res$result,inspect=makeInspect(),
             ticks<-data.frame(breaks=bt,labels=lt)
           }
   )
-  g<-startPlot(xlim=xlim,ylim=c(0,diff(xlim)*aspect),box="x",g=g)
-  g<-addG(g,xAxisTicks(ticks$breaks,ticks$labels),xAxisLabel(var$name))
-  
+  g<-startPlot(xlim=xlim,ylim=c(0,diff(xlim)*aspect),
+               xticks=makeTicks(ticks$breaks,ticks$labels),xlabel=makeLabel(var$name),
+               # yticks=makeTicks(0,0),ylabel=makeLabel("a"),
+               box="x",g=g)
+
   if (!is.null(data)) {
   # prepare data points
     ptSize<-diff(xlim)/6/sqrt(n)
