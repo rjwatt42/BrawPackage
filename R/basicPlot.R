@@ -133,13 +133,14 @@ makeLabel<-function(label=NULL) {
     return(list(label=label))
 }
 startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=FALSE,
-                    xticks=NULL,xlabel=NULL,yticks=NULL,ylabel=NULL,
+                    xticks=NULL,xlabel=NULL,xmax=FALSE,yticks=NULL,ylabel=NULL,ymax=FALSE,
                     backC=braw.env$plotColours$graphBack,orientation="horz",fontScale=1,g=NULL) {
   minGap<-0.1
   unitGap<-1
   labelGapx<-labelGapy<-unitGap*1.25
-  if (containsSubscript(xlabel$xlabel) || containsSuperscript(xlabel$xlabel)) labelGapx<-labelGapx*1.02
-  if (containsSubscript(ylabel$ylabel) || containsSuperscript(ylabel$ylabel)) labelGapy<-labelGapy*1.02
+  if (containsSubscript(xlabel$label) || containsSuperscript(xlabel$label)) labelGapx<-labelGapx*1.5
+  if (containsSubscript(ylabel$label) || containsSuperscript(ylabel$label)) labelGapy<-labelGapy*1.5
+  
   tickGap<-unitGap
   
   bottomGap<-labelGapx+1.5*tickGap
@@ -162,7 +163,8 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=FALSE,
       yticks$breaks<-axisTicks(usr=ylim, log=yticks$logScale, axp = NULL, nint = 5)
     if (is.null(yticks$labels))
       yticks$labels<-yticks$breaks
-    leftGap<-labelGapy+max(nchar(yticks$labels))*tickGap
+    if (!xmax)
+      leftGap<-labelGapy+max(nchar(yticks$labels))*tickGap
     maxtick<-max(c(maxtick,nchar(yticks$labels)))
   } else {
     leftGap<-minGap
@@ -236,7 +238,7 @@ plotTitle<-function(label,position="centre",size=1.25,fontface="bold") {
 }
 
 xAxisLabel<-function(label) {
-  voff<-braw.env$plotLimits$gap[2]*0.0
+  voff<-0+braw.env$plotLimits$gap[2]*0.25
 
   axis<-data.frame(x=reRangeX(mean(braw.env$plotLimits$xlim)),y=rangeY(voff))
   switch(braw.env$plotLimits$orientation,
@@ -244,7 +246,7 @@ xAxisLabel<-function(label) {
            axisText(axis,label=label, hjust=0.5, vjust=-voff/1.5, colour="black",size=1.2,angle=90,fontface="bold")
          },
          "horz"={
-           axisText(axis,label=label, hjust=0.5, colour="black",size=1.2,fontface="bold")
+           axisText(axis,label=label, hjust=0.5, vjust=0, colour="black",size=1.2,fontface="bold")
          }
   )
 }

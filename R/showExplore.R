@@ -126,15 +126,15 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     plotWidth<-0.7
   } 
   if (length(showType)==2) {
-    plotXOffset<-matrix(c(0,0.5)+0.05,nrow=2,byrow=FALSE)
+    plotXOffset<-matrix(c(0,0.55),nrow=2,byrow=FALSE)
     plotYOffset<-matrix(c(0,0),nrow=1,byrow=TRUE)
-    plotWidth<-0.475
+    plotWidth<-0.45
   }
   if (length(showType)==4) {
-    plotXOffset<-matrix(c(0,  0.5, 0, 0.5)+0.05,nrow=4,byrow=FALSE)
+    plotXOffset<-matrix(c(0,  0.55, 0, 0.55),nrow=4,byrow=FALSE)
     plotYOffset<-matrix(c(0.5,0.5, 0, 0),nrow=1,byrow=TRUE)
     plotHeight<-0.475
-    plotWidth<-0.475
+    plotWidth<-0.45
   }
   
   if (is.null(hypothesis$IV2)) whichEffects<-1
@@ -247,12 +247,12 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       braw.env$plotArea<-c(plotXOffset[si,1],plotYOffset[1,si],plotWidth,plotHeight)
     else
       braw.env$plotArea<-c(plotXOffset[si,1],plotYOffset[1,yi],plotWidth,plotHeight)
-    print(braw.env$plotArea)
     if ((showType[si]=="rs") && (!is.null(hypothesis$IV2))) switch(whichEffect,ylabel<-"Main 1",ylabel<-"Main 2",ylabel<-"Interaction")
 
     g<-startPlot(xlim,ylim,
                  xticks=makeTicks(breaks=xbreaks,labels=xnames,logScale=explore$xlog),
                  xlabel=makeLabel(label=exploreTypeShow),
+                 xmax=TRUE,
                  yticks=makeTicks(logScale=yaxis$logScale),
                  ylabel=makeLabel(label=ylabel),
                  top=TRUE,g=g)
@@ -817,7 +817,11 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   }
   # if (exploreResult$count>0)
   # g<-addG(g,plotTitle(paste0("nsims=",brawFormat(exploreResult$count)),"right",size=1,fontface="plain"))
-  g
+  if (braw.env$graphHTML && braw.env$autoShow) {
+    showHTML(g)
+    return(invisible(g))
+  }
+  else return(g)  
 }
 
 showExplore2D<-function(exploreResult=braw.res$explore,showType=c("rs","p"),showTheory=FALSE,
@@ -938,5 +942,9 @@ showExplore2D<-function(exploreResult=braw.res$explore,showType=c("rs","p"),show
   
   # if (exploreResult$count>0)
   #   g<-addG(g,plotTitle(paste0("nsims=",brawFormat(exploreResult$count)),"right",size=1))
-  return(g)  
+  if (braw.env$graphHTML && braw.env$autoShow) {
+    showHTML(g)
+    return(invisible(NULL))
+  }
+  else return(g)  
 }

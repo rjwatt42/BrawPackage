@@ -45,6 +45,10 @@ showExpected<-function(expectedResult=braw.res$expected,showType="Basic",
   ) 
   # if (is.null(expectedResult$hypothesis$IV2) || !is.element(whichEffect,c("All","Mains")))
     # g<-addG(g,plotTitle(paste0("Expected: ",brawFormat(expectedResult$count)),"right",size=0.85))
-  g
+  if (braw.env$graphHTML && braw.env$autoShow) {
+    showHTML(g)
+    return(invisible(g))
+  }
+  else return(g)  
 }
 

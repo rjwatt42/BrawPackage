@@ -10,7 +10,11 @@ showMarginals<-function(result=braw.res$result) {
     g<-inspectMainGraph(result$hypothesis$DV$name,result,plotArea=c(0.5,0.25,0.5,0.6),g=g)
   }
   
-  return(g)
+  if (braw.env$graphHTML && braw.env$autoShow) {
+    showHTML(g)
+    return(invisible(g))
+  }
+  else return(g)  
 }
 
 

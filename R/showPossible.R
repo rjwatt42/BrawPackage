@@ -1015,7 +1015,11 @@ showPossible <- function(possibleResult=NULL,
                                         mapping),colour=BoxCol)
               )
             }
-            return(g)
+            if (braw.env$graphHTML && braw.env$autoShow) {
+              showHTML(g)
+              return(invisible(g))
+            }
+            else return(g)  
           },
           "2D"={
             par(bg=braw.env$plotColours$graphC,pin=c(1.33,1)*3,mar=c(5,5,1,1))

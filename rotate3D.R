@@ -40,25 +40,3 @@ rotate3D <- function(data,azimuth,elevation, distance)
   
   return(tdata[1:2,]/max(scale[1:2,]))
 }
-
-  azimuth=10
-  elevation=10
-  distance=20
-  
-corners <-
-  rbind(x = c(-1,1,1,-1,-1,1,1,-1),
-        y = c(-1,-1,-1,-1,1,1,1,1) ,
-        z = c(-1,-1,1,1,-1,-1,1,1)
-        )
-
-corners <- rotate3D(corners, azimuth,elevation, distance)
-plot(corners[1,],corners[2,])
-use<-c(1:4,1)
-lines(corners[1,use],corners[2,use])
-lines(corners[1,4+use],corners[2,4+use])
-use<-c(1,4,8,5,1)
-lines(corners[1,use],corners[2,use])
-use<-c(2,3,7,6,2)
-lines(corners[1,use],corners[2,use])
-
-print(max(corners))

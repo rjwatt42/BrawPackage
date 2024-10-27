@@ -19,7 +19,7 @@ newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
 
 BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1.5,graphicsSize=c(16,10),
                    reportHTML=FALSE, graphHTML=FALSE,
-                   newDev=FALSE,height=300,aspect=1.5,timeLimit=Inf,
+                   newDev=FALSE,height=300,aspect=1.5,autoShow=TRUE,timeLimit=Inf,
                    reducedOutput=FALSE) {
   if (graphC=="white") graphC<-"#FFFFFF"
   if (graphC=="normal") graphC<-"#BFECFF"
@@ -108,7 +108,7 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1.5,graphicsSize=c(16,10),
           braw.env$labelSize<-height/100*fontScale
           braw.env$dotSize<-braw.env$labelSize*1.25
           
-          braw.env$autoShow<-FALSE
+          braw.env$autoShow<-autoShow
           braw.env$plotRect<-coord_cartesian(xlim=c(0,1),ylim=c(0,1))
           
           ##########################
@@ -306,6 +306,7 @@ braw.def$possible<-makePossible(targetSample=0.3,sims=NULL,
                                 hypothesis=braw.def$hypothesis,design=braw.def$design)
 
 braw.def<<-braw.def
+
 }
 
 setBrawEnv<-function(which,value) {

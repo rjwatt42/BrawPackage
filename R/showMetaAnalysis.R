@@ -86,8 +86,12 @@ showMetaSingle<-function(metaResult=braw.res$metaResult,showTheory=FALSE) {
   g<-addG(g,dataLabel(data=pts_lb,label=lb, hjust=0.5,colour="black",fill=braw.env$plotColours$descriptionC,parser=FALSE))
   # g<-addG(g,plotTitle(lb,"left",size=1))
   
-  return(g)
-  
+  if (braw.env$graphHTML && braw.env$autoShow) {
+    showHTML(g)
+    return(invisible(g))
+  }
+  else return(g)  
+
 }
 
 #' show a multiple meta-analyses
@@ -115,7 +119,11 @@ showMetaMultiple<-function(metaResult=braw.res$metaResult,showType="n-k") {
     if (!all(is.na(metaResult$exp$Smax)))
       g<-drawMeta(metaResult=metaResult,whichMeta="Exp",showType=showType,g)
   }
-  print(g)
+  if (braw.env$graphHTML && braw.env$autoShow) {
+    showHTML(g)
+    return(invisible(g))
+  }
+  else return(g)  
 }
 
 drawMeta<-function(metaResult=doMetaAnalysis(),whichMeta="Single",showType="n-k",g=NULL) {

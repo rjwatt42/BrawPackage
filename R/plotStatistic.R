@@ -550,7 +550,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
     xticks<-NULL
   
   g<-startPlot(xlim,ylim,
-               xticks=xticks,
+               xticks=xticks,xmax=TRUE,
                yticks=makeTicks(logScale=yaxis$logScale),ylabel=makeLabel(ylabel),
                box=box,top=top,orientation=orient,g=g)
   # g<-addG(g,yAxisTicks(logScale=yaxis$logScale),yAxisLabel(ylabel))

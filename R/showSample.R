@@ -34,7 +34,10 @@ showSample<-function(sample=braw.res$result,marginals=braw.env$newSampleDisplay)
   
   if (marginals) {
     g<-showMarginals(sample)
-    return(g)
+    if (braw.env$graphHTML && braw.env$autoShow) {
+      return(invisible(g))
+    }
+    else return(g)  
   }
   
   IV<-sample$hypothesis$IV
@@ -56,5 +59,9 @@ showSample<-function(sample=braw.res$result,marginals=braw.env$newSampleDisplay)
   }
   # braw.env$plotArea<-c(0,0,1,1)
   
-  return(g)
+  if (braw.env$graphHTML && braw.env$autoShow) {
+    showHTML(g)
+    return(invisible(g))
+  }
+  else return(g)  
 }

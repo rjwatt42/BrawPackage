@@ -188,13 +188,13 @@ mergeExploreResult<-function(res1,res2) {
 #' @seealso reportExplore()
 #' @examples
 #' exploreResult<-doExplore(nsims=10,exploreResult=NULL,explore=braw.def$explore,
-#'                              doingNull=FALSE,autoShow=braw.env$autoShow,showType="Basic")
+#'                              doingNull=FALSE,autoShow=FALSE,showType="Basic")
 #' @export
 doExplore<-function(nsims=10,exploreResult=NULL,explore=braw.def$explore,
                     hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,
-                      doingNull=FALSE,autoShow=braw.env$autoShow,showType="rs"
+                      doingNull=FALSE,autoShow=FALSE,showType="rs"
 ) {
-  autoShowLocal<-autoShow
+  autoShowLocal<-braw.env$autoShow
   assign("autoShow",FALSE,braw.env)
   
   if (is.null(exploreResult)) {
@@ -225,13 +225,13 @@ doExplore<-function(nsims=10,exploreResult=NULL,explore=braw.def$explore,
   
   exploreResult <- runExplore(nsims=nsims,exploreResult,doingNull=doingNull,
                               autoShow=autoShow,showType=showType)
-  assign("autoShow",autoShow,braw.env)
+  assign("autoShow",autoShowLocal,braw.env)
   
   return(exploreResult)
 }
 
 runExplore <- function(nsims,exploreResult,doingNull=FALSE,
-                       autoShow=braw.env$autoShow,showType="rs"){
+                       autoShow=FALSE,showType="rs"){
   max_r<-0.9
   
   explore<-exploreResult$explore
