@@ -45,13 +45,13 @@ reRangeX<-function(x) {
 }
 re2RangeX<-function(x) {
   if (!is.null(braw.env$plotLimits)){
-    gap0<-braw.env$plotLimits$gap[1]+braw.env$plotLimits$gap[3]
-    gap1<-braw.env$plotLimits$gap[1]
+    gap0<-braw.env$plotLimits$gap[1]
+    gap1<-braw.env$plotLimits$gap[3]
   } else {
     gap0<-0
     gap1<-0
   }
-  x<-((x-braw.env$plotArea[1])/braw.env$plotArea[3]-gap1)/(1-gap0)
+  x<-(x-braw.env$plotArea[1]-gap0)/(braw.env$plotArea[3]-gap0-gap1)
   if (!is.null(braw.env$plotLimits)){
     x<-x*diff(braw.env$plotLimits$xsc)+braw.env$plotLimits$xsc[1]
   }
