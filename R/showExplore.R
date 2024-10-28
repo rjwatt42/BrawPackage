@@ -107,17 +107,40 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   
   plotYOffset<-matrix(0)
   plotHeight<-1
-  if (!is.null(hypothesis$IV2) && whichEffect=="All") {
-    plotYOffset<-matrix(c(0.666,0.333,0),nrow=1,byrow=TRUE)
-    plotWidth<-0.475
-    plotHeight<-0.32
-  }
-  if (!is.null(hypothesis$IV2) && whichEffect=="Mains") {
-    plotYOffset<-matrix(c(0.5,0),nrow=1,byrow=TRUE)
-    plotWidth<-0.475
-    plotHeight<-0.47
+  if (!is.null(hypothesis$IV2)) {
+    switch(whichEffect,
+           "All"={
+             plotYOffset<-matrix(c(0.666,0.333,0),nrow=1,byrow=TRUE)
+             plotHeight<-0.32
+           },
+           "Mains"={
+             plotYOffset<-matrix(c(0.5,0),nrow=1,byrow=TRUE)
+             plotHeight<-0.47
+           },
+           {}
+    )
+  } else {
+    if (length(showType)==2) {
+      plotYOffset<-matrix(c(0,0),nrow=1,byrow=TRUE)
+    }
+    if (length(showType)==4) {
+      plotYOffset<-matrix(c(0.5,0.5, 0, 0),nrow=1,byrow=TRUE)
+      plotHeight<-0.475
+    }
   }
   
+  plotWidth<-0.9
+  if (!is.null(hypothesis$IV2)) {
+    switch(whichEffect,
+           "All"={
+             plotWidth<-0.475
+           },
+           "Mains"={
+             plotWidth<-0.475
+           },
+           {}
+    )
+  } 
   if (plotHeight==1) {
     plotXOffset<-matrix(0)+0.05
     plotWidth<-0.9
@@ -127,15 +150,13 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   } 
   if (length(showType)==2) {
     plotXOffset<-matrix(c(0,0.55),nrow=2,byrow=FALSE)
-    plotYOffset<-matrix(c(0,0),nrow=1,byrow=TRUE)
     plotWidth<-0.45
   }
   if (length(showType)==4) {
     plotXOffset<-matrix(c(0,  0.55, 0, 0.55),nrow=4,byrow=FALSE)
-    plotYOffset<-matrix(c(0.5,0.5, 0, 0),nrow=1,byrow=TRUE)
-    plotHeight<-0.475
     plotWidth<-0.45
   }
+  
   
   if (is.null(hypothesis$IV2)) whichEffects<-1
   else

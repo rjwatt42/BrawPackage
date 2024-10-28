@@ -29,7 +29,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
            {}
     )
   }
-  showTypes<-showType
+  showTypes<-showType[1]
   
   explore<-exploreResult$explore
   hypothesis<-exploreResult$hypothesis
