@@ -9,13 +9,13 @@
 #'                        whichEffect="All",effectType="all")
 #' @export
 reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
-                        whichEffect="All",effectType="all",quantileShow=0.5,report="Medians"
+                        whichEffect="All",effectType="all",quantileShow=0.5,reportStats="Medians"
 ){
   if (is.null(exploreResult)) exploreResult<-doExplore(autoShow=FALSE)
   
   precision<-braw.env$report_precision-1
   
-  reportMeans<-(report=="Means")
+  reportMeans<-(reportStats=="Means")
   reportQuants<-FALSE
   
   showType<-strsplit(showType,";")[[1]]
@@ -29,7 +29,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
            {}
     )
   }
-  showTypes<-showType[1]
+  showTypes<-showType
   
   explore<-exploreResult$explore
   hypothesis<-exploreResult$hypothesis
@@ -420,10 +420,12 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
       label2<-"\u00B1se"
     }
     
-    if (reportMeans){
-      if (is.element(showType,c("rs","p","ws","n","log(lrs)","log(lrd)","Lambda","pNull","S"))) {
+    if (is.element(showType,c("rs","p","ws","n","log(lrs)","log(lrd)","Lambda","pNull","S",
+                              "iv.mn","iv.sd","iv.sk","iv.kt","dv.mn","dv.sd","dv.sk","dv.kt",
+                              "rs.mn","rs.sd","rs.sk","rs.kt"))) {
+      if (reportMeans){
         outputText<-c(outputText,rep(" ",nc))
-        outputText<-c(outputText,"","mean")
+        outputText<-c(outputText,paste0("\b", y_label),"mean")
         for (i in 1:length(useVals)) {
           outputText<-c(outputText,paste0("!j",brawFormat(ymn[useVals[i]],digits=precision)))
         }
@@ -431,7 +433,6 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
         for (i in 1:length(useVals)) {
           outputText<-c(outputText,paste0("!j",brawFormat(ysd[useVals[i]],digits=precision)))
         }
-      }    
     } else {
       if (reportQuants){
         if (quantsMade) 
@@ -467,7 +468,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
           outputText<-c(outputText,paste0("!j",brawFormat(y75[useVals[i]],digits=precision)))
         }
       }
-      
+    }
     }
     
     

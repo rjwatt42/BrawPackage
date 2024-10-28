@@ -19,7 +19,7 @@ newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
 
 BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1.5,graphicsSize=c(16,10),
                    reportHTML=FALSE, graphHTML=FALSE,
-                   newDev=FALSE,height=300,aspect=1.5,autoShow=TRUE,timeLimit=Inf,
+                   newDev=FALSE,height=300,aspect=1.5,autoShow=TRUE,timeLimit=Inf,fullGraphSize=1,
                    reducedOutput=FALSE) {
   if (graphC=="white") graphC<-"#FFFFFF"
   if (graphC=="normal") graphC<-"#BFECFF"
@@ -34,6 +34,8 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1.5,graphicsSize=c(16,10),
   }
   
   braw.env$plotSize<-c(aspect,1)*height
+  braw.env$fullGraphSize<-fullGraphSize
+  
   # genuine globals (for now)
   braw.env$plotDescriptionCols<-c()
   braw.env$CatCatCols<-c()

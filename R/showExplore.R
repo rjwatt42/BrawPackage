@@ -78,7 +78,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     }
   }
   
-  if (length(showType)>1 && dimension=="2D") {
+  if (length(showType)==2 && dimension=="2D") {
     g<-showExplore2D(exploreResult=exploreResult,showType=showType,showTheory=showTheory,
                      effectType=effectType,whichEffect=whichEffect)
     return(g)
@@ -129,25 +129,27 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     }
   }
   
-  plotWidth<-0.9
-  if (!is.null(hypothesis$IV2)) {
-    switch(whichEffect,
-           "All"={
-             plotWidth<-0.475
-           },
-           "Mains"={
-             plotWidth<-0.475
-           },
-           {}
-    )
-  } 
-  if (plotHeight==1) {
-    plotXOffset<-matrix(0)+0.05
-    plotWidth<-0.9
-  } else {
-    plotXOffset<-matrix(0)+0.15
-    plotWidth<-0.7
-  } 
+  # plotWidth<-0.9
+  # if (!is.null(hypothesis$IV2)) {
+  #   switch(whichEffect,
+  #          "All"={
+  #            plotWidth<-0.475
+  #          },
+  #          "Mains"={
+  #            plotWidth<-0.475
+  #          },
+  #          {}
+  #   )
+  # } 
+  plotXOffset<-matrix(0)
+  plotWidth<-1
+  # if (plotHeight==1) {
+  #   plotXOffset<-matrix(0)+0.05
+  #   plotWidth<-0.9
+  # } else {
+  #   plotXOffset<-matrix(0)+0.15
+  #   plotWidth<-0.7
+  # } 
   if (length(showType)==2) {
     plotXOffset<-matrix(c(0,0.55),nrow=2,byrow=FALSE)
     plotWidth<-0.45
@@ -938,7 +940,7 @@ showExplore2D<-function(exploreResult=braw.res$explore,showType=c("rs","p"),show
   if (showType[2]=="p" && braw.env$pPlotScale=="log10" && any(exploreResult$result$pval>0)) 
     while (mean(log10(exploreResult$result$pval)>ylim[1])<0.75) ylim[1]<-ylim[1]-1
   
-  braw.env$plotArea<-c(0,0,1,1)
+  braw.env$plotArea<-c(0,0,1,1)*0.67+0.33
   g<-startPlot(xlim,ylim,
                xticks=makeTicks(logScale=xaxis$logScale),xlabel=makeLabel(xlabel),
                yticks=makeTicks(logScale=xaxis$logScale),ylabel=makeLabel(ylabel),
