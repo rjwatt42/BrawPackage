@@ -484,12 +484,12 @@ dataPoint<-function(data,shape=21,colour="black",fill="white",alpha=1,size=3) {
   axisPoint(data=data,shape=shape,colour=colour,fill=fill,alpha=alpha,size=size)
 }
 axisPoint<-function(data,shape=21,colour="black",fill="white",alpha=1,size=3) {
-  size<-size*braw.env$plotArea[4]
+  size<-size*braw.env$plotArea[4]*0.75
     if (!braw.env$graphHTML) {
     if (is.null(data$fill)) {
-      g<-geom_point(data=data,aes(x=x,y=y),shape=shape,colour=colour,fill=fill,alpha=alpha,size=size)
+      g<-geom_point(data=data,aes(x=x,y=y),shape=shape,colour=colour,fill=fill,alpha=alpha,size=size*0.9)
     } else {
-      g<-geom_point(data=data,aes(x=x,y=y,fill=fill),shape=shape,colour=colour,alpha=alpha,size=size)
+      g<-geom_point(data=data,aes(x=x,y=y,fill=fill),shape=shape,colour=colour,alpha=alpha,size=size*0.9)
     }
   } else {
     x<-svgX(data$x)
@@ -607,23 +607,23 @@ dataLegend<-function(data,title="title",fontsize=0.65) {
   names<-data$names
   nrows<-1+length(names)+1
   ncols<-max(c(nchar(title),nchar(names)))+2
-  g<-list(axisPolygon(data=data.frame(x=c(1-ncols*dx,1,1,1-ncols*dx,1-ncols*dx),
-                                      y=c(1-nrows*dy,1-nrows*dy,1,1,1-nrows*dy)),
+  g<-list(axisPolygon(data=data.frame(x=rangeX(c(1-ncols*dx,1,1,1-ncols*dx,1-ncols*dx)),
+                                      y=rangeY(c(1-nrows*dy,1-nrows*dy,1,1,1-nrows*dy))),
                       fill="white",colour="white",linewidth=0.5)
   )
-  g<-c(g,list(axisPath(data=data.frame(x=c(1-ncols*dx,1,1,1-ncols*dx,1-ncols*dx),
-                                      y=c(1-nrows*dy,1-nrows*dy,1,1,1-nrows*dy)),
+  g<-c(g,list(axisPath(data=data.frame(x=rangeX(c(1-ncols*dx,1,1,1-ncols*dx,1-ncols*dx)),
+                                      y=rangeY(c(1-nrows*dy,1-nrows*dy,1,1,1-nrows*dy))),
                       colour="black",linewidth=0.5))
   )
-  g<-c(g,list(axisText(data=data.frame(x=(1-ncols*dx+2*dx),y=1-dy),label=title,size=fontsize,fontface="bold"))
+  g<-c(g,list(axisText(data=data.frame(x=rangeX(1-ncols*dx+2*dx),y=rangeY(1-dy)),label=title,size=fontsize,fontface="bold"))
        )
 
   for (i in 1:length(names)) {
     g<-c(g,
-        list(axisPoint(data=data.frame(x=1-ncols*dx+dx,y=1-dy*(i+1)),fill=data$colours[i]))
+        list(axisPoint(data=data.frame(x=rangeX(1-ncols*dx+dx),y=rangeY(1-dy*(i+1))),fill=data$colours[i]))
     )
     g<-c(g,
-         list(axisText(data=data.frame(x=1-ncols*dx+2*dx,y=1-dy*(i+1)),label=data$names[i],vjust=0.5,size=fontsize))
+         list(axisText(data=data.frame(x=rangeX(1-ncols*dx+2*dx),y=rangeY(1-dy*(i+1))),label=data$names[i],vjust=0.5,size=fontsize))
     )
   }
   return(g)

@@ -548,7 +548,7 @@ generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",ca
 #' @examples
 #' analysis<-doAnalysis(sample=doSample(),evidence=makeEvidence(),autoShow=braw.env$autoShow)#' make a multiple samples
 #' @export
-doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,autoShow=braw.env$autoShow){
+doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,autoShow=FALSE){
   design<-sample$design
   hypothesis<-sample$hypothesis
   IV<-hypothesis$IV

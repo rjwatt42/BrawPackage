@@ -1,4 +1,4 @@
-getAxisPrediction<-function(hypothesis) {
+getAxisPrediction<-function(hypothesis,g=NULL) {
   IV<-hypothesis$IV
   DV<-hypothesis$DV
   switch (IV$type,
@@ -41,14 +41,15 @@ getAxisPrediction<-function(hypothesis) {
   g<-startPlot(xlim,ylim,
                xticks=makeTicks(xticks,xlabels),xlabel=makeLabel(IV$name),
                yticks=makeTicks(yticks,ylabels),ylabel=makeLabel(DV$name),
-               top=TRUE,g=NULL)
+               top=TRUE,g=g)
   # g<-addG(g,xAxisTicks(xticks,xlabels),xAxisLabel(IV$name))
   # g<-addG(g,yAxisTicks(yticks,ylabels),yAxisLabel(DV$name))
   
   
 }
 
-plotParParPrediction<-function(g,IV,DV,rho,n,offset=1){
+plotParParPrediction<-function(g,IV,DV,rho,n,offset=1,range=NULL){
+  if (is.null(range)) range<-c(-1,1)*braw.env$fullRange
   if (offset==1) {
     col<- braw.env$plotColours$descriptionC
     xoff=0
@@ -59,7 +60,7 @@ plotParParPrediction<-function(g,IV,DV,rho,n,offset=1){
     xoff=-0.25+off*0.5
   }
   
-  x<-seq(-braw.env$fullRange,braw.env$fullRange,length.out=braw.env$varNPoints)
+  x<-seq(range[1],range[2],length.out=braw.env$varNPoints)
   y<-x*rho
   se<-sqrt((1+x^2)/n)*qnorm(0.975)
   y_lower<-y-se
@@ -328,9 +329,9 @@ plotCatCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
 }
 
 
-plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL){
+plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,range=NULL,g=NULL){
   if (is.null(g)) {
-    g<-getAxisPrediction(hypothesis=list(IV=IV,DV=DV)) 
+    g<-getAxisPrediction(hypothesis=list(IV=IV,DV=DV),g=g) 
   }
   
   n<-design$sN
@@ -354,10 +355,10 @@ plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL){
     
     switch (hypothesisType,
             "Interval Interval"={
-              g<-plotParParPrediction(g,IV,DV,rho,n,offset)
+              g<-plotParParPrediction(g,IV,DV,rho,n,offset=offset,range=range)
             },
             "Ordinal Interval"={
-              g<-plotParParPrediction(g,IV,DV,rho,n,offset)
+              g<-plotParParPrediction(g,IV,DV,rho,n,offset=offset,range=range)
             },
             "Categorical Interval"={
               g<-plotCatParPrediction(g,IV,DV,rho,n,offset,design$sIV1Use=="Within")
@@ -406,7 +407,7 @@ plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL){
       names<-IV2$cases
     } else {
       cols<-c( braw.env$plotColours$descriptionC1, braw.env$plotColours$descriptionC2)
-      names<-c(paste(IV2$name,"<median",sep=""), paste(IV2$name,">median",sep=""))
+      names<-c(paste(IV2$name," < median",sep=""), paste(IV2$name," > median",sep=""))
     }
     braw.env$plotDescriptionCols <- cols
     for (i in 1:length(rho)) {
@@ -416,7 +417,7 @@ plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL){
       
       switch (hypothesisType,
               "Interval Interval"={
-                g<-plotParParPrediction(g,IV,DV1,rho[i],n,offset)
+                g<-plotParParPrediction(g,IV,DV1,rho[i],n,offset=offset,range)
               },
               "Categorical Interval"={
                 g<-plotCatParPrediction(g,IV,DV1,rho[i],n,offset,design$sIV1Use=="Within")

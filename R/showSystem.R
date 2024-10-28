@@ -18,7 +18,7 @@ showSystem<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,evide
     g<-showHypothesis(hypothesis=hypothesis,doWorld=TRUE,plotArea=c(0.0,0.05,0.45,0.8),autoShow=FALSE,g=g)
   else
     g<-showHypothesis(hypothesis=hypothesis,doWorld=TRUE,plotArea=c(0.0,0.05,0.33,0.8),autoShow=FALSE,g=g)
-  g<-showDesign(hypothesis=hypothesis,design=design,plotArea=c(0.33,0.3,0.28,0.33),autoShow=FALSE,g=g)
+  g<-showDesign(hypothesis=hypothesis,design=design,plotArea=c(0.36,0.3,0.28,0.33),autoShow=FALSE,g=g)
   g<-showPrediction(hypothesis=hypothesis,design=design,evidence=evidence,plotArea=c(0.65,0.55,0.33,0.4),autoShow=FALSE,g=g)
   g<-showWorldSampling(hypothesis=hypothesis,design=design,sigOnly=FALSE,plotArea=c(0.7,0.05,0.28,0.4),autoShow=FALSE,g=g)
   
@@ -248,7 +248,7 @@ showPopulation <- function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),au
 #' @examples
 #' showPrediction(hypothesis=makeHypothesis()=makeDesign(),evidence=makeEvidence())
 #' @export
-showPrediction <- function(hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=makeEvidence(),plotArea=c(0,0,1,1),autoShow=braw.env$autoShow,g=NULL ){
+showPrediction <- function(hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=makeEvidence(),plotArea=c(0,0,1,1),autoShow=FALSE,g=NULL ){
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV
@@ -256,29 +256,34 @@ showPrediction <- function(hypothesis=braw.def$hypothesis,design=braw.def$design
   if (is.null(IV) || is.null(DV)) {return(nullPlot())}
   if (is.null(IV2)) no_ivs<-1 else no_ivs<-2
 
-  if (is.null(g)) g<-nullPlot()
   switch (no_ivs,
           { braw.env$plotArea<-plotArea 
+            g<-getAxisPrediction(hypothesis=list(IV=IV,DV=DV),g=g) 
             g<-plotPopulation(IV,DV,effect,g=g)
             g<-plotPrediction(IV,IV2,DV,effect,design,g=g)
             # g<-addG(g,plotTitle(paste0("r[p]=",brawFormat(effect$rIV)),position="centre",size=1,fontface="plain"))
           },
           {
-            if (evidence$rInteractionOn==FALSE){
+            if (!evidence$rInteractionOn){
               effect1<-effect
               effect2<-effect
               effect2$rIV<-effect2$rIV2
-
-                braw.env$plotArea<-c(0,0.25,0.5,0.5)*plotArea[c(3,4,3,4)]+c(plotArea[c(1,2)],0,0)
-                g1<-plotPrediction(IV,NULL,DV,effect1,design)
-                braw.env$plotArea<-c(0.5,0.25,0.5,0.5)*plotArea[c(3,4,3,4)]+c(plotArea[c(1,2)],0,0)
-                g2<-plotPrediction(IV2,NULL,DV,effect2,design)
-                g<-addG(g1,g2)
               
+              if (is.null(g)) g<-nullPlot()
+                braw.env$plotArea<-c(0,0.25,0.45,0.5)*plotArea[c(3,4,3,4)]+c(plotArea[c(1,2)],0,0)
+                g<-getAxisPrediction(hypothesis=list(IV=IV,DV=DV),g=g) 
+                g<-plotPopulation(IV,DV,effect1,g=g)
+                g<-plotPrediction(IV,NULL,DV,effect1,design,g=g)
+                braw.env$plotArea<-c(0.55,0.25,0.45,0.5)*plotArea[c(3,4,3,4)]+c(plotArea[c(1,2)],0,0)
+                g<-getAxisPrediction(hypothesis=list(IV=IV2,DV=DV),g=g) 
+                g<-plotPopulation(IV2,DV,effect2,g=g)
+                g<-plotPrediction(IV2,NULL,DV,effect2,design,g=g)
+
             } else{
               if (evidence$rInteractionOnly){
                 braw.env$plotArea<-plotArea 
-                g<-plotPrediction(IV,IV2,DV,effect,design)
+                g<-getAxisPrediction(hypothesis=list(IV=IV,DV=DV),g=g)
+                g<-plotPrediction(IV,IV2,DV,effect,design,g=g)
               } else{
                 effect1<-effect
                 effect2<-effect

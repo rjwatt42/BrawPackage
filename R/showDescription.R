@@ -241,11 +241,11 @@ plotCatInterDescription<-function(analysis,g=NULL){
     analysis1$hypothesis$DV$vals<-Dvals[use] 
     
     if (analysis1$hypothesis$DV$type=="Categorical") {
-      g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,2+(i-1)/(hypothesis$IV2$ncats-1),g)
+      g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,2+(i-1)/(hypothesis$IV2$ncats-1),g=g)
       g<-plotPoints(g,analysis1$hypothesis$IV,analysis1$hypothesis$DV,analysis1,i+1,hypothesis$IV2$ncats)
     } else {
       g<-plotPoints(g,analysis1$hypothesis$IV,analysis1$hypothesis$DV,analysis1,i+1,hypothesis$IV2$ncats)
-      g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,2+(i-1)/(hypothesis$IV2$ncats-1),g)
+      g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,2+(i-1)/(hypothesis$IV2$ncats-1),g=g)
     }
   }
   g<-addG(g,dataLegend(data.frame(names=names,colours=cols),title=analysis$hypothesis$IV2$name))
@@ -279,8 +279,7 @@ plotParInterDescription<-function(analysis,g=NULL){
         analysis1$hypothesis$DV$vals<-Dvals[use1]
         analysis1$hypothesis$DV$mu<-mean(analysis$dv[use1],na.rm=TRUE)
         analysis1<-doAnalysis(analysis1)
-        print(analysis1$rIV)
-        
+
             use2<-analysis$iv2>=median(analysis$iv2)
         analysis2<-analysis
         analysis2$participant<-analysis$participant[use2]
@@ -297,16 +296,18 @@ plotParInterDescription<-function(analysis,g=NULL){
         analysis2$hypothesis$DV$mu<-mean(analysis$dv[use2],na.rm=TRUE)
         analysis2<-doAnalysis(analysis2)
         
+        range1<-c(min(analysis1$ivplot),max(analysis1$ivplot))
+        range2<-c(min(analysis2$ivplot),max(analysis2$ivplot))
         if (analysis1$hypothesis$DV$type=="Categorical") {
-          g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,2,g)
-          g<-plotPrediction(analysis2$hypothesis$IV,NULL,analysis2$hypothesis$DV,analysis2,analysis$design,3,g)
+          g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,offset=2,g=g)
+          g<-plotPrediction(analysis2$hypothesis$IV,NULL,analysis2$hypothesis$DV,analysis2,analysis$design,offset=3,g=g)
           g<-plotPoints(g,analysis1$hypothesis$IV,analysis1$hypothesis$DV,analysis1,2,2)
           g<-plotPoints(g,analysis2$hypothesis$IV,analysis2$hypothesis$DV,analysis2,3,2)
         } else {
           g<-plotPoints(g,analysis1$hypothesis$IV,analysis1$hypothesis$DV,analysis1,2,2)
           g<-plotPoints(g,analysis2$hypothesis$IV,analysis2$hypothesis$DV,analysis2,3,2)
-          g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,2,g)
-          g<-plotPrediction(analysis2$hypothesis$IV,NULL,analysis2$hypothesis$DV,analysis2,analysis$design,3,g)
+          g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,offset=2,range=range1,g=g)
+          g<-plotPrediction(analysis2$hypothesis$IV,NULL,analysis2$hypothesis$DV,analysis2,analysis$design,offset=3,range=range2,g=g)
         }
    g<-addG(g,dataLegend(data.frame(names=names,colours=col),title=analysis1$hypothesis$IV2$name))     
   g
@@ -318,7 +319,7 @@ plotParDescription<-function(analysis,g) {
   analysis$hypothesis$DV$vals<-analysis$dv
   
   g<-plotPoints(g,analysis$hypothesis$IV,analysis$hypothesis$DV,analysis,1)
-  g<-plotPrediction(analysis$hypothesis$IV,analysis$hypothesis$IV2,analysis$hypothesis$DV,analysis,analysis$design,1,g)
+  g<-plotPrediction(analysis$hypothesis$IV,analysis$hypothesis$IV2,analysis$hypothesis$DV,analysis,analysis$design,offset=1,g=g)
   g
 }
 
@@ -328,7 +329,7 @@ plotCatDescription<-function(analysis,g) {
   analysis$hypothesis$DV$vals<-analysis$dv
   
   g<-plotPoints(g,analysis$hypothesis$IV,analysis$hypothesis$DV,analysis,1)
-  g<-plotPrediction(analysis$hypothesis$IV,analysis$hypothesis$IV2,analysis$hypothesis$DV,analysis,analysis$design,1,g)
+  g<-plotPrediction(analysis$hypothesis$IV,analysis$hypothesis$IV2,analysis$hypothesis$DV,analysis,analysis$design,offset=1,g=g)
 
   g
 }
@@ -345,8 +346,8 @@ showDescription<-function(analysis=braw.res$result,plotArea=c(0,0,1,1),g=NULL) {
   braw.env$plotArea<-plotArea
   
   old_newSampleDisplay<-braw.env$newSampleDisplay
-  if (!is.null(analysis$hypothesis$IV2)) braw.env$newSampleDisplay<-FALSE
-
+  if (!is.null(analysis$hypothesis$IV2)) setBrawEnv("newSampleDisplay",FALSE)
+  
   if (braw.env$newSampleDisplay && braw.env$allScatter) {
     g<-showSample(analysis,marginals=FALSE)
   } else {
@@ -360,16 +361,40 @@ showDescription<-function(analysis=braw.res$result,plotArea=c(0,0,1,1),g=NULL) {
             "Ordinal"=g<-plotParDescription(analysis,g),
             "Categorical"=g<-plotCatDescription(analysis,g)
     )
+    g<-addG(g,plotTitle(paste0("r[s]=",round(analysis$rIV,3)),position="right",size=1,fontface="plain"))
   } else{
-    switch (analysis$hypothesis$IV2$type,
-            "Interval"=g<-plotParInterDescription(analysis,g),
-            "Ordinal"=g<-plotParInterDescription(analysis,g),
-            "Categorical"=g<-plotCatInterDescription(analysis,g)
-    )
+    if (analysis$evidence$rInteractionOn) {
+      switch (analysis$hypothesis$IV2$type,
+              "Interval"=g<-plotParInterDescription(analysis,g),
+              "Ordinal"=g<-plotParInterDescription(analysis,g),
+              "Categorical"=g<-plotCatInterDescription(analysis,g)
+      )
+    } else {
+      analysis1<-analysis
+      analysis1$hypothesis$IV2<-NULL
+      analysis2<-analysis
+      analysis2$hypothesis$IV<-analysis2$hypothesis$IV2
+      analysis2$hypothesis$IV2<-NULL
+      
+      braw.env$plotArea<-c(0,0.25,0.45,0.5)*plotArea[c(3,4,3,4)]+c(plotArea[c(1,2)],0,0)
+      g<-getAxisPrediction(analysis1$hypothesis) 
+      switch (analysis$hypothesis$DV$type,
+              "Interval"=g<-plotParDescription(analysis1,g=g),
+              "Ordinal"=g<-plotParDescription(analysis1,g=g),
+              "Categorical"=g<-plotCatDescription(analysis1,g=g)
+      )
+      braw.env$plotArea<-c(0.55,0.25,0.45,0.5)*plotArea[c(3,4,3,4)] +c(plotArea[c(1,2)],0,0)
+      g<-getAxisPrediction(analysis1$hypothesis,g=g) 
+      switch (analysis$hypothesis$DV$type,
+              "Interval"=g<-plotParDescription(analysis2,g=g),
+              "Ordinal"=g<-plotParDescription(analysis2,g=g),
+              "Categorical"=g<-plotCatDescription(analysis2,g=g)
+      )
+    }
   }
-  braw.env$newSampleDisplay<-old_newSampleDisplay
-  g<-addG(g,plotTitle(paste0("r[s]=",round(analysis$rIV,3)),position="right",size=1,fontface="plain"))
   
+  setBrawEnv("newSampleDisplay",old_newSampleDisplay)
+
   if (braw.env$graphHTML && braw.env$autoShow) {
     showHTML(g)
     return(invisible(g))

@@ -8,12 +8,12 @@
 #' @return ggplot2 object - and printed
 #' @export
 reportExpected<-function(expectedResult=braw.res$expected,showType="Basic",
-                         whichEffect="All",effectType="all"){
+                         whichEffect="All",effectType="all",report="Medians"){
   if (is.null(expectedResult)) expectedResult=doExpected(autoShow=FALSE)
   
+  reportMeans<-(report=="Means")
   reportQuants<-FALSE
-  reportMeans<-FALSE
-  
+
   IV<-expectedResult$hypothesis$IV
   IV2<-expectedResult$hypothesis$IV2
   DV<-expectedResult$hypothesis$DV
@@ -57,8 +57,8 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic",
     )
   } else pars<-showType
   
-  if (is.null(IV2) || effectType!="all") {nc=1+length(pars)}
-  else { nc=1+length(pars)*4 }
+  if (is.null(IV2) || effectType!="all") {nc=4+length(pars)}
+  else { nc=4+length(pars)*3 }
   
   if (is.element(showType,c("NHST","Hits","Misses"))) {nc=4}
   nc<-nc+1
@@ -106,10 +106,10 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic",
       
       if (!is.null(IV2)){
         if (effectTypes==1) outputText<-c(outputText,"!H!C ","!C ",effectType,rep(" ",nc-3))
-        else outputText<-c(outputText,"!H!C ","!C ","direct"," "," ","unique"," "," ","total"," ")
+        else outputText<-c(outputText,"!H!C ","!C ","direct"," "," ","unique"," "," ","total"," "," ")
       }
       
-      outputText1<-c("!H "," ")
+      outputText1<-c()
       for (par in pars) {
         if (braw.env$RZ=="z") {
           switch(par,
@@ -126,9 +126,10 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic",
         else 
           outputText1<-c(outputText1," ")
       }
+      outputText1<-c(outputText1," ")
     }
   outputText1<-rep(outputText1,effectTypes)
-  outputText<-c(outputText,outputText1,rep("",nc-length(outputText1)))
+  outputText<-c(outputText,"!H "," ",outputText1,rep("",nc-length(outputText1)-2))
 
   for (whichEffect in whichEffects)  {
     
@@ -225,9 +226,9 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic",
           if (i==1 && j==1) {
             ot1<-c(ot1,"","mean ")
             ot2<-c(ot2,"","sd ")
-            ot3<-c(ot3,"","iqr ")
-            ot4<-c(ot4,"","quant75 ")
-            ot5<-c(ot5,"","median ")
+            ot3<-c(ot3,"","median ")
+            ot4<-c(ot4,"","iqr ")
+            ot5<-c(ot5,"","quant75 ")
             ot6<-c(ot6,"","quant25 ")
           } 
           if (i>1 && j==1) {
@@ -285,29 +286,31 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic",
                paste0("!j",brawFormat(sd(a,na.rm=TRUE),digits=braw.env$report_precision))
         )
         ot3<-c(ot3,
-               paste0("!j",brawFormat(IQR(a,na.rm=TRUE),digits=braw.env$report_precision))
+               paste0("!j",brawFormat(quantile(a,0.5,na.rm=TRUE,names=FALSE),digits=braw.env$report_precision))
         )
         ot4<-c(ot4,
-             paste0("!j",brawFormat(quantile(a,0.75,na.rm=TRUE,names=FALSE),digits=braw.env$report_precision))
-      )
+               paste0("!j",brawFormat(IQR(a,na.rm=TRUE),digits=braw.env$report_precision))
+        )
         ot5<-c(ot5,
-             paste0("!j",brawFormat(quantile(a,0.5,na.rm=TRUE,names=FALSE),digits=braw.env$report_precision))
+             paste0("!j",brawFormat(quantile(a,0.75,na.rm=TRUE,names=FALSE),digits=braw.env$report_precision))
       )
         ot6<-c(ot6,
              paste0("!j",brawFormat(quantile(a,0.25,na.rm=TRUE,names=FALSE),digits=braw.env$report_precision))
       )
       }
     }
-    ot1<-c(ot1,rep(" ",nc-length(ot1)))
-    
+
     if (reportQuants) ot4[1]<-paste0("\b",whichEffect)
-    else              ot5[1]<-paste0("\b",whichEffect)
+    else              ot5[3]<-paste0("\b",whichEffect)
     
-    if (reportQuants) outputText<-c(outputText,ot4)
-    outputText<-c(outputText,ot5)
-    if (reportQuants) outputText<-c(outputText,ot6)
-    else outputText<-c(outputText,ot3)
-    if (reportMeans) outputText<-c(outputText,ot1,ot2)
+    if (reportMeans) { outputText<-c(outputText,ot1,rep(" ",nc-length(ot1)),
+                                     ot2,rep(" ",nc-length(ot2)))
+    } else {
+      if (reportQuants) outputText<-c(outputText,ot5,rep(" ",nc-length(ot5)))
+      outputText<-c(outputText,ot3,rep(" ",nc-length(ot3)))
+      if (reportQuants) outputText<-c(outputText,ot6,rep(" ",nc-length(ot6)))
+      else              outputText<-c(outputText,ot4,rep(" ",nc-length(ot4)))
+    }
     
     if (pars[1]=="p" || pars[2]=="p") {
       if (is.null(IV2)) {
