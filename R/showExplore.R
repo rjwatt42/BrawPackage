@@ -8,11 +8,10 @@ drawNHSTBar<-function(i,npts,pts1,bwidth,col1) {
   dataPolygon(data=pts,fill=col1)
 }
 drawNHSTLabel<-function(lb1,lb1xy,xoff,col1) {
-  
   if (sum(col2rgb(col1))>128*3) col<-"black" else col<-"white"
   lb1xy$x<-lb1xy$x+xoff
   dataLabel(data=lb1xy,label=lb1,
-            hjust=1,vjust=0.5,
+            hjust=1,vjust=1,
             fill=col1,colour=col)
 }
 
@@ -210,7 +209,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   if (showType[si]=="p" && braw.env$pPlotScale=="log10" && any(exploreResult$result$pval>0)) 
     while (mean(log10(exploreResult$result$pval)>ylim[1])<0.75) ylim[1]<-ylim[1]-1
   
-  col2<-braw.env$plotColours$infer_nsigNonNull
+  col2<-desat(braw.env$plotColours$infer_nsigNonNull,0.5)
   col3<-braw.env$plotColours$infer_nsigNull
   col5<-braw.env$plotColours$infer_sigNull
   switch (braw.env$STMethod,
@@ -236,19 +235,23 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   lb3<-braw.env$nullNS
   lb4<-braw.env$nullNegative
   lb5<-braw.env$nullPositive
+  if (braw.env$STMethod=="NHST") {
+    lb0<-braw.env$nonNullSig
+    lb5<-braw.env$nullSig
+  }
   
   yn<-0.5
+  lb2xy<-data.frame(x=max(xlim),y=1-yn/10)
+  yn<-yn+1
   lb0xy<-data.frame(x=max(xlim),y=1-yn/10)
   yn<-yn+1
   lb1xy<-data.frame(x=max(xlim),y=1-yn/10)
-  yn<-yn+1
-  lb2xy<-data.frame(x=max(xlim),y=1-yn/10)
   yn<-0.5
+  lb3xy<-data.frame(x=max(xlim),y=0+yn/10)
+  yn<-yn+1
   lb5xy<-data.frame(x=max(xlim),y=0+yn/10)
   yn<-yn+1
   lb4xy<-data.frame(x=max(xlim),y=0+yn/10)
-  yn<-yn+1
-  lb3xy<-data.frame(x=max(xlim),y=0+yn/10)
   
   exploreTypeShow<-explore$exploreType
   if (is.element(explore$exploreType,c("rIV","rIV2","rIVIV2","rIVIV2DV"))) {
@@ -730,10 +733,10 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
         for (use in showSequence) {
           switch(use,
                  "isigNulls"={valsD<-isigNulls;colShow<-col4},
-                 "nsigNulls"={valsD<-nsigNulls;colShow<-desat(col3,0.5)},
+                 "nsigNulls"={valsD<-nsigNulls;colShow<-col3},
                  "sigNulls"={valsD<-sigNulls;colShow<-col5},
                  "sigNonNulls"={valsD<-sigNonNulls;colShow<-col0},
-                 "nsigNonNulls"={valsD<-nsigNonNulls;colShow<-desat(col2,0.5)},
+                 "nsigNonNulls"={valsD<-nsigNonNulls;colShow<-col2},
                  "isigNonNulls"={valsD<-isigNonNulls;colShow<-col1}
                  )
           if (any(valsD!=0)) {

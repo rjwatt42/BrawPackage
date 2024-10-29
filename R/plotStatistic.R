@@ -1048,10 +1048,10 @@ e2_plot<-function(analysis,disp,otheranalysis=NULL,orientation="vert",showTheory
     lambda<-brawFormat(analysis$hypothesis$effect$rIV,digits=3)
     switch (braw.env$RZ,
             "r"={
-              lab<-paste0("NonNull: r[p]=",lambda)
+              lab<-paste0("NonNull: r[p]~ ",lambda)
             },
             "z"={
-              lab<-paste0("NonNull: z[p]=",lambda)
+              lab<-paste0("NonNull: z[p]~ ",lambda)
             }
     )
   } else {
@@ -1060,10 +1060,10 @@ e2_plot<-function(analysis,disp,otheranalysis=NULL,orientation="vert",showTheory
   lambda<-brawFormat(analysis$hypothesis$effect$world$populationPDFk,digits=3)
   switch (braw.env$RZ,
           "r"={
-            lab<-paste0("NonNull: r[p]=",dist,"(",rz,"/",lambda,")")
+            lab<-paste0("NonNull: r[p]~ ",distr,"(",rz,"/",lambda,")")
           },
           "z"={
-            lab<-paste0("NonNull: z[p]=",dist,"(",rz,"/",lambda,")")
+            lab<-paste0("NonNull: z[p]~ ",distr,"(",rz,"/",lambda,")")
           }
   )
   
@@ -1089,10 +1089,10 @@ e2_plot<-function(analysis,disp,otheranalysis=NULL,orientation="vert",showTheory
 e1_plot<-function(nullanalysis,disp,otheranalysis=NULL,orientation="vert",showTheory=TRUE,g=NULL){
   switch (braw.env$RZ,
           "r"={
-            lab<-"Null: r[p]=0"
+            lab<-"Null: r[p]= 0"
           },
           "z"={
-            lab<-"Null: z[p]=0"
+            lab<-"Null: z[p]= 0"
           }
   )
   switch (braw.env$STMethod,
