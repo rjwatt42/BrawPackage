@@ -61,10 +61,10 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
   } else exploreTypeShow<-explore$exploreType
 
   outputText<-rep("",nc)
-  if (is.element(showType[1],c("NHST","Hits","Misses")) && sum(!is.na(exploreResult$nullresult$rval))>0) {
-    outputText[1:2]<-c("!TExplore  ",paste("nsims = ",format(sum(!is.na(exploreResult$result$rval))),"+",format(sum(!is.na(exploreResult$nullresult$rval))),sep=""),rep("",nc-2))
+  if (is.element(showType[1],c("NHST","Hits","Misses")) && sum(!is.na(exploreResult$nullresult$rval[,1]))>0) {
+    outputText[1:2]<-c("!TExplore  ",paste("nsims = ",format(sum(!is.na(exploreResult$result$rval[,1]))),"+",format(sum(!is.na(exploreResult$nullresult$rval[,1]))),sep=""),rep("",nc-2))
   } else {
-    outputText[1:2]<-c("!TExplore  ",paste("nsims = ",format(sum(!is.na(exploreResult$result$rval))+sum(!is.na(exploreResult$nullresult$rval))),sep=""),rep("",nc-2))
+    outputText[1:2]<-c("!TExplore  ",paste("nsims = ",format(sum(!is.na(exploreResult$result$rval[,1]))),sep=""),rep("",nc-2))
   }
   outputText<-c(outputText,rep("",nc))
   
