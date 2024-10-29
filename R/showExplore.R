@@ -774,7 +774,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
         r_est<-r_est$minimum
         nvals<-seq(min(n),max(n),length.out=101)
         yvals<-rn2w(r_est,nvals)
-        if (braw.env$nPlotScale=="log10") ptsn<-data.frame(x=log10(nvals),y=yvals)
+        if (explore$xlog=="log10") ptsn<-data.frame(x=log10(nvals),y=yvals)
         else          ptsn<-data.frame(x=nvals,y=yvals)
         g<-addG(g,dataLine(data=ptsn,colour="black",linetype="dotted",linewidth=0.25))
         

@@ -64,7 +64,7 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic",
   nc<-nc+1
   
   # header
-  if (is.element(showType,c("NHST","Hits","Misses")) && sum(!is.na(nullresult$rIV))>0) {
+  if (is.element(showType[1],c("NHST","Hits","Misses")) && sum(!is.na(nullresult$rIV))>0) {
     outputText<-c("!TExpected  ",paste("nsims = ",format(sum(!is.na(result$rIV))),"+",format(sum(!is.na(nullresult$rIV))),sep=""),rep("",nc-2))
   } else {
     outputText<-c("!TExpected  ",paste("nsims = ",format(sum(!is.na(result$rIV))+sum(!is.na(nullresult$rIV))),sep=""),rep("",nc-2))

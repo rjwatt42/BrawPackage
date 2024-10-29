@@ -190,7 +190,7 @@ mergeExploreResult<-function(res1,res2) {
 #' exploreResult<-doExplore(nsims=10,exploreResult=NULL,explore=braw.def$explore,
 #'                              doingNull=FALSE,autoShow=FALSE,showType="Basic")
 #' @export
-doExplore<-function(nsims=10,exploreResult=NULL,explore=braw.def$explore,
+doExplore<-function(nsims=10,exploreResult=braw.res$explore,explore=braw.def$explore,
                     hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,
                       doingNull=FALSE,autoShow=FALSE,showType="rs"
 ) {
@@ -218,8 +218,7 @@ doExplore<-function(nsims=10,exploreResult=NULL,explore=braw.def$explore,
     # catch up - make enough null results to match results
     if (exploreResult$nullcount<exploreResult$count) {
       ns<-exploreResult$count-exploreResult$nullcount
-      exploreResult <- runExplore(nsims=ns,exploreResult,doingNull=TRUE,autoShow=FALSE)
-      exploreResult$nullcount<-exploreResult$nullcount+ns
+      exploreResult <- runExplore(0,exploreResult,doingNull=TRUE,autoShow=FALSE)
     }
   }
   
@@ -247,8 +246,8 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
   if (hypothesis$effect$world$worldOn && hypothesis$effect$world$populationNullp>0) 
     doingNull<-FALSE
   
-  if (nsims==0) doingNonNUll<-FALSE
-  else          doingNonNUll<-TRUE
+  if (nsims==0) doingNonNull<-FALSE
+  else          doingNonNull<-TRUE
   
   if (doingNull && exploreResult$nullcount<exploreResult$count) {
     nsims<-exploreResult$count-exploreResult$nullcount
@@ -340,7 +339,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
   else   nsims<-exploreResult$count+nsims
   
   time.at.start<-Sys.time()
-  while (exploreResult$count<nsims && Sys.time()-time.at.start<braw.env$timeLimit){
+  while (((doingNonNull && exploreResult$count<nsims) || (doingNull && exploreResult$nullcount<nsims)) && Sys.time()-time.at.start<braw.env$timeLimit){
     if (!autoShow) ns<-nsims
     else {
       if (exploreResult$count==0) ns<-1
@@ -350,7 +349,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
     ns<-min(ns,100)
     if (exploreResult$count+ns>nsims) ns<-nsims-exploreResult$count
     for (ni in 1:ns) {
-      if (doingNonNUll)      ri<-exploreResult$count+ni
+      if (doingNonNull)      ri<-exploreResult$count+ni
       else                   ri<-exploreResult$nullcount+ni
       for (vi in 1:length(vals)){
         
@@ -705,7 +704,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
         hypothesis$DV<-DV
         hypothesis$effect<-effect
         
-        if (doingNonNUll) {
+        if (doingNonNull) {
           res<-multipleAnalysis(1,hypothesis,design,evidence)
           result<-storeExploreResult(result,res,ri,vi)
         }

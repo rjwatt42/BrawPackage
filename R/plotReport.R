@@ -5,6 +5,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
   doItalic=FALSE
   indentSize="30px"
   lineColour="#446688"
+  lineColourPale="#99BBDD"
   rowColour="#88BBFF"
   cellPadding="padding:5px;padding-top:1px;padding-bottom:1px;"
   blankLineStyle="padding-top:20px;"
@@ -71,6 +72,11 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
           blankStyle<-"padding-top:1px;"
           outputText[index+(1:nc)]<-sub("!T","",outputText[index+(1:nc)])
         }
+        if (any(grepl("!U",outputText[index+(1:nc)]))) {
+          rowStyle<-paste0(rowStyle,"border-bottom:solid;border-bottom-color:",lineColourPale,";border-bottom-width:1px;")
+          blankStyle<-"padding-top:1px;"
+          outputText[index+(1:nc)]<-sub("!U","",outputText[index+(1:nc)])
+        }
         for (i in 1:nc) {
           if (i>1) startStyle<-""
           cellStyle<-""
@@ -112,7 +118,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
             }
             if (grepl("!u",outputText[index])) {
               cellStyle<-paste0(cellStyle,"border-bottom:solid;border-bottom-color:#882222;border-bottom-width:1px;")
-              cellStyle<-paste0(cellStyle,"border-top:solid;border-top-color:#882222;border-top-width:1px;")
+              # cellStyle<-paste0(cellStyle,"border-top:solid;border-top-color:#882222;border-top-width:1px;")
               outputText[index]<-sub("!u","",outputText[index])
             }
             if (grepl("!r",outputText[index])) {
