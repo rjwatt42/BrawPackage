@@ -474,8 +474,8 @@ sem_results<-function(pathmodel,sem) {
   )
   
   nan_action<-"pairwise.complete.obs" # "complete.obs"
-  sem$S<-cov(sem$data,use=nan_action)
-  sem$S_model=get_Stheta(sem);
+  sem$covariance<-cov(sem$data,use=nan_action)
+  sem$cov_model=get_Stheta(sem);
   
   # full model stats
   
@@ -498,9 +498,9 @@ sem_results<-function(pathmodel,sem) {
   rmsea=sqrt(model_chi_noncentrality/model_chi_df);
   model_rmsea_p=1-pchisq(model_chisqr, model_chi_df, model_chi_noncentrality);
   # 
-  ds=sem$S_model-sem$S;
-  # [a,b]=meshgrid(diag(sem$S));
-  a<-matrix(diag(sem$S),nrow=nrow(sem$S),ncol=ncol(sem$S),byrow=TRUE)
+  ds=sem$cov_model-sem$covariance;
+  # [a,b]=meshgrid(diag(sem$covariance));
+  a<-matrix(diag(sem$covariance),nrow=nrow(sem$covariance),ncol=ncol(sem$covariance),byrow=TRUE)
   b<-t(a)
   dc=ds/sqrt(a*b);
   model_srmr=sqrt(sum(abs(dc^2)));
@@ -557,12 +557,13 @@ sem_results<-function(pathmodel,sem) {
   sem$CF_table=CF_table;
   
   # effect sizes
-  sem$S<-sem$S[,order(colnames(sem$S))]
-  sem$S<-sem$S[order(rownames(sem$S)),]
+  sem$covariance<-sem$covariance[,order(colnames(sem$covariance))]
+  sem$covariance<-sem$covariance[order(rownames(sem$covariance)),]
   
-  v<-matrix(diag(sem$S),nrow(sem$S),ncol(sem$S))
+  v<-matrix(diag(sem$covariance),nrow(sem$covariance),ncol(sem$covariance))
   sem$ES_table<-CF_table/sqrt(v/t(v))
   
+  sem$Rtotal<-sem$covariance/sqrt(v*t(v))
   return(sem)
   
   # source_names=pathmodel$path$stages[[1]];
@@ -645,12 +646,12 @@ sem_results<-function(pathmodel,sem) {
 # safe_names=regexprep(sem$varnames,{'[^\w]*'},{''});
 # allnames=safe_names(use_all); 
 # [~,use]=unique(allnames);
-# sem$S_table=array2table(sem$S(use,use),'variablenames',allnames(use),'rownames',allnames(use));
+# sem$S_table=array2table(sem$covariance(use,use),'variablenames',allnames(use),'rownames',allnames(use));
 # 
 # %% model covariances
 # 
-# sem$S_model_table=array2table(sem$S_model(use,use),'variablenames',allnames(use),'rownames',allnames(use));
-# sem$E_table=array2table(sem$S_model(use,use)-sem$S(use,use),'variablenames',allnames(use),'rownames',allnames(use));
+# sem$cov_model_table=array2table(sem$cov_model(use,use),'variablenames',allnames(use),'rownames',allnames(use));
+# sem$E_table=array2table(sem$cov_model(use,use)-sem$covariance(use,use),'variablenames',allnames(use),'rownames',allnames(use));
 # 
 # 
 # 

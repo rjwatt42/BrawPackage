@@ -12,7 +12,7 @@ pathmodel<-list(path=list(
             )
 )
 pathmodel$path$add<-list(c("Age","PHQ-9 total"),c("Sex","PHQ-9 total"))
-pathmodel$path$remove<-list(c("Age","CESD-total"),c("Sex","HAMD total"))
+pathmodel$path$remove<-list(c("Age","CESD-total"))
 # pathmodel$path$stages<-list("CESD-total","PHQ-9 total","Sex")
 # pathmodel$path$depth<-"2"
 # pathmodel$path$stages<-list("Sex","PHQ-9 total")

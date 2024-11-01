@@ -1,5 +1,6 @@
 plotPathModel<-function(pathmodel) {
   
+  digits<-2
   r<-pathmodel$ES_table
   
   switch(pathmodel$depth,
@@ -56,9 +57,9 @@ plotPathModel<-function(pathmodel) {
         use1<-which(names==cnames[i1])
         use2<-which(names==rnames[i2])
         yStart<-ys[use1]
-        xStart<-xs[use1]+(nchar(cnames[i1])+1)*fontSize*0.3
+        xStart<-xs[use1]+(nchar(cnames[i1])+1)*fontSize*0.25
         yEnd<-ys[use2]
-        xEnd<-xs[use2]-(nchar(rnames[i2])+1)*fontSize*0.25
+        xEnd<-xs[use2]-(nchar(rnames[i2])+2)*fontSize*0.25
         arrowLength<-sqrt((yStart-yEnd)^2+(xStart-xEnd)^2)
         direction<- atan2((yEnd-yStart),(xEnd-xStart))*180/pi
 
@@ -66,7 +67,7 @@ plotPathModel<-function(pathmodel) {
           colLine<-"#000000"
           arrowWidth<-0.3
           if (r1<0) colArrow<-"#0088FF"
-          else      colArrow="#FFFF00"
+          else      colArrow="#FFEE00"
           if (abs(r1)<0.1) {
             colArrow<-desat(colArrow,0.1)
             colLine<-desat(colLine,0.1)
@@ -84,7 +85,7 @@ plotPathModel<-function(pathmodel) {
           aLen<-c(aLen,arrowLength)
           aWid<-c(aWid,arrowWidth)
           
-          rlabels<-c(rlabels,brawFormat(r1))
+          rlabels<-c(rlabels,brawFormat(r1,digits=digits))
           rx<-c(rx,xStart+(xEnd-xStart)*fontSize*0.3)
           ry<-c(ry,yStart+(yEnd-yStart)*fontSize*0.3)
           rcol<-c(rcol,colArrow)
