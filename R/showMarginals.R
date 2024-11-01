@@ -176,7 +176,7 @@ pile<-function(data,ptSize) {
   x<-c()
   y<-c()
   for (i in 1:length(data)){
-    for (iy in seq(0,100,by=0.001)) {
+    for (iy in seq(0,100,by=0.01)) {
       distances=sqrt((x-data[i])^2+(y-iy)^2)
       found<-any(distances<space)
       if (!found) {

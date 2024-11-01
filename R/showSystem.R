@@ -133,7 +133,7 @@ showWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),autoShow=
   rx<-c(rx[1],rx,rx[length(rx)])
   rdens<-c(0,rdens,0)
   pts=data.frame(x=rx,y=rdens)
-  g<-addG(g,dataPolygon(pts,fill=braw.env$plotColours$descriptionC,colour=NA))
+  g<-addG(g,dataPolygon(pts,fill=braw.env$plotColours$populationC,colour=NA))
   g<-addG(g,dataLine(pts))
   
   if (braw.env$graphHTML && autoShow) {
@@ -173,7 +173,7 @@ showDesign<-function(design=braw.def$design,hypothesis=braw.def$hypothesis,plotA
   g<-startPlot(xlim=binRange, ylim=c(0,1),
                xticks=makeTicks(nRange$ticks,10^nRange$ticks),xlabel=makeLabel(nRange$label),
                box="x",g=g)
-  g<-addG(g,dataPolygon(data=pts,fill=braw.env$plotColours$descriptionC))
+  g<-addG(g,dataPolygon(data=pts,fill=braw.env$plotColours$designC))
   g<-addG(g,dataLine(data=pts))
 
   if (design$Replication$On) {

@@ -1,4 +1,10 @@
-
+svgBox<-function(height=NULL,aspect=1.3,fontScale=1.5) {
+  if (is.null(height) && is.null(aspect)) return(braw.env$plotSize)
+  if (is.null(height)) height<-braw.env$plotSize[2]
+    setBrawEnv("plotSize",c(aspect,1)*height)
+    setBrawEnv("labelSize",height/100*fontScale)
+    setBrawEnv("dotSize",height/100*fontScale*1.25)
+}
 svgBoxX<-function() {return(braw.env$plotSize[1])}
 svgBoxY<-function() {return(braw.env$plotSize[2])}
 svgX<-function(x) {return(x*svgBoxX())}
@@ -114,6 +120,7 @@ nullPlot<-function() {
   if (braw.env$graphHTML) {
     g<-paste0(
       '<svg width=',format(svgBoxX()),' height=',format(svgBoxY()),
+      ' margin:0; padding:0;',
       ' style=background-color:','"black"','',
       ' xmlns="http://www.w3.org/2000/svg">',
       '<defs>',
@@ -171,6 +178,7 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=FALSE,
       xticks$breaks<-axisTicks(usr=xlim, log=xticks$logScale, axp = NULL, nint = 5)
     if (is.null(xticks$labels))
       xticks$labels<-xticks$breaks
+    if (!is.character(xticks$labels)) xticks$labels<-brawFormat(xticks$labels,digits=-2)
     maxtick<-max(nchar(xticks$labels))
   } else {
     maxtick<-0
@@ -183,6 +191,7 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=FALSE,
       yticks$labels<-yticks$breaks
     if (!xmax)
       leftGap<-labelGapy+max(nchar(yticks$labels))*tickGap
+    if (!is.character(yticks$labels)) yticks$labels<-brawFormat(yticks$labels,digits=-2)
     maxtick<-max(c(maxtick,nchar(yticks$labels)))
   } else {
     leftGap<-minGap
@@ -273,6 +282,7 @@ xAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE,angle=0,size=NULL){
     breaks<-axisTicks(usr=braw.env$plotLimits$xlim, log=logScale, axp = NULL, nint = 5)
   }
   if (is.null(labels)) labels<-breaks
+  if (!is.character(labels)) labels<-brawFormat(labels,digits=2)
   if (logScale) breaks<-log10(breaks)
   # labels<-as.character(labels)
   
@@ -372,7 +382,7 @@ dataBar<-function(data,colour="black",fill="white",alpha=1,barwidth=0.85) {
 # dataErrorbar
 # dataLegend
 # dataContour
-dataLabel<-function(data,label, hjust=0, vjust=0, fill="white",colour="black",parser=TRUE,fontface="plain",size=1,label.size=0.25) {
+dataLabel<-function(data,label, hjust=0, vjust=0, angle=0, fill="white",colour="black",parser=TRUE,fontface="plain",size=1,label.size=0.25) {
   if (!braw.env$graphHTML) {
     mathlabel<-grepl("['^']{1}",label) | grepl("['[']{1}",label)
   if (any(mathlabel)) {
@@ -387,13 +397,13 @@ dataLabel<-function(data,label, hjust=0, vjust=0, fill="white",colour="black",pa
     a<-hjust; hjust<-vjust; vjust<-a
   }
   data<-reRangeXY(data)
-  g<-geom_label(data=data,aes(x = x, y = y), label=label, 
+  g<-geom_label(data=data,aes(x = x, y = y), label=label, angle=angle,
              hjust=hjust, vjust=vjust, nudge_y=voff,
              fill=fill,color=colour,fontface=fontface,
              label.padding=unit(0.1, "lines"),label.size=label.size,
              size=reSizeFont(size),parse=parser)
   } else {
-    g<-dataText(data,label, hjust=hjust, vjust=vjust, colour=colour,fontface=fontface,size=size,background=TRUE,fill=fill)
+    g<-dataText(data,label, hjust=hjust, vjust=vjust, angle=angle, colour=colour,fontface=fontface,size=size,background=TRUE,fill=fill)
   }
   return(g)
 }
@@ -405,7 +415,7 @@ dataText<-function(data,label, hjust=0, vjust=0, colour="black",size=1,angle=0,f
 axisText<-function(data,label, hjust=0, vjust=0, colour="black",size=1,angle=0,dx=0,dy=0,fontface="plain",background=FALSE,fill="white") {
   if (!braw.env$graphHTML) {
     parse<-FALSE
-    mathlabel<-grepl("['^']{1}",label) | grepl("['[']{1}",label)
+    mathlabel<-grepl("['[']{1}",label) #| grepl("[\\^]{1}",label)
     if (any(mathlabel)) {
       label<-gsub("=","==",label)
       parse=TRUE
@@ -448,6 +458,10 @@ axisText<-function(data,label, hjust=0, vjust=0, colour="black",size=1,angle=0,d
       thisLabel<-label[i]
       thisLabel<-gsub('\\[([^ ]*?)\\]',
                       paste0('</tspan><tspan baseline-shift="sub" font-size="',
+                             reSizeFont(size*3)*0.8,'">\\1</tspan><tspan>'),
+                      thisLabel)
+      thisLabel<-gsub('\\^([^ ]*?) ',
+                      paste0('</tspan><tspan baseline-shift="super" font-size="',
                              reSizeFont(size*3)*0.8,'">\\1</tspan><tspan>'),
                       thisLabel)
       thisLabel<-paste0(

@@ -18,9 +18,11 @@ plotGLM<-function(DV,IVs,result,whichR) {
   fontSize<-braw.env$labelSize*1.25
   if (length(r)>10) fontSize<-braw.env$labelSize
   
+  xlim<-c(-1,1)*15
+  ylim<-c(-1,1)*10
   braw.env$plotArea<-c(0,0,1,1)
-  g<-startPlot(xlim=c(-1,1)*15,ylim=c(-1,1)*10,back="transparent",box="none",g=NULL)
-  g<-addG(g,dataPolygon(data.frame(x=c(-1,-1,1,1)*14,y=c(-1,1,1,-1)*9),col=braw.env$plotColours$graphBack,fill=braw.env$plotColours$graphBack))
+  g<-startPlot(xlim=xlim,ylim=ylim,box="none",g=NULL)
+  # g<-addG(g,dataPolygon(data.frame(x=c(-1,-1,1,1)*14,y=c(-1,1,1,-1)*9),col=braw.env$plotColours$graphBack,fill=braw.env$plotColours$graphBack))
   
   g<-addG(g,dataLabel(data.frame(x=0,y=0),label=DV$name,hjust=0.5,vjust=0.5,fontface="bold",size=1.25))
   xStart<-4+nchar(DV$name)/2*(fontSize/14)
@@ -74,7 +76,7 @@ plotGLM<-function(DV,IVs,result,whichR) {
       g<-addG(g,drawArrow(start=c(xStart,y[i]),arrowLength,direction=-90+direction*180/pi,width=width,ends="last",col=colArrow,fill=colArrow))
     }
   }
-  g<-addG(g,dataText(data.frame(x=0,y=-10),label=paste0("r[model]=",brawFormat(result$r.full,3)),hjust=0.5))
+  g<-addG(g,dataText(data.frame(x=xlim[1],y=ylim[1]),label=paste0("r[model]=",brawFormat(result$r.full,3)),vjust=0))
   
   return(g)
 

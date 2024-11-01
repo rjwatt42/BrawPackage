@@ -26,7 +26,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
       blankStyle<-blankLineStyle
       headerRow<-FALSE
       for (j in 1:nr) {
-        bgcolor<-"white"
+        bgcolor<-""
         startStyle<-""
         outputFront<-paste0(outputFront,"<tr>")
         rowStyle<-paste0("font-size:",format(braw.env$labelSize*fontSize*3),"px;")
@@ -43,7 +43,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
             if (any(grepl("!H",outputText[index-nc+(1:nc)]))) doubleHeaderBottom<-TRUE
           }
           headerRow<-TRUE
-          bgcolor<-rowColour
+          bgcolor<-paste0(" bgcolor=",rowColour)
           
           # rowStyle<-paste0(rowStyle,"font-weight:bold;")
           rowStyle<-paste0(rowStyle,"text-align:center;")
@@ -132,8 +132,8 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
 
             
             if (nchar(outputText[index])>0)
-                 outputFront<-paste0(outputFront,"<td bgcolor=",bgcolor," style=",cellStyle,rowStyle,startStyle,">",outputText[index],"</td>")
-            else outputFront<-paste0(outputFront,"<td bgcolor=",bgcolor," style=height:1px;",rowStyle,"></td>")
+                 outputFront<-paste0(outputFront,"<td ",bgcolor," style=",cellStyle,rowStyle,startStyle,">",outputText[index],"</td>")
+            else outputFront<-paste0(outputFront,"<td ",bgcolor," style=height:1px;",rowStyle,"></td>")
         }
         outputFront<-paste0(outputFront,"</tr>")
         if (index+nc<=length(outputText))

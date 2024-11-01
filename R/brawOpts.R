@@ -48,20 +48,22 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1.5,graphicsSize=c(16,10),
   
   # graph themes
   plotColours<-list(graphC=graphC,graphBack="#999999",
-                    maineffectES="#FFCC00",covariationES="#FF1100",interactionES="#0011FF",
-                    sampleC="#FFCC00",descriptionC="#FF9955",replicationC="#FF7755",
+                    variableC="#FFEE88",maineffectES="#FFEE88",covariationES="#FF1100",interactionES="#0011FF",
+                    populationC="#FFEE88",sampleC="#FFCC00",descriptionC="#DD8844",
+                    designC="#CC4422",replicationC="#FF7755",
                     descriptionC1="#FF5533",descriptionC2="#CCBB33",
                     infer_sigC="#11CC00",infer_nsigC="#FF4400",infer_none="#AAAAAA",infer_miss=NULL,
-                    infer_sigNonNull="#11CC00",infer_isigNonNull="#881100",infer_nsigNonNull="#881100",infer_siglsNonNull="#AABB99",infer_nsdNonNull="#DDCCCC",
-                    infer_sigNull="#118800",infer_isigNull="#FF4400",infer_nsigNull="#FF4400",infer_nsiglsNull="#CC9988",infer_nsdNull="#CCDDCC",
+                    infer_sigNonNull="#11CC00",infer_isigNonNull="#881100",infer_nsigNonNull="#881100",infer_nsdNonNull="#DDCCCC",
+                    infer_sigNull="#118800",infer_isigNull="#FF4400",infer_nsigNull="#FF4400",infer_nsdNull="#CCDDCC",
                     psig="#FFAA00",alpha="#44FF22",
                     fdr="#227700",fmr="#BB5555")
 
   if (BW) {
     plotColours<-list(graphC="#FFFFFF",graphBack="#999999",
                       maineffectES="#FFFFFF",covariationES="#FFFFFF",interactionES="#FFFFFF",
-                      sampleC="#FFFFFF",descriptionC="#FFFFFF",
+                      populationC="#FFFFFF",sampleC="#FFFFFF",descriptionC="#FFFFFF",
                       descriptionC1="#888888",descriptionC2="#111111",
+                      designC="#444444",replicationC="#777777",
                       infer_sigC="#FFFFFF",infer_nsigC="#111111",infer_none="#AAAAAA",
                       infer_sigNonNull="#FFFFFF",infer_isigNonNull="#555555",infer_nsigNonNull="#555555",infer_nsdNonNull="#333333",
                       infer_sigNull="#BBBBBB",infer_isigNull="#111111",infer_nsigNull="#FFFFFF",infer_nsdNull="#DDDDDD",

@@ -74,7 +74,11 @@ plotParParPrediction<-function(g,IV,DV,rho,n,offset=1,range=NULL){
   
   pts2<-data.frame(x=x,y=y)
   pts1<-data.frame(x=xv,y=c(yv_lower,rev(yv_upper)))
+  pts1a<-data.frame(x=x,y=yv_lower)
+  pts1b<-data.frame(x=x,y=yv_upper)
   g<-addG(g,dataPolygon(data=pts1,fill = col, colour=NA, alpha=0.5))
+  g<-addG(g,dataLine(data=pts1a,colour=col,linewidth=1))
+  g<-addG(g,dataLine(data=pts1b,colour=col,linewidth=1))
   if (offset==1) {
     g<-addG(g,dataLine(data=pts2,colour=col,linewidth=2))
   } else {

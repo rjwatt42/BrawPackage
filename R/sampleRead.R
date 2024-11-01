@@ -20,8 +20,10 @@ prepareSample<-function(raw_data, doOrdinals=FALSE, maxOrdinal=9, header=c()){
   }
   
   # check for a participant column
-  if (is.element(vars[1],c("participant","Participant","participants","Participants"))) {
-    vars[1] <- "participant"
+  participant_use<-which(is.element(vars,c("participant","Participant","participants","Participants")))
+  if (participant_use>0) {
+    vars[participant_use] <- "participant"
+    colnames(raw_data)[participant_use]<-vars[participant_use]
   } else{
     participants<-1:nrow(raw_data)
     raw_data<-cbind(data.frame(participant=participants),raw_data)
@@ -179,16 +181,25 @@ prepareSample<-function(raw_data, doOrdinals=FALSE, maxOrdinal=9, header=c()){
   return(allData)
 }
 
-readSample<-function(data,DV,IV,IV2=NULL) {
+readSample<-function(data,DV=NA,IV=NA,IV2=NULL) {
 
+  if (is.character(data) && grepl(".xlsx",data)) data<-read_xlsx(data)
   if (is.character(data)) data<-read.csv(data)
   if (length(IV)>1) IV2<-IV[2]
   
   data1<-prepareSample(data)
   
+  if (is.na(DV) || is.na(IV)) return(data1)
+  nv<-length(data1$variables$name)
+  
+  if (is.na(DV)) DV<-data1$variables[nv,]$name
+  if (is.na(IV)) IV<-data1$variables[1,]$name
+  if (!is.null(IV2) && is.na(IV2)) IV2<-data1$variables[2,]$name
+  
   dvUse<-as.list(data1$variables[which(data1$variables$name==DV),])
   ivUse<-as.list(data1$variables[which(data1$variables$name==IV[1]),])
-  if (!is.null(IV2)) iv2Use<-as.list(data1$variables[which(data1$variables$name==IV2),])
+  if (!is.null(IV2)) 
+    iv2Use<-as.list(data1$variables[which(data1$variables$name==IV2),])
   else iv2Use<-NULL
   
   dvUse$cases<-str_split(dvUse$cases,",")[[1]]
@@ -203,6 +214,6 @@ readSample<-function(data,DV,IV,IV2=NULL) {
   setBrawDef("hypothesis",makeHypothesis(DV=dvUse,IV=ivUse,IV2=iv2Use))
   setBrawDef("design",makeDesign(sN=length(data1$data$participant)))
   
-  sample<-doSample()
+  sample<-doSample(autoShow = FALSE)
   return(sample)
 }

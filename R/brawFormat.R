@@ -1,11 +1,15 @@
 brawFormat<-function(numbers,digits=braw.env$report_precision) {
 
-  if (is.infinite(numbers)) return(format(numbers))
-  if (is.null(numbers) || is.na(numbers)) return("NULL")
+  if (any(is.infinite(numbers))) return(format(numbers))
+  if (is.null(numbers) || any(is.na(numbers))) return("NULL")
   
   pad<-function(x) if(x>=0) paste0(" ",x) else x
   trim<-function(x) sub(".0+$", "", x) 
   
+  if (digits<0) {
+    digits<-(-digits)-max(floor(log10(abs(numbers))))
+    if (digits<0) digits<-0
+  }
   if (all(abs(numbers-round(numbers))<10^(-digits))) {
     r<-sprintf(round(numbers),fmt="%d")
   } else {

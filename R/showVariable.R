@@ -14,7 +14,7 @@ drawVar<-function(pts,ticks,var,plotArea=c(0,0,1,1),g){
                box="x",g=g)
   # g<-addG(g,xAxisTicks(ticks$breaks,ticks$labels),xAxisLabel(var$name))
   g<-addG(g,
-    dataPolygon(pts,fill=braw.env$plotColours$sampleC,colour=braw.env$plotColours$sampleC,linewidth=0.25)
+    dataPolygon(pts,fill=braw.env$plotColours$variableC,colour=braw.env$plotColours$variableC,linewidth=0.25)
     )
   g<-addG(g,
           dataLine(pts,colour="black",linewidth=0.25)
