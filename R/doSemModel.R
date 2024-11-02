@@ -111,9 +111,9 @@ fit_sem_model<-function(pathmodel,model_data) {
       sem$coefficients[iw,inn]=sem$Bresult[iw,inn]
 
   switch(pathmodel$path$depth,
-         '1'= depth<-1,
-         '2'= depth<-2,
-         '3'= depth<-length(stages)
+         'd1'= depth<-1,
+         'd2'= depth<-2,
+         'all'= depth<-length(stages)
   )
 
   path<-c()
@@ -268,9 +268,9 @@ path2sem<-function(pathmodel,model_data) {
   within_stage<-pathmodel$path$within_stage
 
   switch(pathmodel$path$depth,
-         '1'= depth<-1,
-         '2'= depth<-2,
-         '3'= depth<-length(stages)
+         'd1'= depth<-1,
+         'd2'= depth<-2,
+         'all'= depth<-length(stages)
   )
 
   # now we expand Categorical variables
@@ -340,8 +340,8 @@ path2sem<-function(pathmodel,model_data) {
   data<-full_data[,use]
 
 
-  Bdesign<-zeros(P,P)
-  Ldesign<-zeros(P,Q)
+  Bdesign<-zeros(P,P); rownames(Bdesign)<-endo_names; colnames(Bdesign)<-endo_names
+  Ldesign<-zeros(P,Q); rownames(Ldesign)<-endo_names; colnames(Ldesign)<-exo_names
   Bresult<-Bdesign+NA
   Lresult<-Ldesign+NA
 
@@ -410,18 +410,22 @@ path2sem<-function(pathmodel,model_data) {
     }
   }
   
-  if (!is.null(pathmodel$path$add)) {
+  if (!is.null(pathmodel$path$add) && !isempty(pathmodel$path$add)) {
     for (iadd in 1:length(pathmodel$path$add)) {
-      source<-pathmodel$path$add[[iadd]][1]
-      isCat<-original_vartypes[which(source==original_varnames)]
-      iSource<-which(source==gsub("=[^ ]*","",exo_names))
       dest<-pathmodel$path$add[[iadd]][2]
-      iDest<-which(dest==endo_names)
-      Ldesign[iDest,iSource]<-1
+      iDest<-which(dest==gsub("=[^ ]*","",endo_names))
+      source<-pathmodel$path$add[[iadd]][1]
+      iSource<-which(source==gsub("=[^ ]*","",exo_names))
+      if (isempty(iSource)) {
+        iSource<-which(source==gsub("=[^ ]*","",endo_names))
+        Bdesign[iDest,iSource]<-1
+      } else {
+        Ldesign[iDest,iSource]<-1
+      }
     }
   }
   
-  if (!is.null(pathmodel$path$remove)) {
+  if (!is.null(pathmodel$path$remove) && !isempty(pathmodel$path$remove)) {
     for (iadd in 1:length(pathmodel$path$remove)) {
       source<-pathmodel$path$remove[[iadd]][1]
       isCat<-original_vartypes[which(source==original_varnames)]
@@ -468,13 +472,14 @@ sem_results<-function(pathmodel,sem) {
   n_obs=sem$n_obs;
   
   switch(pathmodel$path$depth,
-         '1'= depth<-1,
-         '2'= depth<-2,
-         '3'= depth<-length(stages)
+         'd1'= depth<-1,
+         'd2'= depth<-2,
+         'all'= depth<-length(stages)
   )
   
   nan_action<-"pairwise.complete.obs" # "complete.obs"
   sem$covariance<-cov(sem$data,use=nan_action)
+  sem$Dcov<-sem$covariance
   sem$cov_model=get_Stheta(sem);
   
   # full model stats
