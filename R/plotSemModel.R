@@ -35,10 +35,12 @@ plotPathModel<-function(pathmodel) {
   
   # get the locations sorted to start with
   x<- -dx*(length(pathmodel$stages)-1)/2
+  offset<-TRUE
   for (st in 1:length(pathmodel$stages))  {
     thisStage<-pathmodel$stages[[st]]
+    offset<-!offset
     y<-dy*(length(thisStage)-1)/2
-    if (rem(st,2)==0) y<-y+dy/2
+    if ((rem(length(thisStage)-1,2)==1) == offset)  y<-y+dy/2
     for (vr in 1:length(thisStage)) {
       names<-c(names,thisStage[vr])
       xs<-c(xs,x)
@@ -93,31 +95,34 @@ plotPathModel<-function(pathmodel) {
           rdir<-c(rdir,direction)
         }
 
-  # arrows first
+  # arrows first in increasing size order
   for (ai in order(abs(ar))) {
     g<-addG(g,drawArrow(c(ax[ai],ay[ai]),aLen[ai],direction=rdir[ai]+90,
                         width=aWid[ai],ends="last",col=rfg[ai],fill=rcol[ai]))
     
   }
   
-  # now the effect sizes in increasing size order
-  for (ri in 1:length(rlabels)) {
+  # now the effect size labels
+  for (ri in order(abs(ar))) {
     if (ry[ri]<0) vjust=1 else vjust=0
     g<-addG(g,dataLabel(data.frame(x=rx[ri],y=ry[ri]),label=rlabels[ri],
-                        size=0.6,hjust=0.5,vjust=0.5,angle=rdir[ri],
+                        size=0.6,hjust=0.5,vjust=0.5,# angle=rdir[ri],
                         fill=darken(rcol[ri],1,0.2),colour=rfg[ri]))
   }
   
   # now draw variable names
   for (ni in 1:length(names)) {
+    fill="white"
+    if (is.element(names[ni],colnames(pathmodel$Bdesign)) && all(pathmodel$Bdesign[,names[ni]]==0)) fill<-"#FFAAAA"
+    if (!is.element(names[ni],rownames(pathmodel$Bdesign))) fill<-"#CCFF44"
     g<-addG(g,dataLabel(data.frame(x=xs[ni],y=ys[ni]),label=names[ni],
-                        size=fontSize,hjust=0.5,vjust=0.5,fontface="bold"))
+                        size=fontSize,hjust=0.5,vjust=0.5,fontface="bold",fill=fill))
   }
 
   # now summary result
   label<-paste0("AIC = ",brawFormat(pathmodel$eval$AIC),";  R^2 = ",brawFormat(pathmodel$eval$Rsquared),
                 ";  k = ",brawFormat(pathmodel$eval$k),";  n = ",brawFormat(pathmodel$eval$n))
-  g<-addG(g,dataText(data.frame(x=xlim[2]-diff(xlim)/30,y=ylim[1]+diff(ylim)/30),label,hjust=1,size=0.7))
+  g<-addG(g,dataLabel(data.frame(x=xlim[2]-diff(xlim)/30,y=ylim[1]+diff(ylim)/30),label,hjust=1,size=0.7))
   return(g)
 
 }

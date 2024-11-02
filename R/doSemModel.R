@@ -206,6 +206,8 @@ get_ml_fitfcn<-function(LB,S,phi,psy,Ldesign,Bdesign,data,debug=FALSE) {
 
 get_Stheta<-function(L,B=NULL,phi=NULL,psy=NULL) {
   
+  nan_action<-"pairwise.complete.obs" # "complete.obs"
+  
   if (is.null(B)) {
     sem=L;
     L=sem$Lresult; L[is.na(L)]=0;
@@ -265,6 +267,7 @@ path2sem<-function(pathmodel,model_data) {
   full_varnames<-model_data$varnames
   
   only_ivs<-pathmodel$path$only_ivs
+  only_dvs<-pathmodel$path$only_dvs
   within_stage<-pathmodel$path$within_stage
 
   switch(pathmodel$path$depth,
@@ -278,7 +281,8 @@ path2sem<-function(pathmodel,model_data) {
   new_names<-c()
   for (iv in 1:length(full_vartypes)) {
     if (!full_vartypes[iv]) {
-      new_data<-cbind(new_data,full_data[,iv])
+      nv<-full_data[,iv]
+      new_data<-cbind(new_data,nv)
       new_names<-c(new_names,full_varnames[iv])
     } else {
       cases<-unique(full_data[,iv])
@@ -289,7 +293,7 @@ path2sem<-function(pathmodel,model_data) {
         nv[,ic-1]<-unlist(full_data[,iv])==cases[ic]
       }
       nn<-paste0(full_varnames[iv],'=',cases[2:length(cases)])
-      colnames(nv)<-nn
+      # colnames(nv)<-nn
       new_data<-cbind(new_data,nv)
       new_names<-cbind(new_names,nn)
       for (is in 1:length(stages)){
@@ -307,10 +311,15 @@ path2sem<-function(pathmodel,model_data) {
       change<-which(full_varnames[iv]==s)
       if (!isempty(change))
         only_ivs<-cbind(only_ivs[1:(change-1)],nn,only_ivs[(change+1):length(s)])
+      s<-only_dvs
+      change<-which(full_varnames[iv]==s)
+      if (!isempty(change))
+        only_dvs<-cbind(only_dvs[1:(change-1)],nn,only_dvs[(change+1):length(s)])
     }
   }
   full_varnames<-new_names
   full_data<-new_data
+  colnames(full_data)<-new_names
 
   exo_names<-stages[[1]]
   endo_names<-c()
@@ -319,7 +328,7 @@ path2sem<-function(pathmodel,model_data) {
     for (iv in 1:length(dests)) {
       if (!isempty(dests[iv])){
         if (is.element(dests[iv],pathmodel$path$only_ivs))
-          exo_names<-rbind(exo_names,dests[iv])
+          exo_names<-c(exo_names,dests[iv])
         else
           endo_names<-rbind(endo_names,dests[iv])
       }
@@ -424,15 +433,24 @@ path2sem<-function(pathmodel,model_data) {
       }
     }
   }
+
+  if (!isempty(only_dvs)) {
+    use<-is.element(unlist(only_dvs),colnames(Bdesign))
+    Bdesign[,unlist(only_dvs[use])]<-0
+  }
   
   if (!is.null(pathmodel$path$remove) && !isempty(pathmodel$path$remove)) {
     for (iadd in 1:length(pathmodel$path$remove)) {
-      source<-pathmodel$path$remove[[iadd]][1]
-      isCat<-original_vartypes[which(source==original_varnames)]
-      iSource<-which(source==gsub("=[^ ]*","",exo_names))
       dest<-pathmodel$path$remove[[iadd]][2]
       iDest<-which(dest==endo_names)
-      Ldesign[iDest,iSource]<-0
+      source<-pathmodel$path$remove[[iadd]][1]
+      iSource<-which(source==gsub("=[^ ]*","",exo_names))
+      if (isempty(iSource)) {
+        iSource<-which(source==gsub("=[^ ]*","",endo_names))
+        Bdesign[iDest,iSource]<-0
+      } else {
+        Ldesign[iDest,iSource]<-0
+      }
     }
   }
   
@@ -479,7 +497,6 @@ sem_results<-function(pathmodel,sem) {
   
   nan_action<-"pairwise.complete.obs" # "complete.obs"
   sem$covariance<-cov(sem$data,use=nan_action)
-  sem$Dcov<-sem$covariance
   sem$cov_model=get_Stheta(sem);
   
   # full model stats
