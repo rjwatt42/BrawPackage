@@ -212,7 +212,7 @@ makeDesign<-function(sN=42, sMethod=makeSampling("Random") ,sNRand=FALSE,sNRandK
 #' @export
 makeEvidence<-function(shortHand=FALSE,sigOnly=FALSE,
                        rInteractionOn=FALSE,rInteractionOnly=TRUE,ssqType="Type3",
-                       caseOrder="Alphabetic",
+                       caseOrder="AsStated",
                        llr=list(e1=c(),e2=0),
                        Welch=FALSE,Transform="None",
                        McFaddens=TRUE,

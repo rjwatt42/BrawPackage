@@ -106,7 +106,7 @@ plotCatParPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha,g){
     muv<-array(DV$mu,ncats)
     sdv<-array(DV$sd,ncats)
     mu_order<-1:ncats
-    if (rho<0) {mu_order<-rev(mu_order)}
+    # if (rho<0) {mu_order<-rev(mu_order)}
   }
   hsy<-1+seq(-1,1,length.out=ncats)*Heteroscedasticity
 
