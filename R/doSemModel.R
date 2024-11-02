@@ -285,7 +285,9 @@ path2sem<-function(pathmodel,model_data) {
       new_data<-cbind(new_data,nv)
       new_names<-c(new_names,full_varnames[iv])
     } else {
-      cases<-unique(full_data[,iv])
+      if (is.factor(full_data[,iv]))
+             cases<-levels(full_data[,iv])
+        else cases<-unique(full_data[,iv])
       cases<-cases[!is.na(cases)]
       nv<-zeros(nrow(full_data),length(cases)-1)
       nv[is.na(full_data[,iv]),]<-NA
