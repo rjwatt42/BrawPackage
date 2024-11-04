@@ -698,7 +698,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
                     df<-paste("(",format(anRaw$Df[nrow(anRaw)]),")",sep="")
                   } else {
                   tv<-t.test(dv~iv1,var.equal=!evidence$Welch)
-                  tval<-tv$statistic
+                  tval<- -tv$statistic
                   analysis$pIV<-tv$p.value
                   df<-paste("(",format(tv$parameter),")",sep="")
                   }
