@@ -19,10 +19,10 @@ mergeExpected<-function(r1,r2) {
     dv.sd=rbind(r1$dv.sd,r2$dv.sd),
     dv.sk=rbind(r1$dv.sk,r2$dv.sk),
     dv.kt=rbind(r1$dv.kt,r2$dv.ky),
-    rs.mn=rbind(r1$rs.mn,r2$rs.mn),
-    rs.sd=rbind(r1$rs.sd,r2$rs.sd),
-    rs.sk=rbind(r1$rs.sk,r2$rs.sk),
-    rs.kt=rbind(r1$rs.kt,r2$rs.ky)
+    rd.mn=rbind(r1$rd.mn,r2$rd.mn),
+    rd.sd=rbind(r1$rd.sd,r2$rd.sd),
+    rd.sk=rbind(r1$rd.sk,r2$rd.sk),
+    rd.kt=rbind(r1$rd.kt,r2$rd.ky)
   )
   if (!is.null(r1$rIV2)) {
     newResult<-c(newResult,list(
@@ -57,7 +57,7 @@ resetExpected<-function(nsims=0,evidence,expectedResult=NULL){
     rIV=b,pIV=b,rpIV=b,roIV=b,poIV=b,nval=b,noval=b,df1=b,
     iv.mn=b,iv.sd=b,iv.sk=b,iv.kt=b,
     dv.mn=b,dv.sd=b,dv.sk=b,dv.kt=b,
-    rs.mn=b,rs.sd=b,rs.sk=b,rs.kt=b
+    rd.mn=b,rd.sd=b,rd.sk=b,rd.kt=b
   )
   newResult<-c(newResult,list(
     rIV2=b,pIV2=b,rIVIV2DV=b,pIVIV2DV=b,
@@ -93,7 +93,7 @@ resetExpected<-function(nsims=0,evidence,expectedResult=NULL){
 #' @seealso showExpected() and reportExpected())
 #' @export
 doExpected <- function(nsims=10,expectedResult=braw.res$expected,hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=makeEvidence(),
-                         doingNull=FALSE,autoShow=braw.env$autoShow,showType="Basic") {
+                         doingNull=FALSE,inSteps=FALSE,autoShow=braw.env$autoShow,showType="Basic") {
 
   if (!is.null(expectedResult)) {
     hypothesis<-expectedResult$hypothesis
@@ -118,7 +118,7 @@ doExpected <- function(nsims=10,expectedResult=braw.res$expected,hypothesis=braw
     }
   }
   
-  if (autoShow) {
+  if (inSteps && autoShow) {
     min_ns<-floor(log10(nsims/100))
     min_ns<-max(0,min_ns)
     ns<-10^min_ns

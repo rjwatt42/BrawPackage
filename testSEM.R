@@ -1,9 +1,9 @@
 
-data1<-readSample("testData.xlsx")
+data1<-readSample("class data 2018.xlsx")
 data1$data<-data1$data[rowSums(is.na(data1$data))==0,]
 
 pathmodel<-list(path=list(
-                          stages=list(c("PsychDistress"),c("Autism?")),
+                          stages=list(c("Age","Sex"),c("HAMD total")),
                           depth="d1",
                           only_ivs=list(),
                           only_dvs=list(),

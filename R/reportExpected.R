@@ -47,11 +47,11 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic",
            "Power"=     {pars<-c("ws","wp")},
            "2D"=     {pars<-c("rs","p")},
            "CILimits"=  {pars<-c("ci1","ci2")},
-           "NHST"={pars<-c("e2","e1")},
+           "NHST"={pars<-c("e2p","e1p")},
            "Hits"=       {pars<-c("e1a","e2a")},
            "Misses"=       {pars<-c("e1b","e2b")},
            "DV"=     {pars<-c("dv.mn","dv.sd","dv.sk","dv.kt")},
-           "Residuals"=     {pars<-c("rs.mn","rs.sd","rs.sk","rs.kt")},
+           "Residuals"=     {pars<-c("rd.mn","rd.sd","rd.sk","rd.kt")},
            { pars<-strsplit(showType,";")[[1]]
            }
     )
@@ -274,10 +274,10 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic",
                   "dv.sd"={a<-result$dv.sd},
                   "dv.sk"={a<-result$dv.sk},
                   "dv.kt"={a<-result$dv.kt},
-                  "rs.mn"={a<-result$rs.mn},
-                  "rs.sd"={a<-result$rs.sd},
-                  "rs.sk"={a<-result$rs.sk},
-                  "rs.kt"={a<-result$rs.kt}
+                  "rd.mn"={a<-result$rd.mn},
+                  "rd.sd"={a<-result$rd.sd},
+                  "rd.sk"={a<-result$rd.sk},
+                  "rd.kt"={a<-result$rd.kt}
           )
           ot1<-c(ot1,
                  paste0("!j",brawFormat(mean(a,na.rm=TRUE),digits=braw.env$report_precision))
@@ -300,8 +300,8 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic",
         }
       }
       
-      if (reportQuants) ot4[1]<-paste0("\b",whichEffect)
-      else              ot5[3]<-paste0("\b",whichEffect)
+      if (reportMeans) ot1[1]<-paste0("\b",whichEffect)
+      else             ot3[1]<-paste0("\b",whichEffect)
       
       if (reportMeans) { outputText<-c(outputText,ot1,rep(" ",nc-length(ot1)),
                                        ot2,rep(" ",nc-length(ot2)))

@@ -98,7 +98,7 @@ plotPathModel<-function(pathmodel) {
   # arrows first in increasing size order
   for (ai in order(abs(ar))) {
     g<-addG(g,drawArrow(c(ax[ai],ay[ai]),aLen[ai],direction=rdir[ai]+90,
-                        width=aWid[ai],ends="last",col=rfg[ai],fill=rcol[ai]))
+                        width=aWid[ai],ends="last",col=rfg[ai],fill=rcol[ai],finAngle=60))
     
   }
   

@@ -49,7 +49,7 @@ plotGLM<-function(DV,IVs,result,whichR) {
       colArrow<-desat(colArrow,gain=abs(r[use[i]])^0.5)
       g<-addG(g,dataLabel(data.frame(x=-xStart,y=y[i]),label=IVs$name[use[i]],hjust=1,vjust=0.5,col=col,fill=fill,size=1.25,label.size=width*4))
       direction<-atan2(y[i]*0.9,arrowLength+0.25)
-      g<-addG(g,drawArrow(start=c(-xStart,y[i]),arrowLength,direction=90-direction*180/pi,width=width,ends="last",col=colArrow,fill=colArrow))
+      g<-addG(g,drawArrow(start=c(-xStart,y[i]),arrowLength,direction=90-direction*180/pi,width=width,ends="last",col=colArrow,fill=colArrow,finAngle=30))
     }
   }
   
@@ -73,7 +73,7 @@ plotGLM<-function(DV,IVs,result,whichR) {
       colArrow<-desat(colArrow,gain=abs(r[use[i]])^0.5)
       g<-addG(g,dataLabel(data.frame(x=xStart,y=y[i]),label=IVs$name[use[i]],hjust=0,vjust=0.5,col=col,fill=fill,size=1.25,label.size=width*5))
       direction<-atan2(y[i]*0.9,arrowLength+0.25)
-      g<-addG(g,drawArrow(start=c(xStart,y[i]),arrowLength,direction=-90+direction*180/pi,width=width,ends="last",col=colArrow,fill=colArrow))
+      g<-addG(g,drawArrow(start=c(xStart,y[i]),arrowLength,direction=-90+direction*180/pi,width=width,ends="last",col=colArrow,fill=colArrow,finAngle=30))
     }
   }
   g<-addG(g,dataText(data.frame(x=xlim[1],y=ylim[1]),label=paste0("r[model]=",brawFormat(result$r.full,3)),vjust=0))

@@ -28,17 +28,20 @@ OrdProportions<-function(var) {
   pp<-pp/max(pp)
 }
 
-r2CatProportions<-function(rho,ncats1,ncats2) {
+r2CatProportions<-function(rho,ncats1,ncats2,pp1=NULL,pp2=NULL) {
   
+  if (is.null(pp1)) pp1<-rep(1,ncats1)
+  pp1<-pp1/sum(pp1)
+  if (is.null(pp2)) pp2<-rep(1,ncats2)
+  pp2<-pp2/sum(pp2)
   # find proportions in each cell
   sigma<-matrix(c(1,rho,rho,1),nrow=2)
   mu<-c(0,0)
   
-  xbreaks<-qnorm(seq(0,1,1/ncats1))
-  ybreaks<-qnorm(seq(0,1,1/ncats2))
+  xbreaks<-qnorm(cumsum(c(0,pp1)))
+  ybreaks<-qnorm(cumsum(c(0,pp2)))
   division<-matrix(ncol=ncats1+1,nrow=ncats2)
   for (ix in 1:ncats1+1){
-    whole<-pmnorm(c(xbreaks[ix],Inf),mu,sigma)
     divis<-pmnorm(matrix(c(rep(xbreaks[ix],ncats2+1),ybreaks),ncol=2,byrow=FALSE),mu,sigma)
     division[,ix]<-diff(divis)
   }
@@ -181,6 +184,8 @@ makeDefaultVariables<-function() {
     Perfectionism=makeVariable(name="Perfectionism",type="Interval",mu=0,sd=2),
     Happiness=makeVariable(name="Happiness",type="Interval",mu=50,sd=12),
     ExamGrade=makeVariable(name="ExamGrade",type="Interval",mu=65,sd=10,skew=-0.6),
+    ExamPass=makeVariable(name="ExamPass?",type="Categorical",ncats=2,cases="no,yes",proportions="1,3"),
+    "ExamPass?"=makeVariable(name="ExamPass?",type="Categorical",ncats=2,cases="no,yes",proportions="1,3"),
     RiskTaking=makeVariable(name="RiskTaking",type="Interval",mu=30,sd=6),
     Interesting=makeVariable(name="Interesting",type="Interval",mu=10,sd=2),
     

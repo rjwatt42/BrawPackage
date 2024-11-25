@@ -129,7 +129,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
   resOriginal<-res
   ResultHistory<-list(n=res$nval,df1=res$df1,r=res$rIV,rp=res$rpIV,p=res$pIV)
   
-  if (Replication$On && Replication$Repeats>0) {
+  if (Replication$On) {
     # are we asked to start with a significant first result?
     while (Replication$forceSigOriginal && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
       if (!evidence$shortHand) {
@@ -155,6 +155,8 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
       budgetUse<-res$nval
     }
     
+    resPrevious<-res
+    if (Replication$Repeats>0)
     for (i in 1:Replication$Repeats) {
       if (Replication$Keep=="Cautious" && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
         break
@@ -196,6 +198,11 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
         budgetUse<-budgetUse+res$nval
         if (budgetUse>=Replication$Budget) break;
       }
+      
+      if (Replication$Keep=="FirstSuccess" && isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
+        break
+      }
+      
     }
     # is this result "better" than the previous ones
     if ((Replication$Keep=="LargeN" && res$nval>resPrevious$nval) || 
@@ -213,9 +220,12 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
              use<-which.max(ResultHistory$n)
            },
            "SmallP"={
-             use<-which.min(ResultHistory$p)
+             use<-which.min(ResultHistory$p[2:length(ResultHistory$p)])
            },
            "Last"={
+             use<-length(ResultHistory$p)
+           },
+           "FirstSuccess"={
              use<-length(ResultHistory$p)
            },
            "Cautious"={

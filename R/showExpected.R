@@ -22,13 +22,13 @@ showExpected<-function(expectedResult=braw.res$expected,showType="Basic",
   if (is.null(expectedResult)) expectedResult=doExpected(autoShow=FALSE)
   if (is.numeric(expectedResult)) expectedResult=doExpected(expectedResult,autoShow=FALSE)
 
-    if (!expectedResult$hypothesis$effect$world$worldOn && is.element(showType,c("NHST","Hits","Misses"))) {
+    if (!expectedResult$hypothesis$effect$world$worldOn && is.element(showType[1],c("NHST","Hits","Misses"))) {
       if (expectedResult$nullcount<expectedResult$count) {
         expectedResult<-doExpected(0,expectedResult,doingNull=TRUE)
       }
     }
     
-  if (is.element(showType,c("NHST","Hits","Misses")) &&
+  if (is.element(showType[1],c("NHST","Hits","Misses","p(sig)")) &&
       !expectedResult$hypothesis$effect$world$worldOn && 
       !all(is.na(expectedResult$nullresult$rIV))) {
       if (all(expectedResult$result$rpIV==0)) expectedResult$result$rpIV<-expectedResult$result$rpIV+0.0000000001

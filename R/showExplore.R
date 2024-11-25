@@ -7,11 +7,13 @@ drawNHSTBar<-function(i,npts,pts1,bwidth,col1) {
   pts<-data.frame(x=x1,y=y1)
   dataPolygon(data=pts,fill=col1)
 }
-drawNHSTLabel<-function(lb1,lb1xy,xoff,col1) {
+drawNHSTLabel<-function(lb1,lb1xy,xoff,col1,vjust=NULL) {
   if (sum(col2rgb(col1))>128*3) col<-"black" else col<-"white"
   lb1xy$x<-lb1xy$x+xoff
+  if (is.null(vjust))
+    if (lb1xy$y>0.5) vjust<-1 else vjust<-0
   dataLabel(data=lb1xy,label=lb1,
-            hjust=1,vjust=1,
+            hjust=1,vjust=vjust,
             fill=col1,colour=col)
 }
 
@@ -65,7 +67,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
            "Power"=     {showType<-c("ws","wp")},
            "CILimits"=  {showType<-c("ci1","ci2")},
            "DV"= {showType<-c("dv.mn","dv.sd","dv.sk","dv.kt")},
-           "Residuals"= {showType<-c("rs.mn","rs.sd","rs.sk","rs.kt")},
+           "Residuals"= {showType<-c("rd.mn","rd.sd","rd.sk","rd.kt")},
            {}
     )
   }
@@ -103,6 +105,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   }
   
   if (whichEffect=="All" && !evidence$rInteractionOn) whichEffect<-"Mains"
+  if ((whichEffect=="All" || whichEffect=="Mains") && is.null(hypothesis$IV2)) whichEffect<-"Main 1"
   
   plotYOffset<-matrix(0)
   plotHeight<-1
@@ -158,6 +161,12 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     plotWidth<-0.45
   }
   
+  if (length(showType)==1 && whichEffect=="Mains"){
+    plotXOffset<-matrix(c(0,0.55),nrow=2,byrow=FALSE)
+    plotWidth<-0.45
+    plotYOffset<-matrix(c(0,0),nrow=1,byrow=TRUE)
+    plotHeight<-0.475
+  }
   
   if (is.null(hypothesis$IV2)) whichEffects<-1
   else
@@ -258,7 +267,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     if (is.null(hypothesis$IV2)) {
       exploreTypeShow<-"r[p]"
     } else {
-      exploreTypeShow<-paste0("r[p]",gsub("^r","",explore$exploreType))
+      exploreTypeShow<-paste0("r[p]~",gsub("^r","",explore$exploreType))
     }
   } else exploreTypeShow<-explore$exploreType
   
@@ -271,8 +280,12 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     }
     if (length(whichEffects)==1)
       braw.env$plotArea<-c(plotXOffset[si,1],plotYOffset[1,si],plotWidth,plotHeight)
-    else
-      braw.env$plotArea<-c(plotXOffset[si,1],plotYOffset[1,yi],plotWidth,plotHeight)
+    else {
+      if (length(showType)==1 && length(whichEffects)==2)
+        braw.env$plotArea<-c(plotXOffset[yi,1],plotYOffset[1,yi],plotWidth,plotHeight)
+      else
+        braw.env$plotArea<-c(plotXOffset[si,1],plotYOffset[1,yi],plotWidth,plotHeight)
+    }
     if ((showType[si]=="rs") && (!is.null(hypothesis$IV2))) switch(whichEffect,ylabel<-"Main 1",ylabel<-"Main 2",ylabel<-"Interaction")
 
     g<-startPlot(xlim,ylim,
@@ -285,9 +298,14 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     if (nchar(useLabel)>0)    g<-addG(g,plotTitle(useLabel,size=1.5))
     
     col<-darken(ycols[1],off=-0.2)
-    
+    col<-ycols[1]
       for (effectType in effectTypes) {
-      col<-darken(col,off=0.1)
+        switch(effectType,
+               "direct"={},
+               "unique"={col<-darken(desat(col,0.1),1.3)},
+               "total"={col<-darken(desat(col,0.1),0.7)}
+        )
+      # col<-darken(col,off=0.1)
     theoryVals<-NULL
     theoryUpper<-NULL
     theoryLower<-NULL
@@ -649,16 +667,16 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
               "dv.kt"={
                 showVals<-result$dv$kt
               },
-              "rs.mn"={
+              "rd.mn"={
                 showVals<-result$rs$mn
               },
-              "rs.sd"={
+              "rd.sd"={
                 showVals<-result$rs$sd
               },
-              "rs.sk"={
+              "rd.sk"={
                 showVals<-result$rs$sk
               },
-              "rs.kt"={
+              "rd.kt"={
                 showVals<-result$rs$kt
               }
       )
@@ -714,8 +732,9 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
             for (i in 1:length(vals))
               g<-expected_plot(g,
                                data.frame(x=vals[i],y1=showVals[,i],y2=sigVals[,i]),
-                               showType=showType[si],ylim=ylim,scale=2.25/(length(vals)+1),col=col,
-                               npointsMax=200/length(vals))
+                               showType=showType[si],ylim=ylim,scale=2.25/(length(vals)+1),width=0.5,
+                               col=col,
+                               npointsMax=500/length(vals))
           }
           g<-addG(g,dataPoint(data=pts0f,fill=col,size=4))
           if (!is.null(y75)) {
@@ -757,7 +776,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                 g<-addG(g,dataPolygon(data=ptsShow,fill=colShow,colour=NA))
               } else {
                   npts<-length(vals)
-                  bwidth<-0.4*(ptsShow$x[2]-pts1$x[1])
+                  bwidth<-0.4*(ptsShow$x[2]-ptsShow$x[1])
                   for (i in 1:npts) {
                     g<-addG(g,drawNHSTBar(i,npts,ptsShow,bwidth,colShow))
                   }
@@ -834,7 +853,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     }
 
     lineCol<-"black"
-    if (is.element(showType[si],c("p","e1","e2","e1d","e2d"))) lineCol<-"green"
+    if (is.element(showType[si],c("p","e1p","e2p","e1d","e2d"))) lineCol<-"green"
     for (yl in ylines) {
       g<-addG(g,horzLine(yl,linetype="dotted",colour=lineCol))
     }
@@ -953,12 +972,12 @@ showExplore2D<-function(exploreResult=braw.res$explore,showType=c("rs","p"),show
   # g<-addG(g,yAxisTicks(logScale=yaxis$logScale),yAxisLabel(ylabel))
   
   lineCol<-"black"
-  if (is.element(showType[1],c("p","e1","e2","e1d","e2d"))) lineCol<-"green"
+  if (is.element(showType[1],c("p","e1p","e2p","e1d","e2d"))) lineCol<-"green"
   for (xl in xlines) {
     g<-addG(g,vertLine(xl,linetype="dotted",colour=lineCol,linewidth=0.5))
   }
   lineCol<-"black"
-  if (is.element(showType[2],c("p","e1","e2","e1d","e2d"))) lineCol<-"green"
+  if (is.element(showType[2],c("p","e1p","e2p","e1d","e2d"))) lineCol<-"green"
   for (yl in ylines) {
     g<-addG(g,horzLine(yl,linetype="dotted",colour=lineCol,linewidth=0.5))
   }

@@ -18,8 +18,8 @@ getWorld<-function(name) {
            world<-list(worldOn=TRUE,
                        populationPDF="Single",
                        populationRZ="r",
-                       populationPDFk=0.5,
-                       populationNullp=0)
+                       populationPDFk=0.3,
+                       populationNullp=0.5)
          },
          "Double"={
            world<-list(worldOn=TRUE,
@@ -179,6 +179,9 @@ getDesign<-function(name,design=braw.def$design) {
          },
          "Replication"={
            design$Replication<-makeReplication(TRUE)
+         },
+         "Replication2"={
+           design$Replication<-makeReplication(TRUE,Repeats = 2,Keep="FirstSuccess")
          },
          {}
   )

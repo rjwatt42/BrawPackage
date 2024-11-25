@@ -366,10 +366,10 @@ multipleAnalysis<-function(nsims=1,hypothesis,design,evidence,newResult=c()){
       newResult$dv.sd[j]<-res$dv.sd
       newResult$dv.sk[j]<-res$dv.sk
       newResult$dv.kt[j]<-res$dv.kt
-      newResult$rs.mn[j]<-res$rs.mn
-      newResult$rs.sd[j]<-res$rs.sd
-      newResult$rs.sk[j]<-res$rs.sk
-      newResult$rs.kt[j]<-res$rs.kt
+      newResult$rd.mn[j]<-res$rd.mn
+      newResult$rd.sd[j]<-res$rd.sd
+      newResult$rd.sk[j]<-res$rd.sk
+      newResult$rd.kt[j]<-res$rd.kt
     }
   }
   
@@ -923,19 +923,19 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
     analysis$dv.sd<-sd(dv,na.rm=TRUE)
     analysis$dv.sk<-skewness(dv,na.rm=TRUE)
     analysis$dv.kt<-kurtosis(dv,na.rm=TRUE)
-    analysis$rs.mn<-mean(residuals,na.rm=TRUE)
-    analysis$rs.sd<-sd(residuals,na.rm=TRUE)
-    analysis$rs.sk<-skewness(residuals,na.rm=TRUE)
-    analysis$rs.kt<-kurtosis(residuals,na.rm=TRUE)
+    analysis$rd.mn<-mean(residuals,na.rm=TRUE)
+    analysis$rd.sd<-sd(residuals,na.rm=TRUE)
+    analysis$rd.sk<-skewness(residuals,na.rm=TRUE)
+    analysis$rd.kt<-kurtosis(residuals,na.rm=TRUE)
   } else {
     analysis$dv.mn<-NA
     analysis$dv.sd<-NA
     analysis$dv.sk<-NA
     analysis$dv.kt<-NA
-    analysis$rs.mn<-NA
-    analysis$rs.sd<-NA
-    analysis$rs.sk<-NA
-    analysis$rs.kt<-NA
+    analysis$rd.mn<-NA
+    analysis$rd.sd<-NA
+    analysis$rd.sk<-NA
+    analysis$rd.kt<-NA
   }
   
   analysis$hypothesis<-hypothesis

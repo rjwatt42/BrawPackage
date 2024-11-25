@@ -115,10 +115,10 @@ reportDescription<-function(analysis=braw.res$result){
   } else {
     outputText<-c(outputText,"Formula:",paste(an_model),rep("",nc-2))
   }
-  if (!braw.env$reducedOutput) {
+  # if (!braw.env$reducedOutput) {
     outputText<-c(outputText,"R^2",paste(brawFormat(analysis$rFull^2,digits=braw.env$report_precision),sep=""),rep("",nc-2))
     outputText<-c(outputText,"AIC",paste(brawFormat(analysis$aic,digits=braw.env$report_precision),sep=""),rep("",nc-2))
-  }  
+  # }  
   
   outputText<-c(outputText,rep("",nc))
   switch (no_ivs,
@@ -164,10 +164,8 @@ reportDescription<-function(analysis=braw.res$result){
             an_rset<-brawFormat(analysis$rFullse,digits=braw.env$report_precision)
             outputText<-c(outputText,
                           "!j!iFull model",
-                          paste(an_rt,"\u00B1",an_rset),
-                          # paste0("\u3008",brawFormat(analysis$rFullCI[1],digits=braw.env$report_precision-1),
-                          #        ",",brawFormat(analysis$rFullCI[2],digits=braw.env$report_precision-1),
-                          #        "\u3009"),
+                          an_rt,
+                          # paste(an_rt,"\u00B1",an_rset),
                           rep("",nc-2)
             )
           }
@@ -181,7 +179,7 @@ reportDescription<-function(analysis=braw.res$result){
               ss<-c()
               cases<-levels(analysis$iv)
               if (braw.env$reportGroupMeans) {
-                outputText<-c(outputText,"!H!C")
+                outputText<-c(outputText,"!H!CCases")
                 for (i in 1:IV$ncats){
                   outputText<-c(outputText,IV$cases[i])
                 }

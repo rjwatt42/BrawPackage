@@ -18,7 +18,7 @@ showSystem<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,evide
     g<-showHypothesis(hypothesis=hypothesis,doWorld=TRUE,plotArea=c(0.0,0.05,0.45,0.8),autoShow=FALSE,g=g)
   else
     g<-showHypothesis(hypothesis=hypothesis,doWorld=TRUE,plotArea=c(0.0,0.05,0.33,0.8),autoShow=FALSE,g=g)
-  g<-showDesign(hypothesis=hypothesis,design=design,plotArea=c(0.36,0.3,0.28,0.33),autoShow=FALSE,g=g)
+  g<-showDesign(hypothesis=hypothesis,design=design,plotArea=c(0.3,0.3,0.28,0.33),autoShow=FALSE,g=g)
   g<-showPrediction(hypothesis=hypothesis,design=design,evidence=evidence,plotArea=c(0.65,0.55,0.33,0.4),autoShow=FALSE,g=g)
   g<-showWorldSampling(hypothesis=hypothesis,design=design,sigOnly=FALSE,plotArea=c(0.7,0.05,0.28,0.4),autoShow=FALSE,g=g)
   
@@ -63,11 +63,13 @@ showHypothesis<-function(hypothesis=braw.def$hypothesis,doWorld=TRUE,plotArea=c(
            g<-showVariable(IV,plotArea=c(xoff,yoff+0.65*ygain,xgain,0.35*ygain),g=g)
            g<-showVariable(DV,plotArea=c(xoff,yoff,xgain,0.35*ygain),g=g)
            g<-showEffect(effect$rIV,showValue=!doWorld,plotArea=c(xoff,yoff+0.35*ygain,xgain,0.3*ygain),1,g)
-           if (doWorld) g<-showWorld(hypothesis,plotArea=c(xoff+0.15,0.35*ygain,xgain*0.9,0.3*ygain),g=g)
+           if (doWorld) g<-showWorld(hypothesis,plotArea=c(xoff+0.13,0.4*ygain,xgain*0.65,0.27*ygain),g=g)
          },
          {
-           xgain<-plotArea[3]/2
+           xgain<-plotArea[3]/2.5
            xoff<-plotArea[1]
+           ygain<-ygain*0.8
+           yoff<-yoff+0.1
            g<-showVariable(IV,plotArea=c(xoff,yoff+0.6*ygain,xgain,0.4*ygain),g=g)
            g<-showVariable(IV2,plotArea=c(xoff+xgain,yoff+0.6*ygain,xgain,0.4*ygain),g=g)
            g<-showVariable(DV,plotArea=c(xoff+xgain/2,yoff,xgain,0.4*ygain),g=g)

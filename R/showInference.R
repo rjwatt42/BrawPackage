@@ -82,15 +82,15 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
            "Power"=     {showType<-c("ws","wp")},
            "CILimits"=  {showType<-c("ci1","ci2")},
            "NHST"={
-             showType<-c("e2","e1")
-             r<-getNulls(analysis)
-             analysis1<-r$analysis
-             analysis2<-r$nullanalysis
-             other1<-analysis2
-             other2<-analysis1
+             showType<-c("rse","ps1")
+             # r<-getNulls(analysis)
+             # analysis1<-r$analysis
+             # analysis2<-r$nullanalysis
+             # other1<-analysis2
+             # other2<-analysis1
              },
            "Hits"=       {
-             showType<-c("e2a","e1a")
+             showType<-c("e2r","e1r")
              r<-getNulls(analysis,useSig=TRUE)
              analysis1<-r$analysis
              analysis2<-r$nullanalysis
@@ -98,7 +98,7 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
              other2<-analysis1
            },
            "Misses"=       {
-             showType<-c("e2b","e1b")
+             showType<-c("e2r","e1r")
              r<-getNulls(analysis,useNSig=TRUE)
              analysis1<-r$analysis
              analysis2<-r$nullanalysis
@@ -109,7 +109,7 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
              showType=c("dv.mn","dv.sd","dv.sk","dv.kt")
            },
            "Residuals"= {
-             showType=c("rs.mn","rs.sd","rs.sk","rs.kt")
+             showType=c("rd.mn","rd.sd","rd.sk","rd.kt")
            },
            { showType<-strsplit(showType,";")[[1]]
              if (length(showType)==1) showType<-c(showType,NA)

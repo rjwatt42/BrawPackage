@@ -17,7 +17,6 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
   
   reportMeans<-(reportStats=="Means")
   reportQuants<-FALSE
-  
   showType<-strsplit(showType,";")[[1]]
   if (length(showType)==1) {
     switch(showType,
@@ -25,7 +24,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
            "Power"=     {showType<-c("ws","wp")},
            "CILimits"=  {showType<-c("ci1","ci2")},
            "DV"= {showType<-c("dv.mn","dv.sd","dv.sk","dv.kt")},
-           "Residuals"= {showType<-c("rs.mn","rs.sd","rs.sk","rs.kt")},
+           "Residuals"= {showType<-c("rd.mn","rd.sd","rd.sk","rd.kt")},
            {}
     )
   }
@@ -401,22 +400,22 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
             "dv.kt"={
               showVals<-exploreResult$result$dv$kt
             },
-            "rs.mn"={
+            "rd.mn"={
               showVals<-exploreResult$result$rs$mn
             },
-            "rs.sd"={
+            "rd.sd"={
               showVals<-exploreResult$result$rs$sd
             },
-            "rs.sk"={
+            "rd.sk"={
               showVals<-exploreResult$result$rs$sk
             },
-            "rs.kt"={
+            "rd.kt"={
               showVals<-exploreResult$result$rs$kt
             }
     )
     if (is.element(showType,c("rs","p","ws","n","log(lrs)","log(lrd)","Lambda","pNull","S",
                               "iv.mn","iv.sd","iv.sk","iv.kt","dv.mn","dv.sd","dv.sk","dv.kt",
-                              "rs.mn","rs.sd","rs.sk","rs.kt"))) {
+                              "rd.mn","rd.sd","rd.sk","rd.kt"))) {
       quants=(1-quantileShow)/2
       for (i in 1:length(exploreResult$vals)) {
         y75[i]<-quantile(showVals[,i],0.5+quants,na.rm=TRUE)
@@ -537,6 +536,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
     }
   }
   }
+  outputText<-c(outputText,rep("",nc))
   nr=length(outputText)/nc
   reportPlot(outputText,nc,nr)        
   

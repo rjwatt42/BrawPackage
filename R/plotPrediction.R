@@ -32,16 +32,16 @@ getAxisPrediction<-function(hypothesis,g=NULL) {
             ylabels=yticks
           },
           "Categorical"={
-            ylim = c(-0.1,1.1)
+            ylim = c(-0.5,1.5)
             yticks<-seq(0,1,0.2)
-            ylabels=yticks
+            ylabels=c(DV$cases[1],rep(" ",4),DV$cases[2])
           }
   )
   
   g<-startPlot(xlim,ylim,
                xticks=makeTicks(xticks,xlabels),xlabel=makeLabel(IV$name),
                yticks=makeTicks(yticks,ylabels),ylabel=makeLabel(DV$name),
-               top=TRUE,g=g)
+               top=FALSE,g=g)
   # g<-addG(g,xAxisTicks(xticks,xlabels),xAxisLabel(IV$name))
   # g<-addG(g,yAxisTicks(yticks,ylabels),yAxisLabel(DV$name))
   
@@ -49,7 +49,7 @@ getAxisPrediction<-function(hypothesis,g=NULL) {
 }
 
 plotParParPrediction<-function(g,IV,DV,rho,n,offset=1,range=NULL){
-  if (is.null(range)) range<-c(-1,1)*braw.env$fullRange
+  fullrange<-c(-1,1)*braw.env$fullRange
   if (offset==1) {
     col<- braw.env$plotColours$descriptionC
     xoff=0
@@ -60,7 +60,7 @@ plotParParPrediction<-function(g,IV,DV,rho,n,offset=1,range=NULL){
     xoff=-0.25+off*0.5
   }
   
-  x<-seq(range[1],range[2],length.out=braw.env$varNPoints)
+  x<-seq(fullrange[1],fullrange[2],length.out=braw.env$varNPoints)
   y<-x*rho
   se<-sqrt((1+x^2)/n)*qnorm(0.975)
   y_lower<-y-se
@@ -70,6 +70,14 @@ plotParParPrediction<-function(g,IV,DV,rho,n,offset=1,range=NULL){
   
   x<-x*IV$sd+IV$mu
   y<-y*DV$sd+DV$mu
+  
+  if (!is.null(range)) {
+    use<-(x>=range[1]) & (x<=range[2])
+    x<-x[use]
+    y<-y[use]
+    yv_lower<-yv_lower[use]
+    yv_upper<-yv_upper[use]
+  }
   xv<-c(x,rev(x))
   
   pts2<-data.frame(x=x,y=y)
@@ -232,7 +240,7 @@ plotCatOrdPrediction<-function(g,IV,DV,rho,n,offset= 1,within=FALSE){
 
 plotParCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
   plotBars<-FALSE
-  plotBaseline<-TRUE
+  plotBaseline<-FALSE
   
   if (offset==1) {
     col<- braw.env$plotColours$descriptionC
@@ -264,8 +272,8 @@ plotParCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
     y_lower<-pnorm(qnorm(y)-se)
     y_upper<-pnorm(qnorm(y)+se)
     
-    pts2<-data.frame(x=x1,y=y+1)
-    pts1<-data.frame(x=xv,y=c(y_lower,rev(y_upper))+1)
+    pts2<-data.frame(x=x1,y=y)
+    pts1<-data.frame(x=xv,y=c(y_lower,rev(y_upper)))
     g<-addG(g,
       dataPolygon(data=pts1,fill = col, colour=NA, alpha=0.5),
       dataLine(data=pts2,colour=col,linewidth=2)
@@ -308,7 +316,7 @@ plotCatCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
       }
     }
   } else {
-    pp<-r2CatProportions(rho,ncats1,ncats2)
+    pp<-r2CatProportions(rho,ncats1,ncats2,IV$proportions,DV$proportions)
   }
   
   full_x<-c()
@@ -333,7 +341,8 @@ plotCatCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
 }
 
 
-plotPrediction<-function(IV,IV2,DV,effect,design,offset=1,range=NULL,g=NULL){
+plotPrediction<-function(IV=braw.def$hypothesis$IV,IV2=braw.def$hypothesis$IV2,DV=braw.def$hypothesis$DV,
+                         effect=braw.def$effect,design=braw.def$design,offset=1,range=NULL,g=NULL){
   if (is.null(g)) {
     g<-getAxisPrediction(hypothesis=list(IV=IV,DV=DV),g=g) 
   }

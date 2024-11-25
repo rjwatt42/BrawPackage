@@ -556,6 +556,7 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
                  if (length(pp)<ng) {pp<-c(pp,rep(pp[length(pp)],ng-length(pp)))}
                  proportions<-c(0,pp)
                  breaks<-qnorm(cumsum(proportions)/sum(proportions))
+                 print(breaks)
                  vals=ivr*0
                  for (i in 1:IV$ncats) {vals=vals+(ivr>breaks[i])}
                  iv<-factor(vals,levels=1:IV$ncats,labels=IV$cases)
@@ -707,7 +708,7 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
             for (j in 1:DV$nlevs) {
               use2=(as.numeric(dv)==j)
               mn1<-mean(use2)
-              jitter<-runif(length(xplot[use1&use2]),-1,1)*mean(use1&use2)
+              jitter<-runif(length(xplot[use1&use2]),-1,1)*mean(use1&use2)*2
               xplot[use1&use2]<-i+jitter
             }
           }
@@ -715,7 +716,7 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
             for (j in 1:DV$ncats) {
               use2=(as.numeric(dv)==j)
               mn1<-mean(use2)
-              jitter<-runif(length(xplot[use1&use2]),-1,1)*mean(use1&use2)
+              jitter<-runif(length(xplot[use1&use2]),-1,1)*sqrt(mean(use1&use2))/2
               xplot[use1&use2]<-i+jitter
             }
           }
@@ -754,12 +755,12 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
     switch(DV$type,
            "Interval"={yplot<-dv},
            "Ordinal"={yplot<-dv},
-           "Categorical"={yplot<-length(levels(dv))+1-match(dv,levels(dv))}
+           "Categorical"={yplot<-match(dv,levels(dv))-1}
     )
     
-    if (DV$type=="Ordinal" && IV$type=="Ordinal"){
-      xplot<-xplot+rnorm(length(xplot))*0.05
-      yplot<-yplot+rnorm(length(yplot))*0.05
+    if (DV$type=="Ordinal"){
+      jitter<-runif(length(xplot),-1,1)*0.125
+      yplot<-yplot+jitter
     }
     
     if (DV$type=="Categorical"){
@@ -775,16 +776,16 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
           for (j in 1:IV$nlevs) {
             use2=(as.numeric(iv)==j)
             mn1<-mean(use2)
-            jitter<-runif(length(yplot[use1&use2]),-1,1)*mean(use1&use2)
-            yplot[use1&use2]<-yplot[use1]+jitter
+            jitter<-runif(length(yplot[use1&use2]),-1,1)*mean(use1&use2)*2
+            yplot[use1&use2]<-yplot[use1&use2]+jitter
           }
         }
         if (IV$type=="Categorical") {
           for (j in 1:IV$ncats) {
             use2=(as.numeric(iv)==j)
             mn1<-mean(use2)
-            jitter<-runif(length(yplot[use1&use2]),-1,1)*mean(use1&use2)
-            yplot[use1&use2]<-yplot[use1]+jitter
+            jitter<-runif(length(yplot[use1&use2]),-1,1)*sqrt(mean(use1&use2))/2
+            yplot[use1&use2]<-yplot[use1&use2]+jitter
           }
         }
       }

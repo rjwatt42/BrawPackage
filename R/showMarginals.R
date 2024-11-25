@@ -1,4 +1,4 @@
-showMarginals<-function(result=braw.res$result) {
+showMarginals<-function(result=braw.res$result,style="piled") {
   if (is.null(result)) result<-doAnalysis()
 
   if (!is.null(result$hypothesis$IV2)) {
@@ -6,8 +6,15 @@ showMarginals<-function(result=braw.res$result) {
     g<-inspectMainGraph(result$hypothesis$IV2$name,result,plotArea=c(0.5,0.5,0.4,0.5),g=g)
     g<-inspectMainGraph(result$hypothesis$DV$name,result,plotArea=c(0.3,0,0.4,0.5),g=g)
   } else {
-    g<-inspectMainGraph(result$hypothesis$IV$name,result,plotArea=c(0,0.25,0.5,0.6))
-    g<-inspectMainGraph(result$hypothesis$DV$name,result,plotArea=c(0.5,0.25,0.5,0.6),g=g)
+    if (style=="all") {
+      g<-inspectMainGraph(result$hypothesis$IV$name,result,inspect=makeInspect("piled"),plotArea=c(0,0,0.5,0.45))
+      g<-inspectMainGraph(result$hypothesis$DV$name,result,inspect=makeInspect("piled"),plotArea=c(0.5,0,0.5,0.45),g=g)
+      g<-inspectMainGraph(result$hypothesis$IV$name,result,inspect=makeInspect("sorted"),plotArea=c(0,0.5,0.5,0.45),g=g)
+      g<-inspectMainGraph(result$hypothesis$DV$name,result,inspect=makeInspect("sorted"),plotArea=c(0.5,0.5,0.5,0.45),g=g)
+    } else {
+      g<-inspectMainGraph(result$hypothesis$IV$name,result,inspect=makeInspect(style),plotArea=c(0,0.25,0.5,0.6))
+      g<-inspectMainGraph(result$hypothesis$DV$name,result,inspect=makeInspect(style),plotArea=c(0.5,0.25,0.5,0.6),g=g)
+    }
   }
   
   if (braw.env$graphHTML && braw.env$autoShow) {
@@ -20,7 +27,7 @@ showMarginals<-function(result=braw.res$result) {
 
 makeInspect<-function(inspectOrder="piled",
                       showFitDistribution=TRUE,
-                      showMean=FALSE,
+                      showMean=TRUE,
                       showSd=FALSE) {
   list(inspectOrder=inspectOrder,
        showFitDistribution=showFitDistribution,
@@ -69,7 +76,8 @@ inspectMainGraph<-function(varName,result=braw.res$result,inspect=makeInspect(),
             ticks<-data.frame(breaks=bt,labels=lt)
           }
   )
-  g<-startPlot(xlim=xlim,ylim=c(0,diff(xlim)*aspect),
+  ylim<-c(0,diff(xlim)*aspect)
+  g<-startPlot(xlim=xlim,ylim=ylim,
                xticks=makeTicks(ticks$breaks,ticks$labels),xlabel=makeLabel(var$name),
                # yticks=makeTicks(0,0),ylabel=makeLabel("a"),
                box="x",g=g)
@@ -79,47 +87,25 @@ inspectMainGraph<-function(varName,result=braw.res$result,inspect=makeInspect(),
     ptSize<-diff(xlim)/6/sqrt(n)
     
     switch(inspect$inspectOrder,
-           "unsorted"={y<-1:n},
-           "sorted"={y<-rank(data,ties.method="first")},
+           "unsorted"={
+             y<-1:n
+           },
+           "sorted"={
+             y<-rank(data,ties.method="first")
+             },
            "piled"={
              if (var$type!="Interval") {data<-data+runif(n,-1,1)*0.2}
-             y<-pile(data,ptSize)
+             y<-pile(data,ptSize)*aspect
            }
     )
-    y<-y*aspect
+    y<-y/max(y)*diff(ylim)*0.8
     y<-y+ptSize
     # xc<-ptSize*cos(seq(0,2*pi,length.out=20))
     # yc<-ptSize*sin(seq(0,2*pi,length.out=20))
     # y<-y/max(y)*diff(xlim)*aspect*0.9
     
-    
-  # show mean
-    if (inspect$showMean) {
-      # vertical line
-      switch (var$type,
-              "Categorical"= g<-addG(g,geom_vline(xintercept=Mode(data), colour = "red", lwd=2)),
-              "Ordinal"= g<-addG(g,geom_vline(xintercept=median(data), colour = "red", lwd=2)),
-              "Interval"= g<-addG(g,geom_vline(xintercept=mean(data), colour = "red", lwd=2))
-      )
-    }
-  # show sd
-    if (inspect$showSd) {
-      # vertical lines
-      switch (var$type,
-              "Categorical"={},
-              "Ordinal"={
-                g<-addG(g,geom_vline(xintercept=quantile(data,0.25), colour = "red", lwd=1))
-                g<-addG(g,geom_vline(xintercept=quantile(data,0.75), colour = "red", lwd=1))
-              },
-              "Interval"={
-                g<-addG(g,geom_vline(xintercept=mean(data)+std(data,1), colour = "red", lwd=1))
-                g<-addG(g,geom_vline(xintercept=mean(data)-std(data,1), colour = "red", lwd=1))
-              }
-      )
-    }
-    
     # show fitted distribution
-      if (inspect$showFitDistribution) {
+      if (inspect$showFitDistribution && inspect$inspectOrder=="piled") {
         switch(var$type,
                "Interval"={
                  dT<-makedrawInterval(var)
@@ -165,6 +151,33 @@ inspectMainGraph<-function(varName,result=braw.res$result,inspect=makeInspect(),
     # }
     
     
+    # show mean
+    if (inspect$showMean) {
+      # vertical line
+      switch (var$type,
+              "Categorical"= xintercept<-Mode(inspect$data),
+              "Ordinal"=     xintercept<-median(inspect$data),
+              "Interval"=    xintercept<-mean(inspect$data)
+      )
+      g<-addG(g,vertLine(xintercept,colour="red",linewidth=1))
+    }
+    
+    # show sd
+    if (inspect$showSd) {
+      # vertical lines
+      switch (var$type,
+              "Categorical"={},
+              "Ordinal"={
+                g<-addG(g,geom_vline(xintercept=quantile(data,0.25), colour = "red", lwd=1))
+                g<-addG(g,geom_vline(xintercept=quantile(data,0.75), colour = "red", lwd=1))
+              },
+              "Interval"={
+                g<-addG(g,geom_vline(xintercept=mean(data)+std(data,1), colour = "red", lwd=1))
+                g<-addG(g,geom_vline(xintercept=mean(data)-std(data,1), colour = "red", lwd=1))
+              }
+      )
+    }
+    
   # wind up
   }
   return(g)
@@ -176,7 +189,7 @@ pile<-function(data,ptSize) {
   x<-c()
   y<-c()
   for (i in 1:length(data)){
-    for (iy in seq(0,100,by=0.01)) {
+    for (iy in seq(0,500,by=0.01)) {
       distances=sqrt((x-data[i])^2+(y-iy)^2)
       found<-any(distances<space)
       if (!found) {

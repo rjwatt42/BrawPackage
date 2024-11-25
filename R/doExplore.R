@@ -80,7 +80,7 @@ resetExploreResult<-function(nsims,n_vals,oldResult=NULL) {
   result<-list(rval=b,pval=b,rpval=b,raval=b,roval=b,poval=b,nval=b,df1=b,
                iv=list(mn=b,sd=b,sk=b,kt=b),
                dv=list(mn=b,sd=b,sk=b,kt=b),
-               rs=list(mn=b,sd=b,sk=b,kt=b),
+               rd=list(mn=b,sd=b,sk=b,kt=b),
                rIV2=b,rIVIV2DV=b,pIV2=b,pIVIV2DV=b,
                r=list(direct=bm,unique=bm,total=bm),
                p=list(direct=bm,unique=bm,total=bm)
@@ -107,10 +107,10 @@ storeExploreResult<-function(result,res,ri,vi) {
   result$dv$sd[ri,vi]<-res$dv.sd
   result$dv$sk[ri,vi]<-res$dv.sk
   result$dv$kt[ri,vi]<-res$dv.kt
-  result$rs$mn[ri,vi]<-res$rs.mn
-  result$rs$sd[ri,vi]<-res$rs.sd
-  result$rs$sk[ri,vi]<-res$rs.sk
-  result$rs$kt[ri,vi]<-res$rs.kt
+  result$rd$mn[ri,vi]<-res$rd.mn
+  result$rd$sd[ri,vi]<-res$rd.sd
+  result$rd$sk[ri,vi]<-res$rd.sk
+  result$rd$kt[ri,vi]<-res$rd.kt
   
   if (!is.null(res$rIV2)){
     result$rIV2[ri,vi]<-res$rIV2
@@ -151,10 +151,10 @@ mergeExploreResult<-function(res1,res2) {
   result$dv$sd<-rbind(res1$dv$sd,res2$dv$sd)
   result$dv$sk<-rbind(res1$dv$sk,res2$dv$sk)
   result$dv$kt<-rbind(res1$dv$kt,res2$dv$kt)
-  result$rs$mn<-rbind(res1$rs$mn,res2$rs$mn)
-  result$rs$sd<-rbind(res1$rs$sd,res2$rs$sd)
-  result$rs$sk<-rbind(res1$rs$sk,res2$rs$sk)
-  result$rs$kt<-rbind(res1$rs$kt,res2$rs$kt)
+  result$rd$mn<-rbind(res1$rd$mn,res2$rd$mn)
+  result$rd$sd<-rbind(res1$rd$sd,res2$rd$sd)
+  result$rd$sk<-rbind(res1$rd$sk,res2$rd$sk)
+  result$rd$kt<-rbind(res1$rd$kt,res2$rd$kt)
   
   result$r$direct<-abind(res1$r$direct,res2$r$direct,along=1)
     result$r$unique<-abind(res1$r$unique,res2$r$unique,along=1)

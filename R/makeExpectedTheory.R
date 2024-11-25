@@ -19,7 +19,7 @@ doExpectedTheory<-function(showType,logScale,hypothesis=braw.def$hypothesis,desi
   xdsig<-NULL
   xd<-NULL
   
-  if (is.element(showType,c("p","e1","e2","po"))) {
+  if (is.element(showType,c("p","e1p","e2p","po"))) {
     npt<-201
     if (logScale) {
       yv<-seq(0,ylim[1],length.out=npt)
@@ -29,15 +29,17 @@ doExpectedTheory<-function(showType,logScale,hypothesis=braw.def$hypothesis,desi
       yvUse<-yv
     }
     oldEffect<-effectTheory
-    if (showType=="e1") effectTheory$world$populationNullp<-1
-    if (showType=="e2") effectTheory$world$populationNullp<-0
+    if (showType=="e1p") effectTheory$world$populationNullp<-1
+    if (showType=="e2p") effectTheory$world$populationNullp<-0
     xd<-fullRSamplingDist(yvUse,effectTheory$world,design,"p",logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
     xdsig<-fullRSamplingDist(yvUse,effectTheory$world,design,"p",logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
     effectTheory<-oldEffect
   }
   
-  if (is.element(showType,c("rs","ro","ci1","ci2"))) {
+  if (is.element(showType,c("rs","ro","ci1","ci2","e1r","e2r"))) {
     npt<-101
+    if (showType=="e1r") effectTheory$world$populationNullp<-1
+    if (showType=="e2r") effectTheory$world$populationNullp<-0
     if (braw.env$RZ=="z") {
       zvals<-seq(-1,1,length.out=npt*2)*braw.env$z_range*2
       rvals<-tanh(zvals)

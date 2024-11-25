@@ -96,28 +96,28 @@ makeSampling<-function(type="Random") {
           "Cluster"={
             method=list(type="Cluster",
                           Main_rad=1,
-                          Cluster_n=6,
+                          Cluster_n=8,
                           Cluster_rad=0.3,
-                          Contact_n=1,
+                          Contact_n=0,
                           Contact_rad=0
             )
           },
           "Snowball"={
             method=list(type="Snowball",
                            Main_rad=1,
-                           Cluster_n=2,
-                           Cluster_rad=0.3,
-                           Contact_n=8,
-                           Contact_rad=0.3
+                           Cluster_n=1,
+                           Cluster_rad=0.0,
+                           Contact_n=7,
+                           Contact_rad=0.2
             )
           },
           "Convenience"={
             method=list(type="Convenience",
                               Main_rad=1,
-                              Cluster_n=4,
-                              Cluster_rad=0.2,
-                              Contact_n=2,
-                              Contact_rad=0.3
+                              Cluster_n=1,
+                              Cluster_rad=0.3,
+                              Contact_n=3,
+                              Contact_rad=0.2
             )
           }
   )

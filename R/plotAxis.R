@@ -8,7 +8,7 @@ plotAxis<-function(showType,hypothesis,design=NULL) {
   base_hue_w<-0.65
   hue_diff<-0.03
   
-  logScale<-(is.element(showType,c("p","e1","e2")) && braw.env$pPlotScale=="log10") ||
+  logScale<-(is.element(showType,c("p","e1p","e2p")) && braw.env$pPlotScale=="log10") ||
     (is.element(showType,c("ws","wp")) && braw.env$wPlotScale=="log10") ||
     (is.element(showType,c("n","no")) && braw.env$nPlotScale=="log10") ||
     (is.element(showType,c("nw")))
@@ -216,7 +216,23 @@ plotAxis<-function(showType,hypothesis,design=NULL) {
             use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
             ylines<-c(0,effect$rIV)
           },
-          "e1"={
+          "e1r"={
+            ylim<-rlims
+            yticks<-rticks
+            ymins<-rmins
+            ylabel<-rslab
+            use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
+            ylines<-c(0,effect$rIV)
+          },
+          "e2r"={
+            ylim<-rlims
+            yticks<-rticks
+            ymins<-rmins
+            ylabel<-rslab
+            use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
+            ylines<-c(0,effect$rIV)
+          },
+          "e1p"={
             ylim<-plim
             yticks<-pticks
             ymins<-pmins
@@ -224,7 +240,7 @@ plotAxis<-function(showType,hypothesis,design=NULL) {
             ylines<-plines
             use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
           },
-          "e2"={
+          "e2p"={
             ylim<-plim
             yticks<-pticks
             ymins<-pmins
@@ -377,7 +393,7 @@ plotAxis<-function(showType,hypothesis,design=NULL) {
             ymins<-seq(-l3,l3,0.1)
             ylabel<-"kurtosis"
           },
-          "rs.mn"={
+          "rd.mn"={
             var<-hypothesis$DV
             if (fixedAxis) gain<-1/6.5 else gain<- 1/sqrt(design$sN)
             l1<-5*var$sd*gain
@@ -388,7 +404,7 @@ plotAxis<-function(showType,hypothesis,design=NULL) {
             ymins<-seq(-l3,l3,0.1)+0
             ylabel<-"mean"
           },
-          "rs.sd"={
+          "rd.sd"={
             var<-hypothesis$DV
             if (fixedAxis) gain<-1/6.5 else gain<- 1/sqrt(design$sN)
             l1<-5*var$sd*gain
@@ -399,7 +415,7 @@ plotAxis<-function(showType,hypothesis,design=NULL) {
             ymins<-seq(-l2,l3,0.1)+var$sd
             ylabel<-"sd"
           },
-          "rs.sk"={
+          "rd.sk"={
             if (fixedAxis) gain<-1/6.5 else gain<- 1/sqrt(design$sN)
             l1<-2*5*gain
             l2<-floor(l1/0.5)*0.5
@@ -409,7 +425,7 @@ plotAxis<-function(showType,hypothesis,design=NULL) {
             ymins<-seq(-l3,l3,0.1)
             ylabel<-"skew"
           },
-          "rs.kt"={
+          "rd.kt"={
             if (fixedAxis) gain<-1/6.5 else gain<- 1/sqrt(design$sN)
             l1<-3*5*gain
             l2<-floor(l1/0.5)*0.5
