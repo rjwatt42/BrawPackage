@@ -302,8 +302,8 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       for (effectType in effectTypes) {
         switch(effectType,
                "direct"={},
-               "unique"={col<-darken(desat(col,0.1),1.3)},
-               "total"={col<-darken(desat(col,0.1),0.7)}
+               "unique"={col<-darken(desat(col,0.7),1.3)},
+               "total"={col<-darken(desat(col,0.7),0.7)}
         )
       # col<-darken(col,off=0.1)
     theoryVals<-NULL
@@ -858,6 +858,11 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       g<-addG(g,horzLine(yl,linetype="dotted",colour=lineCol))
     }
   }
+    if (!is.null(hypothesis$IV2) && is.element(showType[si],c("rs","p"))) 
+      g<-addG(g,dataLegend(data.frame(names=c("direct","unique","total"),
+                                      colours=c(ycols[1],darken(desat(ycols[1],0.7),1.3),darken(desat(ycols[1],0.7),0.7))),
+                           title="",fontsize=1)
+      )
   }
   }
   # if (exploreResult$count>0)

@@ -673,9 +673,10 @@ dataErrorBar<-function(data,colour="black",linewidth=0.25) {
 }
 dataLegend<-function(data,title="title",fontsize=0.65) {
   dy=0.05*fontsize
-  dx=0.02*fontsize
+  dx=0.025*fontsize
   names<-data$names
-  nrows<-1+length(names)+1
+  if (nchar(title)>0) tn<-1 else tn<-0
+  nrows<-tn+length(names)+1
   ncols<-max(c(nchar(title),nchar(names)))+2
   g<-list(axisPolygon(data=data.frame(x=rangeX(c(1-ncols*dx,1,1,1-ncols*dx,1-ncols*dx)),
                                       y=rangeY(c(1-nrows*dy,1-nrows*dy,1,1,1-nrows*dy))),
@@ -685,15 +686,16 @@ dataLegend<-function(data,title="title",fontsize=0.65) {
                                       y=rangeY(c(1-nrows*dy,1-nrows*dy,1,1,1-nrows*dy))),
                       colour="black",linewidth=0.5))
   )
+  if (tn>0)
   g<-c(g,list(axisText(data=data.frame(x=rangeX(1-ncols*dx+2*dx),y=rangeY(1-dy)),label=title,size=fontsize,fontface="bold"))
        )
 
   for (i in 1:length(names)) {
     g<-c(g,
-        list(axisPoint(data=data.frame(x=rangeX(1-ncols*dx+dx),y=rangeY(1-dy*(i+1))),fill=data$colours[i]))
+        list(axisPoint(data=data.frame(x=rangeX(1-ncols*dx+dx),y=rangeY(1-dy*(i+tn))),fill=data$colours[i]))
     )
     g<-c(g,
-         list(axisText(data=data.frame(x=rangeX(1-ncols*dx+2*dx),y=rangeY(1-dy*(i+1))),label=data$names[i],vjust=0.5,size=fontsize))
+         list(axisText(data=data.frame(x=rangeX(1-ncols*dx+2*dx),y=rangeY(1-dy*(i+tn))),label=data$names[i],vjust=0.5,size=fontsize))
     )
   }
   return(g)

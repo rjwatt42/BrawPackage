@@ -278,12 +278,21 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
           "DVprop"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "DVskew"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "DVkurtosis"={vals<-seq(minVal,maxVal,length.out=npoints)},
-          "rIV"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "rIV"={
+            if (is.null(IV2)) vals<-seq(minVal,maxVal,length.out=npoints)
+            else {
+              b<-2*effect$rIV2*effect$rIVIV2
+              c<-effect$rIV2^2+effect$rIVIV2DV^2-max_r
+              r1<- max(minVal,(-b-sqrt(b^2-4*c))/2)
+              r2<-min(maxVal,(-b+sqrt(b^2-4*c))/2)
+              vals<-seq(r1,r2,length.out=npoints)
+            }
+            },
           "rIV2"={
             b<-2*effect$rIV*effect$rIVIV2
             c<-effect$rIV^2+effect$rIVIV2DV^2-max_r
-            r1<- (-b-sqrt(b^2-4*c))/2
-            r2<-(-b+sqrt(b^2-4*c))/2
+            r1<- max(minVal,(-b-sqrt(b^2-4*c))/2)
+            r2<-min(maxVal,(-b+sqrt(b^2-4*c))/2)
             vals<-seq(r1,r2,length.out=npoints)
           },
           "rIVIV2"={
