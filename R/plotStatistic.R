@@ -60,8 +60,8 @@ collectData<-function(analysis,whichEffect) {
             }
     )
   }
-  ps[ps<min_p]<-min_p
-  po[po<min_p]<-min_p
+  # ps[ps<min_p]<-min_p
+  # po[po<min_p]<-min_p
   # if (braw.env$truncate_p) {
   #   ps[ps<braw.env$min_p]<-braw.env$min_p
   #   po[po<braw.env$min_p]<-braw.env$min_p
@@ -626,7 +626,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   
   xoff=0
   if (!is.null(hypothesis$IV2) && effectType=="all") 
-    xoff=c(0,2,4)
+    xoff=c(0,1,2)*1.2
 
   switch(orientation,
          "horz"={
@@ -658,7 +658,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   
   box<-"Y" 
   if (!is.null(hypothesis$IV2) && effectType=="all") 
-    xticks<-makeTicks(breaks=c(0,2,4),c("direct","unique","total"))
+    xticks<-makeTicks(breaks=xoff,c("direct","unique","total"))
   else
     xticks<-NULL
   
@@ -712,6 +712,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
     )
     if (logScale) {
       showVals<-log10(showVals)
+      showVals[showVals<(-10)]<--10
     }  
   }    
   sigOnly<-evidence$sigOnly
@@ -961,6 +962,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
 
       xd[is.na(xd)]<-0
       theoryGain<-1/max(xd)*distMax
+      if (is.infinite(theoryGain)) theoryGain<-0
       xd<-xd*theoryGain
       histGain<-abs(sum(xd*c(0,diff(yv))))
       histGainrange<-sort(c(yv[1],yv[length(yv)]))
@@ -1000,10 +1002,10 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       else
         resSig<-rep(FALSE,length(rvals))
       if (useWorldCols && ((hypothesis$effect$world$worldOn && hypothesis$effect$world$populationNullp>0)
-          || (!all(data$rp[,i]!=0) && !all(data$rp[,i]==0))))
-        resNull<-data$rp[,i]!=0
+          || (!all(data$rp!=0) && !all(data$rp==0))))
+        resNull<-data$rp!=0
       else
-        resNull<-rep(NA,length(data$rp[,i]))
+        resNull<-rep(NA,length(data$rp))
       
       if (sigOnly) {
         shvals<-shvals[resSig]
@@ -1019,7 +1021,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       }
       if (is.element(showType,c("e1d","e2d"))) {
         d<-res2llr(analysis,braw.env$STMethod)
-        err<-(d<0 & data$rp[,i]!=0) | (d>0 & data$rp[,i]==0)
+        err<-(d<0 & data$rp!=0) | (d>0 & data$rp==0)
         resWSig<-resSig & err
         pts<-data.frame(x=rvals*0+xoff[i],y1=shvals,y2=resSig,y3=resWSig,y0=resNull,n=nvals)
       } else {

@@ -2,8 +2,11 @@
 makeFormula<-function(IV,IV2,DV,design,evidence,analysis,an_vars){
 
   assign_string = " <<"  
-  times_string = "x"
-  times_string = "\u22c5"
+  times_string1 = "x"
+  times_string2 = ""
+  times_string1 = "\u22c5"
+  times_string1 = "("
+  times_string2 = ")"
   minus_string = " \u2212 "
   plus_string = " + "
 
@@ -30,7 +33,7 @@ makeFormula<-function(IV,IV2,DV,design,evidence,analysis,an_vars){
       if (coeffs[i]>=0){join<-plus_string}else{join<-minus_string}
       an_vars[i]<-gsub(":",braw.env$interaction_string,an_vars[i])
       an_vars[i]<-gsub("=",braw.env$when_string,an_vars[i])
-      an_model<-paste(an_model, join, brawFormat(abs(coeffs[i]),digits=braw.env$report_precision)   ,times_string,an_vars[i],sep="")
+      an_model<-paste(an_model, join, brawFormat(abs(coeffs[i]),digits=braw.env$report_precision)   ,times_string1,an_vars[i],times_string2,sep="")
     }
   }
   

@@ -60,7 +60,9 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
           labelpts<-data.frame(x=-0.1,y=0.5)
           hjust<-1
           ends="last"
-          fill=braw.env$plotColours$maineffectES},
+          fill=braw.env$plotColours$maineffectES
+          size=1
+          },
           
           {start=c(0,0.92)
           len=sqrt(0.9^2+0.55^2)
@@ -69,6 +71,7 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
           hjust<- 0.35
           ends="last"
           fill=braw.env$plotColours$maineffectES
+          size=0.7
           },
 
           {start=c(0,0.92)
@@ -78,6 +81,7 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
           hjust<- 0.65
           ends="last"
           fill=braw.env$plotColours$maineffectES
+          size=0.7
           },
           
           {start=c(0.6,0.5)
@@ -86,7 +90,9 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
           labelpts<-data.frame(x=0,y=0.6)
           hjust<-0.5
           ends="both"
-          fill=braw.env$plotColours$covariationES},
+          fill=braw.env$plotColours$covariationES
+          size=0.7
+          },
           
           {start=c(0,0.46)
           direction=0
@@ -94,7 +100,9 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
           labelpts<-data.frame(x=0,y=0.7)
           hjust<-0.5
           ends="join"
-          fill=braw.env$plotColours$interactionES}
+          fill=braw.env$plotColours$interactionES
+          size=0.7
+          }
   )
   g<-addG(g,drawArrow(start,len,direction,ends,fill=fill))
   
@@ -105,7 +113,7 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
     }else{ 
       if (r==0) lbl<-"0.0" else lbl<-as.character(r)
     }
-    g<-addG(g,dataText(data=labelpts, label = lbl, size=1, hjust=hjust, fontface="bold"))
+    g<-addG(g,dataText(data=labelpts, label = lbl, size=size, hjust=hjust, fontface="bold"))
   }
   
   return(g)

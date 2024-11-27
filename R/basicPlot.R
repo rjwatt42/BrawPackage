@@ -179,7 +179,7 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=FALSE,
     if (is.null(xticks$breaks))
       xticks$breaks<-axisTicks(usr=xlim, log=xticks$logScale, axp = NULL, nint = 5)
     if (is.null(xticks$labels))
-      xticks$labels<-xticks$breaks
+      xticks$labels<-as.character(xticks$breaks)
     if (!is.character(xticks$labels)) xticks$labels<-brawFormat(xticks$labels,digits=-2)
   } else {
     bottomGap<-minGap
@@ -188,7 +188,7 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=FALSE,
     if (is.null(yticks$breaks))
       yticks$breaks<-axisTicks(usr=ylim, log=yticks$logScale, axp = NULL, nint = 5)
     if (is.null(yticks$labels))
-      yticks$labels<-yticks$breaks
+      yticks$labels<-as.character(yticks$breaks)
     if (!xmax)
       leftGap<-labelGapy+max(nchar(yticks$labels))*tickGap
     if (!is.character(yticks$labels)) yticks$labels<-brawFormat(yticks$labels,digits=-2)
