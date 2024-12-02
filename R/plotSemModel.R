@@ -1,4 +1,4 @@
-plotPathModel<-function(pathmodel) {
+plotSEMModel<-function(pathmodel) {
   
   digits<-2
   r<-pathmodel$ES_table
@@ -96,18 +96,21 @@ plotPathModel<-function(pathmodel) {
         }
 
   # arrows first in increasing size order
-  for (ai in order(abs(ar))) {
-    g<-addG(g,drawArrow(c(ax[ai],ay[ai]),aLen[ai],direction=rdir[ai]+90,
-                        width=aWid[ai],ends="last",col=rfg[ai],fill=rcol[ai],finAngle=60))
-    
-  }
   
-  # now the effect size labels
-  for (ri in order(abs(ar))) {
-    if (ry[ri]<0) vjust=1 else vjust=0
-    g<-addG(g,dataLabel(data.frame(x=rx[ri],y=ry[ri]),label=rlabels[ri],
-                        size=0.6,hjust=0.5,vjust=0.5,# angle=rdir[ri],
-                        fill=darken(rcol[ri],1,0.2),colour=rfg[ri]))
+  if (!is.null(ar)) {
+    for (ai in order(abs(ar))) {
+      g<-addG(g,drawArrow(c(ax[ai],ay[ai]),aLen[ai],direction=rdir[ai]+90,
+                          width=aWid[ai],ends="last",col=rfg[ai],fill=rcol[ai],finAngle=60))
+      
+    }
+    
+    # now the effect size labels
+    for (ri in order(abs(ar))) {
+      if (ry[ri]<0) vjust=1 else vjust=0
+      g<-addG(g,dataLabel(data.frame(x=rx[ri],y=ry[ri]),label=rlabels[ri],
+                          size=0.6,hjust=0.5,vjust=0.5,# angle=rdir[ri],
+                          fill=darken(rcol[ri],1,0.2),colour=rfg[ri]))
+    }
   }
   
   # now draw variable names
@@ -121,7 +124,7 @@ plotPathModel<-function(pathmodel) {
 
   # now summary result
   label<-paste0("AIC = ",brawFormat(pathmodel$eval$AIC),";  R^2 = ",brawFormat(pathmodel$eval$Rsquared),
-                ";  k = ",brawFormat(pathmodel$eval$k),";  n = ",brawFormat(pathmodel$eval$n))
+                ";  k = ",brawFormat(pathmodel$eval$k),";  n = ",brawFormat(pathmodel$eval$n_obs))
   g<-addG(g,dataLabel(data.frame(x=xlim[2]-diff(xlim)/30,y=ylim[1]+diff(ylim)/30),label,hjust=1,size=0.7))
   return(g)
 

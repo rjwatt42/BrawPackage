@@ -16,7 +16,7 @@
 #' @export
 makePossible<-function(targetSample=braw.res$result,UseSource="world",
                        targetPopulation=NULL,UsePrior="none",prior=getWorld("Psych"),
-                       sims=braw.res$expected$result,
+                       sims=braw.res$multiple$result,
                        hypothesis=braw.def$hypothesis,design=braw.def$design,
                        simSlice=0.1,correction=TRUE
 ) {
@@ -36,7 +36,7 @@ makePossible<-function(targetSample=braw.res$result,UseSource="world",
     design$sN<-result$nval
   }
   if (is.null(sims)) {
-      sims<-braw.res$expected$result
+      sims<-braw.res$multiple$result
   }
   if (hypothesis$effect$world$worldOn==FALSE) {
     hypothesis$effect$world$populationPDF<-"Single"

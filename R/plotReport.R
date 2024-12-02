@@ -117,6 +117,10 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
                 cellStyle<-paste0(cellStyle,"font-style:italic;")
               outputText[index]<-sub("!i","",outputText[index])
             }
+            if (grepl("!r",outputText[index])) {
+              cellStyle<-paste0(cellStyle,"color:red;")
+              outputText[index]<-sub("!r","",outputText[index])
+            }
             if (grepl("!j",outputText[index])) {
               cellStyle<-paste0(cellStyle,"text-align:right;")
               outputText[index]<-sub("!j","",outputText[index])
@@ -138,10 +142,10 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
               # cellStyle<-paste0(cellStyle,"border-top:solid;border-top-color:#882222;border-top-width:1px;")
               outputText[index]<-sub("!u","",outputText[index])
             }
-            if (grepl("!r",outputText[index])) {
+            if (grepl("!v",outputText[index])) {
               if (doVerticalLines)
               cellStyle<-paste0(cellStyle,"border-right:solid;border-right-color:#888888;border-right-width:1px;")
-              outputText[index]<-sub("!r","",outputText[index])
+              outputText[index]<-sub("!v","",outputText[index])
             }
 
             outputText[index]<-gsub("\\[([a-zA-Z0-9_+-]*)\\]","<sub>\\1</sub>",outputText[index])

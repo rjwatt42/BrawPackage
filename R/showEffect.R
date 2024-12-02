@@ -1,4 +1,4 @@
-drawArrow<-function(start,len,direction,ends,col="black",fill="white",width=0.1,position="start",finAngle=45) {
+drawArrow<-function(start,len,direction,ends,col="black",fill="white",alpha=1, width=0.1,position="start",finAngle=45) {
   if (position=="centre") {
     start<-c(
       start[1]-len/2*sin((direction-90)/(180/pi)),
@@ -41,7 +41,7 @@ drawArrow<-function(start,len,direction,ends,col="black",fill="white",width=0.1,
   y<-arrow_x*sin(direction/(180/pi))-arrow_y*cos(direction/(180/pi))
   pts<-data.frame(x=x+start[1],y=y+start[2])
   
-  dataPolygon(data=pts,colour=col,fill=fill)
+  dataPolygon(data=pts,colour=col,fill=fill,alpha=alpha)
   
 }
 
@@ -102,9 +102,48 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
           ends="join"
           fill=braw.env$plotColours$interactionES
           size=0.7
+          },
+          
+          {start=c(0,0.92)
+          direction=0
+          len=0.9
+          labelpts<-data.frame(x=-0.1,y=0.5)
+          hjust<-1
+          ends="last"
+          fill=braw.env$plotColours$maineffectES
+          size=0.7
+          },
+          
+          {start=c(0.92,0.92)
+          len=sqrt(0.9^2+0.55^2)
+          direction=-atan(0.55/0.35)*57.296
+          labelpts<-data.frame(x=0.6,y=0.4)
+          hjust<- 0.35
+          ends="last"
+          fill=braw.env$plotColours$maineffectES
+          size=0.7
+          },
+          
+          {start=c(0,0.82)
+          len=sqrt(0.9^2+0.55^2)
+          direction=atan(0.55/0.35)*57.296
+          labelpts<-data.frame(x=0.6,y=0.7)
+          hjust<- 0.35
+          ends="last"
+          fill=braw.env$plotColours$maineffectES
+          size=0.7
           }
+          
+          
   )
-  g<-addG(g,drawArrow(start,len,direction,ends,fill=fill))
+  col<-"#000000"
+  alpha<-1
+  if (is.element(t,c(4,6,7,8)) && !is.null(r) && r==0) {
+    fill<-darken(desat(fill,0.5),off=0.8)
+    # alpha<-0.2
+    col<-darken(col,off=0.8)
+  }
+  g<-addG(g,drawArrow(start,len,direction,ends,col=col,fill=fill,alpha=alpha))
   
   
   if (showValue && braw.env$simData && !is.null(r)) {
@@ -113,7 +152,7 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
     }else{ 
       if (r==0) lbl<-"0.0" else lbl<-as.character(r)
     }
-    g<-addG(g,dataText(data=labelpts, label = lbl, size=size, hjust=hjust, fontface="bold"))
+    g<-addG(g,dataText(data=labelpts, label = lbl, size=size*1, hjust=hjust, colour=col, fontface="bold"))
   }
   
   return(g)

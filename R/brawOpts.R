@@ -50,8 +50,8 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1.5,graphicsSize=c(16,10),
   
   # graph themes
   plotColours<-list(graphC=graphC,graphBack="#999999",
-                    variableC="#FFEE88",maineffectES="#FFEE88",covariationES="#FF1100",interactionES="#0011FF",
-                    populationC="#FFEE88",sampleC="#FFCC00",descriptionC="#DD8844",
+                    variableC="#FFCC00",maineffectES="#DD8844",covariationES="#FF1100",interactionES="#0011FF",
+                    populationC="#FFCC00",sampleC="#FFCC00",descriptionC="#DD8844",
                     designC="#CC4422",replicationC="#FF7755",
                     descriptionC1="#FF5533",descriptionC2="#CCBB33",
                     descriptionTotal=darken(desat("#DD8844",0.1),0.7),descriptionsUnique=darken(desat("#DD8844",0.1),1.3),
@@ -297,7 +297,7 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1.5,graphicsSize=c(16,10),
 braw.env<<-braw.env          
 
 braw.res$result<-NULL 
-braw.res$expected<-NULL 
+braw.res$multiple<-NULL 
 braw.res$explore<-NULL 
 braw.res$metaResult<-NULL
 braw.res$metaMultiple<-NULL

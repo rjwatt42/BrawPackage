@@ -78,54 +78,24 @@ makeFiddle<-function(y,yd,orientation="horiz"){
   xd<-0.15
   
   d<-0.05
-  d2<-d^2
   if (length(y)>1)
   for (i in 2:length(y)){
     this_y<-reRangeY(y[i])
     this_yz<-reRangeY(yz)
-    this_xz<-reRangeX(xz)
     dy2<-(this_yz-this_y)^2
-    use<-dy2<d2
-    if (!any(use)) possible_x<-0
-    else {
-      # this1<-0
-      # positive<-this_xz>=0
-      # if (any(!positive)) {
-      #   left<-this_xz[use & positive]-sqrt(d2-dy2[use & positive])
-      # right<-this_xz[use & positive]+sqrt(d2-dy2[use & positive])
-      # useThis<-order(left)
-      # right<-c(0,right[useThis])
-      # left<-c(left[useThis],Inf)
-      # this1<-right[which(right<left)[1]]
-      # }
-      # if (any(!positive)) {
-      #   left<-this_xz[use & !positive]-sqrt(d2-dy2[use & !positive])
-      #   right<-this_xz[use & !positive]+sqrt(d2-dy2[use & !positive])
-      #   useThis<-order(right,decreasing = FALSE)
-      #   left<-c(0,left[useThis])
-      #   right<-c(right[useThis],-Inf)
-      #   this2<-left[which(left>right)[1]]
-      #   if (abs(this2)<this1) this1<-this2 
-      # }
-      # possible_x<-re2RangeX(this1)
-
-      for (possible_x in seq(0,500,by=0.01)) {
-        this_x<-reRangeX(possible_x)
-        this_xneg<-reRangeX(-possible_x)
-        distances1=dy2[use]+(this_xz[use]-this_x)^2
-        distances2=dy2[use]+(this_xz[use]-this_xneg)^2
-        use1<-min(distances1)
-        use2<-min(distances2)
-        # if (all(c(use1,use2)>d)) {
-        if (use1>d2 && use2>d2) {
-            if (use2>use1) possible_x<- -possible_x
-          break
-        }
-        if (use2>d2) {
-          possible_x<- -possible_x
-          break
-        }
-        if (use1>d2) break
+    this_xz<-reRangeX(xz)
+    for (possible_x in seq(0,500,by=0.01)) {
+      this_x<-reRangeX(possible_x)
+      this_xneg<-reRangeX(-possible_x)
+      distances1=sqrt(dy2+(this_xz-this_x)^2)
+      distances2=sqrt(dy2+(this_xz-this_xneg)^2)
+      # distances1=sqrt((yz-y[i])^2+(xz-possible_x)^2)
+      # distances2=sqrt((yz-y[i])^2+(xz- (-possible_x))^2)
+      use1<-min(distances1)
+      use2<-min(distances2)
+      if (all(c(use1,use2)>d)) {
+        if (use2>use1) possible_x<- -possible_x
+        break
       }
     }
     xz<-c(xz,possible_x)
@@ -751,7 +721,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   
   for (i in 1:length(xoff)){
     if (showTheory) {
-      # theory<-doExpectedTheory(showType,logScale,hypothesis,design,i)
+      # theory<-doMultipleTheory(showType,logScale,hypothesis,design,i)
       # yv<-theory$yv
       # xd<-theory$xd
       # xdsig<-theory$xdsig

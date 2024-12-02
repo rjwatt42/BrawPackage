@@ -364,13 +364,23 @@ showDescription<-function(analysis=braw.res$result,plotArea=c(0,0,1,1),g=NULL) {
     )
     g<-addG(g,dataLabel("centreright",paste0("r[s]=",round(analysis$rIV,3)),size=0.75,fill="black",colour="white"))
   } else{
+    g<-nullPlot()
     if (analysis$evidence$rInteractionOn) {
+      if (analysis$evidence$rInteractionOnly) 
+        braw.env$plotArea<-c(0,0,1,1)*plotArea[c(3,4,3,4)]+c(plotArea[c(1,2)],0,0)
+      else
+        braw.env$plotArea<-c(0.25,0.5,0.45,0.5)*plotArea[c(3,4,3,4)]+c(plotArea[c(1,2)],0,0)
+      
+      g<-getAxisPrediction(analysis$hypothesis,g=g) 
       switch (analysis$hypothesis$IV2$type,
               "Interval"=g<-plotParInterDescription(analysis,g),
               "Ordinal"=g<-plotParInterDescription(analysis,g),
               "Categorical"=g<-plotCatInterDescription(analysis,g)
       )
-    } else {
+      yoff<-0
+    } else yoff<-0.25
+    
+    if (!analysis$evidence$rInteractionOn || !analysis$evidence$rInteractionOnly) {
       analysis1<-analysis
       analysis1$hypothesis$IV2<-NULL
       analysis2<-analysis
@@ -381,14 +391,14 @@ showDescription<-function(analysis=braw.res$result,plotArea=c(0,0,1,1),g=NULL) {
       
       analysis2$hypothesis$IV2<-NULL
       
-      braw.env$plotArea<-c(0,0.25,0.45,0.5)*plotArea[c(3,4,3,4)]+c(plotArea[c(1,2)],0,0)
-      g<-getAxisPrediction(analysis1$hypothesis) 
+      braw.env$plotArea<-c(0,yoff,0.45,0.5)*plotArea[c(3,4,3,4)]+c(plotArea[c(1,2)],0,0)
+      g<-getAxisPrediction(analysis1$hypothesis,g=g) 
       switch (analysis$hypothesis$DV$type,
               "Interval"=g<-plotParDescription(analysis1,g=g),
               "Ordinal"=g<-plotParDescription(analysis1,g=g),
               "Categorical"=g<-plotCatDescription(analysis1,g=g)
       )
-      braw.env$plotArea<-c(0.55,0.25,0.45,0.5)*plotArea[c(3,4,3,4)] +c(plotArea[c(1,2)],0,0)
+      braw.env$plotArea<-c(0.55,yoff,0.45,0.5)*plotArea[c(3,4,3,4)] +c(plotArea[c(1,2)],0,0)
       g<-getAxisPrediction(analysis2$hypothesis,g=g) 
       switch (analysis$hypothesis$DV$type,
               "Interval"=g<-plotParDescription(analysis2,g=g),

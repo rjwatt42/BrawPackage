@@ -19,14 +19,17 @@ fit_sem_model<-function(pathmodel,model_data) {
   # data
   # endogenous exogenous
 
+  nan_action<-"complete.obs" # "complete.obs"
+  if (length(c(sem$endogenous, sem$exogenous))==1) useRow<-!is.na(sem$data)
+  else useRow<-rowSums(is.na(sem$data[,c(sem$endogenous, sem$exogenous)]))==0
+  sem$data<-matrix(sem$data[useRow,],ncol=ncol(sem$data))
+  n_obs<-nrow(sem$data)
+  
+  if (n_stages>1) {
   Lstart<-zeros(1,sum(sem$Ldesign!=0))
   Bstart<-zeros(1,sum(sem$Bdesign!=0))
   LBstart<-c(Lstart, Bstart)
 
-  nan_action<-"complete.obs" # "complete.obs"
-  useRow<-rowSums(is.na(sem$data[,c(sem$endogenous, sem$exogenous)]))==0
-  sem$data<-sem$data[useRow,]
-  n_obs<-nrow(sem$data)
   use<-1:n_obs
 
   L<-matrix(0,nloop,1)
@@ -67,7 +70,6 @@ fit_sem_model<-function(pathmodel,model_data) {
       B[loop,]<-Bend
       Fm[loop,1]<-out$value
     }
-
     use<-ceiling(rand(n_obs,1)*n_obs)
   }
 
@@ -101,7 +103,6 @@ fit_sem_model<-function(pathmodel,model_data) {
   error<-t(Yactual-Ypredicted)
   Rsquared<-1-var(error)/var(t(Yactual))
 
-
   sem$coefficients=zeros(P,P+Q)
   for (iw in 1:P)
     for (ix in 1:Q)
@@ -130,19 +131,9 @@ fit_sem_model<-function(pathmodel,model_data) {
         use_vars=which(is.element(model_data$varnames,c(predictors, thisVariable)))
         mdl<-list(
          ResponseName=thisVariable,
-        PredictorNames=predictors,
-        VariableNames=model_data$varnames[use_vars],
-        IsCategorical<-model_data$varcat[use_vars],
-        # 
-        # for (ip in 1:length(use_vars)) {
-        #   d<-model_data$data[,use_vars[ip]]
-        #   d<-d[!is.na(d)]
-        #   if (model_data$varcat(use_vars[ip]))
-        #     mdl$VariableInfo$Range[ip]<-unique(d)
-        #   else
-        #     mdl$VariableInfo$Range[ip]<-c(min(d),max(d))
-        # }
-        # # safe_name<-model_data.varnames[use_vars[ip]]
+         PredictorNames=predictors,
+         VariableNames=model_data$varnames[use_vars],
+         IsCategorical=model_data$varcat[use_vars],
          Data=model_data$data[,use_vars]
         )
       }
@@ -166,7 +157,9 @@ fit_sem_model<-function(pathmodel,model_data) {
   }
   sem$mdl<-pathLocalModel
 
-
+  } else {
+  
+}
   sem$P<-P
   sem$Q<-Q
   sem$n_obs<-n_obs
@@ -220,10 +213,13 @@ get_Stheta<-function(L,B=NULL,phi=NULL,psy=NULL) {
     if (length(sem$exogenous)>1) phi<-cov(data[,sem$exogenous],use=nan_action)
     else phi<-matrix(1)
 
-    Y<-t(data[,1:P])
-    X<-t(data[,(P+1):ncol(data)])
-    z<-B%*%Y+L%*%X
-    error<-t(Y-z)
+    if (P>1) Y<-t(data[,1:P])
+    else Y<-matrix(data[,1],nrow=1)
+    if (ncol(data)>P) {
+      X<-t(data[,(P+1):ncol(data)])
+      z<-B%*%Y+L%*%X
+      error<-t(Y-z)
+    } else error<-Y
     if (ncol(error)>1) psy<-diag(diag(var(error,na.rm=TRUE)))
     else psy<-matrix(var(error,na.rm=TRUE))
   }
@@ -325,8 +321,12 @@ path2sem<-function(pathmodel,model_data) {
   full_data<-new_data
   colnames(full_data)<-new_names
 
-  exo_names<-stages[[1]]
-  endo_names<-c()
+  if (length(stages)==1) {
+    endo_names<-stages[[1]]
+    exo_names<-c()
+  } else {
+    exo_names<-stages[[1]]
+    endo_names<-c()
   for (ist in 2:length(stages)) {
     dests<-stages[[ist]]
     for (iv in 1:length(dests)) {
@@ -338,23 +338,28 @@ path2sem<-function(pathmodel,model_data) {
       }
     }
   }
+  }
   exo_names<-unique(exo_names)
   endo_names<-unique(endo_names)
   varnames<-c(endo_names,exo_names)
   P<-length(endo_names)
   Q<-length(exo_names)
   endogenous<-1:P
-  exogenous<-P+(1:Q)
+  if (Q>0)  exogenous<-P+(1:Q)
+  else exogenous<-c()
 
   use<-c()
   for (i in 1:length(varnames)) {
     use<-c(use,which(full_varnames==varnames[i]))
   }
   data<-full_data[,use]
-
+  if (length(use)==1) data<-matrix(data,ncol=1)
 
   Bdesign<-zeros(P,P); rownames(Bdesign)<-endo_names; colnames(Bdesign)<-endo_names
-  Ldesign<-zeros(P,Q); rownames(Ldesign)<-endo_names; colnames(Ldesign)<-exo_names
+  if (Q>0) {
+    Ldesign<-zeros(P,Q); rownames(Ldesign)<-endo_names; colnames(Ldesign)<-exo_names
+  } else Ldesign<-c()
+    
   Bresult<-Bdesign+NA
   Lresult<-Ldesign+NA
 
@@ -370,6 +375,7 @@ path2sem<-function(pathmodel,model_data) {
   }
 
   # now we build the SEM structures: LDesign and BDesign
+  if (length(stages)>1)
   for (ist in 2:length(stages)) {
     use_stages=ist-(1:depth)
     use_stages<-use_stages[use_stages>0]
@@ -463,6 +469,7 @@ path2sem<-function(pathmodel,model_data) {
     stages=stages,
     depth=depth,
     add=pathmodel$path$add,
+    remove=pathmodel$path$remove,
     
     P=P,
     Q=Q,
@@ -501,7 +508,32 @@ sem_results<-function(pathmodel,sem) {
   
   nan_action<-"complete.obs" # "complete.obs"
   sem$covariance<-cov(sem$data,use=nan_action)
-  sem$cov_model=get_Stheta(sem);
+  rownames(sem$covariance)<-sem$varnames
+  colnames(sem$covariance)<-sem$varnames#[use_cf]
+  if (Q>0) sem$cov_model=get_Stheta(sem)
+  else sem$cov_model<-0
+  
+  # model coefficients
+  CF_table=cbind(sem$Bresult,sem$Lresult);
+  # use_cf=!apply(is.na(CF_table),2,all)
+  # CF_table=CF_table[,use_cf]
+  rownames(CF_table)<-sem$endo_names
+  colnames(CF_table)<-sem$varnames#[use_cf]
+  addRows<-setdiff(sem$varnames,sem$endo_names)
+  addMatrix<-matrix(NA,nrow=length(addRows),ncol=ncol(CF_table))
+  rownames(addMatrix)<-addRows
+  CF_table<-rbind(CF_table,addMatrix)
+  # CF_table<-CF_table[,order(colnames(CF_table))]
+  # CF_table<-CF_table[order(rownames(CF_table)),]
+  
+  sem$CF_table=CF_table;
+  
+  # effect sizes
+  # sem$covariance<-sem$covariance[,order(colnames(sem$covariance))]
+  # sem$covariance<-sem$covariance[order(rownames(sem$covariance)),]
+  
+  v<-matrix(diag(sem$covariance),nrow(sem$covariance),ncol(sem$covariance))
+  sem$ES_table<-CF_table/sqrt(v/t(v))
   
   # full model stats
   
@@ -535,20 +567,24 @@ sem_results<-function(pathmodel,sem) {
   B=sem$Bresult; B[is.na(B)]=0;
   L=sem$Lresult; L[is.na(L)]=0;
   Y=t(sem$data[,1:P]); Y[is.na(Y)]=0;
-  X=t(sem$data[,(P+1):ncol(sem$data)]); X[is.na(X)]=0;
-  Ypredicted=B%*%Y+L%*%X;
+  if (P==1) Y<-matrix(Y,nrow=1)
+  if (Q>0) {
+    X=t(sem$data[,(P+1):ncol(sem$data)]); X[is.na(X)]=0;
+    Ypredicted=B%*%Y+L%*%X;
+  } else Ypredicted<-matrix(mean(sem$data),nrow=1,ncol=nrow(sem$data))
   Yactual=Y-rowMeans(Y)
   Ypredicted=Ypredicted-rowMeans(Ypredicted)
   error=t(Yactual-Ypredicted)
   Rsquared=1-sum(diag(var(error)))/sum(diag(var(t(Y))))
   #
-  k=(P+Q); n=n_obs;
+  k=sum(!is.na(CF_table))+2*length(sem$endogenous); 
+  n_data=n_obs*length(sem$endogenous);
   Resid2=sum(error^2);
-  AIC=k+n*(log(2*pi*sum(error^2)/(n-k))+1);
-  llr<-exp((2*k-AIC)/2)
-  AICc=AIC+(2*k*k+2*k)/(n-k-1);
-  BIC=k*log(n)+AIC-2*k;
-  CAIC=k*(log(n)+1)+AIC-2*k;
+  AIC=k+n_obs*(log(2*pi*sum(error^2)/(n_data-k))+1);
+  llr<-(2*k-AIC)/2
+  AICc=AIC+(2*k*k+2*k)/(n_data-k-1);
+  BIC=k*log(n_data)+AIC-2*k;
+  CAIC=k*(log(n_data)+1)+AIC-2*k;
   # 
   sem$stats<-list(model_chisqr=model_chisqr,
                  model_chi_df=model_chi_df,
@@ -560,7 +596,8 @@ sem_results<-function(pathmodel,sem) {
   )
   sem$eval<-list(Rsquared=Rsquared,
                  k=k,
-                 n=n,
+                 n_data=n_data,
+                 n_obs=n_obs,
                  llr=llr,
                  AIC=AIC,
                  AICc=AICc,
@@ -568,28 +605,6 @@ sem_results<-function(pathmodel,sem) {
                  CAIC=CAIC
   )
   # 
-
-  # model coefficients
-  CF_table=cbind(sem$Bresult,sem$Lresult);
-  # use_cf=!apply(is.na(CF_table),2,all)
-  # CF_table=CF_table[,use_cf]
-  rownames(CF_table)<-sem$endo_names
-  colnames(CF_table)<-sem$varnames#[use_cf]
-  addRows<-setdiff(sem$varnames,sem$endo_names)
-  addMatrix<-matrix(NA,nrow=length(addRows),ncol=ncol(CF_table))
-  rownames(addMatrix)<-addRows
-  CF_table<-rbind(CF_table,addMatrix)
-  CF_table<-CF_table[,order(colnames(CF_table))]
-  CF_table<-CF_table[order(rownames(CF_table)),]
-  
-  sem$CF_table=CF_table;
-  
-  # effect sizes
-  sem$covariance<-sem$covariance[,order(colnames(sem$covariance))]
-  sem$covariance<-sem$covariance[order(rownames(sem$covariance)),]
-  
-  v<-matrix(diag(sem$covariance),nrow(sem$covariance),ncol(sem$covariance))
-  sem$ES_table<-CF_table/sqrt(v/t(v))
   
   sem$Rtotal<-sem$covariance/sqrt(v*t(v))
   return(sem)
