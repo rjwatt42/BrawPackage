@@ -1063,7 +1063,7 @@ showPossible <- function(possibleResult=NULL,
                   g<-addG(g,
                           dataText(pos,
                                    h[hi],fontface="bold",
-                                   hjust=0,size=0.7,colour=colPdark)
+                                   hjust=0,size=0.6,colour=colPdark)
                   )
                   pos$x<-pos$x+diff(xlim)*0.05
                 }
@@ -1076,7 +1076,7 @@ showPossible <- function(possibleResult=NULL,
                   g<-addG(g,
                           dataText(pos,
                                    h[hi],fontface="bold",
-                                   hjust=0,size=0.7,colour=colPdark)
+                                   hjust=0,size=0.6,colour=colPdark)
                   )
                   pos$x<-pos$x+diff(xlim)*0.05
                 }
@@ -1092,7 +1092,7 @@ showPossible <- function(possibleResult=NULL,
                   g<-addG(g,
                           dataText(pos,
                                    h[hi],fontface="bold",
-                                   hjust=0,size=0.7,colour=colPdark)
+                                   hjust=0,size=0.6,colour=colPdark)
                   )
                   pos$x<-pos$x+diff(xlim)*0.05
                 }
