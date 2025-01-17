@@ -29,6 +29,8 @@ drawDistribution<-function(x_use,y_use,z_use,xlim,ylim,zlim,mapping,colUse,alpha
 }
 
 densityFunctionStats<-function(dens_r,rp){
+  if (is.matrix(dens_r)) dens_r<-dens_r[1,]
+  
   use<-!is.na(dens_r)
   cum_dens_r<-cumsum(dens_r[use])/sum(dens_r[use])
   cum_rp<-rp[use]
@@ -50,7 +52,10 @@ densityFunctionStats<-function(dens_r,rp){
     }
   }
   
-  peak<-rp[which.max(dens_r)]
+  pk<-which.max(dens_r)
+  dr<-diff(dens_r[(pk-3):(pk+3)])
+  peak<-approx(dr,rp[(pk-3):(pk+2)]+diff(rp[1:2])/2,0)$y
+  # peak<-rp[which.max(dens_r)]
   dens_at_peak<-max(dens_r)
   list(
     peak=peak,
