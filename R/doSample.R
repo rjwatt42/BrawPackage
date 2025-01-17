@@ -74,30 +74,66 @@ makeSampleVar<-function(design,n,MV){
               dvr1_m<-c()
               dvr1_s<-c()
               
-              nClusts<-ceil(n/method$Cluster_n/method$Contact_n)
+              if (design$sMethodSeverity<1) 
+                sMethodSeverity<-design$sN*design$sMethodSeverity
+              else               sMethodSeverity<-design$sMethodSeverity
+              nClusts<-n-sMethodSeverity
+              switch(method$type,
+                     "Cluster"={
+                       Cluster_n<-n/nClusts-1
+                       Contact_n<-0
+                     },
+                     "Snowball"={
+                       Cluster_n<-0
+                       Contact_n<-n/nClusts-1
+                     },
+                     "Convenience"={
+                       Cluster_n<-sqrt(n/nClusts-1)
+                       Contact_n<-sqrt(n/nClusts-1)
+                     })
+              
+              if (Cluster_n>floor(Cluster_n) && runif(1)<=(Cluster_n-floor(Cluster_n)))
+                Cluster_n<-ceiling(Cluster_n)
+              else
+                Cluster_n<-floor(Cluster_n)
+              if (Contact_n>floor(Contact_n) && runif(1)<=(Contact_n-floor(Contact_n)))
+                Contact_n<-ceiling(Contact_n)
+              else
+                Contact_n<-floor(Contact_n)
+              
+              if (nClusts==n) method$Cluster_rad<-1
               Main_rad<-sqrt(1-method$Cluster_rad^2)*method$Main_rad
               for (i in 1:nClusts) {
                 # location of cluster
-                rad_new<-rnorm(1,0,Main_rad)
-                dir_new<-pi+runif(1,0,2*pi)
-                x_cluster_centre<-cos(dir_new)*rad_new
-                y_cluster_centre<-sin(dir_new)*rad_new
-                
-                for (j in 1:method$Cluster_n) {
+                  x_cluster_centre<-rnorm(1)
+                  y_cluster_centre<-rnorm(1)
+
+                for (j in 1:(Cluster_n+1)) {
                   # location of contact group
-                  rad_new<-rnorm(1,0,method$Cluster_rad)
-                  dir_new<-pi+rnorm(1,atan2(y_cluster_centre,x_cluster_centre),pi*0.5)
-                  x_contact<-x_cluster_centre+cos(dir_new)*rad_new
-                  y_contact<-y_cluster_centre+sin(dir_new)*rad_new
+                  use<-FALSE
+                  while (!any(use)) {
+                    x_contact<-rnorm(100)
+                    y_contact<-rnorm(100)
+                    use<-sqrt((x_contact-x_cluster_centre)^2+(y_contact-y_cluster_centre)^2)<rnorm(100)*method$Cluster_rad
+                  }
+                  x_contact<-x_contact[which(use)[1]]
+                  y_contact<-y_contact[which(use)[1]]
+                  ivr1<-c(ivr1,x_contact)
+                  dvr1_m<-c(dvr1_m,y_contact)
                   
                   # track any contacts
-                  for (k in 1:method$Contact_n) {
+                  if (Contact_n>0)
+                  for (k in 1:Contact_n) {
+                    use<-FALSE
+                    while (!any(use)) {
+                      x_contact1<-rnorm(100)
+                      y_contact1<-rnorm(100)
+                      use<-sqrt((x_contact1-x_contact)^2+(y_contact1-y_contact)^2)<rnorm(100)*method$Contact_rad
+                    }
+                    x_contact<-x_contact1[which(use)[1]]
+                    y_contact<-y_contact1[which(use)[1]]
                     ivr1<-c(ivr1,x_contact)
                     dvr1_m<-c(dvr1_m,y_contact)
-                    rad_new<-rnorm(1,0,method$Contact_rad)
-                    dir_new<-pi+rnorm(1,atan2(y_contact,x_contact),pi*0.5)
-                    x_contact<-x_contact+cos(dir_new)*rad_new
-                    y_contact<-y_contact+sin(dir_new)*rad_new
                   }
                 }
               }
@@ -135,6 +171,32 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV
   effect<-hypothesis$effect
+  if (effect$rSD>0 && effect$rIV!=0) effect$rIV<-tanh(atanh(effect$rIV)+rnorm(1,0,atanh(effect$rSD)))
+  
+  # check effect sizes before going any further
+  fullES<-effect$rIV^2+effect$rIV2^2+2*effect$rIV*effect$rIV2*effect$rIVIV2+effect$rIVIV2DV^2
+  while (fullES>=1) {
+    effect$rIV<-effect$rIV*0.9
+    effect$rIV2<-effect$rIV2*0.9
+    effect$rIVIV2<-effect$rIVIV2*0.9
+    effect$rIVIV2DV<-effect$rIVIV2DV*0.9
+    fullES<-effect$rIV^2+effect$rIV2^2+2*effect$rIV*effect$rIV2*effect$rIVIV2+effect$rIVIV2DV^2
+  }
+  
+  total1<-effect$rIV+effect$rIV2*effect$rIVIV2
+  while (total1>=1) {
+    effect$rIV<-effect$rIV*0.9
+    effect$rIV2<-effect$rIV2*0.9
+    effect$rIVIV2<-effect$rIVIV2*0.9
+    total1<-effect$rIV+effect$rIV2*effect$rIVIV2
+  }
+  total2<-effect$rIV2+effect$rIV*effect$rIVIV2
+  while (total2>=1) {
+    effect$rIV<-effect$rIV*0.9
+    effect$rIV2<-effect$rIV2*0.9
+    effect$rIVIV2<-effect$rIVIV2*0.9
+    total1<-effect$rIV2+effect$rIV*effect$rIVIV2
+  }
   
   rho<-effect$rIV
   
@@ -335,30 +397,6 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
       braw.env$lastSample<-list(participant=id, iv=iv, iv2=iv2, dv=dv)
       
     } else {
-      # check effect sizes before going any further
-      fullES<-effect$rIV^2+effect$rIV2^2+2*effect$rIV*effect$rIV2*effect$rIVIV2+effect$rIVIV2DV^2
-      while (fullES>=1) {
-        effect$rIV<-effect$rIV*0.9
-        effect$rIV2<-effect$rIV2*0.9
-        effect$rIVIV2<-effect$rIVIV2*0.9
-        effect$rIVIV2DV<-effect$rIVIV2DV*0.9
-        fullES<-effect$rIV^2+effect$rIV2^2+2*effect$rIV*effect$rIV2*effect$rIVIV2+effect$rIVIV2DV^2
-      }
-      
-      total1<-effect$rIV+effect$rIV2*effect$rIVIV2
-      while (total1>=1) {
-        effect$rIV<-effect$rIV*0.9
-        effect$rIV2<-effect$rIV2*0.9
-        effect$rIVIV2<-effect$rIVIV2*0.9
-        total1<-effect$rIV+effect$rIV2*effect$rIVIV2
-      }
-      total2<-effect$rIV2+effect$rIV*effect$rIVIV2
-      while (total2>=1) {
-        effect$rIV<-effect$rIV*0.9
-        effect$rIV2<-effect$rIV2*0.9
-        effect$rIVIV2<-effect$rIVIV2*0.9
-        total1<-effect$rIV2+effect$rIV*effect$rIVIV2
-      }
       
       # make id
       id<-factor(1:n)

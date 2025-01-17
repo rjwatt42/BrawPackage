@@ -104,6 +104,20 @@ inspectMainGraph<-function(varName,result=braw.res$result,inspect=makeInspect(),
     # yc<-ptSize*sin(seq(0,2*pi,length.out=20))
     # y<-y/max(y)*diff(xlim)*aspect*0.9
     
+    if (inspect$showFitDistribution && inspect$inspectOrder=="sorted") {
+      switch(var$type,
+             "Interval"={
+               xs<-seq(var$mu-3*var$sd,var$mu+3*var$sd,length.out=51)
+               ys<-pnorm(xs,var$mu,var$sd)*(max(y)-min(y))+min(y)
+               pts<-data.frame(x=xs,y=ys)
+               g<-addG(g,dataPath(data=pts))
+             },
+             "Ordinal"={
+             },
+             "Categorical"={
+             }
+      )
+    }
     # show fitted distribution
       if (inspect$showFitDistribution && inspect$inspectOrder=="piled") {
         switch(var$type,

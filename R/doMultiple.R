@@ -11,6 +11,9 @@ mergeMultiple<-function(r1,r2) {
     nval=rbind(r1$nval,r2$nval),
     noval=rbind(r1$noval,r2$noval),
     df1=rbind(r1$df1,r2$df1),
+    sem=rbind(r1$sem,r2$sem),
+    aic=rbind(r1$aic,r2$aic),
+    aicNull=rbind(r1$aicNull,r2$aicNull),
     iv.mn=rbind(r1$iv.mn,r2$iv.mn),
     iv.sd=rbind(r1$iv.sd,r2$iv.sd),
     iv.sk=rbind(r1$iv.sk,r2$iv.sk),
@@ -24,6 +27,7 @@ mergeMultiple<-function(r1,r2) {
     rd.sk=rbind(r1$rd.sk,r2$rd.sk),
     rd.kt=rbind(r1$rd.kt,r2$rd.ky)
   )
+  colnames(newResult$sem)<-colnames(r2$sem)
   if (!is.null(r1$rIV2)) {
     newResult<-c(newResult,list(
       rIV2=rbind(r1$rIV2,r2$rIV2),
@@ -55,6 +59,7 @@ resetMultiple<-function(nsims=0,evidence,multipleResult=NULL){
   }
   newResult<-list(
     rIV=b,pIV=b,rpIV=b,roIV=b,poIV=b,nval=b,noval=b,df1=b,
+    aic=b,aicNull=b,sem=matrix(NA,nsims,8),
     iv.mn=b,iv.sd=b,iv.sk=b,iv.kt=b,
     dv.mn=b,dv.sd=b,dv.sk=b,dv.kt=b,
     rd.mn=b,rd.sd=b,rd.sk=b,rd.kt=b
@@ -92,7 +97,7 @@ resetMultiple<-function(nsims=0,evidence,multipleResult=NULL){
 #'                              doingNull=FALSE,autoShow=braw.env$autoShow,showType="Basic")
 #' @seealso showMultiple() and reportMultiple())
 #' @export
-doMultiple <- function(nsims=10,multipleResult=braw.res$multiple,hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=makeEvidence(),
+doMultiple <- function(nsims=10,multipleResult=braw.res$multiple,hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,
                          doingNull=FALSE,inSteps=FALSE,autoShow=braw.env$autoShow,showType="Basic") {
 
   if (!is.null(multipleResult)) {

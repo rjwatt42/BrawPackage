@@ -59,9 +59,11 @@ getExploreRange<-function(explore) {
          "Repeats"=range<-list(minVal=0,maxVal=8,logScale=FALSE,np=9),
          "pNull"=range<-list(minVal=0,maxVal=1,logScale=FALSE,np=13),
          "Lambda"=range<-list(minVal=0.1,maxVal=1,logScale=FALSE,np=13),
+         "PoorSamplingAmount"=range<-list(minVal=0, maxVal=0.2,logScale=FALSE,np=13),
          "CheatingAmount"=range<-list(minVal=0, maxVal=0.8,logScale=FALSE,np=13),
          "ClusterRad"=range<-list(minVal=0, maxVal=1,logScale=FALSE,np=13),
          "SampleGamma"=range<-list(minVal=1, maxVal=10,logScale=FALSE,np=13),
+         "NoStudies"=range<-list(minVal=2,maxVal=200,logScale=TRUE,np=13),
          {range<-list(minVal=0,maxVal=1,logScale=FALSE,np=2)}
   )
   return(range)
@@ -78,12 +80,14 @@ resetExploreResult<-function(nsims,n_vals,oldResult=NULL) {
   }
   
   result<-list(rval=b,pval=b,rpval=b,raval=b,roval=b,poval=b,nval=b,df1=b,
+               aic=b,aicNull=b,sem=b,
                iv=list(mn=b,sd=b,sk=b,kt=b),
                dv=list(mn=b,sd=b,sk=b,kt=b),
                rd=list(mn=b,sd=b,sk=b,kt=b),
                rIV2=b,rIVIV2DV=b,pIV2=b,pIVIV2DV=b,
                r=list(direct=bm,unique=bm,total=bm),
-               p=list(direct=bm,unique=bm,total=bm)
+               p=list(direct=bm,unique=bm,total=bm),
+               k=b,pnull=b
   )
   if (!is.null(oldResult)) {
     result<-mergeExploreResult(oldResult,result)
@@ -91,6 +95,7 @@ resetExploreResult<-function(nsims,n_vals,oldResult=NULL) {
   return(result)
 }
 storeExploreResult<-function(result,res,ri,vi) {
+  if (!is.null(res$rIV)) {
   result$rval[ri,vi]<-res$rIV
   result$pval[ri,vi]<-res$pIV
   result$rpval[ri,vi]<-res$rpIV
@@ -98,6 +103,11 @@ storeExploreResult<-function(result,res,ri,vi) {
   result$poval[ri,vi]<-res$poIV
   result$nval[ri,vi]<-res$nval
   result$df1[ri,vi]<-res$df1
+  result$aic[ri,vi]<-res$aic
+  result$aicNull[ri,vi]<-res$aicNull
+  
+  if (!is.null(res$sem))
+    result$sem[ri,vi]<-res$sem[1,8]
   
   result$iv$mn[ri,vi]<-res$iv.mn
   result$iv$sd[ri,vi]<-res$iv.sd
@@ -127,6 +137,10 @@ storeExploreResult<-function(result,res,ri,vi) {
     result$p$unique[ri,vi,1:n]<-res$p$unique
     result$p$total[ri,vi,1:n]<-res$p$total
   }
+  } else {
+  result$k[ri,vi]<-res$bestK
+  result$pnull[ri,vi]<-res$bestNull
+}
   return(result)
 }
 
@@ -142,6 +156,12 @@ mergeExploreResult<-function(res1,res2) {
   result$poval<-rbind(res1$poval,res2$poval)
   result$nval<-rbind(res1$nval,res2$nval)
   result$df1<-rbind(res1$df1,res2$df1)
+  result$aic<-rbind(res1$aic,res2$aic)
+  result$aicNull<-rbind(res1$aicNull,res2$aicNull)
+  if (!is.null(res1$sem))
+    result$sem<-rbind(res1$sem,res2$sem)
+  else 
+    result$sem<-NULL
   
   result$iv$mn<-rbind(res1$iv$mn,res2$iv$mn)
   result$iv$sd<-rbind(res1$iv$sd,res2$iv$sd)
@@ -171,6 +191,9 @@ mergeExploreResult<-function(res1,res2) {
     result$pIVIV2DV<-rbind(res1$pIVIV2DV,res2$pIVIV2DV)
   }
     
+    result$k<-rbind(res1$k,res2$k)
+    result$pnull<-rbind(res1$pnull,res2$pnull)
+    
   return(result)
 }
 
@@ -191,7 +214,7 @@ mergeExploreResult<-function(res1,res2) {
 #'                              doingNull=FALSE,autoShow=FALSE,showType="Basic")
 #' @export
 doExplore<-function(nsims=10,exploreResult=braw.res$explore,explore=braw.def$explore,
-                    hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,
+                    hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,metaAnalysis=braw.def$metaAnalysis,
                       doingNull=FALSE,autoShow=FALSE,showType="rs"
 ) {
   autoShowLocal<-braw.env$autoShow
@@ -207,7 +230,8 @@ doExplore<-function(nsims=10,exploreResult=braw.res$explore,explore=braw.def$exp
                         explore=explore,
                         hypothesis=hypothesis,
                         design=design,
-                        evidence=evidence
+                        evidence=evidence,
+                        metaAnalysis=metaAnalysis
     )
   }
   explore<-exploreResult$explore
@@ -237,6 +261,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
   hypothesis<-exploreResult$hypothesis
   design<-exploreResult$design
   evidence<-exploreResult$evidence
+  metaAnalysis<-exploreResult$metaAnalysis
   
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2
@@ -312,6 +337,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
           "Usage"={vals<-c("Between","Within")},
           "WithinCorr"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "SampleGamma"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "PoorSamplingAmount"=vals<-{seq(minVal,maxVal,length.out=npoints)},
           "Dependence"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Outliers"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "NonResponse"={vals<-seq(minVal,maxVal,length.out=npoints)},
@@ -320,7 +346,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
           "IVRangeC"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "IVRangeE"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "DVRange"={vals<-seq(minVal,maxVal,length.out=npoints)},
-          "Cheating"={vals<-c("None","Grow","Prune","Replace","Retry","Add")},
+          "Cheating"={vals<-c("None","Grow","Prune","Replace","Retry")},
           "CheatingAmount"={vals<-seq(minVal*design$sN,maxVal*design$sN,length.out=npoints)},
           "Alpha"={vals<-vals<-seq(minVal,maxVal,length.out=npoints)},
           "Transform"={vals<-c("None","Log","Exp")},
@@ -329,7 +355,10 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
           
           "Keep"={vals<-c("cautious", "last", "largeN", "smallP", "median")},
           "Power"={vals<-seq(minVal,maxVal,length.out=npoints)},
-          "Repeats" ={ vals<-minVal:maxVal }
+          "Repeats" ={ vals<-minVal:maxVal },
+          
+          "NoStudies"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "MetaType"={vale<-c("FF","FT","TF","TT")}
   )
   if (substr(explore$exploreType,1,1)=="r" && braw.env$RZ=="z") vals<-tanh(vals)
   if (xlog) vals<-10^vals
@@ -346,6 +375,8 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
   if (doingNull && exploreResult$nullcount<exploreResult$count)
     nsims<-min(exploreResult$count,exploreResult$nullcount)+nsims
   else   nsims<-exploreResult$count+nsims
+  
+  doingMetaAnalysis<-FALSE
   
   time.at.start<-Sys.time()
   while (((doingNonNull && exploreResult$count<nsims) || (doingNull && exploreResult$nullcount<nsims)) && Sys.time()-time.at.start<braw.env$timeLimit){
@@ -657,6 +688,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
                   design$sNRand<-TRUE
                   design$sNRandK<-vals[vi]
                 },
+                "PoorSamplingAmount"={design$sMethodSeverity<-vals[vi]},
                 "Dependence"={design$sDependence<-vals[vi]},
                 "Outliers"={design$sOutliers<-vals[vi]},
                 "NonResponse"={design$sNonResponse<-vals[vi]},
@@ -703,9 +735,24 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
                 
                 "NoStudies"={
                   metaAnalysis$nstudies<-vals[vi]
+                  doingMetaAnalysis<-TRUE
                 },
                 "sigOnly"={
                   metaAnalysis$sigOnly<-vals[vi]
+                  doingMetaAnalysis<-TRUE
+                },
+                "MetaType"={
+                  switch(vals[vi],
+                         "FF"={metaAnalysis$includeNulls<-FALSE
+                               metaAnalysis$includeBias<-FALSE},
+                         "FT"={metaAnalysis$includeNulls<-TRUE
+                               metaAnalysis$includeBias<-FALSE},
+                         "TF"={metaAnalysis$includeNulls<-FALSE
+                               metaAnalysis$includeBias<-TRUE},
+                         "TT"={metaAnalysis$includeNulls<-TRUE
+                               metaAnalysis$includeBias<-TRUE},
+                  )
+                  doingMetaAnalysis<-TRUE
                 }
         )
         hypothesis$IV<-IV
@@ -713,16 +760,21 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
         hypothesis$DV<-DV
         hypothesis$effect<-effect
         
-        if (doingNonNull) {
-          res<-multipleAnalysis(1,hypothesis,design,evidence)
+        if (doingMetaAnalysis) {
+          res<-doMetaAnalysis(1,NULL,metaAnalysis,hypothesis,design,evidence)
           result<-storeExploreResult(result,res,ri,vi)
-        }
-        
-        if (doingNull) {
-          nullhypothesis<-hypothesis
-          nullhypothesis$effect$rIV<-0
-          res_null<-multipleAnalysis(1,nullhypothesis,design,evidence)
-          nullresult<-storeExploreResult(nullresult,res_null,ri,vi)
+        } else {
+          if (doingNonNull) {
+            res<-multipleAnalysis(1,hypothesis,design,evidence)
+            result<-storeExploreResult(result,res,ri,vi)
+          }
+          
+          if (doingNull) {
+            nullhypothesis<-hypothesis
+            nullhypothesis$effect$rIV<-0
+            res_null<-multipleAnalysis(1,nullhypothesis,design,evidence)
+            nullresult<-storeExploreResult(nullresult,res_null,ri,vi)
+          }
         }
       }
     }

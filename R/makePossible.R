@@ -16,7 +16,7 @@
 #' @export
 makePossible<-function(targetSample=braw.res$result,UseSource="world",
                        targetPopulation=NULL,UsePrior="none",prior=getWorld("Psych"),
-                       sims=braw.res$multiple$result,
+                       sims=braw.res$multiple$result,sigOnly=FALSE,
                        hypothesis=braw.def$hypothesis,design=braw.def$design,
                        simSlice=0.1,correction=TRUE
 ) {
@@ -47,6 +47,7 @@ makePossible<-function(targetSample=braw.res$result,UseSource="world",
   
   possible<-
   list(targetSample=targetSample,
+       sigOnly=sigOnly,
        UseSource=UseSource,
        targetPopulation=targetPopulation,
        UsePrior=UsePrior,
@@ -110,7 +111,7 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
   }
   
   pRho<-possible$targetPopulation
-  if (braw.env$RZ=="z") pRho<-tanh(pRho)
+  if (braw.env$RZ=="z" && !is.null(pRho)) pRho<-tanh(pRho)
   # get the prior population distribution
   switch(possible$UsePrior,
          "none"={ prior<-list(worldOn=TRUE,
@@ -140,7 +141,7 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
   }
   
   # enumerate the source populations
-  sD<-fullRSamplingDist(rs,source,design,separate=TRUE)
+  sD<-fullRSamplingDist(rs,source,design,separate=TRUE,sigOnly=possible$sigOnly)
   sourceRVals<-sD$vals
   sourceSampDens_r<-sD$dens
   sourceSampDens_r_plus<-rbind(sD$densPlus)
@@ -168,39 +169,42 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
   }
   
   # likelihood function for each sample (there's usually only 1)
-  sampleSampDens_r<-1
+  if (length(n)<length(sRho)) n<-rep(n,length(sRho))
+  sampleLikelihoodTotal_r<-1
   sampleLikelihood_r<-c()
-  if (!is.null(sRho) && !is.na(sRho)) {
-    for (ei in 1:length(sRho)){
-      rDens<-0
+  if (!any(is.null(sRho)) && !any(is.na(sRho))) {
+    for (ei in 1:length(sRho)) {
+      s1<-c()
+      for (i in 1:length(rp)) {
+        rDens<-0
       for (ci in 1:length(correction)) {
         local_r<-tanh(atanh(sRho[ei])+correction[ci])
         if (design$sNRand) {
           d<-0
           for (ni in seq(braw.env$minN,braw.env$maxRandN*design$sN,length.out=braw.env$nNpoints)) {
             g<-dgamma(ni-braw.env$minN,shape=design$sNRandK,scale=(design$sN-braw.env$minN)/design$sNRandK)
-            d<-d+rSamplingDistr(rp,local_r,ni)*g
+            d<-d+rSamplingDistr(rs,rp[i],ni,sigOnly=possible$sigOnly)*g
           }
-          d<-d/sum(d)
-          rDens<-rDens+d
         } else {
-          rDens<-rDens+rSamplingDistr(rp,local_r,n[ei])
+          d<-rSamplingDistr(rs,rp[i],n[ei],sigOnly=possible$sigOnly)
         }
+        d<-d/sum(d)
+        rDens<-rDens+d
       }
-      sampleLikelihood_r<-rbind(sampleLikelihood_r,rDens/length(correction))
-      sampleSampDens_r <- sampleSampDens_r * rDens/length(correction)
+        useDens<-approx(rs,rDens/length(correction),tanh(atanh(sRho[ei])))$y
+        s1<-cbind(s1,useDens)
+      }
+      sampleLikelihood_r<-rbind(sampleLikelihood_r,s1)
+      sampleLikelihoodTotal_r<-sampleLikelihoodTotal_r*s1
     }
     sampleLikelihood_r_show<-sampleLikelihood_r
     
     # times the a-priori distribution
-    sampleSampDens_r<-sampleSampDens_r*priorPopDens_r_full
-    for (ei in 1:length(sRho)){
-      sampleLikelihood_r[ei,]<-sampleLikelihood_r[ei,]*priorPopDens_r_full
-    }
-    
-    for (ei in 1:length(sRho)){
-      sampleLikelihood_r_show[ei,]<-sampleLikelihood_r_show[ei,]*priorPopDens_r
-    }
+    sampleLikelihoodTotal_r<-sampleLikelihoodTotal_r*priorPopDens_r_full
+    # for (ei in 1:length(sRho)){
+    #   sampleLikelihood_r[ei,]<-sampleLikelihood_r[ei,]*priorPopDens_r_full
+    #   sampleLikelihood_r_show[ei,]<-sampleLikelihood_r_show[ei,]*priorPopDens_r
+    # }
     
     # dr_gain<-max(sourceSampDens_r,na.rm=TRUE)
     # sourceSampDens_r<-sourceSampDens_r/dr_gain
@@ -231,8 +235,13 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
                        pRho=pRho,
                        source=source,prior=prior,
                        Theory=list(
-                         rs=rs,sourceSampDens_r=sourceSampDens_r,sourceSampDens_r_plus=sourceSampDens_r_plus,sourceSampDens_r_null=sourceSampDens_r_null,
-                         rp=rp,priorSampDens_r=sourceSampDens_r,sampleLikelihood_r=sampleLikelihood_r,sampleLikelihood_r_show=sampleLikelihood_r_show,priorPopDens_r=priorPopDens_r,sourcePopDens_r=sourcePopDens_r,priorSampDens_r_null=priorSampDens_r_null,priorSampDens_r_plus=priorSampDens_r_plus
+                         rs=rs,sourceSampDens_r=sourceSampDens_r,
+                               sourceSampDens_r_plus=sourceSampDens_r_plus,sourceSampDens_r_null=sourceSampDens_r_null,
+                         rp=rp,priorSampDens_r=sourceSampDens_r,
+                               sampleLikelihood_r=sampleLikelihood_r,sampleLikelihood_r_show=sampleLikelihood_r_show,
+                               sampleLikelihoodTotal_r=sampleLikelihoodTotal_r,
+                               priorPopDens_r=priorPopDens_r,sourcePopDens_r=sourcePopDens_r,
+                               priorSampDens_r_null=priorSampDens_r_null,priorSampDens_r_plus=priorSampDens_r_plus
                        ),
                        Sims=list(
                          r=possible$sims$rIV,

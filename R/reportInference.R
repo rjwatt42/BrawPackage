@@ -19,7 +19,8 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
           "Model"= {anova<-analysis$model}
   )
   nc<-ncol(anova)+2
-  if (nc<7) nc<-7
+  if (evidence$doSEM) nc<-20
+  if (nc<8) nc<-8
   
   an_name<-analysis$an_name
     outputText<-rep(" ",nc)
@@ -71,18 +72,19 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
                     mean(use1,na.rm=TRUE)*sd(analysis$dv[use1],na.rm=TRUE)^2
                   )
                 )
-        outputText<-c(outputText,"!H!Ctest-statistic","(df) ","value","p",f1,"r[s]","Cohen's d",rep("",nc-7))
-        outputText<-c(outputText,paste0("!c",t_name),df,brawFormat(tval,digits=braw.env$report_precision),pvalText,
+        outputText<-c(outputText,"!Htest-statistic","(df) ","value","p",f1,"r[s]","Cohen's d",rep("",nc-7))
+        outputText<-c(outputText,paste0("!j",t_name),df,brawFormat(tval,digits=braw.env$report_precision),pvalText,
                       f2,rvalText,brawFormat(dval,digits=braw.env$report_precision),rep("",nc-7))
       } else {
-        outputText<-c(outputText,"!H!Ctest-statistic","(df) ","value","p",f1,"r[s]",rep("",nc-6))
-        outputText<-c(outputText,paste0("!c",t_name),df,brawFormat(tval,digits=braw.env$report_precision),pvalText,
+        outputText<-c(outputText,"!Htest-statistic","(df) ","value","p",f1,"r[s]",rep("",nc-6))
+        outputText<-c(outputText,paste0("!j",t_name),df,brawFormat(tval,digits=braw.env$report_precision),pvalText,
                       f2,rvalText,rep("",nc-6))
       }
     }
     
-    if (!(braw.env$reducedOutput && is.null(IV2))) {
-      outputText<-c(outputText,"!H!C ","r",paste0(sub("Pr\\(","p\\(",sub("^","",colnames(anova)))),"")
+    if (!braw.env$reducedOutput && !is.null(IV2)) {
+      nc1<-length(colnames(anova))+1
+      outputText<-c(outputText,"!H!C ","r",paste0(sub("Pr\\(","p\\(",sub("^","",colnames(anova)))),rep("",nc-1-nc1))
       total_done<-FALSE
       
       for (i in 1:nrow(anova)){
@@ -115,7 +117,7 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
               outputText<-c(outputText,paste0("!j",brawFormat(anova[i,j],digits=braw.env$report_precision)))
             }
           }
-          outputText<-c(outputText,"")
+          outputText<-c(outputText,rep("",nc-1-nc1))
         }
       }
       if (!total_done && analysisType=="Anova") {
@@ -126,9 +128,11 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
         if (!is.na(df)) {df<-paste0("!j",brawFormat(df,digits=braw.env$report_precision))} else {df<-""}
         outputText<-c(outputText,"Total "," ",ssq,df,rep(" ",nc-4))
       }
+      outputText<-c(outputText,rep("",nc))
     }
     
     AIC<-analysis$aic
+    llkNull<-exp(-0.5*(analysis$aic-analysis$aicNull))
     k<-nrow(anova)-2+2
     n_data<-analysis$nval
     llr<-(2*k-AIC)/2
@@ -136,16 +140,30 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
     BIC=AIC+k*log(n_data)-2*k;
     CAIC=k*(log(n_data)+1)+AIC-2*k;
     outputText<-c(outputText,rep("",nc))
-    outputText<-c(outputText,"!HAIC","AICc","BIC","R^2","k","llr",rep("",nc-6))
-    outputText<-c(outputText,
-                  brawFormat(AIC,digits=1),
-                  brawFormat(AICc,digits=1),
-                  brawFormat(BIC,digits=1),
-                  brawFormat(analysis$rFull^2,digits=braw.env$report_precision),
-                  brawFormat(k),
-                  brawFormat(llr,digits=1),
-                  rep("",nc-6)
-    )
+    if (braw.env$reducedOutput) {
+      outputText<-c(outputText,"!HAIC","AICnull","llr[+]","R^2","k","llr",rep("",nc-6))
+      outputText<-c(outputText,
+                    brawFormat(analysis$aic,digits=1),
+                    brawFormat(analysis$aicNull,digits=1),
+                    brawFormat(log(llkNull),digits=3),
+                    brawFormat(analysis$rFull^2,digits=braw.env$report_precision),
+                    brawFormat(k),
+                    brawFormat(llr,digits=1),
+                    rep("",nc-6)
+      )
+    } else {
+      outputText<-c(outputText,"!HAIC","llr[+]","AICc","BIC","R^2","k","llr",rep("",nc-7))
+      outputText<-c(outputText,
+                    brawFormat(analysis$aic,digits=1),
+                    brawFormat(log(llkNull),digits=3),
+                    brawFormat(AICc,digits=1),
+                    brawFormat(BIC,digits=1),
+                    brawFormat(analysis$rFull^2,digits=braw.env$report_precision),
+                    brawFormat(k),
+                    brawFormat(llr,digits=1),
+                    rep("",nc-7)
+      )
+    }
     
     
     if (!braw.env$reducedOutput) {
@@ -155,7 +173,35 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
       outputText<-c(outputText," ",brawFormat(rn2w(analysis$rIV,analysis$nval),digits=3),
                     brawFormat(rn2w(effect$rIV,analysis$nval),digits=3),
                     paste0("!j",brawFormat(ceil(rw2n(analysis$rIV,0.8,2)))),
-                    rep("",nc-3))
+                    rep("",nc-4))
+    }
+    
+    if (evidence$doSEM) {
+      outputText<-c(outputText,rep("",nc))
+      outputText<-c(outputText,"!TNested Paths",rep("",nc-1))
+      header<-c("!H!CModel", "rIV","rIV2","rIVIV2","AIC","k","llr","srmr","rmsea","Chi^2","df","AIC[1]","k[1]")
+      outputText<-c(outputText,header,rep("",nc-length(header)))
+      for (ig in 1:(ncol(analysis$sem)-1))
+        if (!is.na(analysis$sem[1,ig])) {
+          if (analysis$sem1[1,ig]==min(analysis$sem1[1,1:7],na.rm=TRUE))
+            col<-'!B'
+          else col<-''
+        row<-c(       paste0(col,colnames(analysis$sem)[ig]),
+                      brawFormat(analysis$semRs[1,ig],digits=2,na.rm=TRUE),
+                      brawFormat(analysis$semRs[2,ig],digits=2,na.rm=TRUE),
+                      brawFormat(analysis$semRs[3,ig],digits=2,na.rm=TRUE),
+                      brawFormat(analysis$sem[1,ig],digits=1,na.rm=TRUE),
+                      brawFormat(analysis$semK[ig],digits=3,na.rm=TRUE),
+                      brawFormat(analysis$semLLR[ig],digits=3,na.rm=TRUE),
+                      brawFormat(analysis$semSRMR[ig],digits=3,na.rm=TRUE),
+                      brawFormat(analysis$semRMSEA[ig],digits=3,na.rm=TRUE),
+                      brawFormat(analysis$semCHI2[ig],digits=3,na.rm=TRUE),
+                      brawFormat(analysis$semDF[ig],digits=0,na.rm=TRUE),
+                      brawFormat(analysis$sem1[1,ig],digits=1,na.rm=TRUE),
+                      brawFormat(analysis$semK1[ig],digits=3,na.rm=TRUE)
+        )
+        outputText<-c(outputText,row,rep("",nc-length(row)))
+        }
     }
     
     nr=length(outputText)/nc

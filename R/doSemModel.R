@@ -1,6 +1,17 @@
-fit_sem_model<-function(pathmodel,model_data) {
-
-  nloop<-1
+fit_sem_model<-function(pathmodel,model_data,fixedCoeffs=NULL) {
+# this follows the notation in 
+  # Flora D.B. (2018) Statistical Methods for the Social and Behavioural Sciences
+#  
+#  Q,P = no of exogenous, endogenous variables
+#  S = sample covariance matrix 
+#  Stheta = predicted covariance matrix
+#  the process is to optimize the match S & Stheta
+  # the ML for a given estimate of Stheta
+  # is given by log(abs(Stheta)) - trace(S%/%Stheta) - log(abs(S)) -(P+Q)
+#
+#  Stheta is obtained from a given set of possible model coefficients
+  
+  nloop<-1 # how many attempts?
 
   stages<-pathmodel$path$stages
   stages<-stages[!sapply(stages,isempty)]
@@ -25,7 +36,18 @@ fit_sem_model<-function(pathmodel,model_data) {
   sem$data<-matrix(sem$data[useRow,],ncol=ncol(sem$data))
   n_obs<-nrow(sem$data)
   
-  if (n_stages>1) {
+  if (!is.null(fixedCoeffs)) {
+    for (i in 1:length(fixedCoeffs$v1)) {
+      if (is.element(fixedCoeffs$v2[i],rownames(sem$Ldesign)) &&
+          is.element(fixedCoeffs$v1[i],colnames(sem$Ldesign)))
+      sem$Ldesign[fixedCoeffs$v2[i],fixedCoeffs$v1[i]]<-0
+     else 
+      sem$Bdesign[fixedCoeffs$v2[i],fixedCoeffs$v1[i]]<-0
+    }
+  }
+  sem$fixedCoeffs<-fixedCoeffs
+  
+  if (n_stages>1) { 
   Lstart<-zeros(1,sum(sem$Ldesign!=0))
   Bstart<-zeros(1,sum(sem$Bdesign!=0))
   LBstart<-c(Lstart, Bstart)
@@ -40,7 +62,8 @@ fit_sem_model<-function(pathmodel,model_data) {
 
     S<-cov(use_data[,c(sem$endogenous, sem$exogenous)],use=nan_action)
 
-    if (length(sem$exogenous)>1) phi<-cov(use_data[,sem$exogenous],use=nan_action)
+    if (length(sem$exogenous)>1) 
+         phi<-cov(use_data[,sem$exogenous],use=nan_action)
     else phi<-matrix(var(use_data[,sem$exogenous]))
     if (length(sem$endogenous)>1) {
       psy<-cov(use_data[,sem$endogenous],use=nan_action)
@@ -167,7 +190,6 @@ fit_sem_model<-function(pathmodel,model_data) {
   # return(sem)
   
   sem<-sem_results(pathmodel,sem)
-
   return(sem)
 }
 
@@ -418,9 +440,10 @@ path2sem<-function(pathmodel,model_data) {
     if (within_stage==1){
       for (iso1 in 1:length(dests)){
         iQ1=which(sources[iso1]==endo_names);
+        if (!isempty(iQ1))
         for (iso2 in (iso1+1):length(dests)){
           iQ2=which(dests[iso2]==endo_names);
-          if (iQ2>0){
+          if (!isempty(iQ2)){
             Bdesign[iQ2,iQ1]=1;
             Bresult[iQ2,iQ1]=1;
           }
@@ -539,29 +562,27 @@ sem_results<-function(pathmodel,sem) {
   
   # chi2 exact fit
   model_chisqr=(n_obs-1)*sem$Fmin;
-  # rows are: Fixed labeled unlabeled
-  numweights=rbind(P, 0, sum(!is.na(sem$Lresult)+sum(!is.na(sem$Bresult))))
-  numcovs=rbind(0, 0, Q*(Q-1)/2)
-  numvariances=rbind(0, 0, (P+Q))
-  nummeans=rbind(P, 0, Q)
-  numintercepts=rbind(0, 0, P)
-  # %     num_est_pars=numweights + numcovs + numvariancess;
-  # %     num_obs_pars=(P+Q)*(P+Q+1)/2;
-  # %     model_chi_df=num_obs_pars - num_est_pars;
-  df=cbind(numweights, numcovs, numvariances, nummeans, numintercepts)
-  model_chi_df=sum(sum(df)-df[nrow(df),]);
+  model_chi_df=(P+Q)*(P+Q+1)/2-(2*Q+sum(sem$Lresult[!is.na(sem$Lresult)]!=0)
+                                +sum(sem$Bresult[!is.na(sem$Bresult)]!=0)
+  )
   model_chi_p=1-pchisq(abs(model_chisqr), model_chi_df);
   # non-central chi2
   model_chi_noncentrality=max(model_chisqr-model_chi_df,0)/(n_obs-1);
   rmsea=sqrt(model_chi_noncentrality/model_chi_df);
   model_rmsea_p=1-pchisq(model_chisqr, model_chi_df, model_chi_noncentrality);
   # 
-  ds=sem$cov_model-sem$covariance;
-  # [a,b]=meshgrid(diag(sem$covariance));
-  a<-matrix(diag(sem$covariance),nrow=nrow(sem$covariance),ncol=ncol(sem$covariance),byrow=TRUE)
+  # ds=sem$cov_model-sem$covariance;
+  scd<-sem$covariance
+  a<-matrix(diag(scd),nrow=nrow(scd),ncol=ncol(scd),byrow=TRUE)
   b<-t(a)
-  dc=ds/sqrt(a*b);
-  model_srmr=sqrt(sum(abs(dc^2)));
+  scd<-scd/sqrt(a*b)
+  scm<-sem$cov_model
+  a<-matrix(diag(scm),nrow=nrow(scm),ncol=ncol(scm),byrow=TRUE)
+  b<-t(a)
+  scm<-scm/sqrt(a*b)
+  dc<-scm-scd
+  # dc=ds/(a*b);
+  model_srmr=sqrt(mean(dc^2));
   #
   # 
   B=sem$Bresult; B[is.na(B)]=0;
@@ -571,20 +592,34 @@ sem_results<-function(pathmodel,sem) {
   if (Q>0) {
     X=t(sem$data[,(P+1):ncol(sem$data)]); X[is.na(X)]=0;
     Ypredicted=B%*%Y+L%*%X;
-  } else Ypredicted<-matrix(mean(sem$data),nrow=1,ncol=nrow(sem$data))
+  } else Ypredicted<-matrix(colMeans(sem$data),nrow=ncol(sem$data),ncol=nrow(sem$data))
   Yactual=Y-rowMeans(Y)
   Ypredicted=Ypredicted-rowMeans(Ypredicted)
   error=t(Yactual-Ypredicted)
   Rsquared=1-sum(diag(var(error)))/sum(diag(var(t(Y))))
   #
-  k=sum(!is.na(CF_table))+2*length(sem$endogenous); 
-  n_data=n_obs*length(sem$endogenous);
-  Resid2=sum(error^2);
-  AIC=k+n_obs*(log(2*pi*sum(error^2)/(n_data-k))+1);
-  llr<-(2*k-AIC)/2
-  AICc=AIC+(2*k*k+2*k)/(n_data-k-1);
-  BIC=k*log(n_data)+AIC-2*k;
-  CAIC=k*(log(n_data)+1)+AIC-2*k;
+  k1=sum(!is.na(CF_table))+2*length(sem$endogenous); 
+  # if (!is.null(sem$fixedCoeffs)) k<-k+nrow(sem$fixedCoeffs)
+  n_data=n_obs
+  Resid21=colSums(error^2);
+  AIC1=2*k1+n_obs*sum(log(2*pi*Resid21/n_data)+1);
+  use1<-rowSums(cbind(sem$Ldesign,sem$Bdesign))>0
+  if (all(!use1)) {
+    k<-2
+    Resid2<-sum(error^2)
+  } else {
+    k=sum(!is.na(CF_table))+2*sum(use1); 
+    Resid2=colSums(error^2)[use1]
+  }
+  AIC=2*k+n_obs*sum(log(2*pi*Resid2/n_data)+1);
+  llr<-k-AIC/2
+  AICc=AIC+2*k*(k+1)/(n_data-k-1);
+  BIC=AIC-2*k+k*log(n_data);
+  CAIC=AIC-2*k+k*(log(n_data)+1);
+  
+  k_null<-2*length(sem$endogenous)
+  Resid2_null<-sum(Yactual^2)
+  AICnull<-2*k_null+n_obs*(log(2*pi*Resid2_null/n_data)+1)
   # 
   sem$stats<-list(model_chisqr=model_chisqr,
                  model_chi_df=model_chi_df,
@@ -599,10 +634,14 @@ sem_results<-function(pathmodel,sem) {
                  n_data=n_data,
                  n_obs=n_obs,
                  llr=llr,
+                 resid2=Resid2,
                  AIC=AIC,
+                 k1=k1,
+                 AIC1=AIC1,
                  AICc=AICc,
                  BIC=BIC,
-                 CAIC=CAIC
+                 CAIC=CAIC,
+                 AICnull=AICnull
   )
   # 
   

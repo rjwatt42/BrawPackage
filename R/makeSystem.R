@@ -30,10 +30,10 @@ makeWorld<-function(worldOn=FALSE,populationPDF="Single",populationRZ="r",
 #'            ResidDistr="normal",world=makeWorld()
 #' )
 #' @export
-makeEffect<-function(rIV=0,rIV2=0,rIVIV2=0,rIVIV2DV=0,Heteroscedasticity=0,
+makeEffect<-function(rIV=0,rIV2=0,rIVIV2=0,rIVIV2DV=0,rSD=0,Heteroscedasticity=0,
                      ResidDistr="normal",world=braw.def$world){
 
-  effect<-list(rIV=rIV,rIV2=rIV2,rIVIV2=rIVIV2,rIVIV2DV=rIVIV2DV,
+  effect<-list(rIV=rIV,rIV2=rIV2,rIVIV2=rIVIV2,rIVIV2DV=rIVIV2DV,rSD=rSD,
                Heteroscedasticity=Heteroscedasticity,ResidDistr=ResidDistr,
                world=world
   )
@@ -96,7 +96,7 @@ makeSampling<-function(type="Random") {
           "Cluster"={
             method=list(type="Cluster",
                           Main_rad=1,
-                          Cluster_n=8,
+                          Cluster_n=10,
                           Cluster_rad=0.3,
                           Contact_n=0,
                           Contact_rad=0
@@ -106,15 +106,15 @@ makeSampling<-function(type="Random") {
             method=list(type="Snowball",
                            Main_rad=1,
                            Cluster_n=1,
-                           Cluster_rad=0.0,
-                           Contact_n=7,
+                           Cluster_rad=1,
+                           Contact_n=10,
                            Contact_rad=0.2
             )
           },
           "Convenience"={
             method=list(type="Convenience",
                               Main_rad=1,
-                              Cluster_n=1,
+                              Cluster_n=3,
                               Cluster_rad=0.3,
                               Contact_n=3,
                               Contact_rad=0.2
@@ -152,7 +152,7 @@ makeReplication<-function(On=FALSE,Repeats=1,Keep="Cautious",RepAlpha=0.05,
 #' 
 #' @param sMethod         sampling method object
 #' @param sIV1Use         "Between","Within"
-#' @param sCheating       "None","Grow","Prune","Replace","Retry","Add"
+#' @param sCheating       "None","Grow","Prune","Replace","Retry"
 #' @param sCheatingLimit  "Fixed","Budget"
 #' @returns a design object
 #' @seealso [showDesign()]
@@ -170,7 +170,8 @@ makeReplication<-function(On=FALSE,Repeats=1,Keep="Cautious",RepAlpha=0.05,
 #'            Replication=makeReplication()
 #' )
 #' @export
-makeDesign<-function(sN=42, sMethod=makeSampling("Random") ,sNRand=FALSE,sNRandK=2, 
+makeDesign<-function(sN=42, sMethod=makeSampling("Random"),sMethodSeverity=0.1,
+                     sNRand=FALSE,sNRandK=2, 
                      sIV1Use="Between",sIV2Use="Between", 
                      sWithinCor=0.5,
                      sBudgetOn=FALSE,sNBudget=1000,
@@ -180,7 +181,8 @@ makeDesign<-function(sN=42, sMethod=makeSampling("Random") ,sNRand=FALSE,sNRandK
                      Replication=makeReplication()
 ) {
   
-  design<-list(sN=sN, sMethod=sMethod, sNRand=sNRand,sNRandK=sNRandK,
+  design<-list(sN=sN, sMethod=sMethod, sMethodSeverity=sMethodSeverity,
+               sNRand=sNRand,sNRandK=sNRandK,
                sIV1Use=sIV1Use,sIV2Use=sIV2Use, 
                sWithinCor=sWithinCor,
                sBudgetOn=sBudgetOn,sNBudget=sNBudget,
@@ -214,6 +216,8 @@ makeEvidence<-function(shortHand=FALSE,sigOnly=FALSE,
                        rInteractionOn=FALSE,rInteractionOnly=TRUE,ssqType="Type3",
                        caseOrder="AsStated",
                        llr=list(e1=c(),e2=0),
+                       useAIC="AIC",
+                       doSEM=FALSE,
                        Welch=FALSE,Transform="None",
                        McFaddens=TRUE,
                        prior=makeWorld(TRUE,"Uniform","r")
@@ -221,7 +225,7 @@ makeEvidence<-function(shortHand=FALSE,sigOnly=FALSE,
   
   evidence<-list(rInteractionOn=rInteractionOn,rInteractionOnly=rInteractionOnly,ssqType=ssqType,
                  caseOrder=caseOrder,shortHand=shortHand,sigOnly=sigOnly,
-                 llr=llr,
+                 llr=llr,useAIC=useAIC,doSEM=doSEM,
                  Welch=Welch,Transform=Transform,McFaddens=McFaddens,
                  prior=prior
   )

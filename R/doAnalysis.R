@@ -345,6 +345,8 @@ multipleAnalysis<-function(nsims=1,hypothesis,design,evidence,newResult=c()){
       newResult$nval[j]<-res$nval
       newResult$noval[j]<-res$noval
       newResult$df1[j]<-res$df1
+      newResult$aic[j]<-res$aic
+      newResult$aicNull[j]<-res$aicNull
       if (!is.null(hypothesis$IV2)) {
         newResult$rIV2[j]<-res$rIV2
         newResult$pIV2[j]<-res$pIV2
@@ -357,6 +359,10 @@ multipleAnalysis<-function(nsims=1,hypothesis,design,evidence,newResult=c()){
         newResult$p$direct[j,]<-res$p$direct
         newResult$p$unique[j,]<-res$p$unique
         newResult$p$total[j,]<-res$p$total
+      }
+      if (!is.null(res$sem)){
+      newResult$sem[j,]<-res$sem
+      colnames(newResult$sem)<-colnames(res$sem)
       }
       newResult$iv.mn[j]<-res$iv.mn
       newResult$iv.sd[j]<-res$iv.sd
@@ -512,6 +518,13 @@ generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",ca
   }
   r.full<-matrix(model2fulleffect(lmNormC,anNormC),nrow=1)
   aic<-AIC(lmNormC)
+
+  k<-2
+  n_obs<-n
+  n_data<-n
+  resid2<-sum((analysisRawData$dv-mean(analysisRawData$dv))^2)
+  aicNull<-2*k+n_obs*(log(2*pi*resid2/n_data)+1)
+  
   # if (length(r.direct)<3) {
   #   r.direct<-c(r.direct,0)
   #   r.unique<-c(r.unique,0)
@@ -528,6 +541,7 @@ generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",ca
               r.total=r.total,
               r.full=r.full,
               aic=aic,
+              aicNull=aicNull,
               
               p.direct=p.direct,
               p.unique=p.unique,
@@ -550,6 +564,7 @@ generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",ca
 #' analysis<-doAnalysis(sample=doSample(),evidence=makeEvidence(),autoShow=braw.env$autoShow)#' make a multiple samples
 #' @export
 doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,autoShow=FALSE){
+
   design<-sample$design
   hypothesis<-sample$hypothesis
   IV<-hypothesis$IV
@@ -610,7 +625,131 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
   }
   analysis$rIVIV2<-0
   
+  if (evidence$doSEM) {
+    stages<-list(IV$name,IV2$name,DV$name)
+    pathmodel<-list(path=
+                      list(
+                        stages=stages,
+                        depth=2,
+                        only_ivs=NULL,
+                        only_dvs=NULL,
+                        within_stage=FALSE,
+                        add=NULL,
+                        remove=NULL
+                      )
+    )
+    use<-1:(ncol(allData)-1)
+    model_data<-list(pid=allData[,1],
+                     data=allData[,use+1],
+                     varnames=c(DV$name,IV$name,IV2$name)[use],
+                     varcat=c(DV$type=="Categorical",IV$type=="Categorical",IV2$type=="Categorical")[use]
+    )
+    if (!is.null(IV2) && ncol(allData)>3) {
+      pathmodel$path$stages<-list(IV$name,IV2$name,DV$name)
+      pathmodel$path$depth<-2
+      sem6<-fit_sem_model(pathmodel,model_data)
+      sem5<-fit_sem_model(pathmodel,model_data,fixedCoeffs=data.frame(v1=IV$name,v2=IV2$name))
+      sem4<-fit_sem_model(pathmodel,model_data,fixedCoeffs=data.frame(v1=IV$name,v2=DV$name))
+      sem2<-fit_sem_model(pathmodel,model_data,
+                          fixedCoeffs=data.frame(v1=c(IV$name,IV$name),v2=c(IV2$name,DV$name)))
+      
+      pathmodel$path$stages<-list(IV2$name,IV$name,DV$name)
+      sem3<-fit_sem_model(pathmodel,model_data,fixedCoeffs=data.frame(v1=IV2$name,v2=DV$name))
+      sem1<-fit_sem_model(pathmodel,model_data,
+                          fixedCoeffs=data.frame(v1=c(IV2$name,IV2$name),v2=c(IV$name,DV$name)))
+      sem0<-fit_sem_model(pathmodel,model_data,
+                          fixedCoeffs=data.frame(v1=c(IV2$name,IV2$name,IV$name),v2=c(IV$name,DV$name,DV$name)))
+                          
+      analysis$semRs<-t(rbind(
+        c(sem0$ES_table[DV$name,IV$name],sem0$ES_table[DV$name,IV2$name],sem0$ES_table[IV$name,IV2$name]),
+        c(sem1$ES_table[DV$name,IV$name],sem1$ES_table[DV$name,IV2$name],sem1$ES_table[IV$name,IV2$name]),
+        c(sem2$ES_table[DV$name,IV$name],sem2$ES_table[DV$name,IV2$name],sem2$ES_table[IV$name,IV2$name]),
+        c(sem3$ES_table[DV$name,IV$name],sem3$ES_table[DV$name,IV2$name],sem3$ES_table[IV$name,IV2$name]),
+        c(sem4$ES_table[DV$name,IV$name],sem4$ES_table[DV$name,IV2$name],sem4$ES_table[IV2$name,IV$name]),
+        c(sem5$ES_table[DV$name,IV$name],sem5$ES_table[DV$name,IV2$name],sem5$ES_table[IV2$name,IV$name]),
+        c(sem6$ES_table[DV$name,IV$name],sem6$ES_table[DV$name,IV2$name],sem6$ES_table[IV2$name,IV$name])
+      ))
+      modelSEMs<-c(sem0$eval[[evidence$useAIC]],
+                   sem1$eval[[evidence$useAIC]],
+                   sem2$eval[[evidence$useAIC]],
+                   sem3$eval[[evidence$useAIC]],
+                   sem4$eval[[evidence$useAIC]],
+                   sem5$eval[[evidence$useAIC]],
+                   sem6$eval[[evidence$useAIC]]
+      )
+      modelSEM1s<-c(sem0$eval[[paste0(evidence$useAIC,"1")]],
+                   sem1$eval[[paste0(evidence$useAIC,"1")]],
+                   sem2$eval[[paste0(evidence$useAIC,"1")]],
+                   sem3$eval[[paste0(evidence$useAIC,"1")]],
+                   sem4$eval[[paste0(evidence$useAIC,"1")]],
+                   sem5$eval[[paste0(evidence$useAIC,"1")]],
+                   sem6$eval[[paste0(evidence$useAIC,"1")]]
+      )
+      analysis$semP<-c(sem0$P,sem1$P,sem2$P,sem3$P,sem4$P,sem5$P,sem6$P)
+      analysis$semQ<-c(sem0$Q,sem1$Q,sem2$Q,sem3$Q,sem4$Q,sem5$Q,sem6$Q)
+      analysis$semK1<-c(sem0$eval$k1,sem1$eval$k1,sem2$eval$k1,sem3$eval$k1,sem4$eval$k1,sem5$eval$k1,sem6$eval$k1)
+      analysis$semK<-c(sem0$eval$k,sem1$eval$k,sem2$eval$k,sem3$eval$k,sem4$eval$k,sem5$eval$k,sem6$eval$k)
+      analysis$semLLR<-c(sem0$eval$llr,sem1$eval$llr,sem2$eval$llr,sem3$eval$llr,sem4$eval$llr,sem5$eval$llr,sem6$eval$llr)
+      analysis$semRESID2<-c(sem0$eval$resid2,sem1$eval$resid2,sem2$eval$resid2,sem3$eval$resid2,sem4$eval$resid2,sem5$eval$resid2,sem6$eval$resid2)
+      analysis$semSRMR<-c(sem0$stats$model_srmr,sem1$stats$model_srmr,sem2$stats$model_srmr,
+                           sem3$stats$model_srmr,sem4$stats$model_srmr,sem5$stats$model_srmr,sem6$stats$model_srmr)
+      analysis$semRMSEA<-c(sem0$stats$rmsea,sem1$stats$rmsea,sem2$stats$rmsea,
+                           sem3$stats$rmsea,sem4$stats$rmsea,sem5$stats$rmsea,sem6$stats$rmsea)
+      analysis$semCHI2<-c(sem0$stats$model_chisqr,sem1$stats$model_chisqr,sem2$stats$model_chisqr,
+                          sem3$stats$model_chisqr,sem4$stats$model_chisqr,sem5$stats$model_chisqr,sem6$stats$model_chisqr)
+      analysis$semDF<-c(sem0$stats$model_chi_df,sem1$stats$model_chi_df,sem2$stats$model_chi_df,
+                          sem3$stats$model_chi_df,sem4$stats$model_chi_df,sem5$stats$model_chi_df,sem6$stats$model_chi_df)
+    } else {
+      pathmodel$path$stages<-list(DV$name)
+      sem0<-fit_sem_model(pathmodel,model_data)
+      
+      pathmodel$path$stages<-list(IV$name,DV$name)
+      sem1<-fit_sem_model(pathmodel,model_data)
+      
+      modelSEMs<-c(sem0$eval[[evidence$useAIC]],
+                   sem1$eval[[evidence$useAIC]],
+                   NA,NA,NA,NA,NA
+                   )
+      analysis$semP<-c(sem0$eval$P,sem1$eval$P,rep(NA,5))
+      analysis$semQ<-c(sem0$eval$Q,sem1$eval$Q,rep(NA,5))
+      analysis$semRs<-t(rbind(c(NA,NA,NA),c(sem1$ES_table[1,2],NA,NA)))
+      analysis$semK<-c(sem0$eval$k,sem1$eval$k,rep(NA,5))
+      analysis$semLLR<-c(sem0$eval$llr,sem1$eval$llr,rep(NA,5))
+      analysis$semRESID2<-c(sem0$eval$resid2,sem1$eval$resid2,rep(NA,5))
+      analysis$semSRMR<-c(sem0$stats$model_srmr,sem1$stats$model_srmr,rep(NA,5))
+      analysis$semRMSEA<-c(sem0$stats$rmsea,sem1$stats$rmsea,rep(NA,5))
+      analysis$semCHI2<-c(sem0$stats$model_chisqr,sem1$stats$model_chisqr,rep(NA,5))
+      analysis$semDF<-c(sem0$stats$model_chi_df,sem1$stats$model_chi_df,rep(NA,5))
+    }
+    rarrow<-'\u2192'
+    barrow<-'\u2190\u2192'
+    analysis$sem<-matrix(c(modelSEMs,which.min(modelSEMs)),nrow=1)
+    colnames(analysis$sem)<-c("DV",
+                              paste0("IV",rarrow,"DV"),
+                              paste0("IV2",rarrow,"DV"),
+                              paste0("IV2",rarrow,"IV",rarrow,"DV"),
+                              paste0("IV",rarrow,"IV2",rarrow,"DV"),
+                              paste0("(IV + IV2)",rarrow,"DV"),
+                              paste0("(IV" ,barrow, "IV2)",rarrow,"DV"),
+                              "Best"
+    )
+    analysis$sem1<-matrix(c(modelSEM1s,which.min(modelSEM1s)),nrow=1)
+    colnames(analysis$sem1)<-c("DV",
+                              paste0("IV",rarrow,"DV"),
+                              paste0("IV2",rarrow,"DV"),
+                              paste0("IV2",rarrow,"IV",rarrow,"DV"),
+                              paste0("IV",rarrow,"IV2",rarrow,"DV"),
+                              paste0("(IV + IV2)",rarrow,"DV"),
+                              paste0("(IV" ,barrow, "IV2)",rarrow,"DV"),
+                              "Best"
+    )
+  } else {
+    analysis$sem<-NULL
+    analysis$sem1<-NULL
+  }
+  
   analysis$aic<-anResult$aic
+  analysis$aicNull<-anResult$aicNull
   analysis$rFull<-anResult$r.full
   analysis$rFullse<-r2se(analysis$rFull,n)
   analysis$rFullCI<-r2ci(analysis$rFull,n)

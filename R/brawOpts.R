@@ -17,9 +17,9 @@ newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
   print(startPlot(box="none",backC=braw.env$plotColours$graphC))
 }
 
-BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1.5,graphicsSize=c(16,10),
+BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16,10),
                    reportHTML=FALSE, graphHTML=FALSE,
-                   newDev=FALSE,height=NULL,aspect=1.3,autoShow=FALSE,timeLimit=Inf,fullGraphSize=1,
+                   newDev=FALSE,height=400,aspect=1.3,autoShow=FALSE,timeLimit=Inf,fullGraphSize=1,
                    reducedOutput=FALSE) {
   if (graphC=="white") graphC<-"#FFFFFF"
   if (graphC=="normal") graphC<-"#BFECFF"
@@ -27,7 +27,7 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1.5,graphicsSize=c(16,10),
   braw.def <- new.env(parent = emptyenv())
   braw.res <- new.env(parent = emptyenv())
   
-  if (is.null(height)) height<-convertHeight(unit(1, "npc"),"pt",valueOnly = TRUE)
+  # if (is.null(height)) height<-convertHeight(unit(1, "npc"),"pt",valueOnly = TRUE)
   
   if (newDev) {
     while (dev.cur()!=1) dev.off()
@@ -56,8 +56,8 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1.5,graphicsSize=c(16,10),
                     descriptionC1="#FF5533",descriptionC2="#CCBB33",
                     descriptionTotal=darken(desat("#DD8844",0.1),0.7),descriptionsUnique=darken(desat("#DD8844",0.1),1.3),
                     infer_sigC="#11CC00",infer_nsigC="#FF4400",infer_none="#AAAAAA",infer_miss=NULL,
-                    infer_sigNonNull="#11CC00",infer_isigNonNull="#881100",infer_nsigNonNull="#881100",infer_nsdNonNull="#DDCCCC",
-                    infer_sigNull="#118800",infer_isigNull="#FF4400",infer_nsigNull="#FF4400",infer_nsdNull="#CCDDCC",
+                    infer_sigNonNull="#11CC00",infer_nsigNonNull="#AA6633",infer_isigNonNull="#881100",infer_nsdNonNull="#DDCCCC",
+                    infer_sigNull="#88AA66",infer_nsigNull="#FF4400",infer_isigNull="#FF4400",infer_nsdNull="#CCDDCC",
                     psig="#FFAA00",alpha="#44FF22",
                     fdr="#227700",fmr="#BB5555")
 
@@ -215,7 +215,7 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1.5,graphicsSize=c(16,10),
                  "w"=   {pSigLabel<-"w"}
           )
           
-          posChar<-"'+'"
+          posChar<-"+"
           switch(useLabels$P,
                  "+"={
                    nullChar<-"0"
@@ -251,17 +251,22 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1.5,graphicsSize=c(16,10),
                     nonNullNegative<-paste0(Zchar,"^",posChar,'(-sig)')  # "Z+ -ve"
                   },
                   "D"= {
+                    braw.env$nonNull<-paste0(Zchar,"[",posChar,"]")
+                    braw.env$Null<-paste0(Zchar,"[",nullChar,"]")
+                    # braw.env$nonNull<-paste0(Zchar,posChar)
+                    # braw.env$Null<-paste0(Zchar,nullChar)
+                    
                     Plabel<-paste0(Pchar,"[",Ptypechar,"]")
                     Llabel<-paste0(Lchar,"[",Ltypechar,"]")
 
-                    nullSig<-paste0(Zchar,"[",nullChar,"]",'(sig)')  # "Z+ +ve"
-                    nullPositive<-paste0(Zchar,"[",nullChar,"]",'(+sig)')  # "Z+ +ve"
-                    nullNS<-paste0(Zchar,"[",nullChar,"]",'(ns) ')  # "Z+ -ve"
-                    nullNegative<-paste0(Zchar,"[",nullChar,"]",'(-sig)')  # "Z+ -ve"
-                    nonNullSig<-paste0(Zchar,"[",posChar,"]",'(sig)')  # "Z+ +ve"
-                    nonNullPositive<-paste0(Zchar,"[",posChar,"]",'(+sig)')  # "Z+ +ve"
-                    nonNullNS<-paste0(Zchar,"[",posChar,"]",'(ns) ')  # "Z+ -ve"
-                    nonNullNegative<-paste0(Zchar,"[",posChar,"]",'(-sig)')  # "Z+ -ve"
+                    nullSig<-paste0(braw.env$Null,'(sig)')  # "Z+ +ve"
+                    nullPositive<-paste0(braw.env$Null,'(+sig)')  # "Z+ +ve"
+                    nullNS<-paste0(braw.env$Null,'(ns) ')  # "Z+ -ve"
+                    nullNegative<-paste0(braw.env$Null,'(-sig)')  # "Z+ -ve"
+                    nonNullSig<-paste0(braw.env$nonNull,'(sig)')  # "Z+ +ve"
+                    nonNullPositive<-paste0(braw.env$nonNull,'(+sig)')  # "Z+ +ve"
+                    nonNullNS<-paste0(braw.env$nonNull,'(ns) ')  # "Z+ -ve"
+                    nonNullNegative<-paste0(braw.env$nonNull,'(-sig)')  # "Z+ -ve"
                   }
           )
           
@@ -279,7 +284,7 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1.5,graphicsSize=c(16,10),
           
           braw.env$Plabel<-Plabel
           braw.env$Llabel<-Llabel
-          
+
           braw.env$nonNullSig<-nonNullSig
           braw.env$nonNullPositive<-nonNullPositive
           braw.env$nonNullNS<-nonNullNS
@@ -294,7 +299,6 @@ BrawOpts<-function(BW=FALSE,graphC="normal",fontScale=1.5,graphicsSize=c(16,10),
 
           braw.env$timeLimit<-timeLimit # seconds
           
-braw.env<<-braw.env          
 
 braw.res$result<-NULL 
 braw.res$multiple<-NULL 
@@ -303,7 +307,6 @@ braw.res$metaResult<-NULL
 braw.res$metaMultiple<-NULL
 braw.res$possibleResult<-NULL
 
-braw.res<<-braw.res
 
 braw.def$IV<-makeVariable("IV")
 braw.def$IV2<-NULL
@@ -315,10 +318,13 @@ braw.def$design<-makeDesign()
 braw.def$evidence<-makeEvidence()
 braw.def$metaAnalysis<-makeMetaAnalysis()
 braw.def$explore<-makeExplore()
-braw.def$possible<-makePossible(targetSample=0.3,sims=NULL,
-                                hypothesis=braw.def$hypothesis,design=braw.def$design)
+# braw.def$possible<-makePossible(targetSample=0.3,sims=NULL,
+#                                 hypothesis=braw.def$hypothesis,design=braw.def$design)
+braw.def$possible<-NULL
 
 braw.def<<-braw.def
+braw.env<<-braw.env          
+braw.res<<-braw.res
 
 }
 

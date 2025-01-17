@@ -53,7 +53,7 @@ BrawInstructions <- function(HelpType="Plan") {
            ' <li>',
            '<b>Analysis:</b>',
            '<br> An analysis is the procedure by which the sample will be used to reach an inference about the population.',
-           'If null hypothesis testing is used, then the most important part of the analysis is the choice of alpha (normally 0.05).',
+           'If null hypothesis testing is used, then the most important part of the analysis is the choice of &alpha; (normally 0.05).',
            ' </li>',
            '</ol>')
            
@@ -248,7 +248,7 @@ BrawInstructions <- function(HelpType="Plan") {
            '<b>Power</b>',
            '<br><b>w<sub>s</sub></b> sample power (r<sub>s</sub> & n)',
            '<br><b>w<sub>p</sub></b> population power (r<sub>p</sub> & n)',
-           '<br><b>w<sub>n</sub></b> required sample size from r<sub>s</sub>',
+           '<br><b>n<sub>w</sub></b> required sample size from r<sub>s</sub>',
            '   </td>',
            '   <td class="here">',
            '<b>Replication</b>',

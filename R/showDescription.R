@@ -362,7 +362,11 @@ showDescription<-function(analysis=braw.res$result,plotArea=c(0,0,1,1),g=NULL) {
             "Ordinal"=g<-plotParDescription(analysis,g),
             "Categorical"=g<-plotCatDescription(analysis,g)
     )
-    g<-addG(g,dataLabel("centreright",paste0("r[s]=",round(analysis$rIV,3)),size=0.75,fill="black",colour="white"))
+    g<-addG(g,dataLegend(data.frame(names=c(paste0("n=",analysis$nval),
+                                            paste0("r[s]=",round(analysis$rIV,3))),
+                                    colours=c(braw.env$plotColours$sampleC,
+                                              braw.env$plotColours$descriptionC)),
+                         title="",shape=c(21,22)))
   } else{
     g<-nullPlot()
     if (analysis$evidence$rInteractionOn) {

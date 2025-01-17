@@ -1,24 +1,25 @@
 
 cheatSample<-function(hypothesis,design,evidence,sample,result) {
   changeAmount<-1
-  
+  CheatingAttempts<-design$sCheatingAttempts
+
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV
   effect<-hypothesis$effect
   
   if (design$sCheating=="None") return(result)
-  if (design$sCheatingAttempts==0) return(result)
+  if (CheatingAttempts==0) return(result)
   if (isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence)) return(result)
 
   # fix the hypothesis
   hypothesis$effect$world$worldOn<-FALSE
   hypothesis$effect$rIV<-result$rpIV
   
-  if (is.element(design$sCheating,c("Retry","Add"))) {
+  if (is.element(design$sCheating,c("Retry"))) {
     ntrials<-0
     switch(design$sCheatingLimit,
-           "Fixed"={limit<-design$sCheatingAttempts},
+           "Fixed"={limit<-CheatingAttempts},
            "Budget"={limit<-design$sCheatingBudget}
            )
     while (!isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence) && ntrials<limit) {
@@ -34,7 +35,7 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
   
   if (is.element(design$sCheating,c("Grow","Replace"))) {
     design2<-design
-    design2$sN<-design$sCheatingAttempts*changeAmount
+    design2$sN<-CheatingAttempts*changeAmount
     design2$sNRand<-FALSE
     
     effect2<-effect
@@ -44,7 +45,8 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
 
   if (is.element(design$sCheating,c("Prune","Replace"))) {
     ntrials<-0
-    while (!isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence) && ntrials<design$sCheatingAttempts) {
+    while (!isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence) 
+           && ntrials<CheatingAttempts) {
       ps<-c()
       for (i in 1:length(sample$iv)) {
         sample1<-sample
@@ -81,7 +83,8 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
   
   if (design$sCheating=="Grow") {
     ntrials<-0
-    while (!isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence) && ntrials<design$sCheatingAttempts*changeAmount) {
+    while (!isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence) 
+           && ntrials<CheatingAttempts*changeAmount) {
       sample$participant<-c(sample$participant,length(sample$participant)+(1:changeAmount))
       sample$iv<-c(sample$iv,sample2$iv[ntrials+(1:changeAmount)])
       sample$dv<-c(sample$dv,sample2$dv[ntrials+(1:changeAmount)])
@@ -98,7 +101,7 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
   
   if (design$sCheating=="Replace") {
     ntrials<-0
-    while (!isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence) && ntrials<design$sCheatingAttempts) {
+    while (!isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence) && ntrials<CheatingAttempts) {
       ps<-c()
       for (i in 1:length(sample$iv)) {
         sample1<-sample

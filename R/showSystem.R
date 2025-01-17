@@ -67,31 +67,49 @@ showHypothesis<-function(hypothesis=braw.def$hypothesis,evidence=braw.def$eviden
            xoff<-plotArea[1]
            g<-showVariable(IV,plotArea=c(xoff,yoff+0.65*ygain,xgain,0.35*ygain),g=g)
            g<-showVariable(DV,plotArea=c(xoff,yoff,xgain,0.35*ygain),g=g)
-           g<-showEffect(effect$rIV,showValue=!doWorld,plotArea=c(xoff,yoff+0.35*ygain,xgain,0.3*ygain),1,g)
-           if (doWorld) g<-showWorld(hypothesis,plotArea=c(xoff+0.13,0.4*ygain,xgain*0.65,0.27*ygain),g=g)
+           g<-showEffect(c(effect$rIV,effect$rSD),showValue=!doWorld,plotArea=c(xoff,yoff+0.35*ygain,xgain,0.3*ygain),1,g)
+           if (doWorld) g<-showWorld(hypothesis,plotArea=c(xoff+0.23,0.4*ygain,xgain*0.65,0.27*ygain),g=g)
          },
          {
            xgain<-plotArea[3]/2.5
            xoff<-plotArea[1]
            ygain<-ygain
-           if (hypothesis$layout=="path") {
-             g<-showVariable(IV,plotArea=c(xoff,yoff+0.65*ygain,xgain*0.9,0.35*ygain),g=g)
-             g<-showVariable(IV2,plotArea=c(xoff+xgain*1.1,yoff+0.35*ygain,xgain*0.9,0.35*ygain),g=g)
-             g<-showVariable(DV,plotArea=c(xoff,yoff,xgain,0.35*ygain),g=g)
-             g<-showEffect(effect$rIV,6,showValue=!doWorld,plotArea=c(xoff,yoff+0.35*ygain,xgain,0.3*ygain),g)
-             g<-showEffect(effect$rIV2,7,showValue=!doWorld,plotArea=c(xoff+xgain*1.1/2,yoff+0.05*ygain,xgain,0.3*ygain),g)
-             g<-showEffect(effect$rIVIV2,8,showValue=!doWorld,plotArea=c(xoff+xgain*1.1/2,yoff+0.65*ygain,xgain,0.3*ygain),g)
-           } else {
-             g<-showVariable(IV,plotArea=c(xoff-xgain*0.3,yoff+0.65*ygain,xgain,0.35*ygain),g=g)
-             g<-showVariable(IV2,plotArea=c(xoff+xgain*1.3,yoff+0.65*ygain,xgain,0.35*ygain),g=g)
-             g<-showVariable(DV,plotArea=c(xoff+xgain/2,yoff,xgain,0.35*ygain),g=g)
-           g<-showEffect(effect$rIV,2,showValue=!doWorld,plotArea=c(xoff-xgain*0.3,yoff+0.35*ygain,xgain,0.3*ygain),g)
-           g<-showEffect(effect$rIV2,3,showValue=!doWorld,plotArea=c(xoff+xgain*1.3,yoff+0.35*ygain,xgain,0.3*ygain),g)
-           if (hypothesis$layout!="simple")
-           g<-showEffect(effect$rIVIV2,4,showValue=!doWorld,plotArea=c(xoff+xgain/2,yoff+0.7*ygain,xgain,0.22*ygain),g)
-           if (evidence$rInteractionOn && hypothesis$layout=="normal")
-           g<-showEffect(effect$rIVIV2DV,5,showValue=!doWorld,plotArea=c(xoff+xgain/2,yoff+0.35*ygain,xgain,0.3*ygain),g)
-           }
+           switch(hypothesis$layout,
+                  "simple"={
+                    g<-showVariable(IV,plotArea=c(xoff-xgain*0.3,yoff+0.65*ygain,xgain,0.35*ygain),g=g)
+                    g<-showVariable(IV2,plotArea=c(xoff+xgain*1.3,yoff+0.65*ygain,xgain,0.35*ygain),g=g)
+                    g<-showVariable(DV,plotArea=c(xoff+xgain/2,yoff,xgain,0.35*ygain),g=g)
+                    g<-showEffect(effect$rIV,2,showValue=!doWorld,plotArea=c(xoff-xgain*0.3,yoff+0.35*ygain,xgain,0.3*ygain),g)
+                    g<-showEffect(effect$rIV2,3,showValue=!doWorld,plotArea=c(xoff+xgain*1.3,yoff+0.35*ygain,xgain,0.3*ygain),g)
+                  },
+                  "normal"={
+                    g<-showVariable(IV,plotArea=c(xoff-xgain*0.3,yoff+0.65*ygain,xgain,0.35*ygain),g=g)
+                    g<-showVariable(IV2,plotArea=c(xoff+xgain*1.3,yoff+0.65*ygain,xgain,0.35*ygain),g=g)
+                    g<-showVariable(DV,plotArea=c(xoff+xgain/2,yoff,xgain,0.35*ygain),g=g)
+                    g<-showEffect(effect$rIV,2,showValue=!doWorld,plotArea=c(xoff-xgain*0.3,yoff+0.35*ygain,xgain,0.3*ygain),g)
+                    g<-showEffect(effect$rIV2,3,showValue=!doWorld,plotArea=c(xoff+xgain*1.3,yoff+0.35*ygain,xgain,0.3*ygain),g)
+                    g<-showEffect(effect$rIVIV2,4,showValue=!doWorld,plotArea=c(xoff+xgain/2,yoff+0.7*ygain,xgain,0.22*ygain),g)
+                    if (evidence$rInteractionOn)
+                      g<-showEffect(effect$rIVIV2DV,5,showValue=!doWorld,plotArea=c(xoff+xgain/2,yoff+0.35*ygain,xgain,0.3*ygain),g)
+                  },
+                  "path"={
+                    g<-showVariable(IV,plotArea=c(xoff,yoff+0.65*ygain,xgain*0.9,0.35*ygain),g=g)
+                    g<-showVariable(IV2,plotArea=c(xoff+xgain*1.1,yoff+0.35*ygain,xgain*0.9,0.35*ygain),g=g)
+                    g<-showVariable(DV,plotArea=c(xoff,yoff,xgain,0.35*ygain),g=g)
+                    g<-showEffect(effect$rIV,6,showValue=!doWorld,plotArea=c(xoff,yoff+0.35*ygain,xgain,0.3*ygain),g)
+                    g<-showEffect(effect$rIV2,7,showValue=!doWorld,plotArea=c(xoff+xgain*1.1/2,yoff+0.05*ygain,xgain,0.3*ygain),g)
+                    g<-showEffect(effect$rIVIV2,8,showValue=!doWorld,plotArea=c(xoff+xgain*1.1/2,yoff+0.65*ygain,xgain,0.3*ygain),g)
+                  },
+                  "lpath"={
+                    g<-showVariable(IV2,plotArea=c(xoff+xgain*1.1,yoff+0.65*ygain,xgain*0.9,0.35*ygain),g=g)
+                    g<-showVariable(IV,plotArea=c(xoff,yoff+0.35*ygain,xgain*0.9,0.35*ygain),g=g)
+                    g<-showVariable(DV,plotArea=c(xoff+xgain*1.1,yoff,xgain,0.35*ygain),g=g)
+                    g<-showEffect(effect$rIV,9,showValue=!doWorld,plotArea=c(xoff,yoff+0.05*ygain,xgain,0.3*ygain),g)
+                    g<-showEffect(effect$rIV2,10,showValue=!doWorld,plotArea=c(xoff+xgain*1.1/2,yoff+0.35*ygain,xgain,0.3*ygain),g)
+                    g<-showEffect(effect$rIVIV2,11,showValue=!doWorld,plotArea=c(xoff,yoff+0.65*ygain,xgain,0.3*ygain),g)
+                  }
+             
+           )
            wgain<-0.8
            if (doWorld) g<-showWorld(hypothesis,plotArea=c(xoff+0.27,0.3*ygain,0.275*wgain,0.38*wgain*ygain),g=g)
          })
@@ -167,32 +185,62 @@ showWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),autoShow=
 #' showDesign(design=makeDesign())
 #' @export
 showDesign<-function(design=braw.def$design,hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),autoShow=FALSE,g=NULL) {
+
   nRange<-plotAxis("n",hypothesis)
   binRange<-nRange$lim
-  
-  nbin<-seq(binRange[1],binRange[2],length.out=braw.env$worldNPoints)
-  
-  if (braw.env$nPlotScale=="log10")  nbin<-10^(nbin)
-  if (design$sNRand) {
-    ndens<-dgamma(nbin-braw.env$minN,shape=design$sNRandK,scale=(design$sN-braw.env$minN)/design$sNRandK)
-    ndens<-ndens/max(ndens)
-  } else {
-    ndens<-nbin*0
-    use=which.min(abs(nbin-design$sN))
-    ndens[use]<-1
-  }
-  
-  x<-c(min(nbin),nbin,max(nbin))
-  y<-c(0,ndens,0)*0.8
-  pts=data.frame(x=log10(x),y=y)
   
   braw.env$plotArea<-plotArea
   g<-startPlot(xlim=binRange, ylim=c(0,1),
                xticks=makeTicks(nRange$ticks,10^nRange$ticks),xlabel=makeLabel(nRange$label),
                box="x",g=g)
+  
+  nbin<-seq(binRange[1],binRange[2],length.out=braw.env$worldNPoints)
+  xpts<-c(-1,-1,1,1)*(max(log10(nbin))-min(log10(nbin)))/100
+  
+  if (braw.env$nPlotScale=="log10")  nbin<-10^(nbin)
+  if (design$sNRand) {
+    ndens<-dgamma(nbin-braw.env$minN,shape=design$sNRandK,scale=(design$sN-braw.env$minN)/design$sNRandK)
+    ndens<-ndens/max(ndens)
+    x<-c(min(nbin),nbin,max(nbin))
+    y<-c(0,ndens,0)*0.8
+    pts=data.frame(x=log10(x),y=y)
+  } else {
+    pts<-data.frame(x=log10(design$sN)+xpts,
+                    y=c(0,1,1,0)*0.8)
+  }
   g<-addG(g,dataPolygon(data=pts,fill=braw.env$plotColours$designC))
-  g<-addG(g,dataLine(data=pts))
+  # g<-addG(g,dataLine(data=pts))
 
+  if (is.element(design$sMethod$type,c("Cluster","Snowball","Convenience"))) {
+    if (design$sMethodSeverity<1)
+      nEffective<-design$sN-design$sN*design$sMethodSeverity
+    else
+      nEffective<-design$sN-design$sMethodSeverity
+    pts<-data.frame(x=log10(nEffective)+xpts,
+                      y=c(0,1,1,0)*0.5)
+    g<-addG(g,dataPolygon(data=pts,fill=complementary(braw.env$plotColours$designC)))
+  }
+
+  if (design$sCheating!="None") {
+    switch(design$sCheating,
+           "Grow"={
+             pts<-data.frame(x=log10(design$sN+design$sN*c(0,0,1,1)*design$sCheatingBudget),
+                             y=c(0,1,1,0)*0.5)
+             g<-addG(g,dataPolygon(data=pts,fill=complementary(braw.env$plotColours$designC),alpha=0.2))
+           },
+           "Prune"={
+             pts<-data.frame(x=log10(design$sN+design$sN*c(0,0,-1,-1)*design$sCheatingBudget),y=c(0,1,1,0)*0.5)
+             g<-addG(g,dataPolygon(data=pts,fill=complementary(braw.env$plotColours$designC),alpha=0.2))
+            },
+           "Replace"={
+             pts<-data.frame(x=log10(design$sN+design$sN*c(-1,-1,1,1)*design$sCheatingBudget),y=c(0,1,1,0)*0.5)
+             g<-addG(g,dataPolygon(data=pts,fill=complementary(braw.env$plotColours$designC),alpha=0.2))
+           },
+           "Retry"={
+           }
+    )
+  }
+  
   if (design$Replication$On) {
     if (!hypothesis$effect$world$worldOn) {
       hypothesis$effect$world$worldOn<-TRUE
@@ -203,6 +251,7 @@ showDesign<-function(design=braw.def$design,hypothesis=braw.def$hypothesis,plotA
     }
     nRepDens<-fullRSamplingDist(nbin,hypothesis$effect$world,design,"nw",logScale=(braw.env$nPlotScale=="log10"),sigOnly=FALSE)
     y<-c(0,nRepDens,0)/max(nRepDens)*0.4
+    x<-nbin[c(1,1:length(nbin),length(nbin))]
     pts=data.frame(x=log10(x),y=y)
     g<-addG(g,dataPolygon(data=pts,fill=braw.env$plotColours$replicationC,alpha=0.5))
     g<-addG(g,dataLine(data=pts))

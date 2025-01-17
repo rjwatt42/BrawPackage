@@ -1,9 +1,11 @@
 
-SingleSamplingPDF<-function(z,lambda,sigma,shape,remove_nonsig=FALSE,df1=1) {
-  d1<-exp(-0.5*((z-lambda)^2/sigma^2))/sqrt(2*pi*sigma^2)
+SingleSamplingPDF<-function(z,lambda,sigma,shape=0,remove_nonsig=FALSE,df1=1) {
+  # shape is additional normal error distribution
+  sigmad<-sqrt(sigma^2+shape^2)
+  d1<-exp(-0.5*((z-lambda)^2/sigmad^2))/sqrt(2*pi*sigmad^2)
   if (remove_nonsig) {
     zcrit<-atanh(p2r(braw.env$alphaSig,1/sigma^2+3,df1))
-    d0<-1-(pnorm(zcrit,lambda,sigma)-pnorm(-zcrit,lambda,sigma))
+    d0<-1-(pnorm(zcrit,lambda,sigmad)-pnorm(-zcrit,lambda,sigmad))
   } else {
     d0<-1
   }
@@ -11,9 +13,9 @@ SingleSamplingPDF<-function(z,lambda,sigma,shape,remove_nonsig=FALSE,df1=1) {
 }
 
 
-GaussSamplingPDF<-function(z,lambda,sigma,shape=NA,remove_nonsig=FALSE,df1=1) {
+GaussSamplingPDF<-function(z,lambda,sigma,offset=0,shape=NA,remove_nonsig=FALSE,df1=1) {
   sigma2<-sqrt(lambda^2+sigma^2)
-  d1<-exp(-0.5*z^2/sigma2^2)/sqrt(2*pi*sigma2^2)
+  d1<-exp(-0.5*(z-offset)^2/sigma2^2)/sqrt(2*pi*sigma2^2)
   
   if (remove_nonsig) {
     zcrit<-atanh(p2r(braw.env$alphaSig,1/sigma^2+3,df1))
@@ -23,9 +25,9 @@ GaussSamplingPDF<-function(z,lambda,sigma,shape=NA,remove_nonsig=FALSE,df1=1) {
   }
   return(list(pdf=d1,sig_pdf=d0))
 }
-GaussSamplingCDF<-function(zcrit,lambda,sigma) {
+GaussSamplingCDF<-function(zcrit,lambda,sigma,offset=0) {
   sigma<-sqrt(lambda^2+sigma^2)
-  1-(pnorm(zcrit,0,sigma)-pnorm(-zcrit,0,sigma))
+  1-(pnorm(zcrit,offset,sigma)-pnorm(-zcrit,offset,sigma))
 }
 
 
@@ -155,20 +157,58 @@ GenExpSamplingPDF<-function(z,lambda,sigma,genexp_shape=1,remove_nonsig=FALSE,df
 }
 
 
-getLogLikelihood<-function(z,n,df1,worldDistr,worldDistK,worldDistNullP=0,remove_nonsig=FALSE) {
+getLogLikelihood<-function(z,n,df1,distribution,param1,param2=0,remove_nonsig=FALSE) {
   sigma<-1/sqrt(n-3)
+  lambda2<-0
   zcrit<-atanh(p2r(braw.env$alphaSig,n,df1))
 
+  if (distribution=="fixed") {
+    shape<-NA
+    res<-matrix(0,nrow=length(param1),ncol=length(param2))
+    lambda<-param1
+    for (i in 1:length(lambda)) {
+        mainPDF<-SingleSamplingPDF(z,lambda[i],sigma,shape=0,remove_nonsig=remove_nonsig,df1=df1)
+        # now normalize for the non-sig
+        likelihoods<-mainPDF$pdf/mainPDF$sig_pdf
+        # likelihoods[is.infinite(likelihoods)]<-NA
+        res[i,1]<-sum(log(likelihoods[likelihoods>1e-300]),na.rm=TRUE)
+        if (res[i,1]==Inf) {
+          a<-1
+      }
+    }
+    return(res)
+  } 
+  if (distribution=="random") {
+    shape<-NA
+    res<-matrix(0,nrow=length(param1),ncol=length(param2))
+    lambda1<-param1
+    lambda2<-param2
+    param2<-0
+    for (i in 1:length(lambda1)) {
+      for (j in 1:length(lambda2)) {
+        mainPDF<-SingleSamplingPDF(z,lambda1[i],sigma,shape=lambda2[j],remove_nonsig=remove_nonsig,df1=df1)
+        # now normalize for the non-sig
+        likelihoods<-mainPDF$pdf/mainPDF$sig_pdf
+        # likelihoods[is.infinite(likelihoods)]<-NA
+        res[i,j]<-sum(log(likelihoods[likelihoods>1e-300]),na.rm=TRUE)
+        if (res[i,j]==Inf) {
+          a<-1
+        }
+      }
+    }
+    return(res)
+  } 
+  
   # get nulls ready first
-  if (any(worldDistNullP>0)) {
+  if (any(param2>0)) {
     nullPDF<-SingleSamplingPDF(z,0,sigma,NA,remove_nonsig,df1)
   } else {
     nullPDF<-list(pdf=0,sig_pdf=1)
     zcrit<-0
   } 
   shape<-NA
-  res<-matrix(0,nrow=length(worldDistK),ncol=length(worldDistNullP))
-  switch(worldDistr,
+  res<-matrix(0,nrow=length(param1),ncol=length(param2))
+  switch(distribution,
          "Single"={
            PDF<-SingleSamplingPDF
          },
@@ -187,11 +227,11 @@ getLogLikelihood<-function(z,n,df1,worldDistr,worldDistK,worldDistNullP=0,remove
            shape<-metaAnal$shape
          }
   )
-  for (i in 1:length(worldDistK)) {
-    lambda<-worldDistK[i]
-    mainPDF<-PDF(z,lambda,sigma,shape,remove_nonsig,df1)
-    for (j in 1:length(worldDistNullP)) {
-      nullP<-worldDistNullP[j]
+  for (i in 1:length(param1)) {
+    lambda<-param1[i]
+    mainPDF<-PDF(z,lambda,sigma,shape=shape,remove_nonsig=remove_nonsig,df1=df1)
+    for (j in 1:length(param2)) {
+      nullP<-param2[j]
       # make the whole source first
       sourcePDF<-mainPDF$pdf*(1-nullP)+nullPDF$pdf*nullP
       # now normalize for the non-sig

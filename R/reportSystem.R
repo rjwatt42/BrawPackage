@@ -71,3 +71,67 @@ reportSystem<-function(hypothesis=braw.def$hypothesis,design=braw.def$design){
   reportPlot(outputText,nc,nr)
     
 }
+
+reportDesign<-function(design=braw.def$design) {
+
+  nc=6
+  
+  outputText<-rep("",nc)
+  
+  if (design$sMethod$type=="Random") col<-'' else col<-'!r'
+  if (design$sCheating=="None") col1<-'' else col1<-'!r'
+  outputText<-c(outputText,
+                "!TDesign:",rep("",nc-1),
+                "!HSample n","Usage","Method","Cheating",rep("",nc-4),
+                paste0("!c",design$sN),paste0("!c",design$sIV1Use),
+                paste0(col,design$sMethod$type),paste0(col1,design$sCheating),
+                rep("",nc-4)
+  )
+  if (is.element(design$sMethod$type,c("Convenience","Cluster","Snowball")) ){
+    if (design$sMethodSeverity<1) 
+      sMethodSeverity<-design$sN*design$sMethodSeverity
+    else               sMethodSeverity<-design$sMethodSeverity
+    n<-design$sN
+    nClusts<-n-sMethodSeverity
+    outputText<-c(outputText,rep("",2),
+                  paste0("seeds=",brawFormat(nClusts,digits=1)),
+                  rep("",nc-3))
+    switch(design$sMethod$type,
+           "Cluster"={
+             Cluster_n<-n/nClusts-1
+             Contact_n<-0
+           },
+           "Snowball"={
+             Contact_n<-n/nClusts-1
+             Cluster_n<-0
+           },
+           "Convenience"={
+             Cluster_n<-sqrt(n/nClusts-1)
+             Contact_n<-sqrt(n/nClusts-1)
+           })
+    
+    if (Cluster_n>0) {
+      outputText<-c(outputText,rep("",2),
+                    paste0("clust_r=",brawFormat(design$sMethod$Cluster_rad,digits=1)),
+                    rep("",nc-3))
+      outputText<-c(outputText,rep("",2),
+                    paste0("clust_n=",brawFormat(Cluster_n,digits=1)),
+                    rep("",nc-3))
+    }
+    if (Contact_n>0) {
+      outputText<-c(outputText,rep("",2),
+                    paste0("chain_r=",brawFormat(design$sMethod$Contact_rad,digits=1)),
+                    rep("",nc-3))
+      outputText<-c(outputText,rep("",2),
+                    paste0("chain_n=",brawFormat(Contact_n,digits=1)),
+                    rep("",nc-3))
+    }
+  }
+   
+  outputText<-c(outputText,rep("",nc))
+  
+  nr=length(outputText)/nc
+  reportPlot(outputText,nc,nr)
+  
+  
+}

@@ -28,7 +28,7 @@ showMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
       }
     }
     
-  if (is.element(showType[1],c("NHST","Hits","Misses","p(sig)")) &&
+  if (is.element(showType[1],c("NHST","Hits","Misses","p(sig)","SEM")) &&
       !multipleResult$hypothesis$effect$world$worldOn && 
       !all(is.na(multipleResult$nullresult$rIV))) {
       if (all(multipleResult$result$rpIV==0)) multipleResult$result$rpIV<-multipleResult$result$rpIV+0.0000000001

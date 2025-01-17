@@ -47,6 +47,10 @@ plotInference<-function(analysis,otheranalysis=NULL,disp="rs",orientation="vert"
           "ps"= {g<-ps_plot(analysis,disp,showTheory=showTheory,g=g)},
           "po"= {g<-p_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,g=g)},
           
+          "llknull"={g<-r_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
+          "AIC"={g<-aic_plot(analysis,disp,showTheory=showTheory,g=g)},
+          "SEM"={g<-sem_plot(analysis,disp,showTheory=showTheory,g=g)},
+          "sLLR"={g<-l_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
           "log(lrs)"={g<-l_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
           "log(lrd)"={g<-l_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
           
@@ -57,6 +61,7 @@ plotInference<-function(analysis,otheranalysis=NULL,disp="rs",orientation="vert"
           "n"= {g<-n_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
           
           "rse"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,g=g)},
+          "rss"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,g=g)},
           "e1r"={g<-e1_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
           "e2r"={g<-e2_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
           "ps1"= {g<-ps_plot(analysis,disp,showTheory=showTheory,g=g)},
@@ -133,6 +138,8 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
             d1<-analysis$noval
             if (braw.env$nPlotScale=="log10") d1<-log10(d1)
           },
+          "llknull"=d1<-(-0.5*(analysis$aic-analysis$aicNull)),
+          "sLLR"=d1<-res2llr(analysis,"sLLR"),
           "log(lrs)"=d1<-res2llr(analysis,"sLLR"),
           "log(lrd)"=d1<-res2llr(analysis,"dLLR"),
           "ws"={
@@ -181,6 +188,8 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
             d2<-analysis$noval
             if (braw.env$nPlotScale=="log10") d2<-log10(d2)
           },
+          "llknull"=d2<-(-0.5*(analysis$aic-analysis$aicNull)),
+          "sLLR"=d2<-res2llr(analysis,"sLLR"),
           "log(lrs)"=d2<-res2llr(analysis,"sLLR"),
           "log(lrd)"=d2<-res2llr(analysis,"dLLR"),
           "ws"={

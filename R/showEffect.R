@@ -50,10 +50,12 @@ drawArrow<-function(start,len,direction,ends,col="black",fill="white",alpha=1, w
 showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
 
   if (!is.null(plotArea)) braw.env$plotArea<-plotArea
+  if (length(r)>1) {rSD<-r[2]; r<-r[1]} else {rSD<-NULL}
   
   g<-startPlot(xlim=c(-1,1),ylim=c(0,1),back="transparent",box="none",g=g)
   
   switch (t,
+          # 1
           {start=c(0,0.92)
           direction=0
           len=0.9
@@ -63,7 +65,7 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
           fill=braw.env$plotColours$maineffectES
           size=1
           },
-          
+          # 2
           {start=c(0,0.92)
           len=sqrt(0.9^2+0.55^2)
           direction=atan(0.55/0.9)*57.296
@@ -73,7 +75,7 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
           fill=braw.env$plotColours$maineffectES
           size=0.7
           },
-
+          # 3
           {start=c(0,0.92)
           len=sqrt(0.9^2+0.55^2)
           direction=-atan(0.55/0.9)*57.296
@@ -83,7 +85,7 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
           fill=braw.env$plotColours$maineffectES
           size=0.7
           },
-          
+          # 4
           {start=c(0.6,0.5)
           direction=-90
           len=1.2
@@ -93,7 +95,7 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
           fill=braw.env$plotColours$covariationES
           size=0.7
           },
-          
+          # 5
           {start=c(0,0.46)
           direction=0
           len=0.45
@@ -103,7 +105,7 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
           fill=braw.env$plotColours$interactionES
           size=0.7
           },
-          
+          # 6
           {start=c(0,0.92)
           direction=0
           len=0.9
@@ -113,7 +115,7 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
           fill=braw.env$plotColours$maineffectES
           size=0.7
           },
-          
+          # 7
           {start=c(0.92,0.92)
           len=sqrt(0.9^2+0.55^2)
           direction=-atan(0.55/0.35)*57.296
@@ -123,7 +125,7 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
           fill=braw.env$plotColours$maineffectES
           size=0.7
           },
-          
+          # 8
           {start=c(0,0.82)
           len=sqrt(0.9^2+0.55^2)
           direction=atan(0.55/0.35)*57.296
@@ -132,9 +134,37 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
           ends="last"
           fill=braw.env$plotColours$maineffectES
           size=0.7
+          },
+          # 9
+          {start=c(0,0.92)
+          len=sqrt(0.9^2+0.55^2)
+          direction=atan(0.55/0.35)*57.296
+          labelpts<-data.frame(x=0.0,y=0.5)
+          hjust<- 0.35
+          ends="last"
+          fill=braw.env$plotColours$maineffectES
+          size=0.7
+          },
+          # 10
+          {start=c(0.92,0.92)
+          direction=0
+          len=0.9
+          labelpts<-data.frame(x=1.1,y=0.5)
+          hjust<-0
+          ends="last"
+          fill=braw.env$plotColours$maineffectES
+          size=0.7
+          },
+          # 11
+          {start=c(0.92,0.92)
+          len=sqrt(0.9^2+0.55^2)
+          direction=-atan(0.55/0.35)*57.296
+          labelpts<-data.frame(x=0.0,y=0.7)
+          hjust<- 0.35
+          ends="last"
+          fill=braw.env$plotColours$maineffectES
+          size=0.7
           }
-          
-          
   )
   col<-"#000000"
   alpha<-1
@@ -148,7 +178,8 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
   
   if (showValue && braw.env$simData && !is.null(r)) {
     if (t==1){
-      lbl=paste("r[p]=",as.character(r),sep="")
+      lbl=paste("r[p]=",brawFormat(r,digits=2),sep="")
+      if (!is.null(rSD) && rSD!=0) lbl<-paste0(lbl,"\u00B1",brawFormat(rSD,digits=1))
     }else{ 
       if (r==0) lbl<-"0.0" else lbl<-as.character(r)
     }

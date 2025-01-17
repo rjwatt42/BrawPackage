@@ -11,7 +11,7 @@ plotAxis<-function(showType,hypothesis,design=NULL) {
   logScale<-(is.element(showType,c("p","e1p","e2p")) && braw.env$pPlotScale=="log10") ||
     (is.element(showType,c("ws","wp")) && braw.env$wPlotScale=="log10") ||
     (is.element(showType,c("n","no")) && braw.env$nPlotScale=="log10") ||
-    (is.element(showType,c("nw")))
+    (is.element(showType,c("nw","llknull")))
   
   switch(braw.env$RZ,
          "r"={
@@ -100,6 +100,22 @@ plotAxis<-function(showType,hypothesis,design=NULL) {
             use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
             ylines<-c(0,effect$rIV)
           },
+          "rse"={
+            ylim<-rlims
+            yticks<-rticks
+            ymins<-rmins
+            ylabel<-rslab
+            use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
+            ylines<-c(0,effect$rIV)
+          },
+          "rss"={
+            ylim<-rlims
+            yticks<-rticks
+            ymins<-rmins
+            ylabel<-rslab
+            use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
+            ylines<-c(0,effect$rIV)
+          },
           "rp"={
             ylim<-rlims
             yticks<-rticks
@@ -139,6 +155,130 @@ plotAxis<-function(showType,hypothesis,design=NULL) {
             ylines<-plines
             ylabel<-polabel
             use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_p+hue_diff,1,1),hsv(base_hue_p+hue_diff*2,1,1))
+          },
+          "llknull"={
+            ylim<-log10(c(0.1, 100000))
+            ylabel<-'llr[+]'
+            ylines<-log10(c(1))
+            use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
+          },
+          "SEM"={
+            ylim<-c(0,1)
+            ylabel<-'Outcomes'
+            use_cols<-c(rep("white",7))
+            if (is.null(hypothesis$IV2)) {
+              if (effect$world$worldOn) {
+                use_cols[1]<-braw.env$plotColours$infer_nsigNull
+                use_cols[2]<-braw.env$plotColours$infer_sigNull
+                use_cols[3]<-braw.env$plotColours$infer_sigNonNull
+                use_cols[4]<-braw.env$plotColours$infer_nsigNonNull
+              } else {
+                if (effect$rIV==0) {
+                  use_cols[1]<-braw.env$plotColours$infer_nsigNull
+                  use_cols[2]<-braw.env$plotColours$infer_sigNull
+                } else {
+                  use_cols[1]<-braw.env$plotColours$infer_nsigNull
+                  use_cols[2]<-braw.env$plotColours$infer_sigNull
+                }
+              }
+            }
+            if (!is.null(hypothesis$IV2)) {
+              if (effect$world$worldOn) {
+                use_cols[1]<-braw.env$plotColours$infer_nsigNull
+                use_cols[2:7]<-braw.env$plotColours$infer_sigNull
+                use_cols[8:13]<-braw.env$plotColours$infer_sigNonNull
+                use_cols[14]<-braw.env$plotColours$infer_nsigNonNull
+              } else {
+                if (effect$rIV==0 && effect$rIV2==0 && effect$rIVIV2==0 ) {
+                  use_cols[1]<-braw.env$plotColours$infer_nsigNull
+                  use_cols[2:7]<-braw.env$plotColours$infer_sigNull
+                } else {
+                  use_cols[1]<-braw.env$plotColours$infer_nsigNonNull
+                  for (i in 2:7) # 2 effects missed
+                    use_cols[i]<-darken(
+                      blend(braw.env$plotColours$infer_nsigNonNull,
+                            braw.env$plotColours$infer_sigNonNull,0.7),
+                      off=0.1+(i-1)/14)
+                  
+                  if (effect$rIV!=0 && effect$rIV2!=0 && effect$rIVIV2!=0 )
+                    use_cols[7]<-braw.env$plotColours$infer_sigNonNull
+                  if (effect$rIV!=0 && effect$rIV2!=0 && effect$rIVIV2==0 )
+                    use_cols[6]<-braw.env$plotColours$infer_sigNonNull
+                  if (effect$rIV==0 && effect$rIV2!=0 && effect$rIVIV2!=0 ) {
+                      errors<-c(1,0,2,1,3,1,2)
+                      for (i in 1:7) # 2 effects missed
+                        use_cols[i]<-darken(
+                          blend(braw.env$plotColours$infer_nsigNonNull,
+                                braw.env$plotColours$infer_sigNonNull,
+                                ((3-errors[i])/3)^0.25),
+                          off=0)
+                          # off=(sum(errors[1:i]==errors[i])/sum(errors==errors[i])-1)/9)
+                  }
+                  if (effect$rIV!=0 && effect$rIV2==0 && effect$rIVIV2!=0 )
+                    use_cols[4]<-braw.env$plotColours$infer_sigNonNull
+                  if (effect$rIV==0 && effect$rIV2!=0 && effect$rIVIV2==0 )
+                    use_cols[3]<-braw.env$plotColours$infer_sigNonNull
+                  if (effect$rIV!=0 && effect$rIV2==0 && effect$rIVIV2==0 )
+                    use_cols[2]<-braw.env$plotColours$infer_sigNonNull
+                }
+              }
+            }
+          },
+          "AIC"={
+            ylim<-c(1.5*design$sN,3.5*design$sN)*hypothesis$DV$sd
+            ylabel<-'AIC[1]'
+            use_cols<-c(rep("white",7))
+            if (is.null(hypothesis$IV2)) {
+              if (effect$world$worldOn) {
+                use_cols[1]<-braw.env$plotColours$infer_nsigNull
+                use_cols[2]<-braw.env$plotColours$infer_sigNull
+                use_cols[3]<-braw.env$plotColours$infer_sigNonNull
+                use_cols[4]<-braw.env$plotColours$infer_nsigNonNull
+              } else {
+                if (effect$rIV==0) {
+                  use_cols[1]<-braw.env$plotColours$infer_nsigNull
+                  use_cols[2]<-braw.env$plotColours$infer_sigNull
+                } else {
+                  use_cols[1]<-braw.env$plotColours$infer_nsigNull
+                  use_cols[2]<-braw.env$plotColours$infer_sigNull
+                }
+              }
+              }
+            if (!is.null(hypothesis$IV2)) {
+              if (effect$world$worldOn) {
+                use_cols[1]<-braw.env$plotColours$infer_nsigNull
+                use_cols[2:7]<-braw.env$plotColours$infer_sigNull
+                use_cols[8:13]<-braw.env$plotColours$infer_sigNonNull
+                use_cols[14]<-braw.env$plotColours$infer_nsigNonNull
+              } else {
+              if (effect$rIV==0 && effect$rIV2==0 && effect$rIVIV2==0 ) {
+                use_cols[1]<-braw.env$plotColours$infer_nsigNull
+                use_cols[2:7]<-braw.env$plotColours$infer_sigNull
+              } else {
+                use_cols[1]<-braw.env$plotColours$infer_nsigNonNull
+                use_cols[2:7]<-darken(
+                  blend(braw.env$plotColours$infer_nsigNonNull,braw.env$plotColours$infer_sigNonNull,0.7),
+                  off=0.5)
+                if (effect$rIV!=0 && effect$rIV2!=0 && effect$rIVIV2!=0 )
+                  use_cols[7]<-braw.env$plotColours$infer_sigNonNull
+                if (effect$rIV!=0 && effect$rIV2!=0 && effect$rIVIV2==0 )
+                  use_cols[6]<-braw.env$plotColours$infer_sigNonNull
+                if (effect$rIV==0 && effect$rIV2!=0 && effect$rIVIV2!=0 )
+                  use_cols[5]<-braw.env$plotColours$infer_sigNonNull
+                if (effect$rIV!=0 && effect$rIV2==0 && effect$rIVIV2!=0 )
+                  use_cols[4]<-braw.env$plotColours$infer_sigNonNull
+                if (effect$rIV==0 && effect$rIV2!=0 && effect$rIVIV2==0 )
+                  use_cols[3]<-braw.env$plotColours$infer_sigNonNull
+                if (effect$rIV!=0 && effect$rIV2==0 && effect$rIVIV2==0 )
+                  use_cols[2]<-braw.env$plotColours$infer_sigNonNull
+              }
+              }
+            }
+          },
+          "sLLR"={
+            ylim<-c(0, braw.env$lrRange)
+            ylabel<-'log[e](lr[s])'
+            use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
           },
           "log(lrs)"={
             ylim<-c(0, braw.env$lrRange)

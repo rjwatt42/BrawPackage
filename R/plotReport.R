@@ -12,6 +12,8 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
   rowColour="#88BBFF"
   rowColour=tableColour
   cellPadding="padding:3px;margin-top:0px;"
+  cellFilledStyle<-'padding-left:5px;padding-right:5px;'
+  cellEmptyStyle<-'padding-left:0px;padding-right:0px;'
   blankLineStyle="padding-top:20px;"
   tableStart<-paste0('<table style="margin-top:0px;">')
   if (renderAsHTML) {
@@ -19,7 +21,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
     mainStyle<-paste0("font-size:",format(fontSize) ,"px;font-weight:normal;text-align: left;")
     
     preText<-""
-    outputFront<-paste0('<div style="padding:10px;margin-left:50px;',mainStyle,'">')
+    outputFront<-paste0('<div style="padding:',fontSize,'px;margin-left:',fontSize*2,'px;',mainStyle,'">')
     outputBack<-'</div>'
     if (!is.null(outputText)) {
       outputFront<-paste0(outputFront,'<div style=padding:0px;>',tableStart)
@@ -153,8 +155,8 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
 
             
             if (nchar(outputText[index])>0)
-                 outputFront<-paste0(outputFront,"<td ",bgcolor," style=",cellStyle,rowStyle,startStyle,">",outputText[index],"</td>")
-            else outputFront<-paste0(outputFront,"<td ",bgcolor," style=height:1px;",rowStyle,"></td>")
+                 outputFront<-paste0(outputFront,"<td ",bgcolor," style=",cellStyle,cellFilledStyle,rowStyle,startStyle,">",outputText[index],"</td>")
+            else outputFront<-paste0(outputFront,"<td ",bgcolor," style=height:1px;",cellEmptyStyle,rowStyle,"></td>")
         }
         outputFront<-paste0(outputFront,"</tr>")
         if (index+nc<=length(outputText))
@@ -267,7 +269,8 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
     if (largelabels[i]) sz<-1.2 
     
     mathlabel<-grepl("['^']{1}",label) || grepl("['[']{1}",label)
-    if (any(mathlabel)) parse<-TRUE
+    if (any(mathlabel)) parse<-TRUE else parse<-FALSE
+    label<-gsub("\\+","'+'",label)
     pts<-data.frame(x=x,y=top+1-y)
     g<-g+geom_label(data=pts,aes(x=x, y=y), label=label,fontface=fontface, 
                                          hjust=hjust, vjust=0, 

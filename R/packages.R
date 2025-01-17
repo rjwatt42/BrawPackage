@@ -3,7 +3,7 @@
 # source("https://github.com/rjwatt42/BrawStats/raw/main/packages.R")
 # suppressPackageStartupMessages
 
-list.of.packages<-c("ggplot2","ggtext","grDevices",
+list.of.packages<-c("ggplot2","ggtext","grDevices","grid",
                     "mnormt","lme4",
                     "readxl","writexl","stringr","clipr",
                     "car","pracma","abind"
@@ -14,6 +14,7 @@ if(length(new.packages)>0) install.packages(new.packages,repos="http://cran.fhcr
 library(ggplot2)
 library(ggtext)
 library(grDevices)
+library(grid)
 
 library(mnormt)      # pmnorm for logistic
 library(lme4)        # lmer (mixed models)
