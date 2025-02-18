@@ -8,9 +8,18 @@
 doResult<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,autoShow=braw.env$autoShow){
   # sample<-doSample(hypothesis=hypothesis,design=design,autoShow=FALSE)
   # result<-doAnalysis(sample,evidence=evidence,autoShow=autoShow)
+  if (evidence$metaAnalysis$On) {
+    metaSingle<-doMetaAnalysis(metaResult=braw.res$metaSingle,metaAnalysis=evidence$metaAnalysis,keepStudies=FALSE,
+                             hypothesis=hypothesis,design=design,evidence=evidence)
+    if (autoShow) print(showMetaSingle(metaSingle))
+    return(metaSingle)
+  } 
+  
+  evidence$shortHand<-FALSE
   result<-runSimulation(hypothesis=hypothesis,design=design,evidence=evidence,autoShow=FALSE)
-  if (autoShow) print(showResult(result))
   setBrawRes("result",result)
+  if (autoShow) print(showResult(result))
+  
   return(result)
 }
 
@@ -585,7 +594,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
   no_ivs<-ncol(allData)-2
   n<-nrow(allData)
 
-  withins<-c(design$sIV1Use=="Within",design$sIV2Use=="Within")
+  withins<-c(design$sIV1Use=="Within" && IV$type=="Categorical",design$sIV2Use=="Within" && IV2$type=="Categorical")
 
   anResult<-generalAnalysis(allData,evidence$rInteractionOn,withins,evidence$ssqType,evidence$caseOrder)
   
@@ -824,7 +833,9 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
               if (IV$ncats==2){
                 if (design$sIV1Use=="Within"){
                   an_name<-"t-test: Paired Samples"
-                  tv<-t.test(dv~iv1,paired=TRUE,var.equal=!evidence$Welch)
+                  # tv<-t.test(dv~iv1,paired=TRUE,var.equal=!evidence$Welch)
+                  # tv<-t.test(dv[as.numeric(iv1)==1],dv[as.numeric(iv1)==2],paired=TRUE,var.equal=!evidence$Welch)
+                  tv<-t.test(dv[as.numeric(iv1)==1]-dv[as.numeric(iv1)==2],var.equal=!evidence$Welch)
                   tval<-tv$statistic
                   df<-paste("(",format(tv$parameter),")",sep="")
                   analysis$pIV<-tv$p.value
@@ -1099,13 +1110,11 @@ runSimulation<-function(hypothesis,design,evidence,sigOnly=FALSE,onlyAnalysis=FA
   ntrials<-0
   p_min<-1
   while (1==1) {
-    if (!evidence$shortHand) {
-      # sample<-doSample(IV,IV2,DV,effect,design)
-      # res<-doAnalysis(IV,IV2,DV,effect,design,evidence,sample)
+    # if (!evidence$shortHand) {
       res<-getSample(hypothesis,design,evidence)
-    } else {
-      res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
-    }
+    # } else {
+    #   res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
+    # }
     res1<-res
     if (design$sBudgetOn) {
       if (res$pIV<p_min) {
@@ -1125,13 +1134,11 @@ runSimulation<-function(hypothesis,design,evidence,sigOnly=FALSE,onlyAnalysis=FA
   
   # sig only
   while (sigOnly && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
-    if (!evidence$shortHand) {
-      # sample<-doSample(IV,IV2,DV,effect,design)
-      # res<-doAnalysis(IV,IV2,DV,effect,design,evidence,sample)
+    # if (!evidence$shortHand) {
       res<-getSample(hypothesis,design,evidence)
-    } else {
-      res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
-    }
+    # } else {
+    #   res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
+    # }
   }
   # Replication?
   res<-replicateSample(hypothesis,design,evidence,sample,res)

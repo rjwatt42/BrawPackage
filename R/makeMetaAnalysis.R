@@ -9,15 +9,17 @@
 #' sigOnlySource=FALSE,
 #' includeNulls=TRUE)
 #' @export
-makeMetaAnalysis<-function(nstudies=10,
-                           analysisType="random",
+makeMetaAnalysis<-function(On=FALSE, nstudies=10,
+                           analysisType="random",analysisVar="sd",analysisPrior="none",
                            modelPDF="All",
                            sigOnlySource=FALSE,
-                           includeNulls=TRUE,includeBias=FALSE) {
-  
+                           includeNulls=FALSE,includeBias=FALSE) {
   metaAnalysis<-list(
+    On=On,
     nstudies=nstudies,
     analysisType=analysisType,
+    analysisVar=analysisVar,
+    analysisPrior=analysisPrior,
     modelPDF=modelPDF,
     sigOnlySource=sigOnlySource,
     includeNulls=includeNulls,

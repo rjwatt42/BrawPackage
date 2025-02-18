@@ -53,9 +53,12 @@ densityFunctionStats<-function(dens_r,rp){
   }
   
   pk<-which.max(dens_r)
-  dr<-diff(dens_r[(pk-3):(pk+3)])
-  peak<-approx(dr,rp[(pk-3):(pk+2)]+diff(rp[1:2])/2,0)$y
-  # peak<-rp[which.max(dens_r)]
+  if (sum(dens_r>0)<=1) 
+    peak<-rp[pk]
+  else {
+    dr<-diff(dens_r[(pk-3):(pk+3)])
+    peak<-approx(dr,rp[(pk-3):(pk+2)]+diff(rp[1:2])/2,0)$y
+  }
   dens_at_peak<-max(dens_r)
   list(
     peak=peak,
@@ -201,7 +204,7 @@ showPossible <- function(possibleResult=NULL,
   BoxColSamples<-darken(BoxCol,off=0.35)
   BoxColPopulations<-darken(BoxCol,off=0.4)
   
-  colS<-"yellow"
+  colS<-braw.env$plotColours$metaAnalysis
   if (showP>0)  colS<-braw.env$plotColours$infer_nsigC
   colSdark=darken(colS,off=-0.67)
   colSlight=darken(colS,off=0.2)
@@ -267,7 +270,9 @@ showPossible <- function(possibleResult=NULL,
   
   sourceRVals<-possibleResult$sourceRVals
   sRho<-possibleResult$sRho
+  if (length(sRho)==0) sRho<-NA
   n<-possibleResult$possible$design$sN
+  if (showType=="Populations") n<-possibleResult$possible$targetSampleN
   
   rs<-possibleResult$Theory$rs
   sourceSampDens_r<-possibleResult$Theory$sourceSampDens_r
@@ -279,7 +284,14 @@ showPossible <- function(possibleResult=NULL,
   priorSampDens_r<-possibleResult$Theory$priorSampDens_r
   sampleLikelihood_r<-possibleResult$Theory$sampleLikelihood_r
   sampleLikelihood_r_show<-possibleResult$Theory$sampleLikelihood_r_show
-  sampleLikelihoodTotal_r<-possibleResult$Theory$sampleLikelihoodTotal_r
+  if (!is.null(sampleLikelihood_r_show)) {
+  use<-rowSums(sampleLikelihood_r_show)>0
+  # sampleLikelihoodTotal_r<-possibleResult$Theory$sampleLikelihoodTotal_r
+  if (nrow(sampleLikelihood_r_show)==1) 
+    sampleLikelihoodTotal_r<-sampleLikelihood_r_show[use,]*possibleResult$Theory$priorPopDens_r
+  else
+    sampleLikelihoodTotal_r<-exp(colSums(log(sampleLikelihood_r_show[use,])))*possibleResult$Theory$priorPopDens_r
+  }
   priorSampDens_r_null<-possibleResult$Theory$priorSampDens_r_null
   priorSampDens_r_plus<-possibleResult$Theory$priorSampDens_r_plus
   
@@ -604,7 +616,7 @@ showPossible <- function(possibleResult=NULL,
             
             if (walls) {
               si=1;
-            if (!isempty(sRho)) {
+            if (!is.na(sRho)) {
               za<-approx(rs,sampleBackwall$rsw_dens_null,sRho[si])$y
               zb<-approx(rs,sampleBackwall$rsw_dens_plus,sRho[si])$y
               llrNull<-log(za/zb)
@@ -723,7 +735,7 @@ showPossible <- function(possibleResult=NULL,
               # vertical lines
               if (showType=="Samples" && possible$showTheory) {
                 # show probability density on sample back wall
-                if (!isempty(sRho)){
+                if (!is.na(sRho)){
                   for (si in 1:length(sRho)) {
                     z<-approx(sampleBackwall$rsw,ztotal,sRho[si])$y
                     z[z<0]<-0
@@ -760,7 +772,7 @@ showPossible <- function(possibleResult=NULL,
             }
             
             # main distributions            
-            if (is.null(sRho)) theoryAlpha=0.8 else theoryAlpha=0.3
+            if (is.na(sRho)) theoryAlpha=0.8 else theoryAlpha=0.3
             simAlpha<-1
             switch (showType,
                     "Samples"={
@@ -800,7 +812,7 @@ showPossible <- function(possibleResult=NULL,
                         
                         simgain<-mean(sourceSampDens_r_plus)/mean(sSimDens)
                         sSimDens<-sSimDens*simgain*pgain
-                        if (cutaway) {
+                        if (!is.na(sRho) && cutaway) {
                           waste<-sum(sSimBins<=min(sRho))
                           use_s<-(waste):length(sSimBins)
                           sSimBins<-sSimBins[use_s]
@@ -846,7 +858,7 @@ showPossible <- function(possibleResult=NULL,
                         if (possible$showTheory){
                           if (any(i==useVals)) {
                             z_use<-sourceSampDens_r_plus[i,]*pgain
-                            if (cutaway) {
+                            if (!is.na(sRho) && cutaway) {
                               use<-max(which(rs<min(sRho)))
                               z_use[use]<-approx(rs,z_use,min(sRho))$y
                               z_use[1:use-1]<-0
@@ -855,7 +867,7 @@ showPossible <- function(possibleResult=NULL,
                             g<-drawDistribution(rep(sourceRVals[i],length(rs)),rs,z_use,xlim,ylim,zlim,
                                                 mapping,colS,theoryAlpha,draw_lower_limit,g)
                             
-                          if (!cutaway && !is.null(sRho)) {
+                          if (!cutaway && !is.na(sRho)) {
                             z_use<-sourceSampDens_r_plus[i,]*pgain
                             use<-max(which(rs<max(sRho)))
                             z_use[use]<-approx(rs,z_use,max(sRho))$y
@@ -865,7 +877,7 @@ showPossible <- function(possibleResult=NULL,
                                                 mapping,colS,theoryAlpha*2,draw_lower_limit,g)
                             
                           }
-                          if (showP>0 && !is.null(sRho)) {
+                          if (showP>0 && !is.na(sRho)) {
                             for (j in 1:length(sRho)) {
                             rcrit<-sRho[j]
                             if (sRho>0)  use<-which(rs>=rcrit)
@@ -894,6 +906,7 @@ showPossible <- function(possibleResult=NULL,
                         # vertical lines on main distribution
                         if (!isempty(sRho)){
                           for (si in 1:length(sRho)) {
+                            if (any(sampleLikelihood_r_show[si,]!=0)){
                             z<-approx(rs,sourceSampDens_r_plus[i,]*pgain,sRho[si])$y
                             if (logZ) {
                               z<-log10(z)
@@ -916,6 +929,7 @@ showPossible <- function(possibleResult=NULL,
                             }
                           }
                           }
+                        }
                       }
                       if (cutaway && endFace) {
                         # main distribution
@@ -1056,12 +1070,13 @@ showPossible <- function(possibleResult=NULL,
             )
             
             # text annotations
-            if (doTextResult && walls) {
+            if (doTextResult && walls && !is.na(sRho)) {
               # samples
               xoff<-diff(zlim)*1.2
-              if (length(sRho)<=8) {
+              if (!is.na(sRho) && length(sRho)<=10) {
+                use<-order(sRho)
                   h<-c(paste0(braw.env$RZ,"[s]"),
-                       paste0("= ",paste(brawFormat(sRho,digits=2),collapse=","))
+                       paste0("= ",paste(brawFormat(sRho[use],digits=2),collapse=", "))
                   )
                 pos<-rotate3D(data.frame(x=xlim[1],y=ylim[1],z=zlim[1]+xoff), mapping)
                 for (hi in 1:length(h)) {
@@ -1074,7 +1089,7 @@ showPossible <- function(possibleResult=NULL,
                 }
                 xoff<-xoff-diff(zlim)*0.06
                 h<-c(paste0("n"),
-                     paste0("= ",paste(brawFormat(n,digits=2),collapse=","))
+                     paste0("=  ",paste(brawFormat(n[use],digits=2),collapse=",    "))
                 )
                 pos<-rotate3D(data.frame(x=xlim[1],y=ylim[1],z=zlim[1]+xoff), mapping)
                 for (hi in 1:length(h)) {
@@ -1087,7 +1102,7 @@ showPossible <- function(possibleResult=NULL,
                 }
               }
               # mle population
-              if (showType=="Populations") {
+              # if (showType=="Populations") {
                 h<-c(paste0(braw.env$RZ,"[mle]"),
                      paste0("= ",brawFormat(rp_peak,digits=3))
                 )
@@ -1101,7 +1116,7 @@ showPossible <- function(possibleResult=NULL,
                   )
                   pos$x<-pos$x+diff(xlim)*0.05
                 }
-              }
+              # }
               # xoff<-xoff-diff(zlim)*0.085
               # llrA<-dnorm(atanh(sRho),mean=atanh(sRho),sd=1/sqrt(n-3))
               # llr0<-dnorm(0,mean=atanh(sRho),sd=1/sqrt(n-3))

@@ -1,9 +1,83 @@
+addGraphElement<-function(element) {
+  if (braw.env$addHistory) {
+    if (is.null(element)) {
+      if (is.null(braw.env$history)) {
+        braw.env$history<-list(list(list(type="Null",args=list())))
+      } else {
+        braw.env$history[[length(braw.env$history)+1]]<-list(list(type="Null",args=list()))
+      }
+    } else {
+      b<-braw.env$history[[length(braw.env$history)]]
+      b[[length(b)+1]]<-element
+      braw.env$history[[length(braw.env$history)]]<-b
+    }
+  }
+  # setBrawEnv("graph",b)
+}
+
+doGraphElement<-function(element,g) {
+  args<-element$args
+  switch(element$type,
+         "Null"={
+           g<-drawNullPlot()
+         },
+         "Start"={
+           braw.env$plotLimits<-args
+         },
+         "Text"={ #   drawText(data,label, hjust, vjust, colour,fill,size,angle,dx,dy,fontface,background)
+           g<-addG(g,
+                   drawText(data=args[[1]],label=args[[2]], hjust=args[[3]], vjust=args[[4]], 
+                            colour=args[[5]],fill=args[[6]],size=args[[7]],angle=args[[8]],dx=args[[9]],dy=args[[10]],
+                            fontface=args[[11]],background=args[[12]]) 
+           )
+         },
+         "Label"={
+           g<-addG(g,
+                   drawLabel(data=args[[1]],label=args[[2]], hjust=args[[3]], vjust=args[[4]], 
+                             fill=args[[5]],colour=args[[6]],parser=args[[7]],
+                             fontface=args[[8]],size=args[[9]],label.size=args[[10]])
+           )
+         },
+         "Point"={
+           g<-addG(g,
+                   drawPoint(data=args[[1]],shape=args[[2]],colour=args[[3]],fill=args[[4]],alpha=args[[5]],size=args[[6]])
+           )
+         },
+         "Path"={
+           g<-addG(g,
+                   drawPath(data=args[[1]],arrow=args[[2]],colour=args[[3]],linetype=args[[4]],linewidth=args[[5]],alpha=args[[6]])
+           )
+         },
+         "Polygon"={
+           g<-addG(g,
+                   drawPolygon(data=args[[1]],colour=args[[2]],fill=args[[3]],alpha=args[[4]],linewidth=args[[5]])
+           )
+         }
+  )
+  return(g)
+}
+
+buildGraph<-function(g1=NULL) {
+  if (is.null(g1)) g1<-braw.env$history[[length(braw.env$history)]]
+  g<-c()
+  for (i in 1:length(g1)) {
+    g<-doGraphElement(g1[[i]],g)
+  }
+  return(g)
+}
+
+showHistory<-function(back=-1) {
+  back<-min(back,0)
+  use<-max(1,length(braw.env$history)+back)
+  buildGraph(braw.env$history[[use]])
+}
+
 svgBox<-function(height=NULL,aspect=1.3,fontScale=1.5) {
   if (is.null(height) && is.null(aspect)) return(braw.env$plotSize)
   if (is.null(height)) height<-braw.env$plotSize[2]
-    setBrawEnv("plotSize",c(aspect,1)*height)
-    setBrawEnv("labelSize",height/100*fontScale)
-    setBrawEnv("dotSize",height/100*fontScale*1.25)
+  setBrawEnv("plotSize",c(aspect,1)*height)
+  setBrawEnv("labelSize",height/100*fontScale)
+  setBrawEnv("dotSize",height/100*fontScale*1.25)
 }
 svgBoxX<-function() {return(braw.env$plotSize[1])}
 svgBoxY<-function() {return(braw.env$plotSize[2])}
@@ -102,9 +176,9 @@ reRangeYX<-function(data) {
 reOrientXY<-function(data,orientation=braw.env$plotLimits$orientation) {
   if (!is.null(braw.env$plotLimits)) 
     switch(orientation,
-         "horz"={data<-data},
-         "vert"={data<-data.frame(x=data$y,y=data$x)}
-         )
+           "horz"={data<-data},
+           "vert"={data<-data.frame(x=data$y,y=data$x)}
+    )
   return(data)
 }
 reSizeFont<-function(size) {
@@ -114,8 +188,8 @@ reSizeFont<-function(size) {
 
 plotLimits<-function(xlim,ylim,orientation="horz",gaps=c(1,1,0,0),fontScale=1) {
   gain<-0.3*c(braw.env$plotSize[1],braw.env$plotSize[2],braw.env$plotSize[1],braw.env$plotSize[2])
-    gaps<-gaps*fontScale/gain
-
+  gaps<-gaps*fontScale/gain
+  
   switch(orientation,
          "horz"={braw.env$plotLimits<-list(xlim=xlim,ylim=ylim,xsc=xlim,ysc=ylim,
                                            orientation=orientation,gap=gaps,fontScale=fontScale,
@@ -123,10 +197,16 @@ plotLimits<-function(xlim,ylim,orientation="horz",gaps=c(1,1,0,0),fontScale=1) {
          "vert"={braw.env$plotLimits<-list(xlim=xlim,ylim=ylim,xsc=ylim,ysc=xlim,
                                            orientation=orientation,gap=gaps[c(2,1,4,3)],fontScale=fontScale,
                                            xAxisTickSize=5,yAxisTickSize=5)}
-         )
+  )
 }
 
+# this is the start of any figure - which may then contain several graphs
 nullPlot<-function() {
+  addGraphElement(NULL)
+  drawNullPlot()
+}
+
+drawNullPlot<-function() {  
   if (braw.env$graphHTML) {
     if (braw.env$plotColours$graphC=="#FFFFFF") col<-"rgba(0,0,0,0)"
     else col<-braw.env$plotColours$graphC
@@ -146,15 +226,15 @@ containsSubscript<-function(label) any(grepl('\\[([^ ]*)\\]',label))
 containsSuperscript<-function(label) any(grepl('[\\^].',label))
 
 makeTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE,angle=0) {
-    return(list(breaks=breaks,labels=labels,logScale=logScale,angle=angle))
+  return(list(breaks=breaks,labels=labels,logScale=logScale,angle=angle))
 }
 makeLabel<-function(label=NULL) {
-    return(list(label=label))
+  return(list(label=label))
 }
 startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=0,
                     xticks=NULL,xlabel=NULL,xmax=FALSE,yticks=NULL,ylabel=NULL,ymax=FALSE,
                     backC=braw.env$plotColours$graphBack,orientation="horz",fontScale=1,
-                    fullSize="full",g=NULL) {
+                    g=NULL) {
   sz<-braw.env$fullGraphSize
   # if (all(braw.env$plotArea==c(0,0,1,1))) {
   #   braw.env$plotSize<-c(1.5,1)*300*sz
@@ -188,7 +268,7 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=0,
   if (!is.null(yticks) && !is.null(yticks$labels))
     maxtick<-max(c(maxtick,nchar(yticks$labels)))
   tickSize<-5/max(7,maxtick)
-
+  
   tickGap<-unitGap*tickSize
   
   bottomGap<-labelGapx+2*unitGap
@@ -216,27 +296,19 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=0,
   } else {
     leftGap<-minGap
   }
-
+  
   gaps<-c(leftGap,bottomGap,rightGap,topGap)
   plotLimits(xlim = xlim, ylim = ylim,orientation=orientation,gaps,fontScale=braw.env$labelSize*fontScale)
   
   if (is.null(g)) g<-nullPlot()
-    # yside<-data.frame(x=c(0,braw.env$plotLimits$gap[1],braw.env$plotLimits$gap[1],0),y=c(braw.env$plotLimits$gap[2],braw.env$plotLimits$gap[2],1-braw.env$plotLimits$gap[4],1-braw.env$plotLimits$gap[4]))
-    # g<-addG(g,axisPolygon(data=rangeXY(yside), fill="red"))
-    # xside<-data.frame(x=c(braw.env$plotLimits$gap[1],1-braw.env$plotLimits$gap[3],1-braw.env$plotLimits$gap[3],gaps[1]),y=c(0,0,braw.env$plotLimits$gap[2],braw.env$plotLimits$gap[2]))
-    # g<-addG(g,axisPolygon(data=rangeXY(xside), fill="green"))
-    # topside<-data.frame(x=c(braw.env$plotLimits$gap[1],1-braw.env$plotLimits$gap[3],1-braw.env$plotLimits$gap[3],braw.env$plotLimits$gap[1]),y=c(1,1,1-braw.env$plotLimits$gap[4],1-braw.env$plotLimits$gap[4]))
-    # g<-addG(g,axisPolygon(data=rangeXY(topside), fill="yellow"))
-    # farside<-data.frame(x=c(1,1-braw.env$plotLimits$gap[3],1-braw.env$plotLimits$gap[3],1),y=c(braw.env$plotLimits$gap[2],braw.env$plotLimits$gap[2],1-braw.env$plotLimits$gap[4],1-braw.env$plotLimits$gap[4]))
-    # g<-addG(g,axisPolygon(data=rangeXY(farside), fill="yellow"))
-    
+  addGraphElement(list(type="Start",args=braw.env$plotLimits))
   
   if (!(is.character(backC) && backC=="transparent")) {
     back<-data.frame(x=xlim[c(1,2,2,1)],y=ylim[c(1,1,2,2)])
     # g<-addG(g,axisPath(data=data.frame(x=c(0,1,1,0,0),y=c(0,0,1,1,0)),colour="red"))
     g<-addG(g,dataPolygon(data=back, fill=backC, colour=backC))
   }
-
+  
   xaxis<-data.frame(x=xlim,y=ylim[1])
   yaxis<-data.frame(x=xlim[1],y=ylim)
   
@@ -251,7 +323,7 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=0,
            g<-addG(g,dataLine(data=xaxis,colour="black",linewidth=0.25))
            g<-addG(g,dataLine(data=yaxis,colour="black",linewidth=0.25))
          }
-         )
+  )
   if (!is.null(xticks)) 
     g<-addG(g,xAxisTicks(breaks=xticks$breaks,labels=xticks$labels,logScale=xticks$logScale,angle=xticks$angle,size=tickSize))
   if (!is.null(yticks)) 
@@ -267,20 +339,20 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=0,
 
 plotTitle<-function(label,position="centre",size=1.25,fontface="bold") {
   ypos<-1-braw.env$plotLimits$gap[4]*0.8
-    switch(position,
-           "left"={
-             data<-data.frame(x=(braw.env$plotLimits$gap[1]), y=ypos)
-             hjust<-0
-           },
-           "centre"={
-             data<-data.frame(x=(braw.env$plotLimits$gap[1]+(1-braw.env$plotLimits$gap[1]-braw.env$plotLimits$gap[3])/2),y=ypos)
-             hjust<-0.5
-           },
-           "right"={
-             data<-data.frame(x=(1-braw.env$plotLimits$gap[3]),y=ypos)
-             hjust<-1
-           },
-    )
+  switch(position,
+         "left"={
+           data<-data.frame(x=(braw.env$plotLimits$gap[1]), y=ypos)
+           hjust<-0
+         },
+         "centre"={
+           data<-data.frame(x=(braw.env$plotLimits$gap[1]+(1-braw.env$plotLimits$gap[1]-braw.env$plotLimits$gap[3])/2),y=ypos)
+           hjust<-0.5
+         },
+         "right"={
+           data<-data.frame(x=(1-braw.env$plotLimits$gap[3]),y=ypos)
+           hjust<-1
+         },
+  )
   axisText(rangeXY(data),label,hjust=hjust,vjust=0.0,size=size,fontface=fontface)
 }
 
@@ -326,7 +398,7 @@ xAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE,angle=0,size=NULL){
   )
 }
 yAxisLabel<-function(label,size=0.75){
-
+  
   axis<-data.frame(x=rangeX(0.0),y=reRangeY(mean(braw.env$plotLimits$ylim)))
   switch(braw.env$plotLimits$orientation,
          "vert"={
@@ -339,7 +411,7 @@ yAxisLabel<-function(label,size=0.75){
 }
 yAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE,angle=0,size=NULL){
   if (is.null(breaks)) {
-      breaks<-axisTicks(usr=braw.env$plotLimits$ylim, log=logScale, axp = NULL, nint = 5)
+    breaks<-axisTicks(usr=braw.env$plotLimits$ylim, log=logScale, axp = NULL, nint = 5)
   }
   
   if (is.null(labels)) labels<-breaks
@@ -348,7 +420,7 @@ yAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE,angle=0,size=NULL){
   
   ticks<-data.frame(x=reRangeX(braw.env$plotLimits$xlim[1]),y=reRangeY(breaks))
   if (is.null(size)) size<-4/max(4,max(nchar(labels)))
-
+  
   switch(braw.env$plotLimits$orientation,
          "vert"={
            axisText(ticks,label=labels, hjust=0.5, vjust=1.1, colour="black",size=size,fontface="plain")
@@ -390,13 +462,11 @@ dataBar<-function(data,colour="black",fill="white",alpha=1,barwidth=0.85) {
 }
 
 # primitives from here down:
-# dataLabel
-# dataText
-# dataPath
-# dataPoint
-# dataPolygon
-# dataErrorbar
-# dataLegend
+# axisLabel
+# axisText
+# axisPath
+# axisPoint
+# axisPolygon
 # dataContour
 dataLabel<-function(data,label, hjust=0, vjust=0, fill="white",colour="black",size=0.8,angle=0,fontface="plain",background=FALSE,parser=TRUE,label.size=0.25) {
   if (is.character(data)) 
@@ -430,25 +500,29 @@ dataLabel<-function(data,label, hjust=0, vjust=0, fill="white",colour="black",si
   return(g)  
 }
 axisLabel<-function(data,label, hjust=0, vjust=0, angle=0, fill="white",colour="black",parser=TRUE,fontface="plain",size=0.8,label.size=0.25) {
+  addGraphElement(list(type="Label",args=list(data,label,hjust,vjust,colour,fill,parser,fontface,size,label.size)))
+  drawLabel(data,label, hjust, vjust, angle, fill,colour,parser,fontface,size,label.size) 
+}
+drawLabel<-function(data,label, hjust=0, vjust=0, angle=0, fill="white",colour="black",parser=TRUE,fontface="plain",size=0.8,label.size=0.25) {
   if (!braw.env$graphHTML) {
     mathlabel<-grepl("['^']{1}",label) | grepl("['[']{1}",label)
-  if (any(mathlabel)) {
-    label<-gsub("\\[([^ ]*)\\]","\\['\\1'\\]",label)
-    label<-gsub("=","==",label)
-    parser<-TRUE
-    voff<-0
-  } else {
-    if (parser) label<-deparse(bquote(.(label)))
-    voff<-0
-  }
-  if (braw.env$plotLimits$orientation=="vert") {
-    a<-hjust; hjust<-vjust; vjust<-a
-  }
-  g<-geom_label(data=data,aes(x = x, y = y), label=label, angle=angle,
-             hjust=hjust, vjust=vjust, nudge_y=voff,
-             fill=fill,color=colour,fontface=fontface,
-             label.padding=unit(0.1, "lines"),label.size=label.size,
-             size=reSizeFont(size)*0.8,parse=parser)
+    if (any(mathlabel)) {
+      label<-gsub("\\[([^ ]*)\\]","\\['\\1'\\]",label)
+      label<-gsub("=","==",label)
+      parser<-TRUE
+      voff<-0
+    } else {
+      if (parser) label<-deparse(bquote(.(label)))
+      voff<-0
+    }
+    if (braw.env$plotLimits$orientation=="vert") {
+      a<-hjust; hjust<-vjust; vjust<-a
+    }
+    g<-geom_label(data=data,aes(x = x, y = y), label=label, angle=angle,
+                  hjust=hjust, vjust=vjust, nudge_y=voff,
+                  fill=fill,color=colour,fontface=fontface,
+                  label.padding=unit(0.1, "lines"),label.size=label.size,
+                  size=reSizeFont(size)*0.8,parse=parser)
   } else {
     g<-axisText(data,label, hjust=hjust, vjust=vjust, angle=angle, colour=colour,fontface=fontface,size=size,background=TRUE,fill=fill)
   }
@@ -460,14 +534,19 @@ dataText<-function(data,label, hjust=0, vjust=0, colour="black",size=1,angle=0,f
   return(g)  
 }
 axisText<-function(data,label, hjust=0, vjust=0, colour="black",size=1,angle=0,dx=0,dy=0,fontface="plain",background=FALSE,fill="white") {
+  addGraphElement(list(type="Text",args=list(data,label,hjust,vjust,colour,fill,size,angle,dx,dy,fontface,background)))
+  drawText(data,label, hjust, vjust, colour,fill,size,angle,dx,dy,fontface,background)
+}
+drawText<-function(data,label, hjust=0, vjust=0, colour="black",fill="white",size=1,angle=0,dx=0,dy=0,fontface="plain",background=FALSE) {
   if (!braw.env$graphHTML) {
     parse<-FALSE
     mathlabel<-grepl("['^']{1}",label) | grepl("['[']{1}",label)
     if (any(mathlabel)) {
       label<-gsub("\\[([^ ]*)\\]","\\['\\1'\\]",label)
       label<-gsub("=","==",label)
+      label<-gsub("\u00B1([0-9.]*)","~'\u00B1 \\1'",label)
       parse=TRUE
-      if (fontface=="bold") label<-paste0('bold(',label,')')
+      # if (fontface=="bold") label<-paste0('bold(',label,')')
     }
     
     #   mathlabel<-grepl("['[']{1}",label) #| grepl("[\\^]{1}",label)
@@ -480,8 +559,8 @@ axisText<-function(data,label, hjust=0, vjust=0, colour="black",size=1,angle=0,d
       a<-hjust; hjust<-vjust; vjust<-a
     }
     g<-geom_text(data=data,aes(x = x, y = y), label=label, hjust=hjust, vjust=vjust, 
-              color=colour,fontface=fontface,angle=angle,
-              size=reSizeFont(size)*0.8,parse=parse)
+                 color=colour,fontface=fontface,angle=angle,
+                 size=reSizeFont(size)*0.8,parse=parse)
   } else {
     halign<-' text-anchor="start"' 
     if (hjust==0.5) halign<-' text-anchor="middle"' 
@@ -496,7 +575,7 @@ axisText<-function(data,label, hjust=0, vjust=0, colour="black",size=1,angle=0,d
     
     x<-svgX(data$x)
     y<-svgY(data$y)
-    if (containsSubscript(label)) y<-y-0.025*braw.env$plotArea[4]*svgBoxY()
+    # if (containsSubscript(label)) y<-y-0.025*braw.env$plotArea[4]*svgBoxY()
     labels<-""
     
     if (!background) filter<-'' else {
@@ -520,12 +599,12 @@ axisText<-function(data,label, hjust=0, vjust=0, colour="black",size=1,angle=0,d
                              reSizeFont(size)*0.8,'">\\1</tspan><tspan>'),
                       thisLabel)
       thisLabel<-paste0(
-                     '<tspan',halign,valign,
-                     ' dx=',dx,'px',
-                     ' dy=',-dy,'px',
-                     '>',
-                     thisLabel,
-                     '</tspan>'
+        '<tspan',halign,valign,
+        ' dx=',dx,'px',
+        ' dy=',-dy,'px',
+        '>',
+        thisLabel,
+        '</tspan>'
       )
       
       labels<-paste0(labels,
@@ -549,11 +628,16 @@ axisText<-function(data,label, hjust=0, vjust=0, colour="black",size=1,angle=0,d
   return(g)
 }
 
+
 dataPath<-function(data,arrow=NULL,colour="black",linetype="solid",linewidth=0.25,alpha=1) {
   data<-reRangeXY(data)
   axisPath(data,arrow=arrow,colour=colour,linetype=linetype,linewidth=linewidth,alpha=alpha)
-  }
+}
 axisPath<-function(data,arrow=NULL,colour="black",linetype="solid",linewidth=0.25,alpha=1) {
+  addGraphElement(list(type="Path",args=list(data,arrow,colour,linetype,linewidth,alpha)))
+  drawPath(data,arrow,colour,linetype,linewidth,alpha)
+}
+drawPath<-function(data,arrow=NULL,colour="black",linetype="solid",linewidth=0.25,alpha=1) {
   if (!braw.env$graphHTML) {
     g<-geom_path(data=data,aes(x=x,y=y),arrow=arrow,color=colour,alpha=alpha,
                  linetype=linetype,linewidth=linewidth)
@@ -586,9 +670,14 @@ dataPoint<-function(data,shape=21,colour="black",fill="white",alpha=1,size=3) {
   axisPoint(data=data,shape=shape,colour=colour,fill=fill,alpha=alpha,size=size)
 }
 axisPoint<-function(data,shape=21,colour="black",fill="white",alpha=1,size=3) {
+  addGraphElement(list(type="Point",args=list(data,shape,colour,fill,alpha,size)))
+  drawPoint(data,shape,colour,fill,alpha,size)
+}
+drawPoint<-function(data,shape=21,colour="black",fill="white",alpha=1,size=3) {
   size<-0.75*size*(braw.env$plotArea[4])^0.5
-    if (!braw.env$graphHTML) {
-      size<-size*1.5
+  if (alpha<1) colour=fill
+  if (!braw.env$graphHTML) {
+    size<-size*1.5
     if (is.null(data$fill)) {
       g<-geom_point(data=data,aes(x=x,y=y),shape=shape,colour=colour,fill=fill,alpha=alpha,size=size*0.9)
     } else {
@@ -635,17 +724,21 @@ dataPolygon<-function(data,colour="black",fill="white",alpha=1,linewidth=0.25) {
   return(g)
 }
 axisPolygon<-function(data,colour="black",fill="white",alpha=1,linewidth=0.25) {
+  addGraphElement(list(type="Polygon",args=list(data,colour,fill,alpha,linewidth)))
+  drawPolygon(data,colour,fill,alpha,linewidth)
+}
+drawPolygon<-function(data,colour="black",fill="white",alpha=1,linewidth=0.25) {
   if (!braw.env$graphHTML) {
     if (!is.na(colour) && colour=="none") colour=NA
     if (!is.null(data$ids)) {
-    g<-geom_polygon(data=data,aes(x=x,y=y,group=ids,alpha=alpha*value),colour = colour, fill = fill,linewidth=linewidth)
-  } else {
-    if (!is.null(data$fill)) {
-      g<-geom_polygon(data=data,aes(x=x,y=y, fill = fill),colour = colour,alpha=alpha,linewidth=linewidth)
+      g<-geom_polygon(data=data,aes(x=x,y=y,group=ids,alpha=alpha*value),colour = colour, fill = fill,linewidth=linewidth)
     } else {
-      g<-geom_polygon(data=data,aes(x=x,y=y),colour = colour, fill = fill,alpha=alpha,linewidth=linewidth)
+      if (!is.null(data$fill)) {
+        g<-geom_polygon(data=data,aes(x=x,y=y, fill = fill),colour = colour,alpha=alpha,linewidth=linewidth)
+      } else {
+        g<-geom_polygon(data=data,aes(x=x,y=y),colour = colour, fill = fill,alpha=alpha,linewidth=linewidth)
+      }
     }
-  }
   } else {
     x<-svgX(data$x)
     y<-svgY(data$y)
@@ -659,14 +752,14 @@ axisPolygon<-function(data,colour="black",fill="white",alpha=1,linewidth=0.25) {
                           ' stroke-opacity="',1,'"')
         points<-' points="'
         for (j in 1:4)  points<-paste0(points,' ',format(x[i+j-1]),',',format(y[i+j-1]))
-          points<-paste0(points,'"')
+        points<-paste0(points,'"')
         g<-paste0(g,
-            '<polyline',
-            points,
-            linestyle,
-            ' />'
-          )
-        }
+                  '<polyline',
+                  points,
+                  linestyle,
+                  ' />'
+        )
+      }
     } else {
       linestyle<-paste0(' fill="',fill,'" stroke="',colour,'"',
                         ' fill-opacity="',alpha,'"',
@@ -699,13 +792,13 @@ dataErrorBar<-function(data,colour="black",linewidth=0.25) {
   i<-1
   g<-c()
   for (i in 1:length(data$x)) {
-    thisError<-data.frame(x=rep(data$x[i],2),y=c(data$ymin[i]-1,data$ymax[i]+1))
+    thisError<-data.frame(x=rep(data$x[i],2),y=c(data$ymin[i],data$ymax[i]))
     g<-c(g,dataPath(thisError,colour=colour,linewidth=linewidth))
   }
   return(g)
 }
 dataLegend<-function(data,title="title",fontsize=0.6,shape=21) {
-  dy=0.055*fontsize
+  dy=0.075*fontsize
   dx=0.025*fontsize/braw.env$plotArea[3]
   names<-data$names
   if (nchar(title)>0) tn<-1.2 else tn<-0
@@ -716,36 +809,50 @@ dataLegend<-function(data,title="title",fontsize=0.6,shape=21) {
                       fill="white",colour="white",linewidth=0.5)
   )
   g<-c(g,list(axisPath(data=data.frame(x=rangeX(c(1-ncols*dx,1,1,1-ncols*dx,1-ncols*dx)),
-                                      y=rangeY(c(1-nrows*dy,1-nrows*dy,1,1,1-nrows*dy))),
-                      colour="black",linewidth=0.5))
+                                       y=rangeY(c(1-nrows*dy,1-nrows*dy,1,1,1-nrows*dy))),
+                       colour="black",linewidth=0.5))
   )
   if (tn>0)
-  g<-c(g,list(axisText(data=data.frame(x=rangeX(1-ncols*dx+2*dx),y=rangeY(1-dy*tn)),label=title,size=fontsize,fontface="bold"))
-       )
-
+    g<-c(g,list(axisText(data=data.frame(x=rangeX(1-ncols*dx+2*dx),y=rangeY(1-dy*tn)),label=title,size=fontsize,fontface="bold"))
+    )
+  
   if (length(shape)<length(names)) shape<-rep(shape,length(names))
   for (i in 1:length(names)) {
     if (!is.na(data$colours[i]))
+      g<-c(g,
+           list(axisPoint(data=data.frame(x=rangeX(1-ncols*dx+dx),y=rangeY(1-dy*(i+tn))),
+                          fill=data$colours[i],shape=shape[i]))
+      )
     g<-c(g,
-        list(axisPoint(data=data.frame(x=rangeX(1-ncols*dx+dx),y=rangeY(1-dy*(i+tn))),fill=data$colours[i],shape=shape[i]))
-    )
-    g<-c(g,
-         list(axisText(data=data.frame(x=rangeX(1-ncols*dx+2*dx),y=rangeY(1-dy*(i+tn))),label=data$names[i],vjust=0.5,size=fontsize))
+         list(axisText(data=data.frame(x=rangeX(1-ncols*dx+2*dx),y=rangeY(1-dy*(i+tn))),
+                       label=data$names[i],vjust=0.5,size=fontsize))
     )
   }
   return(g)
 }
 
-dataContour<-function(data,colour="black",breaks=c(0.1,0.3,0.5,0.7,0.9),linewidth=0.25,linetype="solid") {
+dataContour<-function(data,colour="black",fill=NA,breaks=c(0.1,0.3,0.5,0.7,0.9),linewidth=0.25,linetype="solid") {
   data<-reRangeXY(data)
-  geom_contour(data=data,aes(x=x,y=y,z=z),colour=colour,breaks=breaks,lwd=linewidth,lty=linetype)
+  c<-contourLines(data$y,data$x,data$z,levels=breaks)
+  ct<-list()
+  for (i in 1:length(c)) {
+    cdata<-data.frame(x=c[[i]]$y,y=c[[i]]$x)
+    if (is.na(fill))
+      ct<-c(ct,list(axisPath(cdata,colour=colour,linewidth=linewidth,linetype=linetype)))
+    else ct<-c(ct,list(axisPolygon(cdata,colour=colour,fill=fill,alpha=1/length(breaks),linewidth=linewidth)))
+  }
+  return(ct)
+  # x1<-as.vector(matrix(rep(data$x,101),length(data$y),byrow=TRUE))
+  # y1<-as.vector(matrix(rep(data$y,101),length(data$x),byrow=FALSE))
+  # z1<-as.vector(data$z)
+  # geom_contour(data=data,aes(x=x1,y=y1,z=z1),colour=colour,breaks=breaks,lwd=linewidth,lty=linetype)
 }
 
 desat <- function(col,gain=1) {
-    col<-(col2rgb(col)/255-0.5)*gain+0.5
-    col[col<0]<-0
-    col[col>1]<-1
-    rgb(col[1],col[2],col[3])
+  col<-(col2rgb(col)/255-0.5)*gain+0.5
+  col[col<0]<-0
+  col[col>1]<-1
+  rgb(col[1],col[2],col[3])
 }
 
 darken <- function(col,gain=1,off=0) {

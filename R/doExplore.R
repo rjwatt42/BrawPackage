@@ -2,7 +2,7 @@
 #' 
 #' @param exploreType "rIV","Heteroscedasticity","rIV2","rIVIV2","rIVIV2DV" \cr
 #'                    "pNull","Lambda" \cr
-#'                    "n","Method","Usage","WithinCorr","ClusterRad","SampleGamma" \cr
+#'                    "n","Method","Usage","WithinCorr","ClusterRad","SampleSD" \cr
 #'                     "Dependence","Outliers","NonResponse","IVRange","IVRangeC","IVRangeE","DVRange" \cr
 #'                     "Cheating","CheatingAmount" \cr
 #'                     "Alpha","Transform","InteractionOn" \cr
@@ -34,7 +34,7 @@ makeExplore<-function(exploreType="n",exploreNPoints=13,
 getExploreRange<-function(explore) {
   
   exploreType<-explore$exploreType
-  if (is.element(exploreType,c("rIV","rIV2","rIVIV2","rIVIV2DV"))) exploreType<-"rs"
+  if (is.element(exploreType,c("rIV2","rIVIV2","rIVIV2DV"))) exploreType<-"rs"
   if (is.element(exploreType,c("IVskew","DVskew","Heteroscedasticity","Dependence","Outliers","NonResponse"))) exploreType<-"anom"
   if (is.element(exploreType,c("IVRange","IVRangeC","DVRange"))) exploreType<-"anom1"
   if (is.element(exploreType,c("IVRangeE"))) exploreType<-"anom2"
@@ -42,7 +42,9 @@ getExploreRange<-function(explore) {
   
   switch(exploreType,
          "n"=range<-list(minVal=10,maxVal=250,logScale=FALSE,np=13),
-         "rs"=range<-list(minVal=-0.9,maxVal=0.9,logScale=FALSE,np=13),
+         "rIV"=range<-list(minVal=0,maxVal=0.75,logScale=FALSE,np=13),
+         "rSD"=range<-list(minVal=0,maxVal=0.4,logScale=FALSE,np=13),
+         "rs"=range<-list(minVal=-0.75,maxVal=0.75,logScale=FALSE,np=13),
          "anom"=range<-list(minVal=0,maxVal=1,logScale=FALSE,np=13),
          "anom1"=range<-list(minVal=0.1,maxVal=3,logScale=FALSE,np=13),
          "anom2"=range<-list(minVal=-3,maxVal=3,logScale=FALSE,np=13),
@@ -62,7 +64,7 @@ getExploreRange<-function(explore) {
          "PoorSamplingAmount"=range<-list(minVal=0, maxVal=0.2,logScale=FALSE,np=13),
          "CheatingAmount"=range<-list(minVal=0, maxVal=0.8,logScale=FALSE,np=13),
          "ClusterRad"=range<-list(minVal=0, maxVal=1,logScale=FALSE,np=13),
-         "SampleGamma"=range<-list(minVal=1, maxVal=10,logScale=FALSE,np=13),
+         "SampleSD"=range<-list(minVal=1, maxVal=100,logScale=TRUE,np=13),
          "NoStudies"=range<-list(minVal=2,maxVal=200,logScale=TRUE,np=13),
          {range<-list(minVal=0,maxVal=1,logScale=FALSE,np=2)}
   )
@@ -87,7 +89,7 @@ resetExploreResult<-function(nsims,n_vals,oldResult=NULL) {
                rIV2=b,rIVIV2DV=b,pIV2=b,pIVIV2DV=b,
                r=list(direct=bm,unique=bm,total=bm),
                p=list(direct=bm,unique=bm,total=bm),
-               k=b,pnull=b
+               param1=b,param2=b
   )
   if (!is.null(oldResult)) {
     result<-mergeExploreResult(oldResult,result)
@@ -103,12 +105,15 @@ storeExploreResult<-function(result,res,ri,vi) {
   result$poval[ri,vi]<-res$poIV
   result$nval[ri,vi]<-res$nval
   result$df1[ri,vi]<-res$df1
+  
+  if (!is.null(res$aic)) {
   result$aic[ri,vi]<-res$aic
   result$aicNull[ri,vi]<-res$aicNull
-  
+  }
   if (!is.null(res$sem))
     result$sem[ri,vi]<-res$sem[1,8]
   
+  if (!is.null(res$iv)) {
   result$iv$mn[ri,vi]<-res$iv.mn
   result$iv$sd[ri,vi]<-res$iv.sd
   result$iv$sk[ri,vi]<-res$iv.sk
@@ -121,6 +126,7 @@ storeExploreResult<-function(result,res,ri,vi) {
   result$rd$sd[ri,vi]<-res$rd.sd
   result$rd$sk[ri,vi]<-res$rd.sk
   result$rd$kt[ri,vi]<-res$rd.kt
+  }
   
   if (!is.null(res$rIV2)){
     result$rIV2[ri,vi]<-res$rIV2
@@ -138,9 +144,11 @@ storeExploreResult<-function(result,res,ri,vi) {
     result$p$total[ri,vi,1:n]<-res$p$total
   }
   } else {
-  result$k[ri,vi]<-res$bestK
-  result$pnull[ri,vi]<-res$bestNull
-}
+    param1Max<-max(c(res$fixed$param1Max,res$random$param1Max,res$single$param1Max,res$gauss$param1Max,res$exp$param1Max),na.rm=TRUE)
+    param2Max<-max(c(res$fixed$param2Max,res$random$param2Max,res$single$param2Max,res$gauss$param2Max,res$exp$param2Max),na.rm=TRUE)
+    result$param1[ri,vi]<-param1Max
+    result$param2[ri,vi]<-param2Max
+  }
   return(result)
 }
 
@@ -191,8 +199,8 @@ mergeExploreResult<-function(res1,res2) {
     result$pIVIV2DV<-rbind(res1$pIVIV2DV,res2$pIVIV2DV)
   }
     
-    result$k<-rbind(res1$k,res2$k)
-    result$pnull<-rbind(res1$pnull,res2$pnull)
+    result$param1<-rbind(res1$param1,res2$param1)
+    result$param2<-rbind(res1$param2,res2$param2)
     
   return(result)
 }
@@ -201,7 +209,7 @@ mergeExploreResult<-function(res1,res2) {
 #' 
 #' @param exploreType "rIV","Heteroscedasticity","rIV2","rIVIV2","rIVIV2DV" \cr
 #'                    "pNull","Lambda" \cr
-#'                    "n","Method","Usage","WithinCorr","ClusterRad","SampleGamma" \cr
+#'                    "n","Method","Usage","WithinCorr","ClusterRad","SampleSD" \cr
 #'                     "Dependence","Outliers","NonResponse","IVRange","IVRangeC","IVRangeE","DVRange" \cr
 #'                     "Cheating","CheatingAmount" \cr
 #'                     "Alpha","Transform","InteractionOn" \cr
@@ -215,8 +223,19 @@ mergeExploreResult<-function(res1,res2) {
 #' @export
 doExplore<-function(nsims=10,exploreResult=braw.res$explore,explore=braw.def$explore,
                     hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,metaAnalysis=braw.def$metaAnalysis,
-                      doingNull=FALSE,autoShow=FALSE,showType="rs"
+                      doingNull=FALSE,doingMetaAnalysis=FALSE,autoShow=FALSE,showType="rs"
 ) {
+  oldHypothesis<-braw.def$hypothesis
+  oldDesign<-braw.def$design
+  oldEvidence<-braw.def$evidence
+  oldMetaAnalysis<-braw.def$metaAnalysis
+  on.exit(setBrawDef("hypothesis",oldHypothesis))
+  on.exit(setBrawDef("design",oldDesign),add=TRUE)
+  on.exit(setBrawDef("evidence",oldEvidence),add=TRUE)
+  on.exit(setBrawDef("metaAnalysis",oldMetaAnalysis),add=TRUE)
+  oldAlpha<-braw.env$alphaSig
+  on.exit(setBrawEnv("alphaSig",oldAlpha),add=TRUE)
+  
   autoShowLocal<-braw.env$autoShow
   assign("autoShow",FALSE,braw.env)
   
@@ -231,6 +250,7 @@ doExplore<-function(nsims=10,exploreResult=braw.res$explore,explore=braw.def$exp
                         hypothesis=hypothesis,
                         design=design,
                         evidence=evidence,
+                        doingMetaAnalysis=doingMetaAnalysis,
                         metaAnalysis=metaAnalysis
     )
   }
@@ -247,13 +267,14 @@ doExplore<-function(nsims=10,exploreResult=braw.res$explore,explore=braw.def$exp
   }
   
   exploreResult <- runExplore(nsims=nsims,exploreResult,doingNull=doingNull,
+                              doingMetaAnalysis=doingMetaAnalysis,
                               autoShow=autoShow,showType=showType)
   assign("autoShow",autoShowLocal,braw.env)
   
   return(exploreResult)
 }
 
-runExplore <- function(nsims,exploreResult,doingNull=FALSE,
+runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FALSE,
                        autoShow=FALSE,showType="rs"){
   max_r<-0.9
   
@@ -303,6 +324,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
           "DVprop"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "DVskew"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "DVkurtosis"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "rSD"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "rIV"={
             if (is.null(IV2)) vals<-seq(minVal,maxVal,length.out=npoints)
             else {
@@ -336,7 +358,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
           "ClusterRad"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Usage"={vals<-c("Between","Within")},
           "WithinCorr"={vals<-seq(minVal,maxVal,length.out=npoints)},
-          "SampleGamma"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "SampleSD"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "PoorSamplingAmount"=vals<-{seq(minVal,maxVal,length.out=npoints)},
           "Dependence"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Outliers"={vals<-seq(minVal,maxVal,length.out=npoints)},
@@ -358,10 +380,11 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
           "Repeats" ={ vals<-minVal:maxVal },
           
           "NoStudies"={vals<-seq(minVal,maxVal,length.out=npoints)},
-          "MetaType"={vale<-c("FF","FT","TF","TT")}
+          "MetaType"={vals<-c("FF","FT","TF","TT")}
   )
   if (substr(explore$exploreType,1,1)=="r" && braw.env$RZ=="z") vals<-tanh(vals)
   if (xlog) vals<-10^vals
+  if (is.element(explore$exploreType,c("IVlevels","DVlevels","n","NoStudies"))) vals<-round(vals)
   
   exploreResult$vals<-vals
   exploreResult$explore<-explore
@@ -375,8 +398,6 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
   if (doingNull && exploreResult$nullcount<exploreResult$count)
     nsims<-min(exploreResult$count,exploreResult$nullcount)+nsims
   else   nsims<-exploreResult$count+nsims
-  
-  doingMetaAnalysis<-FALSE
   
   time.at.start<-Sys.time()
   while (((doingNonNull && exploreResult$count<nsims) || (doingNull && exploreResult$nullcount<nsims)) && Sys.time()-time.at.start<braw.env$timeLimit){
@@ -632,6 +653,9 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
                   DV$type<-"Interval"
                   DV$kurtosis<-10^vals[vi]
                 },
+                "rSD"={
+                  effect$rSD<-vals[vi]
+                },
                 "rIV"={
                   if (effect$world$worldOn) {
                     effect$world$populationPDFk<-vals[vi]
@@ -684,9 +708,9 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
                 )
                 },
                 "WithinCorr"={design$sWithinCor<-vals[vi]},
-                "SampleGamma"={
+                "SampleSD"={
                   design$sNRand<-TRUE
-                  design$sNRandK<-vals[vi]
+                  design$sNRandSD<-vals[vi]
                 },
                 "PoorSamplingAmount"={design$sMethodSeverity<-vals[vi]},
                 "Dependence"={design$sDependence<-vals[vi]},
@@ -761,7 +785,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
         hypothesis$effect<-effect
         
         if (doingMetaAnalysis) {
-          res<-doMetaAnalysis(1,NULL,metaAnalysis,hypothesis,design,evidence)
+          res<-doMetaAnalysis(NULL,metaAnalysis,hypothesis=hypothesis,design=design,evidence=evidence)
           result<-storeExploreResult(result,res,ri,vi)
         } else {
           if (doingNonNull) {
@@ -778,6 +802,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
         }
       }
     }
+    exploreResult$doingMetaAnalysis<-doingMetaAnalysis
     exploreResult$count<-ri
     exploreResult$result<-result
     if (doingNull) {

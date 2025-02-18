@@ -21,7 +21,7 @@ sampleShortCut<-function(hypothesis,design,evidence,nsims,appendData,oldanalysis
     if (!effect$world$worldOn) {
       effect$world$populationPDF<-"Single"
       effect$world$populationRZ<-"r"
-      effect$world$populationPDFk<-effect$rIV
+      effect$world$populationPDFk<-tanh(atanh(effect$rIV)+rnorm(1,0,atanh(effect$rSD)))
       effect$world$populationNullp<-0
     }
     switch (paste0(effect$world$populationPDF,"_",effect$world$populationRZ),
@@ -81,7 +81,7 @@ sampleShortCut<-function(hypothesis,design,evidence,nsims,appendData,oldanalysis
     } else {
       ns<-rep(design$sN,sample_increase)
       if (design$sNRand) {
-        ns<-braw.env$minN+rgamma(sample_increase,shape=design$sNRandK,scale=(design$sN-braw.env$minN)/design$sNRandK)
+        ns<-nDistrRand(sample_increase,design)
         ns<-as.integer(round(ns))
       }
     }
@@ -89,6 +89,7 @@ sampleShortCut<-function(hypothesis,design,evidence,nsims,appendData,oldanalysis
     s1<-1/sqrt(ns-3)
     rs<-tanh(rnorm(sample_increase,mean=atanh(pops),sd=s1))
     ps<-(1-pnorm(atanh(abs(rs)),0,s1))*2
+    ps<-r2p(rs,ns)
     
     if (sigOnly) {
       keep<-isSignificant(braw.env$STMethod,ps,rs,ns,df1,evidence)
@@ -109,7 +110,20 @@ sampleShortCut<-function(hypothesis,design,evidence,nsims,appendData,oldanalysis
                    rpIV=rbind(matrix(r_effects[1:nsims],ncol=1),oldanalysis$rpIV),
                    nval=rbind(matrix(n_effects[1:nsims],ncol=1),oldanalysis$nval),
                    df1=rbind(matrix(rep(df1,nsims),ncol=1),oldanalysis$df1),
-                   dv=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$dv)
+                   iv.mn=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$iv.mn),
+                   iv.sd=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$iv.sd),
+                   iv.sk=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$iv.sk),
+                   iv.kt=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$iv.kt),
+                   dv.mn=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$dv.mn),
+                   dv.sd=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$dv.sd),
+                   dv.sk=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$dv.sk),
+                   dv.kt=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$dv.kt),
+                   rd.mn=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$rd.mn),
+                   rd.sd=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$rd.sd),
+                   rd.sk=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$rd.sk),
+                   rd.kt=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$rd.kt),
+                   aic=rbind(matrix(rep(NA,nsims),ncol=1),oldanalysis$aic),
+                   aicNull=rbind(matrix(rep(NA,nsims),ncol=1),oldanalysis$aicNull)
     )
     
   } else {
@@ -118,7 +132,19 @@ sampleShortCut<-function(hypothesis,design,evidence,nsims,appendData,oldanalysis
                  rpIV=matrix(rp_effects[1:nsims],ncol=1),
                  nval=matrix(n_effects[1:nsims],ncol=1),
                  df1=matrix(rep(df1,nsims),ncol=1),
-                 dv=rep(0,nsims)
+                 iv.mn=matrix(rep(0,nsims),ncol=1),
+                 iv.sd=matrix(rep(0,nsims),ncol=1),
+                 iv.sk=matrix(rep(0,nsims),ncol=1),
+                 iv.kt=matrix(rep(0,nsims),ncol=1),
+                 dv.mn=matrix(rep(0,nsims),ncol=1),
+                 dv.sd=matrix(rep(0,nsims),ncol=1),
+                 dv.sk=matrix(rep(0,nsims),ncol=1),
+                 dv.kt=matrix(rep(0,nsims),ncol=1),
+                 rd.mn=matrix(rep(0,nsims),ncol=1),
+                 rd.sd=matrix(rep(0,nsims),ncol=1),
+                 rd.sk=matrix(rep(0,nsims),ncol=1),
+                 rd.kt=matrix(rep(0,nsims),ncol=1),
+                 aic=NA,aicNull=NA
   )
   }
   analysis$participant<-1:length(analysis$rIV)

@@ -1,3 +1,42 @@
+getWorldEffect<-function(effect) {
+  if (effect$world$worldOn) {
+    if (!is.na(effect$world$populationRZ) && !isempty(effect$world$populationRZ)){
+      switch (effect$world$populationRZ,
+              "r"={
+                switch (effect$world$populationPDF,
+                        "Single"={rho<-effect$world$populationPDFk},
+                        "Double"={rho<-effect$world$populationPDFk*sign(runif(1,-1,1))},
+                        "Uniform"={rho<-runif(1,min=-1,max=1)},
+                        "Exp"={rho<-rexp(1,rate=1/effect$world$populationPDFk)*sign((runif(1)*2-1))},
+                        "Gauss"={rho<-rnorm(1,mean=0,sd=effect$world$populationPDFk)*sign((runif(1)*2-1))},
+                        ">"={rho<-runif(1,min=effect$world$populationPDFk,max=1)*sign(runif(1,min=-1,max=1))},
+                        "<"={rho<-runif(1,min=-1,max=1)*effect$world$populationPDFk}
+                )
+              },
+              "z"={
+                switch (effect$world$populationPDF,
+                        "Single"={rho<-effect$world$populationPDFk},
+                        "Double"={rho<-effect$world$populationPDFk*sign(runif(1,-1,1))},
+                        "Uniform"={rho<-runif(1,min=-uniformZrange,max=uniformZrange)},
+                        "Exp"={rho<-rexp(1,rate=1/effect$world$populationPDFk)*sign((runif(1)*2-1))},
+                        "Gauss"={rho<-rnorm(1,mean=0,sd=effect$world$populationPDFk)*sign((runif(1)*2-1))},
+                        ">"={rho<-runif(1,min=effect$world$populationPDFk,max=10)*sign(runif(1,min=-1,max=1))},
+                        "<"={rho<-runif(1,min=-1,max=1)*effect$world$populationPDFk}
+                )
+                rho<-tanh(rho)
+              }
+      )
+      rhoOld<-rho
+      if (effect$world$populationNullp>0) {
+        if (runif(1)<=effect$world$populationNullp)
+        {rho<-0}
+      }
+      rho<-max(min(rho,0.99),-0.99)
+    }
+  } else
+    rho<-effect$rIV
+  return(rho)
+}
 
 drawCatPositions<-function(ncats){
   pbreaks<-seq(0,1,1/(ncats))
@@ -198,43 +237,7 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
     total1<-effect$rIV2+effect$rIV*effect$rIVIV2
   }
   
-  rho<-effect$rIV
-  
-  if (effect$world$worldOn) {
-    if (!is.na(effect$world$populationRZ) && !isempty(effect$world$populationRZ)){
-      switch (effect$world$populationRZ,
-              "r"={
-                switch (effect$world$populationPDF,
-                        "Single"={rho<-effect$world$populationPDFk},
-                        "Double"={rho<-effect$world$populationPDFk*sign(runif(1,-1,1))},
-                        "Uniform"={rho<-runif(1,min=-1,max=1)},
-                        "Exp"={rho<-rexp(1,rate=1/effect$world$populationPDFk)*sign((runif(1)*2-1))},
-                        "Gauss"={rho<-rnorm(1,mean=0,sd=effect$world$populationPDFk)*sign((runif(1)*2-1))},
-                        ">"={rho<-runif(1,min=effect$world$populationPDFk,max=1)*sign(runif(1,min=-1,max=1))},
-                        "<"={rho<-runif(1,min=-1,max=1)*effect$world$populationPDFk}
-                )
-              },
-              "z"={
-                switch (effect$world$populationPDF,
-                        "Single"={rho<-effect$world$populationPDFk},
-                        "Double"={rho<-effect$world$populationPDFk*sign(runif(1,-1,1))},
-                        "Uniform"={rho<-runif(1,min=-uniformZrange,max=uniformZrange)},
-                        "Exp"={rho<-rexp(1,rate=1/effect$world$populationPDFk)*sign((runif(1)*2-1))},
-                        "Gauss"={rho<-rnorm(1,mean=0,sd=effect$world$populationPDFk)*sign((runif(1)*2-1))},
-                        ">"={rho<-runif(1,min=effect$world$populationPDFk,max=10)*sign(runif(1,min=-1,max=1))},
-                        "<"={rho<-runif(1,min=-1,max=1)*effect$world$populationPDFk}
-                )
-                rho<-tanh(rho)
-              }
-      )
-      rhoOld<-rho
-      if (effect$world$populationNullp>0) {
-        if (runif(1)<=effect$world$populationNullp)
-        {rho<-0}
-      }
-      rho<-max(min(rho,0.99),-0.99)
-    }
-  }
+  rho<-getWorldEffect(effect)
   
   n<-design$sN
   if (n<1) {
@@ -245,8 +248,8 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
     }
   }
   if (design$sNRand) {
-    n<-braw.env$minN+rgamma(1,shape=design$sNRandK,scale=(design$sN-braw.env$minN)/design$sNRandK)
-    while (n>100000) {n<-braw.env$minN+rgamma(1,shape=design$sNRandK,scale=(design$sN-braw.env$minN)/design$sNRandK)}
+    n<-nDistrRand(1,design)
+    while (n>100000) {n<-nDistrRand(1,design)}
   }
   n<-round(n)
 

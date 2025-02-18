@@ -5,7 +5,7 @@ brawFormat<-function(numbers,digits=braw.env$report_precision,na.rm=FALSE) {
     if (na.rm) return(" ") else return("NULL")
   
   pad<-function(x) if(x>=0) paste0(" ",x) else x
-  trim<-function(x) sub("(.[1-9]*)0+$", "\\1", x) 
+  trim<-function(x) sub("([.]{1}[1-9]*)0+$", "\\1", x) 
   
   if (digits<0) {
     digits<-(-digits)-max(floor(log10(abs(numbers))))
@@ -20,7 +20,7 @@ brawFormat<-function(numbers,digits=braw.env$report_precision,na.rm=FALSE) {
   if (any(change)) r[change]<-unname(sapply(r[change],pad))
   
   # change<- r!="0" && numbers!=round(numbers,digits)
-  change<-grepl(".[1-9]*0+$",r)
+  change<-grepl("[.]{1}[1-9]*0+$",r)
   if (any(change)) r[change]<-unname(sapply(r[change],trim))
   r
 }

@@ -47,7 +47,7 @@ showSample<-function(sample=braw.res$result,marginals=FALSE){
   if (!is.null(sample$rIV)) effect$rIV<-sample$rIV
   
   if (is.null(IV2)) {
-    # braw.env$plotArea<-c(0,0,1,1)
+    braw.env$plotArea<-c(0,0,1,1)
     g<-plotSample(IV,DV,effect,sample$ivplot,sample$dvplot)
   } else {
     braw.env$plotArea<-c(0,0,0.45,0.55)

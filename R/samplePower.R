@@ -58,7 +58,7 @@ wn2z<-function(w,n,t=2,alpha=NA){
   z
 }
 
-rw2n<-function(r,w,t=2,alpha=NA){
+rw2n<-function(r,w,t=2,alpha=NA,doRound=TRUE){
   if (is.na(alpha)) alpha<-braw.env$alphaSig
   if (any(abs(r)>1)) {
     print("rw2n exception")
@@ -74,7 +74,7 @@ rw2n<-function(r,w,t=2,alpha=NA){
     # two tailed
     nnear<-((qnorm(w)-qnorm(alpha/2))/z)^2+3
   }
-  nnear<-round(nnear)  
+  if (doRound) nnear<-round(nnear)  
   nnear[nnear>1000000]<-1000000
   nnear[nnear<5]<-5
   nnear

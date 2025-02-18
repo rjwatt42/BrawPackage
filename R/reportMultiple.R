@@ -242,8 +242,8 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
                                   result$rIV),
                                 ncol=2,byrow=FALSE)
                    colnames(data)<-c("nsig","sig")
-                   data[!(!sigs),1]<-NA
-                   data[!(sigs),2]<-NA
+                   data[sigs,1]<-NA
+                   data[!sigs,2]<-NA
                    digits=3
                    nbar<-2
                  },

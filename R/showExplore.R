@@ -57,16 +57,23 @@ trimExploreResult<-function(result,nullresult) {
 #'                        effectType="unique",whichEffect="All")
 #' @export
 showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension="1D",showTheory=FALSE,
-                      effectType="unique",whichEffect="All",quantileShow=0.5){
+                      effectType="unique",whichEffect="All",quantileShow=0.5,autoYlim=TRUE,showHist=TRUE){
 
+# do we need more simulations  
   if (is.null(exploreResult)) exploreResult=doExplore()
-
+  if (!exploreResult$hypothesis$effect$world$worldOn && is.element(showType[1],c("NHST","Hits","Misses"))) {
+    if (exploreResult$nullcount<exploreResult$count) {
+      exploreResult<-doExplore(0,exploreResult,doingNull=TRUE)
+    }
+  }
+  
   explore<-exploreResult$explore
   hypothesis<-exploreResult$hypothesis
   effect<-hypothesis$effect
   design<-exploreResult$design
   evidence<-exploreResult$evidence
   
+# sort out what we are showing
   
   showType<-strsplit(showType,";")[[1]]
   if (length(showType)==1) {
@@ -79,15 +86,18 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
            {}
     )
   }
-  if (is.element(explore$exploreType,c("NoStudies","MetaType"))) showType<-c("Lambda","pNull")
+  if (exploreResult$doingMetaAnalysis) 
+    switch(exploreResult$metaAnalysis$analysisType,
+           "fixed"={showType<-c("LambdaF")},
+           "random"={
+             showType<-c("LambdaF","LambdaR")
+             if (exploreResult$metaAnalysis$analysisVar=="var") showType[2]<-"LambdaRn"
+               },
+           {showType<-c("Lambda","pNull")}
+           )
+    
   
   if (length(showType)>1 && showType[2]==" ") showType<-showType[1]
-  
-  if (!exploreResult$hypothesis$effect$world$worldOn && is.element(showType[1],c("NHST","Hits","Misses"))) {
-    if (exploreResult$nullcount<exploreResult$count) {
-      exploreResult<-doExplore(0,exploreResult,doingNull=TRUE)
-    }
-  }
   
   if (length(showType)==2 && dimension=="2D") {
     g<-showExplore2D(exploreResult=exploreResult,showType=showType,showTheory=showTheory,
@@ -95,23 +105,22 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     return(g)
   }
   
-  if (showType[1]=="SEM") whichEffect<-"Main 1"
-  
   quants<-(1-quantileShow)/2
   showPower<-TRUE # show power calculations?
   
   oldAlpha<-braw.env$alphaSig
-  on.exit(braw.env$alphaSig<-oldAlpha)
-  
+  on.exit(setBrawEnv("alphaSig",oldAlpha),add=TRUE)
+
   vals<-exploreResult$vals
-  
   if (explore$exploreType=="rIV" && braw.env$RZ=="z") {
     vals<-atanh(vals)
   }
   
+  if (showType[1]=="SEM") whichEffect<-"Main 1"
   if (whichEffect=="All" && !evidence$rInteractionOn) whichEffect<-"Mains"
   if ((whichEffect=="All" || whichEffect=="Mains") && is.null(hypothesis$IV2)) whichEffect<-"Main 1"
   
+# dimensions & position of graph area  
   plotYOffset<-matrix(0)
   plotHeight<-1
   if (!is.null(hypothesis$IV2)) {
@@ -136,27 +145,8 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     }
   }
   
-  # plotWidth<-0.9
-  # if (!is.null(hypothesis$IV2)) {
-  #   switch(whichEffect,
-  #          "All"={
-  #            plotWidth<-0.475
-  #          },
-  #          "Mains"={
-  #            plotWidth<-0.475
-  #          },
-  #          {}
-  #   )
-  # } 
   plotXOffset<-matrix(0)
   plotWidth<-1
-  # if (plotHeight==1) {
-  #   plotXOffset<-matrix(0)+0.05
-  #   plotWidth<-0.9
-  # } else {
-  #   plotXOffset<-matrix(0)+0.15
-  #   plotWidth<-0.7
-  # } 
   if (length(showType)==2) {
     plotXOffset<-matrix(c(0,0.55),nrow=2,byrow=FALSE)
     plotWidth<-0.45
@@ -180,6 +170,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     plotHeight<-0.475
   }
   
+# which effects are we showing (main1, main2, interaction)?
   if (is.null(hypothesis$IV2)) whichEffects<-1
   else
     switch (whichEffect,
@@ -192,12 +183,28 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
             "Mains"=whichEffects<-1:2,
             "All"=whichEffects<-1:3
     )
+  # and effect types
+  if (effectType=="all") {
+    if (!is.null(hypothesis$IV2)) effectTypes<-c("direct","unique","total")
+    else effectTypes<-"direct"
+  } 
+  else effectTypes<-effectType
   
-  if (is.character(vals[1]) || length(vals)<10) {
-    xlim<-c(0,length(vals)+1)
-    vals<-1:length(vals)
-    xbreaks<-vals
-    xnames<-exploreResult$vals
+# prepare the x-axis  
+  if (is.character(vals[1]) || length(vals)<=10 || (length(vals)>=25 && exploreResult$count>500/length(vals))) {
+    if (is.character(vals[1])) {
+      vals<-1:length(vals)
+      xlim<-c(0,length(vals)+1)
+      xbreaks<-vals
+      xnames<-exploreResult$vals
+    } else {
+      if (explore$xlog) vals<-log10(vals)
+      xlim<-c(min(vals),max(vals))
+      valsRange<-diff(xlim)
+      xlim<-xlim+c(-1,1)*valsRange/10
+      xbreaks<-NULL
+      xnames<-NULL
+    }
     doLine=FALSE
   } else {
     if (explore$xlog) vals<-log10(vals)
@@ -208,13 +215,8 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     xnames<-NULL
     doLine=TRUE
   }
-  
-  if (effectType=="all") {
-    if (!is.null(hypothesis$IV2)) effectTypes<-c("direct","unique","total")
-    else effectTypes<-"direct"
-  } 
-  else effectTypes<-effectType
-  
+  if (showHist) doLine<-FALSE
+  if (!doLine)  quants<-0.95/2
   
   g<-NULL
   
@@ -227,15 +229,16 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   ylines<-yaxis$lines
   ySecond<-NULL
   
-  if (showType[si]=="SEM") ylim<-c(0,1)
+  if (is.element(showType[si],c("SEM","NHST","p(sig)","Hits","Misses"))) ylim<-c(0,1)
   if (showType[si]=="AIC") {
     ylim<-c(-1,0.1)*design$sN*hypothesis$DV$sd
     ylabel<-"diff(AIC)"
   }
-  # if (showType[si]=="AIC" && explore$exploreType=="n") 
-  #     ylim<-c(-1.5*explore$minVal,1.5*explore$maxVal)*hypothesis$DV$sd
-  if (showType[si]=="p" && braw.env$pPlotScale=="log10" && any(exploreResult$result$pval>0)) 
+  if (showType[si]=="p" && braw.env$pPlotScale=="log10" && any(exploreResult$result$pval>0)) {
+    ylim<-c(-4,0)  
     while (mean(log10(exploreResult$result$pval)>ylim[1])<0.75) ylim[1]<-ylim[1]-1
+    autoYlim<-FALSE
+  }
   
   col2<-desat(braw.env$plotColours$infer_nsigNonNull,0.5)
   col3<-braw.env$plotColours$infer_nsigNull
@@ -294,24 +297,15 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     }
     if ((showType[si]=="rs") && (!is.null(hypothesis$IV2))) switch(whichEffect,ylabel<-"Main 1",ylabel<-"Main 2",ylabel<-"Interaction")
 
-    g<-startPlot(xlim,ylim,
-                 xticks=makeTicks(breaks=xbreaks,labels=xnames,logScale=explore$xlog),
-                 xlabel=makeLabel(label=exploreTypeShow),
-                 xmax=TRUE,
-                 yticks=makeTicks(logScale=yaxis$logScale),
-                 ylabel=makeLabel(label=ylabel),
-                 top=TRUE,g=g)
-    if (nchar(useLabel)>0)    g<-addG(g,plotTitle(useLabel,size=1.5))
-    
     col<-darken(ycols[1],off=-0.2)
     col<-ycols[1]
-      for (effectType in effectTypes) {
-        switch(effectType,
-               "direct"={},
-               "unique"={col<-darken(desat(col,0.7),1.3)},
-               "total"={col<-darken(desat(col,0.7),0.7)}
-        )
-      # col<-darken(col,off=0.1)
+    for (effectType in effectTypes) {
+      switch(effectType,
+             "direct"={},
+             "unique"={col<-darken(desat(col,0.7),1.3)},
+             "total"={col<-darken(desat(col,0.7),0.7)}
+      )
+      
     theoryVals<-NULL
     theoryUpper<-NULL
     theoryLower<-NULL
@@ -455,35 +449,9 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
         )
         hypothesis$effect$world$populationNullp<-Nullp
       }
-      
       if (explore$xlog) newvals<-log10(newvals)
-      if (!is.null(theoryVals)) {
-        theory<-data.frame(x=newvals, y=theoryVals)
-        g<-addG(g,dataLine(theory,colour=darken(col,1,-0.15),linewidth=1))
-      }
-      if (!is.null(theoryUpper)) {
-        theory<-data.frame(x=newvals, y=theoryUpper)
-        g<-addG(g,dataLine(theory,colour=darken(col,1,-0.15),linewidth=0.5))
-      }
-      if (!is.null(theoryLower)) {
-        theory<-data.frame(x=newvals, y=theoryLower)
-        g<-addG(g,dataLine(theory,colour=darken(col,1,-0.15),linewidth=0.5))
-      }
-      
-      if (!is.null(theoryVals1)) {
-        theory<-data.frame(x=c(newvals,rev(newvals)), y=1-c(theoryVals1,theoryVals1*0))
-        g<-addG(g,dataPolygon(theory,colour=braw.env$plotColours$infer_sigNonNull,fill=braw.env$plotColours$infer_sigNonNull))
-      }
-      if (!is.null(theoryVals0)) {
-        theory<-data.frame(x=c(newvals,rev(newvals)), y=c(theoryVals0,theoryVals0*0))
-        g<-addG(g,dataPolygon(theory,colour=braw.env$plotColours$infer_sigNull,fill=braw.env$plotColours$infer_sigNull))
-      }
-      if (!is.null(theoryVals2)) {
-        theory<-data.frame(x=newvals, y=theoryVals2)
-        g<-addG(g,dataLine(theory,colour="black",linewidth=0.5))
-      }
-      
     }
+    
     
     if (!is.null(exploreResult$result)) {
       result<-trimExploreResult(exploreResult$result,exploreResult$nullresult)
@@ -591,11 +559,20 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                 df1<-result$df1
                 showVals<-r2llr(rVals,ns,df1,"dLLR",evidence$llr,evidence$prior)
               },
+              "LambdaF"={
+                showVals<-result$param1
+              },
+              "LambdaR"={
+                showVals<-result$param2
+              },
+              "LambdaRn"={
+                showVals<-result$param2
+              },
               "Lambda"={
-                showVals<-result$k
+                showVals<-result$param1
               },
               "pNull"={
-                showVals<-result$pnull
+                showVals<-result$param2
               },
               "S"={
                 showVals<-result$S
@@ -728,12 +705,12 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                 showVals<-result$rs$kt
               }
       )
-      
       if (!is.element(showType[si],c("NHST","SEM"))) {
         # draw the basic line and point data
         if (is.element(showType[si],c("p(sig)","Hits","Misses"))) {
           y50<-showMeans
           y75<-NULL
+          y25<-NULL
         } else {
           y75<-apply( showVals , 2 , quantile , probs = 0.50+quants , na.rm = TRUE ,names=FALSE)
           y62<-apply( showVals , 2 , quantile , probs = 0.50+quants/2 , na.rm = TRUE ,names=FALSE)
@@ -741,7 +718,54 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
           y38<-apply( showVals , 2 , quantile , probs = 0.50-quants/2 , na.rm = TRUE ,names=FALSE)
           y25<-apply( showVals , 2 , quantile , probs = 0.50-quants , na.rm = TRUE ,names=FALSE)
         }
-
+      }
+      
+      if (autoYlim) {
+        ylim<-c(
+          min(y25,y50,theoryVals,theoryLower,theoryVals1,theoryVals0,theoryVals2,na.rm=TRUE),
+          max(y75,y50,theoryVals,theoryUpper,theoryVals1,theoryVals0,theoryVals2,na.rm=TRUE)
+              )
+        ylim<-ylim+c(-1,1)*diff(ylim)/4
+      }
+      # general start
+      g<-startPlot(xlim,ylim,
+                   xticks=makeTicks(breaks=xbreaks,labels=xnames,logScale=explore$xlog),
+                   xlabel=makeLabel(label=exploreTypeShow),
+                   xmax=TRUE,
+                   yticks=makeTicks(logScale=yaxis$logScale),
+                   ylabel=makeLabel(label=ylabel),
+                   top=TRUE,g=g)
+      if (nchar(useLabel)>0)    g<-addG(g,plotTitle(useLabel,size=1.5))
+      
+      # theory plots
+      if (!is.null(theoryVals)) {
+        theory<-data.frame(x=newvals, y=theoryVals)
+        g<-addG(g,dataLine(theory,colour=darken(col,1,-0.15),linewidth=1))
+      }
+      if (!is.null(theoryUpper)) {
+        theory<-data.frame(x=newvals, y=theoryUpper)
+        g<-addG(g,dataLine(theory,colour=darken(col,1,-0.15),linewidth=0.5))
+      }
+      if (!is.null(theoryLower)) {
+        theory<-data.frame(x=newvals, y=theoryLower)
+        g<-addG(g,dataLine(theory,colour=darken(col,1,-0.15),linewidth=0.5))
+      }
+      if (!is.null(theoryVals1)) {
+        theory<-data.frame(x=c(newvals,rev(newvals)), y=1-c(theoryVals1,theoryVals1*0))
+        g<-addG(g,dataPolygon(theory,colour=braw.env$plotColours$infer_sigNonNull,fill=braw.env$plotColours$infer_sigNonNull))
+      }
+      if (!is.null(theoryVals0)) {
+        theory<-data.frame(x=c(newvals,rev(newvals)), y=c(theoryVals0,theoryVals0*0))
+        g<-addG(g,dataPolygon(theory,colour=braw.env$plotColours$infer_sigNull,fill=braw.env$plotColours$infer_sigNull))
+      }
+      if (!is.null(theoryVals2)) {
+        theory<-data.frame(x=newvals, y=theoryVals2)
+        g<-addG(g,dataLine(theory,colour="black",linewidth=0.5))
+      }
+      
+      # plot results
+      if (!is.element(showType[si],c("NHST","SEM"))) {
+        # draw the basic line and point data
         if (!isempty(y50)) {
           y50[y50>ylim[2]]<-ylim[2]
           y50[y50<ylim[1]]<-ylim[1]
@@ -769,29 +793,43 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
             g<-addG(g,dataLine(data.frame(x=vals,y=y62),colour="white",alpha=0.6))
           }
           pts0f<-data.frame(x=vals,y=y50)
-          
-          g<-addG(g,dataLine(data=pts0f))
+          g<-addG(g,dataLine(data=pts0f,linewidth=0.75))
           g<-addG(g,dataPoint(data=pts0f,fill=col,size=4))
-        } else {
-          pts0f<-data.frame(x=vals,y=y50)
-          g<-addG(g,dataLine(data=pts0f,linewidth=0.25))
+        } else { # not doLine
+          if (nrow(rVals)>0)
           sigVals<-isSignificant(braw.env$STMethod,pVals,rVals,nVals,df1Vals,exploreResult$evidence,braw.env$alphaSig)
+          else
+          sigVals<-showVals*0+1
           if (!is.null(showVals)) {
-            for (i in 1:length(vals))
+            for (i in 1:length(vals)) {
+              if (i==1) left=(vals[i+1]-vals[i])*0.35 else left=(vals[i]-vals[i-1])*0.35
+              if (i==length(vals)) right=(vals[i]-vals[i-1])*0.35 else right=(vals[i+1]-vals[i])*0.35
               g<-expected_plot(g,
                                data.frame(x=vals[i],y1=showVals[,i],y2=sigVals[,i]),
-                               showType=showType[si],ylim=ylim,scale=2.25/(length(vals)+1),width=0.5,
-                               col=col,
-                               npointsMax=500/length(vals))
+                               showType=showType[si],ylim=ylim,
+                               scale=3/(length(vals)+1),
+                               width=c(left,right),
+                               col=col,useSignificanceCols=FALSE,
+                               histStyle="wide",
+                               alpha=min(1,2.5/sqrt(length(showVals[,i]))),
+                               npointsMax=500/length(vals)
+              )
+            }
           }
+          pts0f<-data.frame(x=vals,y=y50)
+          g<-addG(g,dataLine(data=pts0f,linewidth=0.75))
+          if (length(vals)>=25) pts0f<-pts0f[seq(1,length(vals),round(length(vals)/13)),]
           g<-addG(g,dataPoint(data=pts0f,fill=col,size=4))
           if (!is.null(y75)) {
-          pts1f<-data.frame(x=vals,ymin=y25,ymax=y75)
-          g<-addG(g,dataErrorBar(pts1f))
+            g<-addG(g,dataLine(data.frame(x=vals,y=y25),colour="black",alpha=0.9))
+            g<-addG(g,dataLine(data.frame(x=vals,y=y75),colour="black",alpha=0.9))
+            pts1f<-data.frame(x=vals,ymin=y25,ymax=y75)
+            # g<-addG(g,dataErrorBar(pts1f,colour=col))
           }
         } # end of line and point
         }
-      } else {
+      } # end of !("NHST","SEM")
+      else {
         # now the NHST filled areas
         ytop<-rep(1,ncol(showVals))
         if (doLine) xoff<-0
@@ -829,14 +867,6 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
         }
           
         g<-addG(g,dataLegend(data.frame(colours=showCols[!is.na(showCols)],names=showLabels[!is.na(showCols)]),title="",shape=22))
-        # yoff<-1
-        #   for (use in 1:nrow(showVals)) {
-        #     if (!is.na(showCols[use])) {
-        #       position<-data.frame(x=max(vals),y=yoff)
-        #       g<-addG(g,drawNHSTLabel(showLabels[use],position,xoff,showCols[use]))
-        #       yoff<-yoff-1/10
-        #     }
-        # }
       }
 
       
@@ -872,8 +902,13 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
         w<-y50
         r<-exploreResult$vals
         minrw<-function(r,w,n){sum(abs(w-rn2w(r,n)),na.rm=TRUE)}
-        n_est<-optimize(minrw,c(0,100),w=w,r=r)
+        maxN<-50
+        n_est<-50
+        while (n_est>(maxN/2)) {
+          maxN<-maxN*2
+          n_est<-optimize(minrw,c(0,maxN),w=w,r=r)
         n_est<-n_est$minimum
+        }
         rvals<-seq(min(r),max(r),length.out=101)
         yvals<-rn2w(rvals,n_est)
         ptsn<-data.frame(x=rvals,y=yvals)

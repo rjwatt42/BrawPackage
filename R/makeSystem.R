@@ -171,7 +171,7 @@ makeReplication<-function(On=FALSE,Repeats=1,Keep="Cautious",RepAlpha=0.05,
 #' )
 #' @export
 makeDesign<-function(sN=42, sMethod=makeSampling("Random"),sMethodSeverity=0.1,
-                     sNRand=FALSE,sNRandK=2, 
+                     sNRand=FALSE,sNRandSD=33.3, sNRandDist="Gamma",
                      sIV1Use="Between",sIV2Use="Between", 
                      sWithinCor=0.5,
                      sBudgetOn=FALSE,sNBudget=1000,
@@ -182,7 +182,7 @@ makeDesign<-function(sN=42, sMethod=makeSampling("Random"),sMethodSeverity=0.1,
 ) {
   
   design<-list(sN=sN, sMethod=sMethod, sMethodSeverity=sMethodSeverity,
-               sNRand=sNRand,sNRandK=sNRandK,
+               sNRand=sNRand,sNRandSD=sNRandSD,sNRandDist=sNRandDist,
                sIV1Use=sIV1Use,sIV2Use=sIV2Use, 
                sWithinCor=sWithinCor,
                sBudgetOn=sBudgetOn,sNBudget=sNBudget,
@@ -220,14 +220,16 @@ makeEvidence<-function(shortHand=FALSE,sigOnly=FALSE,
                        doSEM=FALSE,
                        Welch=FALSE,Transform="None",
                        McFaddens=TRUE,
-                       prior=makeWorld(TRUE,"Uniform","r")
+                       prior=makeWorld(TRUE,"Uniform","r"),
+                       metaAnalysis=makeMetaAnalysis()
                        ){
   
   evidence<-list(rInteractionOn=rInteractionOn,rInteractionOnly=rInteractionOnly,ssqType=ssqType,
                  caseOrder=caseOrder,shortHand=shortHand,sigOnly=sigOnly,
                  llr=llr,useAIC=useAIC,doSEM=doSEM,
                  Welch=Welch,Transform=Transform,McFaddens=McFaddens,
-                 prior=prior
+                 prior=prior,
+                 metaAnalysis=metaAnalysis
   )
 
   # braw.def$evidence<<-evidence

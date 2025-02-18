@@ -9,45 +9,51 @@ makeMetaHist<-function(vals,use,xlim) {
 worldLabel<-function(metaResult,whichMeta=NULL) {
   if (is.null(whichMeta)) whichMeta<-metaResult$bestDist
     Dist<-tolower(whichMeta)
-    K<-metaResult[[Dist]]$Kmax
-    pNull<-metaResult[[Dist]]$Nullmax
-  
-  lb<-paste0(Dist,"(",brawFormat(mean(K,na.rm=TRUE),digits=2))
-  if (length(K)>1)
-    lb<-paste0(lb,"\u00B1",brawFormat(std(K),digits=2))
-  lb<-paste0(lb,")")
-  if (!is.null(pNull)) {
-    lb<-paste0(lb,"\np(null)=",brawFormat(mean(pNull,na.rm=TRUE),digits=2))
-    if (length(pNull)>1)
-      lb<-paste0(lb,"\u00B1",brawFormat(std(pNull),digits=2))
-  }
-  return(lb)
+    p1<-metaResult[[Dist]]$param1Max
+    p2<-metaResult[[Dist]]$param2Max
+
+    if (is.element(Dist,c("random","fixed"))) label1<-"r[est]" else label1<-Dist
+    lb<-paste0(label1,"=",brawFormat(mean(p1,na.rm=TRUE),digits=3))
+    # if (length(p1)>1)
+    #   lb<-paste0(lb,"\u00B1",brawFormat(std(p1),digits=2))
+    if (!is.null(p2)) {
+      if (is.element(Dist,c("random","fixed"))) label2<-"sd(r)[est]" else label2<-"p(null)"
+      lb<-paste0(lb,"\n",label2,"=",brawFormat(mean(p2,na.rm=TRUE),digits=3))
+      # if (length(p2)>1)
+      #   lb<-paste0(lb,"\u00B1",brawFormat(std(p2),digits=2))
+    }
+    return(lb)
 }
 
 #' show a single meta-analysis 
 #' 
 #' @return ggplot2 object - and printed
 #' @examples
-#' showSingleMeta(metaResult=doMetaAnalysis(1),showTheory=FALSE)
+#' showSingleMeta(metaResult=doMetaAnalysis(),showTheory=FALSE)
 #' @export
-showMetaSingle<-function(metaResult=braw.res$metaResult,showTheory=FALSE) {
-  if (is.null(metaResult)) metaResult<-doMetaAnalysis(1)
+showMetaSingle<-function(metaResult=braw.res$metaSingle,showTheory=FALSE) {
+  if (is.null(metaResult)) metaResult<-doMetaAnalysis()
+  
+  showSval<-TRUE
+  showSig<-FALSE
   
   metaAnalysis<-metaResult$metaAnalysis
   hypothesis<-metaResult$hypothesis
   design<-metaResult$design
+  setBrawEnv("RZ","z")
   
   d1<-metaResult$result$rIV
+  if (braw.env$RZ=="z") d1<-atanh(d1)
   d1n<-(metaResult$result$rpIV==0)
   x<-plotAxis("rs",hypothesis)
   xlim<-x$lim
   disp1<-x$label
-  # if (all(d1>=0)) xlim[1]<-0
-  
+
   d2<-metaResult$result$nval
   y<-plotAxis("n",hypothesis)
   disp2<-y$label
   ylim<-y$lim
+  ylim<-log10(c(braw.env$minN-1,braw.env$maxN+1))
   
   if (y$logScale) d2<-log10(d2)
   useAll<-(d2>ylim[1]) & (d2<ylim[2])
@@ -61,38 +67,56 @@ showMetaSingle<-function(metaResult=braw.res$metaResult,showTheory=FALSE) {
                yticks=makeTicks(y$ticks,10^y$ticks),ylabel=makeLabel(disp2),
                top=1,g=NULL)
 
-  if (length(d1)>=1200) {
-    nbins<-diff(ylim)/(2*IQR(d2[use])*length(d2[use])^(-0.33))*2
-    nbins<-min(nbins,101)
-    g<-addG(g,stat_bin2d(data=pts,aes(x=x,y=y),bins=nbins)+scale_fill_gradientn(colours=c(braw.env$plotColours$graphBack,braw.env$plotColours$descriptionC)))
-  }
+  # if (length(d1)>=1200) {
+  #   nbins<-diff(ylim)/(2*IQR(d2[use])*length(d2[use])^(-0.33))*2
+  #   nbins<-min(nbins,101)
+  #   g<-addG(g,stat_bin2d(data=pts,aes(x=x,y=y),bins=nbins)+scale_fill_gradientn(colours=c(braw.env$plotColours$graphBack,braw.env$plotColours$descriptionC)))
+  # }
   
   g<-drawWorld(hypothesis,design,metaResult,g,
-               darken(braw.env$plotColours$descriptionC,off=0.1),showTheory=showTheory)
-  if (metaAnalysis$includeBias) {
-    rv<-seq(min(xlim),max(xlim),length.out=101)
-    nv<-rw2n(rv,0.5)
+               darken(braw.env$plotColours$metaAnalysis,off=0.1),showTheory=showTheory)
+  if (showSig && metaAnalysis$includeBias) {
+    nv<-10^seq(log10(braw.env$minN),log10(braw.env$maxN),length.out=101)
+    rv<-p2r(0.05,nv,1)
+    if (braw.env$RZ=="z") rv<-atanh(rv)
     if (braw.env$nPlotScale=="log10") {nv<-log10(nv)}
-    nv[nv>ylim[2] | nv<ylim[1]]<-NA
-    g<-addG(g,dataLine(data.frame(x=rv,y=nv),
-                       colour=darken(braw.env$plotColours$infer_sigC,off=0.1),linewidth=0.5))
+    use<-(nv<ylim[2] & nv>ylim[1])
+    g<-addG(g,dataLine(data.frame(x=rv[use],y=nv[use]),
+                       colour=darken(braw.env$plotColours$infer_nsigC,off=-0.1),linewidth=0.5))
+    g<-addG(g,dataLine(data.frame(x=-rv[use],y=nv[use]),
+                       colour=darken(braw.env$plotColours$infer_nsigC,off=-0.1),linewidth=0.5))
   }
     
   dotSize<-braw.env$dotSize/2
   
   # show individual studies
-  if (length(d1)<1200) {
+  # if (length(d1)<1200) {
     colgain<-1-min(1,sqrt(max(0,(length(d1)-50))/200))
-    dotSize<-dotSize/(ceil(length(d1)/400))
+    dotSize<-dotSize/(ceil(length(d1)/100))
+    alpha<-1/(ceil(length(d1)/100))
     cl<-"black"
-    col1<-braw.env$plotColours$descriptionC
-    col2<-braw.env$plotColours$infer_nsigC
-    g<-addG(g,dataPoint(data=ptsAll, shape=braw.env$plotShapes$study, colour = darken(col1,off=-colgain), fill = col1, size = dotSize))
-    g<-addG(g,dataPoint(data=ptsNull,shape=braw.env$plotShapes$study, colour = darken(col2,off=-colgain), fill = col2,  size = dotSize))
-  }
+    fill1<-braw.env$plotColours$metaAnalysis
+    fill2<-braw.env$plotColours$infer_nsigC
+    if (showSval) {
+      b<-getLogLikelihood(atanh(metaResult$result$rIV),metaResult$result$nval,rep(1,length(metaResult$result$nval)),
+                          distribution=metaResult$bestDist,param1=metaResult$bestParam1,param2=metaResult$bestParam2,
+                          remove_nonsig=metaResult$metaAnalysis$includeBias,returnVals = TRUE)
+    # b<-metaResult$bestVals
+    fill1<-hsv(0.9*round((b-min(b))/(max(b)-min(b))*4)/4)
+    }
+    alpha<-1
+    col1<-fill1
+    col2<-fill2
+    use<-ptsAll$y<braw.env$maxN
+    g<-addG(g,dataPoint(data=ptsAll[use,], shape=braw.env$plotShapes$study, colour = col1[use], fill = fill1[use], alpha=alpha, size = dotSize))
+    if (nrow(ptsNull)>0)
+    g<-addG(g,dataPoint(data=ptsNull,shape=braw.env$plotShapes$study, colour = col2, fill = fill2, alpha=alpha, size = dotSize))
+  # }
   
-  lb<-worldLabel(metaResult)
-  g<-addG(g,dataLegend(data.frame(names=strsplit(lb,"\n")[[1]],colours=c(braw.env$plotColours$descriptionC,NA)),title="",shape=22))
+  lb<-worldLabel(metaResult,metaAnalysis$analysisType)
+  names=strsplit(lb,"\n")[[1]]
+  if (length(names)==1) colours=braw.env$plotColours$metaAnalysis else colours=c(braw.env$plotColours$metaAnalysis,NA)
+  g<-addG(g,dataLegend(data.frame(names=names,colours=colours),title="",shape=22))
   # g<-addG(g,plotTitle(lb,"left",size=1))
   
   if (braw.env$graphHTML && braw.env$autoShow) {
@@ -109,25 +133,33 @@ showMetaSingle<-function(metaResult=braw.res$metaResult,showTheory=FALSE) {
 #' @examples
 #' showMultipleMeta<-function(metaResult=doMetaAnalysis(),showType="n-k")
 #' @export
-showMetaMultiple<-function(metaResult=braw.res$metaResult,showType="n-k") {
-  if (is.null(metaResult)) metaResult<-doMetaAnalysis()
+showMetaMultiple<-function(metaResult=braw.res$metaMultiple,showType="n-k") {
+  if (is.null(metaResult)) metaResult<-doMetaMultiple()
 
-  if (metaResult$metaAnalysis$analysisType=="fixed") showType<-"S-k"
+  if (metaResult$metaAnalysis$analysisType=="fixed") {
+    if (metaResult$hypothesis$effect$world$worldOn) showType<-"k-rp"
+    else showType<-"S-k"
+  }
+  if (metaResult$metaAnalysis$analysisType=="random") showType<-"sd-k"
   if (showType=="S-S") {
     braw.env$plotArea<-c(0,0,1,1)
     g<-drawMeta(metaResult=metaResult,showType=showType,g=NULL)
   } else {
     g<-nullPlot()
-    if (metaResult$metaAnalysis$analysisType=="fixed") braw.env$plotArea<-c(0,0,1,1)
-    else braw.env$plotArea<-c(0,0,0.4,1)
-    if (!all(is.na(metaResult$single$Smax)))
-      g<-drawMeta(metaResult=metaResult,whichMeta="Single",showType=showType,g)
-    braw.env$plotArea<-c(0.4,0,0.3,1)
-    if (!all(is.na(metaResult$gauss$Smax)))
-      g<-drawMeta(metaResult=metaResult,whichMeta="Gauss",showType=showType,g)
-    braw.env$plotArea<-c(0.7,0,0.3,1)
-    if (!all(is.na(metaResult$exp$Smax)))
-      g<-drawMeta(metaResult=metaResult,whichMeta="Exp",showType=showType,g)
+    if (is.element(metaResult$metaAnalysis$analysisType,c("fixed","random"))) {
+      braw.env$plotArea<-c(0,0,1,1)
+      g<-drawMeta(metaResult=metaResult,showType=showType,whichMeta=metaResult$metaAnalysis$analysisType,g=g)
+    }  else {
+      braw.env$plotArea<-c(0,0,0.4,1)
+      if (!all(is.na(metaResult$single$Smax)))
+        g<-drawMeta(metaResult=metaResult,whichMeta="Single",showType=showType,g)
+      braw.env$plotArea<-c(0.4,0,0.3,1)
+      if (!all(is.na(metaResult$gauss$Smax)))
+        g<-drawMeta(metaResult=metaResult,whichMeta="Gauss",showType=showType,g)
+      braw.env$plotArea<-c(0.7,0,0.3,1)
+      if (!all(is.na(metaResult$exp$Smax)))
+        g<-drawMeta(metaResult=metaResult,whichMeta="Exp",showType=showType,g)
+    }
   }
   if (braw.env$graphHTML && braw.env$autoShow) {
     showHTML(g)
@@ -136,17 +168,19 @@ showMetaMultiple<-function(metaResult=braw.res$metaResult,showType="n-k") {
   else return(g)  
 }
 
-drawMeta<-function(metaResult=doMetaAnalysis(),whichMeta="Single",showType="n-k",g=NULL) {
+drawMeta<-function(metaResult=doMetaMultiple(),whichMeta="Single",showType="n-k",g=NULL) {
   
   metaAnalysis<-metaResult$metaAnalysis
 
+  xlim<-c(-1,1)
+  xticks<-seq(-1,1,0.5)
+  
+  if (is.element(whichMeta,c("Single","Gauss","Exp"))) {
   n1<-sum(metaResult$bestDist=="Single")
   n2<-sum(metaResult$bestDist=="Gauss")
   n3<-sum(metaResult$bestDist=="Exp")
   sAll<-c(metaResult$single$Smax,metaResult$gauss$Smax,metaResult$exp$Smax)
   
-  xlim<-c(-1,1)
-  xticks<-seq(-1,1,0.5)
   if (showType=="S-S") {
     use<-order(c(n1,n2,n3))
     use1<-c("Single","Gauss","Exp")[use[2]]
@@ -160,19 +194,19 @@ drawMeta<-function(metaResult=doMetaAnalysis(),whichMeta="Single",showType="n-k"
   } else {
     switch (whichMeta,
             "Single"={
-              x<-metaResult$single$Kmax
+              x<-metaResult$single$param1Max
               yS<-metaResult$single$Smax
-              y1<-metaResult$single$Nullmax
+              y1<-metaResult$single$param2Max
             },
             "Gauss"={
-              x<-metaResult$gauss$Kmax
+              x<-metaResult$gauss$param1Max
               yS<-metaResult$gauss$Smax
-              y1<-metaResult$gauss$Nullmax
+              y1<-metaResult$gauss$param2Max
             },
             "Exp"={
-              x<-metaResult$exp$Kmax
+              x<-metaResult$exp$param1Max
               yS<-metaResult$exp$Smax
-              y1<-metaResult$exp$Nullmax
+              y1<-metaResult$exp$param2Max
             }
     )
   }
@@ -181,23 +215,46 @@ drawMeta<-function(metaResult=doMetaAnalysis(),whichMeta="Single",showType="n-k"
     yS<-yS[keep]
     y1<-y1[keep]
     x<-x[keep]
+    useBest<-yS==best
     
     if (isempty(x)) {return(nullPlot())}
-    
+  }
+  
     yticks<-c()
-    useBest<-yS==best
     switch (showType,
             "S-k"={
-              y<-yS
+              x<-metaResult$fixed$param1Max
+              y<-metaResult$fixed$Smax
+              y1<-0
+              sAll<-metaResult$fixed$Smax
               ylim<-c(min(sAll,na.rm=TRUE),max(sAll,na.rm=TRUE))+c(-1,1)*(max(sAll,na.rm=TRUE)-min(sAll,na.rm=TRUE))/4
               ylabel<-"log(lk)"
-              xlabel<-braw.env$Llabel
+              xlabel<-"r[est]"
+              useBest<-1:length(x)
             },
             "n-k"={
               y<-y1
               ylim<-c(-0.02,1.1)
               ylabel<-"p[null]"
               xlabel<-braw.env$Llabel
+            },
+            "k-rp"={
+              x<-metaResult$fixed$rpIV
+              y<-metaResult$fixed$param1Max
+              y1<-0
+              ylim<-c(-1,1)
+              ylabel<-"r[est]"
+              xlabel<-"r[p]"
+              useBest<-1:length(x)
+            },
+            "sd-k"={
+              x<-metaResult$random$param1Max
+              y<-metaResult$random$param2Max
+              y1<-0
+              ylim<-c(min(y),max(y))+c(-1,1)*(max(y)-min(y))*0.2
+              ylabel<-"sd(r)[est]"
+              xlabel<-"r[est]"
+              useBest<-1:length(x)
             },
             "S-S"={
               y<-yS
@@ -222,11 +279,15 @@ drawMeta<-function(metaResult=doMetaAnalysis(),whichMeta="Single",showType="n-k"
                      xticks=makeTicks(xticks),xlabel=makeLabel(xlabel),
                      top=TRUE,g=g)
 
-      dotSize=min(4,max(4,sqrt(50/length(x))))
+      dotSize=16*min(0.25,2.5/sqrt(length(x)))
       
-      g<-addG(g,dataPoint(data=pts,shape=braw.env$plotShapes$meta, colour = "black", fill = "grey", size = dotSize))
+      g<-addG(g,dataPoint(data=pts,shape=braw.env$plotShapes$meta, 
+                          colour="black", fill="grey", alpha=min(1,2.5/sqrt(length(x))), 
+                          size = dotSize))
       pts<-data.frame(x=x[useBest],y=y[useBest])
-      g<-addG(g,dataPoint(data=pts,shape=braw.env$plotShapes$meta, colour = "black", fill = "yellow", size = dotSize))
+      g<-addG(g,dataPoint(data=pts,shape=braw.env$plotShapes$meta,
+                          colour="black", fill=braw.env$plotColours$metaAnalysis, alpha=min(1,2.5/sqrt(length(x))), 
+                          size = dotSize))
       
       if (showType=="S-S") {
         g<-addG(g,dataPath(data=data.frame(x=xlim,y=ylim),colour="red"))
@@ -240,98 +301,147 @@ drawMeta<-function(metaResult=doMetaAnalysis(),whichMeta="Single",showType="n-k"
         vj<-1
         }
     if (showType=="S-S") {
-      fullText<-paste0(use2,"(",format(mean(metaY$Kmax),digits=3))
-      if (length(metaY$Kmax)>1) fullText<-paste0(fullText,"\u00B1",format(std(metaY$Kmax),digits=2),")")
+      fullText<-paste0(use2,"(",format(mean(metaY$param1Max),digits=3))
+      if (length(metaY$param1Max)>1) fullText<-paste0(fullText,"\u00B1",format(std(metaY$param1Max),digits=2),")")
       else fullText<-paste0(fullText,")")
       if (metaAnalysis$includeNulls) {
-        fullText<-paste0(fullText,"\nnull=",format(mean(metaY$Nullmax),digits=3))
-        if (length(metaY$Nullmax)>1) fullText<-paste0(fullText,"\u00B1",format(std(metaY$Nullmax),digits=2),")")
+        fullText<-paste0(fullText,"\nnull=",format(mean(metaY$param2Max),digits=3))
+        if (length(metaY$param2Max)>1) fullText<-paste0(fullText,"\u00B1",format(std(metaY$param2Max),digits=2),")")
       }
       fullText<-paste0(fullText,"\nS= ",format(mean(metaY$Smax),digits=2))
       if (length(metaY$Smax)>1) fullText<-paste0(fullText,"\u00B1",format(std(metaY$Smax),digits=2),")")
       fullText<-paste0(fullText," (",format(sum(y>x)),"/",length(metaResult$bestDist),")")
       
-      if (mean(y>x)) colM="yellow"  else colM="grey"
+      if (mean(y>x)) colM=braw.env$plotColours$metaAnalysis  else colM="grey"
       names<-strsplit(fullText,"\n")[[1]]
       g<-addG(g,dataLegend(data.frame(names=names,colours=c(colM,rep(NA,length(names)-1))),title="",shape=braw.env$plotShapes$meta))
       
-      fullText<-paste0(use1,"(",format(mean(metaX$Kmax),digits=3))
-      if (length(metaX$Kmax)>1) fullText<-paste0(fullText,"\u00B1",format(std(metaX$Kmax),digits=2),")")
+      fullText<-paste0(use1,"(",format(mean(metaX$param1Max),digits=3))
+      if (length(metaX$param1Max)>1) fullText<-paste0(fullText,"\u00B1",format(std(metaX$param1Max),digits=2),")")
       else fullText<-paste0(fullText,")")
       if (metaAnalysis$includeNulls) {
-        fullText<-paste0(fullText,"\nnull=",format(mean(metaX$Nullmax),digits=3))
-        if (length(metaX$Nullmax)>1) fullText<-paste0(fullText,"\u00B1",format(std(metaX$Nullmax),digits=2),")")
+        fullText<-paste0(fullText,"\nnull=",format(mean(metaX$param2Max),digits=3))
+        if (length(metaX$param2Max)>1) fullText<-paste0(fullText,"\u00B1",format(std(metaX$param2Max),digits=2),")")
       }
       fullText<-paste0(fullText,"\nS= ",format(mean(metaX$Smax),digits=2))
       if (length(metaX$Smax)>1) fullText<-paste0(fullText,"\u00B1",format(std(metaX$Smax),digits=2),")")
       fullText<-paste0(fullText," (",format(sum(x>y)),"/",length(metaResult$bestDist),")")
       
-      if (mean(y>x)) colM="grey"  else colM="yellow"
+      if (mean(y>x)) colM="grey"  else colM=braw.env$plotColours$metaAnalysis
       names<-strsplit(fullText,"\n")[[1]]
       g<-addG(g,dataLegend(data.frame(names=names,colours=c(colM,rep(NA,length(names)-1))),title="",shape=braw.env$plotShapes$meta))
     } else {
-      
 
-      use<-which.max(c(n1,n2,n3))
-      bestD<-c("Single","Gauss","Exp")[use]
-      if (whichMeta==bestD)  colM="yellow" else colM="grey"
-      lb<-worldLabel(metaResult,whichMeta)
-      g<-addG(g,dataLegend(data.frame(names=strsplit(lb,"\n")[[1]],colours=c(colM,NA)),title="",shape=braw.env$plotShapes$meta))
+      if (is.element(showType,c("S-k","sd-k","k-rp"))) {
+        colM=braw.env$plotColours$metaAnalysis
+        lb<-worldLabel(metaResult,whichMeta)
+        names<-strsplit(lb,"\n")[[1]]
+
+        if (whichMeta=="fixed") {names<-names[1]; colours<-colM;}
+        else colours<-c(colM,NA)
+        g<-addG(g,dataLegend(data.frame(names=names,colours=colours),title="",
+                             shape=braw.env$plotShapes$meta))
+      } else {
+        use<-which.max(c(n1,n2,n3))
+        bestD<-c("Single","Gauss","Exp")[use]
+        if (whichMeta==bestD)  colM=braw.env$plotColours$metaAnalysis else colM="grey"
+        lb<-worldLabel(metaResult,whichMeta)
+        g<-addG(g,dataLegend(data.frame(names=strsplit(lb,"\n")[[1]],colours=c(colM,NA)),title="",shape=braw.env$plotShapes$meta))
+      }     
     }
     return(g)
 
 }
 
-makeWorldDist<-function(metaResult,design,world,x,y,sigOnly=FALSE) {
-  if (metaResult$metaAnalysis$analysisType=="random") {
-    lambda<-metaResult$bestK
-    shape<-metaResult$bestNull
-    nullP<-0
-  } else {
+makeWorldDist<-function(metaResult,design,world,z,n,sigOnly=FALSE,doTheory=FALSE) {
+  if (doTheory) {
     lambda<-world$populationPDFk
+    nullP<-world$populationNullp
+    offset<-0
     shape<-0
     nullP<-world$populationNullp
+    if (metaResult$metaAnalysis$analysisType=="random") {
+      lambda<-metaResult$hypothesis$effect$rSD
+      offset<-metaResult$hypothesis$effect$rIV
+      nullP<-0
+      world$populationPDF<-"Gauss"
+    }
+    if (metaResult$metaAnalysis$analysisType=="fixed") {
+      lambda<-metaResult$hypothesis$effect$rIV
+      nullP<-0
+      world$populationPDF<-"Single"
+    }
+  } else {
+    lambda<-metaResult$bestParam1
+    nullP<-metaResult$bestParam2
+    offset<-0
+    shape<-0
+    if (metaResult$metaAnalysis$analysisType=="random") {
+      lambda<-metaResult$random$param1Max
+      shape<-metaResult$random$param2Max
+      nullP<-0
+      world$populationPDF<-"Single"
+    }
+    if (metaResult$metaAnalysis$analysisType=="fixed") {
+      lambda<-metaResult$fixed$param1Max
+      nullP<-0
+      world$populationPDF<-"Single"
+    }
   }
-  sigma<-1/sqrt(y-3)
-  gain<-dgamma(y-braw.env$minN,shape=design$sNRandK,scale=(design$sN-braw.env$minN)/design$sNRandK)
+  sigma<-1/sqrt(n-3)
+  gain<-nDistrDens(n,design)
+  gain<-gain*n  # *n for the log scale
   
-  z<-c()
+  zdens<-c()
   switch (world$populationPDF,
           "Single"={
-            for (i in 1:length(y)) {
-              z1<-SingleSamplingPDF(atanh(x),lambda,sigma[i],shape)$pdf*(1-nullP)+
-                SingleSamplingPDF(atanh(x),0,sigma[i])$pdf*nullP
-              if (sigOnly) {
-                zcrit<-qnorm(1-braw.env$alphaSig/2,0,sigma[i])
-                z1[atanh(abs(x))<zcrit]<-0
+            for (i in 1:length(n)) {
+              zrow<-SingleSamplingPDF(z,lambda,sigma[i],shape)$pdf*(1-nullP)+
+                SingleSamplingPDF(z,0,sigma[i])$pdf*nullP
+              if (metaResult$metaAnalysis$includeBias & sigOnly) {
+                zcrit<-atanh(p2r(braw.env$alphaSig,n[i]))
+                zrow[abs(z)<zcrit]<-0
               }
-              z<-rbind(z,zdens2rdens(z1,x)*gain[i])
+              if (braw.env$RZ=="r") zrow<-zdens2rdens(zrow,z)
+              densGain<-1/sum(zrow)
+              # densGain<-gain[i]
+              zdens<-rbind(zdens,zrow*densGain)
             }
           },
           "Gauss"={
-            for (i in 1:length(y)) {
-              z1<-GaussSamplingPDF(atanh(x),lambda,sigma[i])$pdf*(1-nullP)+
-                SingleSamplingPDF(atanh(x),0,sigma[i])$pdf*nullP
-              if (sigOnly) {
-                zcrit<-qnorm(1-braw.env$alphaSig/2,0,sigma[i])
-                z1[atanh(abs(x))<zcrit]<-0
+            for (i in 1:length(n)) {
+              zrow<-GaussSamplingPDF(z,lambda,sigma[i],offset)$pdf*(1-nullP)+
+                SingleSamplingPDF(z,0,sigma[i])$pdf*nullP
+              if (metaResult$metaAnalysis$includeBias & sigOnly) {
+                zcrit<-atanh(p2r(braw.env$alphaSig,n[i]))
+                zrow[abs(z)<zcrit]<-0
               }
-              z<-rbind(z,zdens2rdens(z1,x)*gain[i])
+              if (braw.env$RZ=="r") zrow<-zdens2rdens(zrow,z)
+              densGain<-1/max(zrow)
+              # densGain<-gain[i]
+              zdens<-rbind(zdens,zrow*densGain)
             }
           },
           "Exp"={
-            for (i in 1:length(y)) {
-              z1<-ExpSamplingPDF(atanh(x),lambda,sigma[i])$pdf*(1-nullP)+
-                SingleSamplingPDF(atanh(x),0,sigma[i])$pdf*nullP
-              if (sigOnly) {
-                zcrit<-qnorm(1-braw.env$alphaSig/2,0,sigma[i])
-                z1[atanh(abs(x))<zcrit]<-0
+            for (i in 1:length(n)) {
+              zrow<-ExpSamplingPDF(z,lambda,sigma[i])$pdf*(1-nullP)+
+                SingleSamplingPDF(z,0,sigma[i])$pdf*nullP
+              if (metaResult$metaAnalysis$includeBias & sigOnly) {
+                zcrit<-atanh(p2r(braw.env$alphaSig,n[i]))
+                zrow[abs(z)<zcrit]<-0
               }
-              z<-rbind(z,zdens2rdens(z1,x)*gain[i])
+              if (braw.env$RZ=="r") zrow<-zdens2rdens(zrow,z)
+              densGain<-1/max(zrow)
+              # densGain<-gain[i]
+              zdens<-rbind(zdens,zrow*densGain)
             }
           }
   )
-  return(z)
+  zdens[1,]<-0
+  zdens[,1]<-0
+  zdens[nrow(zdens),]<-0
+  zdens[,ncol(zdens)]<-0
+  return(zdens)
 }
 
 drawWorld<-function(hypothesis,design,metaResult,g,colour="white",showTheory=FALSE) {
@@ -340,37 +450,43 @@ drawWorld<-function(hypothesis,design,metaResult,g,colour="white",showTheory=FAL
     world<-makeWorld(worldOn=TRUE,populationPDF="Single",populationRZ="r",
                      populationPDFk=hypothesis$effect$rIV,populationNullp=0)
   }
-  
-  x<-seq(-1,1,length.out=101)*braw.env$r_range
-  y<-seq(5,braw.env$maxN,length.out=101)
+  z<-seq(-1,1,length.out=501)*braw.env$z_range
+  if (braw.env$nPlotScale=="log10") 
+    n<-10^seq(log10(braw.env$minN),log10(braw.env$maxN),length.out=101)
+  else
+    n<-seq(braw.env$minN,braw.env$maxN,length.out=101)
 
-  za<-makeWorldDist(metaResult,design,world,x,y)
-
-  world$populationPDF<-metaResult$bestDist
-  world$populationPDFk<-metaResult$bestK
-  world$populationNullp<-metaResult$bestNull
-  zb<-makeWorldDist(metaResult,design,world,x,y)
-  
-  if (braw.env$nPlotScale=="log10") {y<-log10(y)}
-  
-  x1<-as.vector(matrix(rep(x,101),101,byrow=TRUE))
-  y1<-as.vector(matrix(rep(y,101),101,byrow=FALSE))
-  za<-as.vector(za)
-  zb<-as.vector(zb)
-
-  use<-is.finite(za) & y1<braw.env$maxRandN*design$sN
+  za<-makeWorldDist(metaResult,design,world,z,n,sigOnly=TRUE,doTheory=TRUE)
   za<-za/max(za,na.rm=TRUE)
-  ptsa<-data.frame(x=x1[use],y=y1[use],z=za[use])
   
-  use<-is.finite(zb) & y1<braw.env$maxRandN*design$sN
-  zb<-zb/max(zb,na.rm=TRUE)
-  ptsb<-data.frame(x=x1[use],y=y1[use],z=zb[use])
-
-  # white is the actual world
-  # black is the best fit world
-  if (showTheory) {
-    g<-addG(g,dataContour(data=ptsa,colour="white",linetype="dotted"))
+  if (!is.element(metaResult$metaAnalysis$analysisType,c("fixed","random"))) {
+    world$populationPDF<-metaResult$bestDist
+    world$populationPDFk<-metaResult$bestParam1
+    world$populationNullp<-metaResult$bestParam2
   }
-  g<-addG(g,dataContour(data=ptsb,colour=colour,linewidth=0.5))
+  zb<-makeWorldDist(metaResult,design,world,z,n,sigOnly=TRUE,doTheory=FALSE)
+  # zb<-matrix(nrow=length(n),ncol=length(z))
+  # for (i in 1:length(n))
+  #   zb[i,]<-getLogLikelihood(z,n[i],df1=1,
+  #                            metaResult$metaAnalysis$analysisType,
+  #                            metaResult$fixed$param1Max,0,
+  #                            metaResult$metaAnalysis$includeBias,returnVals=TRUE)
+  # zb[1,]<-0
+  # zb[101,]<-0
+  # zb[,1]<-0
+  # zb[,101]<-0
+  zb<-zb/max(zb,na.rm=TRUE)
+  
+  if (braw.env$nPlotScale=="log10") {n<-log10(n)}
+  
+  ptsa<-list(x=z,y=n,z=za)
+  ptsb<-list(x=z,y=n,z=zb^0.1)
+  
+  # white is the actual world
+  # filled is the best fit world
+  if (showTheory) {
+    g<-addG(g,dataContour(data=ptsa,colour="black",linewidth=0.5,linetype="dotted"))
+  }
+  g<-addG(g,dataContour(data=ptsb,colour=NA,fill=colour,linewidth=0.5))
   return(g)
 }

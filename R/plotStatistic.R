@@ -73,49 +73,40 @@ collectData<-function(analysis,whichEffect) {
 }
 
 makeFiddle<-function(y,yd,orientation="horiz"){
-  yz<-y[1]
-  xz<-0
-  xd<-0.15
-  
   d<-0.05
+  d2<-d^2
+  yG<-(braw.env$plotArea[4]-braw.env$plotLimits$gap[4]-braw.env$plotLimits$gap[2])/diff(braw.env$plotLimits$ysc)
+  rY<-function(y) y*yG
+  
+  xG<-(braw.env$plotArea[3]-braw.env$plotLimits$gap[3]-braw.env$plotLimits$gap[1])/diff(braw.env$plotLimits$xsc)
+  rX<-function(x) x*xG
+  
+  possible_xs<-seq(0,500,by=0.01)
+  
+  yz<-y[1]
+  yzR<-rY(yz)
+  xz<-0
+  xzR<-rX(xz)
   if (length(y)>1)
   for (i in 2:length(y)){
-    this_y<-reRangeY(y[i])
-    this_yz<-reRangeY(yz)
-    dy2<-(this_yz-this_y)^2
-    this_xz<-reRangeX(xz)
-    for (possible_x in seq(0,500,by=0.01)) {
-      this_x<-reRangeX(possible_x)
-      this_xneg<-reRangeX(-possible_x)
-      distances1=sqrt(dy2+(this_xz-this_x)^2)
-      distances2=sqrt(dy2+(this_xz-this_xneg)^2)
-      # distances1=sqrt((yz-y[i])^2+(xz-possible_x)^2)
-      # distances2=sqrt((yz-y[i])^2+(xz- (-possible_x))^2)
+    this_y<-rY(y[i])
+    dy2<-(yzR-this_y)^2
+    for (possible_x in possible_xs) {
+      this_x<-rX(possible_x)
+      this_xneg<- -this_x
+      distances1=dy2+(xzR-this_x)^2
+      distances2=dy2+(xzR-this_xneg)^2
       use1<-min(distances1)
       use2<-min(distances2)
-      if (all(c(use1,use2)>d)) {
+      if (all(c(use1,use2)>d2)) {
         if (use2>use1) possible_x<- -possible_x
         break
       }
     }
     xz<-c(xz,possible_x)
+    xzR<-c(xzR,rX(possible_x))
     yz<-c(yz,y[i])
-    
-    
-    # found<-(abs(reRangeY(yz)-reRangeY(y[i]))<d)
-    # if (any(found,na.rm=TRUE)) {
-    #   xdiff<-sqrt(d^2-(reRangeY(yz[found])-reRangeY(y[i]))^2)
-    #   xpos1<-reRangeX(xz[found])+xdiff
-    #   xpos2<-reRangeX(xz[found])-xdiff
-    #   if (all(xpos1<reRangeX(0))) usex1<-reRangeX(0) else usex1<-max(xpos1)
-    #   if (all(xpos2>reRangeX(0))) usex2<-reRangeX(0) else usex2<-min(xpos2)
-    #   if (abs(usex1-reRangeX(0))<abs(usex2-reRangeX(0))) usex<-usex1 else usex<-usex2
-    #   usex<-re2RangeX(usex)
-    #   xz<-c(xz,usex)
-    # } else {
-    #   xz<-c(xz,0)
-    # }
-    # yz<-c(yz,y[i])
+    yzR<-c(yzR,this_y)
   }
   if (orientation=="horz") xz<-xz/2
   return(xz)
@@ -303,7 +294,7 @@ expected_hist<-function(pts,valType,ylim,histGain,histGainrange){
           "mn"=  { # ns is small
             bins<-getBins(vals,NULL,NULL,NULL,NULL,fixed=TRUE)
           },
-          
+          {bins<-getBins(vals,NULL,NULL,NULL,NULL,fixed=TRUE)}
           
   )
   
@@ -349,55 +340,58 @@ expected_hist<-function(pts,valType,ylim,histGain,histGainrange){
 }
 
 expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
-                        i=1,scale=1,width=1,col="white",orientation="vert",ylim,histGain=NA,histGainrange=NA,npointsMax=200){
+                        i=1,scale=1,width=1,col="white",alpha=1,useSignificanceCols=braw.env$useSignificanceCols,
+                        histStyle="width",orientation="vert",ylim,histGain=NA,histGainrange=NA,npointsMax=200){
   se_arrow<-0.3
   se_size<-0.25
   
+  c1=col
+  c2=col
+  c3=col
+  c4=col
+  
   if (!is.null(showType)) {
-    if (braw.env$useSignificanceCols){
-    if (!all(is.na(pts$y0))){
-      c1<-braw.env$plotColours$infer_sigNonNull
-      c2<-braw.env$plotColours$infer_nsigNull
-      c3<-braw.env$plotColours$infer_sigNull
-      c4<-braw.env$plotColours$infer_nsigNonNull
-    } else {
-      c1<-braw.env$plotColours$infer_sigNonNull
-      c2<-braw.env$plotColours$infer_nsigNull
-      c3<-braw.env$plotColours$infer_sigNonNull
-      c4<-braw.env$plotColours$infer_nsigNull
-      pts$y0<-rep(TRUE,length(pts$y2))
+    if (useSignificanceCols){
+      if (!all(is.na(pts$y0))){
+        c1<-braw.env$plotColours$infer_sigNonNull
+        c2<-braw.env$plotColours$infer_nsigNull
+        c3<-braw.env$plotColours$infer_sigNull
+        c4<-braw.env$plotColours$infer_nsigNonNull
+      } else {
+        c1<-braw.env$plotColours$infer_sigNonNull
+        c2<-braw.env$plotColours$infer_nsigNull
+        c3<-braw.env$plotColours$infer_sigNonNull
+        c4<-braw.env$plotColours$infer_nsigNull
+        pts$y0<-rep(TRUE,length(pts$y2))
+      }
+      
+      if (showType=="e1r") {
+        c1=braw.env$plotColours$infer_sigNull
+        c2=braw.env$plotColours$infer_nsigNull
+      }
+      if (showType=="e2r") {
+        c1=braw.env$plotColours$infer_sigNonNull
+        c2=braw.env$plotColours$infer_nsigNonNull
+      }
+      if (showType=="e1p") {
+        c1=braw.env$plotColours$infer_sigNull
+        c2=braw.env$plotColours$infer_nsigNull
+      }
+      if (showType=="e2p") {
+        c1=braw.env$plotColours$infer_sigNonNull
+        c2=braw.env$plotColours$infer_nsigNonNull
+      }
+      if (showType=="e1d") {
+        c1=braw.env$plotColours$infer_sigNull
+        c2=braw.env$plotColours$infer_nsdNull
+        c3<-braw.env$plotColours$infer_isigNull
+      }
+      if (showType=="e2d") {
+        c1=braw.env$plotColours$infer_sigNonNull
+        c2=braw.env$plotColours$infer_nsdNonNull
+        c3<-braw.env$plotColours$infer_isigNonNull
+      }
     }
-    
-    if (showType=="e1r") {
-      c1=braw.env$plotColours$infer_sigNull
-      c2=braw.env$plotColours$infer_nsigNull
-    }
-    if (showType=="e2r") {
-      c1=braw.env$plotColours$infer_sigNonNull
-      c2=braw.env$plotColours$infer_nsigNonNull
-    }
-    if (showType=="e1p") {
-      c1=braw.env$plotColours$infer_sigNull
-      c2=braw.env$plotColours$infer_nsigNull
-    }
-    if (showType=="e2p") {
-      c1=braw.env$plotColours$infer_sigNonNull
-      c2=braw.env$plotColours$infer_nsigNonNull
-    }
-    if (showType=="e1d") {
-      c1=braw.env$plotColours$infer_sigNull
-      c2=braw.env$plotColours$infer_nsdNull
-      c3<-braw.env$plotColours$infer_isigNull
-    }
-    if (showType=="e2d") {
-      c1=braw.env$plotColours$infer_sigNonNull
-      c2=braw.env$plotColours$infer_nsdNonNull
-      c3<-braw.env$plotColours$infer_isigNonNull
-    }
-  } else {
-    c1=col
-    c2=col
-  }
   }
   if (length(pts$y1)<=npointsMax) {
     if (is.logical(pts$y2)) {
@@ -417,26 +411,11 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
           pts1se<-data.frame(y=rCI[1,],x=x)
           g<-addG(g,dataLine(data=pts1se,arrow=arrow(length=unit(se_arrow,"cm"),ends="both"),colour="white",linewidth=se_size))
         }
-        # if (showType=="p"){
-        #   browser()
-        #   n<-pts$n
-        #   p<-pts$y1
-        #   r<-p2r(p,n,analysis$df[1])
-        #   rCI<-r2ci(r,n)
-        #   pCI<-r2p(rCI,n,analysis$df[1])
-        #   if (pts$y2) c<-c1 else c=c2
-        #   
-        #   x<-pts$x
-        #   if (length(x)<length(pCI)) x<-rep(x,length(pCI))
-        #   pts1se<-data.frame(y=log10(pCI[1,]),x=pts$x)
-        #   g<-addG(g,dataLine(data=pts1se,arrow=arrow(length=unit(se_arrow,"cm"),ends="both"),colour=c,linewidth=se_size))
-        # }
-      # }
     }
     
     xr<-makeFiddle(pts$y1,2/40/braw.env$plotArea[4],orientation)
-    if (max(abs(xr))>0) xr<-xr/max(abs(xr))*0.4
-    pts$x<-pts$x+xr
+    if (max(abs(xr))>0) xr<-xr*0.35/max(abs(xr))
+    pts$x<-pts$x+xr*sum(width)*0.3/0.35
     gain<-7/max(7,sqrt(length(xr)))
     colgain<-1-min(1,sqrt(max(0,(length(xr)-50))/200))
     
@@ -450,23 +429,28 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
     co1<-darken(c1,off=-colgain)
     co2<-darken(c2,off=-colgain)
     dotSize<-braw.env$dotSize*scale*gain
+    if (useSignificanceCols) {
     pts_sigNonNull=pts[pts$y2 & pts$y0,]
     pts_nsNonNull=pts[!pts$y2 & pts$y0,]
     pts_sigNull=pts[pts$y2 & !pts$y0,]
     pts_nsNull<-pts[!pts$y2 & !pts$y0,]
     
     g<-addG(g,dataPoint(data=data.frame(x=pts_sigNonNull$x,y=pts_sigNonNull$y1),shape=braw.env$plotShapes$study, 
-                        colour = darken(c1,off=-colgain), fill = c1, size = dotSize))
+                        colour = darken(c1,off=-colgain), alpha=alpha, fill = c1, size = dotSize))
     g<-addG(g,dataPoint(data=data.frame(x=pts_nsNonNull$x,y=pts_nsNonNull$y1),shape=braw.env$plotShapes$study, 
-                        colour = darken(c4,off=-colgain), fill = c4, size = dotSize))
+                        colour = darken(c4,off=-colgain), alpha=alpha, fill = c4, size = dotSize))
     g<-addG(g,dataPoint(data=data.frame(x=pts_sigNull$x,y=pts_sigNull$y1),shape=braw.env$plotShapes$study, 
-                        colour = darken(c3,off=-colgain), fill = c3, size = dotSize))
+                        colour = darken(c3,off=-colgain), alpha=alpha, fill = c3, size = dotSize))
     g<-addG(g,dataPoint(data=data.frame(x=pts_nsNull$x,y=pts_nsNull$y1),shape=braw.env$plotShapes$study, 
-                        colour = darken(c2,off=-colgain), fill = c2, size = dotSize))
+                        colour = darken(c2,off=-colgain), alpha=alpha, fill = c2, size = dotSize))
+    } else {
+      g<-addG(g,dataPoint(data=data.frame(x=pts$x,y=pts$y1),shape=braw.env$plotShapes$study, 
+                          colour = darken(c1,off=-colgain), alpha=alpha, fill = c1, size = dotSize))
+    }
     if (!is.null(showType))
       if (is.element(showType,c("e1d","e2d"))) {
         pts_wsig=pts[pts$y3,]
-        g<-addG(g,dataPoint(data=data.frame(x=pts_wsig$x,y=pts_wsig$y1),shape=braw.env$plotShapes$study, colour = co1, fill = c3, size = dotSize))
+        g<-addG(g,dataPoint(data=data.frame(x=pts_wsig$x,y=pts_wsig$y1),shape=braw.env$plotShapes$study, colour = co1, alpha=alpha, fill = c3, size = dotSize))
       }
   } else { # more than 250 points
     if (is.logical(pts$y2)) {
@@ -491,21 +475,30 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
     # }
     cols<-c(c4,c1,c3,c2)
     
+    if (length(width)==1) width=c(width,width)
     for (i in 1:length(hists$h1)) {
       dens<-c(hists$h1[i],hists$h2[i],hists$h3[i],hists$h4[i])
       # dens<-cumsum(dens)
       use<-order(dens)
+      use<-rev(1:length(dens))
       ystart<-0
       for (j in use) {
         if (dens[j]>0) {
+          if (histStyle=="width") {
+            alpha<-simAlpha
+            w<-dens[j]
+          } else {
+            alpha<-(dens[j]/0.35)^0.6
+            w<-0.5/0.35
+          }
           data<-data.frame(y=c(hists$x[i],hists$x[i],hists$x[i+1],hists$x[i+1]),
-                           x=c(-dens[j],-ystart,-ystart,-dens[j])+xoff)
+                           x=(c(-w,0,0,-w)-ystart)*width[1]+xoff)
           g<-addG(g,dataPolygon(data=data,
-                                colour=NA, fill = cols[j],alpha=simAlpha))
+                                colour=NA, fill = cols[j],alpha=alpha))
         data<-data.frame(y=c(hists$x[i],hists$x[i],hists$x[i+1],hists$x[i+1]),
-                         x=c(dens[j],ystart,ystart,dens[j])+xoff)
+                         x=(c(w,0,0,w)+ystart)*width[2]+xoff)
         g<-addG(g,dataPolygon(data=data,
-                              colour=NA, fill = cols[j],alpha=simAlpha))
+                              colour=NA, fill = cols[j],alpha=alpha))
         ystart<-dens[j]
         }
       }

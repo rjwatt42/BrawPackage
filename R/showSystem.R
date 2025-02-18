@@ -11,26 +11,39 @@
 #' @examples
 #' showSystem(hypothesis=makeHypothesis(),design=makeDesign())
 #' @export
-showSystem<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence) {
-  ygain<-0.95
-  g<-NULL
-  if (is.null(hypothesis$IV2))
-    g<-showHypothesis(hypothesis=hypothesis,evidence=evidence,doWorld=TRUE,plotArea=c(0.0,0.05,0.45,0.8),autoShow=FALSE,g=g)
-  else
-    g<-showHypothesis(hypothesis=hypothesis,evidence=evidence,doWorld=TRUE,plotArea=c(0.0,0.05,0.33,0.8),autoShow=FALSE,g=g)
-  g<-showDesign(hypothesis=hypothesis,design=design,plotArea=c(0.3,0.3,0.28,0.33),autoShow=FALSE,g=g)
-  g<-showPrediction(hypothesis=hypothesis,design=design,evidence=evidence,plotArea=c(0.65,0.55,0.33,0.4),autoShow=FALSE,g=g)
-  g<-showWorldSampling(hypothesis=hypothesis,design=design,sigOnly=FALSE,plotArea=c(0.7,0.05,0.28,0.4),autoShow=FALSE,g=g)
-  
-  braw.env$plotArea<-c(0,0,1,1)
-  g<-addG(g,axisText(data=data.frame(x=0.02,y=1),"Hypothesis",vjust=1,size=1.2,fontface="bold"))
-  # g<-addG(g,axisText(data=data.frame(x=0.25,y=1.005),"\uff0b",vjust=1,size=2,fontface="plain"))
-  # g<-addG(g,axisPath(data=data.frame(x=c(0,0.33,0.33,0,0),y=c(0,0,1,1,0))))
-  g<-addG(g,axisText(data=data.frame(x=0.35,y=1),"Design",vjust=1,size=1.2,fontface="bold"))
-  # g<-addG(g,axisText(data=data.frame(x=0.6,y=1.005),"\u21d2",vjust=1,size=2,fontface="plain"))
-  # g<-addG(g,axisPath(data=data.frame(x=0.33+c(0,0.33,0.33,0),y=c(0,0,1,1))))
-  g<-addG(g,axisText(data=data.frame(x=0.73,y=1),"Expected",vjust=1,size=1.2,fontface="bold"))
-  # g<-addG(g,axisPath(data=data.frame(x=0.66+c(0,0.33,0.33,0),y=c(0,0,1,1))))
+showSystem<-function(whichShow="all",hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence) {
+  braw.env$addHistory<-FALSE
+  switch(whichShow,
+         "all"={
+           ygain<-0.95
+           g<-NULL
+           if (is.null(hypothesis$IV2))
+             g<-showHypothesis(hypothesis=hypothesis,evidence=evidence,doWorld=TRUE,plotArea=c(0.0,0.05,0.45,0.8),autoShow=FALSE,g=g)
+           else
+             g<-showHypothesis(hypothesis=hypothesis,evidence=evidence,doWorld=TRUE,plotArea=c(0.0,0.05,0.33,0.8),autoShow=FALSE,g=g)
+           g<-showDesign(hypothesis=hypothesis,design=design,plotArea=c(0.3,0.3,0.28,0.33),autoShow=FALSE,g=g)
+           g<-showPrediction(hypothesis=hypothesis,design=design,evidence=evidence,plotArea=c(0.65,0.55,0.33,0.4),autoShow=FALSE,g=g)
+           g<-showWorldSampling(hypothesis=hypothesis,design=design,sigOnly=FALSE,plotArea=c(0.7,0.05,0.28,0.4),autoShow=FALSE,g=g)
+           
+           braw.env$plotArea<-c(0,0,1,1)
+           g<-addG(g,axisText(data=data.frame(x=0.02,y=1),"Hypothesis",vjust=1,size=1.2,fontface="bold"))
+           g<-addG(g,axisText(data=data.frame(x=0.35,y=1),"Design",vjust=1,size=1.2,fontface="bold"))
+           g<-addG(g,axisText(data=data.frame(x=0.73,y=1),"Expected",vjust=1,size=1.2,fontface="bold"))
+         },
+         "hypothesis"={
+           g<-showHypothesis(hypothesis=hypothesis,evidence=evidence)
+         },
+         "design"={
+           g<-showDesign(hypothesis=hypothesis,design=design)
+         },
+         "population"={
+           g<-showPopulation(hypothesis=hypothesis)
+         },
+         "prediction"={
+           g<-showPrediction(hypothesis=hypothesis,design=design,evidence=evidence)
+         },
+  )
+  braw.env$addHistory<-TRUE
   
   if (braw.env$graphHTML && braw.env$autoShow) {
     showHTML(g)
@@ -199,7 +212,7 @@ showDesign<-function(design=braw.def$design,hypothesis=braw.def$hypothesis,plotA
   
   if (braw.env$nPlotScale=="log10")  nbin<-10^(nbin)
   if (design$sNRand) {
-    ndens<-dgamma(nbin-braw.env$minN,shape=design$sNRandK,scale=(design$sN-braw.env$minN)/design$sNRandK)
+    ndens<-nDistrDens(nbin,design)
     ndens<-ndens/max(ndens)
     x<-c(min(nbin),nbin,max(nbin))
     y<-c(0,ndens,0)*0.8
@@ -326,7 +339,7 @@ showPrediction <- function(hypothesis=braw.def$hypothesis,design=braw.def$design
           { braw.env$plotArea<-plotArea 
             g<-getAxisPrediction(hypothesis=list(IV=IV,DV=DV),g=g) 
             g<-plotPopulation(IV,DV,effect,g=g)
-            g<-plotPrediction(IV,IV2,DV,effect,design,g=g)
+            g<-plotPrediction(IV,IV2,DV,effect,design,correction=TRUE,g=g)
             # g<-addG(g,plotTitle(paste0("r[p]=",brawFormat(effect$rIV)),position="centre",size=1,fontface="plain"))
           },
           {

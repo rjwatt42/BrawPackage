@@ -14,27 +14,50 @@
 #' hypothesis=makeHypothesis(),design=makeDesign(),
 #' simSlice=0.1,correction=TRUE)
 #' @export
-makePossible<-function(targetSample=braw.res$result,UseSource="world",
+makePossible<-function(targetSample=NULL,UseSource="world",
                        targetPopulation=NULL,UsePrior="none",prior=getWorld("Psych"),
-                       sims=braw.res$multiple$result,sigOnly=FALSE,
+                       sims=braw.res$multiple$result,sigOnly=FALSE,sigOnlyCompensate=FALSE,
                        hypothesis=braw.def$hypothesis,design=braw.def$design,
                        simSlice=0.1,correction=TRUE
 ) {
+  if (is.numeric(targetSample)) {
+    targetSampleN<-design$sN
+  }
   if (is.null(targetSample)) {
     if (is.null(braw.res$result)) {
       targetSample<-0.3
+      targetSampleN<-design$sN
     } else {
       targetSample<-braw.res$result
     }
-  }
-  if (!is.numeric(targetSample)) {
+  } 
+  
+  if (is.list(targetSample)) {
     result<-targetSample
-    targetSample<-result$rIV
-    targetPopulation<-result$rpIV
-    hypothesis=result$hypothesis
-    design=result$design
-    design$sN<-result$nval
+    if (is.data.frame(targetSample)) {
+      targetSample<-result$rIV
+      targetSampleN<-result$nval
+    } else {
+      targetSample<-result$rIV
+      targetSampleN<-result$nval
+      targetPopulation<-result$rpIV
+      hypothesis=result$hypothesis
+      design=result$design
+      design$sN<-result$nval
+    }
   }
+  if (sigOnly) {
+    rcrit<-p2r(braw.env$alphaSig,targetSampleN)
+    targetSample<-targetSample[abs(targetSample)>=rcrit]
+  }
+  if (is.null(targetSampleN)) {
+    if (design$sNRand) {
+      n<-nDistrRand(length(targetSample),design)
+      while (any(n>100000)) {n<-nDistrRand(length(targetSample),design)}
+      targetSampleN<-n
+    } else targetSampleN<-rep(design$sN,length(targetSample))
+  }
+    
   if (is.null(sims)) {
       sims<-braw.res$multiple$result
   }
@@ -47,7 +70,9 @@ makePossible<-function(targetSample=braw.res$result,UseSource="world",
   
   possible<-
   list(targetSample=targetSample,
+       targetSampleN=targetSampleN,
        sigOnly=sigOnly,
+       sigOnlyCompensate=sigOnlyCompensate,
        UseSource=UseSource,
        targetPopulation=targetPopulation,
        UsePrior=UsePrior,
@@ -83,6 +108,7 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
 
   # get the sample effect size of interest and its corresponding sample size
   sRho<-possible$targetSample
+  sRhoN<-possible$targetSampleN
   if (braw.env$RZ=="z") sRho<-tanh(sRho)
   
   # get the source population distribution
@@ -141,7 +167,7 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
   }
   
   # enumerate the source populations
-  sD<-fullRSamplingDist(rs,source,design,separate=TRUE,sigOnly=possible$sigOnly)
+  sD<-fullRSamplingDist(rs,source,design,separate=TRUE,sigOnly=possible$sigOnly,sigOnlyCompensate=possible$sigOnlyCompensate)
   sourceRVals<-sD$vals
   sourceSampDens_r<-sD$dens
   sourceSampDens_r_plus<-rbind(sD$densPlus)
@@ -169,26 +195,44 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
   }
   
   # likelihood function for each sample (there's usually only 1)
-  if (length(n)<length(sRho)) n<-rep(n,length(sRho))
+  if (length(sRhoN)<length(sRho)) sRhoN<-rep(sRhoN,length(sRho))
   sampleLikelihoodTotal_r<-1
   sampleLikelihood_r<-c()
-  if (!any(is.null(sRho)) && !any(is.na(sRho))) {
+  if (length(sRho)>0 && !any(is.null(sRho)) && !any(is.na(sRho))) {
     for (ei in 1:length(sRho)) {
       s1<-c()
       for (i in 1:length(rp)) {
         rDens<-0
-      for (ci in 1:length(correction)) {
-        local_r<-tanh(atanh(sRho[ei])+correction[ci])
+        for (ci in 1:length(correction)) {
+        dg<-0
         if (design$sNRand) {
           d<-0
           for (ni in seq(braw.env$minN,braw.env$maxRandN*design$sN,length.out=braw.env$nNpoints)) {
-            g<-dgamma(ni-braw.env$minN,shape=design$sNRandK,scale=(design$sN-braw.env$minN)/design$sNRandK)
-            d<-d+rSamplingDistr(rs,rp[i],ni,sigOnly=possible$sigOnly)*g
+            g<-nDistrDens(ni,design)
+            dr<-rSamplingDistr(rs,rp[i],ni)*g
+            dg1<-sum(dr)
+            if (possible$sigOnly) {
+              rcrit<-p2r(braw.env$alphaSig,ni,1)
+              dr[abs(rs)<rcrit]<-0
+              if (possible$sigOnlyCompensate)
+              dr<-dr/sum(dr)*dg1
+            }
+            dg<-dg+dg1
+            d<-d+dr
           }
         } else {
-          d<-rSamplingDistr(rs,rp[i],n[ei],sigOnly=possible$sigOnly)
+          dr<-rSamplingDistr(rs,rp[i],sRhoN[ei])
+          dg1<-sum(dr)
+          if (possible$sigOnly) {
+            rcrit<-p2r(braw.env$alphaSig,sRhoN[ei],1)
+            dr[abs(rs)<rcrit]<-0
+            if (possible$sigOnlyCompensate)
+              dr<-dr/sum(dr)*dg1
+          }
+          dg<-dg+dg1
+          d<-dr
         }
-        d<-d/sum(d)
+        d<-d/dg
         rDens<-rDens+d
       }
         useDens<-approx(rs,rDens/length(correction),tanh(atanh(sRho[ei])))$y
@@ -201,14 +245,7 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
     
     # times the a-priori distribution
     sampleLikelihoodTotal_r<-sampleLikelihoodTotal_r*priorPopDens_r_full
-    # for (ei in 1:length(sRho)){
-    #   sampleLikelihood_r[ei,]<-sampleLikelihood_r[ei,]*priorPopDens_r_full
-    #   sampleLikelihood_r_show[ei,]<-sampleLikelihood_r_show[ei,]*priorPopDens_r
-    # }
-    
-    # dr_gain<-max(sourceSampDens_r,na.rm=TRUE)
-    # sourceSampDens_r<-sourceSampDens_r/dr_gain
-    
+
     if (any(!is.na(priorSampDens_r))) {
       dr_gain<-max(priorSampDens_r,na.rm=TRUE)
       priorSampDens_r<-priorSampDens_r/dr_gain
@@ -227,6 +264,7 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
     sampleLikelihood_r<-sampleLikelihood_r/max(sampleLikelihood_r,na.rm=TRUE)
   } else {
     sampleLikelihood_r<-c()
+    sampleLikelihood_r_show<-c()
   }
   
   possibleResult<-list(possible=possible,
@@ -247,7 +285,8 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
                          r=possible$sims$rIV,
                          rp=possible$sims$rpIV,
                          n<-possible$sims$nval
-                       )
+                       ),
+                       mle=densityFunctionStats(sampleLikelihoodTotal_r,rp)$peak
   )
   
   setBrawRes("possibleResult",possibleResult)

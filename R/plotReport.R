@@ -3,6 +3,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
 
   doVerticalLines=FALSE
   doItalic=FALSE
+  centreTable=TRUE
   indentSize="30px"
   gapSize="30px"
   lineColour="#446688"
@@ -11,20 +12,22 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
   tableColour="#ffffff"
   rowColour="#88BBFF"
   rowColour=tableColour
+  if (centreTable) placing="margin:auto;" else placing=""
   cellPadding="padding:3px;margin-top:0px;"
   cellFilledStyle<-'padding-left:5px;padding-right:5px;'
   cellEmptyStyle<-'padding-left:0px;padding-right:0px;'
   blankLineStyle="padding-top:20px;"
-  tableStart<-paste0('<table style="margin-top:0px;">')
+  tableStart<-paste0('<table style="',placing,'margin-top:0px;">')
   if (renderAsHTML) {
     fontSize<-fontSize*13
     mainStyle<-paste0("font-size:",format(fontSize) ,"px;font-weight:normal;text-align: left;")
     
     preText<-""
-    outputFront<-paste0('<div style="padding:',fontSize,'px;margin-left:',fontSize*2,'px;',mainStyle,'">')
+    # outputFront<-paste0('<div style="padding:',fontSize,'px;margin-left:',fontSize*2,'px;',mainStyle,'">')
+    outputFront<-paste0('<div style="padding:',fontSize,'px;',placing,mainStyle,'">')
     outputBack<-'</div>'
     if (!is.null(outputText)) {
-      outputFront<-paste0(outputFront,'<div style=padding:0px;>',tableStart)
+      outputFront<-paste0(outputFront,'<div style="padding:0px',placing,'">',tableStart)
       index<-0
       col1Use<-0
       col2Use<-0
@@ -80,6 +83,10 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
           rowStyle<-paste0(rowStyle,"font-weight:bold;")
           blankStyle<-"padding-top:1px;"
           outputText[index+(1:nc)]<-sub("!T","",outputText[index+(1:nc)])
+        }
+        if (any(grepl("!B",outputText[index+(1:nc)]))) {
+          rowStyle<-paste0(rowStyle,"font-weight:bold;")
+          outputText[index+(1:nc)]<-sub("!B","",outputText[index+(1:nc)])
         }
         if (any(grepl("!U",outputText[index+(1:nc)]))) {
           rowStyle<-paste0(rowStyle,"border-bottom:solid;border-bottom-color:",lineColourPale,";border-bottom-width:1px;")
@@ -161,7 +168,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
         outputFront<-paste0(outputFront,"</tr>")
         if (index+nc<=length(outputText))
         if (all(sapply(outputText[index+(1:nc)],nchar)==0)) {
-          outputFront<-paste0(outputFront,'</table></div><div style=padding:0px;',blankStyle,'>',tableStart)
+          outputFront<-paste0(outputFront,'</table></div><div style=padding:0px;',placing,blankStyle,'>',tableStart)
           colStyle<-""
           colUse<-0
           blankStyle<-blankLineStyle

@@ -9,14 +9,22 @@
 #'                        whichEffect="All",effectType="all")
 #' @export
 reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
-                        whichEffect="All",effectType="all",quantileShow=0.5,reportStats="Medians"
+                        whichEffect="All",effectType="all",
+                        quantileShow=0.5,reportStats="Medians",
+                        returnDataFrame=FALSE
 ){
   if (is.null(exploreResult)) exploreResult<-doExplore(autoShow=FALSE)
   
-  precision<-braw.env$report_precision-1
-  
+  precision<-braw.env$report_precision
   reportMeans<-(reportStats=="Means")
   reportQuants<-FALSE
+  
+  if (exploreResult$doingMetaAnalysis) 
+    switch(exploreResult$metaAnalysis$analysisType,
+           "fixed"={showType<-"LambdaF"},
+           "random"={showType<-"LambdaF;LambdaR"},
+           {showType<-"Lambda;pNull"})
+  
   showType<-strsplit(showType,";")[[1]]
   if (length(showType)==1) {
     switch(showType,
@@ -33,12 +41,13 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
   explore<-exploreResult$explore
   hypothesis<-exploreResult$hypothesis
   effect<-hypothesis$effect
+  design<-exploreResult$design
   evidence<-exploreResult$evidence
   
   oldAlpha<-braw.env$alphaSig
-  on.exit(braw.env$alphaSig<-oldAlpha)
-  
-  max_cols<-7
+  on.exit(setBrawEnv("alphaSig",oldAlpha),add=TRUE)
+
+  max_cols<-10
   
   vals<-exploreResult$vals
   if (explore$exploreType=="pNull" && braw.env$pPlus) vals<-1-vals
@@ -49,24 +58,6 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
     useVals<-1:length(vals)
   }
   nc<-length(useVals)+2
-  
-  exploreTypeShow<-explore$exploreType
-  if (is.element(explore$exploreType,c("rIV","rIV2","rIVIV2","rIVIV2DV"))) {
-    if (is.null(hypothesis$IV2)) {
-      exploreTypeShow<-"r[p]"
-    } else {
-      exploreTypeShow<-paste0("r[p]",gsub("^r","",explore$exploreType))
-    }
-  } else exploreTypeShow<-explore$exploreType
-  
-  outputText<-rep("",nc)
-  if (is.element(showType[1],c("NHST","Hits","Misses")) && sum(!is.na(exploreResult$nullresult$rval[,1]))>0) {
-    outputText[1:2]<-c("!TExplore  ",paste("nsims = ",format(sum(!is.na(exploreResult$result$rval[,1]))),"+",format(sum(!is.na(exploreResult$nullresult$rval[,1]))),sep=""))
-  } else {
-    outputText[1:2]<-c("!TExplore  ",paste("nsims = ",format(sum(!is.na(exploreResult$result$rval[,1]))),sep=""))
-  }
-  outputText<-c(outputText,rep("",nc))
-  
   
   if (is.null(hypothesis$IV2))    {
     effectTypes<-"direct"
@@ -82,16 +73,37 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
     if (whichEffect=="rIV2") {whichEffects<-"Main 2"}
     if (whichEffect=="rIVIV2DV") {whichEffects<-"Interaction"}
   }
-  if (showType[1]=="SEM") {
+  if (showTypes[1]=="SEM") {
     whichEffects<-"Main 1"
     effectTypes<-"direct"
   }
+  
+  exploreTypeShow<-explore$exploreType
+  if (is.element(explore$exploreType,c("rIV","rIV2","rIVIV2","rIVIV2DV"))) {
+    if (is.null(hypothesis$IV2)) {
+      exploreTypeShow<-"r[p]"
+    } else {
+      exploreTypeShow<-paste0("r[p]",gsub("^r","",explore$exploreType))
+    }
+  } else exploreTypeShow<-explore$exploreType
+  
+  returnData<-data.frame(vals=vals)
+  names(returnData)[1]<-explore$exploreType
+  
+  outputText<-rep("",nc)
+  if (is.element(showTypes[1],c("NHST","Hits","Misses")) && sum(!is.na(exploreResult$nullresult$rval[,1]))>0) {
+    outputText[1:2]<-c(paste0("!TExplore: ",exploreTypeShow),paste("  nsims = ",brawFormat(exploreResult$count),"+",brawFormat(exploreResult$nullcount),sep=""))
+  } else {
+    outputText[1:2]<-c(paste0("!TExplore: ",exploreTypeShow),paste("  nsims = ",brawFormat(exploreResult$count),sep=""))
+  }
+  outputText<-c(outputText,rep("",nc))
+  
   
   tableHeader<-FALSE
   for (whichEffect in whichEffects)  {
     for (effectType in effectTypes) {
       if (!tableHeader) {
-        outputText<-c(outputText,paste0("!T",exploreTypeShow),rep(" ",2),rep(" ",nc-3))
+        outputText<-c(outputText,"!T"," ",exploreTypeShow,rep(" ",nc-3))
         headerText<-c(paste0("!H"),"!D ")
         if (explore$exploreType=="rIV" && braw.env$RZ=="z")  vals<-atanh(vals)
         for (i in 1:length(useVals)) {
@@ -108,7 +120,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
       else y_label2<-effectType
       
       for (showType in showTypes) {
-        y_label<-showType
+        y_label<-plotAxis(showType,hypothesis,design)$label
         extra_y_label<-NULL
         if (is.null(hypothesis$IV2)){
           rVals<-exploreResult$result$rval
@@ -366,11 +378,17 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                   df1<-exploreResult$result$df1
                   showVals<-r2llr(rVals,ns,df1,"dLLR",exploreResult$evidence$llr,exploreResult$evidence$prior)
                 },
+                "LambdaF"={
+                  showVals<-exploreResult$result$param1
+                },
+                "LambdaR"={
+                  showVals<-exploreResult$result$param2
+                },
                 "Lambda"={
-                  showVals<-exploreResult$result$k
+                  showVals<-exploreResult$result$param1
                 },
                 "pNull"={
-                  showVals<-exploreResult$result$pnull
+                  showVals<-exploreResult$result$param2
                 },
                 "PDF"={
                   showVals<-exploreResult$result$dist==effect$world$populationPDF
@@ -423,7 +441,8 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                   showVals<-exploreResult$result$rs$kt
                 }
         )
-        if (is.element(showType,c("rs","p","ws","n","AIC","log(lrs)","log(lrd)","Lambda","pNull","S",
+        if (is.element(showType,c("rs","p","ws","n","AIC","log(lrs)","log(lrd)",
+                                  "LambdaF","LambdaR","Lambda","pNull","S",
                                   "iv.mn","iv.sd","iv.sk","iv.kt","dv.mn","dv.sd","dv.sk","dv.kt",
                                   "rd.mn","rd.sd","rd.sk","rd.kt"))) {
           quants=(1-quantileShow)/2
@@ -435,6 +454,10 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
             ymn[i]<-mean(showVals[,i],na.rm=TRUE)
             ysd[i]<-sd(showVals[,i],na.rm=TRUE)
           }
+          
+          oldNames<-names(returnData)
+          returnData<-cbind(returnData,data.frame(means=ymn,sds=ysd))
+          names(returnData)<-c(oldNames,paste0('mean(',showType,')'),paste0('sd(',showType,')'))
           
           if (reportMeans){
             outputText<-c(outputText,rep(" ",nc))
@@ -479,6 +502,12 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
         
         
         if (is.element(showType,c("p(sig)","Hits","Misses")) ){
+          if (returnDataFrame) {
+            d<-data.frame(vals=vals,psig=y50)
+            names(d)[1]<-explore$exploreType
+            return(d)
+          }
+          
           outputText<-c(outputText,"","-se ")
           for (i in 1:length(useVals)) {
             outputText<-c(outputText,paste0("!j",brawFormat(y25[useVals[i]],digits=precision)))
@@ -542,11 +571,32 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
         }
         if (is.element(showType[1],c("NHST","SEM"))) {
           if (is.null(semPropsNull)) {
+            if (returnDataFrame) {
+              d<-data.frame(vals=vals)
+              for (ig in 1:nrow(semProps)) {
+                d<-cbind(d,semProps[ig,])
+                }
+              names(d)<-c(explore$exploreType,showLabels)
+              return(d)
+            }
+            
             for (ig in 1:nrow(semProps)) {
               outputText<-c(outputText,paste0("!j",showLabels[ig])," ")
               for (i in useVals)  outputText<-c(outputText,paste0(brawFormat(100*semProps[ig,i],digits=1),"%"))
             }
           } else {
+            if (returnDataFrame) {
+              d<-data.frame(vals=vals)
+              for (ig in 1:nrow(semProps)) {
+                d<-cbind(d,semProps[ig,])
+              }
+              for (ig in 1:nrow(semProps)) {
+                d<-cbind(d,semPropsNull[ig,])
+              }
+              names(d)<-c(explore$exploreType,paste0("NonNulls",showLabels),paste0("Nulls",showLabels))
+              return(d)
+            }
+            
             outputText<-c(outputText,"Non-Nulls",rep("",nc-1))
             for (ig in 1:nrow(semProps)) {
               outputText<-c(outputText,paste0("!j",showLabels[ig])," ")
@@ -557,12 +607,16 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
               outputText<-c(outputText,paste0("!j",showLabels[ig])," ")
               for (i in useVals)  outputText<-c(outputText,paste0(brawFormat(100*semPropsNull[ig,i],digits=1),"%"))
             }
-            
           }
         }
       }
     }
   }
+  
+  if (returnDataFrame) {
+    return(returnData)
+  }
+  
   outputText<-c(outputText,rep("",nc))
   nr=length(outputText)/nc
   reportPlot(outputText,nc,nr)        

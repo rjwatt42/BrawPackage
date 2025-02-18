@@ -1,10 +1,13 @@
 
 SingleSamplingPDF<-function(z,lambda,sigma,shape=0,remove_nonsig=FALSE,df1=1) {
   # shape is additional normal error distribution
-  sigmad<-sqrt(sigma^2+shape^2)
+  sigmad<-sigma^2+shape
+  sigmad[sigmad<0]<-0
+  sigmad<-sqrt(sigmad)
   d1<-exp(-0.5*((z-lambda)^2/sigmad^2))/sqrt(2*pi*sigmad^2)
   if (remove_nonsig) {
     zcrit<-atanh(p2r(braw.env$alphaSig,1/sigma^2+3,df1))
+    d1[abs(z)<zcrit]<-0
     d0<-1-(pnorm(zcrit,lambda,sigmad)-pnorm(-zcrit,lambda,sigmad))
   } else {
     d0<-1
@@ -157,45 +160,46 @@ GenExpSamplingPDF<-function(z,lambda,sigma,genexp_shape=1,remove_nonsig=FALSE,df
 }
 
 
-getLogLikelihood<-function(z,n,df1,distribution,param1,param2=0,remove_nonsig=FALSE) {
+getLogLikelihood<-function(z,n,df1,distribution,param1,param2=0,remove_nonsig=FALSE,returnVals=FALSE) {
+  if (is.null(param2)) param2<-0
   sigma<-1/sqrt(n-3)
   lambda2<-0
   zcrit<-atanh(p2r(braw.env$alphaSig,n,df1))
 
   if (distribution=="fixed") {
     shape<-NA
-    res<-matrix(0,nrow=length(param1),ncol=length(param2))
+    res<-matrix(-Inf,nrow=length(param1),ncol=length(param2))
+    lksHold<-c()
     lambda<-param1
     for (i in 1:length(lambda)) {
+      j<-1
         mainPDF<-SingleSamplingPDF(z,lambda[i],sigma,shape=0,remove_nonsig=remove_nonsig,df1=df1)
         # now normalize for the non-sig
         likelihoods<-mainPDF$pdf/mainPDF$sig_pdf
-        # likelihoods[is.infinite(likelihoods)]<-NA
-        res[i,1]<-sum(log(likelihoods[likelihoods>1e-300]),na.rm=TRUE)
-        if (res[i,1]==Inf) {
-          a<-1
-      }
+        likelihoods[(likelihoods<1e-300)]<- 1e-300
+        res[i,j]<-sum(log(likelihoods),na.rm=TRUE)
+        if (res[i,j]==max(res,na.rm=TRUE)) lksHold<-likelihoods
     }
+    if (returnVals) return(lksHold)
     return(res)
   } 
   if (distribution=="random") {
-    shape<-NA
-    res<-matrix(0,nrow=length(param1),ncol=length(param2))
-    lambda1<-param1
-    lambda2<-param2
+    res<-matrix(-Inf,nrow=length(param1),ncol=length(param2))
+    lksHold<-c()
+    lambda<-param1
+    shape<-param2
     param2<-0
-    for (i in 1:length(lambda1)) {
-      for (j in 1:length(lambda2)) {
-        mainPDF<-SingleSamplingPDF(z,lambda1[i],sigma,shape=lambda2[j],remove_nonsig=remove_nonsig,df1=df1)
+    for (i in 1:length(lambda)) {
+      for (j in 1:length(shape)) {
+        mainPDF<-SingleSamplingPDF(z,lambda[i],sigma,shape=shape[j],remove_nonsig=remove_nonsig,df1=df1)
         # now normalize for the non-sig
         likelihoods<-mainPDF$pdf/mainPDF$sig_pdf
-        # likelihoods[is.infinite(likelihoods)]<-NA
-        res[i,j]<-sum(log(likelihoods[likelihoods>1e-300]),na.rm=TRUE)
-        if (res[i,j]==Inf) {
-          a<-1
-        }
+        likelihoods[(likelihoods<1e-300)]<- 1e-300
+        res[i,j]<-sum(log(likelihoods),na.rm=TRUE)
+        if (res[i,j]==max(res,na.rm=TRUE)) lksHold<-likelihoods
       }
     }
+    if (returnVals) return(lksHold)
     return(res)
   } 
   
@@ -207,7 +211,7 @@ getLogLikelihood<-function(z,n,df1,distribution,param1,param2=0,remove_nonsig=FA
     zcrit<-0
   } 
   shape<-NA
-  res<-matrix(0,nrow=length(param1),ncol=length(param2))
+  res<-matrix(-Inf,nrow=length(param1),ncol=length(param2))
   switch(distribution,
          "Single"={
            PDF<-SingleSamplingPDF
@@ -236,13 +240,12 @@ getLogLikelihood<-function(z,n,df1,distribution,param1,param2=0,remove_nonsig=FA
       sourcePDF<-mainPDF$pdf*(1-nullP)+nullPDF$pdf*nullP
       # now normalize for the non-sig
       likelihoods<-sourcePDF/(mainPDF$sig_pdf*(1-nullP)+nullPDF$sig_pdf*nullP)
-      # likelihoods[is.infinite(likelihoods)]<-NA
+      likelihoods[(likelihoods<1e-300)]<- 1e-300
       res[i,j]<-sum(log(likelihoods[likelihoods>1e-300]),na.rm=TRUE)
-      if (res[i,j]==Inf) {
-        a<-1
-      }
+      if (res[i,j]==max(res,na.rm=TRUE)) lksHold<-likelihoods
     }
   }
-  res
+  if (returnVals) return(lksHold)
+  return(res)
 }
 

@@ -125,9 +125,9 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
 
 replicateSample<-function(hypothesis,design,evidence,sample,res) {
 
-  oldalpha<-braw.env$alphaSig
-  on.exit(braw.env$alphaSig<-oldalpha)
-  
+  oldAlpha<-braw.env$alphaSig
+  on.exit(setBrawEnv("alphaSig",oldAlpha),add=TRUE)
+
   Replication<-design$Replication
   resOriginal<-res
   ResultHistory<-list(n=res$nval,df1=res$df1,r=res$rIV,rp=res$rpIV,p=res$pIV)
@@ -135,12 +135,13 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
   if (Replication$On) {
     # are we asked to start with a significant first result?
     while (Replication$forceSigOriginal && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
-      if (!evidence$shortHand) {
-        sample<-doSample(hypothesis,design,autoShow=FALSE)
-        res<-doAnalysis(sample,evidence,autoShow=FALSE)
-      } else {
-        res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
-      }
+      res<-getSample(hypothesis,design,evidence)
+      # if (!evidence$shortHand) {
+      #   sample<-doSample(hypothesis,design,autoShow=FALSE)
+      #   res<-doAnalysis(sample,evidence,autoShow=FALSE)
+      # } else {
+      #   res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
+      # }
       resOriginal<-res
       ResultHistory<-list(n=res$nval,df1=res$df1,r=res$rIV,rp=res$rpIV,p=res$pIV)
     }
@@ -179,12 +180,13 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
       }
       
       # now do the replication
-      if (!evidence$shortHand) {
-        sample<-doSample(hypothesis,design1,autoShow=FALSE)
-        res<-doAnalysis(sample,evidence,autoShow=FALSE)
-      } else {
-        res<-sampleShortCut(hypothesis,design1,evidence,1,FALSE)
-      }
+      res<-getSample(hypothesis,design,evidence)
+      # if (!evidence$shortHand) {
+      #   sample<-doSample(hypothesis,design1,autoShow=FALSE)
+      #   res<-doAnalysis(sample,evidence,autoShow=FALSE)
+      # } else {
+      #   res<-sampleShortCut(hypothesis,design1,evidence,1,FALSE)
+      # }
       # if the result has the wrong sign, 
       if (Replication$forceSign && sign(res$rIV)!=sign(resOriginal$rIV)) {
         res$pIV<-1

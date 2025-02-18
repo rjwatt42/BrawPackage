@@ -100,11 +100,20 @@ resetMultiple<-function(nsims=0,evidence,multipleResult=NULL){
 doMultiple <- function(nsims=10,multipleResult=braw.res$multiple,hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,
                          doingNull=FALSE,inSteps=FALSE,autoShow=braw.env$autoShow,showType="Basic") {
 
+  if (evidence$metaAnalysis$On) {
+    if (!is.null(multipleResult$fixed)) metaMultiple<-multipleResult
+    else                                metaMultiple<-braw.res$metaMultiple
+    metaMultiple<-doMetaMultiple(nsims=nsims,metaResult=metaMultiple,metaAnalysis=evidence$metaAnalysis,keepStudies=FALSE,
+                             hypothesis=hypothesis,design=design,evidence=evidence)
+    if (autoShow) print(showMetaMultiple(metaMultiple))
+    return(metaMultiple)
+  }
   if (!is.null(multipleResult)) {
     hypothesis<-multipleResult$hypothesis
     design<-multipleResult$design
     evidence<-multipleResult$evidence
   }
+  
   if (nsims>0)
     multipleResult<-c(resetMultiple(nsims,evidence,multipleResult),
                       list(hypothesis=hypothesis,
