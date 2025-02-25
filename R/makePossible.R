@@ -46,7 +46,7 @@ makePossible<-function(targetSample=NULL,UseSource="world",
       design$sN<-result$nval
     }
   }
-  if (sigOnly) {
+  if (sigOnly>0) {
     rcrit<-p2r(braw.env$alphaSig,targetSampleN)
     targetSample<-targetSample[abs(targetSample)>=rcrit]
   }
@@ -97,20 +97,24 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
   hypothesis<-possible$hypothesis
   world<-hypothesis$effect$world
   n<-design$sN
-  
-  # note that we do everything in r and then, if required transform to z at the end
-  rs<-seq(-1,1,length=npoints)*braw.env$r_range
-  rp<-seq(-1,1,length=npoints)*braw.env$r_range
-  if (braw.env$RZ=="z") {
-            rs<-tanh(seq(-1,1,length=npoints)*braw.env$z_range)
-            rp<-tanh(seq(-1,1,length=npoints)*braw.env$z_range)
-          }
 
   # get the sample effect size of interest and its corresponding sample size
   sRho<-possible$targetSample
   sRhoN<-possible$targetSampleN
-  if (braw.env$RZ=="z") sRho<-tanh(sRho)
+  pRho<-possible$targetPopulation
   
+  # note that we do everything in r and then, if required transform to z at the end
+  rs<-seq(-1,1,length=npoints)*braw.env$r_range
+  rp<-seq(-1,1,length=npoints)*braw.env$r_range
+  switch(braw.env$RZ,
+         "r"={},
+         "z"={
+           rs<-tanh(seq(-1,1,length=npoints)*braw.env$z_range)
+           rp<-tanh(seq(-1,1,length=npoints)*braw.env$z_range)
+           sRho<-tanh(sRho)
+           pRho<-tanh(pRho)
+         })
+
   # get the source population distribution
   switch(possible$UseSource,
          "null"={source<-list(worldOn=FALSE,
@@ -136,8 +140,6 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
     sourcePopDens_r[rp==0]<-sourcePopDens_r[rp==0]+source$populationNullp
   }
   
-  pRho<-possible$targetPopulation
-  if (braw.env$RZ=="z" && !is.null(pRho)) pRho<-tanh(pRho)
   # get the prior population distribution
   switch(possible$UsePrior,
          "none"={ prior<-list(worldOn=TRUE,
@@ -211,9 +213,9 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
             g<-nDistrDens(ni,design)
             dr<-rSamplingDistr(rs,rp[i],ni)*g
             dg1<-sum(dr)
-            if (possible$sigOnly) {
+            if (possible$sigOnly>0) {
               rcrit<-p2r(braw.env$alphaSig,ni,1)
-              dr[abs(rs)<rcrit]<-0
+              dr[abs(rs)<rcrit]<-dr[abs(rs)<rcrit]*(1-possible$sigOnly)
               if (possible$sigOnlyCompensate)
               dr<-dr/sum(dr)*dg1
             }
@@ -223,9 +225,9 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
         } else {
           dr<-rSamplingDistr(rs,rp[i],sRhoN[ei])
           dg1<-sum(dr)
-          if (possible$sigOnly) {
+          if (possible$sigOnly>0) {
             rcrit<-p2r(braw.env$alphaSig,sRhoN[ei],1)
-            dr[abs(rs)<rcrit]<-0
+            dr[abs(rs)<rcrit]<-dr[abs(rs)<rcrit]*(1-possible$sigOnly)
             if (possible$sigOnlyCompensate)
               dr<-dr/sum(dr)*dg1
           }

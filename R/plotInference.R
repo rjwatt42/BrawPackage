@@ -108,7 +108,6 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
   switch (disp1,
           "rs"={
             d1<-analysis$rIV
-            if (braw.env$RZ=="z") d1<-atanh(d1)
           },
           "p"={
             d1<-analysis$pIV
@@ -116,15 +115,12 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
             },
           "rp"={
             d1<-analysis$rpIV
-            if (braw.env$RZ=="z") d1<-atanh(d1)
           },
           "re"={
             d1<-analysis$rIV-analysis$rpIV
-            if (braw.env$RZ=="z") d1<-atanh(analysis$rIV)-atanh(analysis$rpIV)
           },
           "ro"={
             d1<-analysis$roIV
-            if (braw.env$RZ=="z") d1<-atanh(d1)
           },
           "po"={
             d1<-analysis$poIV
@@ -155,10 +151,15 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
             if (braw.env$wPlotScale=="log10") d1<-log10(d1)
           }
   )
+  if (substr(disp1,1,1=="r"))
+    switch(braw.env$RZ,
+           "r"={},
+           "z"={d1<-atanh(d1)}
+           )
+
   switch (disp2,
           "rs"={
             d2<-analysis$rIV
-            if (braw.env$RZ=="z") d2<-atanh(d2)
           },
           "p"={
             d2<-analysis$pIV
@@ -166,15 +167,12 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
           },
           "rp"={
             d2<-analysis$rpIV
-            if (braw.env$RZ=="z") d2<-atanh(d2)
           },
           "re"={
             d2<-analysis$rIV-analysis$rpIV
-            if (braw.env$RZ=="z") d2<-atanh(analysis$rIV)-atanh(analysis$rpIV)
           },
           "ro"={
             d2<-analysis$roIV
-            if (braw.env$RZ=="z") d2<-atanh(d2)
           },
           "po"={
             d2<-analysis$poIV
@@ -205,6 +203,11 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
             if (braw.env$wPlotScale=="log10") d2<-log10(d2)
           }
   )
+  if (substr(disp2,1,1=="r"))
+    switch(braw.env$RZ,
+           "r"={},
+           "z"={d2<-atanh(d2)}
+    )
   
   pts<-data.frame(x=d1,y=d2)
   braw.env$plotArea<-c(0,0,1,1)

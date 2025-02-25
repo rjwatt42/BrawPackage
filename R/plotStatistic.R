@@ -607,10 +607,12 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   }
   rlims<-c(-1,1)
 
-  if (braw.env$RZ=="z") {
-    r<-atanh(r)
-    rlims<-c(-1,1)*braw.env$z_range
-  }
+  switch(braw.env$RZ,
+         "r"={},
+         "z"={
+           r<-atanh(r)
+           rlims<-c(-1,1)*braw.env$z_range
+         })
   rActual<-r
   rActual[is.na(r)]<-0
   
@@ -666,11 +668,13 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   
   if (!all(is.na(analysis$rIV))) {
     data<-collectData(analysis,whichEffect)
-    if (braw.env$RZ=="z") {
-      data$rs<-atanh(data$rs)
-      data$rp<-atanh(data$rp)
-      data$ro<-atanh(data$ro)
-    }
+    switch(braw.env$RZ,
+           "r"={},
+           "z"={
+             data$rs<-atanh(data$rs)
+             data$rp<-atanh(data$rp)
+             data$ro<-atanh(data$ro)
+           })
     switch (showType,
             "rs"={showVals<-data$rs},
             "rse"={showVals<-data$rs},
@@ -765,43 +769,48 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
         if (showType=="e2r") effectTheory$world$populationNullp<-0
         if (showType=="re") rOff<-"re"
         else rOff<-"rs"
-        if (braw.env$RZ=="z") {
-          zvals<-seq(-1,1,length.out=npt*2)*braw.env$z_range*2
-          rvals<-tanh(zvals)
-          # rvals<-seq(-1,1,length.out=npt)*0.99
-          xd<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
-          xdsig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
-          xd<-rdens2zdens(xd,rvals)
-          xdsig<-rdens2zdens(xdsig,rvals)
-          yv<-atanh(rvals)
-          use<-abs(zvals)<=braw.env$z_range
-          yv<-yv[use]
-          xd<-xd[use]
-          xdsig<-xdsig[use]
-        } else {
-          if (!design$sNRand) {
-            cr<-tanh(pn2z(braw.env$alphaSig,design$sN))
-            inc<-cr/ceiling(cr/(2/npt))
-            rvals<-seq(inc,0.99,inc)
-            rvals<-c(-rev(rvals),0,rvals)
-          } else rvals<-seq(-1,1,length.out=npt)*0.99
-          xd<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
-          xdsig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
-          yv<-rvals
-        }
+        switch(braw.env$RZ,
+               "r"={
+                 if (!design$sNRand) {
+                   cr<-tanh(pn2z(braw.env$alphaSig,design$sN))
+                   inc<-cr/ceiling(cr/(2/npt))
+                   rvals<-seq(inc,0.99,inc)
+                   rvals<-c(-rev(rvals),0,rvals)
+                 } else rvals<-seq(-1,1,length.out=npt)*0.99
+                 xd<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
+                 xdsig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
+                 yv<-rvals
+               },
+               "z"={
+                 zvals<-seq(-1,1,length.out=npt*2)*braw.env$z_range*2
+                 rvals<-tanh(zvals)
+                 # rvals<-seq(-1,1,length.out=npt)*0.99
+                 xd<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
+                 xdsig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
+                 xd<-rdens2zdens(xd,rvals)
+                 xdsig<-rdens2zdens(xdsig,rvals)
+                 yv<-atanh(rvals)
+                 use<-abs(zvals)<=braw.env$z_range
+                 yv<-yv[use]
+                 xd<-xd[use]
+                 xdsig<-xdsig[use]
+               }
+               )
       }
       
       npt<-101
       switch(showType,
              "rp"={
-               if (braw.env$RZ=="z") {
-                 yv<-seq(-1,1,length.out=npt)*braw.env$z_range
-                 xd<-rPopulationDist(tanh(yv),effectTheory$world)
-                 xd<-rdens2zdens(xd,tanh(yv))
-               } else {
-                 yv<-seq(-1,1,length.out=npt)*0.99
-                 xd<-rPopulationDist(yv,effectTheory$world)
-               }
+               switch(braw.env$RZ,
+                      "r"={
+                        yv<-seq(-1,1,length.out=npt)*0.99
+                        xd<-rPopulationDist(yv,effectTheory$world)
+                      },
+                      "z"={
+                        yv<-seq(-1,1,length.out=npt)*braw.env$z_range
+                        xd<-rPopulationDist(tanh(yv),effectTheory$world)
+                        xd<-rdens2zdens(xd,tanh(yv))
+                      })
              },
              "n"={
                ndist<-getNDist(analysis$design,effectTheory$world,logScale=logScale,sigOnly=TRUE)
@@ -1009,14 +1018,14 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       else
         resNotNull<-rep(NA,length(data$rp))
       
-      if (sigOnly) {
-        shvals<-shvals[resSig]
-        rvals<-rvals[resSig]
-        pvals<-pvals[resSig]
-        nvals<-nvals[resSig]
-        resSig<-resSig[resSig]
-        resNotNull<-resNotNull[resSig]
-      }
+      # if (sigOnly) {
+      #   shvals<-shvals[resSig]
+      #   rvals<-rvals[resSig]
+      #   pvals<-pvals[resSig]
+      #   nvals<-nvals[resSig]
+      #   resSig<-resSig[resSig]
+      #   resNotNull<-resNotNull[resSig]
+      # }
       if (effectType=="all") {
         ysc<-1/3
         rvals<-(rvals+1)*ysc*0.9+rem(i-1,3)*ysc*2-1

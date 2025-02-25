@@ -61,13 +61,26 @@ doMetaMultiple<-function(nsims=100,metaMultiple=braw.res$metaMultiple,metaAnalys
   metaMultiple
 }
 
+getTrimFill<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
+  res<-tryCatch({
+    q<-trimfill(zs,1/sqrt(ns-3),ma.common=(dist=="fixed"),common=(dist=="fixed"),random=(dist=="random"))
+    list(param1Max=q$TE.common,param2Max=q$tau,Smax=q$seTE.common,Svals=q$seTE)
+  },
+  error={
+    list(param1Max=NA,param2Max=NA,Smax=NA,Svals=NA)
+  },
+  warning={},
+  finally={}
+  )
+  return(res)
+}
 
 getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
   # param1 is kvals
   # param2 is normally nullvals
   
   np1points<-101
-  np2points<-13
+  np2points<-21
   
   niterations<-1
   reInc<-(np1points-1)/2/3
@@ -85,7 +98,8 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
   
   if (dist=="fixed") {
     param1<-seq(-1,1,length.out=np1points)*atanh(0.95)
-    param0<-0
+    if (metaAnalysis$includeBias) param2<-seq(0,1,length.out=np2points)
+    else param2<-0
   }
   if (dist=="random") {
     param1<-seq(-1,1,length.out=np1points)*atanh(0.95)
@@ -118,9 +132,17 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
          }
   )
   
+  if (dist=="fixed" && metaAnalysis$includeBias)
+    fun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,x[1],0,x[2])+approx(prior_z,priorDens,x[1])$y)}
+  else
+    fun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,x[1],x[2],remove_nonsig)+approx(prior_z,priorDens,x[1])$y)}
+  
+  S<-matrix(0,length(param1),length(param2))
   for (re in 1:niterations) {
-    S<-getLogLikelihood(zs,ns,df1,dist,param1,param2,remove_nonsig)+approx(prior_z,priorDens,param1)$y
-    Smax<-max(S,na.rm=TRUE)
+    for (p1 in 1:length(param1))
+      for (p2 in 1:length(param2))
+        S[p1,p2]<-fun(c(param1[p1],param2[p2]))
+    Smax<-min(S,na.rm=TRUE)
     
     use<-which(S==Smax, arr.ind = TRUE)
     param2Max<-param2[use[1,2]]
@@ -136,14 +158,14 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
     }
   }
   
-  if (niterations==1) {      
-    fun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,x[1],x[2],remove_nonsig)+approx(prior_z,priorDens,x[1])$y)}
+  if (niterations==1) {
     result<-fmincon(c(param1Max,param2Max),fun,ub=c(ub1,ub2),lb=c(lb1,lb2))
     param1Max<-result$par[1]
     param2Max<-result$par[2]
     Smax<- -result$value
   }
-  Svals<-getLogLikelihood(zs,ns,df1,dist,param1Max,param2Max,remove_nonsig,returnVals=TRUE)
+  Svals<-fun(c(param1Max,param2Max))
+  getLogLikelihood(zs,ns,df1,dist,param1Max,param2Max,remove_nonsig,returnVals=TRUE)
          +approx(prior_z,priorDens,param1Max)$y
   if (metaAnalysis$analysisVar=="sd") param2Max<-sign(param2Max)*sqrt(abs(param2Max))
   return(list(param1Max=param1Max,param2Max=param2Max,Smax=Smax,Svals=Svals))
@@ -165,11 +187,17 @@ runMetaAnalysis<-function(metaAnalysis,studies,hypothesis,metaResult){
          "fixed"={
            # a fixed analysis finds a single effect size
            metaAnalysis$includeNulls<-FALSE
-           fixed<-getMaxLikelihood(zs,ns,df1,"fixed",metaAnalysis,hypothesis)
+           switch(metaAnalysis$method,
+                  "MLE"={fixed<-getMaxLikelihood(zs,ns,df1,"fixed",metaAnalysis,hypothesis)},
+                  "TF"={fixed<-getTrimFill(zs,ns,df1,"fixed",metaAnalysis,hypothesis)}
+                  )
          },
          "random"={
            metaAnalysis$includeNulls<-FALSE
-           random<-getMaxLikelihood(zs,ns,df1,"random",metaAnalysis,hypothesis)
+           switch(metaAnalysis$method,
+                  "MLE"={random<-getMaxLikelihood(zs,ns,df1,"random",metaAnalysis,hypothesis)},
+                  "TF"={random<-getTrimFill(zs,ns,df1,"random",metaAnalysis,hypothesis)}
+           )
          },
          "world"={
            # doing world effects analysis
@@ -191,11 +219,12 @@ runMetaAnalysis<-function(metaAnalysis,studies,hypothesis,metaResult){
 if (is.element(metaAnalysis$analysisType,c("fixed","random"))) {
   if (metaAnalysis$analysisType=="fixed") {
     fixed$param1Max<-c(metaResult$fixed$param1Max,tanh(fixed$param1Max))
+    fixed$param2Max<-c(metaResult$fixed$param2Max,fixed$param2Max)
     fixed$Smax<-c(metaResult$fixed$Smax,fixed$Smax)
-    if (metaAnalysis$includeNulls)
-      fixed$param2Max<-c(metaResult$fixed$param2Max,fixed$param2Max)
-    else 
-      fixed$param2Max<-NULL
+    # if (metaAnalysis$includeNulls)
+    #   fixed$param2Max<-c(metaResult$fixed$param2Max,fixed$param2Max)
+    # else 
+    #   fixed$param2Max<-NULL
     fixed$rpIV<-c(metaResult$fixed$rpIV,mean(studies$rpIV))
     fixed$rpSD<-c(metaResult$fixed$rpSD,0)
     bestParam1<-fixed$param1Max

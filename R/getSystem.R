@@ -179,7 +179,7 @@ getDesign<-function(name,design=braw.def$design) {
          "Psych"={
            design$sN<-52
            design$sNRand<-TRUE
-           design$sNRandSD<-1.56
+           design$sNRandSD<-33
          },
          "Within"={
            design$sIV1Use<-"Within"

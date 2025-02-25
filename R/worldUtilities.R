@@ -62,10 +62,10 @@ rSamplingDistr<-function(rvals,R,n,sigOnly=FALSE){
   zvals<-atanh(rvals)
   Z<-atanh(R)
   zdens<-zSamplingDistr(zvals,Z,n)
-  if (sigOnly) {
+  if (sigOnly>0) {
     zcrit<-atanh(p2r(braw.env$alphaSig,n,1))
     g<-sum(zdens)
-    zdens[abs(zvals)<zcrit]<-0.1
+    zdens[abs(zvals)<zcrit]<-zdens[abs(zvals)<zcrit]*(1-sigOnly)
     zdens<-zdens/sum(zdens)*g
   }
   zdens2rdens(zdens,rvals)
@@ -175,13 +175,13 @@ getNDist<-function(design,world=NULL,logScale=FALSE,sigOnly=FALSE,HQ=FALSE) {
     use<-which.min(abs(nvals-design$sN))
     ng[use]<-1
   }
-  if (sigOnly) {
-    nsig<-ng
+  if (sigOnly>0) {
+    nsig<-ng 
     pR<-getRList(world)
     pR$pRhogain<-pR$pRhogain/sum(pR$pRhogain)
     for (ni in 1:length(nvals)) {
       psig<-sum(rn2w(pR$pRho,nvals[ni])*pR$pRhogain)
-      nsig[ni]<-nsig[ni]*psig
+      nsig[ni]<-nsig[ni]*psig+(1-psig)*(1-sigOnly)
     }
   } else {
     nsig<-NA
@@ -391,9 +391,9 @@ fullRSamplingDist<-function(vals,world,design,doStat="rs",logScale=FALSE,sigOnly
         if (logScale) addition<-addition*vals
         addition<-addition*ndens[ni]
         d1<-d1+addition
-        if (sigOnly) {
+        if (sigOnly>0) {
           critR<-tanh(qnorm(1-braw.env$alphaSig/2,0,1/sqrt(nvals[ni]-3)))
-          addition[abs(rp)<critR]<-0
+          addition[abs(rp)<critR]<-addition[abs(rp)<critR]*(1-sigOnly)
           if (sigOnlyCompensate) addition<-addition/sum(addition)
         }
         d<-d+addition

@@ -1133,12 +1133,11 @@ runSimulation<-function(hypothesis,design,evidence,sigOnly=FALSE,onlyAnalysis=FA
   }
   
   # sig only
-  while (sigOnly && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
-    # if (!evidence$shortHand) {
+  # while ((sigOnly<=runif(1)) && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
+  while (TRUE) {
       res<-getSample(hypothesis,design,evidence)
-    # } else {
-    #   res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
-    # }
+      if (isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) break
+      if (runif(1)>sigOnly) break
   }
   # Replication?
   res<-replicateSample(hypothesis,design,evidence,sample,res)

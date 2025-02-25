@@ -55,7 +55,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
                     designC="#CC4422",replicationC="#FF7755",
                     descriptionC1="#FF5533",descriptionC2="#CCBB33",
                     descriptionTotal=darken(desat("#DD8844",0.1),0.7),descriptionsUnique=darken(desat("#DD8844",0.1),1.3),
-                    metaAnalysis="#FFEE00",
+                    metaAnalysis="#FFEE00",metaAnalysisTheory="#FFFFFF",
                     infer_sigC="#11CC00",infer_nsigC="#FF4400",infer_none="#AAAAAA",infer_miss=NULL,
                     infer_sigNonNull="#11CC00",infer_nsigNonNull="#AA6633",infer_isigNonNull="#881100",infer_nsdNonNull="#DDCCCC",
                     infer_sigNull="#88AA66",infer_nsigNull="#FF4400",infer_isigNull="#FF4400",infer_nsdNull="#CCDDCC",
@@ -68,8 +68,8 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
                       populationC="#FFFFFF",sampleC="#FFFFFF",descriptionC="#FFFFFF",
                       designC="#444444",replicationC="#777777",
                       descriptionC1="#888888",descriptionC2="#111111",
-                      descriptionTotal=darken(desat("#DD8844",0.1),0.7),descriptionsUnique=darken(desat("#DD8844",0.1),1.3),
-                      metaAnalysis="#FFCC00",
+                      descriptionTotal=darken(desat("#FFFFFF",0.1),0.7),descriptionsUnique=darken(desat("#DD8844",0.1),1.3),
+                      metaAnalysis="#FFFFFF",metaAnalysisTheory="#FFFFFF",
                       infer_sigC="#FFFFFF",infer_nsigC="#111111",infer_none="#AAAAAA",
                       infer_sigNonNull="#FFFFFF",infer_isigNonNull="#555555",infer_nsigNonNull="#555555",infer_nsdNonNull="#333333",
                       infer_sigNull="#BBBBBB",infer_isigNull="#111111",infer_nsigNull="#FFFFFF",infer_nsdNull="#DDDDDD",
@@ -167,7 +167,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
           braw.env$allScatter<-TRUE
           braw.env$showMedians<-FALSE
           braw.env$minN<-10
-          braw.env$maxN<-500
+          braw.env$maxN<-2000
           braw.env$maxRandN<-5 # times mean sample size
           braw.env$reportGroupMeans<-TRUE
           braw.env$doLegendPoints<-FALSE

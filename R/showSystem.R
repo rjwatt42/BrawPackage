@@ -152,7 +152,10 @@ showWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),autoShow=
   braw.env$plotArea<-plotArea
 
   range<-braw.env$r_range
-  if (braw.env$RZ=="z"){range<-tanh(braw.env$z_range)}
+  switch(braw.env$RZ,
+      "r"={},
+      "z"={range<-tanh(braw.env$z_range)}
+  )
 
   switch(braw.env$RZ,
          "r"={ xticks<-makeTicks(seq(-1,1,0.5));xlabel<-makeLabel(braw.env$rpLabel)},
@@ -168,10 +171,13 @@ showWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),autoShow=
   # }
 
   rdens<-rPopulationDist(rx,world)
-  if (braw.env$RZ=="z") {
+  switch(braw.env$RZ,
+         "r"={},
+         "z"={
     rdens<-rdens2zdens(rdens,rx)
     rx<-atanh(rx)
-  }
+         }
+  )
   if (is.element(world$populationPDF,c("Single","Double"))) {
     rdens<-rdens/sum(rdens)*(1-world$populationNullp)
     rdens[rx==0]<-rdens[rx==0]+world$populationNullp
@@ -408,21 +414,27 @@ showWorldSampling<-function(hypothesis=braw.def$hypothesis,design=braw.def$desig
   # if (world$worldAbs) np<-braw.env$worldNPoints*2+1
   
   vals<-seq(-1,1,length=np)*braw.env$r_range
-  if (braw.env$RZ=="z") {
+  switch(braw.env$RZ,
+         "r"={},
+         "z"={
     vals<-tanh(seq(-1,1,length=np*2)*braw.env$z_range*2)
-  }
+         }
+  )
   
   design1<-design
   design$Replication$On<-FALSE
   
   dens<-fullRSamplingDist(vals,world,design,sigOnly=sigOnly) 
-  if (braw.env$RZ=="z") {
-    dens<-rdens2zdens(dens,vals)
-    vals<-atanh(vals)
-    use<-abs(vals)<=braw.env$z_range
-    dens<-dens[use]
-    vals<-vals[use]
-  }
+  switch(braw.env$RZ,
+         "r"={},
+         "z"={
+           dens<-rdens2zdens(dens,vals)
+           vals<-atanh(vals)
+           use<-abs(vals)<=braw.env$z_range
+           dens<-dens[use]
+           vals<-vals[use]
+         }
+  )
   dens<-dens/sum(dens)
   if (design1$Replication$On) {
     dens1<-fullRSamplingDist(vals,world,design1,sigOnly=sigOnly) 

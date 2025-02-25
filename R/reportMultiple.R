@@ -132,15 +132,11 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
       
       outputText1<-c()
       for (par in pars) {
-        if (braw.env$RZ=="z") {
-          switch(par,
-                 "rs"={par="zs"},
-                 "rp"={par="zp"},
-                 "ro"={par="zo"},
-                 "re"={par="ze"},
-                 {par=par}
-          )
-        }
+        if (substr(par,1,1)=="r")
+          switch(braw.env$RZ,
+                 "r"={},
+                 "z"={par<-gsub("^r","z",par)}
+                 )
         par<-gsub("^([rz]{1})([spoe]{1})$","\\1\\[\\2\\]",par)
         if (par=="llknull") par<-"llr[+]"
         if (par=="AIC") par<-"diff(AIC)"
@@ -326,23 +322,11 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
               ot6<-c(ot6,"")
             }
             switch (pars[j],
-                    "rs"={
-                      a<-r
-                      if (braw.env$RZ=="z") a<-atanh(a)
-                    },
-                    "p"={a<-p},
-                    "rp"={
-                      a<-result$rpIV
-                      if (braw.env$RZ=="z") a<-atanh(a)
-                    },
-                    "ro"={
-                      a<-result$roIV
-                      if (braw.env$RZ=="z") a<-atanh(a)
-                    },
-                    "re"={
-                      a<-result$rIV-result$rpIV
-                      if (braw.env$RZ=="z") a<-atanh(a)
-                    },
+                    "rs"={ a<-r },
+                    "p"={ a<-p},
+                    "rp"={ a<-result$rpIV },
+                    "ro"={ a<-result$roIV },
+                    "re"={ a<-result$rIV-result$rpIV},
                     "po"={a<-result$poIV},
                     "llknull"={a<-(-0.5*(result$aic-result$aicNull))},
                     "AIC"={a<-result$aic-result$aicNull},
@@ -368,6 +352,11 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
                     "rd.sk"={a<-result$rd.sk},
                     "rd.kt"={a<-result$rd.kt}
             )
+            if (substr(pars[j],1,1)=="r") 
+              swicth(braw.end$RZ,
+                     "r"={},
+                     "z"={a<-atan(a)}
+                     )
             ot1<-c(ot1,
                    paste0("!j",brawFormat(mean(a,na.rm=TRUE),digits=braw.env$report_precision))
             )

@@ -675,7 +675,7 @@ axisPoint<-function(data,shape=21,colour="black",fill="white",alpha=1,size=3) {
 }
 drawPoint<-function(data,shape=21,colour="black",fill="white",alpha=1,size=3) {
   size<-0.75*size*(braw.env$plotArea[4])^0.5
-  if (alpha<1) colour=fill
+  # if (alpha<1) colour=fill
   if (!braw.env$graphHTML) {
     size<-size*1.5
     if (is.null(data$fill)) {
@@ -831,15 +831,27 @@ dataLegend<-function(data,title="title",fontsize=0.6,shape=21) {
   return(g)
 }
 
-dataContour<-function(data,colour="black",fill=NA,breaks=c(0.1,0.3,0.5,0.7,0.9),linewidth=0.25,linetype="solid") {
+dataContour<-function(data,colour="black",fill=NA,breaks=seq(0.1,0.9,0.2),linewidth=0.25,linetype="solid") {
   data<-reRangeXY(data)
-  c<-contourLines(data$y,data$x,data$z,levels=breaks)
+  c<-contourLines(data$y,data$x,data$z/max(data$z),levels=breaks)
+  ny<-length(data$y)
+  nx<-length(data$x)
+  c1<-contourLines(c(data$y[1]-diff(data$y[1:2]),data$y,data$y[ny]+diff(data$y[1:2])),
+                   c(data$x[1]-diff(data$x[1:2]),data$x,data$x[nx]+diff(data$x[1:2])),
+                   cbind(0,rbind(0,data$z,0),0),levels=breaks)
   ct<-list()
-  for (i in 1:length(c)) {
-    cdata<-data.frame(x=c[[i]]$y,y=c[[i]]$x)
-    if (is.na(fill))
+  if (is.na(fill)) {
+    for (i in 1:length(c)) {
+      if (length(c[[i]]$x)>4) {
+      cdata<-data.frame(x=c[[i]]$y,y=c[[i]]$x)
       ct<-c(ct,list(axisPath(cdata,colour=colour,linewidth=linewidth,linetype=linetype)))
-    else ct<-c(ct,list(axisPolygon(cdata,colour=colour,fill=fill,alpha=1/length(breaks),linewidth=linewidth)))
+      }
+    }
+  } else {
+    for (i in 1:length(c1)) {
+      cdata<-data.frame(x=c1[[i]]$y,y=c1[[i]]$x)
+      ct<-c(ct,list(axisPolygon(cdata,colour=colour,fill=fill,alpha=i/length(breaks),linewidth=linewidth)))
+    }
   }
   return(ct)
   # x1<-as.vector(matrix(rep(data$x,101),length(data$y),byrow=TRUE))

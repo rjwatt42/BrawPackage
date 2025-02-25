@@ -349,6 +349,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
             vals<-seq(-maxCov,maxCov,length.out=npoints)
           },
           "rIVIV2DV"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "sigOnly"={vals<-seq(0,1,length.out=npoints)},
           
           "PDF"={vals<-c("Single","Double","Uniform","Gauss","Exp",">","<")},
           "Lambda"={vals<-seq(minVal,maxVal,length.out=npoints)},
@@ -382,7 +383,10 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
           "NoStudies"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "MetaType"={vals<-c("FF","FT","TF","TT")}
   )
-  if (substr(explore$exploreType,1,1)=="r" && braw.env$RZ=="z") vals<-tanh(vals)
+  if (substr(explore$exploreType,1,1)=="r")
+    switch(braw.env$RZ,
+           "z"={vals<-tanh(vals)},
+           {})
   if (xlog) vals<-10^vals
   if (is.element(explore$exploreType,c("IVlevels","DVlevels","n","NoStudies"))) vals<-round(vals)
   

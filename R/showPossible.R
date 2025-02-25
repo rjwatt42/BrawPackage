@@ -80,13 +80,16 @@ describePossibleSamples<-function(possibleResult) {
   sr_effectR<-matrix(possibleResult$Sims$r,nrow=1)
   sSimDens<-c()
   if (!isempty(sr_effectR)) {
-    if (braw.env$RZ=="z") {
-      use_effects<-atanh(sr_effectR)
-      hist_range<-braw.env$z_range
-    } else {
-      use_effects<-sr_effectR
-      hist_range<-braw.env$r_range
-    }
+    switch(braw.env$RZ,
+           "r"={
+             use_effects<-sr_effectR
+             hist_range<-braw.env$r_range
+           },
+           "z"={
+             use_effects<-atanh(sr_effectR)
+             hist_range<-braw.env$z_range
+           }
+    )
     binWidth<-2*IQR(use_effects)/length(use_effects)^(1/3)
     nbins=round(2/binWidth)
     sSimBins<-seq(-1,1,length.out=nbins+1)*hist_range
@@ -119,18 +122,21 @@ describePossiblePopulations<-function(possibleResult,possible) {
     # do this in z - for symmetry
     keep<-abs(atanh(pr_effectR)-sRho[1])<possible$simSlice
     pr_effectRP_slice<-pr_effectRP[keep]
-
-    if (braw.env$RZ=="z") {
-      use_effectRP_slice<-atanh(pr_effectRP_slice)
-      use_effectR<-atanh(pr_effectR)
-      use_effectRP<-atanh(pr_effectRP)
-      hist_range<-braw.env$z_range
-    } else {
+    
+    switch(braw.env$RZ,
+           "r"={
       use_effectRP_slice<-pr_effectRP_slice
       use_effectR<-pr_effectR
       use_effectRP<-pr_effectRP
       hist_range<-braw.env$r_range
-    }
+           },
+           "z"={
+      use_effectRP_slice<-atanh(pr_effectRP_slice)
+      use_effectR<-atanh(pr_effectR)
+      use_effectRP<-atanh(pr_effectRP)
+      hist_range<-braw.env$z_range
+           }
+    )
     
     if (possible$prior$populationPDF=="Single" || possible$prior$populationPDF=="Double") {
       binWidth<-0.05
@@ -330,13 +336,16 @@ showPossible <- function(possibleResult=NULL,
   
   offRange<-0
   if (axisScale>1 && !is.null(possible$targetSample)) offRange<-possible$targetSample  
-  if (braw.env$RZ=="r") {
+  switch(braw.env$RZ,
+         "r"={
     xlim<-c(-1,1)/axisScale+offRange # population
     ylim<-c(-1,1)/axisScale+offRange
-  } else {
+         },
+         "z"={
     xlim<-c(min(rp),max(rp))/axisScale+offRange # population
     ylim<-c(min(rs),max(rs))/axisScale+offRange
-  }
+         }
+  )
   zlim<-c(0,1)
   
   if (length(sourceRVals)<8) draw_lower_limit=0.000001
@@ -549,14 +558,17 @@ showPossible <- function(possibleResult=NULL,
     ticks.y<-rotate3D(data.frame(x=xlim[2]+xtick_length*tick_grow,y=long_ticks,z=zlim[1]),mapping)
     g<-addG(g,dataText(data.frame(x=ticks.y$x,y=ticks.y$y),long_ticks,hjust=0.5,vjust=0.5,size=0.7))
     
-    if (braw.env$RZ=="r") {
-      label.x<-"r[p]"
-      label.y<-"r[s]"
-    } else {
-      label.x<-"z[p]"
-      label.y<-"z[s]"
-    }
-    
+    switch(braw.env$RZ,
+           "r"={
+             label.x<-"r[p]"
+             label.y<-"r[s]"
+           },
+           "z"={
+             label.x<-"z[p]"
+             label.y<-"z[s]"
+           }
+    )
+
     pos.x<-rotate3D(data.frame(x=sum(xlim)/2,y=ylim[1]-ytick_length*tick_grow*2,z=zlim[1]-0.1),mapping)
     g<-addG(g,dataText(pos.x,label.x,hjust=0.5,vjust=0.5,fontface="bold"))
 
@@ -1180,15 +1192,19 @@ showPossible <- function(possibleResult=NULL,
                     "Populations"={
                       rw<-rpw
                       rw_dens<-rpw_dens
-                      xlabel<-"r[p]"
-                      if (braw.env$RZ=="z") xlabel<-"z[p]"
+                      switch(braw.env$RZ,
+                             "r"={xlabel<-"r[p]"},
+                             "z"={xlabel<-"z[p]"}
+                      )
                       col<-colP
                     },
                     "Samples"={
                       rw<-rsw
                       rw_dens<-rsw_dens
-                      xlabel<-"r[s]"
-                      if (braw.env$RZ=="z") xlabel<-"z[s]"
+                      switch(braw.env$RZ,
+                             "r"={xlabel<-"r[s]"},
+                             "z"={xlabel<-"z[s]"}
+                             )
                       col<-colS
                     }
             )

@@ -105,7 +105,11 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
       if (!tableHeader) {
         outputText<-c(outputText,"!T"," ",exploreTypeShow,rep(" ",nc-3))
         headerText<-c(paste0("!H"),"!D ")
-        if (explore$exploreType=="rIV" && braw.env$RZ=="z")  vals<-atanh(vals)
+        if (explore$exploreType=="rIV")
+          switch(braw.env$RZ,
+                 "r"={},
+                 "z"={vals<-atanh(vals)}
+          )
         for (i in 1:length(useVals)) {
           if (is.numeric(vals[useVals[i]]))
             headerText<-c(headerText,brawFormat(vals[useVals[i]],digits=precision))
@@ -161,8 +165,10 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
         yiqre<-c()
         switch (showType,
                 "rs"={
-                  showVals<-rVals
-                  if (braw.env$RZ=="z") showVals<-atanh(showVals)
+                  switch(braw.env$RZ,
+                         "r"={showVals<-rVals},
+                         "z"={showVals<-atanh(rVals)}
+                         )
                 },
                 "p"={
                   showVals<-pVals

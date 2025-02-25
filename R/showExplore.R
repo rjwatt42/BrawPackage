@@ -112,10 +112,12 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   on.exit(setBrawEnv("alphaSig",oldAlpha),add=TRUE)
 
   vals<-exploreResult$vals
-  if (explore$exploreType=="rIV" && braw.env$RZ=="z") {
-    vals<-atanh(vals)
-  }
-  
+  if (explore$exploreType=="rIV")
+    switch(braw.env$RZ,
+           "r"={},
+           "z"={vals<-atanh(vals)}
+    )
+
   if (showType[1]=="SEM") whichEffect<-"Main 1"
   if (whichEffect=="All" && !evidence$rInteractionOn) whichEffect<-"Mains"
   if ((whichEffect=="All" || whichEffect=="Mains") && is.null(hypothesis$IV2)) whichEffect<-"Main 1"
@@ -469,15 +471,12 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       switch (showType[si],
               "rs"={
                 showVals<-rVals
-                if (braw.env$RZ=="z") {showVals<-atanh(showVals)}
               },
               "rp"={
                 showVals<-rpVals
-                if (braw.env$RZ=="z") {showVals<-atanh(showVals)}
               },
               "re"={
                 showVals<-rVals-rpVals
-                if (braw.env$RZ=="z") {showVals<-atanh(showVals)}
               },
               "p"={
                 showVals<-pVals
@@ -705,6 +704,12 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                 showVals<-result$rs$kt
               }
       )
+      if (substr(showType[si],1,1)=="r" && substr(showType[si],1,3)!="rd") {
+        switch(braw.env$RZ,
+               "r"={},
+               "z"={showVals<-atanh(showVals)}
+               )
+      }
       if (!is.element(showType[si],c("NHST","SEM"))) {
         # draw the basic line and point data
         if (is.element(showType[si],c("p(sig)","Hits","Misses"))) {
@@ -974,15 +979,12 @@ showExplore2D<-function(exploreResult=braw.res$explore,showType=c("rs","p"),show
   switch (showType[si],
           "rs"={
             showVals<-rVals
-            if (braw.env$RZ=="z") {showVals<-atanh(showVals)}
           },
           "rp"={
             showVals<-rpVals
-            if (braw.env$RZ=="z") {showVals<-atanh(showVals)}
           },
           "re"={
             showVals<-rVals-rpVals
-            if (braw.env$RZ=="z") {showVals<-atanh(showVals)}
           },
           "p"={
             showVals<-pVals
@@ -1015,6 +1017,13 @@ showExplore2D<-function(exploreResult=braw.res$explore,showType=c("rs","p"),show
             }
           }
   )
+    if (substr(showType[si],1,1)=="r" && substr(showType[si],1,3)!="rd") {
+      switch(braw.env$RZ,
+             "r"={},
+             "z"={showVals<-atanh(showVals)}
+      )
+    }
+    
     switch (si,
             xVals<-apply(showVals,2,median),
             yVals<-apply(showVals,2,median)
