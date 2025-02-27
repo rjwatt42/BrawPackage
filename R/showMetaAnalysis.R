@@ -11,18 +11,22 @@ worldLabel<-function(metaResult,whichMeta=NULL) {
     Dist<-tolower(whichMeta)
     p1<-metaResult[[Dist]]$param1Max
     p2<-metaResult[[Dist]]$param2Max
-
+    p3<-metaResult[[Dist]]$param3Max
+    
     if (is.element(Dist,c("random","fixed"))) label1<-"r[est]" else label1<-Dist
     lb<-paste0(label1,"=",brawFormat(mean(p1,na.rm=TRUE),digits=3))
     # if (length(p1)>1)
     #   lb<-paste0(lb,"\u00B1",brawFormat(std(p1),digits=2))
     if (!is.null(p2)) {
       label2<-"p(null)"
-      if (is.element(Dist,c("random"))) label2<-"sd(r)[est]"
-      if (is.element(Dist,c("fixed"))) label2<-"bias[est]"
+      if (is.element(Dist,c("random","fixed"))) label2<-"sd(r)[est]"
       lb<-paste0(lb,"\n",label2,"=",brawFormat(mean(p2,na.rm=TRUE),digits=3))
       # if (length(p2)>1)
       #   lb<-paste0(lb,"\u00B1",brawFormat(std(p2),digits=2))
+    }
+    if (!is.null(p3)) {
+      label3<-"bias[est]"
+      lb<-paste0(lb,"\n",label3,"=",brawFormat(mean(p3,na.rm=TRUE),digits=3))
     }
     return(lb)
 }
@@ -124,7 +128,7 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showTheory=FALSE) {
   
   lb<-worldLabel(metaResult,metaAnalysis$analysisType)
   names=strsplit(lb,"\n")[[1]]
-  if (length(names)==1) colours=braw.env$plotColours$metaAnalysis else colours=c(braw.env$plotColours$metaAnalysis,NA)
+  if (length(names)==1) colours=braw.env$plotColours$metaAnalysis else colours=c(braw.env$plotColours$metaAnalysis,rep(NA,length(names)-1))
   g<-addG(g,dataLegend(data.frame(names=names,colours=colours),title="",shape=22))
   # g<-addG(g,plotTitle(lb,"left",size=1))
   
@@ -268,7 +272,7 @@ drawMeta<-function(metaResult=doMetaMultiple(),whichMeta="Single",showType="n-k"
             },
             "bias-k"={
               x<-metaResult$fixed$param1Max
-              y<-metaResult$fixed$param2Max
+              y<-metaResult$fixed$param3Max
               y1<-0
               ylim<-c(min(y),max(y))+c(-1,1)*(max(y)-min(y))*0.2
               ylim<-c(0,1)
@@ -357,7 +361,7 @@ drawMeta<-function(metaResult=doMetaMultiple(),whichMeta="Single",showType="n-k"
         lb<-worldLabel(metaResult,whichMeta)
         names<-strsplit(lb,"\n")[[1]]
 
-        colours<-c(colM,NA)
+        colours<-c(colM,rep(NA,length(names)-1))
         # if (whichMeta=="fixed") {names<-names[1]; colours<-colM;}
         
         g<-addG(g,dataLegend(data.frame(names=names,colours=colours),title="",

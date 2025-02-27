@@ -39,11 +39,12 @@ doMetaAnalysis<-function(metaSingle=braw.res$metaSingle,metaAnalysis=braw.def$me
 }
 
 doMetaMultiple<-function(nsims=100,metaMultiple=braw.res$metaMultiple,metaAnalysis=braw.def$metaAnalysis,
-                         keepStudies=FALSE,
+                         shortHand=TRUE,
                          hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence
 ) {
   if (is.null(metaAnalysis)) metaAnalysis<-makeMetaAnalysis()
   evidence$sigOnly<-metaAnalysis$sourceBias
+  evidence$shortHand<-shortHand
   
   for (i in 1:nsims) {
     localHypothesis<-hypothesis
@@ -63,11 +64,19 @@ doMetaMultiple<-function(nsims=100,metaMultiple=braw.res$metaMultiple,metaAnalys
 
 getTrimFill<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
   res<-tryCatch({
-    q<-trimfill(zs,1/sqrt(ns-3),ma.common=(dist=="fixed"),common=(dist=="fixed"),random=(dist=="random"))
-    list(param1Max=q$TE.common,param2Max=q$tau,Smax=q$seTE.common,Svals=q$seTE)
+    switch(dist,
+           "fixed"={
+             q<-trimfill(zs,1/sqrt(ns-3),ma.common=TRUE,common=TRUE,random=FALSE)
+             list(param1Max=q$TE.common,param2Max=0,param3Max=(q$k-length(zs))/length(zs),Smax=q$seTE.common,Svals=q$seTE)
+           },
+           "random"={
+             q<-trimfill(zs,1/sqrt(ns-3),ma.common=FALSE,common=FALSE,random=TRUE)
+             list(param1Max=q$TE.random,param2Max=q$tau,param3Max=(q$k-length(zs))/length(zs),Smax=q$seTE.random,Svals=q$seTE)
+           }
+           )
   },
   error={
-    list(param1Max=NA,param2Max=NA,Smax=NA,Svals=NA)
+    list(param1Max=NA,param2Max=NA,param3Max=NA,Smax=NA,Svals=NA)
   },
   warning={},
   finally={}
@@ -81,12 +90,14 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
   
   np1points<-21
   np2points<-21
+  np3points<-21
   
   niterations<-1
   # reInc1<-(np1points-1)/2/3
   # reInc2<-(np2points-1)/2/3
   reInc1<-2
   reInc2<-2
+  reInc3<-2
   
   if (metaAnalysis$includeNulls) {
     param2<-seq(0,1,length.out=np2points)
@@ -100,15 +111,16 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
   }
   
   if (dist=="fixed") {
-    param1<-seq(-1,1,length.out=np1points)#*atanh(0.95)
-    if (metaAnalysis$analyseBias) param2<-seq(0,1,length.out=np2points)
-    else param2<-0
+    param1<-seq(-1,1,length.out=np1points)
+    param2<-0
   }
   if (dist=="random") {
-    param1<-seq(-1,1,length.out=np1points)*atanh(0.95)
+    param1<-seq(-1,1,length.out=np1points)
     if (metaAnalysis$analysisVar=="sd") param2<-seq(0,0.5,length.out=np2points)^2
     else param2<-seq(-0.1,1,length.out=np2points)*(0.5^2)
   }
+  if (metaAnalysis$analyseBias) param3<-seq(0,1,length.out=np2points)
+  else param3<-0
   
   analyseBias<-metaAnalysis$analyseBias
   prior<-metaAnalysis$analysisPrior
@@ -135,41 +147,48 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
          }
   )
   
-  if (dist=="fixed" && metaAnalysis$analyseBias)
-    fun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,x[1],0,x[2])+approx(prior_z,priorDens,x[1])$y)}
-  else
-    fun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,x[1],x[2],analyseBias)+approx(prior_z,priorDens,x[1])$y)}
-  
-  S<-matrix(0,length(param1),length(param2))
+  llfun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,x[1],x[2],x[3])+approx(prior_z,priorDens,x[1])$y)}
+  if(length(param3)==1)
+    llfun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,x[1],x[2],0)+approx(prior_z,priorDens,x[1])$y)}
+  if(length(param2)==1)
+    llfun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,x[1],0,x[3])+approx(prior_z,priorDens,x[1])$y)}
+  if(length(param2)==1 && length(param3)==1)
+    llfun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,x[1],0,0)+approx(prior_z,priorDens,x[1])$y)}
+
+  S<-array(0,c(length(param1),length(param2),length(param3)))
   for (re in 1:niterations) {
     for (p1 in 1:length(param1))
       for (p2 in 1:length(param2))
-        S[p1,p2]<-fun(c(param1[p1],param2[p2]))
+        for (p3 in 1:length(param3))
+          S[p1,p2,p3]<-llfun(c(param1[p1],param2[p2],param3[p3]))
+
     Smax<-min(S,na.rm=TRUE)
-    
     use<-which(S==Smax, arr.ind = TRUE)
-    param2Max<-param2[use[1,2]]
-    lb2<-param2[max(1,use[1,2]-reInc2)]
-    ub2<-param2[min(length(param2),use[1,2]+reInc2)]
     param1Max<-param1[use[1,1]]
     lb1<-param1[max(1,use[1,1]-reInc1)]
     ub1<-param1[min(length(param1),use[1,1]+reInc1)]
+    param2Max<-param2[use[1,2]]
+    lb2<-param2[max(1,use[1,2]-reInc2)]
+    ub2<-param2[min(length(param2),use[1,2]+reInc2)]
+    param3Max<-param3[use[1,3]]
+    lb3<-param3[max(1,use[1,3]-reInc3)]
+    ub3<-param3[min(length(param3),use[1,3]+reInc3)]
     
     param1<-seq(lb1,ub1,length.out=np1points)
-    # if (metaAnalysis$includeNulls) {
-      param2<-seq(lb2,ub2,length.out=np2points)
-    # }
+    if (length(param2)>1) param2<-seq(lb2,ub2,length.out=np2points)
+    if (length(param3)>1) param3<-seq(lb3,ub3,length.out=np3points)
   }
-  
+
   if (niterations==1) {
-    result<-fmincon(c(param1Max,param2Max),fun,ub=c(ub1,ub2),lb=c(lb1,lb2))
+    result<-fmincon(c(param1Max,param2Max,param3Max),llfun,ub=c(ub1,ub2,ub3),lb=c(lb1,lb2,lb3))
     param1Max<-result$par[1]
     param2Max<-result$par[2]
+    param3Max<-result$par[3]
     Smax<- -result$value
   }
-  Svals<-fun(c(param1Max,param2Max))
+  Svals<-llfun(c(param1Max,param2Max,param3Max))
   if (dist=="random" && metaAnalysis$analysisVar=="sd") param2Max<-sign(param2Max)*sqrt(abs(param2Max))
-  return(list(param1Max=param1Max,param2Max=param2Max,Smax=Smax,Svals=Svals))
+  return(list(param1Max=param1Max,param2Max=param2Max,param3Max=param3Max,Smax=Smax,Svals=Svals))
 }
 
 
@@ -221,6 +240,7 @@ if (is.element(metaAnalysis$analysisType,c("fixed","random"))) {
   if (metaAnalysis$analysisType=="fixed") {
     fixed$param1Max<-c(metaResult$fixed$param1Max,tanh(fixed$param1Max))
     fixed$param2Max<-c(metaResult$fixed$param2Max,fixed$param2Max)
+    fixed$param3Max<-c(metaResult$fixed$param3Max,fixed$param3Max)
     fixed$Smax<-c(metaResult$fixed$Smax,fixed$Smax)
     # if (metaAnalysis$includeNulls)
     #   fixed$param2Max<-c(metaResult$fixed$param2Max,fixed$param2Max)
@@ -229,7 +249,8 @@ if (is.element(metaAnalysis$analysisType,c("fixed","random"))) {
     fixed$rpIV<-c(metaResult$fixed$rpIV,mean(studies$rpIV))
     fixed$rpSD<-c(metaResult$fixed$rpSD,0)
     bestParam1<-fixed$param1Max
-    bestParam2<-fixed$param2Max
+    bestParam2<-0
+    bestParam3<-fixed$param3Max
     bestDist<-"fixed"
     bestS<-fixed$Smax
     bestVals<-fixed$Svals
@@ -244,6 +265,7 @@ if (is.element(metaAnalysis$analysisType,c("fixed","random"))) {
     random$rpSDex<-c(metaResult$random$rpSDex,rpSDex)
     bestParam1<-random$param1Max
     bestParam2<-random$param2Max
+    bestParam3<-random$param3Max
     bestDist<-"random"
     bestS<-random$Smax
     bestVals<-random$Svals
@@ -256,18 +278,21 @@ if (is.element(metaAnalysis$analysisType,c("fixed","random"))) {
          {bestDist<-"Single"
          bestParam1<-single$param1Max
          bestParam2<-single$param2Max
+         bestParam3<-single$param3Max
          bestS<-single$Smax
          bestVals<-single$Svals
          },
          {bestDist<-"Gauss"
          bestParam1<-gauss$param1Max
          bestParam2<-gauss$param2Max
+         bestParam3<-gauss$param3Max
          bestS<-gauss$Smax
          bestVals<-gauss$Svals
          },
          {bestDist<-"Exp"
          bestParam1<-exp$param1Max
          bestParam2<-exp$param2Max
+         bestParam3<-exp$param3Max
          bestS<-exp$Smax
          bestVals<-exp$Svals
          }
@@ -277,17 +302,21 @@ if (is.element(metaAnalysis$analysisType,c("fixed","random"))) {
     bestDist<-c(metaResult$bestDist,bestDist)
     bestParam1<-c(metaResult$bestParam1,bestParam1)
     bestParam2<-c(metaResult$bestParam2,bestParam2)
+    bestParam3<-c(metaResult$bestParam3,bestParam3)
     bestS<-c(metaResult$bestS,bestS)
     count<-length(bestS)
     single$param1Max<-c(metaResult$single$param1Max,single$param1Max)
-    single$Smax<-c(metaResult$single$Smax,single$Smax)
     single$param2Max<-c(metaResult$single$param2Max,single$param2Max)
+    single$param3Max<-c(metaResult$single$param3Max,single$param3Max)
+    single$Smax<-c(metaResult$single$Smax,single$Smax)
     gauss$param1Max<-c(metaResult$gauss$param1Max,gauss$param1Max)
-    gauss$Smax<-c(metaResult$gauss$Smax,gauss$Smax)
     gauss$param2Max<-c(metaResult$gauss$param2Max,gauss$param2Max)
+    gauss$param3Max<-c(metaResult$gauss$param3Max,gauss$param3Max)
+    gauss$Smax<-c(metaResult$gauss$Smax,gauss$Smax)
     exp$param1Max<-c(metaResult$exp$param1Max,exp$param1Max)
-    exp$Smax<-c(metaResult$exp$Smax,exp$Smax)
     exp$param2Max<-c(metaResult$exp$param2Max,exp$param2Max)
+    exp$param3Max<-c(metaResult$exp$param3Max,exp$param3Max)
+    exp$Smax<-c(metaResult$exp$Smax,exp$Smax)
   }
 }
   
@@ -299,6 +328,7 @@ if (is.element(metaAnalysis$analysisType,c("fixed","random"))) {
                    bestDist=bestDist,
                    bestParam1=bestParam1,
                    bestParam2=bestParam2,
+                   bestParam3=bestParam3,
                    bestS=bestS,
                    bestVals=bestVals,
                    count=count,
