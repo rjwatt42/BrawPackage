@@ -5,7 +5,7 @@ SingleSamplingPDF<-function(z,lambda,sigma,shape=0,remove_nonsig=FALSE,df1=1) {
   sigmad[sigmad<0]<-0
   sigmad<-sqrt(sigmad)
   d1<-exp(-0.5*((z-lambda)^2/sigmad^2))/sqrt(2*pi*sigmad^2)
-  if (remove_nonsig) {
+  if (remove_nonsig>0) {
     zcrit<-atanh(p2r(braw.env$alphaSig,1/sigma^2+3,df1))
     d1[abs(z)<zcrit]<-d1[abs(z)<zcrit]*(1-remove_nonsig)
     d0<-1-(pnorm(zcrit,lambda,sigmad)-pnorm(-zcrit,lambda,sigmad))*remove_nonsig
@@ -176,8 +176,8 @@ getLogLikelihood<-function(z,n,df1,distribution,param1,param2=0,remove_nonsig=FA
         mainPDF<-SingleSamplingPDF(z,lambda[i],sigma,shape=0,remove_nonsig=remove_nonsig,df1=df1)
         # now normalize for the non-sig
         likelihoods<-mainPDF$pdf/mainPDF$sig_pdf
-        likelihoods[(likelihoods<1e-300)]<- 1e-300
-        res[i,j]<-sum(log(likelihoods),na.rm=TRUE)
+        # likelihoods[(likelihoods<1e-300)]<- 1e-300
+        res[i,j]<-sum(log(likelihoods[likelihoods>=1e-300]),na.rm=TRUE)+(-1000*sum(likelihoods<1e-300))
         if (res[i,j]==max(res,na.rm=TRUE)) lksHold<-likelihoods
     }
     if (returnVals) return(lksHold)

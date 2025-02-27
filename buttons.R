@@ -192,7 +192,7 @@ displaySingle<-function() {
 }
 doSingle<-function(panel) {
   prepare()
-  singleResult<<-doResult(autoShow=FALSE)
+  singleResult<<-doSingle(autoShow=FALSE)
   displaySingle()
 }
 

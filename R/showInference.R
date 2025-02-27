@@ -63,7 +63,7 @@ getNulls<-function(analysis,useSig=FALSE,useNSig=FALSE) {
 showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D",orientation="vert",
                         whichEffect="All",effectType="all",showTheory=braw.env$showTheory
 ) {
-  if (is.null(analysis)) analysis<-doResult(autoShow=FALSE)
+  if (is.null(analysis)) analysis<-doSingle(autoShow=FALSE)
   
   if (showType[1]=="2D") {
     showType<-"Basic"

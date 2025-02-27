@@ -30,7 +30,7 @@ plotSample<-function(IV,DV,effect,ivplot,dvplot,g=NULL) {
 #' showSample(sample=doSample())
 #' @export
 showSample<-function(sample=braw.res$result,marginals=FALSE){
-  if (is.null(sample)) sample<-doResult(autoShow=FALSE)
+  if (is.null(sample)) sample<-doSingle(autoShow=FALSE)
   
   if (marginals) {
     g<-showMarginals(sample)

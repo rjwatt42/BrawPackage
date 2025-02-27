@@ -82,9 +82,9 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showTheory=FALSE) {
   
   g<-drawWorld(hypothesis,design,metaResult,g,
                braw.env$plotColours$metaAnalysisTheory,
-               sigOnly=metaAnalysis$includeBias,
+               sigOnly=metaAnalysis$analyseBias,
                showTheory=showTheory,SvalExp=SvalExp,showLines=showLines)
-  if (showSig && metaAnalysis$includeBias) {
+  if (showSig && metaAnalysis$analyseBias) {
     nv<-10^seq(log10(braw.env$minN),log10(braw.env$maxN),length.out=101)
     rv<-p2r(0.05,nv,1)
     switch(braw.env$RZ,
@@ -111,7 +111,7 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showTheory=FALSE) {
     if (showSval) {
       b<-getLogLikelihood(atanh(metaResult$result$rIV),metaResult$result$nval,rep(1,length(metaResult$result$nval)),
                           distribution=metaResult$bestDist,param1=metaResult$bestParam1,param2=metaResult$bestParam2,
-                          remove_nonsig=metaResult$metaAnalysis$includeBias,returnVals = TRUE)
+                          remove_nonsig=metaResult$metaAnalysis$analyseBias,returnVals = TRUE)
       fill1<-hsv(0.9*round((b-min(b))/(max(b)-min(b))*4)/4)
       fill1<-hsv(0.9*round((b/max(b))^SvalExp*10)/10)
     }
@@ -147,7 +147,7 @@ showMetaMultiple<-function(metaResult=braw.res$metaMultiple,showType="n-k") {
 
   if (metaResult$metaAnalysis$analysisType=="fixed") {
     showType<-"S-k"
-    if (metaResult$metaAnalysis$includeBias) showType<-"bias-k"
+    if (metaResult$metaAnalysis$analyseBias) showType<-"bias-k"
     if (metaResult$hypothesis$effect$world$worldOn) showType<-"k-rp"
   }
   if (metaResult$metaAnalysis$analysisType=="random") showType<-"sd-k"
@@ -419,7 +419,7 @@ makeWorldDist<-function(metaResult,design,world,z,n,sigOnly=FALSE,doTheory=FALSE
             for (i in 1:length(n)) {
               zrow<-SingleSamplingPDF(z,lambda,sigma[i],shape)$pdf*(1-nullP)+
                 SingleSamplingPDF(z,0,sigma[i])$pdf*nullP
-              if (metaResult$metaAnalysis$includeBias & sigOnly>0) {
+              if (metaResult$metaAnalysis$analyseBias & sigOnly>0) {
                 zcrit<-atanh(p2r(braw.env$alphaSig,n[i]))
                 zrow[abs(z)<zcrit]<-zrow[abs(z)<zcrit]*(1-sigOnly)
               }
@@ -432,7 +432,7 @@ makeWorldDist<-function(metaResult,design,world,z,n,sigOnly=FALSE,doTheory=FALSE
             for (i in 1:length(n)) {
               zrow<-GaussSamplingPDF(z,lambda,sigma[i],offset)$pdf*(1-nullP)+
                 SingleSamplingPDF(z,0,sigma[i])$pdf*nullP
-              if (metaResult$metaAnalysis$includeBias & sigOnly>0) {
+              if (metaResult$metaAnalysis$analyseBias & sigOnly>0) {
                 zcrit<-atanh(p2r(braw.env$alphaSig,n[i]))
                 zrow[abs(z)<zcrit]<-zrow[abs(z)<zcrit]*(1-sigOnly)
               }
@@ -445,7 +445,7 @@ makeWorldDist<-function(metaResult,design,world,z,n,sigOnly=FALSE,doTheory=FALSE
             for (i in 1:length(n)) {
               zrow<-ExpSamplingPDF(z,lambda,sigma[i])$pdf*(1-nullP)+
                 SingleSamplingPDF(z,0,sigma[i])$pdf*nullP
-              if (metaResult$metaAnalysis$includeBias & sigOnly>0) {
+              if (metaResult$metaAnalysis$analyseBias & sigOnly>0) {
                 zcrit<-atanh(p2r(braw.env$alphaSig,n[i]))
                 zrow[abs(z)<zcrit]<-zrow[abs(z)<zcrit]*(1-sigOnly)
               }

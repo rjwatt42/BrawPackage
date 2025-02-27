@@ -349,7 +349,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
             vals<-seq(-maxCov,maxCov,length.out=npoints)
           },
           "rIVIV2DV"={vals<-seq(minVal,maxVal,length.out=npoints)},
-          "sigOnly"={vals<-seq(0,1,length.out=npoints)},
+          "sourceBias"={vals<-seq(0,1,length.out=npoints)},
           
           "PDF"={vals<-c("Single","Double","Uniform","Gauss","Exp",">","<")},
           "Lambda"={vals<-seq(minVal,maxVal,length.out=npoints)},
@@ -765,20 +765,20 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
                   metaAnalysis$nstudies<-vals[vi]
                   doingMetaAnalysis<-TRUE
                 },
-                "sigOnly"={
-                  metaAnalysis$sigOnly<-vals[vi]
+                "sourceBias"={
+                  metaAnalysis$sourceBias<-vals[vi]
                   doingMetaAnalysis<-TRUE
                 },
                 "MetaType"={
                   switch(vals[vi],
                          "FF"={metaAnalysis$includeNulls<-FALSE
-                               metaAnalysis$includeBias<-FALSE},
+                               metaAnalysis$analyseBias<-FALSE},
                          "FT"={metaAnalysis$includeNulls<-TRUE
-                               metaAnalysis$includeBias<-FALSE},
+                               metaAnalysis$analyseBias<-FALSE},
                          "TF"={metaAnalysis$includeNulls<-FALSE
-                               metaAnalysis$includeBias<-TRUE},
+                               metaAnalysis$analyseBias<-TRUE},
                          "TT"={metaAnalysis$includeNulls<-TRUE
-                               metaAnalysis$includeBias<-TRUE},
+                               metaAnalysis$analyseBias<-TRUE},
                   )
                   doingMetaAnalysis<-TRUE
                 }

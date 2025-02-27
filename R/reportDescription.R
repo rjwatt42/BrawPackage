@@ -48,7 +48,7 @@ makeFormula<-function(IV,IV2,DV,design,evidence,analysis,an_vars){
 #' reportDescription(analysis=doAnalysis())
 #' @export
 reportDescription<-function(analysis=braw.res$result){
-  if (is.null(analysis)) analysis<-doResult(autoShow=FALSE)
+  if (is.null(analysis)) analysis<-doSingle(autoShow=FALSE)
   
   IV<-analysis$hypothesis$IV
   IV2<-analysis$hypothesis$IV2

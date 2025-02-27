@@ -22,8 +22,8 @@ studies<-list(result=list(rIV=rval[type==useType],
                           df1=nval[type==useType]*0+1,
                           rpIV=nval[type==useType]*0))
 
-mMLE<-makeMetaAnalysis(analysisType="fixed",method="MLE",includeBias=FALSE)
-mTF<-makeMetaAnalysis(analysisType="fixed",method="TF",includeBias=FALSE)
+mMLE<-makeMetaAnalysis(analysisType="fixed",method="MLE",analyseBias=FALSE)
+mTF<-makeMetaAnalysis(analysisType="fixed",method="TF",analyseBias=FALSE)
 
 resMLE<-doMetaAnalysis(studies,mMLE,TRUE)
 resTF<-doMetaAnalysis(studies,mTF,TRUE)

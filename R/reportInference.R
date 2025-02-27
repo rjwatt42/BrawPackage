@@ -6,7 +6,7 @@
 #' reportInference(analysis=doAnalysis())
 #' @export
 reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowerN=TRUE){
-  if (is.null(analysis)) analysis<-doResult(autoShow=FALSE)
+  if (is.null(analysis)) analysis<-doSingle(autoShow=FALSE)
   
   IV<-analysis$hypothesis$IV
   IV2<-analysis$hypothesis$IV2

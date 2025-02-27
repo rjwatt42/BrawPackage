@@ -30,7 +30,7 @@ iqr<-function(s) {
 #' reportSample(sample=doSample())
 #' @export
 reportSample<-function(sample=braw.res$result){
-  if (is.null(sample)) sample<-doResult(autoShow=FALSE)
+  if (is.null(sample)) sample<-doSingle(autoShow=FALSE)
   
   hypothesis<-sample$hypothesis
   IV<-hypothesis$IV

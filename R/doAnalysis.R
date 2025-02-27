@@ -3,13 +3,13 @@
 #' 
 #' @returns result object
 #' @examples
-#' analysis<-doResult(hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),autoShow=braw.env$autoShow)#' make a multiple samples
+#' analysis<-doSingle(hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),autoShow=braw.env$autoShow)#' make a multiple samples
 #' @export
-doResult<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,autoShow=braw.env$autoShow){
+doSingle<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,autoShow=braw.env$autoShow){
   # sample<-doSample(hypothesis=hypothesis,design=design,autoShow=FALSE)
   # result<-doAnalysis(sample,evidence=evidence,autoShow=autoShow)
   if (evidence$metaAnalysis$On) {
-    metaSingle<-doMetaAnalysis(metaResult=braw.res$metaSingle,metaAnalysis=evidence$metaAnalysis,keepStudies=FALSE,
+    metaSingle<-doMetaAnalysis(metaSingle=NULL,metaAnalysis=evidence$metaAnalysis,keepStudies=FALSE,
                              hypothesis=hypothesis,design=design,evidence=evidence)
     if (autoShow) print(showMetaSingle(metaSingle))
     return(metaSingle)
@@ -18,7 +18,7 @@ doResult<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,evidenc
   evidence$shortHand<-FALSE
   result<-runSimulation(hypothesis=hypothesis,design=design,evidence=evidence,autoShow=FALSE)
   setBrawRes("result",result)
-  if (autoShow) print(showResult(result))
+  if (autoShow) print(showSingle(result))
   
   return(result)
 }
@@ -388,7 +388,7 @@ multipleAnalysis<-function(nsims=1,hypothesis,design,evidence,newResult=c()){
     }
   }
   
-  newResult$effect<-hypothesis$effect
+  newResult$hypothesis<-hypothesis
   newResult$design<-design
   newResult$evidence<-evidence
   newResult

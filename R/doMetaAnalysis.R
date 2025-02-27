@@ -16,7 +16,7 @@ doMetaAnalysis<-function(metaSingle=braw.res$metaSingle,metaAnalysis=braw.def$me
                          hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence
 ) {
   if (is.null(metaAnalysis)) metaAnalysis<-makeMetaAnalysis()
-  evidence$sigOnly<-metaAnalysis$sigOnlySource
+  evidence$sigOnly<-metaAnalysis$sourceBias
   evidence$shortHand<-shortHand
   
   localHypothesis<-hypothesis
@@ -43,7 +43,7 @@ doMetaMultiple<-function(nsims=100,metaMultiple=braw.res$metaMultiple,metaAnalys
                          hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence
 ) {
   if (is.null(metaAnalysis)) metaAnalysis<-makeMetaAnalysis()
-  evidence$sigOnly<-metaAnalysis$sigOnlySource
+  evidence$sigOnly<-metaAnalysis$sourceBias
   
   for (i in 1:nsims) {
     localHypothesis<-hypothesis
@@ -79,11 +79,14 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
   # param1 is kvals
   # param2 is normally nullvals
   
-  np1points<-101
+  np1points<-21
   np2points<-21
   
   niterations<-1
-  reInc<-(np1points-1)/2/3
+  # reInc1<-(np1points-1)/2/3
+  # reInc2<-(np2points-1)/2/3
+  reInc1<-2
+  reInc2<-2
   
   if (metaAnalysis$includeNulls) {
     param2<-seq(0,1,length.out=np2points)
@@ -97,8 +100,8 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
   }
   
   if (dist=="fixed") {
-    param1<-seq(-1,1,length.out=np1points)*atanh(0.95)
-    if (metaAnalysis$includeBias) param2<-seq(0,1,length.out=np2points)
+    param1<-seq(-1,1,length.out=np1points)#*atanh(0.95)
+    if (metaAnalysis$analyseBias) param2<-seq(0,1,length.out=np2points)
     else param2<-0
   }
   if (dist=="random") {
@@ -107,7 +110,7 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
     else param2<-seq(-0.1,1,length.out=np2points)*(0.5^2)
   }
   
-  remove_nonsig<-metaAnalysis$includeBias
+  analyseBias<-metaAnalysis$analyseBias
   prior<-metaAnalysis$analysisPrior
   prior_z<-seq(min(param1),max(param1),length.out=101)
   zcrit<-atanh(p2r(braw.env$alphaSig,ns,1))
@@ -132,10 +135,10 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
          }
   )
   
-  if (dist=="fixed" && metaAnalysis$includeBias)
+  if (dist=="fixed" && metaAnalysis$analyseBias)
     fun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,x[1],0,x[2])+approx(prior_z,priorDens,x[1])$y)}
   else
-    fun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,x[1],x[2],remove_nonsig)+approx(prior_z,priorDens,x[1])$y)}
+    fun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,x[1],x[2],analyseBias)+approx(prior_z,priorDens,x[1])$y)}
   
   S<-matrix(0,length(param1),length(param2))
   for (re in 1:niterations) {
@@ -146,16 +149,16 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
     
     use<-which(S==Smax, arr.ind = TRUE)
     param2Max<-param2[use[1,2]]
-    lb2<-param2[max(1,use[1,2]-reInc)]
-    ub2<-param2[min(length(param2),use[1,2]+reInc)]
+    lb2<-param2[max(1,use[1,2]-reInc2)]
+    ub2<-param2[min(length(param2),use[1,2]+reInc2)]
     param1Max<-param1[use[1,1]]
-    lb1<-param1[max(1,use[1,1]-reInc)]
-    ub1<-param1[min(length(param1),use[1,1]+reInc)]
+    lb1<-param1[max(1,use[1,1]-reInc1)]
+    ub1<-param1[min(length(param1),use[1,1]+reInc1)]
     
     param1<-seq(lb1,ub1,length.out=np1points)
-    if (metaAnalysis$includeNulls) {
+    # if (metaAnalysis$includeNulls) {
       param2<-seq(lb2,ub2,length.out=np2points)
-    }
+    # }
   }
   
   if (niterations==1) {
@@ -165,9 +168,7 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
     Smax<- -result$value
   }
   Svals<-fun(c(param1Max,param2Max))
-  getLogLikelihood(zs,ns,df1,dist,param1Max,param2Max,remove_nonsig,returnVals=TRUE)
-         +approx(prior_z,priorDens,param1Max)$y
-  if (metaAnalysis$analysisVar=="sd") param2Max<-sign(param2Max)*sqrt(abs(param2Max))
+  if (dist=="random" && metaAnalysis$analysisVar=="sd") param2Max<-sign(param2Max)*sqrt(abs(param2Max))
   return(list(param1Max=param1Max,param2Max=param2Max,Smax=Smax,Svals=Svals))
 }
 
