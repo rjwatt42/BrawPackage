@@ -21,7 +21,10 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
   
   if (exploreResult$doingMetaAnalysis) 
     switch(exploreResult$metaAnalysis$analysisType,
-           "fixed"={showType<-"LambdaF"},
+           "fixed"={
+             showType<-"LambdaF"
+             if (exploreResult$metaAnalysis$analyseBias) showType<-paste0(showType,";LambdaB")
+           },
            "random"={showType<-"LambdaF;LambdaR"},
            {showType<-"Lambda;pNull"})
   
@@ -384,6 +387,9 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                   df1<-exploreResult$result$df1
                   showVals<-r2llr(rVals,ns,df1,"dLLR",exploreResult$evidence$llr,exploreResult$evidence$prior)
                 },
+                "LambdaB"={
+                  showVals<-exploreResult$result$param3
+                },
                 "LambdaF"={
                   showVals<-exploreResult$result$param1
                 },
@@ -448,7 +454,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                 }
         )
         if (is.element(showType,c("rs","p","ws","n","AIC","log(lrs)","log(lrd)",
-                                  "LambdaF","LambdaR","Lambda","pNull","S",
+                                  "LambdaB","LambdaF","LambdaR","Lambda","pNull","S",
                                   "iv.mn","iv.sd","iv.sk","iv.kt","dv.mn","dv.sd","dv.sk","dv.kt",
                                   "rd.mn","rd.sd","rd.sk","rd.kt"))) {
           quants=(1-quantileShow)/2

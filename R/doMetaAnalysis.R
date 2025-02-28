@@ -63,15 +63,18 @@ doMetaMultiple<-function(nsims=100,metaMultiple=braw.res$metaMultiple,metaAnalys
 }
 
 getTrimFill<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
+  sigs<-isSignificant(method="NHST",p=r2p(tanh(zs),ns),r=tanh(zs),n=ns)
   res<-tryCatch({
     switch(dist,
            "fixed"={
              q<-trimfill(zs,1/sqrt(ns-3),ma.common=TRUE,common=TRUE,random=FALSE)
-             list(param1Max=q$TE.common,param2Max=0,param3Max=(q$k-length(zs))/length(zs),Smax=q$seTE.common,Svals=q$seTE)
+             nFill<-q$k-length(zs)
+             list(param1Max=q$TE.common,param2Max=0,param3Max=nFill/(nFill+sum(!sigs)),Smax=q$seTE.common,Svals=q$seTE)
            },
            "random"={
              q<-trimfill(zs,1/sqrt(ns-3),ma.common=FALSE,common=FALSE,random=TRUE)
-             list(param1Max=q$TE.random,param2Max=q$tau,param3Max=(q$k-length(zs))/length(zs),Smax=q$seTE.random,Svals=q$seTE)
+             nFill<-q$k-length(zs)
+             list(param1Max=q$TE.random,param2Max=q$tau,param3Max=nFill/(nFill+sum(!sigs)),Smax=q$seTE.random,Svals=q$seTE)
            }
            )
   },
@@ -81,6 +84,9 @@ getTrimFill<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
   warning={},
   finally={}
   )
+  if (is.infinite(res$param1Max)) res$param1Max<-NA
+  if (is.infinite(res$param2Max)) res$param2Max<-NA
+  if (is.infinite(res$param3Max)) res$param3Max<-NA
   return(res)
 }
 

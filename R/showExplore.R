@@ -88,7 +88,10 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   }
   if (exploreResult$doingMetaAnalysis) 
     switch(exploreResult$metaAnalysis$analysisType,
-           "fixed"={showType<-c("LambdaF")},
+           "fixed"={
+             showType<-c("LambdaF")
+             if (exploreResult$metaAnalysis$analyseBias) showType<-c(showType,"LambdaB")
+             },
            "random"={
              showType<-c("LambdaF","LambdaR")
              if (exploreResult$metaAnalysis$analysisVar=="var") showType[2]<-"LambdaRn"
@@ -558,6 +561,9 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                 df1<-result$df1
                 showVals<-r2llr(rVals,ns,df1,"dLLR",evidence$llr,evidence$prior)
               },
+              "LambdaB"={
+                showVals<-result$param3
+              },
               "LambdaF"={
                 showVals<-result$param1
               },
@@ -726,11 +732,18 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       }
       
       if (autoYlim) {
+        if (showHist) {
+          use_y<-c(showVals,theoryVals,theoryLower,theoryVals1,theoryVals0,theoryVals2)
+        } else {
+          use_y<-c(y25,y50,theoryVals,theoryLower,theoryVals1,theoryVals0,theoryVals2)
+        }
+        use_y[is.infinite(use_y)]<-NA
         ylim<-c(
-          min(y25,y50,theoryVals,theoryLower,theoryVals1,theoryVals0,theoryVals2,na.rm=TRUE),
-          max(y75,y50,theoryVals,theoryUpper,theoryVals1,theoryVals0,theoryVals2,na.rm=TRUE)
+          min(use_y,na.rm=TRUE),
+          max(use_y,na.rm=TRUE)
               )
-        ylim<-ylim+c(-1,1)*diff(ylim)/4
+        if (diff(ylim)==0) ylim<-ylim+x(-1,1)*ylim/10
+        else               ylim<-ylim+c(-1,1)*diff(ylim)/4
       }
       # general start
       g<-startPlot(xlim,ylim,

@@ -151,7 +151,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
             if (braw.env$wPlotScale=="log10") d1<-log10(d1)
           }
   )
-  if (substr(disp1,1,1=="r"))
+  if (substr(disp1,1,1)=="r")
     switch(braw.env$RZ,
            "r"={},
            "z"={d1<-atanh(d1)}
@@ -203,7 +203,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
             if (braw.env$wPlotScale=="log10") d2<-log10(d2)
           }
   )
-  if (substr(disp2,1,1=="r"))
+  if (substr(disp2,1,1)=="r")
     switch(braw.env$RZ,
            "r"={},
            "z"={d2<-atanh(d2)}

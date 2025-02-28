@@ -420,6 +420,13 @@ plotAxis<-function(showType,hypothesis,design=NULL) {
             ylabel<-"False Miss"
             use_cols<-braw.env$plotColours$fmr
           },
+          "LambdaB"={
+            ylim<-c(-0.01,1.01)
+            ytick<-seq(0,1,0.1)
+            ymins<-seq(0,1,0.1)
+            ylabel<-"bias[est]"
+            use_cols<-braw.env$plotColours$metaAnalysis
+          },
           "LambdaF"={
             ylim<-c(-1.01,1.01)
             ytick<-seq(-1,1,0.2)
@@ -464,7 +471,7 @@ plotAxis<-function(showType,hypothesis,design=NULL) {
           },
           "S"={
             ylim<-c(min(result$Ss),max(result$Ss))
-            ylabel<-"S"
+            ylabel<-"llk"
             ytick<-seq(ceil(min(result$Ss)),ceil(max(result$Ss)),1)
             use_cols<-braw.env$plotColours$metaAnalysis
           },

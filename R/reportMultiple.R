@@ -353,7 +353,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
                     "rd.kt"={a<-result$rd.kt}
             )
             if (substr(pars[j],1,1)=="r") 
-              swicth(braw.end$RZ,
+              switch(braw.end$RZ,
                      "r"={},
                      "z"={a<-atan(a)}
                      )

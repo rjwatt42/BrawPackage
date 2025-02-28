@@ -89,7 +89,7 @@ resetExploreResult<-function(nsims,n_vals,oldResult=NULL) {
                rIV2=b,rIVIV2DV=b,pIV2=b,pIVIV2DV=b,
                r=list(direct=bm,unique=bm,total=bm),
                p=list(direct=bm,unique=bm,total=bm),
-               param1=b,param2=b
+               param1=b,param2=b,param3=b
   )
   if (!is.null(oldResult)) {
     result<-mergeExploreResult(oldResult,result)
@@ -146,8 +146,10 @@ storeExploreResult<-function(result,res,ri,vi) {
   } else {
     param1Max<-max(c(res$fixed$param1Max,res$random$param1Max,res$single$param1Max,res$gauss$param1Max,res$exp$param1Max),na.rm=TRUE)
     param2Max<-max(c(res$fixed$param2Max,res$random$param2Max,res$single$param2Max,res$gauss$param2Max,res$exp$param2Max),na.rm=TRUE)
+    param3Max<-max(c(res$fixed$param3Max,res$random$param3Max,res$single$param3Max,res$gauss$param3Max,res$exp$param3Max),na.rm=TRUE)
     result$param1[ri,vi]<-param1Max
     result$param2[ri,vi]<-param2Max
+    result$param3[ri,vi]<-param3Max
   }
   return(result)
 }
@@ -201,6 +203,7 @@ mergeExploreResult<-function(res1,res2) {
     
     result$param1<-rbind(res1$param1,res2$param1)
     result$param2<-rbind(res1$param2,res2$param2)
+    result$param3<-rbind(res1$param3,res2$param3)
     
   return(result)
 }
