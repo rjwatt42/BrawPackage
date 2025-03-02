@@ -163,24 +163,28 @@ showMetaMultiple<-function(metaResult=braw.res$metaMultiple,showType=NULL,dimens
            })
   }
   
-  if (showType=="metaS;metaS") {
-    braw.env$plotArea<-c(0,0,1,1)
-    g<-drawMeta(metaResult=metaResult,showType=showType,g=NULL)
+  if (is.element(metaResult$metaAnalysis$analysisType,c("fixed","random"))) {
+    g<-showMultiple(metaResult,showType=showType,dimension=dimension)
   } else {
-    g<-nullPlot()
-    if (is.element(metaResult$metaAnalysis$analysisType,c("fixed","random"))) {
+    if (showType=="metaS;metaS") {
       braw.env$plotArea<-c(0,0,1,1)
-      g<-drawMeta(metaResult=metaResult,showType=showType,whichMeta=metaResult$metaAnalysis$analysisType,g=g)
-    }  else {
-      braw.env$plotArea<-c(0,0,0.4,1)
-      if (!all(is.na(metaResult$single$Smax)))
-        g<-drawMeta(metaResult=metaResult,whichMeta="Single",showType=showType,g)
-      braw.env$plotArea<-c(0.4,0,0.3,1)
-      if (!all(is.na(metaResult$gauss$Smax)))
-        g<-drawMeta(metaResult=metaResult,whichMeta="Gauss",showType=showType,g)
-      braw.env$plotArea<-c(0.7,0,0.3,1)
-      if (!all(is.na(metaResult$exp$Smax)))
-        g<-drawMeta(metaResult=metaResult,whichMeta="Exp",showType=showType,g)
+      g<-drawMeta(metaResult=metaResult,showType=showType,g=NULL)
+    } else {
+      g<-nullPlot()
+      if (is.element(metaResult$metaAnalysis$analysisType,c("fixed","random"))) {
+        braw.env$plotArea<-c(0,0,1,1)
+        g<-drawMeta(metaResult=metaResult,showType=showType,whichMeta=metaResult$metaAnalysis$analysisType,g=g)
+      }  else {
+        braw.env$plotArea<-c(0,0,0.4,1)
+        if (!all(is.na(metaResult$single$Smax)))
+          g<-drawMeta(metaResult=metaResult,whichMeta="Single",showType=showType,g)
+        braw.env$plotArea<-c(0.4,0,0.3,1)
+        if (!all(is.na(metaResult$gauss$Smax)))
+          g<-drawMeta(metaResult=metaResult,whichMeta="Gauss",showType=showType,g)
+        braw.env$plotArea<-c(0.7,0,0.3,1)
+        if (!all(is.na(metaResult$exp$Smax)))
+          g<-drawMeta(metaResult=metaResult,whichMeta="Exp",showType=showType,g)
+      }
     }
   }
   if (braw.env$graphHTML && braw.env$autoShow) {
