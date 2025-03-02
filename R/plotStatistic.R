@@ -217,7 +217,7 @@ expected_hist<-function(pts,valType,ylim,histGain,histGainrange){
   svals<-pts$y1[pts$y2]
   
   if (is.null(valType)) valType<-"rs"
-  if (is.element(valType,c("rse","rss","ro","ci1","ci2","llknull"))) valType<-"rs"
+  if (is.element(valType,c("rse","rss","ro","ci1","ci2","llknull","metaRiv"))) valType<-"rs"
   if (is.element(valType,c("e1p","e2p","po"))) valType<-"p"
   if (is.element(valType,c("wp","ws"))) valType<-"ws"
   if (is.element(valType,c("iv.mn","iv.sd","iv.sk","iv.kt",
@@ -291,9 +291,6 @@ expected_hist<-function(pts,valType,ylim,histGain,histGainrange){
             bins<-getBins(vals,svals,target,NULL,braw.env$max_nw)
           },
           
-          "mn"=  { # ns is small
-            bins<-getBins(vals,NULL,NULL,NULL,NULL,fixed=TRUE)
-          },
           {bins<-getBins(vals,NULL,NULL,NULL,NULL,fixed=TRUE)}
           
   )
@@ -435,16 +432,21 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
     pts_sigNull=pts[pts$y2 & !pts$y0,]
     pts_nsNull<-pts[!pts$y2 & !pts$y0,]
     
-    g<-addG(g,dataPoint(data=data.frame(x=pts_sigNonNull$x,y=pts_sigNonNull$y1),shape=braw.env$plotShapes$study, 
+    shape<-braw.env$plotShapes$study
+    if (is.na(pts$n[1])) { # metaAnalysis
+      shape<-braw.env$plotShapes$meta
+      c1<-c2<-c3<-c4<-braw.env$plotColours$metaMultiple
+    }
+    g<-addG(g,dataPoint(data=data.frame(x=pts_sigNonNull$x,y=pts_sigNonNull$y1),shape=shape, 
                         colour = darken(c1,off=-colgain), alpha=alpha, fill = c1, size = dotSize))
-    g<-addG(g,dataPoint(data=data.frame(x=pts_nsNonNull$x,y=pts_nsNonNull$y1),shape=braw.env$plotShapes$study, 
+    g<-addG(g,dataPoint(data=data.frame(x=pts_nsNonNull$x,y=pts_nsNonNull$y1),shape=shape, 
                         colour = darken(c4,off=-colgain), alpha=alpha, fill = c4, size = dotSize))
-    g<-addG(g,dataPoint(data=data.frame(x=pts_sigNull$x,y=pts_sigNull$y1),shape=braw.env$plotShapes$study, 
+    g<-addG(g,dataPoint(data=data.frame(x=pts_sigNull$x,y=pts_sigNull$y1),shape=shape, 
                         colour = darken(c3,off=-colgain), alpha=alpha, fill = c3, size = dotSize))
-    g<-addG(g,dataPoint(data=data.frame(x=pts_nsNull$x,y=pts_nsNull$y1),shape=braw.env$plotShapes$study, 
+    g<-addG(g,dataPoint(data=data.frame(x=pts_nsNull$x,y=pts_nsNull$y1),shape=shape, 
                         colour = darken(c2,off=-colgain), alpha=alpha, fill = c2, size = dotSize))
     } else {
-      g<-addG(g,dataPoint(data=data.frame(x=pts$x,y=pts$y1),shape=braw.env$plotShapes$study, 
+      g<-addG(g,dataPoint(data=data.frame(x=pts$x,y=pts$y1),shape=shape, 
                           colour = darken(c1,off=-colgain), alpha=alpha, fill = c1, size = dotSize))
     }
     if (!is.null(showType))
@@ -592,6 +594,16 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
     # top<-TRUE
   }
   
+  if (is.element(showType,c("metaRiv","metaRsd","metaBias","metaS"))){
+    # showType<-"rs"
+    labelSig<-FALSE
+    labelNSig<-FALSE
+    showSig<-FALSE
+    doingMetaAnalysis<-TRUE
+    showTheory<-FALSE
+    # top<-TRUE
+  } else doingMetaAnalysis<-FALSE
+  
   hypothesis<-analysis$hypothesis
   effect<-hypothesis$effect
   design<-analysis$design
@@ -666,7 +678,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   for (yl in ylines)
     g<-addG(g,horzLine(intercept=yl,linewidth=0.25,linetype="dashed",colour=lineCol))
   
-  if (!all(is.na(analysis$rIV))) {
+  if (!all(is.na(analysis$rIV)) || doingMetaAnalysis) {
     data<-collectData(analysis,whichEffect)
     switch(braw.env$RZ,
            "r"={},
@@ -684,6 +696,10 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
             "re"={showVals<-data$rs-data$rp},
             "p"={showVals<-data$ps},
             "po"={showVals<-data$po},
+            "metaRiv"={showVals<-cbind(analysis$bestParam1)},
+            "metaRsd"={showVals<-cbind(analysis$bestParam2)},
+            "metaBias"={showVals<-cbind(analysis$bestParam3)},
+            "metaS"={showVals<-cbind(analysis$bestS)},
             "llknull"={showVals<-exp(cbind(-0.5*(analysis$aic-analysis$aicNull)))},
             "sLLR"={showVals<-cbind(res2llr(analysis,"sLLR"))},
             "log(lrs)"={showVals<-cbind(res2llr(analysis,"sLLR"))},
@@ -720,7 +736,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   }    
   sigOnly<-evidence$sigOnly
   
-  if (!all(is.na(analysis$rIV))) { theoryAlpha<-0.5} else {theoryAlpha<-1}
+  if (!all(is.na(analysis$rIV)) || doingMetaAnalysis) { theoryAlpha<-0.5} else {theoryAlpha<-1}
   
   for (i in 1:length(xoff)){
     if (showTheory) {
@@ -1000,32 +1016,28 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
     
     # then the samples
     rvals<-c()
-    if (!all(is.na(analysis$rIV))) {
+    if (!all(is.na(analysis$rIV)) || doingMetaAnalysis) {
       shvals<-showVals[,i]
-      rvals<-data$rs[,i]
-      pvals<-data$ps[,i]
-      nvals<-data$ns
-      if (showSig)
+      if (showSig) {
         if (showType=="rss") 
           resSig<-(analysis$sem[,8]==2)
-      else 
-        resSig<-isSignificant(braw.env$STMethod,pvals,rvals,nvals,data$df1,evidence)
-      else
-        resSig<-rep(FALSE,length(rvals))
-      if (is.element(showType,c("rse","rss")) && ((hypothesis$effect$world$worldOn && hypothesis$effect$world$populationNullp>0)
-          || (!all(data$rp!=0) && !all(data$rp==0))))
-        resNotNull<-data$rp!=0
-      else
-        resNotNull<-rep(NA,length(data$rp))
+        else {
+          rvals<-data$rs[,i]
+          pvals<-data$ps[,i]
+          nvals<-data$ns
+          resSig<-isSignificant(braw.env$STMethod,pvals,rvals,nvals,data$df1,evidence)
+        }
+        if (is.element(showType,c("rse","rss")) && ((hypothesis$effect$world$worldOn && hypothesis$effect$world$populationNullp>0)
+                                                    || (!all(data$rp!=0) && !all(data$rp==0))))
+          resNotNull<-data$rp!=0
+        else
+          resNotNull<-rep(NA,length(data$rp))
+      } else {
+        resSig<-rep(FALSE,length(shvals))
+        resNotNull<-rep(FALSE,length(shvals))
+        nvals<-rep(NA,length(shvals))
+      }
       
-      # if (sigOnly) {
-      #   shvals<-shvals[resSig]
-      #   rvals<-rvals[resSig]
-      #   pvals<-pvals[resSig]
-      #   nvals<-nvals[resSig]
-      #   resSig<-resSig[resSig]
-      #   resNotNull<-resNotNull[resSig]
-      # }
       if (effectType=="all") {
         ysc<-1/3
         rvals<-(rvals+1)*ysc*0.9+rem(i-1,3)*ysc*2-1
@@ -1034,9 +1046,9 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
         d<-res2llr(analysis,braw.env$STMethod)
         err<-(d<0 & data$rp!=0) | (d>0 & data$rp==0)
         resWSig<-resSig & err
-        pts<-data.frame(x=rvals*0+xoff[i],y1=shvals,y2=resSig,y3=resWSig,y0=resNotNull,n=nvals)
+        pts<-data.frame(x=shvals*0+xoff[i],y1=shvals,y2=resSig,y3=resWSig,y0=resNotNull,n=nvals)
       } else {
-        pts<-data.frame(x=rvals*0+xoff[i],y1=shvals,y2=resSig,y0=resNotNull,n=nvals)
+        pts<-data.frame(x=shvals*0+xoff[i],y1=shvals,y2=resSig,y0=resNotNull,n=nvals)
       }
       
       g<-expected_plot(g,pts,showType,analysis,IV,DV,i,orientation=orientation,

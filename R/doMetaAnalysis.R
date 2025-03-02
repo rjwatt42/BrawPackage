@@ -204,11 +204,11 @@ runMetaAnalysis<-function(metaAnalysis,studies,hypothesis,metaResult){
   ns<-studies$nval
   df1<-studies$df1
   
-  fixed<-list(param1Max=NA,param2Max=NA,Smax=NA)
-  random<-list(param1Max=NA,param2Max=NA,Smax=NA)
-  single<-list(param1Max=NA,param2Max=NA,Smax=NA)
-  gauss<-list(param1Max=NA,param2Max=NA,Smax=NA)
-  exp<-list(param1Max=NA,param2Max=NA,Smax=NA)
+  fixed<-list(param1Max=NA,param2Max=NA,param3Max=NA,Smax=NA)
+  random<-list(param1Max=NA,param2Max=NA,param3Max=NA,Smax=NA)
+  single<-list(param1Max=NA,param2Max=NA,param3Max=NA,Smax=NA)
+  gauss<-list(param1Max=NA,param2Max=NA,param3Max=NA,Smax=NA)
+  exp<-list(param1Max=NA,param2Max=NA,param3Max=NA,Smax=NA)
   switch(metaAnalysis$analysisType,
          "fixed"={
            # a fixed analysis finds a single effect size
@@ -264,8 +264,9 @@ if (is.element(metaAnalysis$analysisType,c("fixed","random"))) {
   } else {
     rpSDex<-sqrt(mean((random$param1Max-studies$rIV)^2*(studies$nval-3)))-1
     random$param1Max<-c(metaResult$random$param1Max,tanh(random$param1Max))
-    random$Smax<-c(metaResult$random$Smax,random$Smax)
     random$param2Max<-c(metaResult$random$param2Max,tanh(random$param2Max))
+    random$param3Max<-c(metaResult$random$param3Max,tanh(random$param3Max))
+    random$Smax<-c(metaResult$random$Smax,random$Smax)
     random$rpIV<-c(metaResult$random$rpIV,mean(studies$rpIV))
     random$rpSD<-c(metaResult$random$rpSD,std(studies$rpIV))
     random$rpSDex<-c(metaResult$random$rpSDex,rpSDex)

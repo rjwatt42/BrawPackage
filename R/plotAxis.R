@@ -420,36 +420,43 @@ plotAxis<-function(showType,hypothesis,design=NULL) {
             ylabel<-"False Miss"
             use_cols<-braw.env$plotColours$fmr
           },
-          "LambdaB"={
+          "metaBias"={
             ylim<-c(-0.01,1.01)
             ytick<-seq(0,1,0.1)
             ymins<-seq(0,1,0.1)
-            ylabel<-"bias[est]"
+            ylabel<-"bias[m]"
             use_cols<-braw.env$plotColours$metaAnalysis
           },
-          "LambdaF"={
+          "metaRiv"={
             ylim<-c(-1.01,1.01)
             ytick<-seq(-1,1,0.2)
             ymins<-seq(-1,1,0.1)
-            ylabel<-"r[est]"
+            ylabel<-"r[m]"
             use_cols<-braw.env$plotColours$metaAnalysis
           },
-          "LambdaR"={
+          "metaRsd"={
             ylim<-c(-0.01,0.5)
             ytick<-seq(0,0.5,0.1)
             ymins<-seq(0,0.5,0.05)
-            ylabel<-"sd(r)[est]"
+            ylabel<-"sd(r)[m]"
             use_cols<-braw.env$plotColours$metaAnalysis
           },
-          "LambdaRn"={
+          "metaRvar"={
             ylim<-c(-0.05,0.2)
             ytick<-seq(-0.05,0.2,0.05)
             ymins<-seq(-0.05,0.2,0.01)
-            ylabel<-"var(r)[est]"
+            ylabel<-"var(r)[m]"
             lines<-0
             use_cols<-braw.env$plotColours$metaAnalysis
           },
-          "k"={
+          "metaBias"={
+            ylim<-c(-0.05,1.05)
+            ytick<-seq(0,0.1,1)
+            ymins<-seq(0,0.1,1)
+            ylabel<-"bias[m]"
+            use_cols<-braw.env$plotColours$metaAnalysis
+          },
+          "metaK"={
             ylim<-c(-0.01,1.01)
             ytick<-seq(0,1,0.2)
             ymins<-seq(0,1,0.1)
@@ -469,7 +476,7 @@ plotAxis<-function(showType,hypothesis,design=NULL) {
             ymins<-seq(0,1,0.1)
             ylabel<-"p(PDF)"
           },
-          "S"={
+          "metaS"={
             ylim<-c(min(result$Ss),max(result$Ss))
             ylabel<-"llk"
             ytick<-seq(ceil(min(result$Ss)),ceil(max(result$Ss)),1)

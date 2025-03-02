@@ -23,14 +23,13 @@ reportMetaSingle<-function(metaResult=braw.res$metaSingle,reportStats="Medians")
   if (is.element(metaResult$metaAnalysis$analysisType,c("fixed","random"))) {
     switch(metaResult$metaAnalysis$analysisType,
            "fixed"={
-             outputText<-c(outputText,"!H","!C","r[est]","bias[est]","llk"," ")
-             outputText<-c(outputText,"Actual"," ",brawFormat(metaResult$result$rpIV[1],digits=3),brawFormat(metaResult$metaAnalysis$sourceBias,digits=3)," "," ")
+             outputText<-c(outputText,"!H","!C","r[m]","bias[m]","llk"," ")
+             outputText<-c(outputText,"Actual"," ",brawFormat(metaResult$effect$rIV,digits=3),brawFormat(metaResult$metaAnalysis$sourceBias,digits=3)," "," ")
              outputText<-c(outputText,"Estimate"," ",brawFormat(metaResult$fixed$param1Max,digits=3),brawFormat(metaResult$fixed$param3Max,digits=3),brawFormat(metaResult$fixed$Smax,digits=3)," ")
            },
            "random"={
-             outputText<-c(outputText,"!H"," ","r[est]","sd(r)[est]"," ","llk")
-             outputText<-c(outputText,"Actual"," ",brawFormat(metaResult$result$rpIV[1],digits=3),brawFormat(metaResult$hypothesis$effect$rSD,digits=3),brawFormat(metaResult$metaAnalysis$sourceBias,digits=3)," ")
-             outputText<-c(outputText,"Used"," ",brawFormat(metaResult$random$rpIV,digits=3),brawFormat(metaResult$random$rpSD,digits=3)," "," ")
+             outputText<-c(outputText,"!H"," ","r[m]","sd(r)[m]","bias[m]","llk")
+             outputText<-c(outputText,"Actual"," ",brawFormat(metaResult$effect$rIV,digits=3),brawFormat(metaResult$hypothesis$effect$rSD,digits=3),brawFormat(metaResult$metaAnalysis$sourceBias,digits=3)," ")
              outputText<-c(outputText,"Estimate"," ",brawFormat(metaResult$random$param1Max,digits=3),brawFormat(metaResult$random$param2Max,digits=3),brawFormat(metaResult$random$param3Max,digits=3),brawFormat(metaResult$random$Smax,digits=3))
            }
     )
@@ -92,13 +91,13 @@ reportMetaMultiple<-function(metaResult=braw.res$metaMultiple,reportStats="Media
   if (is.element(metaResult$metaAnalysis$analysisType,c("fixed","random"))) {
     switch(metaResult$metaAnalysis$analysisType,
            "fixed"={
-             outputText<-c(outputText,"!H","!C","r[est]","bias[est]","llk"," ")
+             outputText<-c(outputText,"!H","!C","r[m]","bias[m]","llk"," ")
              outputText<-c(outputText,"Actual"," ",brawFormat(metaResult$effect$rIV,digits=3),brawFormat(metaResult$metaAnalysis$sourceBias,digits=3)," "," ")
              outputText<-c(outputText,"Estimate",lbCT,brawFormat(funcCT(metaResult$fixed$param1Max),digits=3),brawFormat(funcCT(metaResult$fixed$param3Max),digits=3),brawFormat(funcCT(metaResult$fixed$Smax),digits=3)," ")
              outputText<-c(outputText,"",lbDP,brawFormat(funcDP(metaResult$fixed$param1Max),digits=3),brawFormat(funcDP(metaResult$fixed$param2Max),digits=3),brawFormat(funcDP(metaResult$fixed$Smax),digits=3)," ")
            },
            "random"={
-             outputText<-c(outputText,"!H"," ","r[est]","sd(r)[est]","bias[est]","llk")
+             outputText<-c(outputText,"!H"," ","r[m]","sd(r)[m]","bias[m]","llk")
              outputText<-c(outputText,"Actual"," ",brawFormat(metaResult$hypothesis$effect$rIV,digits=3),brawFormat(metaResult$hypothesis$effect$rSD,digits=3),brawFormat(metaResult$metaAnalysis$sourceBias,digits=3)," ")
              outputText<-c(outputText,"Estimate",lbCT,brawFormat(funcCT(metaResult$random$param1Max),digits=3),brawFormat(funcCT(metaResult$random$param2Max),digits=3),brawFormat(funcCT(metaResult$random$param3Max),digits=3),brawFormat(funcCT(metaResult$random$Smax),digits=3))
              outputText<-c(outputText,"",lbDP,brawFormat(funcDP(metaResult$random$param1Max),digits=3),brawFormat(funcDP(metaResult$random$param2Max),digits=3),brawFormat(funcDP(metaResult$random$param3Max),digits=3),brawFormat(funcDP(metaResult$random$Smax),digits=3))

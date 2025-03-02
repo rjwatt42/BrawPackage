@@ -28,13 +28,16 @@ showMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
       }
     }
     
+  fullResult<-multipleResult$result
   if (is.element(showType[1],c("NHST","Hits","Misses","p(sig)","SEM")) &&
       !multipleResult$hypothesis$effect$world$worldOn && 
       !all(is.na(multipleResult$nullresult$rIV))) {
       if (all(multipleResult$result$rpIV==0)) multipleResult$result$rpIV<-multipleResult$result$rpIV+0.0000000001
       fullResult<-mergeMultiple(multipleResult$result,multipleResult$nullresult)
-    } else fullResult<-multipleResult$result
-
+    }  
+  if (substr(showType[1],1,4)=="meta")
+    fullResult<-multipleResult
+      
   fullResult<-c(fullResult,list(hypothesis=multipleResult$hypothesis,
                                 design=multipleResult$design,
                                 evidence=multipleResult$evidence)

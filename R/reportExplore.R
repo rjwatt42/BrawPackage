@@ -22,10 +22,10 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
   if (exploreResult$doingMetaAnalysis) 
     switch(exploreResult$metaAnalysis$analysisType,
            "fixed"={
-             showType<-"LambdaF"
-             if (exploreResult$metaAnalysis$analyseBias) showType<-paste0(showType,";LambdaB")
+             showType<-"metaRiv"
+             if (exploreResult$metaAnalysis$analyseBias) showType<-paste0(showType,";metaBias")
            },
-           "random"={showType<-"LambdaF;LambdaR"},
+           "random"={showType<-"metaRiv;metaRsd"},
            {showType<-"Lambda;pNull"})
   
   showType<-strsplit(showType,";")[[1]]
@@ -387,13 +387,13 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                   df1<-exploreResult$result$df1
                   showVals<-r2llr(rVals,ns,df1,"dLLR",exploreResult$evidence$llr,exploreResult$evidence$prior)
                 },
-                "LambdaB"={
+                "metaBias"={
                   showVals<-exploreResult$result$param3
                 },
-                "LambdaF"={
+                "metaRiv"={
                   showVals<-exploreResult$result$param1
                 },
-                "LambdaR"={
+                "metaRsd"={
                   showVals<-exploreResult$result$param2
                 },
                 "Lambda"={
@@ -413,7 +413,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                     yiqr[i]<-p_se
                   }
                 },
-                "S"={
+                "metaS"={
                   showVals<-exploreResult$result$S
                 },
                 "iv.mn"={
@@ -454,7 +454,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                 }
         )
         if (is.element(showType,c("rs","p","ws","n","AIC","log(lrs)","log(lrd)",
-                                  "LambdaB","LambdaF","LambdaR","Lambda","pNull","S",
+                                  "metaBias","metaRiv","metaRsd","Lambda","pNull","metaS",
                                   "iv.mn","iv.sd","iv.sk","iv.kt","dv.mn","dv.sd","dv.sk","dv.kt",
                                   "rd.mn","rd.sd","rd.sk","rd.kt"))) {
           quants=(1-quantileShow)/2

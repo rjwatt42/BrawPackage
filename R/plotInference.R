@@ -47,6 +47,11 @@ plotInference<-function(analysis,otheranalysis=NULL,disp="rs",orientation="vert"
           "ps"= {g<-ps_plot(analysis,disp,showTheory=showTheory,g=g)},
           "po"= {g<-p_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,g=g)},
           
+          "metaRiv"={g<-r_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
+          "metaRsd"={g<-r_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
+          "metaBias"={g<-r_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
+          "metaS"={g<-r_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
+          
           "llknull"={g<-r_plot(analysis,disp,orientation=orientation,showTheory=showTheory,g=g)},
           "AIC"={g<-aic_plot(analysis,disp,showTheory=showTheory,g=g)},
           "SEM"={g<-sem_plot(analysis,disp,showTheory=showTheory,g=g)},
@@ -134,6 +139,18 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
             d1<-analysis$noval
             if (braw.env$nPlotScale=="log10") d1<-log10(d1)
           },
+          "metaRiv"={
+            d1<-analysis$bestParam1
+          },
+          "metaRsd"={
+            d1<-analysis$bestParam2
+          },
+          "metaBias"={
+            d1<-analysis$bestParam3
+          },
+          "metaS"={
+            d1<-analysis$bestS
+          },
           "llknull"=d1<-(-0.5*(analysis$aic-analysis$aicNull)),
           "sLLR"=d1<-res2llr(analysis,"sLLR"),
           "log(lrs)"=d1<-res2llr(analysis,"sLLR"),
@@ -185,6 +202,18 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
           "no"={
             d2<-analysis$noval
             if (braw.env$nPlotScale=="log10") d2<-log10(d2)
+          },
+          "metaRiv"={
+            d2<-analysis$bestParam1
+          },
+          "metaRsd"={
+            d2<-analysis$bestParam2
+          },
+          "metaBias"={
+            d2<-analysis$bestParam3
+          },
+          "metaS"={
+            d2<-analysis$bestS
           },
           "llknull"=d2<-(-0.5*(analysis$aic-analysis$aicNull)),
           "sLLR"=d2<-res2llr(analysis,"sLLR"),
@@ -239,20 +268,19 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
     c1=braw.env$plotColours$descriptionC
     c2=braw.env$plotColours$descriptionC
   }
-  if (length(d1)<=200) {
-    use<-!isSignificant(braw.env$STMethod,pvals,rvals,nvals,df1vals,analysis$evidence)
-    pts1=pts[use,]
-    g<-addG(g,dataPoint(data=pts1,shape=braw.env$plotShapes$study, colour = "black", fill = c2, size = dotSize))
-    pts2=pts[!use,]
-    g<-addG(g,dataPoint(data=pts2,shape=braw.env$plotShapes$study, colour = "black", fill = c1, size = dotSize))
-  } else {
-    gain<-(length(d1)-200)/500
-    dotSize<-dotSize/(1+gain)
-    use<-!isSignificant(braw.env$STMethod,pvals,rvals,nvals,df1vals,analysis$evidence)
-    pts1=pts[use,]
-    g<-addG(g,dataPoint(data=pts1,shape=braw.env$plotShapes$study, colour = darken(c2,off=-1+min(3,gain)/3), fill = c2, size = dotSize))
-    pts2=pts[!use,]
-    g<-addG(g,dataPoint(data=pts2,shape=braw.env$plotShapes$study, colour = darken(c1,off=-1+min(3,gain)/3), fill = c1, size = dotSize))
+  
+  shape<-braw.env$plotShapes$study
+  if (length(d1)<=200) gain<-0 else gain<-(length(d1)-200)/500
+  use<-!isSignificant(braw.env$STMethod,pvals,rvals,nvals,df1vals,analysis$evidence)
+  if (length(use)==0) { 
+    use<-rep(FALSE,length(d1))
+    shape<-braw.env$plotShapes$meta
   }
+  dotSize<-dotSize/(1+gain)
+  pts1=pts[use,]
+  g<-addG(g,dataPoint(data=pts1,shape=shape, colour = "black", fill = c2, size = dotSize))
+  pts2=pts[!use,]
+  g<-addG(g,dataPoint(data=pts2,shape=shape, colour = "black", fill = c1, size = dotSize))
+  
   return(g)
 }

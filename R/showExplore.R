@@ -89,11 +89,11 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   if (exploreResult$doingMetaAnalysis) 
     switch(exploreResult$metaAnalysis$analysisType,
            "fixed"={
-             showType<-c("LambdaF")
-             if (exploreResult$metaAnalysis$analyseBias) showType<-c(showType,"LambdaB")
+             showType<-c("metaRiv")
+             if (exploreResult$metaAnalysis$analyseBias) showType<-c(showType,"metaBias")
              },
            "random"={
-             showType<-c("LambdaF","LambdaR")
+             showType<-c("metaRiv","metaRsd")
              if (exploreResult$metaAnalysis$analysisVar=="var") showType[2]<-"LambdaRn"
                },
            {showType<-c("Lambda","pNull")}
@@ -561,13 +561,13 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                 df1<-result$df1
                 showVals<-r2llr(rVals,ns,df1,"dLLR",evidence$llr,evidence$prior)
               },
-              "LambdaB"={
+              "metaBias"={
                 showVals<-result$param3
               },
-              "LambdaF"={
+              "metaRiv"={
                 showVals<-result$param1
               },
-              "LambdaR"={
+              "metaRsd"={
                 showVals<-result$param2
               },
               "LambdaRn"={
@@ -579,7 +579,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
               "pNull"={
                 showVals<-result$param2
               },
-              "S"={
+              "metaS"={
                 showVals<-result$S
               },
               

@@ -13,19 +13,19 @@ worldLabel<-function(metaResult,whichMeta=NULL) {
     p2<-metaResult[[Dist]]$param2Max
     p3<-metaResult[[Dist]]$param3Max
     
-    if (is.element(Dist,c("random","fixed"))) label1<-"r[est]" else label1<-Dist
+    if (is.element(Dist,c("random","fixed"))) label1<-"r[m]" else label1<-Dist
     lb<-paste0(label1,"=",brawFormat(mean(p1,na.rm=TRUE),digits=3))
     # if (length(p1)>1)
     #   lb<-paste0(lb,"\u00B1",brawFormat(std(p1),digits=2))
     if (!is.null(p2)) {
       label2<-"p(null)"
-      if (is.element(Dist,c("random","fixed"))) label2<-"sd(r)[est]"
+      if (is.element(Dist,c("random","fixed"))) label2<-"sd(r)[m]"
       lb<-paste0(lb,"\n",label2,"=",brawFormat(mean(p2,na.rm=TRUE),digits=3))
       # if (length(p2)>1)
       #   lb<-paste0(lb,"\u00B1",brawFormat(std(p2),digits=2))
     }
     if (!is.null(p3)) {
-      label3<-"bias[est]"
+      label3<-"bias[m]"
       lb<-paste0(lb,"\n",label3,"=",brawFormat(mean(p3,na.rm=TRUE),digits=3))
     }
     return(lb)
@@ -144,18 +144,26 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showTheory=FALSE) {
 #' 
 #' @return ggplot2 object - and printed
 #' @examples
-#' showMultipleMeta<-function(metaResult=doMetaAnalysis(),showType="n-k")
+#' showMultipleMeta<-function(metaResult=doMetaAnalysis(),showType="metaK;null")
 #' @export
-showMetaMultiple<-function(metaResult=braw.res$metaMultiple,showType="n-k") {
+showMetaMultiple<-function(metaResult=braw.res$metaMultiple,showType=NULL,dimension="2D") {
   if (is.null(metaResult)) metaResult<-doMetaMultiple()
 
-  if (metaResult$metaAnalysis$analysisType=="fixed") {
-    showType<-"S-k"
-    if (metaResult$metaAnalysis$analyseBias) showType<-"bias-k"
-    if (metaResult$hypothesis$effect$world$worldOn) showType<-"k-rp"
+  if (is.null(showType)) {
+    switch(metaResult$metaAnalysis$analysisType,
+           "fixed"={
+             showType<-"metaRiv;metaS"
+             if (metaResult$metaAnalysis$analyseBias) showType<-"metaRiv;metaBias"
+           },
+           "random"={
+             showType<-"metaRiv;metaRsd"
+           },
+           "world"={
+             showType="metaS;metaS"
+           })
   }
-  if (metaResult$metaAnalysis$analysisType=="random") showType<-"sd-k"
-  if (showType=="S-S") {
+  
+  if (showType=="metaS;metaS") {
     braw.env$plotArea<-c(0,0,1,1)
     g<-drawMeta(metaResult=metaResult,showType=showType,g=NULL)
   } else {
@@ -182,7 +190,7 @@ showMetaMultiple<-function(metaResult=braw.res$metaMultiple,showType="n-k") {
   else return(g)  
 }
 
-drawMeta<-function(metaResult=doMetaMultiple(),whichMeta="Single",showType="n-k",g=NULL) {
+drawMeta<-function(metaResult=doMetaMultiple(),whichMeta="Single",showType="metaK;null",g=NULL) {
   
   metaAnalysis<-metaResult$metaAnalysis
 
@@ -195,7 +203,7 @@ drawMeta<-function(metaResult=doMetaMultiple(),whichMeta="Single",showType="n-k"
   n3<-sum(metaResult$bestDist=="Exp")
   sAll<-c(metaResult$single$Smax,metaResult$gauss$Smax,metaResult$exp$Smax)
   
-  if (showType=="S-S") {
+  if (showType=="metaS;metaS") {
     use<-order(c(n1,n2,n3))
     use1<-c("Single","Gauss","Exp")[use[2]]
     use2<-c("Single","Gauss","Exp")[use[3]]
@@ -234,53 +242,49 @@ drawMeta<-function(metaResult=doMetaMultiple(),whichMeta="Single",showType="n-k"
     if (isempty(x)) {return(nullPlot())}
   }
   
-    yticks<-c()
-    switch (showType,
-            "S-k"={
-              x<-metaResult$fixed$param1Max
-              y<-metaResult$fixed$Smax
+  if (is.element(metaResult$metaAnalysis$analysisType,c("fixed","random"))) {
+    switch(metaResult$metaAnalysis$analysisType,
+           "fixed"={result<-metaResult$fixed},
+           "random"={result<-metaResult$random})
+  }
+  yticks<-c()
+  switch (showType,
+          "metaRiv;metaRsd"={
+              x<-result$param1Max
+              y<-result$param2Max
               y1<-0
-              sAll<-metaResult$fixed$Smax
-              ylim<-c(min(sAll,na.rm=TRUE),max(sAll,na.rm=TRUE))+c(-1,1)*(max(sAll,na.rm=TRUE)-min(sAll,na.rm=TRUE))/4
-              ylabel<-"log(lk)"
-              xlabel<-"r[est]"
+              ylim<-c(min(y),max(y))+c(-1,1)*(max(y)-min(y))*0.2
+              ylabel<-"sd(r)[m]"
+              xlabel<-"r[m]"
               useBest<-1:length(x)
             },
-            "n-k"={
+            "metaRiv;metaBias"={
+              x<-result$param1Max
+              y<-result$param3Max
+              y1<-0
+              ylim<-c(min(y),max(y))+c(-1,1)*(max(y)-min(y))*0.2
+              ylim<-c(0,1)
+              ylabel<-"bias[m]"
+              xlabel<-"r[m]"
+              useBest<-1:length(x)
+            },
+            "metaRiv;metaS"={
+              x<-result$param1Max
+              y<-result$Smax
+              y1<-0
+              sAll<-result$Smax
+              ylim<-c(min(sAll,na.rm=TRUE),max(sAll,na.rm=TRUE))+c(-1,1)*(max(sAll,na.rm=TRUE)-min(sAll,na.rm=TRUE))/4
+              ylabel<-"log(lk)"
+              xlabel<-"r[m]"
+              useBest<-1:length(x)
+            },
+            "metaK;null"={
               y<-y1
               ylim<-c(-0.02,1.1)
               ylabel<-"p[null]"
               xlabel<-braw.env$Llabel
             },
-            "k-rp"={
-              x<-metaResult$fixed$rpIV
-              y<-metaResult$fixed$param1Max
-              y1<-0
-              ylim<-c(-1,1)
-              ylabel<-"r[est]"
-              xlabel<-"r[p]"
-              useBest<-1:length(x)
-            },
-            "sd-k"={
-              x<-metaResult$random$param1Max
-              y<-metaResult$random$param2Max
-              y1<-0
-              ylim<-c(min(y),max(y))+c(-1,1)*(max(y)-min(y))*0.2
-              ylabel<-"sd(r)[est]"
-              xlabel<-"r[est]"
-              useBest<-1:length(x)
-            },
-            "bias-k"={
-              x<-metaResult$fixed$param1Max
-              y<-metaResult$fixed$param3Max
-              y1<-0
-              ylim<-c(min(y),max(y))+c(-1,1)*(max(y)-min(y))*0.2
-              ylim<-c(0,1)
-              ylabel<-"bias[est]"
-              xlabel<-"r[est]"
-              useBest<-1:length(x)
-            },
-            "S-S"={
+            "metaS;metaS"={
               y<-yS
               xlim<-c(min(sAll,na.rm=TRUE),max(sAll,na.rm=TRUE))
               if (length(x)==1) xlim<-xlim+c(-1,1)
@@ -313,7 +317,7 @@ drawMeta<-function(metaResult=doMetaMultiple(),whichMeta="Single",showType="n-k"
                           colour="black", fill=braw.env$plotColours$metaAnalysis, alpha=min(1,2.5/sqrt(length(x))), 
                           size = dotSize))
       
-      if (showType=="S-S") {
+      if (showType=="metaS;metaS") {
         g<-addG(g,dataPath(data=data.frame(x=xlim,y=ylim),colour="red"))
       }
 
@@ -324,7 +328,7 @@ drawMeta<-function(metaResult=doMetaMultiple(),whichMeta="Single",showType="n-k"
         yp<-ylim[2]-diff(ylim)/10
         vj<-1
         }
-    if (showType=="S-S") {
+    if (showType=="metaS;metaS") {
       fullText<-paste0(use2,"(",format(mean(metaY$param1Max),digits=3))
       if (length(metaY$param1Max)>1) fullText<-paste0(fullText,"\u00B1",format(std(metaY$param1Max),digits=2),")")
       else fullText<-paste0(fullText,")")
@@ -356,7 +360,7 @@ drawMeta<-function(metaResult=doMetaMultiple(),whichMeta="Single",showType="n-k"
       g<-addG(g,dataLegend(data.frame(names=names,colours=c(colM,rep(NA,length(names)-1))),title="",shape=braw.env$plotShapes$meta))
     } else {
 
-      if (is.element(showType,c("S-k","bias-k","sd-k","k-rp"))) {
+      if (is.element(showType,c("metaRiv;metaS","metaRiv;metaBias","metaRiv;metaRsd"))) {
         colM=braw.env$plotColours$metaAnalysis
         lb<-worldLabel(metaResult,whichMeta)
         names<-strsplit(lb,"\n")[[1]]
