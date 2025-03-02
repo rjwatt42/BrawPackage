@@ -420,26 +420,19 @@ plotAxis<-function(showType,hypothesis,design=NULL) {
             ylabel<-"False Miss"
             use_cols<-braw.env$plotColours$fmr
           },
-          "metaBias"={
-            ylim<-c(-0.01,1.01)
-            ytick<-seq(0,1,0.1)
-            ymins<-seq(0,1,0.1)
-            ylabel<-"bias[m]"
-            use_cols<-braw.env$plotColours$metaAnalysis
-          },
           "metaRiv"={
             ylim<-c(-1.01,1.01)
             ytick<-seq(-1,1,0.2)
             ymins<-seq(-1,1,0.1)
             ylabel<-"r[m]"
-            use_cols<-braw.env$plotColours$metaAnalysis
+            use_cols<-braw.env$plotColours$metaMultiple
           },
           "metaRsd"={
             ylim<-c(-0.01,0.5)
             ytick<-seq(0,0.5,0.1)
             ymins<-seq(0,0.5,0.05)
             ylabel<-"sd(r)[m]"
-            use_cols<-braw.env$plotColours$metaAnalysis
+            use_cols<-braw.env$plotColours$metaMultiple
           },
           "metaRvar"={
             ylim<-c(-0.05,0.2)
@@ -447,28 +440,28 @@ plotAxis<-function(showType,hypothesis,design=NULL) {
             ymins<-seq(-0.05,0.2,0.01)
             ylabel<-"var(r)[m]"
             lines<-0
-            use_cols<-braw.env$plotColours$metaAnalysis
+            use_cols<-braw.env$plotColours$metaMultiple
           },
           "metaBias"={
             ylim<-c(-0.05,1.05)
             ytick<-seq(0,0.1,1)
             ymins<-seq(0,0.1,1)
             ylabel<-"bias[m]"
-            use_cols<-braw.env$plotColours$metaAnalysis
+            use_cols<-braw.env$plotColours$metaMultiple
           },
           "metaK"={
             ylim<-c(-0.01,1.01)
             ytick<-seq(0,1,0.2)
             ymins<-seq(0,1,0.1)
             ylabel<-braw.env$Llabel
-            use_cols<-braw.env$plotColours$metaAnalysis
+            use_cols<-braw.env$plotColours$metaMultiple
           },
           "pNull"={
             ylim<-c(-0.01,1.01)
             ytick<-seq(0,1,0.2)
             ymins<-seq(0,1,0.1)
             ylabel<-braw.env$Plabel
-            use_cols<-braw.env$plotColours$metaAnalysis
+            use_cols<-braw.env$plotColours$metaMultiple
           },
           "PDF"={
             ylim<-c(0,1)
@@ -480,7 +473,7 @@ plotAxis<-function(showType,hypothesis,design=NULL) {
             ylim<-c(min(result$Ss),max(result$Ss))
             ylabel<-"llk"
             ytick<-seq(ceil(min(result$Ss)),ceil(max(result$Ss)),1)
-            use_cols<-braw.env$plotColours$metaAnalysis
+            use_cols<-braw.env$plotColours$metaMultiple
           },
           "iv.mn"={
             var<-hypothesis$IV

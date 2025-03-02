@@ -314,7 +314,7 @@ drawMeta<-function(metaResult=doMetaMultiple(),whichMeta="Single",showType="meta
                           size = dotSize))
       pts<-data.frame(x=x[useBest],y=y[useBest])
       g<-addG(g,dataPoint(data=pts,shape=braw.env$plotShapes$meta,
-                          colour="black", fill=braw.env$plotColours$metaAnalysis, alpha=min(1,2.5/sqrt(length(x))), 
+                          colour="black", fill=braw.env$plotColours$metaMultiple, alpha=min(1,2.5/sqrt(length(x))), 
                           size = dotSize))
       
       if (showType=="metaS;metaS") {
@@ -340,7 +340,7 @@ drawMeta<-function(metaResult=doMetaMultiple(),whichMeta="Single",showType="meta
       if (length(metaY$Smax)>1) fullText<-paste0(fullText,"\u00B1",format(std(metaY$Smax),digits=2),")")
       fullText<-paste0(fullText," (",format(sum(y>x)),"/",length(metaResult$bestDist),")")
       
-      if (mean(y>x)) colM=braw.env$plotColours$metaAnalysis  else colM="grey"
+      if (mean(y>x)) colM=braw.env$plotColours$metaMultiple  else colM="grey"
       names<-strsplit(fullText,"\n")[[1]]
       g<-addG(g,dataLegend(data.frame(names=names,colours=c(colM,rep(NA,length(names)-1))),title="",shape=braw.env$plotShapes$meta))
       
@@ -355,13 +355,13 @@ drawMeta<-function(metaResult=doMetaMultiple(),whichMeta="Single",showType="meta
       if (length(metaX$Smax)>1) fullText<-paste0(fullText,"\u00B1",format(std(metaX$Smax),digits=2),")")
       fullText<-paste0(fullText," (",format(sum(x>y)),"/",length(metaResult$bestDist),")")
       
-      if (mean(y>x)) colM="grey"  else colM=braw.env$plotColours$metaAnalysis
+      if (mean(y>x)) colM="grey"  else colM=braw.env$plotColours$metaMultiple
       names<-strsplit(fullText,"\n")[[1]]
       g<-addG(g,dataLegend(data.frame(names=names,colours=c(colM,rep(NA,length(names)-1))),title="",shape=braw.env$plotShapes$meta))
     } else {
 
       if (is.element(showType,c("metaRiv;metaS","metaRiv;metaBias","metaRiv;metaRsd"))) {
-        colM=braw.env$plotColours$metaAnalysis
+        colM=braw.env$plotColours$metaMultiple
         lb<-worldLabel(metaResult,whichMeta)
         names<-strsplit(lb,"\n")[[1]]
 
@@ -373,7 +373,7 @@ drawMeta<-function(metaResult=doMetaMultiple(),whichMeta="Single",showType="meta
       } else {
         use<-which.max(c(n1,n2,n3))
         bestD<-c("Single","Gauss","Exp")[use]
-        if (whichMeta==bestD)  colM=braw.env$plotColours$metaAnalysis else colM="grey"
+        if (whichMeta==bestD)  colM=braw.env$plotColours$metaMultiple else colM="grey"
         lb<-worldLabel(metaResult,whichMeta)
         g<-addG(g,dataLegend(data.frame(names=strsplit(lb,"\n")[[1]],colours=c(colM,NA)),title="",shape=braw.env$plotShapes$meta))
       }     
