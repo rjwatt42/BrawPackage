@@ -83,13 +83,13 @@ resetExploreResult<-function(nsims,n_vals,oldResult=NULL) {
   
   result<-list(rval=b,pval=b,rpval=b,raval=b,roval=b,poval=b,nval=b,df1=b,
                aic=b,aicNull=b,sem=b,
-               iv=list(mn=b,sd=b,sk=b,kt=b),
-               dv=list(mn=b,sd=b,sk=b,kt=b),
-               rd=list(mn=b,sd=b,sk=b,kt=b),
+               iv.mn=b,iv.sd=b,iv.sk=b,iv.kt=b,
+               dv.mn=b,dv.sd=b,dv.sk=b,dv.kt=b,
+               er.mn=b,er.sd=b,er.sk=b,er.kt=b,
                rIV2=b,rIVIV2DV=b,pIV2=b,pIVIV2DV=b,
                r=list(direct=bm,unique=bm,total=bm),
                p=list(direct=bm,unique=bm,total=bm),
-               param1=b,param2=b,param3=b
+               param1=b,param2=b,param3=b,S=b
   )
   if (!is.null(oldResult)) {
     result<-mergeExploreResult(oldResult,result)
@@ -122,10 +122,10 @@ storeExploreResult<-function(result,res,ri,vi) {
   result$dv$sd[ri,vi]<-res$dv.sd
   result$dv$sk[ri,vi]<-res$dv.sk
   result$dv$kt[ri,vi]<-res$dv.kt
-  result$rd$mn[ri,vi]<-res$rd.mn
-  result$rd$sd[ri,vi]<-res$rd.sd
-  result$rd$sk[ri,vi]<-res$rd.sk
-  result$rd$kt[ri,vi]<-res$rd.kt
+  result$er.mn[ri,vi]<-res$er.mn
+  result$er.sd[ri,vi]<-res$er.sd
+  result$er.sk[ri,vi]<-res$er.sk
+  result$er.kt[ri,vi]<-res$er.kt
   }
   
   if (!is.null(res$rIV2)){
@@ -147,9 +147,11 @@ storeExploreResult<-function(result,res,ri,vi) {
     param1Max<-max(c(res$fixed$param1Max,res$random$param1Max,res$single$param1Max,res$gauss$param1Max,res$exp$param1Max),na.rm=TRUE)
     param2Max<-max(c(res$fixed$param2Max,res$random$param2Max,res$single$param2Max,res$gauss$param2Max,res$exp$param2Max),na.rm=TRUE)
     param3Max<-max(c(res$fixed$param3Max,res$random$param3Max,res$single$param3Max,res$gauss$param3Max,res$exp$param3Max),na.rm=TRUE)
+    S<-max(c(res$fixed$S,res$random$S,res$single$S,res$gauss$S,res$exp$S),na.rm=TRUE)
     result$param1[ri,vi]<-param1Max
     result$param2[ri,vi]<-param2Max
     result$param3[ri,vi]<-param3Max
+    result$S[ri,vi]<-S
   }
   return(result)
 }
@@ -181,10 +183,10 @@ mergeExploreResult<-function(res1,res2) {
   result$dv$sd<-rbind(res1$dv$sd,res2$dv$sd)
   result$dv$sk<-rbind(res1$dv$sk,res2$dv$sk)
   result$dv$kt<-rbind(res1$dv$kt,res2$dv$kt)
-  result$rd$mn<-rbind(res1$rd$mn,res2$rd$mn)
-  result$rd$sd<-rbind(res1$rd$sd,res2$rd$sd)
-  result$rd$sk<-rbind(res1$rd$sk,res2$rd$sk)
-  result$rd$kt<-rbind(res1$rd$kt,res2$rd$kt)
+  result$er.mn<-rbind(res1$er.mn,res2$er.mn)
+  result$er.sd<-rbind(res1$er.sd,res2$er.sd)
+  result$er.sk<-rbind(res1$er.sk,res2$er.sk)
+  result$er.kt<-rbind(res1$er.kt,res2$er.kt)
   
   result$r$direct<-abind(res1$r$direct,res2$r$direct,along=1)
     result$r$unique<-abind(res1$r$unique,res2$r$unique,along=1)
@@ -204,6 +206,7 @@ mergeExploreResult<-function(res1,res2) {
     result$param1<-rbind(res1$param1,res2$param1)
     result$param2<-rbind(res1$param2,res2$param2)
     result$param3<-rbind(res1$param3,res2$param3)
+    result$S<-rbind(res1$S,res2$S)
     
   return(result)
 }
@@ -386,10 +389,6 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
           "NoStudies"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "MetaType"={vals<-c("FF","FT","TF","TT")}
   )
-  if (substr(explore$exploreType,1,1)=="r")
-    switch(braw.env$RZ,
-           "z"={vals<-tanh(vals)},
-           {})
   if (xlog) vals<-10^vals
   if (is.element(explore$exploreType,c("IVlevels","DVlevels","n","NoStudies"))) vals<-round(vals)
   

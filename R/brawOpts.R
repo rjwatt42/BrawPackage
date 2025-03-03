@@ -148,6 +148,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
           
           braw.env$z_range<-1.5
           braw.env$r_range<-0.99
+          braw.env$d_range<-5
           braw.env$w_range<-c(0.05,1)
           braw.env$fullRange<-3
           braw.env$nNpoints<-201
@@ -205,6 +206,8 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
           braw.env$rsLabel<-'r[s]'
           braw.env$zpLabel<-'z[p]'
           braw.env$zsLabel<-'z[s]'
+          braw.env$dpLabel<-'d[p]'
+          braw.env$dsLabel<-'d[s]'
           
           ###############################
           # notation for world

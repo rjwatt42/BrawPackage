@@ -35,7 +35,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
            "Power"=     {showType<-c("ws","wp")},
            "CILimits"=  {showType<-c("ci1","ci2")},
            "DV"= {showType<-c("dv.mn","dv.sd","dv.sk","dv.kt")},
-           "Residuals"= {showType<-c("rd.mn","rd.sd","rd.sk","rd.kt")},
+           "Residuals"= {showType<-c("er.mn","er.sd","er.sk","er.kt")},
            {}
     )
   }
@@ -440,23 +440,23 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                 "dv.kt"={
                   showVals<-exploreResult$result$dv$kt
                 },
-                "rd.mn"={
+                "er.mn"={
                   showVals<-exploreResult$result$rs$mn
                 },
-                "rd.sd"={
+                "er.sd"={
                   showVals<-exploreResult$result$rs$sd
                 },
-                "rd.sk"={
+                "er.sk"={
                   showVals<-exploreResult$result$rs$sk
                 },
-                "rd.kt"={
+                "er.kt"={
                   showVals<-exploreResult$result$rs$kt
                 }
         )
         if (is.element(showType,c("rs","p","ws","n","AIC","log(lrs)","log(lrd)",
                                   "metaBias","metaRiv","metaRsd","Lambda","pNull","metaS",
                                   "iv.mn","iv.sd","iv.sk","iv.kt","dv.mn","dv.sd","dv.sk","dv.kt",
-                                  "rd.mn","rd.sd","rd.sk","rd.kt"))) {
+                                  "er.mn","er.sd","er.sk","er.kt"))) {
           quants=(1-quantileShow)/2
           for (i in 1:length(exploreResult$vals)) {
             y75[i]<-quantile(showVals[,i],0.5+quants,na.rm=TRUE)

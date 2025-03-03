@@ -12,14 +12,25 @@ worldLabel<-function(metaResult,whichMeta=NULL) {
     p1<-metaResult[[Dist]]$param1Max
     p2<-metaResult[[Dist]]$param2Max
     p3<-metaResult[[Dist]]$param3Max
+    switch(braw.env$RZ,
+           "r"={},
+           "z"={
+             p1<-atanh(p1)
+             p2<-atanh(p2)
+           },
+           "d"={
+             p1<-2*p1/sqrt(1-p1^2)
+             p2<-2*p2/sqrt(1-p2^2)
+           }
+           )
     
-    if (is.element(Dist,c("random","fixed"))) label1<-"r[m]" else label1<-Dist
+    if (is.element(Dist,c("random","fixed"))) label1<-paste0(braw.env$RZ,"[m]") else label1<-Dist
     lb<-paste0(label1,"=",brawFormat(mean(p1,na.rm=TRUE),digits=3))
     # if (length(p1)>1)
     #   lb<-paste0(lb,"\u00B1",brawFormat(std(p1),digits=2))
     if (!is.null(p2)) {
       label2<-"p(null)"
-      if (is.element(Dist,c("random","fixed"))) label2<-"sd(r)[m]"
+      if (is.element(Dist,c("random","fixed"))) label2<-paste0("sd(",braw.env$RZ,")[m]")
       lb<-paste0(lb,"\n",label2,"=",brawFormat(mean(p2,na.rm=TRUE),digits=3))
       # if (length(p2)>1)
       #   lb<-paste0(lb,"\u00B1",brawFormat(std(p2),digits=2))
@@ -42,7 +53,7 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showTheory=FALSE) {
   
   showSval<-FALSE
   showSig<-TRUE
-  SvalExp<-0.5
+  SvalExp<-1
   showLines<-FALSE # in jamovi the code for lines is very slow
   
   metaAnalysis<-metaResult$metaAnalysis
@@ -53,7 +64,8 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showTheory=FALSE) {
   d1<-metaResult$result$rIV
   switch(braw.env$RZ,
          "r"={},
-         "z"={d1<-atanh(d1)}
+         "z"={d1<-atanh(d1)},
+         "d"={d1<-2*d1/sqrt(1-d1^2)}
          )
   d1n<-(metaResult$result$rpIV==0 & hypothesis$effect$world$worldOn)
   x<-plotAxis("rs",hypothesis)
@@ -77,7 +89,8 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showTheory=FALSE) {
                xticks=makeTicks(x$ticks),xlabel=makeLabel(disp1),
                yticks=makeTicks(y$ticks,10^y$ticks),ylabel=makeLabel(disp2),
                top=1,g=NULL)
-
+  g<-addG(g,plotTitle(paste0("Method=",metaResult$metaAnalysis$method),size=0.75))
+  
   # if (length(d1)>=1200) {
   #   nbins<-diff(ylim)/(2*IQR(d2[use])*length(d2[use])^(-0.33))*2
   #   nbins<-min(nbins,101)
@@ -86,14 +99,15 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showTheory=FALSE) {
   
   g<-drawWorld(hypothesis,design,metaResult,g,
                braw.env$plotColours$metaAnalysisTheory,
-               sigOnly=metaAnalysis$analyseBias,
+               # sigOnly=metaAnalysis$analyseBias,
                showTheory=showTheory,SvalExp=SvalExp,showLines=showLines)
   if (showSig && metaAnalysis$analyseBias) {
     nv<-10^seq(log10(braw.env$minN),log10(braw.env$maxN),length.out=101)
     rv<-p2r(0.05,nv,1)
     switch(braw.env$RZ,
            "r"={},
-           "z"={rv<-atanh(rv)}
+           "z"={rv<-atanh(rv)},
+           "d"={rv<-2*rv/sqrt(1-rv^2)}
     )
     if (braw.env$nPlotScale=="log10") {nv<-log10(nv)}
     use<-(nv<ylim[2] & nv>ylim[1])
@@ -489,6 +503,11 @@ drawWorld<-function(hypothesis,design,metaResult,g,colour="white",
          },
          "z"={
            z<-seq(-1,1,length.out=501)*braw.env$z_range
+         },
+         "d"={
+           d<-seq(-1,1,length.out=501)*braw.env$d_range
+           r<-d/sqrt(d^2+4)
+           z<-atanh(r)
          }
          )
   if (braw.env$nPlotScale=="log10") 
@@ -503,6 +522,9 @@ drawWorld<-function(hypothesis,design,metaResult,g,colour="white",
              for (i in 1:nrow(za)) za[i,]<-zdens2rdens(za[i,],r)
            },
            "z"={
+           },
+           "d"={
+             for (i in 1:nrow(za)) za[i,]<-rdens2ddens(zdens2rdens(za[i,],r),d)
            }
     )
     za<-za/max(za,na.rm=TRUE)
@@ -518,13 +540,17 @@ drawWorld<-function(hypothesis,design,metaResult,g,colour="white",
          "r"={
            for (i in 1:nrow(zb)) zb[i,]<-zdens2rdens(zb[i,],r)
          },
-         "z"={}
+         "z"={
+         },
+         "d"={
+           for (i in 1:nrow(zb)) zb[i,]<-rdens2ddens(zdens2rdens(zb[i,],r),d)
+         }
          ) 
   # zb<-zb-min(zb,na.rm=TRUE)
   zb<-zb/max(zb,na.rm=TRUE)
   
   if (braw.env$nPlotScale=="log10") {n<-log10(n)}
-  switch(braw.env$RZ,"r"={z<-r},"z"={})
+  switch(braw.env$RZ,"r"={z<-r},"z"={},"d"={z<-d})
     
   # black is the actual world
   # filled is the best fit world

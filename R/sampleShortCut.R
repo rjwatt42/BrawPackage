@@ -120,10 +120,10 @@ sampleShortCut<-function(hypothesis,design,evidence,nsims,appendData,oldanalysis
                    dv.sd=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$dv.sd),
                    dv.sk=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$dv.sk),
                    dv.kt=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$dv.kt),
-                   rd.mn=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$rd.mn),
-                   rd.sd=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$rd.sd),
-                   rd.sk=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$rd.sk),
-                   rd.kt=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$rd.kt),
+                   er.mn=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$er.mn),
+                   er.sd=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$er.sd),
+                   er.sk=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$er.sk),
+                   er.kt=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$er.kt),
                    aic=rbind(matrix(rep(NA,nsims),ncol=1),oldanalysis$aic),
                    aicNull=rbind(matrix(rep(NA,nsims),ncol=1),oldanalysis$aicNull)
     )
@@ -142,10 +142,10 @@ sampleShortCut<-function(hypothesis,design,evidence,nsims,appendData,oldanalysis
                  dv.sd=matrix(rep(0,nsims),ncol=1),
                  dv.sk=matrix(rep(0,nsims),ncol=1),
                  dv.kt=matrix(rep(0,nsims),ncol=1),
-                 rd.mn=matrix(rep(0,nsims),ncol=1),
-                 rd.sd=matrix(rep(0,nsims),ncol=1),
-                 rd.sk=matrix(rep(0,nsims),ncol=1),
-                 rd.kt=matrix(rep(0,nsims),ncol=1),
+                 er.mn=matrix(rep(0,nsims),ncol=1),
+                 er.sd=matrix(rep(0,nsims),ncol=1),
+                 er.sk=matrix(rep(0,nsims),ncol=1),
+                 er.kt=matrix(rep(0,nsims),ncol=1),
                  aic=NA,aicNull=NA
   )
   }

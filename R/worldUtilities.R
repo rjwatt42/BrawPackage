@@ -52,6 +52,10 @@ rdens2zdens<-function(rdens,rvals){
   rdens*(1-rvals^2)
 }
 
+rdens2ddens<-function(rdens,dvals) {
+  rdens*(4/(dvals^2+4)/sqrt(dvals^2+4))
+}
+
 zSamplingDistr<-function(zvals,Z,n){
   s=1/sqrt(n-3)
   1/s/sqrt(2*pi)*exp(-0.5*((zvals-Z)/s)^2)

@@ -69,12 +69,16 @@ getTrimFill<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
            "fixed"={
              q<-trimfill(zs,1/sqrt(ns-3),ma.common=TRUE,common=TRUE,random=FALSE)
              nFill<-q$k-length(zs)
-             list(param1Max=q$TE.common,param2Max=0,param3Max=nFill/(nFill+sum(!sigs)),Smax=q$seTE.common,Svals=q$seTE)
+             bias<-nFill/(nFill+sum(!sigs))
+             Smax<-getLogLikelihood(zs,ns,df1,dist,q$TE.common,0,bias)
+             list(param1Max=q$TE.common,param2Max=0,param3Max=bias,Smax=Smax,Svals=q$seTE)
            },
            "random"={
              q<-trimfill(zs,1/sqrt(ns-3),ma.common=FALSE,common=FALSE,random=TRUE)
              nFill<-q$k-length(zs)
-             list(param1Max=q$TE.random,param2Max=q$tau,param3Max=nFill/(nFill+sum(!sigs)),Smax=q$seTE.random,Svals=q$seTE)
+             bias<-nFill/(nFill+sum(!sigs))
+             Smax<-getLogLikelihood(zs,ns,df1,dist,q$TE.random,q$tau,bias)
+             list(param1Max=q$TE.random,param2Max=q$tau,param3Max=bias,Smax=Smax,Svals=q$seTE)
            }
            )
   },
@@ -168,8 +172,8 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
         for (p3 in 1:length(param3))
           S[p1,p2,p3]<-llfun(c(param1[p1],param2[p2],param3[p3]))
 
-    Smax<-min(S,na.rm=TRUE)
-    use<-which(S==Smax, arr.ind = TRUE)
+    Smax<- -min(S,na.rm=TRUE)
+    use<-which(S==-Smax, arr.ind = TRUE)
     param1Max<-param1[use[1,1]]
     lb1<-param1[max(1,use[1,1]-reInc1)]
     ub1<-param1[min(length(param1),use[1,1]+reInc1)]

@@ -15,21 +15,23 @@ type<-type[use]
 # convert g to r
 rval<-gval/sqrt(gval^2+4)
 
-d=2*r/sqrt(1-r^2)
-  
+# d=2*r/sqrt(1-r^2)
+# r=d/sqrt(d^2+4)
+
 studies<-list(result=list(rIV=rval[type==useType],
                           nval=nval[type==useType],
                           df1=nval[type==useType]*0+1,
                           rpIV=nval[type==useType]*0))
 
-mMLE<-makeMetaAnalysis(analysisType="fixed",method="MLE",analyseBias=FALSE)
-mTF<-makeMetaAnalysis(analysisType="fixed",method="TF",analyseBias=FALSE)
+mMLE<-makeMetaAnalysis(analysisType="random",method="MLE",analyseBias=TRUE)
+mTF<-makeMetaAnalysis(analysisType="random",method="TF",analyseBias=TRUE)
 
 resMLE<-doMetaAnalysis(studies,mMLE,TRUE)
 resTF<-doMetaAnalysis(studies,mTF,TRUE)
 
-braw.env$minN<<-4
+braw.env$minN<<-5
 braw.env$maxN<<-120
-braw.env$RZ<<-"z"
-braw.env$z_range<<-2
-# print(showMetaSingle(resTF))
+braw.env$RZ<<-"d"
+braw.env$d_range<<-4
+print(showMetaSingle(resTF))
+print(showMetaSingle(resMLE))

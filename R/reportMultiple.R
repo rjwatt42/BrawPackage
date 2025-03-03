@@ -57,7 +57,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
              "Hits"=       {pars<-c("e1a","e2a")},
              "Misses"=       {pars<-c("e1b","e2b")},
              "DV"=     {pars<-c("dv.mn","dv.sd","dv.sk","dv.kt")},
-             "Residuals"=     {pars<-c("rd.mn","rd.sd","rd.sk","rd.kt")},
+             "Residuals"=     {pars<-c("er.mn","er.sd","er.sk","er.kt")},
              { pars<-strsplit(showType,";")[[1]]
              }
       )
@@ -132,7 +132,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
       
       outputText1<-c()
       for (par in pars) {
-        if (substr(par,1,1)=="r")
+        if (is.element(par,c("rs","rp","re","ro","metaRiv","metaRsd")))
           switch(braw.env$RZ,
                  "r"={},
                  "z"={par<-gsub("^r","z",par)}
@@ -347,12 +347,12 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
                     "dv.sd"={a<-result$dv.sd},
                     "dv.sk"={a<-result$dv.sk},
                     "dv.kt"={a<-result$dv.kt},
-                    "rd.mn"={a<-result$rd.mn},
-                    "rd.sd"={a<-result$rd.sd},
-                    "rd.sk"={a<-result$rd.sk},
-                    "rd.kt"={a<-result$rd.kt}
+                    "er.mn"={a<-result$er.mn},
+                    "er.sd"={a<-result$er.sd},
+                    "er.sk"={a<-result$er.sk},
+                    "er.kt"={a<-result$er.kt}
             )
-            if (substr(pars[j],1,1)=="r") 
+            if (is.element(pars[j],c("rs","rp","re","ro","metaRiv","metaRsd")))
               switch(braw.end$RZ,
                      "r"={},
                      "z"={a<-atan(a)}

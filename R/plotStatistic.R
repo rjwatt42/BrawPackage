@@ -19,10 +19,10 @@ collectData<-function(analysis,whichEffect) {
   dv.sk<-cbind(analysis$dv.sk[use])
   dv.kt<-cbind(analysis$dv.kt[use])
   
-  rd.mn<-cbind(analysis$rd.mn[use])
-  rd.sd<-cbind(analysis$rd.sd[use])
-  rd.sk<-cbind(analysis$rd.sk[use])
-  rd.kt<-cbind(analysis$rd.kt[use])
+  er.mn<-cbind(analysis$er.mn[use])
+  er.sd<-cbind(analysis$er.sd[use])
+  er.sk<-cbind(analysis$er.sk[use])
+  er.kt<-cbind(analysis$er.kt[use])
   
   if (all(is.na(analysis$rIV2))){
     rs<-cbind(analysis$rIV[use])
@@ -69,7 +69,7 @@ collectData<-function(analysis,whichEffect) {
   out<-list(rs=rs,ps=ps,ns=ns,df1=df1,rp=rp,ro=ro,po=po,
             iv.mn=iv.mn,iv.sd=iv.sd,iv.sk=iv.sk,iv.kt=iv.kt,
             dv.mn=dv.mn,dv.sd=dv.sd,dv.sk=dv.sk,dv.kt=dv.kt,
-            rd.mn=rd.mn,rd.sd=rd.sd,rd.sk=rd.sk,rd.kt=rd.kt)
+            er.mn=er.mn,er.sd=er.sd,er.sk=er.sk,er.kt=er.kt)
 }
 
 makeFiddle<-function(y,yd,orientation="horiz"){
@@ -222,7 +222,7 @@ expected_hist<-function(pts,valType,ylim,histGain,histGainrange){
   if (is.element(valType,c("wp","ws"))) valType<-"ws"
   if (is.element(valType,c("iv.mn","iv.sd","iv.sk","iv.kt",
                            "dv.mn","dv.sd","dv.sk","dv.kt",
-                           "rd.mn","rd.sd","rd.sk","rd.kt"))) valType<-"mn"
+                           "er.mn","er.sd","er.sk","er.kt"))) valType<-"mn"
   
   switch (valType,
           "rs"=  { # ns is small
@@ -534,7 +534,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   
   if (is.element(showType,c("iv.mn","iv.sd","iv.sk","iv.kt",
                             "dv.mn","dv.sd","dv.sk","dv.kt",
-                            "rd.mn","rd.sd","rd.sk","rd.kt"))) {
+                            "er.mn","er.sd","er.sk","er.kt"))) {
     # showSig<-FALSE
     labelSig<-FALSE
     labelNSig<-FALSE
@@ -617,17 +617,16 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   if (!is.null(hypothesis$IV2)){
     r<-c(r,effect$rIV2,effect$rIVIV2DV)
   }
-  rlims<-c(-1,1)
 
   switch(braw.env$RZ,
-         "r"={},
+         "r"={
+           rlims<-c(-1,1)
+         },
          "z"={
            r<-atanh(r)
            rlims<-c(-1,1)*braw.env$z_range
          })
-  rActual<-r
-  rActual[is.na(r)]<-0
-  
+
   xoff=0
   if (!is.null(hypothesis$IV2) && effectType=="all") 
     xoff=c(0,1,2)*1.2
@@ -724,10 +723,10 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
             "dv.sd"=showVals<-data$dv.sd,
             "dv.sk"=showVals<-data$dv.sk,
             "dv.kt"=showVals<-data$dv.kt,
-            "rd.mn"=showVals<-data$rd.mn,
-            "rd.sd"=showVals<-data$rd.sd,
-            "rd.sk"=showVals<-data$rd.sk,
-            "rd.kt"=showVals<-data$rd.kt,
+            "er.mn"=showVals<-data$er.mn,
+            "er.sd"=showVals<-data$er.sd,
+            "er.sk"=showVals<-data$er.sk,
+            "er.kt"=showVals<-data$er.kt,
     )
     if (logScale) {
       showVals<-log10(showVals)
@@ -792,7 +791,8 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                    inc<-cr/ceiling(cr/(2/npt))
                    rvals<-seq(inc,0.99,inc)
                    rvals<-c(-rev(rvals),0,rvals)
-                 } else rvals<-seq(-1,1,length.out=npt)*0.99
+                 } else 
+                   rvals<-seq(-1,1,length.out=npt)*0.99
                  xd<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
                  xdsig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
                  yv<-rvals
@@ -937,14 +937,14 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                ktsd<-sqrt(24*n*(n-2)*(n-3)/(n+1)^2/(n+3)/(n+5))
                xd<-dnorm(yv,0,ktsd)
              },
-             "rd.mn"={
+             "er.mn"={
                var<-hypothesis$DV
                n<-design$sN
                yv<-seq(ylim[1],ylim[2],length.out=npt)
                mnsd<-1/sqrt(n)*var$sd*sqrt(1-hypothesis$effect$rIV^2)
                xd<-dnorm(yv,0,mnsd)
              },
-             "rd.sd"={
+             "er.sd"={
                var<-hypothesis$DV
                n<-design$sN
                yv<-seq(ylim[1],ylim[2],length.out=npt)
@@ -959,13 +959,13 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                xd<-xd1^n
                if (max(xd)==0) xd<-NULL # for n>1000 because of underflow
              },
-             "rd.sk"={
+             "er.sk"={
                n<-design$sN
                yv<-seq(ylim[1],ylim[2],length.out=npt)
                sksd<-sqrt(6*n*(n-1)/(n-2)/(n+1)/(n+3))
                xd<-dnorm(yv,0,sksd)
              },
-             "rd.kt"={
+             "er.kt"={
                n<-design$sN
                yv<-seq(ylim[1],ylim[2],length.out=npt)
                ktsd<-sqrt(24*n*(n-2)*(n-3)/(n+1)^2/(n+3)/(n+5))
@@ -1256,7 +1256,7 @@ e2_plot<-function(analysis,disp,otheranalysis=NULL,orientation="vert",showTheory
               lab<-paste0("NonNull: r[p]~ ",lambda)
             },
             "z"={
-              lab<-paste0("NonNull: z[p]~ ",lambda)
+              lab<-paste0("NonNull: z[p]~ ",atanh(lambda))
             }
     )
   } else {
@@ -1268,7 +1268,7 @@ e2_plot<-function(analysis,disp,otheranalysis=NULL,orientation="vert",showTheory
             lab<-paste0("NonNull: r[p]~ ",distr,"(",rz,"/",lambda,")")
           },
           "z"={
-            lab<-paste0("NonNull: z[p]~ ",distr,"(",rz,"/",lambda,")")
+            lab<-paste0("NonNull: z[p]~ ",distr,"(",rz,"/",atanh(lambda),")")
           }
   )
   

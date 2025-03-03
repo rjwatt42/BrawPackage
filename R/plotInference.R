@@ -87,10 +87,10 @@ plotInference<-function(analysis,otheranalysis=NULL,disp="rs",orientation="vert"
           "dv.sk"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
           "dv.kt"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
           
-          "rd.mn"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
-          "rd.sd"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
-          "rd.sk"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
-          "rd.kt"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)}
+          "er.mn"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
+          "er.sd"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
+          "er.sk"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
+          "er.kt"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)}
   )
   return(g)
 }
@@ -168,7 +168,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
             if (braw.env$wPlotScale=="log10") d1<-log10(d1)
           }
   )
-  if (substr(disp1,1,1)=="r")
+  if (is.element(disp1,c("rs","rp","re","ro","metaRiv","metaRsd")))
     switch(braw.env$RZ,
            "r"={},
            "z"={d1<-atanh(d1)}
@@ -232,7 +232,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
             if (braw.env$wPlotScale=="log10") d2<-log10(d2)
           }
   )
-  if (substr(disp2,1,1)=="r")
+  if (is.element(disp2,c("rs","rp","re","ro","metaRiv","metaRsd")))
     switch(braw.env$RZ,
            "r"={},
            "z"={d2<-atanh(d2)}

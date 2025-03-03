@@ -82,7 +82,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
            "Power"=     {showType<-c("ws","wp")},
            "CILimits"=  {showType<-c("ci1","ci2")},
            "DV"= {showType<-c("dv.mn","dv.sd","dv.sk","dv.kt")},
-           "Residuals"= {showType<-c("rd.mn","rd.sd","rd.sk","rd.kt")},
+           "Residuals"= {showType<-c("er.mn","er.sd","er.sk","er.kt")},
            {}
     )
   }
@@ -697,20 +697,20 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
               "dv.kt"={
                 showVals<-result$dv$kt
               },
-              "rd.mn"={
+              "er.mn"={
                 showVals<-result$rs$mn
               },
-              "rd.sd"={
+              "er.sd"={
                 showVals<-result$rs$sd
               },
-              "rd.sk"={
+              "er.sk"={
                 showVals<-result$rs$sk
               },
-              "rd.kt"={
+              "er.kt"={
                 showVals<-result$rs$kt
               }
       )
-      if (substr(showType[si],1,1)=="r" && substr(showType[si],1,3)!="rd") {
+      if (is.element(showType[si],c("rs","rp","re","ro","metaRiv","metaRsd"))) {
         switch(braw.env$RZ,
                "r"={},
                "z"={showVals<-atanh(showVals)}
@@ -1030,7 +1030,7 @@ showExplore2D<-function(exploreResult=braw.res$explore,showType=c("rs","p"),show
             }
           }
   )
-    if (substr(showType[si],1,1)=="r" && substr(showType[si],1,3)!="rd") {
+    if (is.element(showType[si],c("rs","rp","re","ro","metaRiv","metaRsd"))) {
       switch(braw.env$RZ,
              "r"={},
              "z"={showVals<-atanh(showVals)}

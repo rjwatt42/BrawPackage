@@ -112,7 +112,7 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
              showType=c("dv.mn","dv.sd","dv.sk","dv.kt")
            },
            "Residuals"= {
-             showType=c("rd.mn","rd.sd","rd.sk","rd.kt")
+             showType=c("er.mn","er.sd","er.sk","er.kt")
            },
            { showType<-strsplit(showType,";")[[1]]
              if (length(showType)==1) showType<-c(showType,NA)

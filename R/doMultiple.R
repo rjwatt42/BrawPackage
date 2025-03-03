@@ -22,10 +22,10 @@ mergeMultiple<-function(r1,r2) {
     dv.sd=rbind(r1$dv.sd,r2$dv.sd),
     dv.sk=rbind(r1$dv.sk,r2$dv.sk),
     dv.kt=rbind(r1$dv.kt,r2$dv.ky),
-    rd.mn=rbind(r1$rd.mn,r2$rd.mn),
-    rd.sd=rbind(r1$rd.sd,r2$rd.sd),
-    rd.sk=rbind(r1$rd.sk,r2$rd.sk),
-    rd.kt=rbind(r1$rd.kt,r2$rd.ky)
+    er.mn=rbind(r1$er.mn,r2$er.mn),
+    er.sd=rbind(r1$er.sd,r2$er.sd),
+    er.sk=rbind(r1$er.sk,r2$er.sk),
+    er.kt=rbind(r1$er.kt,r2$er.ky)
   )
   colnames(newResult$sem)<-colnames(r2$sem)
   if (!is.null(r1$rIV2)) {
@@ -62,7 +62,7 @@ resetMultiple<-function(nsims=0,evidence,multipleResult=NULL){
     aic=b,aicNull=b,sem=matrix(NA,nsims,8),
     iv.mn=b,iv.sd=b,iv.sk=b,iv.kt=b,
     dv.mn=b,dv.sd=b,dv.sk=b,dv.kt=b,
-    rd.mn=b,rd.sd=b,rd.sk=b,rd.kt=b
+    er.mn=b,er.sd=b,er.sk=b,er.kt=b
   )
   newResult<-c(newResult,list(
     rIV2=b,pIV2=b,rIVIV2DV=b,pIVIV2DV=b,
