@@ -2,6 +2,7 @@
 x<-read_excel("/Users/rogerwatt/downloads/chung-et-al-2016.xlsx","data")
 
 useType<-"iTBS"
+useMethod<-"random"
 
 # basic data
 nval<-as.numeric(unlist(x[3:225,7]))
@@ -23,8 +24,8 @@ studies<-list(result=list(rIV=rval[type==useType],
                           df1=nval[type==useType]*0+1,
                           rpIV=nval[type==useType]*0))
 
-mMLE<-makeMetaAnalysis(analysisType="random",method="MLE",analyseBias=TRUE)
-mTF<-makeMetaAnalysis(analysisType="random",method="TF",analyseBias=TRUE)
+mMLE<-makeMetaAnalysis(analysisType=useMethod,method="MLE",analyseBias=TRUE)
+mTF<-makeMetaAnalysis(analysisType=useMethod,method="TF",analyseBias=TRUE)
 
 resMLE<-doMetaAnalysis(studies,mMLE,TRUE)
 resTF<-doMetaAnalysis(studies,mTF,TRUE)
@@ -32,6 +33,6 @@ resTF<-doMetaAnalysis(studies,mTF,TRUE)
 braw.env$minN<<-5
 braw.env$maxN<<-120
 braw.env$RZ<<-"d"
-braw.env$d_range<<-4
-print(showMetaSingle(resTF))
-print(showMetaSingle(resMLE))
+braw.env$d_range<<-5.5
+print(showMetaSingle(resTF,showType="1/se"))
+print(showMetaSingle(resMLE,showType="1/se"))

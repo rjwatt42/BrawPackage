@@ -39,6 +39,9 @@ worldLabel<-function(metaResult,whichMeta=NULL) {
       label3<-"bias[m]"
       lb<-paste0(lb,"\n",label3,"=",brawFormat(mean(p3,na.rm=TRUE),digits=3))
     }
+    label4<-"S[max]"
+    lb<-paste0(lb,"\n",label4,"=",brawFormat(metaResult[[Dist]]$Smax,digits=3))
+    
     return(lb)
 }
 
@@ -48,7 +51,7 @@ worldLabel<-function(metaResult,whichMeta=NULL) {
 #' @examples
 #' showSingleMeta(metaResult=doMetaAnalysis(),showTheory=FALSE)
 #' @export
-showMetaSingle<-function(metaResult=braw.res$metaSingle,showTheory=FALSE) {
+showMetaSingle<-function(metaResult=braw.res$metaSingle,showType="n",showTheory=FALSE) {
   if (is.null(metaResult)) metaResult<-doMetaAnalysis()
   
   showSval<-FALSE
@@ -72,13 +75,22 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showTheory=FALSE) {
   xlim<-x$lim
   disp1<-x$label
 
-  d2<-metaResult$result$nval
-  y<-plotAxis("n",hypothesis)
-  disp2<-y$label
-  ylim<-y$lim
-  ylim<-log10(c(braw.env$minN-1,braw.env$maxN+1))
-  
-  if (y$logScale) d2<-log10(d2)
+  if (showType=="n") {
+    d2<-metaResult$result$nval
+    y<-plotAxis("n",hypothesis)
+    disp2<-y$label
+    ylim<-c(braw.env$minN-1,braw.env$maxN+1)
+    yticks<-y$ticks
+    if (braw.env$nPlotScale=="log10") {
+      d2<-log10(d2)
+      ylim<-log10(ylim)
+    }
+  } else {
+    disp2<-"1/se"
+    ylim<-sqrt(c(braw.env$minN,braw.env$maxN))
+    yticks<-seq(ceil(sqrt(braw.env$minN)),floor(sqrt(braw.env$maxN)),1)
+    d2<-sqrt(metaResult$result$nval)
+  }
   useAll<-(d2>ylim[1]) & (d2<ylim[2])
   ptsAll<-data.frame(x=d1[useAll],y=d2[useAll])
   useNull<-(d2>ylim[1]) & (d2<ylim[2] & d1n)
@@ -87,17 +99,12 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showTheory=FALSE) {
   assign("plotArea",c(0,0,1,1),braw.env)
   g<-startPlot(xlim,ylim,
                xticks=makeTicks(x$ticks),xlabel=makeLabel(disp1),
-               yticks=makeTicks(y$ticks,10^y$ticks),ylabel=makeLabel(disp2),
+               yticks=makeTicks(yticks),
+               ylabel=makeLabel(disp2),
                top=1,g=NULL)
   g<-addG(g,plotTitle(paste0("Method=",metaResult$metaAnalysis$method),size=0.75))
   
-  # if (length(d1)>=1200) {
-  #   nbins<-diff(ylim)/(2*IQR(d2[use])*length(d2[use])^(-0.33))*2
-  #   nbins<-min(nbins,101)
-  #   g<-addG(g,stat_bin2d(data=pts,aes(x=x,y=y),bins=nbins)+scale_fill_gradientn(colours=c(braw.env$plotColours$graphBack,braw.env$plotColours$descriptionC)))
-  # }
-  
-  g<-drawWorld(hypothesis,design,metaResult,g,
+  g<-drawWorld(hypothesis,design,metaResult,showType,g,
                braw.env$plotColours$metaAnalysisTheory,
                # sigOnly=metaAnalysis$analyseBias,
                showTheory=showTheory,SvalExp=SvalExp,showLines=showLines)
@@ -109,7 +116,8 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showTheory=FALSE) {
            "z"={rv<-atanh(rv)},
            "d"={rv<-2*rv/sqrt(1-rv^2)}
     )
-    if (braw.env$nPlotScale=="log10") {nv<-log10(nv)}
+    if (showType!="n") nv<-sqrt(nv)
+    else {if (braw.env$nPlotScale=="log10") {nv<-log10(nv)}}
     use<-(nv<ylim[2] & nv>ylim[1])
     g<-addG(g,dataLine(data.frame(x=rv[use],y=nv[use]),
                        colour=darken(braw.env$plotColours$infer_nsigC,off=-0.1),
@@ -488,7 +496,7 @@ makeWorldDist<-function(metaResult,design,world,z,n,sigOnly=FALSE,doTheory=FALSE
   return(zdens)
 }
 
-drawWorld<-function(hypothesis,design,metaResult,g,colour="white",
+drawWorld<-function(hypothesis,design,metaResult,showType="n",g,colour="white",
                     sigOnly=FALSE,
                     showTheory=FALSE,SvalExp=1,showLines=FALSE) {
   world<-hypothesis$effect$world
@@ -510,10 +518,13 @@ drawWorld<-function(hypothesis,design,metaResult,g,colour="white",
            z<-atanh(r)
          }
          )
-  if (braw.env$nPlotScale=="log10") 
-    n<-10^seq(log10(braw.env$minN),log10(braw.env$maxN),length.out=101)
-  else
-    n<-seq(braw.env$minN,braw.env$maxN,length.out=101)
+  if (showType=="n") {
+    if (braw.env$nPlotScale=="log10") 
+      n<-10^seq(log10(braw.env$minN),log10(braw.env$maxN),length.out=101)
+    else 
+      n<-seq(braw.env$minN,braw.env$maN,length.out=101)
+  } else
+    n<-seq(sqrt(braw.env$minN),sqrt(braw.env$maxN),length.out=101)^2
 
   if (showTheory) {
     za<-makeWorldDist(metaResult,design,world,z,n,sigOnly=sigOnly,doTheory=TRUE)
@@ -549,7 +560,9 @@ drawWorld<-function(hypothesis,design,metaResult,g,colour="white",
   # zb<-zb-min(zb,na.rm=TRUE)
   zb<-zb/max(zb,na.rm=TRUE)
   
-  if (braw.env$nPlotScale=="log10") {n<-log10(n)}
+  if (showType=="n") {
+    if (braw.env$nPlotScale=="log10") {n<-log10(n)}
+  }   else n<-sqrt(n)
   switch(braw.env$RZ,"r"={z<-r},"z"={},"d"={z<-d})
     
   # black is the actual world
