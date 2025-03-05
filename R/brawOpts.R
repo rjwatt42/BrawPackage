@@ -13,7 +13,7 @@ newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
     dev.new(width=height*aspect/144, height=height/144, noRStudioGD = TRUE)
   fontScale<-min(dev.size(units="px"))/200/1.75
   assign("labelSize",3.2*fontScale,braw.env)
-  setBrawEnv("plotRect",coord_cartesian(xlim=c(0,1),ylim=c(-0.25,1.5)))
+  setBrawEnv("plotRect",ggplot2::coord_cartesian(xlim=c(0,1),ylim=c(-0.25,1.5)))
   print(startPlot(box="none",backC=braw.env$plotColours$graphC))
 }
 
@@ -119,7 +119,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
           braw.env$dotSize<-braw.env$labelSize*1.25
           
           braw.env$autoShow<-autoShow
-          braw.env$plotRect<-coord_cartesian(xlim=c(0,1),ylim=c(0,1))
+          braw.env$plotRect<-ggplot2::coord_cartesian(xlim=c(0,1),ylim=c(0,1))
           
           braw.env$addHistory<-TRUE
           braw.env$plotLimits<-c()
