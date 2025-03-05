@@ -77,12 +77,12 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
                       fdr="#BBBBBB",fmr="#555555")
   }
   
-  mainTheme<-theme(panel.background = element_rect(fill=plotColours$graphBack, colour=plotColours$graphBack),
+  mainTheme<-ggplot2::theme(panel.background = element_rect(fill=plotColours$graphBack, colour=plotColours$graphBack),
                    panel.grid.major = element_line(linetype="blank"),panel.grid.minor = element_line(linetype="blank"),
                    plot.background = element_rect(fill=plotColours$graphC, colour=plotColours$graphC))
-  SMplotTheme<-theme(plot.title=element_text(size=14,face="bold"),axis.title=element_text(size=16,face="bold"),
+  SMplotTheme<-ggplot2::theme(plot.title=element_text(size=14,face="bold"),axis.title=element_text(size=16,face="bold"),
                      axis.text.x=element_text(size=12),axis.text.y=element_text(size=12))
-  LGplotTheme<-theme(plot.title=element_text(size=21,face="bold"),axis.title=element_text(size=24,face="bold"),
+  LGplotTheme<-ggplot2::theme(plot.title=element_text(size=21,face="bold"),axis.title=element_text(size=24,face="bold"),
                      axis.text.x=element_text(size=18),axis.text.y=element_text(size=18))
   
   
@@ -99,7 +99,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
           # braw.env$plainDiagramTheme<-mainTheme+SMplotTheme+theme(panel.background = element_rect(fill=plotColours$graphBack, colour=plotColours$graphBack),
           #                                                         panel.spacing=margin(0,0,0,0),plot.margin=margin(0.5,0.5,0.3,-0.2,"cm"))
   braw.env$blankTheme<-function() {
-    theme(panel.background = element_rect(fill=plotColours$graphC, colour=plotColours$graphC),
+    ggplot2::theme(panel.background = element_rect(fill=plotColours$graphC, colour=plotColours$graphC),
           panel.spacing=margin(0,0,0,0,"cm"),plot.margin=margin(-0.2,-0.4,-0.2,-0.5,"cm"),
           panel.grid.major = element_line(linetype="blank"),panel.grid.minor = element_line(linetype="blank"),
           legend.position = "none",
