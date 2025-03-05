@@ -6,7 +6,9 @@
 #' @examples
 #' showExplore(exploreResult=doExplore(),
 #'                        showType="rs",
-#'                        whichEffect="All",effectType="all")
+#'                        whichEffect="All",effectType="all",
+#'                        quantileShow=0.5,reportStats="Medians"
+#'                        )
 #' @export
 reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                         whichEffect="All",effectType="all",

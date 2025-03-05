@@ -4,7 +4,13 @@
 \alias{showDesign}
 \title{show a design object}
 \usage{
-showDesign(design = makeDesign())
+showDesign(
+  design = braw.def$design,
+  hypothesis = braw.def$hypothesis,
+  plotArea = c(0, 0, 1, 1),
+  autoShow = FALSE,
+  g = NULL
+)
 }
 \value{
 ggplot2 object - and printed

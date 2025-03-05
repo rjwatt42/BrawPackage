@@ -7,14 +7,18 @@
 makeEvidence(
   shortHand = FALSE,
   sigOnly = FALSE,
-  rInteractionOn = TRUE,
+  rInteractionOn = FALSE,
   rInteractionOnly = TRUE,
   ssqType = "Type3",
-  caseOrder = "Alphabetic",
+  caseOrder = "AsStated",
   llr = list(e1 = c(), e2 = 0),
+  useAIC = "AIC",
+  doSEM = FALSE,
   Welch = FALSE,
   Transform = "None",
-  prior = makeWorld(TRUE, "Uniform", "r")
+  McFaddens = TRUE,
+  prior = makeWorld(TRUE, "Uniform", "r"),
+  metaAnalysis = makeMetaAnalysis()
 )
 }
 \arguments{
@@ -32,6 +36,10 @@ makeEvidence(shortHand=FALSE,sigOnly=FALSE,
              rInteractionOn=TRUE,rInteractionOnly=TRUE,ssqType="Type3",
              caseOrder="Alphabetic",
              llr=list(e1=c(),e2=0),
+             useAIC="AIC",
+             doSEM=FALSE,
              Welch=FALSE,Transform="None",
-             prior=makeWorld(TRUE,"Uniform","r"))
+             prior=makeWorld(TRUE,"Uniform","r")
+             metaAnalysis=makeMetaAnalysis()
+             )
 }

@@ -49,7 +49,7 @@ worldLabel<-function(metaResult,whichMeta=NULL) {
 #' 
 #' @return ggplot2 object - and printed
 #' @examples
-#' showSingleMeta(metaResult=doMetaAnalysis(),showTheory=FALSE)
+#' showMetaSingle(metaResult=doMetaAnalysis(),showType="n",showTheory=FALSE)
 #' @export
 showMetaSingle<-function(metaResult=braw.res$metaSingle,showType="n",showTheory=FALSE) {
   if (is.null(metaResult)) metaResult<-doMetaAnalysis()
@@ -166,7 +166,7 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showType="n",showTheory=
 #' 
 #' @return ggplot2 object - and printed
 #' @examples
-#' showMultipleMeta<-function(metaResult=doMetaAnalysis(),showType="metaK;null")
+#' showMetaMultiple<-function(metaResult=doMetaAnalysis(),showType=NULL,dimension="2D")
 #' @export
 showMetaMultiple<-function(metaResult=braw.res$metaMultiple,showType=NULL,dimension="2D") {
   if (is.null(metaResult)) metaResult<-doMetaMultiple()

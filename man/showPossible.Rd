@@ -5,13 +5,16 @@
 \title{show the likelihood theory}
 \usage{
 showPossible(
-  possibleResult = makePossible(),
+  possibleResult = NULL,
+  showType = "Populations",
   cutaway = FALSE,
+  walls = TRUE,
+  showP = 0,
   view = "3D",
   axisScale = 1,
-  azimuth = 50,
-  elevation = 5,
-  distance = 2
+  azimuth = NULL,
+  elevation = 15,
+  distance = 8
 )
 }
 \arguments{
@@ -25,6 +28,8 @@ show the likelihood theory
 }
 \examples{
 showPossible <- function(possibleResult=makePossible(),
-                       cutaway=FALSE,view="3D",axisScale=1,
-                       azimuth=50,elevation=5,distance=2)
+                       showType="Populations",
+                       cutaway=FALSE,walls=TRUE,showP=0,
+                       view="3D",axisScale=1,
+                       azimuth=30,elevation=5,distance=2)
 }

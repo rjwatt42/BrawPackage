@@ -5,19 +5,20 @@
 \title{show the estimated population characteristics from a simulated sample}
 \usage{
 showInference(
-  analysis = doAnalysis(),
+  analysis = braw.res$result,
   showType = "Basic",
   dimension = "1D",
   orientation = "vert",
-  effectType = "direct",
-  showTheory = TRUE
+  whichEffect = "All",
+  effectType = "all",
+  showTheory = braw.env$showTheory
 )
 }
 \arguments{
 \item{showType}{"Basic", "CILimits", \cr
 "NHST","Hits","Misses",
        \emph{ or one or two of:} \cr
-"r","p","ci1","ci2", "rp","n"}
+"rs","p","ci1","ci2", "rp","n"}
 
 \item{dimension}{"1D", "2D"}
 
@@ -34,6 +35,6 @@ showInference(analysis=doAnalysis(),
               showType="Basic",
               dimension="1D",
               orientation="vert",
-              effectType="direct",
+              whichEffect="Main 1",
               showTheory=TRUE)
 }

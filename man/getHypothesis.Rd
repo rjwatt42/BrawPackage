@@ -4,7 +4,7 @@
 \alias{getHypothesis}
 \title{make a specific hypothesis}
 \usage{
-getHypothesis(name, hypothesis = makeHypothesis())
+getHypothesis(name, hypothesis = braw.def$hypothesis)
 }
 \arguments{
 \item{name}{"Psych","3"}

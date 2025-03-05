@@ -5,26 +5,26 @@
 \title{make a replication object}
 \usage{
 makeReplication(
-  ReplicationOn = FALSE,
-  ReplRepeats = 1,
-  ReplKeep = "last",
-  ReplPowerOn = TRUE,
-  ReplPower = 0.8,
-  ReplTails = 2,
-  ReplSigOnly = FALSE,
-  ReplBudgetType = "Fixed",
-  ReplBudget = 1000,
-  ReplPowerPrior = "None",
-  ReplVarAlpha = FALSE,
-  ReplAlphaChange = 2
+  On = FALSE,
+  Repeats = 1,
+  Keep = "Cautious",
+  RepAlpha = 0.05,
+  PowerOn = TRUE,
+  Power = 0.8,
+  Tails = 2,
+  PowerPrior = "None",
+  forceSigOriginal = FALSE,
+  forceSign = TRUE,
+  BudgetType = "Unlimited",
+  Budget = 1000
 )
 }
 \arguments{
-\item{ReplKeep}{"last", "cautious", "largeN", "smallP", "median"}
+\item{Keep}{"Cautious", "Last", "LargeN", "SmallP", "Median"}
 
-\item{ReplBudgetType}{"Fixed", "Budget"}
+\item{PowerPrior}{"None", "World", "Prior"}
 
-\item{ReplPowerPrior}{"None", "World", "Prior"}
+\item{BudgetType}{"Fixed", "Unlimited"}
 }
 \value{
 a replication object
@@ -33,11 +33,9 @@ a replication object
 make a replication object
 }
 \examples{
-makeReplication(ReplicationOn=FALSE,ReplRepeats=1,ReplKeep="last",
-                ReplPowerOn=TRUE,ReplPower=0.8,ReplTails=2,
-                ReplSigOnly="No",
-                ReplBudgetType="Fixed",ReplBudget=1000,
-                ReplPowerPrior="None",
-                ReplVarAlpha=FALSE,ReplAlphaChange=2
+makeReplication(On=TRUE,Repeats=1,Keep="Cautious",RepAlpha=0.05,
+                PowerOn=TRUE,Power=0.8,Tails=2,PowerPrior="None",
+                forceSigOriginal="No",forceSign=TRUE,
+                BudgetType="Unlimited",Budget=1000
                 )
 }

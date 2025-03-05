@@ -4,7 +4,14 @@
 \alias{showHypothesis}
 \title{show a hypothesis}
 \usage{
-showHypothesis(hypothesis = makeHypothesis(), doWorld = FALSE)
+showHypothesis(
+  hypothesis = braw.def$hypothesis,
+  evidence = braw.def$evidence,
+  doWorld = TRUE,
+  plotArea = NULL,
+  autoShow = FALSE,
+  g = NULL
+)
 }
 \value{
 ggplot2 object - and printed

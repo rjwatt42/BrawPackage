@@ -5,9 +5,9 @@
 \title{make a simulated sample}
 \usage{
 doSample(
-  hypothesis = makeHypothesis(),
-  design = makeDesign(),
-  autoShow = FALSE
+  hypothesis = braw.def$hypothesis,
+  design = braw.def$design,
+  autoShow = braw.env$autoShow
 )
 }
 \value{

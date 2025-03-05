@@ -5,16 +5,20 @@
 \title{show the estimated population characteristics from varying parameter}
 \usage{
 showExplore(
-  exploreResult = doExplore(),
-  showType = "r",
-  showTheory = TRUE,
+  exploreResult = braw.res$explore,
+  showType = "Basic",
+  dimension = "1D",
+  showTheory = FALSE,
   effectType = "unique",
-  whichEffect = "All"
+  whichEffect = "All",
+  quantileShow = 0.5,
+  autoYlim = TRUE,
+  showHist = TRUE
 )
 }
 \arguments{
-\item{showType}{"r","p","w","wn", "p(sig)" \cr
-"NHST", "Hits","Misses"}
+\item{showType}{"Basic","p(sig)","NHST", "Hits","Misses" \cr
+or one or two of: "rs","p","wp","ws","nw" eg "p;ws"}
 }
 \value{
 ggplot2 object - and printed
@@ -24,6 +28,7 @@ show the estimated population characteristics from varying parameter
 }
 \examples{
 showExplore(exploreResult=doExplore(),
-                       showType="r",
-                       effectType="unique",whichEffect="All")
+                       showType="Basic",dimension="1D",
+                       effectType="unique",whichEffect="All",
+                       quantileShow=0.5,autoYlim=TRUE,showHist=TRUE)
 }

@@ -26,7 +26,7 @@ makeWorld<-function(worldOn=FALSE,populationPDF="Single",populationRZ="r",
 #' @param ResidDistr   "normal","skewed","uniform","cauchy","t(3)"
 #' @returns an effect object
 #' @examples
-#' makeEffect(rIV=0.3,rIV2=0,rIVIV2=0,rIVIV2DV=0,Heteroscedasticity=0,
+#' makeEffect(rIV=0.3,rIV2=0,rIVIV2=0,rIVIV2DV=0,rSD=0,Heteroscedasticity=0,
 #'            ResidDistr="normal",world=makeWorld()
 #' )
 #' @export
@@ -129,9 +129,9 @@ makeSampling<-function(type="Random") {
 #' @param BudgetType "Fixed", "Unlimited"
 #' @returns a replication object
 #' @examples
-#' makeReplication(On=FALSE,Repeats=1,Keep="Cautious",RepAlpha=0.05,
+#' makeReplication(On=TRUE,Repeats=1,Keep="Cautious",RepAlpha=0.05,
 #'                 PowerOn=TRUE,Power=0.8,Tails=2,PowerPrior="None",
-#'                 forceSigOriginal="No",
+#'                 forceSigOriginal="No",forceSign=TRUE,
 #'                 BudgetType="Unlimited",Budget=1000
 #'                 )
 #' @export
@@ -157,7 +157,8 @@ makeReplication<-function(On=FALSE,Repeats=1,Keep="Cautious",RepAlpha=0.05,
 #' @returns a design object
 #' @seealso [showDesign()]
 #' @examples
-#' makeDesign(sN=42, sMethod=makeSampling("Random") ,sNRand=FALSE,sNRandK=2, 
+#' makeDesign(sN=42, sMethod=makeSampling("Random"),sMethodSeverity=0.1,
+#'            sNRand=FALSE,sNRandK=2,sNRandDist="Gamma",
 #'            sBudgetOn=FALSE,sNBudget=1000,
 #'            sIV1Use="Between",sIV2Use="Between",  sWithinCor=0.5,
 #'            
@@ -209,8 +210,12 @@ makeDesign<-function(sN=42, sMethod=makeSampling("Random"),sMethodSeverity=0.1,
 #'              rInteractionOn=TRUE,rInteractionOnly=TRUE,ssqType="Type3",
 #'              caseOrder="Alphabetic",
 #'              llr=list(e1=c(),e2=0),
+#'              useAIC="AIC",
+#'              doSEM=FALSE,
 #'              Welch=FALSE,Transform="None",
-#'              prior=makeWorld(TRUE,"Uniform","r"))
+#'              prior=makeWorld(TRUE,"Uniform","r")
+#'              metaAnalysis=makeMetaAnalysis()
+#'              )
 #' @export
 makeEvidence<-function(shortHand=FALSE,sigOnly=FALSE,
                        rInteractionOn=FALSE,rInteractionOnly=TRUE,ssqType="Type3",

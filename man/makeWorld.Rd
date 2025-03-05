@@ -9,7 +9,7 @@ makeWorld(
   worldOn = FALSE,
   populationPDF = "Single",
   populationRZ = "r",
-  populationPDFk = 0.2,
+  populationPDFk = 0,
   populationNullp = 0,
   worldAbs = FALSE
 )

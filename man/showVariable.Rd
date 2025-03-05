@@ -4,7 +4,12 @@
 \alias{showVariable}
 \title{show a variable object}
 \usage{
-showVariable(variable = makeVariable(), plotArea = NULL, g = NULL)
+showVariable(
+  variable = makeVariable(),
+  sample = NULL,
+  plotArea = NULL,
+  g = NULL
+)
 }
 \arguments{
 \item{variable}{a variable object}

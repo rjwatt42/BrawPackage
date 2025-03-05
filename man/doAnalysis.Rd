@@ -5,8 +5,8 @@
 \title{perform an analysis of a sample object}
 \usage{
 doAnalysis(
-  sample = doSample(),
-  evidence = makeEvidence(),
+  sample = doSample(autoShow = FALSE),
+  evidence = braw.def$evidence,
   autoShow = FALSE
 )
 }

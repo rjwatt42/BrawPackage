@@ -4,13 +4,13 @@
 #' likelihood theory
 #' 
 #' @param typePossible "Samples","Populations"
-#' @returns possibleResult object
+#' @returns possible object
 #' @seealso showPossible() 
 #' @examples
-#' makePossible<-function(typePossible="Samples",
-#' possibleResult=NULL,
-#' UseSource="world",targetSample=0.3,
-#' UsePrior="none",prior=getWorld("Psych"),targetPopulation=0.3,
+#' makePossible<-function(targetSample=NULL,UseSource="world",
+#' targetPopulation=NULL,UsePrior="none",prior=getWorld("Psych"),
+#' sims=braw.res$multiple$result,sigOnly=FALSE,sigOnlyCompensate=FALSE,
+#' typePossible="Samples",
 #' hypothesis=makeHypothesis(),design=makeDesign(),
 #' simSlice=0.1,correction=TRUE)
 #' @export
@@ -87,7 +87,11 @@ makePossible<-function(targetSample=NULL,UseSource="world",
   return(possible)
 }
 
-
+#' @returns possibleResult object
+#' @seealso showPossible() 
+#' @examples
+#' doPossible<-function(possible=makePossible(),possibleResult=NULL)
+#' @export
 doPossible <- function(possible=NULL,possibleResult=NULL){
   
   if (is.null(possible)) possible<-makePossible()

@@ -5,8 +5,9 @@
 \title{show a world object}
 \usage{
 showWorld(
-  hypothesis = makeHypothesis(effect = makeEffect(world = makeWorld())),
+  hypothesis = braw.def$hypothesis,
   plotArea = c(0, 0, 1, 1),
+  autoShow = FALSE,
   g = NULL
 )
 }

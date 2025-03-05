@@ -5,17 +5,18 @@
 \title{make an effect object}
 \usage{
 makeEffect(
-  rIV = 0.3,
+  rIV = 0,
   rIV2 = 0,
   rIVIV2 = 0,
   rIVIV2DV = 0,
+  rSD = 0,
   Heteroscedasticity = 0,
   ResidDistr = "normal",
-  world = makeWorld()
+  world = braw.def$world
 )
 }
 \arguments{
-\item{ResidDistr}{"normal","skewed","uniform","Cauchy","t(3)"}
+\item{ResidDistr}{"normal","skewed","uniform","cauchy","t(3)"}
 }
 \value{
 an effect object
@@ -24,7 +25,7 @@ an effect object
 make an effect object
 }
 \examples{
-makeEffect(rIV=0.3,rIV2=0,rIVIV2=0,rIVIV2DV=0,Heteroscedasticity=0,
+makeEffect(rIV=0.3,rIV2=0,rIVIV2=0,rIVIV2DV=0,rSD=0,Heteroscedasticity=0,
            ResidDistr="normal",world=makeWorld()
 )
 }

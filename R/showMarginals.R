@@ -1,3 +1,9 @@
+#' show a simulated sample
+#' 
+#' @return ggplot2 object - and printed
+#' @examples
+#' showMarginals(sample=doSample(),style="piled")
+#' @export
 showMarginals<-function(result=braw.res$result,style="piled") {
   if (is.null(result)) result<-doAnalysis()
 

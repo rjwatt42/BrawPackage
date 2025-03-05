@@ -53,8 +53,9 @@ trimExploreResult<-function(result,nullresult) {
 #' @return ggplot2 object - and printed
 #' @examples
 #' showExplore(exploreResult=doExplore(),
-#'                        showType="Basic",
-#'                        effectType="unique",whichEffect="All")
+#'                        showType="Basic",dimension="1D",
+#'                        effectType="unique",whichEffect="All",
+#'                        quantileShow=0.5,autoYlim=TRUE,showHist=TRUE)
 #' @export
 showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension="1D",showTheory=FALSE,
                       effectType="unique",whichEffect="All",quantileShow=0.5,autoYlim=TRUE,showHist=TRUE){

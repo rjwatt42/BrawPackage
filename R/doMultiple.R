@@ -94,7 +94,7 @@ resetMultiple<-function(nsims=0,evidence,multipleResult=NULL){
 #' @returns multipleResult object
 #' @examples
 #' multipleResult<-doMultiple(nsims=100,multipleResult=NULL,hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),
-#'                              doingNull=FALSE,autoShow=braw.env$autoShow,showType="Basic")
+#'                              doingNull=FALSE,inSteps=FALSE,autoShow=braw.env$autoShow,showType="Basic")
 #' @seealso showMultiple() and reportMultiple())
 #' @export
 doMultiple <- function(nsims=10,multipleResult=braw.res$multiple,hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,

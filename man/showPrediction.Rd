@@ -5,9 +5,12 @@
 \title{show the prediction corresponding to a hypothesis & design}
 \usage{
 showPrediction(
-  hypothesis = makeHypothesis(),
-  design = makeDesign(),
-  evidence = makeEvidence()
+  hypothesis = braw.def$hypothesis,
+  design = braw.def$design,
+  evidence = makeEvidence(),
+  plotArea = c(0, 0, 1, 1),
+  autoShow = FALSE,
+  g = NULL
 )
 }
 \value{

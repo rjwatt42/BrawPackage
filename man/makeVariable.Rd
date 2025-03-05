@@ -10,7 +10,7 @@ makeVariable(
   mu = 0,
   sd = 1,
   skew = 0,
-  kurtosis = 3,
+  kurtosis = 0,
   nlevs = 7,
   iqr = 3,
   median = NULL,
@@ -42,7 +42,7 @@ make a variable
 }
 \examples{
 makeVariable(name,type="Interval",
-             mu=0,sd=1,skew=0,kurtosis=3,
+             mu=0,sd=1,skew=0,kurtosis=0,
              nlevs=7,iqr=3,median=NULL,ordProportions=NA,ordSource="discrete",
              ncats=2,cases=c("C1","C2"),proportions=c(1,1),catSource="discrete"
              )

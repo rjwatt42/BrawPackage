@@ -3,7 +3,7 @@
 #' @param name  "Psych","PsychF"
 #' @returns world object
 #' @examples
-#' world<-getWorld(name
+#' world<-getWorld(name)
 #' @export
 getWorld<-function(name) {
   switch(name,         

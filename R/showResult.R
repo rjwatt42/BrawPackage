@@ -3,7 +3,7 @@
 #' 
 #' @return ggplot2 object - and printed
 #' @examples
-#' showDescription(analysis=doAnalysis())
+#' showSingle(analysis=doAnalysis(),show="describe",showType="Basic",dimension="1D")
 #' @export
 showSingle<-function(result=braw.res$result,show="describe",showType="Basic",dimension="1D") {
   

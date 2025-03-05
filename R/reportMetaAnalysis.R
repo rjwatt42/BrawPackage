@@ -1,4 +1,9 @@
-
+#' report a simulated metaAnalysis sample
+#' 
+#' @return ggplot2 object - and printed
+#' @examples
+#' reportMetaSingle(metaResult=doMetaAnalysis(),reportStats="Medians")
+#' @export
 reportMetaSingle<-function(metaResult=braw.res$metaSingle,reportStats="Medians"){
   if (is.null(metaResult)) metaResult<-doMetaAnalysis()
   
@@ -71,6 +76,12 @@ reportMetaSingle<-function(metaResult=braw.res$metaSingle,reportStats="Medians")
 }
 
 
+#' report a multiple metaAnalysis samples
+#' 
+#' @return ggplot2 object - and printed
+#' @examples
+#' reportMetaMultiple(metaResult=doMetaMultiple(),reportStats="Medians")
+#' @export
 reportMetaMultiple<-function(metaResult=braw.res$metaMultiple,reportStats="Medians"){
   if (is.null(metaResult)) metaResult<-doMetaAnalysis()
   

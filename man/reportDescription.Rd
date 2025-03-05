@@ -4,7 +4,7 @@
 \alias{reportDescription}
 \title{report a sample effect-size analysis of a simulated sample}
 \usage{
-reportDescription(analysis = doAnalysis())
+reportDescription(analysis = braw.res$result)
 }
 \value{
 ggplot2 object - and printed

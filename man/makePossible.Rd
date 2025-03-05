@@ -5,38 +5,36 @@
 \title{likelihood theory}
 \usage{
 makePossible(
-  typePossible = "Samples",
-  possibleResult = NULL,
+  targetSample = NULL,
   UseSource = "world",
-  targetSample = 0.3,
+  targetPopulation = NULL,
   UsePrior = "none",
   prior = getWorld("Psych"),
-  targetPopulation = 0.3,
-  hypothesis = makeHypothesis(),
-  design = makeDesign(),
+  sims = braw.res$multiple$result,
+  sigOnly = FALSE,
+  sigOnlyCompensate = FALSE,
+  hypothesis = braw.def$hypothesis,
+  design = braw.def$design,
   simSlice = 0.1,
-  correction = TRUE,
-  appendSim = FALSE,
-  possibleLength = "10"
+  correction = TRUE
 )
 }
 \arguments{
 \item{typePossible}{"Samples","Populations"}
 }
 \value{
-possibleResult object
+possible object
 }
 \description{
 likelihood theory
 }
 \examples{
-makePossible<-function(typePossible="Samples",
-possibleResult=NULL,
-UseSource="world",targetSample=0.3,
-UsePrior="none",prior=getWorld("Psych"),targetPopulation=0.3,
+makePossible<-function(targetSample=NULL,UseSource="world",
+targetPopulation=NULL,UsePrior="none",prior=getWorld("Psych"),
+sims=braw.res$multiple$result,sigOnly=FALSE,sigOnlyCompensate=FALSE,
+typePossible="Samples",
 hypothesis=makeHypothesis(),design=makeDesign(),
-simSlice=0.1,correction=TRUE,
-appendSim=FALSE,possibleLength="10")
+simSlice=0.1,correction=TRUE)
 }
 \seealso{
 showPossible()

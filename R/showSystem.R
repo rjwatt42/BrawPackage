@@ -9,7 +9,7 @@
 #' 
 #' @return ggplot2 object - and printed
 #' @examples
-#' showSystem(hypothesis=makeHypothesis(),design=makeDesign())
+#' showSystem(whichShow="all",hypothesis=makeHypothesis(),design=makeDesign())
 #' @export
 showSystem<-function(whichShow="all",hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence) {
   braw.env$addHistory<-FALSE

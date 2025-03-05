@@ -16,4 +16,4 @@ Imports:
     e1071,      
     pracma,   
     NlcOptim  
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2

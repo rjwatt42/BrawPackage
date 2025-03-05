@@ -7,18 +7,21 @@
 makeDesign(
   sN = 42,
   sMethod = makeSampling("Random"),
+  sMethodSeverity = 0.1,
   sNRand = FALSE,
-  sNRandK = 2,
+  sNRandSD = 33.3,
+  sNRandDist = "Gamma",
   sIV1Use = "Between",
   sIV2Use = "Between",
   sWithinCor = 0.5,
   sBudgetOn = FALSE,
   sNBudget = 1000,
   sRangeOn = FALSE,
-  sIVRange = c(-3, 3),
-  sDVRange = c(-3, 3),
+  sIVRange = c(-1, 1) * 4,
+  sDVRange = c(-1, 1) * 4,
   sDependence = 0,
   sOutliers = 0,
+  sNonResponse = 0,
   sCheating = "None",
   sCheatingAttempts = 5,
   sCheatingLimit = "Fixed",
@@ -31,7 +34,7 @@ makeDesign(
 
 \item{sIV1Use}{"Between","Within"}
 
-\item{sCheating}{"None","Grow","Prune","Replace","Retry","Add"}
+\item{sCheating}{"None","Grow","Prune","Replace","Retry"}
 
 \item{sCheatingLimit}{"Fixed","Budget"}
 }
@@ -42,12 +45,13 @@ a design object
 make a design
 }
 \examples{
-makeDesign(sN=42, sMethod=makeSampling("Random") ,sNRand=FALSE,sNRandK=2, 
+makeDesign(sN=42, sMethod=makeSampling("Random"),sMethodSeverity=0.1,
+           sNRand=FALSE,sNRandK=2,sNRandDist="Gamma",
            sBudgetOn=FALSE,sNBudget=1000,
            sIV1Use="Between",sIV2Use="Between",  sWithinCor=0.5,
            
            sRangeOn=FALSE, sIVRange=c(-3,3), sDVRange=c(-3,3), 
-           sDependence=0, sOutliers=0,
+           sDependence=0, sOutliers=0, sNonResponse=0,
            
            sCheating="None", sCheatingAttempts=5,
            sCheatingLimit="Fixed", sCheatingBudget=1000,

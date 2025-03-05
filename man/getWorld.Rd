@@ -16,5 +16,5 @@ world object
 make a specific hypothesis
 }
 \examples{
-world<-getWorld(name
+world<-getWorld(name)
 }

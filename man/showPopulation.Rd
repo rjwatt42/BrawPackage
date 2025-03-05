@@ -4,7 +4,12 @@
 \alias{showPopulation}
 \title{show the population corresponding to a hypothesis object}
 \usage{
-showPopulation(hypothesis = makeHypothesis())
+showPopulation(
+  hypothesis = braw.def$hypothesis,
+  plotArea = c(0, 0, 1, 1),
+  autoShow = FALSE,
+  g = NULL
+)
 }
 \value{
 ggplot2 object - and printed

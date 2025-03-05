@@ -27,7 +27,7 @@ plotSample<-function(IV,DV,effect,ivplot,dvplot,g=NULL) {
 #' 
 #' @return ggplot2 object - and printed
 #' @examples
-#' showSample(sample=doSample())
+#' showSample(sample=doSample(),marginals=FALSE)
 #' @export
 showSample<-function(sample=braw.res$result,marginals=FALSE){
   if (is.null(sample)) sample<-doSingle(autoShow=FALSE)

@@ -3,11 +3,12 @@
 #' 
 #' @return metaAnalysis object 
 #' @examples
-#' makeMetaAnalysis<-function(nstudies=100,
-#' analysisType="random",
-#' modelPDF="All",
+#' makeMetaAnalysis<-function(On=TRUE,nstudies=100,
+#' analysisType="random",analysisVar="sd",
+#' method="MLE",analysisPrior="none",
+#' includeNulls=FALSE,modelPDF="All",
 #' sourceBias=FALSE,
-#' includeNulls=TRUE)
+#' analyseBias=FALSE)
 #' @export
 makeMetaAnalysis<-function(On=FALSE, nstudies=10,
                            analysisType="random",analysisVar="sd",

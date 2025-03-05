@@ -172,6 +172,7 @@ describePossiblePopulations<-function(possibleResult,possible) {
 #' @return ggplot2 object - and printed
 #' @examples
 #' showPossible <- function(possibleResult=makePossible(),
+#'                        showType="Populations",
 #'                        cutaway=FALSE,walls=TRUE,showP=0,
 #'                        view="3D",axisScale=1,
 #'                        azimuth=30,elevation=5,distance=2)

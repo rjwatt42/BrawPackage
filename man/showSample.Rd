@@ -4,7 +4,7 @@
 \alias{showSample}
 \title{show a simulated sample}
 \usage{
-showSample(sample = doSample())
+showSample(sample = braw.res$result, marginals = FALSE)
 }
 \value{
 ggplot2 object - and printed
@@ -13,5 +13,5 @@ ggplot2 object - and printed
 show a simulated sample
 }
 \examples{
-showSample(sample=doSample())
+showSample(sample=doSample(),marginals=FALSE)
 }

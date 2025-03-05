@@ -4,7 +4,7 @@
 \alias{getDesign}
 \title{make a specific design}
 \usage{
-getDesign(name, design = makeDesign())
+getDesign(name, design = braw.def$design)
 }
 \arguments{
 \item{name}{"Psych"}

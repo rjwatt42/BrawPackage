@@ -4,11 +4,11 @@
 \alias{getVariable}
 \title{make a specific variable}
 \usage{
-getVariable(name)
+getVariable(name = NULL)
 }
 \arguments{
 \item{name}{"Psych","Treatment","Treatment?","IQ","Diligence","Perfectionism", \cr
-"Happiness","Grade","RiskTaking","Interesting","Coffee?","Smoker?", \cr
+"Happiness","ExamGrade","RiskTaking","Interesting","Coffee?","Smoker?", \cr
 "RiskTaker?","Musician?","StudySubject","BirthOrder"}
 }
 \value{

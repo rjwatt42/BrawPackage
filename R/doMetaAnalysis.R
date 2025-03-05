@@ -7,9 +7,9 @@
 
 #' @return metaResult object 
 #' @examples
-#' doMetaAnalysis<-function(nsims=50,metaAnalysis=makeMetaAnalysis(),
-#'                          hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,
-#'                          metaResult=NULL)
+#' doMetaAnalysis<-function(metaSingle=NULL,metaAnalysis=makeMetaAnalysis(),
+#'                          keepStudies=FALSE,shortHand=TRUE,
+#'                          hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence)
 #' @export
 doMetaAnalysis<-function(metaSingle=braw.res$metaSingle,metaAnalysis=braw.def$metaAnalysis,
                          keepStudies=FALSE,shortHand=TRUE,
@@ -38,6 +38,12 @@ doMetaAnalysis<-function(metaSingle=braw.res$metaSingle,metaAnalysis=braw.def$me
   metaSingle
 }
 
+#' @return metaResult object 
+#' @examples
+#' doMetaMultiple<-function(nsims=100,metaMultiple=braw.res$metaMultiple,metaAnalysis=braw.def$metaAnalysis,
+#'                          shortHand=TRUE,
+#'                          hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence)
+#' @export
 doMetaMultiple<-function(nsims=100,metaMultiple=braw.res$metaMultiple,metaAnalysis=braw.def$metaAnalysis,
                          shortHand=TRUE,
                          hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence

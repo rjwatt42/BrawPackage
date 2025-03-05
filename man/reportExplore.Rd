@@ -5,15 +5,18 @@
 \title{report the estimated population characteristics from varying parameter}
 \usage{
 reportExplore(
-  exploreResult,
-  showType = "r",
+  exploreResult = braw.res$explore,
+  showType = "rs",
   whichEffect = "All",
-  effectType = "All"
+  effectType = "all",
+  quantileShow = 0.5,
+  reportStats = "Medians",
+  returnDataFrame = FALSE
 )
 }
 \arguments{
-\item{showType}{"r","p","n","w", "p(sig)" \cr
-"NHST", "Hits","FDR;FMR"}
+\item{showType}{"rs","p","n","ws", "p(sig)" \cr
+"NHST", "Hits", "Misses"}
 }
 \value{
 ggplot2 object - and printed
@@ -23,6 +26,8 @@ report the estimated population characteristics from varying parameter
 }
 \examples{
 showExplore(exploreResult=doExplore(),
-                       showType="r",
-                       whichEffect="All",effectType="All")
+                       showType="rs",
+                       whichEffect="All",effectType="all",
+                       quantileShow=0.5,reportStats="Medians"
+                       )
 }
