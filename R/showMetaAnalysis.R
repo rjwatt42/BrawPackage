@@ -137,7 +137,7 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showType="n",showTheory=
     if (showSval) {
       b<-getLogLikelihood(atanh(metaResult$result$rIV),metaResult$result$nval,rep(1,length(metaResult$result$nval)),
                           distribution=metaResult$bestDist,param1=metaResult$bestParam1,param2=metaResult$bestParam2,
-                          remove_nonsig=metaResult$metaAnalysis$analyseBias,returnVals = TRUE)
+                          bias=metaResult$metaAnalysis$analyseBias,returnVals = TRUE)
       fill1<-hsv(0.9*round((b-min(b))/(max(b)-min(b))*4)/4)
       fill1<-hsv(0.9*round((b/max(b))^SvalExp*10)/10)
     }

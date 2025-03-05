@@ -141,7 +141,7 @@ r2llr<-function(r,n,df1,method=braw.env$STMethod,llr=list(e1=c(),e2=0),world=NUL
       world$populationPDF<-"Single"
       world$populationNullp<-0.5
     }
-    lk<-getLogLikelihood(z,n,df1,world$populationPDF,world$populationPDFk,worldDistNullP=c(0,1),remove_nonsig=FALSE)
+    lk<-getLogLikelihood(z,n,df1,world$populationPDF,world$populationPDFk,worldDistNullP=c(0,1),bias=FALSE)
     lk1<-lk[,,1]+log(1-world$populationNullp)
     lk2<-lk[,,2]+log(world$populationNullp)
     llk<-lk1-lk2

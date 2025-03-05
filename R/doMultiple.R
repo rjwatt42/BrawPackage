@@ -103,7 +103,7 @@ doMultiple <- function(nsims=10,multipleResult=braw.res$multiple,hypothesis=braw
   if (evidence$metaAnalysis$On) {
     if (!is.null(multipleResult$fixed)) metaMultiple<-multipleResult
     else                                metaMultiple<-braw.res$metaMultiple
-    metaMultiple<-doMetaMultiple(nsims=nsims,metaResult=metaMultiple,metaAnalysis=evidence$metaAnalysis,keepStudies=FALSE,
+    metaMultiple<-doMetaMultiple(nsims=nsims,metaMultiple=metaMultiple,metaAnalysis=evidence$metaAnalysis,keepStudies=FALSE,
                              hypothesis=hypothesis,design=design,evidence=evidence)
     if (autoShow) print(showMetaMultiple(metaMultiple))
     return(metaMultiple)
