@@ -77,13 +77,13 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
                       fdr="#BBBBBB",fmr="#555555")
   }
   
-  mainTheme<-ggplot2::theme(panel.background = element_rect(fill=plotColours$graphBack, colour=plotColours$graphBack),
-                   panel.grid.major = element_line(linetype="blank"),panel.grid.minor = element_line(linetype="blank"),
-                   plot.background = element_rect(fill=plotColours$graphC, colour=plotColours$graphC))
-  SMplotTheme<-ggplot2::theme(plot.title=element_text(size=14,face="bold"),axis.title=element_text(size=16,face="bold"),
-                     axis.text.x=element_text(size=12),axis.text.y=element_text(size=12))
-  LGplotTheme<-ggplot2::theme(plot.title=element_text(size=21,face="bold"),axis.title=element_text(size=24,face="bold"),
-                     axis.text.x=element_text(size=18),axis.text.y=element_text(size=18))
+  mainTheme<-ggplot2::theme(panel.background = ggplot2::element_rect(fill=plotColours$graphBack, colour=plotColours$graphBack),
+                   panel.grid.major = ggplot2::element_line(linetype="blank"),panel.grid.minor = ggplot2::element_line(linetype="blank"),
+                   plot.background = ggplot2::element_rect(fill=plotColours$graphC, colour=plotColours$graphC))
+  SMplotTheme<-ggplot2::theme(plot.title=ggplot2::element_text(size=14,face="bold"),axis.title=ggplot2::element_text(size=16,face="bold"),
+                     axis.text.x=ggplot2::element_text(size=12),axis.text.y=ggplot2::element_text(size=12))
+  LGplotTheme<-ggplot2::theme(plot.title=ggplot2::element_text(size=21,face="bold"),axis.title=ggplot2::element_text(size=24,face="bold"),
+                     axis.text.x=ggplot2::element_text(size=18),axis.text.y=ggplot2::element_text(size=18))
   
   
   alphaSig<-0.05
@@ -94,16 +94,16 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
           braw.env$plotShapes<-list(data=21,study=22,parameter=21,meta=24)
           
           # braw.env$plotTheme<-mainTheme+SMplotTheme+theme(plot.margin=margin(1.0,1.5,0.5,0.5,"cm"))
-          # braw.env$diagramTheme<-mainTheme+SMplotTheme+theme(panel.background = element_rect(fill=plotColours$graphBack, colour=plotColours$graphBack),
+          # braw.env$diagramTheme<-mainTheme+SMplotTheme+theme(panel.background = ggplot2::element_rect(fill=plotColours$graphBack, colour=plotColours$graphBack),
           #                                                    panel.spacing=margin(0,0,0,0),plot.margin=margin(0.5,0.5,0.3,0.3,"cm"))
-          # braw.env$plainDiagramTheme<-mainTheme+SMplotTheme+theme(panel.background = element_rect(fill=plotColours$graphBack, colour=plotColours$graphBack),
+          # braw.env$plainDiagramTheme<-mainTheme+SMplotTheme+theme(panel.background = ggplot2::element_rect(fill=plotColours$graphBack, colour=plotColours$graphBack),
           #                                                         panel.spacing=margin(0,0,0,0),plot.margin=margin(0.5,0.5,0.3,-0.2,"cm"))
   braw.env$blankTheme<-function() {
-    ggplot2::theme(panel.background = element_rect(fill=plotColours$graphC, colour=plotColours$graphC),
+    ggplot2::theme(panel.background = ggplot2::element_rect(fill=plotColours$graphC, colour=plotColours$graphC),
           panel.spacing=margin(0,0,0,0,"cm"),plot.margin=margin(-0.2,-0.4,-0.2,-0.5,"cm"),
-          panel.grid.major = element_line(linetype="blank"),panel.grid.minor = element_line(linetype="blank"),
+          panel.grid.major = ggplot2::element_line(linetype="blank"),panel.grid.minor = ggplot2::element_line(linetype="blank"),
           legend.position = "none",
-                    plot.background = element_rect(fill=plotColours$graphC, colour=plotColours$graphC),
+                    plot.background = ggplot2::element_rect(fill=plotColours$graphC, colour=plotColours$graphC),
                          axis.title.x=element_blank(),
                          axis.text.x=element_blank(),
                          axis.ticks.x=element_blank(),
