@@ -289,6 +289,6 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
   }
   
   g<-g+labs(x="  ",y="  ")
-  g<-g+coord_cartesian(xlim = c(1-margin,edge+margin), ylim = c(1-margin,top+margin))
+  g<-g+ggplot2::coord_cartesian(xlim = c(1-margin,edge+margin), ylim = c(1-margin,top+margin))
   return(g)
 }
