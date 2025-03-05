@@ -4,16 +4,17 @@ Title: BrawStats Simulator for Understanding Statistics
 Version: 1.0.0.0
 Imports:
     ggplot2,
-    tidyr,
+    ggtext,
+    grDevices,
+    grid,
     mnormt,     
     lme4,       
-    MuMIn,    
     readxl,  
     writexl,  
-    car,    
     stringr,    
     clipr,      
-    e1071,      
+    car,      
     pracma,   
-    NlcOptim  
+    abind,
+    meta
 RoxygenNote: 7.3.2
