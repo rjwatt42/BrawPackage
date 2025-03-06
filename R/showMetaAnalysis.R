@@ -84,6 +84,7 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showType="n",showTheory=
     if (braw.env$nPlotScale=="log10") {
       d2<-log10(d2)
       ylim<-log10(ylim)
+      yticks<-makeTicks(10^yticks,logScale=TRUE)
     }
   } else {
     disp2<-"1/se"
@@ -99,7 +100,7 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showType="n",showTheory=
   assign("plotArea",c(0,0,1,1),braw.env)
   g<-startPlot(xlim,ylim,
                xticks=makeTicks(x$ticks),xlabel=makeLabel(disp1),
-               yticks=makeTicks(yticks),
+               yticks=yticks,
                ylabel=makeLabel(disp2),
                top=1,g=NULL)
   g<-addG(g,plotTitle(paste0("Method=",metaResult$metaAnalysis$method),size=0.75))

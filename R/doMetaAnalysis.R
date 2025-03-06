@@ -16,7 +16,7 @@ doMetaAnalysis<-function(metaSingle=braw.res$metaSingle,metaAnalysis=braw.def$me
                          hypothesis=braw.def$hypothesis,design=NULL,evidence=braw.def$evidence
 ) {
   if (is.null(metaAnalysis)) metaAnalysis<-makeMetaAnalysis()
-  if (is.null(design)) design$sNRand<-TRUE
+  if (is.null(design)) design<-getDesign("Psych")
   evidence$sigOnly<-metaAnalysis$sourceBias
   evidence$shortHand<-shortHand
   
