@@ -13,9 +13,10 @@
 #' @export
 doMetaAnalysis<-function(metaSingle=braw.res$metaSingle,metaAnalysis=braw.def$metaAnalysis,
                          keepStudies=FALSE,shortHand=TRUE,
-                         hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence
+                         hypothesis=braw.def$hypothesis,design=NULL,evidence=braw.def$evidence
 ) {
   if (is.null(metaAnalysis)) metaAnalysis<-makeMetaAnalysis()
+  if (is.null(design)) design$sNRand<-TRUE
   evidence$sigOnly<-metaAnalysis$sourceBias
   evidence$shortHand<-shortHand
   
