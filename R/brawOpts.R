@@ -5,6 +5,7 @@ braw.res<-c()
   BrawOpts()
 }
 
+#' @export
 newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
   while (dev.cur()!=1) dev.off()
   if (Sys.info()[['sysname']]=="Darwin")
@@ -17,6 +18,7 @@ newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
   print(startPlot(box="none",backC=braw.env$plotColours$graphC))
 }
 
+#' @export
 BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16,10),
                    reportHTML=FALSE, graphHTML=FALSE,
                    newDev=FALSE,height=400,aspect=1.3,autoShow=FALSE,timeLimit=Inf,fullGraphSize=1,
