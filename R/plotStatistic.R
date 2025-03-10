@@ -552,14 +552,14 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
     # top<-TRUE
   }
   
-  if (showType=="e1r") {
+  if (is.element(showType,c("e1r","e1+","e1-"))) {
     # showType<-"rs"
     labelSig<-TRUE
     labelNSig<-TRUE
     # top<-TRUE
   }
   
-  if (showType=="e2r") {
+  if (is.element(showType,c("e2r","e2+","e2-"))) {
     # showType<-"rs"
     labelSig<-TRUE
     labelNSig<-TRUE
@@ -713,6 +713,10 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
             "ci2"={showVals<-r2ci(data$rs,data$ns,+1)},
             "e1r"={showVals<-data$rs},
             "e2r"={showVals<-data$rs},
+            "e1+"={showVals<-data$rs},
+            "e2+"={showVals<-data$rs},
+            "e1-"={showVals<-data$rs},
+            "e2-"={showVals<-data$rs},
             "e1p"={showVals<-data$ps},
             "e2p"={showVals<-data$ps},
             "iv.mn"=showVals<-data$iv.mn,
@@ -778,10 +782,10 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
         effectTheory<-oldEffect
       }
       
-      if (is.element(showType,c("rs","rse","rss","re","ro","ci1","ci2","e1r","e2r"))) {
+      if (is.element(showType,c("rs","rse","rss","re","ro","ci1","ci2","e1r","e2r","e1+","e2+","e1-","e2-"))) {
         npt<-101
-        if (showType=="e1r") effectTheory$world$populationNullp<-1
-        if (showType=="e2r") effectTheory$world$populationNullp<-0
+        if (is.element(showType,c("e1r","e1+","e1-"))) effectTheory$world$populationNullp<-1
+        if (is.element(showType,c("e2r","e2+","e2-"))) effectTheory$world$populationNullp<-0
         if (showType=="re") rOff<-"re"
         else rOff<-"rs"
         switch(braw.env$RZ,
@@ -1056,7 +1060,9 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       
       ns<-c()
       s<-c()
-      if (length(rvals)>1 && is.element(showType,c("rs","rse","rss","p","e1r","e2r","e1p","e2p","e1d","e2d"))) {
+      if (length(rvals)>1 && is.element(showType,c("rs","rse","rss","p",
+                                                   "e1r","e2r","e1+","e2+","e1-","e2-",
+                                                   "e1p","e2p","e1d","e2d"))) {
         n<-length(pvals)
         if (!is.null(otheranalysis) && effect$world$worldOn) n<-n+length(otheranalysis$pIV)
         if (is.element(showType,c("rse","rss"))) {
@@ -1071,6 +1077,14 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
         if (is.element(showType,c("e1d","e2d"))) {
           s2<-sum(resSig & shvals<0,na.rm=TRUE)/n
           s1<-sum(resSig & shvals>0,na.rm=TRUE)/n
+        }
+        if (is.element(showType,c("e1+","e2+"))) {
+          s2<-sum(resSig,na.rm=TRUE)/n
+          s1<-sum(resSig,na.rm=TRUE)/n
+        }
+        if (is.element(showType,c("e1-","e2-"))) {
+          s2<-sum(!resSig,na.rm=TRUE)/n
+          s1<-sum(!resSig,na.rm=TRUE)/n
         }
       }
     }  else {
@@ -1125,7 +1139,8 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
     }
     
     if (length(rvals)>1)
-    if (is.element(showType,c("rs","rse","rss","p","e1r","e2r","e1p","e2p","e1d","e2d"))) {
+    if (is.element(showType,c("rs","rse","rss","p","e1r","e2r","e1+","e2+","e1-","e2-",
+                              "e1p","e2p","e1d","e2d"))) {
       lb1<-"p("
       lb2<-") = "
       lb1<-"("
@@ -1194,6 +1209,22 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                 labels<-c(paste0(lb1,"sig correct",lb2,brawFormat(s*100,digits=npct),"% "),
                           paste0(lb1,"ns error",lb2,brawFormat(ns*100,digits=npct),"% "))
                 colours<-c(braw.env$plotColours$infer_sigC,braw.env$plotColours$infer_nsigC)
+              },
+              "e1+"={
+                labels<-paste0(lb1,"sig error",lb2,brawFormat(s1*100,digits=npct),"% ")
+                colours<-braw.env$plotColours$infer_sigC
+              },
+              "e2+"={
+                labels<-paste0(lb1,"sig correct",lb2,brawFormat(s2*100,digits=npct),"% ")
+                colours<-braw.env$plotColours$infer_sigC
+              },
+              "e1-"={
+                labels<-paste0(lb1,"ns correct",lb2,brawFormat(s1*100,digits=npct),"% ")
+                colours<-braw.env$plotColours$infer_nsigC
+              },
+              "e2-"={
+                labels<-paste0(lb1,"ns error",lb2,brawFormat(s2*100,digits=npct),"% ")
+                colours<-braw.env$plotColours$infer_nsigC
               },
               "e1p"={
                 labels<-c(paste0(lb1,"sig error",lb2,brawFormat(s*100,digits=npct),"% "),
@@ -1273,12 +1304,19 @@ e2_plot<-function(analysis,disp,otheranalysis=NULL,orientation="vert",showTheory
   )
   
   }
+  lab<-"NonNull"
   
   switch (braw.env$STMethod,
           "NHST"={
             analysis$hypothesis$effect$world$populationNullp<-0
             switch(disp,
                    "e2r"={
+                     g<-r_plot(analysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
+                   },
+                   "e2+"={
+                     g<-r_plot(analysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
+                   },
+                   "e2-"={
                      g<-r_plot(analysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
                    },
                    "e2p"={
@@ -1308,12 +1346,19 @@ e1_plot<-function(nullanalysis,disp,otheranalysis=NULL,orientation="vert",showTh
             lab<-"Null: z[p]= 0"
           }
   )
+  lab<-"Null"
   switch (braw.env$STMethod,
           "NHST"={
             nullanalysis$hypothesis$effect$world$populationNullp<-1
             # g<-r_plot(nullanalysis,"rs_e1",otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
             switch(disp,
                    "e1r"={
+                     g<-r_plot(nullanalysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
+                   },
+                   "e1+"={
+                     g<-r_plot(nullanalysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
+                   },
+                   "e1-"={
                      g<-r_plot(nullanalysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
                    },
                    "e1a"={

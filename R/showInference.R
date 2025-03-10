@@ -77,12 +77,12 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
   other2<-NULL
   if (length(showType)==1) {
     switch(showType,
-           "Basic"=     {showType<-c("rs","p")},
-           "p(sig)"=    {showType<-"ps"},
+           "Basic"=     {showType<-c("rs","p");dimension<-"1D"},
+           "p(sig)"=    {showType<-"ps";dimension<-"1D"},
            "Power"=     {showType<-c("ws","wp")},
            "CILimits"=  {showType<-c("ci1","ci2")},
            "NHST"={
-             showType<-c("rse","ps1")
+             showType<-c("rse","ps1");dimension<-"1D"
              # r<-getNulls(analysis)
              # analysis1<-r$analysis
              # analysis2<-r$nullanalysis
@@ -90,7 +90,7 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
              # other2<-analysis1
              },
            "Hits"=       {
-             showType<-c("e2r","e1r")
+             showType<-c("e2+","e1+");dimension<-"1D"
              r<-getNulls(analysis,useSig=TRUE)
              analysis1<-r$analysis
              analysis2<-r$nullanalysis
@@ -98,7 +98,7 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
              other2<-analysis1
            },
            "Misses"=       {
-             showType<-c("e2r","e1r")
+             showType<-c("e2-","e1-");dimension<-"1D"
              r<-getNulls(analysis,useNSig=TRUE)
              analysis1<-r$analysis
              analysis2<-r$nullanalysis
@@ -106,13 +106,13 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
              other2<-analysis1
            },
            "SEM"= {
-             showType<-c("rss","SEM")
+             showType<-c("rss","SEM");dimension<-"1D"
            },
            "DV"= {
-             showType=c("dv.mn","dv.sd","dv.sk","dv.kt")
+             showType=c("dv.mn","dv.sd","dv.sk","dv.kt");dimension<-"1D"
            },
            "Residuals"= {
-             showType=c("er.mn","er.sd","er.sk","er.kt")
+             showType=c("er.mn","er.sd","er.sk","er.kt");dimension<-"1D"
            },
            { showType<-strsplit(showType,";")[[1]]
              if (length(showType)==1) showType<-c(showType,NA)

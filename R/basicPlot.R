@@ -337,7 +337,7 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=0,
   return(g)  
 }
 
-plotTitle<-function(label,position="centre",size=1.25,fontface="bold") {
+plotTitle<-function(label,position="left",size=0.75,fontface="bold") {
   ypos<-1-braw.env$plotLimits$gap[4]*0.8
   switch(position,
          "left"={
@@ -798,8 +798,8 @@ dataErrorBar<-function(data,colour="black",linewidth=0.25) {
   return(g)
 }
 dataLegend<-function(data,title="title",fontsize=0.6,shape=21) {
-  dy=0.075*fontsize
-  dx=0.025*fontsize/braw.env$plotArea[3]
+  dy=0.06*fontsize
+  dx=0.035*fontsize
   names<-data$names
   if (nchar(title)>0) tn<-1.2 else tn<-0
   nrows<-tn+length(names)+1
@@ -820,11 +820,11 @@ dataLegend<-function(data,title="title",fontsize=0.6,shape=21) {
   for (i in 1:length(names)) {
     if (!is.na(data$colours[i]))
       g<-c(g,
-           list(axisPoint(data=data.frame(x=rangeX(1-ncols*dx+dx),y=rangeY(1-dy*(i+tn))),
+           list(axisPoint(data=data.frame(x=rangeX(1-ncols*dx+dx*1.5),y=rangeY(1-dy*(i+tn))),
                           fill=data$colours[i],shape=shape[i]))
       )
     g<-c(g,
-         list(axisText(data=data.frame(x=rangeX(1-ncols*dx+2*dx),y=rangeY(1-dy*(i+tn))),
+         list(axisText(data=data.frame(x=rangeX(1-ncols*dx+2.5*dx),y=rangeY(1-dy*(i+tn))),
                        label=data$names[i],vjust=0.5,size=fontsize))
     )
   }

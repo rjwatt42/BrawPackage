@@ -173,7 +173,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
           e2=paste0(brawFormat(sum(resSigW)/length(resSig)*100,digits=1),"%")
         }
         
-        if (result$effect$world$worldOn) {
+        if (effect$world$worldOn) {
           nr<-(length(nullresult$pIV)+length(result$pIV))
           if (braw.env$STMethod=="NHST") {
             e1a<-paste0("!j",brawFormat(sum(nullSig)/nr*100,digits=1),"%")
@@ -353,7 +353,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
                     "er.kt"={a<-result$er.kt}
             )
             if (is.element(pars[j],c("rs","rp","re","ro","metaRiv","metaRsd")))
-              switch(braw.end$RZ,
+              switch(braw.env$RZ,
                      "r"={},
                      "z"={a<-atan(a)}
                      )
