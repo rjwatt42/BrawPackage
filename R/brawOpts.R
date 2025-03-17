@@ -62,7 +62,8 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
                     infer_sigNonNull="#11CC00",infer_nsigNonNull="#AA6633",infer_isigNonNull="#881100",infer_nsdNonNull="#DDCCCC",
                     infer_sigNull="#88AA66",infer_nsigNull="#FF4400",infer_isigNull="#FF4400",infer_nsdNull="#CCDDCC",
                     psig="#FFAA00",alpha="#44FF22",
-                    fdr="#227700",fmr="#BB5555")
+                    fdr="#227700",fmr="#BB5555",
+                    powerPopulation="#0049FF",powerSample="#88BDFF")
 
   if (BW) {
     plotColours<-list(graphC="#FFFFFF",graphBack="#999999",

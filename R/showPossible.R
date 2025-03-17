@@ -183,6 +183,10 @@ showPossible <- function(possibleResult=NULL,
                          view="3D",axisScale=1,
                          azimuth=NULL,elevation=15,distance=8){
   
+  oldRZ<-braw.env$RZ
+  braw.env$RZ<-possibleResult$axisType
+  on.exit(setBrawEnv("RZ",oldRZ))
+  
   if (is.null(possibleResult)) possibleResult<-doPossible()
   if (is.numeric(possibleResult)) {
     sRho<-possibleResult
@@ -213,11 +217,13 @@ showPossible <- function(possibleResult=NULL,
   
   colS<-braw.env$plotColours$metaAnalysis
   if (showP>0)  colS<-braw.env$plotColours$infer_nsigC
+  colSsum<-"#FFBB88"
   colSdark=darken(colS,off=-0.67)
   colSlight=darken(colS,off=0.2)
   colSsim=darken(colS,off=0.0)
   
   colP=braw.env$plotColours$descriptionC
+  colP="#88AAFF"
   colPdark=darken(colP,off=-0.67)
   colPlight=darken(colP,off=0.25)
   colPsim=darken(colP,off=-0.33)
@@ -228,6 +234,7 @@ showPossible <- function(possibleResult=NULL,
   colNullS=darken(braw.env$plotColours$infer_nsigC,off=-0.25)
   colDistS=darken(braw.env$plotColours$infer_sigC,off=-0.25)
   highTransparency=0.25
+  sampDensGain=0.65
   
   char3D=braw.env$labelSize/3
   xylabelSize=1.1
@@ -282,10 +289,9 @@ showPossible <- function(possibleResult=NULL,
   if (showType=="Populations") n<-possibleResult$possible$targetSampleN
   
   rs<-possibleResult$Theory$rs
-  sourceSampDens_r<-possibleResult$Theory$sourceSampDens_r
   sourceSampDens_r_null<-possibleResult$Theory$sourceSampDens_r_null
   sourceSampDens_r_plus<-possibleResult$Theory$sourceSampDens_r_plus
-  sourceSampDens_r_total<-sourceSampDens_r
+  sourceSampDens_r_total<-possibleResult$Theory$sourceSampDens_r_total
   
   rp<-possibleResult$Theory$rp
   priorSampDens_r<-possibleResult$Theory$priorSampDens_r
@@ -343,8 +349,27 @@ showPossible <- function(possibleResult=NULL,
     ylim<-c(-1,1)/axisScale+offRange
          },
          "z"={
-    xlim<-c(min(rp),max(rp))/axisScale+offRange # population
-    ylim<-c(min(rs),max(rs))/axisScale+offRange
+           rp<-atanh(rp)
+
+           for (ci in 1:nrow(sourceSampDens_r_plus)) 
+             sourceSampDens_r_plus[ci,]<-rdens2zdens(sourceSampDens_r_plus[ci,],rs)
+           sourceRVals<-atanh(sourceRVals)
+           
+           sourceSampDens_r_null<-rdens2zdens(sourceSampDens_r_null,rs)
+           sourceSampDens_r_total<-rdens2zdens(sourceSampDens_r_total,rs)
+           rs<-atanh(rs)
+           
+           rsw_dens_plus<-rdens2zdens(rsw_dens_plus,rsw)
+           rsw_dens_null<-rdens2zdens(rsw_dens_null,rsw)
+           rsw_dens<-rdens2zdens(rsw_dens,rsw)
+           rsw<-atanh(rsw)
+           
+           priorSampDens_r<-rdens2zdens(priorSampDens_r,rpw)
+           rpw_dens<-rdens2zdens(rpw_dens,rpw)
+           rpw<-atanh(rpw)
+           
+           xlim<-c(min(rp),max(rp))/axisScale+offRange # population
+           ylim<-c(min(rs),max(rs))/axisScale+offRange
          }
   )
   zlim<-c(0,1)
@@ -711,7 +736,7 @@ showPossible <- function(possibleResult=NULL,
                 ztotal<-log10(ztotal)
                 ztotal[ztotal<zlim[1]]<-zlim[1]
               }
-              g<-drawDistribution(x,y,ztotal,xlim,ylim,zlim,mapping,colS,1,draw_lower_limit,g)
+              g<-drawDistribution(x,y,ztotal,xlim,ylim,zlim,mapping,colSsum,1,draw_lower_limit,g)
                 # split into 2 parts  
                 if (possible$source$worldOn && possible$source$populationNullp>0){
                   if (!any(is.na(sampleBackwall$rsw_dens_null))) {
@@ -785,7 +810,7 @@ showPossible <- function(possibleResult=NULL,
             }
             
             # main distributions            
-            if (is.na(sRho)) theoryAlpha=0.8 else theoryAlpha=0.3
+            if (is.na(sRho)) theoryAlpha=0.6 else theoryAlpha=0.3
             simAlpha<-1
             switch (showType,
                     "Samples"={
@@ -834,7 +859,6 @@ showPossible <- function(possibleResult=NULL,
                         } else {
                           if (!is.matrix(sSimDens)) {
                             sSimDens<-t(sSimDens)
-                            sourceSampDens_r<-t(sourceSampDens_r)
                           } 
                           use_s<-(1:ncol(sSimDens))
                         }
@@ -877,7 +901,7 @@ showPossible <- function(possibleResult=NULL,
                               z_use[1:use-1]<-0
                             } 
                             if (logZ) z_use<-log10(z_use)
-                            g<-drawDistribution(rep(sourceRVals[i],length(rs)),rs,z_use,xlim,ylim,zlim,
+                            g<-drawDistribution(rep(sourceRVals[i],length(rs)),rs,z_use*sampDensGain,xlim,ylim,zlim,
                                                 mapping,colS,theoryAlpha,draw_lower_limit,g)
                             
                           if (!cutaway && !is.na(sRho)) {

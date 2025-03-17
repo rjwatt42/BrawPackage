@@ -113,14 +113,16 @@ makeFiddle<-function(y,yd,orientation="horiz"){
 }
 
 get_upperEdge<-function(allvals,svals){
-  target1<-min(svals,na.rm=TRUE)
+  if (isempty(svals)) target1<-min(allvals)
+  else   target1<-min(svals,na.rm=TRUE)
   if (any(allvals<target1,na.rm=TRUE)){
     target2<-max(allvals[allvals<target1],na.rm=TRUE)
     target<-(target1+target2)/2
   } else target<-target1+0.001
 }
 get_lowerEdge<-function(allvals,svals) {
-  target1<-min(svals,na.rm=TRUE)
+  if (isempty(svals)) target1<-min(allvals)
+  else   target1<-min(svals,na.rm=TRUE)
   if (any(allvals<target1)){
     target2<-max(allvals[allvals<target1],na.rm=TRUE)
     if (target2==-Inf) target2=target1-0.5
@@ -138,8 +140,8 @@ getBins<-function(vals,nsvals,target,minVal,maxVal,fixed=FALSE) {
   nv=max(length(nsvals),length(vals))
   nb<-min(round(sqrt(nv)*0.75),maxBins)
   
-  high_p<-max(vals,na.rm=TRUE)+0.2
-  low_p<-min(vals,na.rm=TRUE)-0.2
+  high_p<-max(vals,na.rm=TRUE)+0.0000002
+  low_p<-min(vals,na.rm=TRUE)-0.0000002
   if (!is.null(minVal)) {
     low_p<-max(minVal,low_p,na.rm=TRUE)
   }
@@ -388,6 +390,7 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
         c2=braw.env$plotColours$infer_nsdNonNull
         c3<-braw.env$plotColours$infer_isigNonNull
       }
+      if (showType=="wp") c1<-c2<-c3<-braw.env$plotColours$power
     }
   }
   if (length(pts$y1)<=npointsMax) {
@@ -426,13 +429,13 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
     co1<-darken(c1,off=-colgain)
     co2<-darken(c2,off=-colgain)
     dotSize<-braw.env$dotSize*scale*gain
+    shape<-braw.env$plotShapes$study
     if (useSignificanceCols) {
     pts_sigNonNull=pts[pts$y2 & pts$y0,]
     pts_nsNonNull=pts[!pts$y2 & pts$y0,]
     pts_sigNull=pts[pts$y2 & !pts$y0,]
     pts_nsNull<-pts[!pts$y2 & !pts$y0,]
     
-    shape<-braw.env$plotShapes$study
     if (is.na(pts$n[1])) { # metaAnalysis
       shape<-braw.env$plotShapes$meta
       c1<-c2<-c3<-c4<-braw.env$plotColours$metaMultiple
@@ -501,7 +504,7 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
                          x=(c(w,0,0,w)+ystart)*width[2]+xoff)
         g<-addG(g,dataPolygon(data=data,
                               colour=NA, fill = cols[j],alpha=alpha))
-        ystart<-dens[j]
+        if (histStyle=="width") ystart<-dens[j]
         }
       }
     }
@@ -524,6 +527,7 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
 r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                  orientation="vert",whichEffect="Main 1",effectType="all",showTheory=TRUE,g=NULL){
 
+  baseColour<-braw.env$plotColours$infer_nsigC
   npct<-1
   showSig<-TRUE
   labelSig<-TRUE
@@ -531,6 +535,11 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   top<-1
   if (is.element(showType,c("e1d","e2d"))) top<-1.5
   if (is.element(showType,c("rse","rss"))) top<-1.5
+
+  if (showType=="wp") {
+    showSig<-FALSE
+    baseColour<-plotAxis("wp",analysis$hypothesis)$cols[1]
+  }
   
   if (is.element(showType,c("iv.mn","iv.sd","iv.sk","iv.kt",
                             "dv.mn","dv.sd","dv.sk","dv.kt",
@@ -677,8 +686,10 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   for (yl in ylines)
     g<-addG(g,horzLine(intercept=yl,linewidth=0.25,linetype="dashed",colour=lineCol))
   
+  dw<-0.001
   if (!all(is.na(analysis$rIV)) || doingMetaAnalysis) {
     data<-collectData(analysis,whichEffect)
+    if (length(data$rs)>0) dw<-1/max(250,length(data$rs))
     switch(braw.env$RZ,
            "r"={},
            "z"={
@@ -843,7 +854,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                xdsig<-ndist$ndensSig
              },
              "ws"={
-               yv<-seq(braw.env$alphaSig*1.01,1/1.01,length.out=npt)
+               yv<-seq(braw.env$alphaSig*(1+dw),1/(1+dw),length.out=npt)
                xd<-fullRSamplingDist(yv,effectTheory$world,design,"ws",logScale=logScale,sigOnly=sigOnly)
              },
              "log(lrs)"={
@@ -999,7 +1010,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
         xdsig<-xdsig*theoryGain
         xdsig[is.na(xdsig)]<-0
         if (!all(xd==xdsig))
-          g<-addG(g,dataPolygon(data=ptsp,colour=NA,fill=braw.env$plotColours$infer_nsigC,alpha=theoryAlpha))
+          g<-addG(g,dataPolygon(data=ptsp,colour=NA,fill=baseColour,alpha=theoryAlpha))
         # xdsig[xdsig==0]<-NA
         i2<-0
         while (i2<length(xdsig)) {

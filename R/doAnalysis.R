@@ -1055,7 +1055,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
   analysis$test_name<-t_name
   analysis$df<-df
   analysis$test_val<-tval
-  analysis$rCalc<-test2effectsize(t_name,tval,analysis$df1,analysis$df2)
+  analysis$rCalc<-test2effectsize(t_name,tval,analysis$df1,analysis$df)
   
   if (IV$type=="Interval"){
     analysis$iv.mn<-mean(iv1,na.rm=TRUE)

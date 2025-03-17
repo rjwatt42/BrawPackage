@@ -7,8 +7,8 @@ getWorldEffect<-function(effect) {
                         "Single"={rho<-effect$world$populationPDFk},
                         "Double"={rho<-effect$world$populationPDFk*sign(runif(1,-1,1))},
                         "Uniform"={rho<-runif(1,min=-1,max=1)},
-                        "Exp"={rho<-rexp(1,rate=1/effect$world$populationPDFk)*sign((runif(1)*2-1))},
-                        "Gauss"={rho<-rnorm(1,mean=0,sd=effect$world$populationPDFk)*sign((runif(1)*2-1))},
+                        "Exp"={rho<-effect$world$populationPDFmu+rexp(1,rate=1/effect$world$populationPDFk)*sign((runif(1)*2-1))},
+                        "Gauss"={rho<-effect$world$populationPDFmu+rnorm(1,mean=0,sd=effect$world$populationPDFk)*sign((runif(1)*2-1))},
                         ">"={rho<-runif(1,min=effect$world$populationPDFk,max=1)*sign(runif(1,min=-1,max=1))},
                         "<"={rho<-runif(1,min=-1,max=1)*effect$world$populationPDFk}
                 )
@@ -18,13 +18,13 @@ getWorldEffect<-function(effect) {
                         "Single"={rho<-effect$world$populationPDFk},
                         "Double"={rho<-effect$world$populationPDFk*sign(runif(1,-1,1))},
                         "Uniform"={rho<-runif(1,min=-uniformZrange,max=uniformZrange)},
-                        "Exp"={rho<-rexp(1,rate=1/effect$world$populationPDFk)*sign((runif(1)*2-1))},
-                        "Gauss"={rho<-rnorm(1,mean=0,sd=effect$world$populationPDFk)*sign((runif(1)*2-1))},
+                        "Exp"={rho<-effect$world$populationPDFmu+rexp(1,rate=1/effect$world$populationPDFk)*sign((runif(1)*2-1))},
+                        "Gauss"={rho<-effect$world$populationPDFmu+rnorm(1,mean=0,sd=effect$world$populationPDFk)},
                         ">"={rho<-runif(1,min=effect$world$populationPDFk,max=10)*sign(runif(1,min=-1,max=1))},
                         "<"={rho<-runif(1,min=-1,max=1)*effect$world$populationPDFk}
                 )
                 rho<-tanh(rho)
-              }
+                 }
       )
       rhoOld<-rho
       if (effect$world$populationNullp>0) {

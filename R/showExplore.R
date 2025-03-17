@@ -743,8 +743,8 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
           min(use_y,na.rm=TRUE),
           max(use_y,na.rm=TRUE)
               )
-        if (diff(ylim)==0) ylim<-ylim+x(-1,1)*ylim/10
-        else               ylim<-ylim+c(-1,1)*diff(ylim)/4
+        if (diff(ylim)==0) ylim<-ylim+c(-1,1)*ylim/10
+        else               ylim<-ylim+c(-1,1)*diff(ylim)/10
       }
       # general start
       g<-startPlot(xlim,ylim,
@@ -755,6 +755,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                    ylabel=makeLabel(label=ylabel),
                    top=TRUE,g=g)
       if (nchar(useLabel)>0)    g<-addG(g,plotTitle(useLabel,size=1.5))
+      else g<-addG(g,plotTitle(paste0("n[sims]=",exploreResult$count),size=0.5,position = "right"))
       
       # theory plots
       if (!is.null(theoryVals)) {

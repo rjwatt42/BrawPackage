@@ -799,7 +799,7 @@ dataErrorBar<-function(data,colour="black",linewidth=0.25) {
 }
 dataLegend<-function(data,title="title",fontsize=0.6,shape=21) {
   dy=0.06*fontsize
-  dx=0.035*fontsize
+  dx=0.022*fontsize/braw.env$plotArea[3] # because rangeX() below
   names<-data$names
   if (nchar(title)>0) tn<-1.2 else tn<-0
   nrows<-tn+length(names)+1

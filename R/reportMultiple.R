@@ -390,7 +390,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
           else              outputText<-c(outputText,ot4,rep(" ",nc-length(ot4)))
         }
         
-        if (pars[1]=="p" || pars[2]=="p") {
+        if (any(pars=="p")) {
           if (is.null(IV2)) {
             outputText<-c(outputText,rep("",nc),
                           paste0("!j\bp(sig) = ",brawFormat(sum(p<braw.env$alphaSig,na.rm=TRUE)/sum(!is.na(p))*100,digits=1),"%"),rep(" ",nc-1))

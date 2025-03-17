@@ -73,11 +73,13 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
                   )
                 )
         outputText<-c(outputText,"!Htest-statistic","(df) ","value","p",f1,"r[s]","Cohen's d",rep("",nc-7))
-        outputText<-c(outputText,paste0("!j",t_name),df,brawFormat(tval,digits=braw.env$report_precision),pvalText,
+        outputText<-c(outputText,paste0("!j",t_name),paste0("(",brawFormat(df),")"),
+                                 brawFormat(tval,digits=braw.env$report_precision),pvalText,
                       f2,rvalText,brawFormat(dval,digits=braw.env$report_precision),rep("",nc-7))
       } else {
         outputText<-c(outputText,"!Htest-statistic","(df) ","value","p",f1,"r[s]",rep("",nc-6))
-        outputText<-c(outputText,paste0("!j",t_name),df,brawFormat(tval,digits=braw.env$report_precision),pvalText,
+        outputText<-c(outputText,paste0("!j",t_name),paste0("(",brawFormat(df),")"),
+                                 brawFormat(tval,digits=braw.env$report_precision),pvalText,
                       f2,rvalText,rep("",nc-6))
       }
     }

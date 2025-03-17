@@ -97,9 +97,18 @@ resetMultiple<-function(nsims=0,evidence,multipleResult=NULL){
 #'                              doingNull=FALSE,inSteps=FALSE,autoShow=braw.env$autoShow,showType="Basic")
 #' @seealso showMultiple() and reportMultiple())
 #' @export
-doMultiple <- function(nsims=10,multipleResult=braw.res$multiple,hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,
+doMultiple <- function(nsims=10,multipleResult=NULL,hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,
                          doingNull=FALSE,inSteps=FALSE,autoShow=braw.env$autoShow,showType="Basic") {
 
+  if (is.null(multipleResult)) {
+    if (!is.null(braw.res$multiple)) {
+      if (identical(hypothesis,braw.res$multiple$hypothesis) &&
+          identical(design,braw.res$multiple$design) &&
+          identical(evidence,braw.res$multiple$evidence) 
+      ) multipleResult<-braw.res$multiple
+    }
+  }
+  
   if (evidence$metaAnalysis$On) {
     if (!is.null(multipleResult$fixed)) metaMultiple<-multipleResult
     else                                metaMultiple<-braw.res$metaMultiple

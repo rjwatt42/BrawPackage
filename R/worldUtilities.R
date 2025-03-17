@@ -117,8 +117,9 @@ rSamp2Pop<-function(r_s,n,world=NULL) {
   tanh(mlEst)
 }
   
-getRList<-function(world) {
-  npops=20*6+1 # 2*3*4*5+1
+getRList<-function(world,HQ=FALSE) {
+  if (HQ) npops=50*6+1
+  else    npops=20*6+1 # 2*3*4*5+1
 
   if (is.null(world)) {
     return(list(pRho=0,pRhogain=1)  )
@@ -146,7 +147,10 @@ getRList<-function(world) {
             pRhogain<-c(0.5,0.5)
           },
           {
-            pRho<-seq(-1,1,length=npops)*braw.env$r_range
+            switch(braw.env$RZ,
+                   "r"=pRho<-seq(-1,1,length=npops)*braw.env$r_range,
+                   "z"=pRho<-tanh(seq(-1,1,length=npops)*braw.env$z_range)
+            )
             pRhogain<-rPopulationDist(pRho,world)
           }
   )
@@ -163,7 +167,7 @@ getRList<-function(world) {
 }
 
 getNDist<-function(design,world=NULL,logScale=FALSE,sigOnly=FALSE,HQ=FALSE) {
-  if (HQ) npt<-101 else npt=21
+  if (HQ) npt<-1001 else npt=21
   nmax<-5
   if (logScale) {
     nvals<-10^seq(log10(braw.env$minN),log10(nmax*design$sN),length.out=npt)
@@ -181,7 +185,7 @@ getNDist<-function(design,world=NULL,logScale=FALSE,sigOnly=FALSE,HQ=FALSE) {
   }
   if (sigOnly>0) {
     nsig<-ng 
-    pR<-getRList(world)
+    pR<-getRList(world,HQ)
     pR$pRhogain<-pR$pRhogain/sum(pR$pRhogain)
     for (ni in 1:length(nvals)) {
       psig<-sum(rn2w(pR$pRho,nvals[ni])*pR$pRhogain)
@@ -199,7 +203,7 @@ getNDist<-function(design,world=NULL,logScale=FALSE,sigOnly=FALSE,HQ=FALSE) {
 
 getNList<-function(design,world,HQ=FALSE) {
   if (design$Replication$On) {
-    if (HQ) npt<-101 else npt=21
+    if (HQ) npt<-201 else npt=21
     nmax<-5
     nvals<-braw.env$minN+seq(0,nmax*design$sN,length.out=npt)
     design$Replication$On<-FALSE
@@ -215,6 +219,7 @@ getNList<-function(design,world,HQ=FALSE) {
 
 rPopulationDist<-function(rvals,world) {
   k<-world$populationPDFk
+  mu<-world$populationPDFmu
   switch (paste0(world$populationPDF,"_",world$populationRZ),
           "Single_r"={
             rdens<-rvals*0
@@ -252,11 +257,11 @@ rPopulationDist<-function(rvals,world) {
             rdens<-zdens2rdens(zdens,rvals)
           },
           "Gauss_r"={
-            rdens<-exp(-0.5*(abs(rvals)/k)^2)/k/sqrt(2*pi)
+            rdens<-exp(-0.5*(abs(rvals-mu)/k)^2)/k/sqrt(2*pi)
           },
           "Gauss_z"={
             zvals<-atanh(rvals)
-            zdens<-exp(-0.5*(abs(zvals)/k)^2)/k/sqrt(2*pi)
+            zdens<-exp(-0.5*(abs(zvals-mu)/k)^2)/k/sqrt(2*pi)
             rdens<-zdens2rdens(zdens,rvals)
           }
   )
@@ -302,7 +307,7 @@ fullRSamplingDist<-function(vals,world,design,doStat="rs",logScale=FALSE,sigOnly
     vals<-seq(-1,1,length=braw.env$worldNPoints)*braw.env$r_range
 
   # distribution of population effect sizes
-  pR<-getRList(world)
+  pR<-getRList(world,HQ)
   rvals<-pR$pRho
   rdens<-pR$pRhogain
   if (length(rvals)>1) rdens<-rdens*diff(rvals[1:2])

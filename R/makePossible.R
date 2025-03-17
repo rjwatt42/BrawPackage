@@ -16,9 +16,11 @@
 #' @export
 makePossible<-function(targetSample=NULL,UseSource="world",
                        targetPopulation=NULL,UsePrior="none",prior=getWorld("Psych"),
-                       sims=braw.res$multiple$result,sigOnly=FALSE,sigOnlyCompensate=FALSE,
+                       sigOnly=FALSE,sigOnlyCompensate=FALSE,
+                       axisType=braw.env$RZ,
+                       sims=braw.res$multiple$result,
                        hypothesis=braw.def$hypothesis,design=braw.def$design,
-                       simSlice=0.1,correction=TRUE
+                       simSlice=0.1,correction=TRUE,HQ=FALSE
 ) {
   if (is.numeric(targetSample)) {
     targetSampleN<-design$sN
@@ -30,7 +32,7 @@ makePossible<-function(targetSample=NULL,UseSource="world",
     } else {
       targetSample<-braw.res$result
     }
-  } 
+  }
   
   if (is.list(targetSample)) {
     result<-targetSample
@@ -46,9 +48,14 @@ makePossible<-function(targetSample=NULL,UseSource="world",
       design$sN<-result$nval
     }
   }
+  if (is.na(targetSample)) {
+    targetSample<-NULL
+    targetSampleN<-design$sN
+  }
+  
   if (sigOnly>0) {
     rcrit<-p2r(braw.env$alphaSig,targetSampleN)
-    targetSample<-targetSample[abs(targetSample)>=rcrit]
+    if (!is.null(targetSample)) targetSample<-targetSample[abs(targetSample)>=rcrit]
   }
   if (is.null(targetSampleN)) {
     if (design$sNRand) {
@@ -77,11 +84,12 @@ makePossible<-function(targetSample=NULL,UseSource="world",
        targetPopulation=targetPopulation,
        UsePrior=UsePrior,
        prior=prior,
+       axisType=axisType,
        hypothesis=hypothesis,
        design=design,
        showTheory=TRUE,
        sims=sims,
-       simSlice=simSlice,correction=correction
+       simSlice=simSlice,correction=correction,HQ=HQ
   )
   
   return(possible)
@@ -95,6 +103,10 @@ makePossible<-function(targetSample=NULL,UseSource="world",
 doPossible <- function(possible=NULL,possibleResult=NULL){
   
   if (is.null(possible)) possible<-makePossible()
+  oldRZ<-braw.env$RZ
+  braw.env$RZ<-possible$axisType
+  on.exit(setBrawEnv("RZ",oldRZ))
+
   npoints=201
 
   design<-possible$design
@@ -108,15 +120,16 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
   pRho<-possible$targetPopulation
   
   # note that we do everything in r and then, if required transform to z at the end
-  rs<-seq(-1,1,length=npoints)*braw.env$r_range
-  rp<-seq(-1,1,length=npoints)*braw.env$r_range
   switch(braw.env$RZ,
-         "r"={},
+         "r"={
+           rs<-seq(-1,1,length=npoints)*braw.env$r_range
+           rp<-seq(-1,1,length=npoints)*braw.env$r_range
+         },
          "z"={
            rs<-tanh(seq(-1,1,length=npoints)*braw.env$z_range)
            rp<-tanh(seq(-1,1,length=npoints)*braw.env$z_range)
-           sRho<-tanh(sRho)
-           pRho<-tanh(pRho)
+           if (!is.null(sRho)) sRho<-tanh(sRho)
+           if (!is.null(pRho)) pRho<-tanh(pRho)
          })
 
   # get the source population distribution
@@ -173,9 +186,11 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
   }
   
   # enumerate the source populations
-  sD<-fullRSamplingDist(rs,source,design,separate=TRUE,sigOnly=possible$sigOnly,sigOnlyCompensate=possible$sigOnlyCompensate)
+  sD<-fullRSamplingDist(rs,source,design,separate=TRUE,
+                        sigOnly=possible$sigOnly,sigOnlyCompensate=possible$sigOnlyCompensate,
+                        HQ=possible$HQ)
   sourceRVals<-sD$vals
-  sourceSampDens_r<-sD$dens
+  sourceSampDens_r_total<-sD$dens
   sourceSampDens_r_plus<-rbind(sD$densPlus)
   sourceSampDens_r_null<-sD$densNull
   if (is.element(source$populationPDF,c("Single","Double")) && source$populationNullp>0) {
@@ -187,7 +202,7 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
   sourceSampDens_r_plus<-sourceSampDens_r_plus/dr_gain
   
   # enumerate the prior populations
-  pD<-fullRSamplingDist(rp,prior,design,separate=TRUE)
+  pD<-fullRSamplingDist(rp,prior,design,separate=TRUE,HQ=TRUE)
   priorRVals<-pD$vals
   priorSampDens_r<-pD$dens
   priorSampDens_r_plus<-pD$densPlus
@@ -279,9 +294,9 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
                        pRho=pRho,
                        source=source,prior=prior,
                        Theory=list(
-                         rs=rs,sourceSampDens_r=sourceSampDens_r,
+                         rs=rs,sourceSampDens_r_total=sourceSampDens_r_total,
                                sourceSampDens_r_plus=sourceSampDens_r_plus,sourceSampDens_r_null=sourceSampDens_r_null,
-                         rp=rp,priorSampDens_r=sourceSampDens_r,
+                         rp=rp,priorSampDens_r=sourceSampDens_r_total,
                                sampleLikelihood_r=sampleLikelihood_r,sampleLikelihood_r_show=sampleLikelihood_r_show,
                                sampleLikelihoodTotal_r=sampleLikelihoodTotal_r,
                                priorPopDens_r=priorPopDens_r,sourcePopDens_r=sourcePopDens_r,
