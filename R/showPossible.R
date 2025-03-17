@@ -1,4 +1,6 @@
-drawDistribution<-function(x_use,y_use,z_use,xlim,ylim,zlim,mapping,colUse,alphaUse,draw_lower_limit,g) {
+drawDistribution<-function(x_use,y_use,z_use,xlim,ylim,zlim,mapping,
+                           colUse,lineUse,alphaUse,draw_lower_limit,g) {
+  if (is.na(colUse)) lineWidth<-0.5 else lineWidth<-0.25
   z_use[z_use<draw_lower_limit]<-0
   while (length(z_use)>0 && any(z_use>0)) {
     use1<-which(z_use>0)[1]
@@ -15,10 +17,11 @@ drawDistribution<-function(x_use,y_use,z_use,xlim,ylim,zlim,mapping,colUse,alpha
       dL<-data.frame(x = c(x_use[1],x_use[use],x_use[use[length(use)]]), 
                      y = c(y_use[1],y_use[use],y_use[use[length(use)]]), 
                      z = c(zlim[1],z_draw[use],zlim[1]))
+      if (!is.na(colUse))
       g<-addG(g,
-              dataPolygon(rotate3D(dL,mapping),fill=colUse,alpha=alphaUse),
-              dataPath(rotate3D(dL,mapping),alpha=alphaUse)
-      )
+              dataPolygon(rotate3D(dL,mapping),fill=colUse,alpha=alphaUse))
+      g<-addG(g,
+              dataPath(rotate3D(dL,mapping),colour=lineUse,alpha=alphaUse,linewidth=lineWidth))
     }
     if (use2==length(z_use)) break
     z_use<-z_use[(use2+1):length(z_use)]
@@ -669,7 +672,7 @@ showPossible <- function(possibleResult=NULL,
               z<-z/max(z)
               if (max(z)==min(z)) z<-z/2
               if (logZ) z<-log10(z)
-              g<-drawDistribution(x,y,z,xlim,ylim,zlim,mapping,colP,0.25,draw_lower_limit,g)
+              g<-drawDistribution(x,y,z,xlim,ylim,zlim,mapping,colP,"black",0.25,draw_lower_limit,g)
               # use<- which((x>=xlim[1]) & (x<=xlim[2]) & (z>=zlim[1]))
               # g<-addG(g,
               #         dataPolygon(rotate3D(data.frame(x=c(x[use[1]],x[use],x[use[length(use)]]),y=c(y[use[1]],y[use],y[use[length(use)]]),z=c(zlim[1],z[use],zlim[1])*wallHeight),mapping),fill=colP,alpha=0.25)
@@ -736,7 +739,7 @@ showPossible <- function(possibleResult=NULL,
                 ztotal<-log10(ztotal)
                 ztotal[ztotal<zlim[1]]<-zlim[1]
               }
-              g<-drawDistribution(x,y,ztotal,xlim,ylim,zlim,mapping,colSsum,1,draw_lower_limit,g)
+              g<-drawDistribution(x,y,ztotal,xlim,ylim,zlim,mapping,colSsum,"black",1,draw_lower_limit,g)
                 # split into 2 parts  
                 if (possible$source$worldOn && possible$source$populationNullp>0){
                   if (!any(is.na(sampleBackwall$rsw_dens_null))) {
@@ -759,14 +762,18 @@ showPossible <- function(possibleResult=NULL,
                   }
                   if (possible$source$populationNullp>0 ) {
                     use<-znull>draw_lower_limit
-                      g<-addG(g,
-                            dataPath(rotate3D(data.frame(x=x[use],y=y[use],z=znull[use]*wallHeight),mapping),colour=colNullS,linewidth=0.5)
-                    )
+                    g<-drawDistribution(x,y,znull*wallHeight,xlim,ylim,zlim,mapping,NA,colNullS,1,draw_lower_limit,g)
+                      # g<-addG(g,
+                      #       dataPath(rotate3D(data.frame(x=x[use],y=y[use],z=znull[use]*wallHeight),mapping),
+                      #                colour=colNullS,linewidth=0.5)
+                    # )
                   }
                   use<-zplus>draw_lower_limit
-                  g<-addG(g,
-                          dataPath(rotate3D(data.frame(x=x[use],y=y[use],z=zplus[use]*wallHeight),mapping),colour=colDistS,linewidth=0.5)
-                  )
+                  g<-drawDistribution(x,y,zplus*wallHeight,xlim,ylim,zlim,mapping,NA,colDistS,1,draw_lower_limit,g)
+                  # g<-addG(g,
+                  #         dataPath(rotate3D(data.frame(x=x[use],y=y[use],z=zplus[use]*wallHeight),mapping),
+                  #                  colour=colDistS,linewidth=0.5)
+                  # )
                 }
               # }
 
@@ -902,7 +909,7 @@ showPossible <- function(possibleResult=NULL,
                             } 
                             if (logZ) z_use<-log10(z_use)
                             g<-drawDistribution(rep(sourceRVals[i],length(rs)),rs,z_use*sampDensGain,xlim,ylim,zlim,
-                                                mapping,colS,theoryAlpha,draw_lower_limit,g)
+                                                mapping,colS,"black",theoryAlpha,draw_lower_limit,g)
                             
                           if (!cutaway && !is.na(sRho)) {
                             z_use<-sourceSampDens_r_plus[i,]*pgain
@@ -911,7 +918,7 @@ showPossible <- function(possibleResult=NULL,
                             z_use[1:use-1]<-0
                             if (logZ) z_use<-log10(z_use)
                             g<-drawDistribution(rep(sourceRVals[i],length(rs)),rs,z_use,xlim,ylim,zlim,
-                                                mapping,colS,theoryAlpha*2,draw_lower_limit,g)
+                                                mapping,colS,"black",theoryAlpha*2,draw_lower_limit,g)
                             
                           }
                           if (showP>0 && !is.na(sRho)) {
