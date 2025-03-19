@@ -36,6 +36,7 @@ GaussSamplingCDF<-function(zcrit,lambda,sigma,offset=0) {
 
 
 ExpSamplingPDF<-function(z,lambda,sigma,shape=NA,bias=FALSE,df1=1) {
+  if (lambda==0) return(GaussSamplingPDF(z,lambda,sigma,offset=0,shape=NA,bias=FALSE,df1=1))
   lambda1<-1/lambda
   # d1a<-0.25*(lambda1*exp(-lambda1*(z-sigma^2*lambda1/2))*(1+erf((z-sigma^2*lambda1)/sqrt(2)/sigma)) +
   #             lambda1*exp(-lambda1*(-z-sigma^2*lambda1/2))*(1+erf((-z-sigma^2*lambda1)/sqrt(2)/sigma)))
@@ -59,6 +60,7 @@ ExpSamplingPDF<-function(z,lambda,sigma,shape=NA,bias=FALSE,df1=1) {
   e2[e2==Inf]<-1
   d1<-e1*p1+e2*p2
   d1<-d1/lambda/2
+  d1[is.na(d1)]<-0.5
   
   if (bias>0) {
     zcrit<-atanh(p2r(braw.env$alphaSig,1/sigma^2+3,df1))
@@ -206,14 +208,15 @@ getLogLikelihood<-function(z,n,df1,distribution,location,spread=0,bias=FALSE,ret
   } 
   
   # get nulls ready first
-  if (any(spread>0)) {
+  nulls<-spread
+  if (any(nulls>0)) {
     nullPDF<-SingleSamplingPDF(z,0,sigma,NA,bias,df1)
   } else {
     nullPDF<-list(pdf=0,sig_pdf=1)
     zcrit<-0
   } 
   shape<-NA
-  res<-matrix(-Inf,nrow=length(location),ncol=length(spread))
+  res<-matrix(-Inf,nrow=length(location),ncol=length(nulls))
   switch(distribution,
          "Single"={
            PDF<-SingleSamplingPDF
@@ -236,8 +239,8 @@ getLogLikelihood<-function(z,n,df1,distribution,location,spread=0,bias=FALSE,ret
   for (i in 1:length(location)) {
     lambda<-location[i]
     mainPDF<-PDF(z,lambda,sigma,shape=shape,bias=bias,df1=df1)
-    for (j in 1:length(spread)) {
-      nullP<-spread[j]
+    for (j in 1:length(nulls)) {
+      nullP<-nulls[j]
       # make the whole source first
       sourcePDF<-mainPDF$pdf*(1-nullP)+nullPDF$pdf*nullP
       # now normalize for the non-sig

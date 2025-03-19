@@ -21,7 +21,7 @@ nDistrDens<-function(nvals,design) {
   )
 }
 
-nDistrRand<-function(nSamples,design){
+nDistrRand<-function(nSamples,design=braw.def$design){
   switch(design$sNRandDist,
          "Gamma"={
            return(

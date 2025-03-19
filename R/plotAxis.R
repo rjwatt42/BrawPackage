@@ -495,6 +495,13 @@ plotAxis<-function(showType,hypothesis,design=NULL) {
             ylabel<-braw.env$Llabel
             use_cols<-braw.env$plotColours$metaMultiple
           },
+          "Lambda"={
+            ylim<-c(-0.01,1.01)
+            ytick<-seq(0,1,0.2)
+            ymins<-seq(0,1,0.1)
+            ylabel<-braw.env$Llabel
+            use_cols<-braw.env$plotColours$metaMultiple
+          },
           "pNull"={
             ylim<-c(-0.01,1.01)
             ytick<-seq(0,1,0.2)

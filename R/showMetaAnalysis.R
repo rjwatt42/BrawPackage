@@ -6,9 +6,11 @@ makeMetaHist<-function(vals,use,xlim) {
   h<-list(bins=bins,dens=dens)
 }
 
-worldLabel<-function(metaResult,whichMeta=NULL) {
+worldLabel<-function(metaResult,whichMeta=NULL,modelPDF=NULL) {
   if (is.null(whichMeta)) whichMeta<-metaResult$bestDist
-    Dist<-tolower(whichMeta)
+  if (whichMeta=="world") whichMeta<-modelPDF
+    whichMeta<-tolower(whichMeta)
+    Dist<-whichMeta
     p1<-metaResult[[Dist]]$param1Max
     p2<-metaResult[[Dist]]$param2Max
     p3<-metaResult[[Dist]]$param3Max
@@ -24,7 +26,8 @@ worldLabel<-function(metaResult,whichMeta=NULL) {
            }
            )
     
-    if (is.element(Dist,c("random","fixed"))) label1<-paste0(braw.env$RZ,"[m]") else label1<-Dist
+    if (is.element(Dist,c("random","fixed"))) label1<-paste0(braw.env$RZ,"[m]") 
+    else                                      label1<-Dist
     lb<-paste0(label1,"=",brawFormat(mean(p1,na.rm=TRUE),digits=3))
     # if (length(p1)>1)
     #   lb<-paste0(lb,"\u00B1",brawFormat(std(p1),digits=2))
@@ -35,6 +38,7 @@ worldLabel<-function(metaResult,whichMeta=NULL) {
       # if (length(p2)>1)
       #   lb<-paste0(lb,"\u00B1",brawFormat(std(p2),digits=2))
     }
+    if (is.element(Dist,c("random","fixed")))
     if (!is.null(p3)) {
       label3<-"bias[m]"
       lb<-paste0(lb,"\n",label3,"=",brawFormat(mean(p3,na.rm=TRUE),digits=3))
@@ -149,7 +153,7 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showType="n",showTheory=
     g<-addG(g,dataPoint(data=ptsNull,shape=braw.env$plotShapes$study, colour = col2, fill = fill2, alpha=alpha, size = dotSize))
   # }
   
-  lb<-worldLabel(metaResult,metaAnalysis$analysisType)
+  lb<-worldLabel(metaResult,metaAnalysis$analysisType,metaAnalysis$modelPDF)
   names=strsplit(lb,"\n")[[1]]
   if (length(names)==1) colours=braw.env$plotColours$metaAnalysis else colours=c(braw.env$plotColours$metaAnalysis,rep(NA,length(names)-1))
   g<-addG(g,dataLegend(data.frame(names=names,colours=colours),title="",shape=22))

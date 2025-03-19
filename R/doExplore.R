@@ -147,7 +147,7 @@ storeExploreResult<-function(result,res,ri,vi) {
     param1Max<-max(c(res$fixed$param1Max,res$random$param1Max,res$single$param1Max,res$gauss$param1Max,res$exp$param1Max),na.rm=TRUE)
     param2Max<-max(c(res$fixed$param2Max,res$random$param2Max,res$single$param2Max,res$gauss$param2Max,res$exp$param2Max),na.rm=TRUE)
     param3Max<-max(c(res$fixed$param3Max,res$random$param3Max,res$single$param3Max,res$gauss$param3Max,res$exp$param3Max),na.rm=TRUE)
-    S<-max(c(res$fixed$S,res$random$S,res$single$S,res$gauss$S,res$exp$S),na.rm=TRUE)
+    S<-max(c(res$fixed$Smax,res$random$Smax,res$single$Smax,res$gauss$Smax,res$exp$Smax),na.rm=TRUE)
     result$param1[ri,vi]<-param1Max
     result$param2[ri,vi]<-param2Max
     result$param3[ri,vi]<-param3Max

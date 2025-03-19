@@ -23,7 +23,7 @@ doMetaAnalysis<-function(metaSingle=braw.res$metaSingle,metaAnalysis=braw.def$me
   localHypothesis<-hypothesis
   if (hypothesis$effect$world$worldOn && is.element(metaAnalysis$analysisType,c("fixed","random")))
   {
-    localHypothesis$effect$rIV<-getWorldEffect(localHypothesis$effect)
+    localHypothesis$effect$rIV<-getWorldEffect(1,localHypothesis$effect)
     localHypothesis$effect$world$worldOn<-FALSE
   }
 
@@ -57,7 +57,7 @@ doMetaMultiple<-function(nsims=100,metaMultiple=braw.res$metaMultiple,metaAnalys
     localHypothesis<-hypothesis
     if (hypothesis$effect$world$worldOn && is.element(metaAnalysis$analysisType,c("fixed","random")))
     {
-      localHypothesis$effect$rIV<-getWorldEffect(localHypothesis$effect)
+      localHypothesis$effect$rIV<-getWorldEffect(1,localHypothesis$effect)
       localHypothesis$effect$world$worldOn<-FALSE
     }
     studies<-multipleAnalysis(metaAnalysis$nstudies,localHypothesis,design,evidence)
@@ -109,7 +109,7 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
   np2points<-21
   np3points<-21
   
-  niterations<-1
+  niterations<-2
   # reInc1<-(np1points-1)/2/3
   # reInc2<-(np2points-1)/2/3
   reInc1<-2
@@ -124,7 +124,7 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
   if (dist=="Single") {
     param1<-seq(-1,1,length.out=np1points)
   } else {
-    param1<-seq(0.01,1,length.out=np1points)
+    param1<-seq(0,1,length.out=np1points)
   }
   
   if (dist=="fixed") {
@@ -196,7 +196,9 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
     if (length(param3)>1) param3<-seq(lb3,ub3,length.out=np3points)
   }
 
-  if (niterations==1) {
+  if (niterations<3) {
+    if (lb1<0.02) {
+    }
     result<-fmincon(c(param1Max,param2Max,param3Max),llfun,ub=c(ub1,ub2,ub3),lb=c(lb1,lb2,lb3))
     param1Max<-result$par[1]
     param2Max<-result$par[2]
@@ -336,6 +338,7 @@ if (is.element(metaAnalysis$analysisType,c("fixed","random"))) {
     exp$param3Max<-c(metaResult$exp$param3Max,exp$param3Max)
     exp$Smax<-c(metaResult$exp$Smax,exp$Smax)
   }
+  count<-length(bestParam1)
 }
   
   metaResult<-list(fixed=fixed,

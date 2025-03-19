@@ -14,7 +14,7 @@
 #' hypothesis=makeHypothesis(),design=makeDesign(),
 #' simSlice=0.1,correction=TRUE)
 #' @export
-makePossible<-function(targetSample=NULL,UseSource="world",
+makePossible<-function(targetSample=NULL,targetSampleN=NULL,UseSource="world",
                        targetPopulation=NULL,UsePrior="none",prior=getWorld("Psych"),
                        sigOnly=FALSE,sigOnlyCompensate=FALSE,
                        axisType=braw.env$RZ,
@@ -22,7 +22,7 @@ makePossible<-function(targetSample=NULL,UseSource="world",
                        hypothesis=braw.def$hypothesis,design=braw.def$design,
                        simSlice=0.1,correction=TRUE,HQ=FALSE
 ) {
-  if (is.numeric(targetSample)) {
+  if (is.numeric(targetSample) && is.null(targetSampleN)) {
     targetSampleN<-design$sN
   }
   if (is.null(targetSample)) {
@@ -48,7 +48,7 @@ makePossible<-function(targetSample=NULL,UseSource="world",
       design$sN<-result$nval
     }
   }
-  if (is.na(targetSample)) {
+  if (length(targetSample)==1 && is.na(targetSample)) {
     targetSample<-NULL
     targetSampleN<-design$sN
   }

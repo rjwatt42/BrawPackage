@@ -97,7 +97,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
              showType<-c("metaRiv","metaRsd")
              if (exploreResult$metaAnalysis$analysisVar=="var") showType[2]<-"LambdaRn"
                },
-           {showType<-c("Lambda","pNull")}
+           {showType<-c("Lambda")}
            )
     
   
@@ -736,7 +736,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
         if (showHist) {
           use_y<-c(showVals,theoryVals,theoryLower,theoryVals1,theoryVals0,theoryVals2)
         } else {
-          use_y<-c(y25,y50,theoryVals,theoryLower,theoryVals1,theoryVals0,theoryVals2)
+          use_y<-c(y25,y50,y75,theoryVals,theoryLower,theoryVals1,theoryVals0,theoryVals2)
         }
         use_y[is.infinite(use_y)]<-NA
         ylim<-c(
