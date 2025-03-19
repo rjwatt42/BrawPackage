@@ -91,3 +91,20 @@ rn2p<-function(r,n,t=2) {
   p<-1-pnorm(z,sd=1/sqrt(n-3))
   return(p*t)
 }
+
+rp2n<-function(r,p,t=2) {
+  if (any(abs(r)>1)) {
+    print("rn2p exception")
+    r[r>1]<-1
+    r[r < -1]<- -1
+  }
+  r<-abs(r)
+  z<-atanh(r)
+  # p<-(1-pnorm(z*sqrt(n-3)))*t
+  # p/t<-1-pnorm(z*sqrt(n-3))
+  # pnorm(z*sqrt(n-3))<-1-p/t
+  # z*sqrt(n-3)<-qnorm(1-p/t)
+  # sqrt(n-3)<-qnorm(1-p/t)/z
+  n<-(qnorm(1-p/t)/z)^2+3
+  return(n)
+}

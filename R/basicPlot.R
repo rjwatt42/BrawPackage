@@ -297,6 +297,7 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=0,
     leftGap<-minGap
   }
   
+  if (is.null(gaps))
   gaps<-c(leftGap,bottomGap,rightGap,topGap)
   plotLimits(xlim = xlim, ylim = ylim,orientation=orientation,gaps,fontScale=braw.env$labelSize*fontScale)
   

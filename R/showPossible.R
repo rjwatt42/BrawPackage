@@ -348,8 +348,8 @@ showPossible <- function(possibleResult=NULL,
   if (axisScale>1 && !is.null(possible$targetSample)) offRange<-possible$targetSample  
   switch(braw.env$RZ,
          "r"={
-    xlim<-c(-1,1)/axisScale+offRange # population
-    ylim<-c(-1,1)/axisScale+offRange
+           xlim<-c(-1,1)/axisScale+offRange # population
+           ylim<-c(-1,1)/axisScale+offRange
          },
          "z"={
            rp<-atanh(rp)
@@ -375,6 +375,7 @@ showPossible <- function(possibleResult=NULL,
            ylim<-c(min(rs),max(rs))/axisScale+offRange
          }
   )
+
   zlim<-c(0,1)
   
   if (length(sourceRVals)<8) draw_lower_limit=0.000001
@@ -408,10 +409,8 @@ showPossible <- function(possibleResult=NULL,
   }
   
   rpw_dens[rpw_dens>1 | is.na(rpw_dens)]<-1
-  # if (!(showType=="Populations" && possible$UsePrior=="none")) {
     rsw_dens_plus<-rsw_dens_plus/max(rsw_dens,na.rm=TRUE)
     rsw_dens_null<-rsw_dens_null/max(rsw_dens,na.rm=TRUE)
-  # }
   populationBackwall<-list(rpw=rpw,rpw_dens=rpw_dens,priorSampDens_r=priorSampDens_r,rp=rp)
   sampleBackwall<-list(rsw=rsw,rsw_dens_plus=rsw_dens_plus,rsw_dens_null=rsw_dens_null)
   
@@ -1217,8 +1216,7 @@ showPossible <- function(possibleResult=NULL,
             else return(g)  
           },
           "2D"={
-            par(bg=braw.env$plotColours$graphC,pin=c(1.33,1)*3,mar=c(5,5,1,1))
-            
+
             # show the back wall
             switch (showType,
                     "Populations"={
@@ -1241,30 +1239,14 @@ showPossible <- function(possibleResult=NULL,
                     }
             )
             
-            rwd<-c(rw[1],rw,rw[length(rw)])
-            rwd_dens<-c(0,rw_dens,0)
             if (showType=="Samples") xlim<-ylim
-            plot(x=rwd,y=rwd_dens,xlab=xlabel,ylab=label.z,type="n",yaxt="n",font.lab=2, cex.lab=char3D,
-                 xlim=xlim,ylim=zlim)
-            axis(side = 2,  at=0, labels = FALSE, tck=-0.05)
             
-            # gray background
-            u <- par("usr") # The coordinates of the plot area
-            rect(u[1], u[3], u[2], u[4], col=braw.env$plotColours$graphBack, border=NA)
-            lines(xlim,c(0,0),col="black")
-            
-            if (showType=="Populations") {
-              # make the back wall
-              polygon(x=rwd,y=rwd_dens,col=addTransparency(col,0.2))
-              lines(x=rw,y=rw_dens,col=colDistS,lwd=2)
-              if (possible$source$populationNullp>0) {
-                lines(x=c(-1,-1,1,1)*0.02,y=c(0,1,1,0),col=addTransparency(colNullS,0.2),lwd=2)
-              }
-              
-              # zpSample<-approx(rw,rw_dens,sRho[1])$y
-              # lines(x=c(0,0)+sRho[1],y=c(0,zpSample),col="red", lwd=3)
-            }
-            
+            g<-startPlot(xlim=xlim,ylim=zlim,
+                         xlabel=makeLabel(xlabel),ylabel=makeLabel(label.z),
+                         xticks=makeTicks(),yticks=NULL,
+                         gaps=c(0.5,1,1,1)*4
+            )
+
             theoryAlpha=0.8
             # simulations
             switch (showType,
@@ -1297,71 +1279,38 @@ showPossible <- function(possibleResult=NULL,
                         if (!all(is.na(sourceSampDens_r_total))){
                           # main distributions
                           # total
-                          polygon (x = rs[c(1,1:length(rs),length(rs))], y = c(0,sampleBackwall$rsw_dens_plus+sampleBackwall$rsw_dens_null,0), col = addTransparency(colS,theoryAlpha), lwd=1)
+                          rsd<-sampleBackwall$rsw_dens_plus+sampleBackwall$rsw_dens_null
+                          
+                          rp<-populationBackwall$rpw
+                          rpd<-populationBackwall$rpw_dens
+                          rpd<-rpd/(sum(rpd)/sum(rsd))
+                          zgain<-25/sum(rsd)
+
+                          g<-addG(g,dataPolygon(data.frame(x=rp[c(1,1:length(rp),length(rp))],
+                                                           y=c(0,rpd,0)*zgain),fill="white",colour=NA))
+                          g<-addG(g,dataPolygon(data.frame(x=rs[c(1,1:length(rs),length(rs))],
+                                                           y=c(0,rsd,0)*zgain),fill=colSsum,alpha=0.8))
+                          g<-addG(g,dataPath(data.frame(x=rs,y=rsd*zgain),colour="black",linewidth=0.35))
                           if (world$worldOn) {
-                            if (world$populationNullp>0)
-                              # null
-                              lines (x = rs, y = sampleBackwall$rsw_dens_null, col = colNullS, lwd=2)
-                            # plus
-                            lines (x = rs, y = sampleBackwall$rsw_dens_plus, col = colDistS, lwd=2)
+                            if (world$populationNullp>0) {
+                              g<-addG(g,dataPath(data.frame(x=rs,y=sampleBackwall$rsw_dens_null*zgain),colour=colNullS,linewidth=0.5))
+                              g<-addG(g,dataPath(data.frame(x=rs,y=sampleBackwall$rsw_dens_plus*zgain),colour=colDistS,linewidth=0.5))
+                            }
                           }
                           
                           if (!all(is.na(sRho))) {
-                            for (i in 1:length(sRho)) {
-                              s<-sRho[i]
-                              gain<-sum(sourceSampDens_r_total)*diff(rs[1:2])
-                              p_at_sample<-(sum(sourceSampDens_r_total[rs>=s])+sum(sourceSampDens_r_total[rs< -s]))/sum(sourceSampDens_r_total)
-                              pn_at_sample<-(sum(sourceSampDens_r_null[rs>=s])+sum(sourceSampDens_r_null[rs< -s]))/sum(sourceSampDens_r_total)
-                              pd_at_sample<-(sum(sourceSampDens_r_plus[rs>=s])+sum(sourceSampDens_r_plus[rs< -s]))/sum(sourceSampDens_r_total)
-                              
-                              l_at_sample<-approx(rs,sourceSampDens_r_total,s)$y#/mean(sourceSampDens_r_total)
-                              ln_at_sample<-approx(rs,sourceSampDens_r_null,s)$y#/mean(sourceSampDens_r_total)
-                              ld_at_sample<-approx(rs,colSums(sourceSampDens_r_plus),s)$y#/mean(sourceSampDens_r_total)
-                              
-                              lines(x=c(sRho[i],sRho[i]),y=c(0,l_at_sample),col=colVline,lwd=1)
-                              points(x=sRho[i],y=l_at_sample,col=colVline,pch=16,cex=1.5)
-                              if (world$worldOn) {
-                                if (length(sRho)<=10) {
-                                  ptext<-bquote(
-                                    bolditalic(p)[.(braw.env$RZ)]== bold(.(format(p_at_sample,digits=3))) ~" "~ atop(phantom(bold(.(format(pd_at_sample,digits=3)))),phantom(bold(.(format(pn_at_sample,digits=3)))))
-                                  )
-                                  ltext<-bquote(
-                                    bold(pd(.(braw.env$RZ)[s]))==.(format(l_at_sample/gain,digits=3)) ~" "~ atop(phantom(.(format(ld_at_sample,digits=3))),phantom(.(format(ln_at_sample,digits=3))))
-                                  )
-                                  # ltext<-format(log(l_at_sample),digits=3)
-                                  if (s>0)   {
-                                    # text(s,0.95,labels=ptext,col=colPdark,adj=0,cex=0.9)
-                                    text(s+0.05,l_at_sample+0.05,labels=ltext,col="black",adj=0,cex=0.9)
-                                  } else  {
-                                    # text(s,0.95,labels=ptext,col=colPdark,adj=1,cex=0.9)
-                                    text(s-0.05,l_at_sample+0.05,labels=ltext,col="black",adj=0.6,cex=0.9)
-                                  } 
+                            for (si in 1:length(sRho)) {
+                                  z<-approx(sampleBackwall$rsw,rsd,sRho[si])$y
+                                  zt<-approx(rs,sourceSampDens_r_total,sRho[si])$y
+                                  z[z<0]<-0
+                                  if (logZ) z<-log10(z)
+                                  if (z>=zlim[1])
+                                    g<-addG(g,dataPath(data.frame(x=c(0,0)+sRho[si],y=c(0,z)*zgain),colour=colVline,linewidth=0.75))
+                                  g<-addG(g,dataText(data.frame(x=sRho[si],y=z*zgain),paste0("pd(",braw.env$RZ,"[s])=",brawFormat(zt)),size=0.85))
                                 }
-                              } else {
-                                s<-abs(sRho[i])
-                                p_at_sample<-(sum(sourceSampDens_r_total[rs>=s])+sum(sourceSampDens_r_total[rs< -s]))/sum(sourceSampDens_r_total)
-                                l_at_sample<-approx(rs,sourceSampDens_r_total,s)$y
-                                
-                                lines(x=c(sRho[1],sRho[1]),y=c(0,l_at_sample-0.01),col=colSdark,lwd=2)
-                                
-                                text(0,1.05,labels=paste0("p[",braw.env$RZ,"]=",format(p_at_sample,digits=3)),
-                                            col=colPdark,adj=-0.1,cex=0.9)
-                                text(0,1.05,labels=paste0("l[",braw.env$RZ,"]=",format(l_at_sample,digits=3)),
-                                            col=colPdark,adj=1.1,cex=0.9)
-                              }
-                            }
-                            if (length(sRho)>1) {
-                              l_at_sample<-sum(log(approx(rs,sourceSampDens_r_total,sRho)$y),na.rm=TRUE)#/mean(sourceSampDens_r_total)
-                              ltext<-bquote(
-                                bold(log(lk(.(braw.env$RZ)[s])))==.(format(l_at_sample,digits=3)) ~" "~ atop(phantom(.(format(ld_at_sample,digits=3))),phantom(.(format(ln_at_sample,digits=3))))
-                              )
-                              ltext<-bquote(
-                                bold(log(lk(Z)))==.(format(l_at_sample,digits=3)) ~" "~ atop(phantom(.(format(ld_at_sample,digits=3))),phantom(.(format(ln_at_sample,digits=3))))
-                              )
-                              text(0+0.05,1+0.15,labels=ltext,col="black",adj=0.5,cex=0.9)
-                            }
                           }
                         }
+                        return(g)
                       },
                       "Populations"={
                         if (!all(is.na(sampleLikelihoodTotal_r))){

@@ -416,11 +416,10 @@ fullRSamplingDist<-function(vals,world,design,doStat="rs",logScale=FALSE,sigOnly
     rn<-nrow(r)
     use<-which(rvals==0)
     if (rn==2) 
-      return(list(vals=rvals[1:(rn-1)],dens=colSums(sourceSampDens_r,na.rm=TRUE),
+      return(list(vals=rvals[1:(rn-1)],dens=colSums(r,na.rm=TRUE),
                   densPlus=rbind(r[1:(rn-1),]),densNull=r[rn,]))
     else 
-      
-      return(list(vals=rvals[1:(rn-1)],dens=colSums(sourceSampDens_r,na.rm=TRUE),
+      return(list(vals=rvals[1:(rn-1)],dens=colSums(r,na.rm=TRUE),
                   densPlus=r[1:(rn-1),],densNull=r[rn,]))
   } else {
     r<-colSums(sourceSampDens_r,na.rm=TRUE)

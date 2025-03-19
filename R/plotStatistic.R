@@ -390,7 +390,7 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
         c2=braw.env$plotColours$infer_nsdNonNull
         c3<-braw.env$plotColours$infer_isigNonNull
       }
-      if (showType=="wp") c1<-c2<-c3<-braw.env$plotColours$power
+      if (showType=="wp") c1<-c2<-c3<-braw.env$plotColours$powerPopulation
     }
   }
   if (length(pts$y1)<=npointsMax) {

@@ -117,12 +117,12 @@ doMultiple <- function(nsims=10,multipleResult=NULL,hypothesis=braw.def$hypothes
     if (autoShow) print(showMetaMultiple(metaMultiple))
     return(metaMultiple)
   }
-  if (!is.null(multipleResult)) {
-    hypothesis<-multipleResult$hypothesis
-    design<-multipleResult$design
-    evidence<-multipleResult$evidence
-  }
-  
+  # if (!is.null(multipleResult)) {
+  #   hypothesis<-multipleResult$hypothesis
+  #   design<-multipleResult$design
+  #   evidence<-multipleResult$evidence
+  # }
+  if (is.na(multipleResult)) multipleResult<-NULL
   if (nsims>0)
     multipleResult<-c(resetMultiple(nsims,evidence,multipleResult),
                       list(hypothesis=hypothesis,
