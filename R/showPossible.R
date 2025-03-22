@@ -671,7 +671,7 @@ showPossible <- function(possibleResult=NULL,
               z<-z/max(z)
               if (max(z)==min(z)) z<-z/2
               if (logZ) z<-log10(z)
-              g<-drawDistribution(x,y,z,xlim,ylim,zlim,mapping,colP,"black",0.25,draw_lower_limit,g)
+              g<-drawDistribution(x,y,z,xlim,ylim,zlim,mapping,colP,"black",0.25,draw_lower_limit=0,g)
               # use<- which((x>=xlim[1]) & (x<=xlim[2]) & (z>=zlim[1]))
               # g<-addG(g,
               #         dataPolygon(rotate3D(data.frame(x=c(x[use[1]],x[use],x[use[length(use)]]),y=c(y[use[1]],y[use],y[use[length(use)]]),z=c(zlim[1],z[use],zlim[1])*wallHeight),mapping),fill=colP,alpha=0.25)
@@ -738,7 +738,7 @@ showPossible <- function(possibleResult=NULL,
                 ztotal<-log10(ztotal)
                 ztotal[ztotal<zlim[1]]<-zlim[1]
               }
-              g<-drawDistribution(x,y,ztotal,xlim,ylim,zlim,mapping,colSsum,"black",1,draw_lower_limit,g)
+              g<-drawDistribution(x,y,ztotal,xlim,ylim,zlim,mapping,colSsum,"black",1,draw_lower_limit=0,g)
                 # split into 2 parts  
                 if (possible$source$worldOn && possible$source$populationNullp>0){
                   if (!any(is.na(sampleBackwall$rsw_dens_null))) {
@@ -760,19 +760,9 @@ showPossible <- function(possibleResult=NULL,
                     zplus[zplus<zlim[1]]<-zlim[1]
                   }
                   if (possible$source$populationNullp>0 ) {
-                    use<-znull>draw_lower_limit
                     g<-drawDistribution(x,y,znull*wallHeight,xlim,ylim,zlim,mapping,NA,colNullS,1,draw_lower_limit,g)
-                      # g<-addG(g,
-                      #       dataPath(rotate3D(data.frame(x=x[use],y=y[use],z=znull[use]*wallHeight),mapping),
-                      #                colour=colNullS,linewidth=0.5)
-                    # )
                   }
-                  use<-zplus>draw_lower_limit
                   g<-drawDistribution(x,y,zplus*wallHeight,xlim,ylim,zlim,mapping,NA,colDistS,1,draw_lower_limit,g)
-                  # g<-addG(g,
-                  #         dataPath(rotate3D(data.frame(x=x[use],y=y[use],z=zplus[use]*wallHeight),mapping),
-                  #                  colour=colDistS,linewidth=0.5)
-                  # )
                 }
               # }
 

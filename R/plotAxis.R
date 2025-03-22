@@ -25,8 +25,8 @@ plotAxis<-function(showType,hypothesis,design=NULL) {
            rlims<-c(-1,1)*braw.env$z_range
            rslab<-braw.env$zsLabel
            rplab<-braw.env$zpLabel
-           rticks<-seq(-1.5,1.5,0.5)
-           rmins<-seq(-1.5,1.5,0.1)
+           rticks<-seq(-2.5,2.5,0.5)
+           rmins<-seq(-2.5,2.5,0.1)
          },
          "d"={    
            rlims<-c(-1,1)*braw.env$d_range

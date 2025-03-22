@@ -89,9 +89,7 @@ getTrimFill<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
            }
            )
   },
-  error={
-    list(param1Max=NA,param2Max=NA,param3Max=NA,Smax=NA,Svals=NA)
-  },
+  error=function(e){list(param1Max=NA,param2Max=NA,param3Max=NA,Smax=NA,Svals=NA)},
   warning={},
   finally={}
   )
@@ -109,7 +107,7 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
   np2points<-21
   np3points<-21
   
-  niterations<-2
+  niterations<-10
   # reInc1<-(np1points-1)/2/3
   # reInc2<-(np2points-1)/2/3
   reInc1<-2
@@ -136,8 +134,11 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
     if (metaAnalysis$analysisVar=="sd") param2<-seq(0,0.5,length.out=np2points)^2
     else param2<-seq(-0.1,1,length.out=np2points)*(0.5^2)
   }
-  if (metaAnalysis$analyseBias) param3<-seq(0,1,length.out=np2points)
-  else param3<-0
+  if (metaAnalysis$analyseBias) {
+    if (is.element(dist,c("fixed","random"))) 
+      param3<-seq(0,1,length.out=np2points)
+    else param3<-1  
+  } else param3<-0
   
   analyseBias<-metaAnalysis$analyseBias
   prior<-metaAnalysis$analysisPrior
@@ -165,15 +166,16 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
   )
   
   llfun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,x[1],x[2],x[3])+approx(prior_z,priorDens,x[1])$y)}
-  if(length(param3)==1)
-    llfun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,x[1],x[2],0)+approx(prior_z,priorDens,x[1])$y)}
   if(length(param2)==1)
-    llfun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,x[1],0,x[3])+approx(prior_z,priorDens,x[1])$y)}
+    llfun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,x[1],param2,x[3])+approx(prior_z,priorDens,x[1])$y)}
+  if(length(param3)==1)
+    llfun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,x[1],x[2],param3)+approx(prior_z,priorDens,x[1])$y)}
   if(length(param2)==1 && length(param3)==1)
-    llfun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,x[1],0,0)+approx(prior_z,priorDens,x[1])$y)}
+    llfun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,x[1],param2,param3)+approx(prior_z,priorDens,x[1])$y)}
 
   S<-array(0,c(length(param1),length(param2),length(param3)))
   for (re in 1:niterations) {
+    # get an approx result
     for (p1 in 1:length(param1))
       for (p2 in 1:length(param2))
         for (p3 in 1:length(param3))
@@ -190,21 +192,25 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
     param3Max<-param3[use[1,3]]
     lb3<-param3[max(1,use[1,3]-reInc3)]
     ub3<-param3[min(length(param3),use[1,3]+reInc3)]
-    
+    # after 2 iterations, can we do a search?
+    if (re==2) {
+      result<-tryCatch( {
+        fmincon(c(param1Max,param2Max,param3Max),llfun,ub=c(ub1,ub2,ub3),lb=c(lb1,lb2,lb3))
+      }, 
+      error = function(e){NULL}
+      )
+      if (!is.null(result)) break
+    }
     param1<-seq(lb1,ub1,length.out=np1points)
     if (length(param2)>1) param2<-seq(lb2,ub2,length.out=np2points)
     if (length(param3)>1) param3<-seq(lb3,ub3,length.out=np3points)
+    result<-list(par=c(param1Max,param2Max,param3Max),value=-Smax)
   }
-
-  if (niterations<3) {
-    if (lb1<0.02) {
-    }
-    result<-fmincon(c(param1Max,param2Max,param3Max),llfun,ub=c(ub1,ub2,ub3),lb=c(lb1,lb2,lb3))
-    param1Max<-result$par[1]
-    param2Max<-result$par[2]
-    param3Max<-result$par[3]
-    Smax<- -result$value
-  }
+  param1Max<-result$par[1]
+  param2Max<-result$par[2]
+  param3Max<-result$par[3]
+  Smax<- -result$value
+  
   Svals<-llfun(c(param1Max,param2Max,param3Max))
   if (dist=="random" && metaAnalysis$analysisVar=="sd") param2Max<-sign(param2Max)*sqrt(abs(param2Max))
   return(list(param1Max=param1Max,param2Max=param2Max,param3Max=param3Max,Smax=Smax,Svals=Svals))

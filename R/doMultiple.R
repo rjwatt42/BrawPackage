@@ -97,17 +97,17 @@ resetMultiple<-function(nsims=0,evidence,multipleResult=NULL){
 #'                              doingNull=FALSE,inSteps=FALSE,autoShow=braw.env$autoShow,showType="Basic")
 #' @seealso showMultiple() and reportMultiple())
 #' @export
-doMultiple <- function(nsims=10,multipleResult=NULL,hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,
+doMultiple <- function(nsims=10,multipleResult=NA,hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,
                          doingNull=FALSE,inSteps=FALSE,autoShow=braw.env$autoShow,showType="Basic") {
 
-  if (is.null(multipleResult)) {
+  if (is.na(multipleResult)) {
     if (!is.null(braw.res$multiple)) {
       if (identical(hypothesis,braw.res$multiple$hypothesis) &&
           identical(design,braw.res$multiple$design) &&
           identical(evidence,braw.res$multiple$evidence) 
       ) multipleResult<-braw.res$multiple
     }
-  }
+  } else multipleResult<-NULL
   
   if (evidence$metaAnalysis$On) {
     if (!is.null(multipleResult$fixed)) metaMultiple<-multipleResult
@@ -117,12 +117,7 @@ doMultiple <- function(nsims=10,multipleResult=NULL,hypothesis=braw.def$hypothes
     if (autoShow) print(showMetaMultiple(metaMultiple))
     return(metaMultiple)
   }
-  # if (!is.null(multipleResult)) {
-  #   hypothesis<-multipleResult$hypothesis
-  #   design<-multipleResult$design
-  #   evidence<-multipleResult$evidence
-  # }
-  if (is.na(multipleResult)) multipleResult<-NULL
+  
   if (nsims>0)
     multipleResult<-c(resetMultiple(nsims,evidence,multipleResult),
                       list(hypothesis=hypothesis,

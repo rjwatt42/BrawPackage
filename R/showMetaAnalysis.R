@@ -8,23 +8,24 @@ makeMetaHist<-function(vals,use,xlim) {
 
 worldLabel<-function(metaResult,whichMeta=NULL,modelPDF=NULL) {
   if (is.null(whichMeta)) whichMeta<-metaResult$bestDist
-  if (whichMeta=="world") whichMeta<-modelPDF
-    whichMeta<-tolower(whichMeta)
-    Dist<-whichMeta
+  if (whichMeta=="world") Dist<-modelPDF
+  else Dist<-whichMeta
+  Dist<-tolower(Dist)
     p1<-metaResult[[Dist]]$param1Max
     p2<-metaResult[[Dist]]$param2Max
     p3<-metaResult[[Dist]]$param3Max
-    switch(braw.env$RZ,
-           "r"={},
-           "z"={
-             p1<-atanh(p1)
-             p2<-atanh(p2)
-           },
-           "d"={
-             p1<-2*p1/sqrt(1-p1^2)
-             p2<-2*p2/sqrt(1-p2^2)
-           }
-           )
+    if (whichMeta!="world")
+      switch(braw.env$RZ,
+             "r"={},
+             "z"={
+               p1<-atanh(p1)
+               p2<-atanh(p2)
+             },
+             "d"={
+               p1<-2*p1/sqrt(1-p1^2)
+               p2<-2*p2/sqrt(1-p2^2)
+             }
+             )
     
     if (is.element(Dist,c("random","fixed"))) label1<-paste0(braw.env$RZ,"[m]") 
     else                                      label1<-Dist

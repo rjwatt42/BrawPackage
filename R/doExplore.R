@@ -227,7 +227,7 @@ mergeExploreResult<-function(res1,res2) {
 #' exploreResult<-doExplore(nsims=10,exploreResult=NULL,explore=braw.def$explore,
 #'                              doingNull=FALSE,autoShow=FALSE,showType="Basic")
 #' @export
-doExplore<-function(nsims=10,exploreResult=NULL,explore=braw.def$explore,
+doExplore<-function(nsims=10,exploreResult=NA,explore=braw.def$explore,
                     hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,metaAnalysis=braw.def$metaAnalysis,
                     doingNull=FALSE,doingMetaAnalysis=FALSE,autoShow=FALSE,showType="rs"
 ) {
@@ -245,15 +245,16 @@ doExplore<-function(nsims=10,exploreResult=NULL,explore=braw.def$explore,
   autoShowLocal<-braw.env$autoShow
   assign("autoShow",FALSE,braw.env)
   
-  if (is.null(exploreResult)) {
+  if (is.na(exploreResult)) {
     if (!is.null(braw.res$explore)) {
       if (identical(hypothesis,braw.res$explore$hypothesis) &&
           identical(design,braw.res$explore$design) &&
           identical(evidence,braw.res$explore$evidence) && 
-          identical(explore,braw.res$explore$explore)
+          identical(explore,braw.res$explore$explore) &&
+          (doingMetaAnalysis && identical(metaAnalysis,braw.res$explore$metaAnalysis))
       ) exploreResult<-braw.res$explore
     }
-  }
+  } else exploreResult<-NULL
   
   if (is.null(exploreResult)) {
     exploreResult<-list(type="explore",

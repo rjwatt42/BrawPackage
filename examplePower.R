@@ -9,3 +9,12 @@ d<-makeDesign(rw2n(rp,0.8))
 doMultiple(100,NA,hypothesis=h,design=d)
 print(showMultiple(showType="wp"))
 }
+
+
+world<-makeWorld(TRUE,"Gauss","z",1/sqrt(50-3),atanh(0.3),0)
+h<-makeHypothesis(effect=makeEffect(world=world))
+d<-makeDesign(62)
+
+doMultiple(100,NA,hypothesis=h,design=d)
+print(showMultiple(showType="wp"))
+
