@@ -382,7 +382,7 @@ fullRSamplingDist<-function(vals,world,design,doStat="rs",logScale=FALSE,sigOnly
                   addition<-addition*dznw*(1-rp^2)
                 },
                 "wp"={
-                  rp<-seq(0,1,length.out=101)
+                  rp<-seq(0,1,length.out=1001)
                   zp<-atanh(rp)
                   wp<-pnorm(qnorm(braw.env$alphaSig/2)+zp*sqrt(nvals[ni]-3)) + pnorm(qnorm(braw.env$alphaSig/2)-zp*sqrt(nvals[ni]-3))
                   addition<-rPopulationDist(rp,world)

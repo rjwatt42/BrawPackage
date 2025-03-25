@@ -7,7 +7,7 @@ h<-makeHypothesis(effect=makeEffect(world=world))
 d<-makeDesign(rw2n(rp,0.8))
 
 doMultiple(100,NA,hypothesis=h,design=d)
-print(showMultiple(showType="wp"))
+print(showMultiple(showType="wp",orientation = "horz"))
 }
 
 
@@ -16,5 +16,5 @@ h<-makeHypothesis(effect=makeEffect(world=world))
 d<-makeDesign(62)
 
 doMultiple(100,NA,hypothesis=h,design=d)
-print(showMultiple(showType="wp"))
+print(showMultiple(showType="wp",orientation = "vert"))
 

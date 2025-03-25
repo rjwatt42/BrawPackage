@@ -106,8 +106,8 @@ doMultiple <- function(nsims=10,multipleResult=NA,hypothesis=braw.def$hypothesis
           identical(design,braw.res$multiple$design) &&
           identical(evidence,braw.res$multiple$evidence) 
       ) multipleResult<-braw.res$multiple
-    }
-  } else multipleResult<-NULL
+    } else multipleResult<-NULL
+  } 
   
   if (evidence$metaAnalysis$On) {
     if (!is.null(multipleResult$fixed)) metaMultiple<-multipleResult

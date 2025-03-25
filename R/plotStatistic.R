@@ -72,7 +72,7 @@ collectData<-function(analysis,whichEffect) {
             er.mn=er.mn,er.sd=er.sd,er.sk=er.sk,er.kt=er.kt)
 }
 
-makeFiddle<-function(y,yd,orientation="horiz"){
+makeFiddle<-function(y,yd,orientation="horz"){
   d<-0.05
   d2<-d^2
   yG<-(braw.env$plotArea[4]-braw.env$plotLimits$gap[4]-braw.env$plotLimits$gap[2])/diff(braw.env$plotLimits$ysc)
@@ -93,14 +93,18 @@ makeFiddle<-function(y,yd,orientation="horiz"){
     dy2<-(yzR-this_y)^2
     for (possible_x in possible_xs) {
       this_x<-rX(possible_x)
-      this_xneg<- -this_x
       distances1=dy2+(xzR-this_x)^2
-      distances2=dy2+(xzR-this_xneg)^2
       use1<-min(distances1)
+      if (orientation=="vert") {
+      this_xneg<- -this_x
+      distances2=dy2+(xzR-this_xneg)^2
       use2<-min(distances2)
       if (all(c(use1,use2)>d2)) {
         if (use2>use1) possible_x<- -possible_x
         break
+      }
+      } else {
+        if (all(use1>d2)) break
       }
     }
     xz<-c(xz,possible_x)
@@ -414,7 +418,15 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
     }
     
     xr<-makeFiddle(pts$y1,2/40/braw.env$plotArea[4],orientation)
-    if (max(abs(xr))>0) xr<-xr*0.35/max(abs(xr))
+    switch(orientation,
+           "horz"={
+             hgain<-0.8
+             },
+           "vert"={
+             hgain<-0.4
+           })
+    if (max(abs(xr))>0) xr<-xr*hgain/max(abs(xr))
+    
     pts$x<-pts$x+xr*sum(width)*0.3/0.35
     gain<-50/max(50,length(xr))
     colgain<-1-min(1,sqrt(max(0,(length(xr)-50))/200))
@@ -430,6 +442,7 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
     co2<-darken(c2,off=-colgain)
     dotSize<-braw.env$dotSize*scale*gain
     shape<-braw.env$plotShapes$study
+    
     if (useSignificanceCols) {
     pts_sigNonNull=pts[pts$y2 & pts$y0,]
     pts_nsNonNull=pts[!pts$y2 & pts$y0,]
@@ -440,16 +453,36 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
       shape<-braw.env$plotShapes$meta
       c1<-c2<-c3<-c4<-braw.env$plotColours$metaMultiple
     }
-    g<-addG(g,dataPoint(data=data.frame(x=pts_sigNonNull$x,y=pts_sigNonNull$y1),shape=shape, 
+    switch(orientation,
+           "horz"={
+             sigNonNullData<-data.frame(x=pts_sigNonNull$x,y=pts_sigNonNull$y1)
+             nsNonNullData<-data.frame(x=pts_nsNonNull$y1,y=pts_nsNonNull$x)
+             sigNullData<-data.frame(x=pts_sigNull$y1,y=pts_sigNull$x)
+             nsNullData<-data.frame(x=pts_nsNull$y1,y=pts_nsNull$x)
+           },
+           "vert"={
+             sigNonNullData<-data.frame(x=pts_sigNonNull$x,y=pts_sigNonNull$y1)
+             nsNonNullData<-data.frame(x=pts_nsNonNull$x,y=pts_nsNonNull$y1)
+             sigNullData<-data.frame(x=pts_sigNull$x,y=pts_sigNull$y1)
+             nsNullData<-data.frame(x=pts_nsNull$x,y=pts_nsNull$y1)
+           })
+    g<-addG(g,dataPoint(data=sigNonNullData,shape=shape, 
                         colour = darken(c1,off=-colgain), alpha=alpha, fill = c1, size = dotSize))
-    g<-addG(g,dataPoint(data=data.frame(x=pts_nsNonNull$x,y=pts_nsNonNull$y1),shape=shape, 
+    g<-addG(g,dataPoint(data=nsNonNullData,shape=shape, 
                         colour = darken(c4,off=-colgain), alpha=alpha, fill = c4, size = dotSize))
-    g<-addG(g,dataPoint(data=data.frame(x=pts_sigNull$x,y=pts_sigNull$y1),shape=shape, 
+    g<-addG(g,dataPoint(data=sigNullData,shape=shape, 
                         colour = darken(c3,off=-colgain), alpha=alpha, fill = c3, size = dotSize))
-    g<-addG(g,dataPoint(data=data.frame(x=pts_nsNull$x,y=pts_nsNull$y1),shape=shape, 
+    g<-addG(g,dataPoint(data=nsNullData,shape=shape, 
                         colour = darken(c2,off=-colgain), alpha=alpha, fill = c2, size = dotSize))
     } else {
-      g<-addG(g,dataPoint(data=data.frame(x=pts$x,y=pts$y1),shape=shape, 
+      switch(orientation,
+             "horz"={
+               mainData<-data.frame(x=pts$y1,y=pts$x)
+             },
+             "vert"={
+               mainData<-data.frame(x=pts$x,y=pts$y1)
+             })
+      g<-addG(g,dataPoint(data=mainData,shape=shape, 
                           colour = darken(c1,off=-colgain), alpha=alpha, fill = c1, size = dotSize))
     }
     if (!is.null(showType))
@@ -496,14 +529,23 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
             alpha<-(dens[j]/0.35)^0.6
             w<-0.5/0.35
           }
-          data<-data.frame(y=c(hists$x[i],hists$x[i],hists$x[i+1],hists$x[i+1]),
-                           x=(c(-w,0,0,-w)-ystart)*width[1]+xoff)
-          g<-addG(g,dataPolygon(data=data,
-                                colour=NA, fill = cols[j],alpha=alpha))
-        data<-data.frame(y=c(hists$x[i],hists$x[i],hists$x[i+1],hists$x[i+1]),
-                         x=(c(w,0,0,w)+ystart)*width[2]+xoff)
-        g<-addG(g,dataPolygon(data=data,
-                              colour=NA, fill = cols[j],alpha=alpha))
+          switch(orientation,
+                 "vert"={
+                   data<-data.frame(y=c(hists$x[i],hists$x[i],hists$x[i+1],hists$x[i+1]),
+                                    x=(c(-w,0,0,-w)-ystart)*width[1]+xoff)
+                   g<-addG(g,dataPolygon(data=data,
+                                         colour=NA, fill = cols[j],alpha=alpha))
+                   data<-data.frame(y=c(hists$x[i],hists$x[i],hists$x[i+1],hists$x[i+1]),
+                                    x=(c(w,0,0,w)+ystart)*width[2]+xoff)
+                   g<-addG(g,dataPolygon(data=data,
+                                         colour=NA, fill = cols[j],alpha=alpha))
+                 },
+                 "horz"={
+                   data<-data.frame(x=c(hists$x[i],hists$x[i],hists$x[i+1],hists$x[i+1]),
+                                    y=(c(w,0,0,w)+ystart)*width[1]+xoff)
+                   g<-addG(g,dataPolygon(data=data,
+                                         colour=NA, fill = cols[j],alpha=alpha))
+                 })
         if (histStyle=="width") ystart<-dens[j]
         }
       }
@@ -636,21 +678,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
            rlims<-c(-1,1)*braw.env$z_range
          })
 
-  xoff=0
-  if (!is.null(hypothesis$IV2) && effectType=="all") 
-    xoff=c(0,1,2)*1.2
-
-  switch(orientation,
-         "horz"={
-           xlim<-c(0,max(xoff))+c(0,1)
-           orient<-"vert"
-         },
-         "vert"={
-           xlim<-c(0,max(xoff))+c(-1,1)/2
-           orient<-"horz"
-         }
-  )
-  
+  xlabel<-NULL
   yaxis<-plotAxis(showType,hypothesis,design)
   ylim<-yaxis$lim
   ylabel<-yaxis$label
@@ -666,25 +694,58 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   if (showType=="p" && braw.env$pPlotScale=="log10" && any(is.numeric(analysis$pIV)) && any(analysis$pIV>0)) 
     while (mean(log10(analysis$pIV)>ylim[1])<0.75) ylim[1]<-ylim[1]-1
   
-  if (orient=="vert") ylim[2]<-ylim[2]+diff(ylim)/5
-  else                ylim<-ylim+c(-1,1)*diff(ylim)/25
+  xoff=0
+  if (!is.null(hypothesis$IV2) && effectType=="all") 
+    xoff=c(0,1,2)*1.2
   
-  box<-"Y" 
+  switch(orientation,
+         "horz"={
+           xlim<-ylim
+           # xlim[2]<-xlim[2]+diff(xlim)/5
+           ylim<-c(0,1)
+           orient<-"horz"
+           box<-"X" 
+           xlabel<-makeLabel(ylabel)
+           ylabel<-NULL
+           xticks<-makeTicks(logScale=yaxis$logScale)
+           yticks<-NULL
+           xmax<-FALSE
+           ymax<-TRUE
+         },
+         "vert"={
+           xlim<-c(0,max(xoff))+c(-1,1)/2
+           ylim<-ylim+c(-1,1)*diff(ylim)/25
+           orient<-"horz"
+           box<-"Y" 
+           ylabel<-makeLabel(ylabel)
+           yticks<-makeTicks(logScale=yaxis$logScale)
+           xlabel<-NULL
+           xticks<-NULL
+           xmax<-TRUE
+           ymax<-FALSE
+         }
+  )
+  
   if (!is.null(hypothesis$IV2) && effectType=="all") 
     xticks<-makeTicks(breaks=xoff,c("direct","unique","total"))
-  else
-    xticks<-NULL
-  
+
   g<-startPlot(xlim,ylim,
-               xticks=xticks,xmax=TRUE,
-               yticks=makeTicks(logScale=yaxis$logScale),ylabel=makeLabel(ylabel),
+               xticks=xticks,xlabel=xlabel,xmax=xmax,
+               yticks=yticks,ylabel=ylabel,ymax=ymax,
                box=box,top=top,orientation=orient,g=g)
   # g<-addG(g,yAxisTicks(logScale=yaxis$logScale),yAxisLabel(ylabel))
     # g<-addG(g,xAxisTicks(breaks=c(0,2,4),c("direct","unique","total")))
   lineCol<-"black"
   if (is.element(showType,c("p","e1p","e2p","e1d","e2d"))) lineCol<-"green"
-  for (yl in ylines)
-    g<-addG(g,horzLine(intercept=yl,linewidth=0.25,linetype="dashed",colour=lineCol))
+  switch(orientation,
+         "horz"={
+           for (yl in ylines)
+             g<-addG(g,vertLine(intercept=yl,linewidth=0.25,linetype="dashed",colour=lineCol))
+         },
+         "vert"={
+           for (yl in ylines)
+             g<-addG(g,horzLine(intercept=yl,linewidth=0.25,linetype="dashed",colour=lineCol))
+         })
   
   dw<-0.001
   if (!all(is.na(analysis$rIV)) || doingMetaAnalysis) {
@@ -997,7 +1058,14 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       }
       
       if (!is.null(xd)) {
-      distMax<-0.8/2
+        switch(orientation,
+               "horz"={
+                 distMax<-0.8
+               },
+               "vert"={
+                 distMax<-0.8/2
+               })
+      
 
       xd[is.na(xd)]<-0
       theoryGain<-1/max(xd)*distMax
@@ -1005,7 +1073,14 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       xd<-xd*theoryGain
       histGain<-abs(sum(xd*c(0,diff(yv))))
       histGainrange<-sort(c(yv[1],yv[length(yv)]))
-      ptsp<-data.frame(y=c(yv,rev(yv)),x=c(xd,-rev(xd))+xoff[i])
+      switch(orientation,
+             "horz"={
+               ln<-length(yv)
+               ptsp<-data.frame(x=yv[c(1,1:ln,ln)],y=c(0,xd,0)+xoff[i])
+             },
+             "vert"={
+               ptsp<-data.frame(y=c(yv,rev(yv)),x=c(xd,-rev(xd))+xoff[i])
+             })
       if (is.element(showType,c("rs","rse","rss","n","p","e1r","e2r","e1p","e2p"))) {
         xdsig<-xdsig*theoryGain
         xdsig[is.na(xdsig)]<-0

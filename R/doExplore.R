@@ -245,7 +245,7 @@ doExplore<-function(nsims=10,exploreResult=NA,explore=braw.def$explore,
   autoShowLocal<-braw.env$autoShow
   assign("autoShow",FALSE,braw.env)
   
-  if (is.na(exploreResult)) {
+  if (!is.null(exploreResult) && is.na(exploreResult)) {
     if (!is.null(braw.res$explore)) {
       if (identical(hypothesis,braw.res$explore$hypothesis) &&
           identical(design,braw.res$explore$design) &&

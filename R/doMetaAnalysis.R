@@ -122,7 +122,7 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
   if (dist=="Single") {
     param1<-seq(-1,1,length.out=np1points)
   } else {
-    param1<-seq(0,1,length.out=np1points)
+    param1<-seq(0,2,length.out=np1points)
   }
   
   if (dist=="fixed") {

@@ -83,12 +83,23 @@ eX<-doExplore(20,NULL,explore=makeExplore("NoStudies"),hypothesis=h,
 print(showExplore(eX))
 
 
-############################
+############
 
 mMLE1<-mMLE
 mMLE1$analyseBias<-FALSE
 mMLE1$sourceBias<-FALSE
 
 eX1<-doExplore(1000,NULL,explore=makeExplore("NoStudies"),hypothesis=h,
-              metaAnalysis=mMLE1,doingMetaAnalysis = TRUE)
+               metaAnalysis=mMLE1,doingMetaAnalysis = TRUE)
 print(showExplore(eX1))
+############################
+
+eXL<-doExplore(20,NULL,explore=makeExplore("Lambda"),hypothesis=h,
+               metaAnalysis=mMLE,doingMetaAnalysis = TRUE)
+print(showExplore(eXL))
+
+############
+
+eXL1<-doExplore(100,NULL,explore=makeExplore("Lambda"),hypothesis=h,
+               metaAnalysis=mMLE1,doingMetaAnalysis = TRUE)
+print(showExplore(eXL1))
