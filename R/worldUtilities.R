@@ -68,9 +68,15 @@ rSamplingDistr<-function(rvals,R,n,sigOnly=FALSE){
   zdens<-zSamplingDistr(zvals,Z,n)
   if (sigOnly>0) {
     zcrit<-atanh(p2r(braw.env$alphaSig,n,1))
-    g<-sum(zdens)
-    zdens[abs(zvals)<zcrit]<-zdens[abs(zvals)<zcrit]*(1-sigOnly)
-    zdens<-zdens/sum(zdens)*g
+    if (length(rvals)==1) {
+      gain<-pnorm(-zcrit,Z,1/sqrt(n-3))+
+        (1-pnorm(zcrit,Z,1/sqrt(n-3)))
+    } else {
+      g<-sum(zdens)
+      zdens[abs(zvals)<zcrit]<-zdens[abs(zvals)<zcrit]*(1-sigOnly)
+      gain<-sum(zdens)/g
+    }
+    zdens<-zdens/gain
   }
   zdens2rdens(zdens,rvals)
 }
@@ -220,6 +226,10 @@ getNList<-function(design,world,HQ=FALSE) {
 rPopulationDist<-function(rvals,world) {
   k<-world$populationPDFk
   mu<-world$populationPDFmu
+  if (world$populationPDF=="sample") {
+    rdens<-rSamplingDistr(mu,rvals,(1/k)^2+3,world$sigOnly)
+    return(rdens)
+  }
   switch (paste0(world$populationPDF,"_",world$populationRZ),
           "Single_r"={
             rdens<-rvals*0

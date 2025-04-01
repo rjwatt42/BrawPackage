@@ -44,10 +44,10 @@ for (fi in 1:length(fint)) {
       fdate1<-files1info$mtime[use1]
       fdate2<-files2info$mtime[use2]
       if (fdate1>fdate2) {
-        print(paste("Update ",fint[fi]," from BrawPack (days difference =",format(as.numeric(fdate1-fdate2)),")",output))
+        print(paste0("Update ",fint[fi]," from BrawPack (",format(fdate1-fdate2,digits=1),") ",output))
       }
       if (fdate2>fdate1) {
-        print(paste("Update ",fint[fi]," from Jamovi (days difference =",format(as.numeric(fdate1-fdate2)),")",output))
+        print(paste0("Update ",fint[fi]," from Jamovi (",format(fdate2-fdate1,digits=1),") ",output))
       }
     }
   }

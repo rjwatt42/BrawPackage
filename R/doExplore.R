@@ -693,7 +693,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
                 },
                 "no"={
                   effect$world$worldOn<-TRUE
-                  effect$world$populationPDFmu<-1/sqrt(vals[vi]-3)
+                  effect$world$populationPDFk<-1/sqrt(vals[vi]-3)
                 },
                 "pNull"={
                   effect$world$worldOn<-TRUE

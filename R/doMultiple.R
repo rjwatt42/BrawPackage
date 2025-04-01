@@ -8,6 +8,8 @@ mergeMultiple<-function(r1,r2) {
     rpIV=rbind(r1$rpIV,r2$rpIV),
     roIV=rbind(r1$roIV,r2$roIV),
     poIV=rbind(r1$poIV,r2$poIV),
+    rFull=rbind(r1$rFull,r2$rFull),
+    pFull=rbind(r1$pFull,r2$pFull),
     nval=rbind(r1$nval,r2$nval),
     noval=rbind(r1$noval,r2$noval),
     df1=rbind(r1$df1,r2$df1),
@@ -59,6 +61,7 @@ resetMultiple<-function(nsims=0,evidence,multipleResult=NULL){
   }
   newResult<-list(
     rIV=b,pIV=b,rpIV=b,roIV=b,poIV=b,nval=b,noval=b,df1=b,
+    rFull=b,pFull=b,
     aic=b,aicNull=b,sem=matrix(NA,nsims,8),
     iv.mn=b,iv.sd=b,iv.sk=b,iv.kt=b,
     dv.mn=b,dv.sd=b,dv.sk=b,dv.kt=b,
@@ -100,13 +103,14 @@ resetMultiple<-function(nsims=0,evidence,multipleResult=NULL){
 doMultiple <- function(nsims=10,multipleResult=NA,hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,
                          doingNull=FALSE,inSteps=FALSE,autoShow=braw.env$autoShow,showType="Basic") {
 
-  if (is.na(multipleResult)) {
-    if (!is.null(braw.res$multiple)) {
+  if (length(multipleResult)==1 && is.na(multipleResult)) {
       if (identical(hypothesis,braw.res$multiple$hypothesis) &&
           identical(design,braw.res$multiple$design) &&
           identical(evidence,braw.res$multiple$evidence) 
-      ) multipleResult<-braw.res$multiple
-    } else multipleResult<-NULL
+      )   
+        multipleResult<-braw.res$multiple
+      else 
+        multipleResult<-NULL
   } 
   
   if (evidence$metaAnalysis$On) {

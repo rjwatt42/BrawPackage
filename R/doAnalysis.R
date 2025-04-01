@@ -351,6 +351,8 @@ multipleAnalysis<-function(nsims=1,hypothesis,design,evidence,newResult=c()){
       newResult$pIV[j]<-res$pIV
       newResult$roIV[j]<-res$roIV
       newResult$poIV[j]<-res$poIV
+      newResult$rFull[j]<-res$rFull
+      newResult$pFull[j]<-res$pFull
       newResult$nval[j]<-res$nval
       newResult$noval[j]<-res$noval
       newResult$df1[j]<-res$df1
@@ -760,6 +762,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
   analysis$aic<-anResult$aic
   analysis$aicNull<-anResult$aicNull
   analysis$rFull<-anResult$r.full
+  analysis$pFull<-r2p(anResult$r.full,n,ncol(anResult$r.direct))
   analysis$rFullse<-r2se(analysis$rFull,n)
   analysis$rFullCI<-r2ci(analysis$rFull,n)
   analysis$wFull<-rn2w(analysis$rFull,n)
@@ -1055,7 +1058,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
   analysis$test_name<-t_name
   analysis$df<-df
   analysis$test_val<-tval
-  analysis$rCalc<-test2effectsize(t_name,tval,analysis$df1,analysis$df)
+  # analysis$rCalc<-test2effectsize(t_name,tval,analysis$df1,analysis$df)
   
   if (IV$type=="Interval"){
     analysis$iv.mn<-mean(iv1,na.rm=TRUE)

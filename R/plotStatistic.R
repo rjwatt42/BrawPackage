@@ -29,6 +29,10 @@ collectData<-function(analysis,whichEffect) {
     ps<-cbind(analysis$pIV[use])
   } else {
     switch (whichEffect,
+            "Model"={
+              rs<-rbind(cbind(analysis$rFull[use]))
+              ps<-rbind(cbind(analysis$pFull[use]))
+            },
             "Main 1"={
               column<-1
               rs<-rbind(cbind(analysis$r$direct[use,column],analysis$r$unique[use,column],analysis$r$total[use,column]))
@@ -685,7 +689,8 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   ylines<-yaxis$lines
   logScale<-yaxis$logScale
   if (is.element(showType,c("rs","rse","rss")) && (!is.null(hypothesis$IV2))) 
-    switch(whichEffect,"Main 1"=ylabel<-"Main 1",
+    switch(whichEffect,"Model"=ylabel<-"Model",
+                       "Main 1"=ylabel<-"Main 1",
                        "Main 2"=ylabel<-"Main 2",
                        "Interaction"=ylabel<-"Interaction"
            )
@@ -695,13 +700,13 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
     while (mean(log10(analysis$pIV)>ylim[1])<0.75) ylim[1]<-ylim[1]-1
   
   xoff=0
-  if (!is.null(hypothesis$IV2) && effectType=="all") 
+  if (!is.null(hypothesis$IV2) && whichEffect=="All" && effectType=="all") 
     xoff=c(0,1,2)*1.2
   
   switch(orientation,
          "horz"={
            xlim<-ylim
-           # xlim[2]<-xlim[2]+diff(xlim)/5
+           xlim<=xlim+c(-1,1)*diff(xlim)/5
            ylim<-c(0,1)
            orient<-"horz"
            box<-"X" 
@@ -726,7 +731,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
          }
   )
   
-  if (!is.null(hypothesis$IV2) && effectType=="all") 
+  if (!is.null(hypothesis$IV2) && whichEffect=="All" && effectType=="all") 
     xticks<-makeTicks(breaks=xoff,c("direct","unique","total"))
 
   g<-startPlot(xlim,ylim,
@@ -747,10 +752,10 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
              g<-addG(g,horzLine(intercept=yl,linewidth=0.25,linetype="dashed",colour=lineCol))
          })
   
-  dw<-0.001
+  dw<-0.01
   if (!all(is.na(analysis$rIV)) || doingMetaAnalysis) {
     data<-collectData(analysis,whichEffect)
-    if (length(data$rs)>0) dw<-1/max(250,length(data$rs))
+    # if (length(data$rs)>0) dw<-1/max(250,length(data$rs))
     switch(braw.env$RZ,
            "r"={},
            "z"={
@@ -826,6 +831,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
         effectTheory$world$populationPDF<-"Single"
         effectTheory$world$populationRZ<-"r"
         switch(whichEffect,
+               "Model"=effectTheory$world$populationPDFk<-sqrt(effect$rIV^2+effect$rIV2^2+effect$rIVIV2DV^2+effect$rIV*effect$rIV2*effect$rIVIV2),
                "Main 1"=effectTheory$world$populationPDFk<-effect$rIV,
                "Main 2"=effectTheory$world$populationPDFk<-effect$rIV2,
                "Interaction"=effectTheory$world$populationPDFk<-effect$rIVIV2DV
@@ -872,6 +878,10 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                  xd<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
                  xdsig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
                  yv<-rvals
+                 if (whichEffect=="Model") {
+                   xd[yv<0]<-0
+                   xdsig[yv<0]<-0
+                 }
                },
                "z"={
                  zvals<-seq(-1,1,length.out=npt*2)*braw.env$z_range*2
@@ -946,7 +956,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                xd<-abs(xd)
              },
              "wp"={
-               yv<-seq(braw.env$alphaSig,1/1.01,length.out=npt)
+               yv<-seq(braw.env$alphaSig*(1+dw),1/(1+dw),length.out=npt)
                xd<-fullRSamplingDist(yv,effectTheory$world,design,"wp",logScale=logScale,sigOnly=sigOnly)
              },
              "iv.mn"={
@@ -1073,6 +1083,11 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       xd<-xd*theoryGain
       histGain<-abs(sum(xd*c(0,diff(yv))))
       histGainrange<-sort(c(yv[1],yv[length(yv)]))
+      if (is.element(showType,c("wp","ws"))) {
+        histGainrange<-c(0.06,0.99)
+        use<-yv>=histGainrange[1] & yv<=histGainrange[2]
+        histGain<-abs(sum(xd[use]*c(0,diff(yv[use]))))
+      }
       switch(orientation,
              "horz"={
                ln<-length(yv)

@@ -187,7 +187,7 @@ showPossible <- function(possibleResult=NULL,
                          azimuth=NULL,elevation=15,distance=8){
   
   oldRZ<-braw.env$RZ
-  braw.env$RZ<-possibleResult$axisType
+  braw.env$RZ<-possibleResult$possible$axisType
   on.exit(setBrawEnv("RZ",oldRZ))
   
   if (is.null(possibleResult)) possibleResult<-doPossible()
@@ -1041,6 +1041,8 @@ showPossible <- function(possibleResult=NULL,
                           }
                           if (!is.null(sampleLikelihood_r_show)){
                             # main distribution
+                            col<-colP
+                            if (possible$sigOnlyCompensate) col<-braw.env$plotColours$infer_sigC
                             for (si in order(-sRho)) {
                               use<-rp>=xlim[1] & rp<=xlim[2] & rd[si,]>draw_lower_limit
                               rp_use<-rp[use]
@@ -1050,14 +1052,14 @@ showPossible <- function(possibleResult=NULL,
                                         dataPolygon(rotate3D(data.frame(x = c(rp_use[1],rp_use,rp_use[length(rp_use)]),
                                                                         y = c(0,rp_use*0,0)+sRho[si], 
                                                                         z = c(zlim[1],dens_use,zlim[1])),
-                                                             mapping),fill=colP,alpha=theoryAlpha)
+                                                             mapping),fill=col,alpha=theoryAlpha)
                                 )
                               } else {
                                 g<-addG(g,
                                         dataPolygon(rotate3D(data.frame(x = c(rp_use[1],rp_use,rp_use[length(rp_use)]), 
                                                                         y = c(0,rp_use*0,0)+sRho[si], 
                                                                         z = c(zlim[1],dens_use,zlim[1])),
-                                                             mapping),fill=colP,alpha=highTransparency)
+                                                             mapping),fill=col,alpha=highTransparency)
                                 )
                               }
                               # vertical lines on main distribution

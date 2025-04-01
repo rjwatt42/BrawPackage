@@ -1,5 +1,31 @@
+sampleLK<-function(nsamp,targetS,targetN,sigOnly=FALSE) {
+  
+  npts<-1001
+  
+  rp<-seq(-0.99,0.99,length.out=npts)
+  
+  slr<-rSamplingDistr(targetS,rp,targetN,sigOnly)
+  
+  bins<-seq(0,1,length.out=npts)
+  cdf<-cumsum(slr)/sum(slr)
+  use<-diff(cdf)>0
+  qlr<-approx(cdf[use],rp[use],bins)$y
+  
+  rq1<-NA
+  while (any(is.na(rq1))) {
+  rq<-runif(nsamp)
+  rq1<-approx(bins,qlr,rq)$y
+  }
+  
+  return(rq1)
+  
+}
+
 getWorldEffect<-function(nsamples=1,effect=braw.def$hypothesis$effect) {
   if (effect$world$worldOn) {
+    if (effect$world$populationPDF=="sample") {
+      rho<-sampleLK(nsamples,effect$world$populationPDFmu,(1/effect$world$populationPDFk)^2+3,effect$world$sigOnly)
+    } else {
     if (!is.na(effect$world$populationRZ) && !isempty(effect$world$populationRZ)){
       switch (effect$world$populationRZ,
               "r"={
@@ -34,8 +60,8 @@ getWorldEffect<-function(nsamples=1,effect=braw.def$hypothesis$effect) {
       rho[rho< -0.99]<- -0.99
       rho[rho>0.99]<- 0.99
     }
-  } else
-    rho<-effect$rIV
+    }
+  } else    rho<-effect$rIV
   return(rho)
 }
 
