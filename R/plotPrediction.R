@@ -130,7 +130,8 @@ plotCatParPrediction<-function(g,IV,DV,rho,n,offset=1, within=FALSE){
   xv<-b
   
   if (length(IV$vals)==0){
-    d<-rho/sqrt(1-rho^2)/2*xv/(sd(xv)*sqrt(1-1/ncats))
+    # d<-xv*rho/sqrt(1-rho^2)/2/(sd(xv)*sqrt(1-1/ncats))
+    d<-xv*rho/(sd(xv)*sqrt(1-1/ncats))
     d<-d-mean(d)
     d<-d*DV$sd+DV$mu
     se<-rep(DV$sd*sqrt(1-rho^2)/sqrt(n[1]/ncats),ncats)
@@ -446,7 +447,7 @@ plotPrediction<-function(IV=braw.def$hypothesis$IV,IV2=braw.def$hypothesis$IV2,D
     switch (IV2$type,
             "Interval"= rho<-effect$rIV+c(-1,1)*effect$rIVIV2DV,
             "Ordinal"= rho<-effect$rIV+c(-1,1)*effect$rIVIV2DV,
-            "Categorical"= rho<-effect$rIV+seq(-1,1,length.out=IV2$ncats)*effect$rIVIV2DV
+            "Categorical"= rho<-effect$rIV+seq(-1,1,length.out=IV2$ncats)/IV2$ncats*effect$rIVIV2DV
     )
     rho[is.na(rho)] <- 0
     

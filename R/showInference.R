@@ -77,6 +77,7 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
   other2<-NULL
   if (length(showType)==1) {
     switch(showType,
+           "Single"=     {showType<-c("rs");dimension<-"1D"},
            "Basic"=     {showType<-c("rs","p");dimension<-"1D"},
            "p(sig)"=    {showType<-"ps";dimension<-"1D"},
            "Power"=     {showType<-c("ws","wp")},
@@ -130,12 +131,12 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
       if (whichEffect=="All") {
         whichEffect<-c("Main 1","Main 2","Interaction")
         area.y<-c(1,1,1)*0.32
-        area.x<-c(0.666,0.333,0)
+        area.x<-c(0,0.333,0.666)
       } else
       if (whichEffect=="Mains") {
         whichEffect<-c("Main 1","Main 2")
         area.y<-c(1,1,1)*0.47
-        area.x<-c(0.5,0)
+        area.x<-c(0,0.5)
       } 
     } else whichEffect<-"Main 1"
   
@@ -165,14 +166,13 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
         }
       }
     } 
-    if (nplots==2) {
-      if (orientation=="vert") nplots<-2
+    if (nplots==2 && length(whichEffect)>1) {
       for (fi in 1:length(whichEffect)) {
         braw.env$plotArea<-c(0.0,area.x[fi],0.45,area.y[fi])
         g1<-plotInference(analysis1,otheranalysis=other1,disp=showType[1],
                           whichEffect=whichEffect[fi],effectType=effectType,
                           orientation=orientation,showTheory=showTheory,g=g1)
-        if (!is.na(showType[2])) {
+        if (length(showType)==2 && !is.na(showType[2])) {
           if (showType[2]=="SEM") braw.env$plotArea<-c(0.55,0,0.45,1)
           else braw.env$plotArea<-c(0.55,area.x[fi],0.45,area.y[fi])
           g1<-plotInference(analysis2,otheranalysis=other2,disp=showType[2],
@@ -181,14 +181,22 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
         } 
       }
     }
-    if (nplots==1) {
-      if (orientation=="vert") braw.env$plotArea<-c(0.05,0.0,0.7,1)
-      else braw.env$plotArea<-c(0.05,0.0,0.9,1)
-      g1<-plotInference(analysis1,otheranalysis=other1,disp=showType[1],
-                        whichEffect=whichEffect[1],effectType=effectType,
-                        orientation=orientation,showTheory=showTheory,g=g1)
+    if (nplots==1 && length(whichEffect)>1) {
+      for (fi in 1:length(whichEffect)) {
+        braw.env$plotArea<-c(area.x[fi],0.0,0.45,0.9)
+        g1<-plotInference(analysis1,otheranalysis=other1,disp=showType[1],
+                          whichEffect=whichEffect[fi],effectType=effectType,
+                          orientation=orientation,showTheory=showTheory,g=g1)
+      }
     }
-    # braw.env$plotLimits<-NULL
+    if (nplots==1 && length(whichEffect)==1) {
+        if (orientation=="vert") braw.env$plotArea<-c(0.05,0.0,0.7,1)
+        else braw.env$plotArea<-c(0.05,0.0,0.9,1)
+        g1<-plotInference(analysis1,otheranalysis=other1,disp=showType[1],
+                          whichEffect=whichEffect[fi],effectType=effectType,
+                          orientation=orientation,showTheory=showTheory,g=g1)
+    }
+      # braw.env$plotLimits<-NULL
   }
 
   if (braw.env$graphHTML && braw.env$autoShow) {

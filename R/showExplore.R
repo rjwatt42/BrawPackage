@@ -747,6 +747,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
         else               ylim<-ylim+c(-1,1)*diff(ylim)/10
       }
       # general start
+      if (effectType==effectTypes[1]) {
       g<-startPlot(xlim,ylim,
                    xticks=makeTicks(breaks=xbreaks,labels=xnames,logScale=explore$xlog),
                    xlabel=makeLabel(label=exploreTypeShow),
@@ -756,6 +757,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                    top=TRUE,g=g)
       if (nchar(useLabel)>0)    g<-addG(g,plotTitle(useLabel,size=1.5))
       else g<-addG(g,plotTitle(paste0("n[sims]=",exploreResult$count),size=0.5,position = "right"))
+      }
       
       # theory plots
       if (!is.null(theoryVals)) {
@@ -955,8 +957,11 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     }
   }
     if (!is.null(hypothesis$IV2) && is.element(showType[si],c("rs","p"))) 
-      g<-addG(g,dataLegend(data.frame(names=c("direct","unique","total"),
-                                      colours=c(ycols[1],darken(desat(ycols[1],0.7),1.3),darken(desat(ycols[1],0.7),0.7))),
+      if (effectType=="all") use<-1:3
+      else use<-which(effectType==c("direct","unique","total"))
+      g<-addG(g,dataLegend(data.frame(names=c("direct","unique","total")[use],
+                                      colours=c(ycols[1],darken(desat(ycols[1],0.7),1.3),darken(desat(ycols[1],0.7),0.7))[use]
+                                      ),
                            title="",fontsize=1)
       )
   }

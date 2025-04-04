@@ -48,6 +48,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     
     if (length(showType)==1) {
       switch(showType,
+             "Single"=     {pars<-c("rs")},
              "Basic"=     {pars<-c("rs","p")},
              "p(sig)"= {pars<-c("p")},
              "Power"=     {pars<-c("ws","wp")},
@@ -64,7 +65,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     } else pars<-showType
     
     if (is.null(IV2) || effectType!="all") {nc=4+length(pars)}
-    else { nc=4+length(pars)*3 }
+    else { nc=4+length(pars)*9 }
     
     if (is.element(showType,c("NHST","SEM"))) {nc=6}
     if (is.element(showType,c("Hits","Misses"))) {nc=4}
@@ -126,9 +127,11 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
         if (showType=="SEM") outputText1[2]<-"!HModel"
       } else {
       if (!is.null(IV2)){
-        if (effectTypes==1) outputText<-c(outputText,"!H!C ","!C ",effectType,rep(" ",nc-3))
-        else outputText<-c(outputText,"!H!C ","!C ","direct"," "," ","unique"," "," ","total"," "," ")
-      }
+        
+        if (effectTypes==1) headerText<-c("!H!C ","!C ",effectType)
+        else headerText<-c("!H!C ","!C ","direct",rep(" ",length(pars)),"unique",rep(" ",length(pars)),"total",rep(" ",length(pars)))
+        outputText<-c(outputText,headerText,rep(" ",nc-length(headerText)))
+        }
       
       outputText1<-c()
       for (par in pars) {

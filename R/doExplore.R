@@ -245,17 +245,20 @@ doExplore<-function(nsims=10,exploreResult=NA,explore=braw.def$explore,
   autoShowLocal<-braw.env$autoShow
   assign("autoShow",FALSE,braw.env)
   
-  if (!is.null(exploreResult) && is.na(exploreResult)) {
-    if (!is.null(braw.res$explore)) {
-      if (identical(hypothesis,braw.res$explore$hypothesis) &&
-          identical(design,braw.res$explore$design) &&
-          identical(evidence,braw.res$explore$evidence) && 
-          identical(explore,braw.res$explore$explore) &&
-          (doingMetaAnalysis && identical(metaAnalysis,braw.res$explore$metaAnalysis))
-      ) exploreResult<-braw.res$explore
-    }
-  } else exploreResult<-NULL
+  if (length(exploreResult)==1 && is.na(exploreResult)) exploreResult<-braw.res$explore
   
+  if (length(exploreResult)>1) {
+    if (identical(hypothesis,braw.res$explore$hypothesis) &&
+        identical(design,braw.res$explore$design) &&
+        identical(evidence,braw.res$explore$evidence) && 
+        identical(explore,braw.res$explore$explore) 
+         )
+         exploreResult<-braw.res$explore
+    else exploreResult<-NULL
+  }
+  if (doingMetaAnalysis && !identical(metaAnalysis,braw.res$explore$metaAnalysis))
+      exploreResult<-NULL
+      
   if (is.null(exploreResult)) {
     exploreResult<-list(type="explore",
                         count=0,

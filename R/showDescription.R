@@ -4,15 +4,14 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,maxoff=1){
   if (braw.env$allScatter && !braw.env$newSampleDisplay) showRawData<-TRUE
   else showRawData<-FALSE
   
+  alphaPoints<-0.5
   if (colindex==1)
           {  col<- braw.env$plotColours$descriptionC
-          alphaPoints<-0.95
           xoff=0
           off=0
           barwidth=1
           } else { 
           col <-braw.env$plotDescriptionCols[[colindex-1]]
-          alphaPoints<-0.95
           off<-(colindex-2)/(maxoff-1)-0.5
           xoff=0.1
           barwidth=0.5

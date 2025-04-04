@@ -689,10 +689,10 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   ylines<-yaxis$lines
   logScale<-yaxis$logScale
   if (is.element(showType,c("rs","rse","rss")) && (!is.null(hypothesis$IV2))) 
-    switch(whichEffect,"Model"=ylabel<-"Model",
-                       "Main 1"=ylabel<-"Main 1",
-                       "Main 2"=ylabel<-"Main 2",
-                       "Interaction"=ylabel<-"Interaction"
+    switch(whichEffect,"Model"={ylabel<-"Model";ylines<-c(0)},
+                       "Main 1"={ylabel<-"Main 1";ylines<-c(0,hypothesis$effect$rIV)},
+                       "Main 2"={ylabel<-"Main 2";ylines<-c(0,hypothesis$effect$rIV2)},
+                       "Interaction"={ylabel<-"Interaction";ylines<-c(0,hypothesis$effect$rIVIV2DV)}
            )
   
   
@@ -700,9 +700,16 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
     while (mean(log10(analysis$pIV)>ylim[1])<0.75) ylim[1]<-ylim[1]-1
   
   xoff=0
-  if (!is.null(hypothesis$IV2) && whichEffect=="All" && effectType=="all") 
+  iUse<-1
+  if (!is.null(hypothesis$IV2) && effectType=="all") {
     xoff=c(0,1,2)*1.2
-  
+    iUse<-1:3
+  }
+  if (!is.null(hypothesis$IV2) && effectType!="all"){
+    if (effectType=="direct") iUse<-1
+    if (effectType=="unique") iUse<-2
+    if (effectType=="total") iUse<-3
+  }
   switch(orientation,
          "horz"={
            xlim<-ylim
@@ -1122,13 +1129,13 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
     # then the samples
     rvals<-c()
     if (!all(is.na(analysis$rIV)) || doingMetaAnalysis) {
-      shvals<-showVals[,i]
+      shvals<-showVals[,iUse[i]]
       if (showSig) {
         if (showType=="rss") 
           resSig<-(analysis$sem[,8]==2)
         else {
-          rvals<-data$rs[,i]
-          pvals<-data$ps[,i]
+          rvals<-data$rs[,iUse[i]]
+          pvals<-data$ps[,iUse[i]]
           nvals<-data$ns
           resSig<-isSignificant(braw.env$STMethod,pvals,rvals,nvals,data$df1,evidence)
         }
@@ -1239,7 +1246,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       )
     }
     
-    if (length(rvals)>1)
+    if (length(rvals)>1 && effectType!="all")
     if (is.element(showType,c("rs","rse","rss","p","e1r","e2r","e1+","e2+","e1-","e2-",
                               "e1p","e2p","e1d","e2d"))) {
       lb1<-"p("
@@ -1353,6 +1360,17 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
               }
       )
       if (length(labels)>0) g<-addG(g,dataLegend(data.frame(names=labels,colours=colours),title="",shape=22))
+    }
+    
+    if (!is.null(hypothesis$IV2)) {
+      switch(effectType,
+             "all"={
+               g<-addG(g,dataText(data.frame(x=xoff[1],y=ylim[2]-diff(ylim)*0.05),"direct",hjust=0.5,size=0.75))
+               g<-addG(g,dataText(data.frame(x=xoff[2],y=ylim[2]-diff(ylim)*0.05),"unique",hjust=0.5,size=0.75))
+               g<-addG(g,dataText(data.frame(x=xoff[3],y=ylim[2]-diff(ylim)*0.05),"total",hjust=0.5,size=0.75))
+             },
+             g<-addG(g,dataText(data.frame(x=xoff,y=ylim[2]-diff(ylim)*0.05),effectType,hjust=0.5,size=0.75))
+      )
     }
   }
   
