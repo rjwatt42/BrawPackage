@@ -351,8 +351,6 @@ multipleAnalysis<-function(nsims=1,hypothesis,design,evidence,newResult=c()){
       newResult$pIV[j]<-res$pIV
       newResult$roIV[j]<-res$roIV
       newResult$poIV[j]<-res$poIV
-      newResult$rFull[j]<-res$rFull
-      newResult$pFull[j]<-res$pFull
       newResult$nval[j]<-res$nval
       newResult$noval[j]<-res$noval
       newResult$df1[j]<-res$df1

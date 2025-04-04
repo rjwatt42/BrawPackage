@@ -85,7 +85,7 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
       }
     }
     
-    if (!braw.env$reducedOutput && !is.null(IV2)) {
+    if (!is.null(IV2)) {
       nc1<-length(colnames(anova))+1
       outputText<-c(outputText,"!H!C ","r",paste0(sub("Pr\\(","p\\(",sub("^","",colnames(anova)))),rep("",nc-1-nc1))
       total_done<-FALSE
@@ -132,8 +132,11 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
         outputText<-c(outputText,"Total "," ",ssq,df,rep(" ",nc-4))
       }
       outputText<-c(outputText,rep("",nc))
+      outputText<-c(outputText,paste0("Full model:"),paste0("r=",brawFormat(analysis$rFull)),paste0("p=",brawFormat(analysis$pFull)),rep("",nc-3))
+      outputText<-c(outputText,rep("",nc))
     }
     
+    if (!braw.env$reducedOutput) {
     AIC<-analysis$aic
     llkNull<-exp(-0.5*(analysis$aic-analysis$aicNull))
     k<-nrow(anova)-2+2
@@ -143,24 +146,13 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
     BIC=AIC+k*log(n_data)-2*k;
     CAIC=k*(log(n_data)+1)+AIC-2*k;
     outputText<-c(outputText,rep("",nc))
-    if (braw.env$reducedOutput) {
-      outputText<-c(outputText,"!HAIC","AICnull","llr[+]","R^2","k","llr",rep("",nc-6))
+      outputText<-c(outputText,"!HAIC","AICc","BIC","AICnull","llr[+]","R^2","k","llr",rep("",nc-7))
       outputText<-c(outputText,
                     brawFormat(analysis$aic,digits=1),
-                    brawFormat(analysis$aicNull,digits=1),
-                    brawFormat(log(llkNull),digits=3),
-                    brawFormat(analysis$rFull^2,digits=braw.env$report_precision),
-                    brawFormat(k),
-                    brawFormat(llr,digits=1),
-                    rep("",nc-6)
-      )
-    } else {
-      outputText<-c(outputText,"!HAIC","llr[+]","AICc","BIC","R^2","k","llr",rep("",nc-7))
-      outputText<-c(outputText,
-                    brawFormat(analysis$aic,digits=1),
-                    brawFormat(log(llkNull),digits=3),
                     brawFormat(AICc,digits=1),
                     brawFormat(BIC,digits=1),
+                    brawFormat(analysis$aicNull,digits=1),
+                    brawFormat(log(llkNull),digits=3),
                     brawFormat(analysis$rFull^2,digits=braw.env$report_precision),
                     brawFormat(k),
                     brawFormat(llr,digits=1),
