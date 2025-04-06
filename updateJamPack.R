@@ -7,11 +7,11 @@ dir2<-"/Users/rogerwatt/Documents/GitHub/BrawStats-for-Jamovi/R"
 # files2<-list.files(dir2)
 cd(dir1)
 files1<-list.files(".")
-files1info<-file.info(files1)
+f1info<-file.info(files1)
 
 cd(dir2)
 files2<-list.files(".")
-files2info<-file.info(files2)
+f2info<-file.info(files2)
 
 cd(here)
 
@@ -41,8 +41,8 @@ for (fi in 1:length(fint)) {
       else output<-paste("lines ",paste(format(which(t1!=t2)),collapse=","))
     } else output<-paste("lengths ",paste(format(c(length(t1),length(t2))),collapse=","))
     if (mismatch) {
-      fdate1<-files1info$mtime[use1]
-      fdate2<-files2info$mtime[use2]
+      fdate1<-f1info$mtime[use1]
+      fdate2<-f2info$mtime[use2]
       if (fdate1>fdate2) {
         print(paste0("Update ",fint[fi]," from BrawPack (",format(fdate1-fdate2,digits=1),") ",output))
       }

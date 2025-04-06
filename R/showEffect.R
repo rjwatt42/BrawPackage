@@ -50,7 +50,8 @@ drawArrow<-function(start,len,direction,ends,col="black",fill="white",alpha=1, w
 showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
 
   if (!is.null(plotArea)) braw.env$plotArea<-plotArea
-  if (length(r)>1) {rSD<-r[2]; r<-r[1]} else {rSD<-NULL}
+  if (length(r)==2) {rSD<-r[2]; r<-r[1]} else {rSD<-NULL; rUN<-NULL}
+  if (length(r)==3) {rUN<-r[3]; rSD<-r[2]; r<-r[1]} else {rSD<-NULL}
   
   g<-startPlot(xlim=c(-1,1),ylim=c(0,1),back="transparent",box="none",g=g)
   
@@ -69,8 +70,8 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
           {start=c(0,0.92)
           len=sqrt(0.9^2+0.55^2)
           direction=atan(0.55/0.9)*57.296
-          labelpts<-data.frame(x=0,y=0.3)
-          hjust<- 0.35
+          labelpts<-data.frame(x=0.25,y=0.3)
+          hjust<- 1
           ends="last"
           fill=braw.env$plotColours$maineffectES
           size=0.7
@@ -79,8 +80,8 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
           {start=c(0,0.92)
           len=sqrt(0.9^2+0.55^2)
           direction=-atan(0.55/0.9)*57.296
-          labelpts<-data.frame(x=0,y=0.3)
-          hjust<- 0.65
+          labelpts<-data.frame(x=-0.25,y=0.3)
+          hjust<- 0
           ends="last"
           fill=braw.env$plotColours$maineffectES
           size=0.7
@@ -181,7 +182,14 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
       lbl=paste("r[p]=",brawFormat(r,digits=2),sep="")
       if (!is.null(rSD) && rSD!=0) lbl<-paste0(lbl,"\u00B1",brawFormat(rSD,digits=1))
     }else{ 
-      if (r==0) lbl<-"0.0" else lbl<-as.character(r)
+      if (r==0) lbl<-"0.0" 
+      else {
+        lbl<-brawFormat(r,digits=2)
+        if (!is.null(rUN)) {
+          if (t==2) lbl<-paste0("(",brawFormat(rUN,digits=2),") ",lbl)
+          if (t==3) lbl<-paste0(lbl," (",brawFormat(rUN,digits=2),")")
+        }
+      }
     }
     g<-addG(g,dataText(data=labelpts, label = lbl, size=size*1, hjust=hjust, colour=col, fontface="bold"))
   }

@@ -36,6 +36,15 @@ makeWorld<-function(worldOn=FALSE,populationPDF="Single",populationRZ="r",
 makeEffect<-function(rIV=0,rIV2=0,rIVIV2=0,rIVIV2DV=0,rSD=0,Heteroscedasticity=0,
                      ResidDistr="normal",world=braw.def$world){
 
+  # check effect sizes before going any further
+  fullES<-rIV^2+rIV2^2+2*rIV*rIV2*rIVIV2+rIVIV2DV^2
+  while (fullES>=1) {
+    rIV<-rIV*0.9
+    rIV2<-rIV2*0.9
+    rIVIV2<-rIVIV2*0.9
+    rIVIV2DV<-rIVIV2DV*0.9
+    fullES<-rIV^2+rIV2^2+2*rIV*rIV2*rIVIV2+rIVIV2DV^2
+  }
   effect<-list(rIV=rIV,rIV2=rIV2,rIVIV2=rIVIV2,rIVIV2DV=rIVIV2DV,rSD=rSD,
                Heteroscedasticity=Heteroscedasticity,ResidDistr=ResidDistr,
                world=world

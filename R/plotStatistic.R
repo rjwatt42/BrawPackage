@@ -1114,7 +1114,14 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
           i1<-i2+min(which(c(xdsig[(i2+1):length(xdsig)],1)>0))
           i2<-(i1-1)+min(which(c(xdsig[i1:length(xdsig)],0)==0))
           use<-i1:(i2-1)
-          ptsp1<-data.frame(y=c(yv[use],rev(yv[use])),x=c(xdsig[use],-rev(xdsig[use]))+xoff[i])
+          switch(orientation,
+                 "horz"={
+                   ln<-length(yv[use])
+                   ptsp1<-data.frame(x=yv[use[c(1,1:ln,ln)]],y=c(0,xd[use],0)+xoff[i])
+                 },
+                 "vert"={
+                   ptsp1<-data.frame(y=c(yv[use],rev(yv[use])),x=c(xdsig[use],-rev(xdsig[use]))+xoff[i])
+                 })
           g<-addG(g,dataPolygon(data=ptsp1,colour=NA,fill=braw.env$plotColours$infer_sigC,alpha=theoryAlpha))
         }
         # g<-addG(g,dataPath(data=ptsp1,colour="black",linewidth=0.1, orientation=orientation))

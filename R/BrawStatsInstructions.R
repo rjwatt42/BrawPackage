@@ -90,7 +90,7 @@ BrawInstructions <- function(HelpType="Plan") {
            '<b>Outputs:</b>',
            '<ul style=margin:0px;>',
            ' <li>',
-           '<b>Compact</b> - shows the most important information.',
+           '<b>Basic</b> - shows the most important information.',
            ' </li>',
            ' <li>',
            '<b>Sample</b> - shows the individual variables. Use this to look for any simple issues with the data such as outliers.',

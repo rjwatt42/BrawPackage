@@ -1129,17 +1129,11 @@ runSimulation<-function(hypothesis,design,evidence,sigOnly=FALSE,onlyAnalysis=FA
         break
       }
     } else {
-      break
+      if (isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) break
+      if (runif(1)>sigOnly) break
     }
   }
   
-  # sig only
-  # while ((sigOnly<=runif(1)) && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
-  while (TRUE) {
-      res<-getSample(hypothesis,design,evidence)
-      if (isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) break
-      if (runif(1)>sigOnly) break
-  }
   # Replication?
   res<-replicateSample(hypothesis,design,evidence,sample,res)
 

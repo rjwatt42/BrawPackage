@@ -156,7 +156,7 @@ reportDescription<-function(analysis=braw.res$result){
                           paste0("!j",brawFormat(analysis$r$total[2],digits=braw.env$report_precision)),
                           rep("",nc-4))
             if (evidence$rInteractionOn) {
-              outputText<-c(outputText,paste0(IV$name,"*",IV2$name),
+              outputText<-c(outputText,paste0(IV$name,braw.env$interaction_string,IV2$name),
                             paste0("!j",brawFormat(analysis$r$direct[3],digits=braw.env$report_precision)),
                             paste0("!j",brawFormat(analysis$r$unique[3],digits=braw.env$report_precision)),
                             paste0("!j",brawFormat(analysis$r$total[3],digits=braw.env$report_precision)),

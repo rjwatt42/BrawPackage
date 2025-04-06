@@ -146,7 +146,7 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
     BIC=AIC+k*log(n_data)-2*k;
     CAIC=k*(log(n_data)+1)+AIC-2*k;
     outputText<-c(outputText,rep("",nc))
-      outputText<-c(outputText,"!HAIC","AICc","BIC","AICnull","llr[+]","R^2","k","llr",rep("",nc-7))
+      outputText<-c(outputText,"!HAIC","AICc","BIC","AICnull","llr[+]","R^2","k","llr",rep("",nc-8))
       outputText<-c(outputText,
                     brawFormat(analysis$aic,digits=1),
                     brawFormat(AICc,digits=1),
@@ -156,7 +156,7 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
                     brawFormat(analysis$rFull^2,digits=braw.env$report_precision),
                     brawFormat(k),
                     brawFormat(llr,digits=1),
-                    rep("",nc-7)
+                    rep("",nc-8)
       )
     }
     

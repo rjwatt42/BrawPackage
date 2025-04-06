@@ -4,7 +4,8 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,maxoff=1){
   if (braw.env$allScatter && !braw.env$newSampleDisplay) showRawData<-TRUE
   else showRawData<-FALSE
   
-  alphaPoints<-0.5
+  alphaPoints<-0.35
+  shrinkDots=0.5
   if (colindex==1)
           {  col<- braw.env$plotColours$descriptionC
           xoff=0
@@ -23,7 +24,6 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,maxoff=1){
   hypothesisType=paste(IV$type,DV$type,sep=" ")
 
   dotSize<-braw.env$dotSize
-  shrinkDots=1
   if (length(x)>100) {
     dotSize<-max(dotSize*sqrt(100/length(x)),2)
   }

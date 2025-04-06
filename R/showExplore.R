@@ -956,7 +956,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       g<-addG(g,horzLine(yl,linetype="dotted",colour=lineCol))
     }
   }
-    if (!is.null(hypothesis$IV2) && is.element(showType[si],c("rs","p"))) 
+    if (!is.null(hypothesis$IV2) && is.element(showType[si],c("rs","p"))) {
       if (effectType=="all") use<-1:3
       else use<-which(effectType==c("direct","unique","total"))
       g<-addG(g,dataLegend(data.frame(names=c("direct","unique","total")[use],
@@ -964,6 +964,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                                       ),
                            title="",fontsize=1)
       )
+    }
   }
   }
   # if (exploreResult$count>0)

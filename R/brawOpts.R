@@ -199,7 +199,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
           braw.env$variables<-makeDefaultVariables()
           
           braw.env$when_string <- "="
-          braw.env$interaction_string <- "\u2217"
+          braw.env$interaction_string <- "\u00D7"
           
           
           ##################################
