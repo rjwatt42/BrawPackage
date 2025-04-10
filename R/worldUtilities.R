@@ -69,8 +69,7 @@ rSamplingDistr<-function(rvals,R,n,sigOnly=FALSE){
   if (sigOnly>0) {
     zcrit<-atanh(p2r(braw.env$alphaSig,n,1))
     if (length(rvals)==1) {
-      gain<-pnorm(-zcrit,Z,1/sqrt(n-3))+
-        (1-pnorm(zcrit,Z,1/sqrt(n-3)))
+      gain<-1-sigOnly*(pnorm(zcrit,Z,1/sqrt(n-3))-pnorm(-zcrit,Z,1/sqrt(n-3)))
     } else {
       g<-sum(zdens)
       zdens[abs(zvals)<zcrit]<-zdens[abs(zvals)<zcrit]*(1-sigOnly)
