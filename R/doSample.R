@@ -17,13 +17,13 @@ discreteVals<-function(ivr,ng,pp,type="continuous",cases=NULL) {
   return(ivDiscrete)
 }
 
-sampleLK<-function(nsamp,targetS,targetN,sigOnly=FALSE) {
+sampleLK<-function(nsamp,targetRs,targetN,sigOnly=FALSE) {
   
   npts<-1001
   
   rp<-seq(-0.99,0.99,length.out=npts)
   
-  slr<-rSamplingDistr(targetS,rp,targetN,sigOnly)
+  slr<-rSamplingDistr(targetRs,rp,targetN,sigOnly)
   
   bins<-seq(0,1,length.out=npts)
   cdf<-cumsum(slr)/sum(slr)
@@ -43,7 +43,10 @@ sampleLK<-function(nsamp,targetS,targetN,sigOnly=FALSE) {
 getWorldEffect<-function(nsamples=1,effect=braw.def$hypothesis$effect) {
   if (effect$world$worldOn) {
     if (effect$world$populationPDF=="sample") {
-      rho<-sampleLK(nsamples,effect$world$populationPDFmu,(1/effect$world$populationPDFk)^2+3,effect$world$sigOnly)
+      rho<-sampleLK(nsamples,
+                    effect$world$populationPDFmu,
+                    (1/effect$world$populationPDFk)^2+3,
+                    effect$world$populationNullp)
     } else {
     if (!is.na(effect$world$populationRZ) && !isempty(effect$world$populationRZ)){
       switch (effect$world$populationRZ,

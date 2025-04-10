@@ -5,8 +5,24 @@
 #' @examples
 #' world<-getWorld(name)
 #' @export
-getWorld<-function(name) {
+getWorld<-function(name,result=braw.res$result) {
   switch(name,         
+         "Sample"={
+           world<-list(worldOn=TRUE,
+                       populationPDF="sample",
+                       populationRZ="r",
+                       populationPDFk=1/sqrt(result$nval-3),
+                       populationPDFmu=result$rIV,
+                       populationNullp=0.0)
+         },
+         "SampleB"={
+           world<-list(worldOn=TRUE,
+                       populationPDF="sample",
+                       populationRZ="r",
+                       populationPDFk=1/sqrt(result$nval-3),
+                       populationPDFmu=result$rIV,
+                       populationNullp=1.0)
+         },
          "Null"={
            world<-list(worldOn=TRUE,
                        populationPDF="Single",
@@ -77,6 +93,12 @@ getHypothesis<-function(name,hypothesis=braw.def$hypothesis) {
          },
          "PsychF"={
            hypothesis$effect$world<-getWorld("PsychF")
+         },
+         "Sample"={
+           hypothesis$effect$world<-getWorld("Sample")
+         },
+         "SampleB"={
+           hypothesis$effect$world<-getWorld("SampleB")
          },
          "2C"={
            hypothesis$IV<-makeVariable("IV","Categorical")

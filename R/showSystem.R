@@ -188,8 +188,10 @@ showWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),autoShow=
   if (is.element(world$populationPDF,c("Single","Double"))) {
     rdens<-rdens/sum(rdens)*(1-world$populationNullp)
     rdens[rx==0]<-rdens[rx==0]+world$populationNullp
-  } else 
+  } 
+  if (!is.element(world$populationPDF,c("sample"))) {
     rdens<-rdens*(1-world$populationNullp)
+  }
   rdens<-rdens/max(rdens)
   rx<-c(rx[1],rx,rx[length(rx)])
   rdens<-c(0,rdens,0)

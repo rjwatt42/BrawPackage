@@ -17,6 +17,7 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,maxoff=1){
           xoff=0.1
           barwidth=0.5
           }
+  off<-off*braw.env$CatPlotOffset
 
   x<-analysis$ivplot
   y<-analysis$dvplot

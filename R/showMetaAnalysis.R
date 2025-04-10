@@ -33,7 +33,7 @@ worldLabel<-function(metaResult,whichMeta=NULL,modelPDF=NULL) {
     # if (length(p1)>1)
     #   lb<-paste0(lb,"\u00B1",brawFormat(std(p1),digits=2))
     if (!is.null(p2)) {
-      label2<-"p(null)"
+      label2<-braw.env$Pchar
       if (is.element(Dist,c("random","fixed"))) label2<-paste0("sd(",braw.env$RZ,")[m]")
       lb<-paste0(lb,"\n",label2,"=",brawFormat(mean(p2,na.rm=TRUE),digits=3))
       # if (length(p2)>1)

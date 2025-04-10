@@ -227,7 +227,7 @@ rPopulationDist<-function(rvals,world) {
   k<-world$populationPDFk
   mu<-world$populationPDFmu
   if (world$populationPDF=="sample") {
-    rdens<-rSamplingDistr(mu,rvals,(1/k)^2+3,world$sigOnly)
+    rdens<-rSamplingDistr(mu,rvals,(1/k)^2+3,world$populationNullp)
     return(rdens)
   }
   switch (paste0(world$populationPDF,"_",world$populationRZ),
@@ -322,14 +322,10 @@ fullRSamplingDist<-function(vals,world,design,doStat="rs",logScale=FALSE,sigOnly
   rdens<-pR$pRhogain
   if (length(rvals)>1) rdens<-rdens*diff(rvals[1:2])
   if (!world$worldOn) world$populationNullp<-0
-  # if (any(rvals==0)) {
-  #   use<-which(rvals==0)
-  #   rdens<-rdens/sum(rdens)*(1-world$populationNullp)
-  #   rdens[use]<-rdens[use]+world$populationNullp
-  # } else {
-    rvals<-c(rvals,0)
-    rdens<-c(rdens/sum(rdens)*(1-world$populationNullp),world$populationNullp)
-  # }
+  if (!is.element(world$populationPDF,c("sample"))) {
+  rvals<-c(rvals,0)
+  rdens<-c(rdens/sum(rdens)*(1-world$populationNullp),world$populationNullp)
+  }
   
   # distribution of sample sizes
   ndist<-getNList(design,world,HQ=HQ)

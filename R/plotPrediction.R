@@ -122,7 +122,7 @@ plotCatParPrediction<-function(g,IV,DV,rho,n,offset=1, within=FALSE){
     # col<- col2rgb(braw.env$plotColours$descriptionC1)*(1-off)+col2rgb(braw.env$plotColours$descriptionC2)*off
     # col<- rgb(col[1]/255,col[2]/255,col[3]/255)
     off<-(colindex-2)/(maxoff-1)-0.5
-    xoff=off*0.2
+    xoff=off*braw.env$CatPlotOffset
   }
   
   ncats<-IV$ncats
@@ -166,19 +166,19 @@ plotCatParPrediction<-function(g,IV,DV,rho,n,offset=1, within=FALSE){
     } else{
       se<-array(0,ncats)
     for (i in 1:ncats){
-      se[i]<-sd(y[x==IV$cases[i]])/sqrt(n[ni]/ncats)
+      se[i]<-sd(y[x==IV$cases[i]])/sqrt(n[ni]/ncats)*braw.env$errorBarGain
     }
     }
     se_pts<-data.frame(x=b+xoff,ymin=d-se,ymax=d+se)
     if (ni==1) {col1<-col;lw<-2}
     if (ni>1 && ni<4) {col1<-"black";lw<-1}
     if (ni==4) {col1<-"white";lw=1}
-    g<-addG(g,dataErrorBar(data=se_pts,colour=col1,linewidth=lw*2))
+    g<-addG(g,dataErrorBar(data=se_pts,colour="black",linewidth=0.25))
   }
   if (colindex>1) {
-    g<-addG(g,dataPoint(data=mn_pts, shape=braw.env$plotShapes$data, colour = "black", fill=col, size = braw.env$dotSize*1.2))
+    g<-addG(g,dataPoint(data=mn_pts, shape=braw.env$plotShapes$data, colour = "black", fill=col, size = braw.env$dotSize))
   }  else {
-    g<-addG(g,dataPoint(data=mn_pts,shape=braw.env$plotShapes$data, colour = "black", fill=col, size = braw.env$dotSize*1.2))
+    g<-addG(g,dataPoint(data=mn_pts,shape=braw.env$plotShapes$data, colour = "black", fill=col, size = braw.env$dotSize))
   }
   g
   

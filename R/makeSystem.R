@@ -17,6 +17,7 @@
 makeWorld<-function(worldOn=FALSE,populationPDF="Single",populationRZ="r",
                     populationPDFk=0.0,populationPDFmu=0.0,populationNullp=0,
                     sigOnly=FALSE,worldAbs=FALSE) {
+  if (populationPDF=="sample") populationPDFk<-1/sqrt(populationPDFk-3)
  world<-list(worldOn=worldOn,
              populationPDF=populationPDF,populationPDFk=populationPDFk,populationPDFmu=populationPDFmu,populationRZ=populationRZ,
              populationNullp=populationNullp,sigOnly=sigOnly,worldAbs=worldAbs)
