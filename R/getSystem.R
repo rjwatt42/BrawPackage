@@ -28,6 +28,7 @@ getWorld<-function(name,result=braw.res$result) {
                        populationPDF="Single",
                        populationRZ="z",
                        populationPDFk=0,
+                       populationPDFmu=0,
                        populationNullp=0)
          },
          "Uniform"={
@@ -35,6 +36,7 @@ getWorld<-function(name,result=braw.res$result) {
                        populationPDF="Uniform",
                        populationRZ="r",
                        populationPDFk=0.3,
+                       populationPDFmu=0,
                        populationNullp=0.0)
          },
          "Single"={
@@ -42,6 +44,7 @@ getWorld<-function(name,result=braw.res$result) {
                        populationPDF="Single",
                        populationRZ="r",
                        populationPDFk=0.3,
+                       populationPDFmu=0,
                        populationNullp=0.5)
          },
          "Double"={
@@ -49,6 +52,7 @@ getWorld<-function(name,result=braw.res$result) {
                        populationPDF="Double",
                        populationRZ="r",
                        populationPDFk=0.3,
+                       populationPDFmu=0,
                        populationNullp=0)
          },
          "Psych"={
@@ -56,6 +60,7 @@ getWorld<-function(name,result=braw.res$result) {
                        populationPDF="Exp",
                        populationRZ="z",
                        populationPDFk=0.3,
+                       populationPDFmu=0,
                        populationNullp=0.74)
          },
          "PsychF"={
@@ -63,6 +68,7 @@ getWorld<-function(name,result=braw.res$result) {
                        populationPDF="Exp",
                        populationRZ="z",
                        populationPDFk=0.3,
+                       populationPDFmu=0,
                        populationNullp=0.0)
          }
   )
