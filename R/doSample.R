@@ -169,7 +169,7 @@ makeSampleVar<-function(design,n,MV){
               dvr1_s<-c()
               
               if (design$sMethodSeverity<1) 
-                sMethodSeverity<-design$sN*design$sMethodSeverity
+                sMethodSeverity<-n*design$sMethodSeverity
               else               sMethodSeverity<-design$sMethodSeverity
               nClusts<-n-sMethodSeverity
               switch(method$type,
