@@ -59,8 +59,8 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
                     descriptionTotal=darken(desat("#DD8844",0.1),0.7),descriptionsUnique=darken(desat("#DD8844",0.1),1.3),
                     metaAnalysis="#FFEE00",metaMultiple="#FF8800",metaAnalysisTheory="#FFFFFF",
                     infer_sigC="#11CC00",infer_nsigC="#FF4400",infer_none="#AAAAAA",infer_miss=NULL,
-                    infer_sigNonNull="#11CC00",infer_nsigNonNull="#AA6633",infer_isigNonNull="#881100",infer_nsdNonNull="#DDCCCC",
-                    infer_sigNull="#88AA66",infer_nsigNull="#FF4400",infer_isigNull="#FF4400",infer_nsdNull="#CCDDCC",
+                    infer_sigNonNull="#44EE11",infer_nsigNonNull="#AA6633",infer_isigNonNull="#881100",infer_nsdNonNull="#DDCCCC",
+                    infer_sigNull="#AAAA00",infer_nsigNull="#FF4400",infer_isigNull="#FF4400",infer_nsdNull="#CCDDCC",
                     psig="#FFAA00",alpha="#44FF22",
                     fdr="#227700",fmr="#BB5555",
                     powerPopulation="#0049FF",powerSample="#88BDFF")
@@ -307,6 +307,14 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
           braw.env$nullSig<-nullSig
           braw.env$nullPositive<-nullPositive
           braw.env$nullNS<-nullNS
+          braw.env$nullNegative<-nullNegative
+          braw.env$nonNullSig<-"H+(sig)"
+          braw.env$nonNullPositive<-nonNullPositive
+          braw.env$nonNullNS<-"H+(ns)"
+          braw.env$nonNullNegative<-nonNullNegative
+          braw.env$nullSig<-"H0(sig)"
+          braw.env$nullPositive<-nullPositive
+          braw.env$nullNS<-"H0(ns)"
           braw.env$nullNegative<-nullNegative
           
           braw.env$allPositive<-paste0(Zchar,"+ve")

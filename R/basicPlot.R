@@ -799,6 +799,7 @@ dataErrorBar<-function(data,colour="black",linewidth=0.25) {
   }
   return(g)
 }
+
 dataLegend<-function(data,title="title",fontsize=0.6,shape=21) {
   dy=0.06*fontsize
   dx=0.025*fontsize/braw.env$plotArea[3] # because rangeX() below
@@ -870,6 +871,8 @@ desat <- function(col,gain=1) {
 }
 
 darken <- function(col,gain=1,off=0) {
+  if (is.character(col) && nchar(col)==4)
+    col<-paste0(substr(col,1,1),substr(col,2,2),substr(col,2,2),substr(col,3,3),substr(col,3,3),substr(col,4,4),substr(col,4,4))
   col<-col2rgb(col)/255*gain+off
   col[col<0]<-0
   col[col>1]<-1

@@ -115,6 +115,22 @@ plotAxis<-function(showType,hypothesis,design=NULL) {
             use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
             ylines<-c(0,effect$rIV)
           },
+          "rse1"={
+            ylim<-rlims
+            yticks<-rticks
+            ymins<-rmins
+            ylabel<-rslab
+            use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
+            ylines<-c(0,effect$rIV)
+          },
+          "rse2"={
+            ylim<-rlims
+            yticks<-rticks
+            ymins<-rmins
+            ylabel<-rslab
+            use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
+            ylines<-c(0,effect$rIV)
+          },
           "rss"={
             ylim<-rlims
             yticks<-rticks

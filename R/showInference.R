@@ -90,6 +90,21 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
              # other1<-analysis2
              # other2<-analysis1
              },
+           "Errors"={
+             showType<-c("rse1","rse2");dimension<-"1D"
+             
+             use<-analysis1$pIV<0.05
+             analysis1$rIV<-analysis1$rIV[use]
+             analysis1$pIV<-analysis1$pIV[use]
+             analysis1$rpIV<-analysis1$rpIV[use]
+             analysis1$nval<-analysis1$nval[use]
+
+             use<-analysis2$pIV>=0.05
+             analysis2$rIV<-analysis2$rIV[use]
+             analysis2$pIV<-analysis2$pIV[use]
+             analysis2$rpIV<-analysis2$rpIV[use]
+             analysis2$nval<-analysis2$nval[use]
+           },
            "Hits"=       {
              showType<-c("e2+","e1+");dimension<-"1D"
              r<-getNulls(analysis,useSig=TRUE)
@@ -169,12 +184,14 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
     if (nplots<=2) {
       if (orientation=="horz") minWidth<-1 else minWidth<-0.6
       for (fi in 1:length(whichEffect)) {
-        for (ni in 1:nplots) {
-          braw.env$plotArea<-c((ni-1)/nplots+0.05,area.x[fi],min(minWidth,0.9/nplots),area.y[fi])
-          g1<-plotInference(analysis1,otheranalysis=other1,disp=showType[ni],
+          braw.env$plotArea<-c((1-1)/nplots+0.05,area.x[fi],min(minWidth,0.9/nplots),area.y[fi])
+          g1<-plotInference(analysis1,otheranalysis=other1,disp=showType[1],
                             whichEffect=whichEffect[fi],effectType=effectType,
                             orientation=orientation,showTheory=showTheory,g=g1)
-        }
+          braw.env$plotArea<-c((2-1)/nplots+0.05,area.x[fi],min(minWidth,0.9/nplots),area.y[fi])
+          g1<-plotInference(analysis2,otheranalysis=other2,disp=showType[2],
+                            whichEffect=whichEffect[fi],effectType=effectType,
+                            orientation=orientation,showTheory=showTheory,g=g1)
       }
     }
   }
