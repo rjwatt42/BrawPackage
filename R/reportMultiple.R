@@ -11,7 +11,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
                          whichEffect="All",effectType="all",reportStats="Medians"){
   
   if (is.null(multipleResult)) multipleResult=doMultiple(autoShow=FALSE)
-  if (!multipleResult$hypothesis$effect$world$worldOn && is.element(showType[1],c("NHST","Hits","Misses"))) {
+  if (!multipleResult$hypothesis$effect$world$worldOn && is.element(showType[1],c("NHST","Errors","Hits","Misses"))) {
     if (multipleResult$nullcount<multipleResult$count) {
       multipleResult<-doMultiple(0,multipleResult,doingNull=TRUE)
     }
@@ -48,17 +48,18 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     
     if (length(showType)==1) {
       switch(showType,
-             "Single"=     {pars<-c("rs")},
+             "Single"=    {pars<-c("rs")},
              "Basic"=     {pars<-c("rs","p")},
-             "p(sig)"= {pars<-c("p")},
+             "p(sig)"=    {pars<-c("p")},
              "Power"=     {pars<-c("ws","wp")},
-             "2D"=     {pars<-c("rs","p")},
+             "2D"=        {pars<-c("rs","p")},
              "CILimits"=  {pars<-c("ci1","ci2")},
-             "NHST"={pars<-c("e2p","e1p")},
-             "Hits"=       {pars<-c("e1a","e2a")},
-             "Misses"=       {pars<-c("e1b","e2b")},
-             "DV"=     {pars<-c("dv.mn","dv.sd","dv.sk","dv.kt")},
-             "Residuals"=     {pars<-c("er.mn","er.sd","er.sk","er.kt")},
+             "NHST"=      {pars<-c("e2p","e1p")},
+             "Errors"=    {pars<-c("e1a","e2a")},
+             "Hits"=      {pars<-c("e1a","e2a")},
+             "Misses"=    {pars<-c("e1b","e2b")},
+             "DV"=        {pars<-c("dv.mn","dv.sd","dv.sk","dv.kt")},
+             "Residuals"= {pars<-c("er.mn","er.sd","er.sk","er.kt")},
              { pars<-strsplit(showType,";")[[1]]
              }
       )
@@ -68,7 +69,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     else { nc=4+length(pars)*9 }
     
     if (is.element(showType,c("NHST","SEM"))) {nc=6}
-    if (is.element(showType,c("Hits","Misses"))) {nc=4}
+    if (is.element(showType,c("Hits","Misses","Errors"))) {nc=4}
     nc<-nc+1
     
     # header
@@ -156,7 +157,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     
     for (whichEffect in whichEffects)  {
       
-      if (is.element(showType,c("Hits","Misses"))){
+      if (is.element(showType,c("Hits","Misses","Errors"))){
         nullSig<-isSignificant(braw.env$STMethod,nullresult$pIV,nullresult$rIV,nullresult$nval,nullresult$df1,nullresult$evidence)
         resSig<-isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,result$evidence)
         if (braw.env$STMethod=="dLLR") {
@@ -179,6 +180,8 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
         if (effect$world$worldOn) {
           nr<-(length(nullresult$pIV)+length(result$pIV))
           if (braw.env$STMethod=="NHST") {
+            e1e<-paste0("!j",brawFormat(sum(nullSig)/(sum(nullSig)+sum(resSig))*100,digits=1),"%")
+            e2e<-paste0("!j",brawFormat(sum(!resSig)/(sum(!nullSig)+sum(!resSig))*100,digits=1),"%")
             e1a<-paste0("!j",brawFormat(sum(nullSig)/nr*100,digits=1),"%")
             e2a<-paste0("!j",brawFormat(sum(!resSig)/nr*100,digits=1),"%")
             outputText<-c(outputText," ","All",e1a,e2a," ")
@@ -209,19 +212,20 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
             e1b=paste0("!j",brawFormat((sum(nullSigW)+sum(resSigW))/nr*100,digits=1),"%")
             e2b=paste0("!j",brawFormat((sum(nullSigC)+sum(resSigC))/nr*100,digits=1),"%")
             e1c=paste0("(",brawFormat((sum(nullSig)+sum(resSig))/nr*100,digits=1),"%)")
+            e2c=paste0("(",brawFormat((1-(sum(nullSig)+sum(resSig))/nr)*100,digits=1),"%)")
             
             e1n=paste0("!j",brawFormat((sum(nullSigW)+sum(resSigW))/(sum(nullSig)+sum(resSig))*100,digits=1),"%")
             e1p=paste0("!j",brawFormat((sum(nullSigC)+sum(resSigC))/(sum(nullSig)+sum(resSig))*100,digits=1),"%")
           }
           # ea=paste0("Combined: ",brawFormat((sum(nullSig)+sum(!resSig))/nr*100,digits=braw.env$report_precision),"%")
           outputText<-c(outputText,"","","","","")
-          outputText<-c(outputText,"!H ","!H!COutcomes:","False","Valid","")
+          outputText<-c(outputText,"!H ","!H!COutcomes:","False","Correct","")
           
-          outputText<-c(outputText," ","All:",e1b,e2b,"")
-          outputText<-c(outputText," ",paste0("Sig ",e1c,":"),e1n,e1p," ")
+          outputText<-c(outputText," ","!jAll:",e1b,e2b,"")
+          outputText<-c(outputText," ",paste0("!jHits ",e1c,":"),e1n,e1p," ")
           
           if (braw.env$STMethod=="NHST") {
-            outputText<-c(outputText," ",paste0("Not Sig ",":"),e2p,e2n," ")
+            outputText<-c(outputText," ",paste0("!jMisses ",e2c,":"),e2p,e2n," ")
           }
         } else {
           outputText<-c(outputText," "," ",e1,e2," ","")

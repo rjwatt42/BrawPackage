@@ -62,7 +62,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
 
 # do we need more simulations  
   if (is.null(exploreResult)) exploreResult=doExplore()
-  if (!exploreResult$hypothesis$effect$world$worldOn && is.element(showType[1],c("NHST","Hits","Misses"))) {
+  if (!exploreResult$hypothesis$effect$world$worldOn && is.element(showType[1],c("NHST","Errors","Hits","Misses"))) {
     if (exploreResult$nullcount<exploreResult$count) {
       exploreResult<-doExplore(0,exploreResult,doingNull=TRUE)
     }
@@ -75,6 +75,8 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   evidence<-exploreResult$evidence
   
 # sort out what we are showing
+  
+  if (is.element(showType[1],c("NHST","Errors","Hits","Misses"))) showHist<-FALSE
   
   showType<-strsplit(showType,";")[[1]]
   if (length(showType)==1) {
@@ -235,7 +237,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   ylines<-yaxis$lines
   ySecond<-NULL
   
-  if (is.element(showType[si],c("SEM","NHST","p(sig)","Hits","Misses"))) ylim<-c(0,1)
+  if (is.element(showType[si],c("p(sig)","NHST","Errors","Hits","Misses","SEM"))) ylim<-c(0,1)
   if (showType[si]=="AIC") {
     ylim<-c(-1,0.1)*design$sN*hypothesis$DV$sd
     ylabel<-"diff(AIC)"
@@ -301,7 +303,8 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       else
         braw.env$plotArea<-c(plotXOffset[si,1],plotYOffset[1,yi],plotWidth,plotHeight)
     }
-    if ((showType[si]=="rs") && (!is.null(hypothesis$IV2))) switch(whichEffect,ylabel<-"Main 1",ylabel<-"Main 2",ylabel<-"Interaction")
+    if ((showType[si]=="rs") && (!is.null(hypothesis$IV2))) 
+      switch(whichEffect,ylabel<-"Main 1",ylabel<-"Main 2",ylabel<-"Interaction")
 
     col<-darken(ycols[1],off=-0.2)
     col<-ycols[1]
@@ -427,7 +430,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
           theoryVals<-c(theoryVals,r)
         }
       }
-      if (is.element(showType[si],c("NHST","Hits","Misses"))) {
+      if (is.element(showType[si],c("NHST","Errors","Hits","Misses"))) {
         Nullp<-hypothesis$effect$world$populationNullp
         hypothesis$effect$world$populationNullp<-0
         theoryVals1<-c()
@@ -443,6 +446,11 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                  theoryVals1<-theoryVals1*(1-nullPs)
                  theoryVals0<-theoryVals1*0+alphas*nullPs
                  theoryVals2<-theoryVals0*0+nullPs
+               },
+               "Errors"={
+                 theoryVals0<-theoryVals1*(1-nullPs)/(theoryVals1*(1-nullPs)+alphas*nullPs)
+                 theoryVals2<-(1-theoryVals1)*(1-nullPs)/((1-theoryVals1)*(1-nullPs)+(1-alphas)*nullPs)
+                 theoryVals1<-c()
                },
                "Hits"={
                  theoryVals<-theoryVals1*(1-nullPs)/(theoryVals1*(1-nullPs)+alphas*nullPs)
@@ -622,6 +630,15 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                 showMeans<-1-colMeans(abs(sigs & nulls))/colMeans(abs(sigs))
                 showSE<-NULL
               },
+              "Errors"={
+                if (explore$exploreType=="Alpha") {
+                  braw.env$alphaSig<-exploreResult$vals
+                }
+                nulls<-result$rpval==0
+                sigs<-isSignificant(braw.env$STMethod,pVals,rVals,nVals,df1Vals,evidence,braw.env$alphaSig)
+                showMeans<-colMeans(abs(sigs & !nulls))/colMeans(abs(sigs))
+                showMeans<-rbind(showMeans,colMeans(abs(!sigs & !nulls))/colMeans(abs(!sigs)))
+              },
               "Hits"={
                 showVals<-NULL
                 if (explore$exploreType=="Alpha") {
@@ -719,7 +736,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       }
       if (!is.element(showType[si],c("NHST","SEM"))) {
         # draw the basic line and point data
-        if (is.element(showType[si],c("p(sig)","Hits","Misses"))) {
+        if (is.element(showType[si],c("p(sig)","Hits","Misses","Errors"))) {
           y50<-showMeans
           y75<-NULL
           y25<-NULL
@@ -814,9 +831,12 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
             g<-addG(g,dataLine(data.frame(x=vals,y=y38),colour="white",alpha=0.6))
             g<-addG(g,dataLine(data.frame(x=vals,y=y62),colour="white",alpha=0.6))
           }
-          pts0f<-data.frame(x=vals,y=y50)
+          y50<-rbind(y50)
+          for (i in 1:nrow(y50)) {
+          pts0f<-data.frame(x=vals,y=y50[i,])
           g<-addG(g,dataLine(data=pts0f,linewidth=0.75))
-          g<-addG(g,dataPoint(data=pts0f,fill=col,size=4))
+          g<-addG(g,dataPoint(data=pts0f,fill=ycols[i],size=4))
+          }
         } else { # not doLine
           if (nrow(rVals)>0)
           sigVals<-isSignificant(braw.env$STMethod,pVals,rVals,nVals,df1Vals,exploreResult$evidence,braw.env$alphaSig)
@@ -854,8 +874,8 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       else {
         # now the NHST filled areas
         ytop<-rep(1,ncol(showVals))
-        if (doLine) xoff<-0
-        else        xoff<-bwidth
+        # if (doLine) xoff<-0
+        # else        xoff<-bwidth
         
         for (use in 1:nrow(showVals)) {
           colShow<-showCols[use]

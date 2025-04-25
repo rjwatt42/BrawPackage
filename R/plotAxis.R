@@ -456,6 +456,13 @@ plotAxis<-function(showType,hypothesis,design=NULL) {
             ymins<-seq(0,1,0.1)
             ylabel<-"Outcomes"
           },
+          "Errors"={
+            ylim<-c(0,1)
+            ytick<-seq(0,1,0.2)
+            ymins<-seq(0,1,0.1)
+            use_cols<-c(braw.env$plotColours$fdr,braw.env$plotColours$fmr)
+            ylabel<-"Outcomes"
+          },
           "p(sig)"={
             ylim<-c(0,1)
             ytick<-seq(0,1,0.2)

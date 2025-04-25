@@ -307,7 +307,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                   }
                   y_label<-"False Misses"
                 },
-                "FDR;FMR"={
+                "Errors"={
                   if (effect$world$worldOn) {
                     for (i in 1:length(exploreResult$vals)){
                       if (explore$exploreType=="Alpha") {
@@ -315,7 +315,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                       }
                       sigs<-isSignificant(braw.env$STMethod,pVals[,i],rVals[,i],nVals[,i],df1Vals[,i],exploreResult$evidence)
                       nulls<-exploreResult$result$rpval[,i]==0
-                      p<-sum(!sigs & !nulls,na.rm=TRUE)/sum(!nulls)
+                      p<-sum(!sigs & !nulls,na.rm=TRUE)/sum(!sigs)
                       y50[i]<-p
                       y75[i]<-p+sqrt(p*(1-p)/length(pVals[,i]))
                       y25[i]<-p-sqrt(p*(1-p)/length(pVals[,i]))
@@ -536,8 +536,9 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
           }
         }
         
-        if (is.element(showType,c("FDR;FMR")) ){
-          y1_label<-"\bHits"
+        if (is.element(showType,c("Errors")) ){
+          y1_label<-"\bFalse Hits"
+          y2_label<-"\bFalse Misses"
 
           if (reportQuants){
             outputText<-c(outputText,"","-se ")
