@@ -1265,7 +1265,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       )
     }
     
-    if (length(rvals)>1 && (is.null(hypothesis$IV2) || effectType!="all"))
+    if (length(rvals)>1 && (is.element(showType,c("rse1","rse2")) || effectType!="all"))
     if (is.element(showType,c("rs","rse","rse1","rse2","rss","p","e1r","e2r","e1+","e2+","e1-","e2-",
                               "e1p","e2p","e1d","e2d"))) {
       lb1<-"p("
