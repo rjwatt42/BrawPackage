@@ -307,7 +307,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                   }
                   y_label<-"False Misses"
                 },
-                "Errors"={
+                "Inference"={
                   if (effect$world$worldOn) {
                     for (i in 1:length(exploreResult$vals)){
                       if (explore$exploreType=="Alpha") {
@@ -536,7 +536,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
           }
         }
         
-        if (is.element(showType,c("Errors")) ){
+        if (is.element(showType,c("Inference")) ){
           y1_label<-"\bFalse Hits"
           y2_label<-"\bFalse Misses"
 

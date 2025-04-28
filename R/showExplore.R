@@ -62,7 +62,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
 
 # do we need more simulations  
   if (is.null(exploreResult)) exploreResult=doExplore()
-  if (!exploreResult$hypothesis$effect$world$worldOn && is.element(showType[1],c("NHST","Errors","Hits","Misses"))) {
+  if (!exploreResult$hypothesis$effect$world$worldOn && is.element(showType[1],c("NHST","Inference","Hits","Misses"))) {
     if (exploreResult$nullcount<exploreResult$count) {
       exploreResult<-doExplore(0,exploreResult,doingNull=TRUE)
     }
@@ -76,7 +76,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   
 # sort out what we are showing
   
-  if (is.element(showType[1],c("NHST","Errors","Hits","Misses"))) showHist<-FALSE
+  if (is.element(showType[1],c("NHST","Inference","Hits","Misses"))) showHist<-FALSE
   
   showType<-strsplit(showType,";")[[1]]
   if (length(showType)==1) {
@@ -237,7 +237,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   ylines<-yaxis$lines
   ySecond<-NULL
   
-  if (is.element(showType[si],c("p(sig)","NHST","Errors","Hits","Misses","SEM"))) ylim<-c(0,1)
+  if (is.element(showType[si],c("p(sig)","NHST","Inference","Hits","Misses","SEM"))) ylim<-c(0,1)
   if (showType[si]=="AIC") {
     ylim<-c(-1,0.1)*design$sN*hypothesis$DV$sd
     ylabel<-"diff(AIC)"
@@ -430,7 +430,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
           theoryVals<-c(theoryVals,r)
         }
       }
-      if (is.element(showType[si],c("NHST","Errors","Hits","Misses"))) {
+      if (is.element(showType[si],c("NHST","Inference","Hits","Misses"))) {
         Nullp<-hypothesis$effect$world$populationNullp
         hypothesis$effect$world$populationNullp<-0
         theoryVals1<-c()
@@ -447,7 +447,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                  theoryVals0<-theoryVals1*0+alphas*nullPs
                  theoryVals2<-theoryVals0*0+nullPs
                },
-               "Errors"={
+               "Inference"={
                  theoryVals0<-theoryVals1*(1-nullPs)/(theoryVals1*(1-nullPs)+alphas*nullPs)
                  theoryVals2<-(1-theoryVals1)*(1-nullPs)/((1-theoryVals1)*(1-nullPs)+(1-alphas)*nullPs)
                  theoryVals1<-c()
@@ -630,7 +630,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                 showMeans<-1-colMeans(abs(sigs & nulls))/colMeans(abs(sigs))
                 showSE<-NULL
               },
-              "Errors"={
+              "Inference"={
                 if (explore$exploreType=="Alpha") {
                   braw.env$alphaSig<-exploreResult$vals
                 }
@@ -736,7 +736,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       }
       if (!is.element(showType[si],c("NHST","SEM"))) {
         # draw the basic line and point data
-        if (is.element(showType[si],c("p(sig)","Hits","Misses","Errors"))) {
+        if (is.element(showType[si],c("p(sig)","Hits","Misses","Inference"))) {
           y50<-showMeans
           y75<-NULL
           y25<-NULL

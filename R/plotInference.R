@@ -68,6 +68,8 @@ plotInference<-function(analysis,otheranalysis=NULL,disp="rs",orientation="vert"
           "rse"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,g=g)},
           "rse1"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,g=g)},
           "rse2"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,g=g)},
+          "rs1"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,g=g)},
+          "rs2"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,g=g)},
           "rss"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,g=g)},
           "e1r"={g<-e1_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
           "e2r"={g<-e2_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,g=g)},
@@ -114,8 +116,8 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
   nvals<-analysis$nval
   df1vals<-analysis$df1
 
-  xaxis<-plotAxis(disp1,analysis$hypothesis,analysis$design)
-  yaxis<-plotAxis(disp2,analysis$hypothesis,analysis$design)
+  xaxis<-plotAxis(disp1,analysis$hypothesis,analysis$design,result=analysis)
+  yaxis<-plotAxis(disp2,analysis$hypothesis,analysis$design,result=analysis)
   switch (disp1,
           "rs"={
             d1<-analysis$rIV

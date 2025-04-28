@@ -227,7 +227,7 @@ expected_hist<-function(pts,valType,ylim,histGain,histGainrange){
   svals<-pts$y1[pts$y2]
   
   if (is.null(valType)) valType<-"rs"
-  if (is.element(valType,c("rse","rse1","rse2","rss","ro","ci1","ci2","llknull","metaRiv"))) valType<-"rs"
+  if (is.element(valType,c("rse","rse1","rse2","rs1","rs2","rss","ro","ci1","ci2","llknull","metaRiv"))) valType<-"rs"
   if (is.element(valType,c("e1p","e2p","po"))) valType<-"p"
   if (is.element(valType,c("wp","ws"))) valType<-"ws"
   if (is.element(valType,c("iv.mn","iv.sd","iv.sk","iv.kt",
@@ -408,9 +408,9 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
       p2<-pts$y1[!pts$y2]
     }
     
-    if (!is.null(analysis) && is.element(showType,c("rs","rse","rse1","rse2","rss","p")) && length(pts$y1)==1) {
+    if (!is.null(analysis) && is.element(showType,c("rs","rse","rse1","rse2","rs1","rs2","rss","p")) && length(pts$y1)==1) {
       # if (is.null(analysis$hypothesis$IV2)) {
-        if (is.element(showType,c("rs","rse","rse1","rse2","rss"))){
+        if (is.element(showType,c("rs","rse","rse1","rse2","rs1","rs2","rss"))){
           n<-pts$n
           r<-pts$y1
           rCI<-r2ci(r,n)
@@ -423,6 +423,7 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
     }
     
     xr<-makeFiddle(pts$y1,2/40/braw.env$plotArea[4],orientation)
+    dotSize<-min(4,braw.env$dotSize*scale/max(abs(xr))*2.5)
     switch(orientation,
            "horz"={
              hgain<-0.8
@@ -445,7 +446,6 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
     }
     co1<-darken(c1,off=-colgain)
     co2<-darken(c2,off=-colgain)
-    dotSize<-braw.env$dotSize*scale*gain
     shape<-braw.env$plotShapes$study
     
     if (useSignificanceCols) {
@@ -583,7 +583,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   labelNSig<-TRUE
   top<-1
   if (is.element(showType,c("e1d","e2d"))) top<-1.5
-  if (is.element(showType,c("rse","rse1","rse2","rss"))) top<-1.5
+  if (is.element(showType,c("rse","rse1","rse2","rs1","rs2","rss"))) top<-1.5
 
   if (showType=="wp") {
     showSig<-FALSE
@@ -691,7 +691,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   ylabel<-yaxis$label
   ylines<-yaxis$lines
   logScale<-yaxis$logScale
-  if (is.element(showType,c("rs","rse","rse1","rse2","rss")) && (!is.null(hypothesis$IV2))) 
+  if (is.element(showType,c("rs","rse","rse1","rse2","rs1","rs2","rss")) && (!is.null(hypothesis$IV2))) 
     switch(whichEffect,"Model"={ylabel<-"Model";ylines<-c(0)},
                        "Main 1"={ylabel<-"Main 1";ylines<-c(0,hypothesis$effect$rIV)},
                        "Main 2"={ylabel<-"Main 2";ylines<-c(0,hypothesis$effect$rIV2)},
@@ -778,6 +778,8 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
             "rse"={showVals<-data$rs},
             "rse1"={showVals<-data$rs},
             "rse2"={showVals<-data$rs},
+            "rs1"={showVals<-data$rs},
+            "rs2"={showVals<-data$rs},
             "rss"={showVals<-data$rs},
             "rp"={showVals<-data$rp},
             "ro"={showVals<-data$ro},
@@ -872,7 +874,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
         effectTheory<-oldEffect
       }
       
-      if (is.element(showType,c("rs","rse","rse1","rse2","rss","re","ro","ci1","ci2","e1r","e2r","e1+","e2+","e1-","e2-"))) {
+      if (is.element(showType,c("rs","rse","rse1","rse2","rs1","rs2","rss","re","ro","ci1","ci2","e1r","e2r","e1+","e2+","e1-","e2-"))) {
         npt<-101
         if (is.element(showType,c("e1r","e1+","e1-"))) effectTheory$world$populationNullp<-1
         if (is.element(showType,c("e2r","e2+","e2-"))) effectTheory$world$populationNullp<-0
@@ -887,15 +889,34 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                    rvals<-c(-rev(rvals),0,rvals)
                  } else 
                    rvals<-seq(-1,1,length.out=npt)*0.99
-                 if (showType=="rse1")
-                   xd<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
-                 else
-                   xd<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
-                 xdsig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
-                 if (showType=="rse2") {
-                   xd<-xd-xdsig
-                   xdsig<-xdsig*0
-                 }
+                 switch(showType,
+                        "rse1"={
+                          xd<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
+                          xdsig<-xd
+                        },
+                        "rse2"={
+                          xd<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
+                          xdsig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
+                          xd<-xd-xdsig
+                          xdsig<-xdsig*0
+                        },
+                        "rs1"={
+                          ew<-effectTheory$world
+                          ew$populationNullp<-0
+                          xd<-fullRSamplingDist(rvals,ew,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
+                          xdsig<-fullRSamplingDist(rvals,ew,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
+                        },
+                        "rs2"={
+                          ew<-effectTheory$world
+                          ew$populationNullp<-1
+                          xd<-fullRSamplingDist(rvals,ew,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
+                          xdsig<-fullRSamplingDist(rvals,ew,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
+                        },
+                        {
+                          xd<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
+                          xdsig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
+                        }
+                        )
                  yv<-rvals
                  if (whichEffect=="Model") {
                    xd[yv<0]<-0
@@ -1115,7 +1136,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
              "vert"={
                ptsp<-data.frame(y=c(yv,rev(yv)),x=c(xd,-rev(xd))+xoff[i])
              })
-      if (is.element(showType,c("rs","rse","rse1","rse2","rss","n","p","e1r","e2r","e1p","e2p"))) {
+      if (is.element(showType,c("rs","rse","rse1","rse2","rs1","rs2","rss","n","p","e1r","e2r","e1p","e2p"))) {
         xdsig<-xdsig*theoryGain
         xdsig[is.na(xdsig)]<-0
         if (!all(xd==xdsig))
@@ -1158,7 +1179,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
           nvals<-data$ns
           resSig<-isSignificant(braw.env$STMethod,pvals,rvals,nvals,data$df1,evidence)
         }
-        if (is.element(showType,c("rse","rse1","rse2","rss")) && ((hypothesis$effect$world$worldOn && hypothesis$effect$world$populationNullp>0)
+        if (is.element(showType,c("rse","rse1","rse2","rs1","rs2","rss")) && ((hypothesis$effect$world$worldOn && hypothesis$effect$world$populationNullp>0)
                                                     || (!all(data$rp!=0) && !all(data$rp==0))))
           resNotNull<-data$rp!=0
         else
@@ -1187,19 +1208,24 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       
       ns<-c()
       s<-c()
-      if (length(rvals)>1 && is.element(showType,c("rs","rse","rse1","rse2","rss","p",
+      if (length(rvals)>1 && is.element(showType,c("rs","rse","rse1","rse2","rs1","rs2","rss","p",
                                                    "e1r","e2r","e1+","e2+","e1-","e2-",
                                                    "e1p","e2p","e1d","e2d"))) {
         n<-length(pvals)
         if (!is.null(otheranalysis) && effect$world$worldOn) n<-n+length(otheranalysis$pIV)
+        ns<-sum(!resSig,na.rm=TRUE)/n
+        s<-sum(resSig,na.rm=TRUE)/n
         if (is.element(showType,c("rse","rse1","rse2","rss"))) {
           sc<-sum((resSig)&(resNotNull))/n
           nse<-sum((!resSig)&(resNotNull))/n
           se<-sum((resSig)&(!resNotNull))/n
           nsc<-sum((!resSig)&(!resNotNull))/n
-        } else {
-          ns<-sum(!resSig,na.rm=TRUE)/n
-          s<-sum(resSig,na.rm=TRUE)/n
+        }
+        if (is.element(showType,c("rs1","rs2"))) {
+          sc<-sum((resSig)&(resNotNull))/n
+          nse<-sum((!resSig)&(resNotNull))/n
+          se<-sum((resSig)&(!resNotNull))/n
+          nsc<-sum((!resSig)&(!resNotNull))/n
         }
         if (is.element(showType,c("e1d","e2d"))) {
           s2<-sum(resSig & shvals<0,na.rm=TRUE)/n
@@ -1265,8 +1291,8 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       )
     }
     
-    if (length(rvals)>1 && (is.element(showType,c("rse1","rse2")) || effectType!="all"))
-    if (is.element(showType,c("rs","rse","rse1","rse2","rss","p","e1r","e2r","e1+","e2+","e1-","e2-",
+    if (length(rvals)>1 && (is.element(showType,c("rse1","rse2","rs1","rs2")) || effectType!="all"))
+    if (is.element(showType,c("rs","rse","rse1","rse2","rs1","rs2","rss","p","e1r","e2r","e1+","e2+","e1-","e2-",
                               "e1p","e2p","e1d","e2d"))) {
       lb1<-"p("
       lb2<-") = "
@@ -1322,6 +1348,26 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                 if (!is.null(nse)) {
                   labels<-c(labels,paste0(npad(brawFormat(nse*100,digits=npct)),"%"," error"))
                   colours<-c(colours,braw.env$plotColours$infer_nsigNonNull)
+                }
+              },
+              "rs1"={
+                if (!is.null(sc)) {
+                  labels<-c(labels,paste0(npad(brawFormat(sc*100,digits=npct)),"%"," correct"))
+                  colours<-c(colours,braw.env$plotColours$infer_sigNonNull)
+                }
+                if (!is.null(nse)) {
+                  labels<-c(labels,paste0(npad(brawFormat(nse*100,digits=npct)),"%"," error"))
+                  colours<-c(colours,braw.env$plotColours$infer_nsigNonNull)
+                }
+              },
+              "rs2"={
+                if (!is.null(nsc)) {
+                  labels<-c(labels,paste0(npad(brawFormat(nsc*100,digits=npct)),"%"," correct"))
+                  colours<-c(colours,braw.env$plotColours$infer_nsigNull)
+                }
+                if (!is.null(se)) {
+                  labels<-c(labels,paste0(npad(brawFormat(se*100,digits=npct)),"%"," error"))
+                  colours<-c(colours,braw.env$plotColours$infer_sigNull)
                 }
               },
               "rss"={

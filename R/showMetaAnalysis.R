@@ -174,13 +174,13 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showType="n",showTheory=
 #' @examples
 #' showMetaMultiple<-function(metaResult=doMetaAnalysis(),showType=NULL,dimension="2D")
 #' @export
-showMetaMultiple<-function(metaResult=braw.res$metaMultiple,showType=NULL,dimension="2D") {
+showMetaMultiple<-function(metaResult=braw.res$metaMultiple,showType=NULL,dimension="1D") {
   if (is.null(metaResult)) metaResult<-doMetaMultiple()
 
   if (is.null(showType)) {
     switch(metaResult$metaAnalysis$analysisType,
            "fixed"={
-             showType<-"metaRiv;metaS"
+             showType<-"metaRiv;metaRsd"
              if (metaResult$metaAnalysis$analyseBias) showType<-"metaRiv;metaBias"
            },
            "random"={

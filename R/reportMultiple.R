@@ -11,7 +11,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
                          whichEffect="All",effectType="all",reportStats="Medians"){
   
   if (is.null(multipleResult)) multipleResult=doMultiple(autoShow=FALSE)
-  if (!multipleResult$hypothesis$effect$world$worldOn && is.element(showType[1],c("NHST","Errors","Hits","Misses"))) {
+  if (!multipleResult$hypothesis$effect$world$worldOn && is.element(showType[1],c("NHST","Inference","Hits","Misses"))) {
     if (multipleResult$nullcount<multipleResult$count) {
       multipleResult<-doMultiple(0,multipleResult,doingNull=TRUE)
     }
@@ -55,7 +55,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
              "2D"=        {pars<-c("rs","p")},
              "CILimits"=  {pars<-c("ci1","ci2")},
              "NHST"=      {pars<-c("e2p","e1p")},
-             "Errors"=    {pars<-c("e1a","e2a")},
+             "Inference"=    {pars<-c("e1a","e2a")},
              "Hits"=      {pars<-c("e1a","e2a")},
              "Misses"=    {pars<-c("e1b","e2b")},
              "DV"=        {pars<-c("dv.mn","dv.sd","dv.sk","dv.kt")},
@@ -69,7 +69,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     else { nc=4+length(pars)*9 }
     
     if (is.element(showType,c("NHST","SEM"))) {nc=6}
-    if (is.element(showType,c("Hits","Misses","Errors"))) {nc=4}
+    if (is.element(showType,c("Hits","Misses","Inference"))) {nc=4}
     nc<-nc+1
     
     # header
@@ -157,7 +157,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     
     for (whichEffect in whichEffects)  {
       
-      if (is.element(showType,c("Hits","Misses","Errors"))){
+      if (is.element(showType,c("Hits","Misses","Inference"))){
         nullSig<-isSignificant(braw.env$STMethod,nullresult$pIV,nullresult$rIV,nullresult$nval,nullresult$df1,nullresult$evidence)
         resSig<-isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,result$evidence)
         if (braw.env$STMethod=="dLLR") {

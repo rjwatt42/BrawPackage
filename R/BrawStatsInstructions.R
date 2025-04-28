@@ -144,10 +144,13 @@ BrawInstructions <- function(HelpType="Plan") {
            '<b>NHST</b> - shows the probability of the different possible outcomes: significant (true or false) and non-significant (true or false).',
            ' </li>',
            ' <li>',
+           '<b>Errors</b> - shows the probability of the different possible outcomes: significant (true or false) and non-significant (true or false).',
+           ' </li>',
+           ' <li>',
            '<b>Hits</b> & <b>Misses</b> - as NHST but only using either the significant or the non-significant results.',
            ' </li>',
            '</ul>',
-           'If you use NHST, Hits or Misses, then BrawStats will run equal number of the hypothesis you have planned and a null hypothesis. This is what would happen if your hypothesis has a 50:50 chance of being correct.',
+           'If you use NHST, Errors, Hits or Misses, then BrawStats will run equal number of the hypothesis you have planned and a null hypothesis. This is what would happen if your hypothesis has a 50:50 chance of being correct.',
            '<br><br>')
          extras<-c("Suggestions")
          extrasContent<-c(

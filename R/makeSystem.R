@@ -150,6 +150,7 @@ makeSampling<-function(type="Random") {
 #' @export
 makeReplication<-function(On=FALSE,Repeats=1,Keep="Cautious",RepAlpha=0.05,
                           PowerOn=TRUE,Power=0.8,Tails=2,PowerPrior="None",
+                          applySigOriginal=TRUE,
                           forceSigOriginal=FALSE,forceSign=TRUE,
                           BudgetType="Unlimited",Budget=1000,
                           RepNoStudies=1
@@ -157,6 +158,7 @@ makeReplication<-function(On=FALSE,Repeats=1,Keep="Cautious",RepAlpha=0.05,
   
   replication<-list(On=On,Repeats=Repeats,Keep=Keep,RepAlpha=RepAlpha,
                     PowerOn=PowerOn,Power=Power,Tails=Tails,PowerPrior=PowerPrior,
+                    applySigOriginal=applySigOriginal,
                     forceSigOriginal=forceSigOriginal,forceSign=forceSign,
                     BudgetType=BudgetType,Budget=Budget
                     )

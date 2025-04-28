@@ -160,6 +160,9 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
     }
     
     resPrevious<-res
+    if (Replication$applySigOriginal && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence))
+      Replication$Repeats<-0
+    
     if (Replication$Repeats>0)
     for (i in 1:Replication$Repeats) {
       if (Replication$Keep=="Cautious" && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
@@ -216,7 +219,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
     { resPrevious<-res }
     
     
-    if (Replication$Keep=="metaAnalysis") {
+    if (Replication$Keep=="MetaAnalysis") {
       res$nval<-sum(ResultHistory$n)
       res$rIV<-sum(ResultHistory$r*ResultHistory$n)/res$nval
       res$df1<-ResultHistory$df1[1]
