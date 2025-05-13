@@ -183,7 +183,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
       }
       
       # now do the replication
-      res<-getSample(hypothesis,design,evidence)
+      res<-getSample(hypothesis,design1,evidence)
       # if (!evidence$shortHand) {
       #   sample<-doSample(hypothesis,design1,autoShow=FALSE)
       #   res<-doAnalysis(sample,evidence,autoShow=FALSE)
@@ -220,8 +220,17 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
     
     
     if (Replication$Keep=="MetaAnalysis") {
+      studies<-list(rIV=ResultHistory$r,nval=ResultHistory$n,df1=ResultHistory$df1,
+                    rpIV=ResultHistory$rp)
+      metaAnalysis<-makeMetaAnalysis(TRUE,analysisType="fixed",
+                                     method="MLE",
+                                     includeNulls=FALSE,
+                                     sourceBias=FALSE,
+                                     analyseBias=1/length(studies$rIV))
+      metaResult<-runMetaAnalysis(metaAnalysis,studies,hypothesis,metaResult=NULL)
       res$nval<-sum(ResultHistory$n)
       res$rIV<-sum(ResultHistory$r*ResultHistory$n)/res$nval
+      res$rIV<-metaResult$fixed$param1Max
       res$df1<-ResultHistory$df1[1]
       res$pIV<-rn2p(res$rIV,res$nval)
     } else {

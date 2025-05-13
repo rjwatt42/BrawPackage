@@ -223,12 +223,13 @@ getNList<-function(design,world,HQ=FALSE) {
 }
 
 rPopulationDist<-function(rvals,world) {
+  if (world$populationPDFsample) {
+    mn<-world$populationSamplemn
+    sd<-world$populationSamplesd
+    rdens1<-rSamplingDistr(mn,rvals,sd,sigOnly=world$populationSamplebias)
+  } else rdens1<-1
   k<-world$populationPDFk
   mu<-world$populationPDFmu
-  if (world$populationPDF=="sample") {
-    rdens<-rSamplingDistr(mu,rvals,(1/k)^2+3,world$populationNullp)
-    return(rdens)
-  }
   switch (paste0(world$populationPDF,"_",world$populationRZ),
           "Single_r"={
             rdens<-rvals*0
@@ -274,7 +275,7 @@ rPopulationDist<-function(rvals,world) {
             rdens<-zdens2rdens(zdens,rvals)
           }
   )
-rdens
+return(rdens*rdens1)
 }
 
 fullPSig<-function(world,design,HQ=FALSE,alpha=braw.env$alphaSig) {

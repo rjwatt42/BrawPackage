@@ -35,13 +35,24 @@ print(showMultiple(doMultiple(200,NULL,hypothesis = h4, design = d4b),showType="
 ##########################
 
 h5<-h3
-d5a<-makeDesign(sN=42,Replication=makeReplication(FALSE))
-d5b<-makeDesign(sN=42,Replication=makeReplication(TRUE))
-d5c<-makeDesign(sN=42,Replication=makeReplication(TRUE,Keep="MetaAnalysis"))
+h5a<-makeHypothesis(effect=makeEffect(world = makeWorld(TRUE,"Exp","z",0.3,0,1)))
+h5b<-makeHypothesis(effect=makeEffect(world = makeWorld(TRUE,"Exp","z",0.3,0,0)))
+d5<-makeDesign(sN=42,Replication=makeReplication(TRUE,Keep="Cautious"))
 
-print(showMultiple(doMultiple(200,NULL,hypothesis = h5, design = d5a),showType="NHST"))
-print(showMultiple(doMultiple(200,NULL,hypothesis = h5, design = d5b),showType="NHST"))
-print(showMultiple(doMultiple(200,NULL,hypothesis = h5, design = d5c),showType="NHST"))
+print(showMultiple(doMultiple(200,NULL,hypothesis = h5, design = d5),showType="NHST"))
+print(showMultiple(doMultiple(200,NULL,hypothesis = h5a, design = d5),showType="NHST"))
+print(showMultiple(doMultiple(200,NULL,hypothesis = h5b, design = d5),showType="NHST"))
+
+##########################
+
+h6<-h3
+h6a<-makeHypothesis(effect=makeEffect(world = makeWorld(TRUE,"Exp","z",0.3,0,1)))
+h6b<-makeHypothesis(effect=makeEffect(world = makeWorld(TRUE,"Exp","z",0.3,0,0)))
+d6<-makeDesign(sN=42,Replication=makeReplication(TRUE,Keep="MetaAnalysis"))
+
+print(showMultiple(doMultiple(200,NULL,hypothesis = h6, design = d6),showType="NHST"))
+print(showMultiple(doMultiple(200,NULL,hypothesis = h6a, design = d6),showType="NHST"))
+print(showMultiple(doMultiple(200,NULL,hypothesis = h6b, design = d6),showType="NHST"))
 
 ##########################
 

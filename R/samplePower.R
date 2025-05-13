@@ -58,6 +58,22 @@ wn2z<-function(w,n,t=2,alpha=NA){
   z
 }
 
+wn2r<-function(w,n,t=2,alpha=NA){
+  if (is.na(alpha)) alpha<-braw.env$alphaSig
+  if (t==1) {
+    # one-tailed
+    z<-(qnorm(w)-qnorm(alpha))/sqrt(n-3)
+  } else {
+    # two tailed
+    if (any(w>1)) {
+      print("w error")
+      w[w>1]<-1
+    }
+    z<-(qnorm(w)-qnorm(alpha/2))/sqrt(n-3)
+  }
+  tanh(z)
+}
+
 rw2n<-function(r,w,t=2,alpha=NA,doRound=TRUE){
   if (is.na(alpha)) alpha<-braw.env$alphaSig
   if (any(abs(r)>1)) {

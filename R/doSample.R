@@ -17,14 +17,13 @@ discreteVals<-function(ivr,ng,pp,type="continuous",cases=NULL) {
   return(ivDiscrete)
 }
 
-sampleLK<-function(nsamp,targetRs,targetN,sigOnly=FALSE) {
+sampleLK<-function(nsamp,world) {
   
   npts<-1001
   
   rp<-seq(-0.99,0.99,length.out=npts)
-  
-  slr<-rSamplingDistr(targetRs,rp,targetN,sigOnly)
-  
+  slr<-rPopulationDist(rp,world)
+
   bins<-seq(0,1,length.out=npts)
   cdf<-cumsum(slr)/sum(slr)
   use<-diff(cdf)>0
@@ -42,11 +41,8 @@ sampleLK<-function(nsamp,targetRs,targetN,sigOnly=FALSE) {
 
 getWorldEffect<-function(nsamples=1,effect=braw.def$hypothesis$effect) {
   if (effect$world$worldOn) {
-    if (effect$world$populationPDF=="sample") {
-      rho<-sampleLK(nsamples,
-                    effect$world$populationPDFmu,
-                    (1/effect$world$populationPDFk)^2+3,
-                    effect$world$populationNullp)
+    if (effect$world$populationPDFsample) {
+      rho<-sampleLK(nsamples,effect$world)
     } else {
     if (!is.na(effect$world$populationRZ) && !isempty(effect$world$populationRZ)){
       switch (effect$world$populationRZ,
@@ -265,7 +261,7 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV
   effect<-hypothesis$effect
-  if (effect$rSD>0 && effect$rIV!=0) effect$rIV<-tanh(atanh(effect$rIV)+rnorm(1,0,atanh(effect$rSD)))
+  # if (effect$rSD>0 && effect$rIV!=0) effect$rIV<-tanh(atanh(effect$rIV)+rnorm(1,0,atanh(effect$rSD)))
   
   # check effect sizes before going any further
   fullES<-effect$rIV^2+effect$rIV2^2+2*effect$rIV*effect$rIV2*effect$rIVIV2+effect$rIVIV2DV^2
@@ -293,6 +289,7 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
   }
   
   rho<-getWorldEffect(1,effect)
+  if (effect$rSD>0 && rho!=0) rho<-tanh(atanh(rho)+rnorm(1,0,atanh(effect$rSD)))
   
   n<-design$sN
   if (n<1) {

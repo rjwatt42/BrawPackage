@@ -308,13 +308,13 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
           braw.env$nullPositive<-nullPositive
           braw.env$nullNS<-nullNS
           braw.env$nullNegative<-nullNegative
-          braw.env$nonNullSig<-"H+(sig)"
+          braw.env$nonNullSig<-"H[+](sig)"
           braw.env$nonNullPositive<-nonNullPositive
-          braw.env$nonNullNS<-"H+(ns)"
+          braw.env$nonNullNS<-"H[+](ns)"
           braw.env$nonNullNegative<-nonNullNegative
-          braw.env$nullSig<-"H0(sig)"
+          braw.env$nullSig<-"H[0](sig)"
           braw.env$nullPositive<-nullPositive
-          braw.env$nullNS<-"H0(ns)"
+          braw.env$nullNS<-"H[0](ns)"
           braw.env$nullNegative<-nullNegative
           
           braw.env$allPositive<-paste0(Zchar,"+ve")

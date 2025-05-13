@@ -11,7 +11,7 @@ getWorld<-function(name,result=braw.res$result) {
            world<-list(worldOn=TRUE,
                        populationPDF="sample",
                        populationRZ="r",
-                       populationPDFk=1/sqrt(result$nval-3),
+                       populationPDFsd=1/sqrt(result$nval-3),
                        populationPDFmu=result$rIV,
                        populationNullp=0.0)
          },
@@ -19,7 +19,7 @@ getWorld<-function(name,result=braw.res$result) {
            world<-list(worldOn=TRUE,
                        populationPDF="sample",
                        populationRZ="r",
-                       populationPDFk=1/sqrt(result$nval-3),
+                       populationPDFsd=1/sqrt(result$nval-3),
                        populationPDFmu=result$rIV,
                        populationNullp=1.0)
          },

@@ -397,14 +397,21 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
           else              outputText<-c(outputText,ot4,rep(" ",nc-length(ot4)))
         }
         
-        if (any(pars=="p")) {
+        # if (any(pars=="p")) {
+        if (is.null(IV2)) {
+          outputText<-c(outputText,rep("",nc),
+                        paste0("\bp(sig) = ",brawFormat(sum(p<braw.env$alphaSig,na.rm=TRUE)/sum(!is.na(p))*100,digits=1),"%"),rep(" ",nc-1))
+        }
+        # }
+        if (any(pars=="wp")) {
           if (is.null(IV2)) {
-            outputText<-c(outputText,rep("",nc),
-                          paste0("!j\bp(sig) = ",brawFormat(sum(p<braw.env$alphaSig,na.rm=TRUE)/sum(!is.na(p))*100,digits=1),"%"),rep(" ",nc-1))
+            outputText<-c(outputText,
+                          paste0("\bp(w[p]>0.8) = ",
+                                 brawFormat(sum(rn2w(result$rpIV,result$nval)>0.8,na.rm=TRUE)/sum(!is.na(result$rpIV))*100,digits=1),"%"),rep(" ",nc-1))
           }
         }
-      }
-  }
+          }
+    }
   nr<-length(outputText)/nc
   reportPlot(outputText,nc,nr)        
   

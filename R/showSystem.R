@@ -189,7 +189,7 @@ showWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),autoShow=
     rdens<-rdens/sum(rdens)*(1-world$populationNullp)
     rdens[rx==0]<-rdens[rx==0]+world$populationNullp
   } 
-  if (!is.element(world$populationPDF,c("sample"))) {
+  if (!is.element(world$populationPDF,c("sample","biasedsample"))) {
     rdens<-rdens*(1-world$populationNullp)
   }
   rdens<-rdens/max(rdens)

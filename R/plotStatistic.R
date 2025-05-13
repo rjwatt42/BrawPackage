@@ -1605,25 +1605,34 @@ ps_plot<-function(analysis,disp,showTheory=TRUE,g=NULL){
       # lb2<-paste0(braw.env$nonNullSig," ~ ",brawFormat(mean(!nulls & sigs)*100,digits=0),'~"%"')
       # lb3<-paste0(braw.env$nullSig," ~ ",brawFormat(mean(nulls & sigs)*100,digits=0),'~"%"')
       # lb5<-paste0(braw.env$nullNS," ~ ",brawFormat(mean(nulls & !sigs)*100,digits=0),'~"%"')
-      lb0<-paste0(braw.env$nonNullNS," ",brawFormat(mean(!nulls & !sigs)*100,digits=0),'%')
-      lb2<-paste0(braw.env$nonNullSig," ",brawFormat(mean(!nulls & sigs)*100,digits=0),'%')
-      lb3<-paste0(braw.env$nullSig," ",brawFormat(mean(nulls & sigs)*100,digits=0),'%')
-      lb5<-paste0(braw.env$nullNS," ",brawFormat(mean(nulls & !sigs)*100,digits=0),'%')
+      lb0<-paste0(braw.env$nonNullNS," '",brawFormat(mean(!nulls & !sigs)*100,digits=0),"%'")
+      lb2<-paste0(braw.env$nonNullSig," '",brawFormat(mean(!nulls & sigs)*100,digits=0),"%'")
+      lb3<-paste0(braw.env$nullSig," '",brawFormat(mean(nulls & sigs)*100,digits=0),"%'")
+      lb5<-paste0(braw.env$nullNS," '",brawFormat(mean(nulls & !sigs)*100,digits=0),"%'")
       
+      cols<-c()
+      nms<-c()
       y<-1
-      y1<-y-mean(!nulls & !sigs)/2
-      g<-addG(g,dataBar(data=data.frame(x=0,y=y),fill=col0,barwidth=0.4))
-      y<-y-mean(!nulls & !sigs)
-      y2<-y-mean(!nulls & sigs)/2
-      g<-addG(g,dataBar(data=data.frame(x=0,y=y),fill=col2,barwidth=0.4))
-      y<-y-mean(!nulls & sigs)
-      y3<-y-mean(nulls & sigs)/2
-      g<-addG(g,dataBar(data=data.frame(x=0,y=y),fill=col3,barwidth=0.4))
-      y<-y-mean(nulls & sigs)
-      y4<-mean(nulls & !sigs)/2
-      g<-addG(g,dataBar(data=data.frame(x=0,y=y),fill=col5,barwidth=0.4))
-      
-      g<-addG(g,dataLegend(data.frame(colours=c(col0,col2,col3,col5),names=c(lb0,lb2,lb3,lb5)),title="",shape=22))
+      if (!all(nulls)) {
+        y1<-y-mean(!nulls & !sigs)/2
+        g<-addG(g,dataBar(data=data.frame(x=0,y=y),fill=col0,barwidth=0.4))
+        y<-y-mean(!nulls & !sigs)
+        y2<-y-mean(!nulls & sigs)/2
+        g<-addG(g,dataBar(data=data.frame(x=0,y=y),fill=col2,barwidth=0.4))
+        cols<-c(cols,col0,col2)
+        nms<-c(nms,lb0,lb2)
+        y<-y-mean(!nulls & sigs)
+      }
+      if (!all(!nulls)) {
+        y3<-y-mean(nulls & sigs)/2
+        g<-addG(g,dataBar(data=data.frame(x=0,y=y),fill=col3,barwidth=0.4))
+        y<-y-mean(nulls & sigs)
+        y4<-mean(nulls & !sigs)/2
+        g<-addG(g,dataBar(data=data.frame(x=0,y=y),fill=col5,barwidth=0.4))
+        cols<-c(cols,col3,col5)
+        nms<-c(nms,lb3,lb5)
+      }        
+      g<-addG(g,dataLegend(data.frame(colours=cols,names=nms),title="",shape=22))
 
     }
   } else {

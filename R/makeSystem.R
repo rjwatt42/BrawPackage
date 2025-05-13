@@ -16,11 +16,13 @@
 #' @export
 makeWorld<-function(worldOn=FALSE,populationPDF="Single",populationRZ="r",
                     populationPDFk=0.0,populationPDFmu=0.0,populationNullp=0,
+                    populationPDFsample=FALSE,populationSamplemn=0.0,populationSamplesd=0.0,populationSamplebias=FALSE,
                     sigOnly=FALSE,worldAbs=FALSE) {
-  if (populationPDF=="sample") populationPDFk<-1/sqrt(populationPDFk-3)
  world<-list(worldOn=worldOn,
-             populationPDF=populationPDF,populationPDFk=populationPDFk,populationPDFmu=populationPDFmu,populationRZ=populationRZ,
-             populationNullp=populationNullp,sigOnly=sigOnly,worldAbs=worldAbs)
+             populationPDF=populationPDF,populationRZ=populationRZ,
+             populationPDFk=populationPDFk,populationPDFmu=populationPDFmu,populationNullp=populationNullp,
+             populationPDFsample=populationPDFsample,populationSamplemn=populationSamplemn,populationSamplesd=populationSamplesd,populationSamplebias=populationSamplebias,
+             sigOnly=sigOnly,worldAbs=worldAbs)
  world  
 }
 

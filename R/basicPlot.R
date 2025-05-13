@@ -546,6 +546,7 @@ drawText<-function(data,label, hjust=0, vjust=0, colour="black",fill="white",siz
     if (any(mathlabel)) {
       label<-gsub("\\[([^ ]*)\\]","\\['\\1'\\]",label)
       label<-gsub("=","==",label)
+      label<-gsub(" ","~",label)
       label<-gsub("\u00B1([0-9.]*)","~'\u00B1 \\1'",label)
       parse=TRUE
       # if (fontface=="bold") label<-paste0('bold(',label,')')
