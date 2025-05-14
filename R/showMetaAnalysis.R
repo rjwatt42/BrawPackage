@@ -67,6 +67,7 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showType="n",showTheory=
   metaAnalysis<-metaResult$metaAnalysis
   hypothesis<-metaResult$hypothesis
   design<-metaResult$design
+  evidence<-metaResult$evidence
   # setBrawEnv("RZ","z")
   
   d1<-metaResult$result$rIV
@@ -75,7 +76,7 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showType="n",showTheory=
          "z"={d1<-atanh(d1)},
          "d"={d1<-2*d1/sqrt(1-d1^2)}
          )
-  d1n<-(metaResult$result$rpIV==0 & hypothesis$effect$world$worldOn)
+  d1n<-(abs(metaResult$result$rpIV)<=evidence$minRp & hypothesis$effect$world$worldOn)
   x<-plotAxis("rs",hypothesis)
   xlim<-x$lim
   disp1<-x$label

@@ -11,7 +11,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
                          whichEffect="All",effectType="all",reportStats="Medians"){
   
   if (is.null(multipleResult)) multipleResult=doMultiple(autoShow=FALSE)
-  if (!multipleResult$hypothesis$effect$world$worldOn && is.element(showType[1],c("NHST","Inference","Hits","Misses"))) {
+  if (!multipleResult$hypothesis$effect$world$worldOn && is.element(showType[1],c("NHST","Inference","Source","Hits","Misses"))) {
     if (multipleResult$nullcount<multipleResult$count) {
       multipleResult<-doMultiple(0,multipleResult,doingNull=TRUE)
     }
@@ -55,7 +55,8 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
              "2D"=        {pars<-c("rs","p")},
              "CILimits"=  {pars<-c("ci1","ci2")},
              "NHST"=      {pars<-c("e2p","e1p")},
-             "Inference"=    {pars<-c("e1a","e2a")},
+             "Inference"= {pars<-c("e1a","e2a")},
+             "Source"=    {pars<-c("e1a","e2a")},
              "Hits"=      {pars<-c("e1a","e2a")},
              "Misses"=    {pars<-c("e1b","e2b")},
              "DV"=        {pars<-c("dv.mn","dv.sd","dv.sk","dv.kt")},
@@ -144,6 +145,8 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
         par<-gsub("^([rz]{1})([spoe]{1})$","\\1\\[\\2\\]",par)
         if (par=="llknull") par<-"llr[+]"
         if (par=="AIC") par<-"diff(AIC)"
+        if (par=="e1a") par<-"sig"
+        if (par=="e2a") par<-"ns"
         if (!is.na(par))
           outputText1<-c(outputText1,par)
         else 
@@ -151,13 +154,13 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
       }
       outputText1<-c(outputText1," ")
       outputText1<-rep(outputText1,effectTypes)
-      outputText1<-c("!H "," ",outputText1,rep("",nc-length(outputText1)-2))
+      outputText1<-c("!H ","!jSources:",outputText1,rep("",nc-length(outputText1)-2))
       }
     outputText<-c(outputText,outputText1)
     
     for (whichEffect in whichEffects)  {
       
-      if (is.element(showType,c("Hits","Misses","Inference"))){
+      if (is.element(showType,c("Hits","Misses","Inference","Source"))){
         nullSig<-isSignificant(braw.env$STMethod,nullresult$pIV,nullresult$rIV,nullresult$nval,nullresult$df1,nullresult$evidence)
         resSig<-isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,result$evidence)
         if (braw.env$STMethod=="dLLR") {
@@ -182,14 +185,18 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
           if (braw.env$STMethod=="NHST") {
             e1e<-paste0("!j",brawFormat(sum(nullSig)/(sum(nullSig)+sum(resSig))*100,digits=1),"%")
             e2e<-paste0("!j",brawFormat(sum(!resSig)/(sum(!nullSig)+sum(!resSig))*100,digits=1),"%")
-            e1a<-paste0("!j",brawFormat(sum(nullSig)/nr*100,digits=1),"%")
-            e2a<-paste0("!j",brawFormat(sum(!resSig)/nr*100,digits=1),"%")
-            outputText<-c(outputText," ","All",e1a,e2a," ")
+            e1a<-paste0("!j",brawFormat((sum(nullSig)+sum(resSig))/nr*100,digits=1),"%")
+            e2a<-paste0("!j",brawFormat((sum(!nullSig)+sum(!resSig))/nr*100,digits=1),"%")
+            outputText<-c(outputText," ","!jAll:",e1a,e2a,rep("",nc-4))
             
             e1=paste0("!j",brawFormat(mean(nullSig)*100,digits=1),"%")
             e2=paste0("!j",brawFormat(mean(!resSig)*100,digits=1),"%")
-            outputText<-c(outputText," ","r=0",e1," "," ")
-            outputText<-c(outputText," ",paste0("r","\u2260","0")," ",e2," ")
+            e3=paste0("!j",brawFormat(mean(!nullSig)*100,digits=1),"%")
+            e4=paste0("!j",brawFormat(mean(resSig)*100,digits=1),"%")
+            nn<-paste0("(",brawFormat(length(nullresult$pIV)/nr*100,digits=1),"%)")
+            nnn<-paste0("(",brawFormat(length(result$pIV)/nr*100,digits=1),"%)")
+            outputText<-c(outputText," ",paste0("!jNulls ",nn,":"),e1,e3,rep("",nc-4))
+            outputText<-c(outputText," ",paste0("!jNon Nulls ",nnn,":"),e4,e2,rep("",nc-4))
             
             e1b=paste0("!j",brawFormat((sum(nullSig)+sum(!resSig))/nr*100,digits=1),"%")
             e2b=paste0("!j",brawFormat((sum(!nullSig)+sum(resSig))/nr*100,digits=1),"%")
@@ -203,12 +210,14 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
           } else {
             e1a<-paste0("!j",brawFormat((sum(nullSigW))/nr*100,digits=1),"%")
             e2a<-paste0("!j",brawFormat((sum(resSigW))/nr*100,digits=1),"%")
-            outputText<-c(outputText,"","!jAll",e1a,e2a," ")
+            outputText<-c(outputText,"","!jAll",e1a,e2a,rep("",nc-4))
             
             e1=paste0("!j",brawFormat(sum(nullSigW)/length(nullSig)*100,digits=1),"%")
             e2=paste0("!j",brawFormat(sum(resSigW)/length(resSig)*100,digits=1),"%")
-            outputText<-c(outputText,"","!jr=0",e1," "," ")
-            outputText<-c(outputText,"",paste0("!jr","\u2260","0")," ",e2," ")
+            e3=paste0("!j",brawFormat(sum(!nullSigW)/length(nullSig)*100,digits=1),"%")
+            e4=paste0("!j",brawFormat(sum(!resSigW)/length(resSig)*100,digits=1),"%")
+            outputText<-c(outputText,"","!jNulls",e1,e3,rep("",nc-4))
+            outputText<-c(outputText,"","!jNon Nulls",e4,e2,rep("",nc-4))
             e1b=paste0("!j",brawFormat((sum(nullSigW)+sum(resSigW))/nr*100,digits=1),"%")
             e2b=paste0("!j",brawFormat((sum(nullSigC)+sum(resSigC))/nr*100,digits=1),"%")
             e1c=paste0("(",brawFormat((sum(nullSig)+sum(resSig))/nr*100,digits=1),"%)")
@@ -218,22 +227,22 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
             e1p=paste0("!j",brawFormat((sum(nullSigC)+sum(resSigC))/(sum(nullSig)+sum(resSig))*100,digits=1),"%")
           }
           # ea=paste0("Combined: ",brawFormat((sum(nullSig)+sum(!resSig))/nr*100,digits=braw.env$report_precision),"%")
-          outputText<-c(outputText,"","","","","")
-          outputText<-c(outputText,"!H ","!H!COutcomes:","False","Correct","")
+          outputText<-c(outputText,rep("",nc))
+          outputText<-c(outputText,"!H ","!H!C!jInferences:","false","correct",rep("",nc-4))
           
-          outputText<-c(outputText," ","!jAll:",e1b,e2b,"")
-          outputText<-c(outputText," ",paste0("!jHits ",e1c,":"),e1n,e1p," ")
+          outputText<-c(outputText," ","!jAll:",e1b,e2b,rep("",nc-4))
+          outputText<-c(outputText," ",paste0("!jHits ",e1c,":"),e1n,e1p,rep("",nc-4))
           
           if (braw.env$STMethod=="NHST") {
-            outputText<-c(outputText," ",paste0("!jMisses ",e2c,":"),e2p,e2n," ")
+            outputText<-c(outputText," ",paste0("!jMisses ",e2c,":"),e2p,e2n,rep("",nc-4))
           }
         } else {
-          outputText<-c(outputText," "," ",e1,e2," ","")
+          outputText<-c(outputText," "," ",e1,e2,rep("",nc-4))
         }
         
       } else 
         if (is.element(showType,c("NHST","SEM"))) {
-          nulls<-result$rp==0
+          nulls<-abs(result$rp)<=evidence$minRp
           sigs<-isSignificant(braw.env$STMethod,
                               result$pIV,result$rIV,
                               result$nval,result$df1,

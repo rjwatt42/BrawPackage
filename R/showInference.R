@@ -1,20 +1,20 @@
 
 getNulls<-function(analysis,useSig=FALSE,useNSig=FALSE) {
-  nonnulls<-which(analysis$rpIV!=0)
-  nulls<-which(analysis$rpIV==0)
+  nonnulls<-which(abs(analysis$rpIV)>analysis$evidence$minRp)
+  nulls<-which(abs(analysis$rpIV)<=analysis$evidence$minRp)
   if (useSig) {
     sigs<-isSignificant(braw.env$STMethod,
                         analysis$pIV,analysis$rIV,analysis$nval,analysis$df1,analysis$evidence)
     
-    nonnulls<-which(analysis$rpIV!=0 & sigs)
-    nulls<-which(analysis$rpIV==0 & sigs)
+    nonnulls<-which(abs(analysis$rpIV)>analysis$evidence$minRp & sigs)
+    nulls<-which(abs(analysis$rpIV)<=analysis$evidence$minRp & sigs)
   }
   if (useNSig) {
     sigs<-isSignificant(braw.env$STMethod,
                         analysis$pIV,analysis$rIV,analysis$nval,analysis$df1,analysis$evidence)
     
-    nonnulls<-which(analysis$rpIV!=0 & !sigs)
-    nulls<-which(analysis$rpIV==0 & !sigs)
+    nonnulls<-which(abs(analysis$rpIV)>analysis$evidence$minRp & !sigs)
+    nulls<-which(abs(analysis$rpIV)<=analysis$evidence$minRp & !sigs)
   }
   
     nullanalysis<-analysis
@@ -84,16 +84,11 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
            "CILimits"=  {showType<-c("ci1","ci2")},
            "NHST"={
              showType<-c("rse","ps1");dimension<-"1D"
-             # r<-getNulls(analysis)
-             # analysis1<-r$analysis
-             # analysis2<-r$nullanalysis
-             # other1<-analysis2
-             # other2<-analysis1
              },
            "Source"={
              showType<-c("rs1","rs2");dimension<-"1D"
              
-             use<-analysis1$rpIV!=0
+             use<-abs(analysis1$rpIV)>analysis$evidence$minRp
              analysis1$rIV<-analysis1$rIV[use]
              analysis1$pIV<-analysis1$pIV[use]
              analysis1$rpIV<-analysis1$rpIV[use]

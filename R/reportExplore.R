@@ -221,7 +221,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                   ng<-2
                   showLabels<-c("sig","ns")
                   
-                  nulls<-exploreResult$result$rpval==0
+                  nulls<-abs(exploreResult$result$rpval)<=evidence$minRp
                   sigs<-nulls*0
                   for (i in 1:length(exploreResult$vals)){
                     if (explore$exploreType=="Alpha") {
@@ -246,7 +246,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                         braw.env$alphaSig<-exploreResult$vals[i]
                       }
                       sigs<-isSignificant(braw.env$STMethod,pVals[,i],rVals[,i],nVals[,i],df1Vals[,i],exploreResult$evidence)
-                      nulls<-exploreResult$result$rpval[,i]==0
+                      nulls<-abs(exploreResult$result$rpval[,i])<=evidence$minRp
                       p<-sum(sigs & nulls,na.rm=TRUE)/sum(sigs)
                       y50[i]<-1-p
                       y75[i]<-1-p+sqrt(p*(1-p)/length(pVals[,i]))
@@ -280,7 +280,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                         braw.env$alphaSig<-exploreResult$vals[i]
                       }
                       sigs<-isSignificant(braw.env$STMethod,pVals[,i],rVals[,i],nVals[,i],df1Vals[,i],exploreResult$evidence)
-                      nulls<-exploreResult$result$rpval[,i]==0
+                      nulls<-abs(exploreResult$result$rpval[,i])<=evidence$minRp
                       p<-sum(!sigs & nulls,na.rm=TRUE)/sum(!sigs)
                       y50[i]<-1-p
                       y75[i]<-1-p+sqrt(p*(1-p)/length(pVals[,i]))
@@ -314,7 +314,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                         braw.env$alphaSig<-exploreResult$vals[i]
                       }
                       sigs<-isSignificant(braw.env$STMethod,pVals[,i],rVals[,i],nVals[,i],df1Vals[,i],exploreResult$evidence)
-                      nulls<-exploreResult$result$rpval[,i]==0
+                      nulls<-abs(exploreResult$result$rpval[,i])<=evidence$minRp
                       p<-sum(!sigs & !nulls,na.rm=TRUE)/sum(!sigs)
                       y50[i]<-p
                       y75[i]<-p+sqrt(p*(1-p)/length(pVals[,i]))
@@ -369,7 +369,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                   if (is.null(exploreResult$hypothesis$IV2)) ng<-2 else ng<-7
                   showLabels<-showLabels[ng:1]
                   
-                  nulls<-exploreResult$result$rpval==0
+                  nulls<-abs(exploreResult$result$rpval)<=evidence$minRp
                   semProps<-c()
                   semPropsNull<-c()
                   if (all(nulls) || all(!nulls)) {

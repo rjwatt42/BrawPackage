@@ -508,24 +508,14 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
       simAlpha<-0.85
     }
     dx<-diff(hists$x[1:2])
-    # c1<-braw.env$plotColours$infer_nsigNonNull
-    # c2<-braw.env$plotColours$infer_sigNonNull
-    # c3<-braw.env$plotColours$infer_sigNull
-    # c4<-braw.env$plotColours$infer_nsigNull
-    # if (1==1) {
-    #   c1<-c4
-    #   c3<-c2
-    # }
     cols<-c(c4,c1,c3,c2)
-    if (showType=="rse2") cols<-rev(cols)
     
     if (length(width)==1) width=c(width,width)
     for (i in 1:length(hists$h1)) {
       dens<-c(hists$h1[i],hists$h2[i],hists$h3[i],hists$h4[i])
-      if (showType=="rse2") dens<-rev(dens)
-      # dens<-cumsum(dens)
-      use<-order(dens)
-      use<-rev(1:length(dens))
+      # if (showType=="rse2") dens<-rev(dens)
+      # if (showType=="rse2") cols<-rev(cols)
+      use<-c(2,3,4,1)
       ystart<-0
       for (j in use) {
         if (dens[j]>0) {
@@ -553,7 +543,7 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
                    g<-addG(g,dataPolygon(data=data,
                                          colour=NA, fill = cols[j],alpha=alpha))
                  })
-        if (histStyle=="width") ystart<-dens[j]
+        if (histStyle=="width") ystart<-ystart+dens[j]
         }
       }
     }
@@ -577,7 +567,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                  orientation="vert",whichEffect="Main 1",effectType="all",showTheory=TRUE,g=NULL){
 
   baseColour<-braw.env$plotColours$infer_nsigC
-  npct<-1
+  npct<-0
   showSig<-TRUE
   labelSig<-TRUE
   labelNSig<-TRUE
@@ -1179,9 +1169,11 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
           nvals<-data$ns
           resSig<-isSignificant(braw.env$STMethod,pvals,rvals,nvals,data$df1,evidence)
         }
-        if (is.element(showType,c("rse","rse1","rse2","rs1","rs2","rss")) && ((hypothesis$effect$world$worldOn && hypothesis$effect$world$populationNullp>0)
-                                                    || (!all(data$rp!=0) && !all(data$rp==0))))
-          resNotNull<-data$rp!=0
+        if (is.element(showType,c("rse","rse1","rse2","rs1","rs2","rss")) && 
+            ((hypothesis$effect$world$worldOn)
+              || (!all(abs(data$rp)>evidence$minRp) && !all(abs(data$rp)<=evidence$minRp)))
+            )
+          resNotNull<-abs(data$rp)>evidence$minRp
         else
           resNotNull<-rep(NA,length(data$rp))
       } else {
@@ -1196,7 +1188,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       }
       if (is.element(showType,c("e1d","e2d"))) {
         d<-res2llr(analysis,braw.env$STMethod)
-        err<-(d<0 & data$rp!=0) | (d>0 & data$rp==0)
+        err<-(d<0 & abs(data$rp)>evidence$minRp) | (d>0 & abs(data$rp)<=evidence$minRp)
         resWSig<-resSig & err
         pts<-data.frame(x=shvals*0+xoff[i],y1=shvals,y2=resSig,y3=resWSig,y0=resNotNull,n=nvals)
       } else {
@@ -1290,8 +1282,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
               }
       )
     }
-    
-    if (length(rvals)>1 && (is.element(showType,c("rse1","rse2","rs1","rs2")) || effectType!="all"))
+    if (length(rvals)>1 && (is.element(showType,c("rse","rse1","rse2","rs1","rs2")) || effectType!="all"))
     if (is.element(showType,c("rs","rse","rse1","rse2","rs1","rs2","rss","p","e1r","e2r","e1+","e2+","e1-","e2-",
                               "e1p","e2p","e1d","e2d"))) {
       lb1<-"p("
@@ -1300,6 +1291,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       lb2<-")="
       labels<-c()
       colours<-c()
+      title<-""
       npad<-function(a) {if (nchar(a)<2) return(paste0("  ",a)) else return(a)}
       switch (showType,
               "rs"={
@@ -1313,60 +1305,65 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                 }
               },
               "rse"={
+                title<-""
                 if (!is.null(nse)) {
-                  labels<-c(labels,paste0(npad(brawFormat(nse*100,digits=npct)),"%"," error"))
+                  labels<-c(labels,paste0(braw.env$nonNull," '",brawFormat(nse*100,digits=npct),"%'"," error"))
                   colours<-c(colours,braw.env$plotColours$infer_nsigNonNull)
                 }
                 if (!is.null(sc)) {
-                  labels<-c(labels,paste0(npad(brawFormat(sc*100,digits=npct)),"%"," correct"))
+                  labels<-c(labels,paste0(braw.env$nonNull," '",brawFormat(sc*100,digits=npct),"%'"," correct"))
                   colours<-c(colours,braw.env$plotColours$infer_sigNonNull)
                 }
                 if (!is.null(se)) {
-                  labels<-c(labels,paste0(npad(brawFormat(se*100,digits=npct)),"%"," error"))
+                  labels<-c(labels,paste0(braw.env$Null," '",brawFormat(se*100,digits=npct),"%'"," error"))
                   colours<-c(colours,braw.env$plotColours$infer_sigNull)
                 }
                 if (!is.null(nsc)) {
-                  labels<-c(labels,paste0(npad(brawFormat(nsc*100,digits=npct)),"%"," correct"))
+                  labels<-c(labels,paste0(braw.env$Null," '",brawFormat(nsc*100,digits=npct),"%'"," correct"))
                   colours<-c(colours,braw.env$plotColours$infer_nsigNull)
                 }
               },
               "rse1"={
+                title<-"Hits"
                 if (!is.null(sc)) {
-                  labels<-c(labels,paste0(npad(brawFormat(sc*100,digits=npct)),"%"," correct"))
+                  labels<-c(labels,paste0(braw.env$nonNull," '",brawFormat(sc*100,digits=npct),"%'"," correct"))
                   colours<-c(colours,braw.env$plotColours$infer_sigNonNull)
                 }
                 if (!is.null(se)) {
-                  labels<-c(labels,paste0(npad(brawFormat(se*100,digits=npct)),"%"," error"))
+                  labels<-c(labels,paste0(braw.env$Null," '",brawFormat(se*100,digits=npct),"%'"," error"))
                   colours<-c(colours,braw.env$plotColours$infer_sigNull)
                 }
               },
               "rse2"={
+                title<-"Misses"
                 if (!is.null(nsc)) {
-                  labels<-c(labels,paste0(npad(brawFormat(nsc*100,digits=npct)),"%"," correct"))
+                  labels<-c(labels,paste0(braw.env$Null," '",brawFormat(nsc*100,digits=npct),"%'"," correct"))
                   colours<-c(colours,braw.env$plotColours$infer_nsigNull)
                 }
                 if (!is.null(nse)) {
-                  labels<-c(labels,paste0(npad(brawFormat(nse*100,digits=npct)),"%"," error"))
+                  labels<-c(labels,paste0(braw.env$nonNull," '",brawFormat(nse*100,digits=npct),"%'"," error"))
                   colours<-c(colours,braw.env$plotColours$infer_nsigNonNull)
                 }
               },
               "rs1"={
+                title<-"Non Nulls"
                 if (!is.null(sc)) {
-                  labels<-c(labels,paste0(npad(brawFormat(sc*100,digits=npct)),"%"," correct"))
+                  labels<-c(labels,paste0(braw.env$nonNull," '",brawFormat(sc*100,digits=npct),"%'"," correct"))
                   colours<-c(colours,braw.env$plotColours$infer_sigNonNull)
                 }
                 if (!is.null(nse)) {
-                  labels<-c(labels,paste0(npad(brawFormat(nse*100,digits=npct)),"%"," error"))
+                  labels<-c(labels,paste0(braw.env$nonNull," '",brawFormat(nse*100,digits=npct),"%'"," error"))
                   colours<-c(colours,braw.env$plotColours$infer_nsigNonNull)
                 }
               },
               "rs2"={
+                title<-"Nulls"
                 if (!is.null(nsc)) {
-                  labels<-c(labels,paste0(npad(brawFormat(nsc*100,digits=npct)),"%"," correct"))
+                  labels<-c(labels,paste0(braw.env$Null," '",brawFormat(nsc*100,digits=npct),"%'"," correct"))
                   colours<-c(colours,braw.env$plotColours$infer_nsigNull)
                 }
                 if (!is.null(se)) {
-                  labels<-c(labels,paste0(npad(brawFormat(se*100,digits=npct)),"%"," error"))
+                  labels<-c(labels,paste0(braw.env$Null," '",brawFormat(se*100,digits=npct),"%'"," error"))
                   colours<-c(colours,braw.env$plotColours$infer_sigNull)
                 }
               },
@@ -1444,7 +1441,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                 colours<-c(braw.env$plotColours$infer_sigC,braw.env$plotColours$infer_sigC,braw.env$plotColours$infer_nsigC)
               }
       )
-      if (length(labels)>0) g<-addG(g,dataLegend(data.frame(names=labels,colours=colours),title="",shape=22))
+      if (length(labels)>0) g<-addG(g,dataLegend(data.frame(names=labels,colours=colours),title=title,shape=22))
     }
     
     if (!is.null(hypothesis$IV2)) {
@@ -1587,7 +1584,7 @@ ps_plot<-function(analysis,disp,showTheory=TRUE,g=NULL){
   
   if (is.null(analysis$hypothesis$IV2)) {
     sigs<-isSignificant(braw.env$STMethod,analysis$pIV,analysis$rIV,analysis$nval,analysis$df1,analysis$evidence)
-    nulls<-analysis$rp==0
+    nulls<-abs(analysis$rp)<=analysis$evidence$minRp
     if ((all(nulls) || all(!nulls)) && disp=="ps") {
       g<-startPlot(xlim=c(-1,1),ylim=c(0,1),
                    yticks=makeTicks(),ylabel=makeLabel("p(sig)"),
@@ -1739,7 +1736,7 @@ sem_plot<-function(analysis,disp,showTheory=TRUE,g=NULL){
   cols<-yaxis$cols
   
   if (is.null(analysis$sem)) analysis$sem<-analysis$result$sem
-  nulls<-analysis$rp==0
+  nulls<-abs(analysis$rp)<=analysis$evidence$minRp
   if (all(nulls) || all(!nulls)) {
       g<-startPlot(xlim=c(-2,1),ylim=c(0,1),
                    yticks=makeTicks(),ylabel=makeLabel("SEM"),

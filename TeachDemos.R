@@ -41,7 +41,7 @@ d5<-makeDesign(sN=42,Replication=makeReplication(TRUE,Keep="Cautious"))
 
 print(showMultiple(doMultiple(200,NULL,hypothesis = h5, design = d5),showType="NHST"))
 print(showMultiple(doMultiple(200,NULL,hypothesis = h5a, design = d5),showType="NHST"))
-print(showMultiple(doMultiple(200,NULL,hypothesis = h5b, design = d5),showType="NHST"))
+print(showMultiple(doMultiple(2000,NULL,hypothesis = h5b, design = d5),showType="NHST"))
 
 ##########################
 
@@ -52,7 +52,7 @@ d6<-makeDesign(sN=42,Replication=makeReplication(TRUE,Keep="MetaAnalysis"))
 
 print(showMultiple(doMultiple(200,NULL,hypothesis = h6, design = d6),showType="NHST"))
 print(showMultiple(doMultiple(200,NULL,hypothesis = h6a, design = d6),showType="NHST"))
-print(showMultiple(doMultiple(200,NULL,hypothesis = h6b, design = d6),showType="NHST"))
+print(showMultiple(doMultiple(2000,NULL,hypothesis = h6b, design = d6),showType="NHST"))
 
 ##########################
 

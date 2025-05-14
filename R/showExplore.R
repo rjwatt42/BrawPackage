@@ -541,7 +541,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                                   paste0("(IV" ,barrow, "IV2)",rarrow,"DV")
                 )
                 if (is.null(hypothesis$IV2)) ng<-2 else ng<-7
-                nulls<-rpVals==0
+                nulls<-abs(rpVals)<=evidence$minRp
                 semProps<-c()
                 semPropsNull<-c()
                 if (all(nulls) || all(!nulls)) {
@@ -602,7 +602,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                 } else {
                   getStat<-function(x,n) {colMeans(x)}
                 }
-                nulls<-result$rpval==0
+                nulls<-abs(result$rpval)<=evidence$minRp
                 sigs<-isSignificant(braw.env$STMethod,pVals,rVals,nVals,df1Vals,evidence,braw.env$alphaSig)
                 if (any(!nulls)) {
                   showMeans<-getStat(abs(sigs & !nulls),nVals)
@@ -625,7 +625,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                 if (explore$exploreType=="Alpha") {
                   braw.env$alphaSig<-exploreResult$vals
                 }
-                nulls<-result$rpval==0
+                nulls<-abs(result$rpval)<=evidence$minRp
                 sigs<-isSignificant(braw.env$STMethod,pVals,rVals,nVals,df1Vals,evidence,braw.env$alphaSig)
                 showMeans<-1-colMeans(abs(sigs & nulls))/colMeans(abs(sigs))
                 showSE<-NULL
@@ -634,7 +634,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                 if (explore$exploreType=="Alpha") {
                   braw.env$alphaSig<-exploreResult$vals
                 }
-                nulls<-result$rpval==0
+                nulls<-abs(result$rpval)<=evidence$minRp
                 sigs<-isSignificant(braw.env$STMethod,pVals,rVals,nVals,df1Vals,evidence,braw.env$alphaSig)
                 showMeans<-colMeans(abs(sigs & !nulls))/colMeans(abs(sigs))
                 showMeans<-rbind(showMeans,colMeans(abs(!sigs & !nulls))/colMeans(abs(!sigs)))
@@ -644,7 +644,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                 if (explore$exploreType=="Alpha") {
                   braw.env$alphaSig<-exploreResult$vals
                 }
-                nulls<-result$rpval==0
+                nulls<-abs(result$rpval)<=evidence$minRp
                 sigs<-isSignificant(braw.env$STMethod,pVals,rVals,nVals,df1Vals,evidence,braw.env$alphaSig)
                 showMeans<-colMeans(abs(sigs & !nulls))/colMeans(abs(sigs))
                 showSE<-NULL
@@ -654,7 +654,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                 if (explore$exploreType=="Alpha") {
                   braw.env$alphaSig<-exploreResult$vals
                 }
-                nulls<-result$rpval==0
+                nulls<-abs(result$rpval)<=evidence$minRp
                 sigs<-isSignificant(braw.env$STMethod,pVals,rVals,nVals,df1Vals,evidence,braw.env$alphaSig)
                 showMeans<-colMeans(abs(!sigs & !nulls))/colMeans(abs(!sigs))
                 showSE<-NULL
@@ -665,7 +665,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                   braw.env$alphaSig<-exploreResult$vals
                 }
                 sigs<-isSignificant(braw.env$STMethod,pVals,rVals,nVals,df1Vals,evidence,braw.env$alphaSig)
-                nulls<-rpVals==0
+                nulls<-abs(rpVals)<=evidence$minRp
                 if (braw.env$STMethod=="NHST") {
                   d<-sigs
                 } else {

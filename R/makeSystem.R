@@ -243,6 +243,7 @@ makeEvidence<-function(shortHand=FALSE,sigOnly=FALSE,
                        doSEM=FALSE,
                        Welch=FALSE,Transform="None",
                        McFaddens=TRUE,
+                       minRp=0,
                        prior=makeWorld(TRUE,"Uniform","r"),
                        metaAnalysis=makeMetaAnalysis()
                        ){
@@ -251,6 +252,7 @@ makeEvidence<-function(shortHand=FALSE,sigOnly=FALSE,
                  caseOrder=caseOrder,shortHand=shortHand,sigOnly=sigOnly,
                  llr=llr,useAIC=useAIC,doSEM=doSEM,
                  Welch=Welch,Transform=Transform,McFaddens=McFaddens,
+                 minRp=minRp,
                  prior=prior,
                  metaAnalysis=metaAnalysis
   )

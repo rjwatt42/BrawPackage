@@ -35,6 +35,7 @@ doMetaAnalysis<-function(metaSingle=braw.res$metaSingle,metaAnalysis=braw.def$me
   
   metaSingle$hypothesis<-hypothesis
   metaSingle$design<-design
+  metaSingle$evidence<-evidence
   setBrawRes("metaSingle",metaSingle)
   metaSingle
 }
@@ -65,6 +66,7 @@ doMetaMultiple<-function(nsims=100,metaMultiple=braw.res$metaMultiple,metaAnalys
   }
   metaMultiple$hypothesis<-hypothesis
   metaMultiple$design<-design
+  metaMultiple$evidence<-evidence
   setBrawRes("metaMultiple",metaMultiple)
   metaMultiple
 }

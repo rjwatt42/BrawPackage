@@ -803,11 +803,12 @@ dataErrorBar<-function(data,colour="black",linewidth=0.25) {
 
 dataLegend<-function(data,title="title",fontsize=0.6,shape=21) {
   dy=0.06*fontsize
-  dx=0.025*fontsize/braw.env$plotArea[3] # because rangeX() below
+  dx=0.02*fontsize/braw.env$plotArea[3] # because rangeX() below
   names<-data$names
+  names1<-gsub("\\]","",gsub("\\[","",gsub("'","",names)))
   if (nchar(title)>0) tn<-1.2 else tn<-0
   nrows<-tn+length(names)+1
-  ncols<-max(c(nchar(title),nchar(names)))+2
+  ncols<-max(c(nchar(title),nchar(names1)))+2
   g<-list(axisPolygon(data=data.frame(x=rangeX(c(1-ncols*dx,1,1,1-ncols*dx,1-ncols*dx)),
                                       y=rangeY(c(1-nrows*dy,1-nrows*dy,1,1,1-nrows*dy))),
                       fill="white",colour="white",linewidth=0.5)

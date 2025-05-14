@@ -212,13 +212,8 @@ plotAxis<-function(showType,hypothesis,design=NULL,result=NULL) {
                 use_cols[3]<-braw.env$plotColours$infer_sigNonNull
                 use_cols[4]<-braw.env$plotColours$infer_nsigNonNull
               } else {
-                if (effect$rIV==0) {
-                  use_cols[1]<-braw.env$plotColours$infer_nsigNull
-                  use_cols[2]<-braw.env$plotColours$infer_sigNull
-                } else {
-                  use_cols[1]<-braw.env$plotColours$infer_nsigNull
-                  use_cols[2]<-braw.env$plotColours$infer_sigNull
-                }
+                use_cols[1]<-braw.env$plotColours$infer_nsigNull
+                use_cols[2]<-braw.env$plotColours$infer_sigNull
               }
             }
             if (!is.null(hypothesis$IV2)) {
