@@ -781,7 +781,8 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
         }
       }
       
-      if (autoYlim && showType!="NHST") {
+      if (showType[si] != "NHST")
+      if (autoYlim) {
         if (showHist) {
           use_y<-c(showVals,theoryVals,theoryLower,theoryVals1,theoryVals0,theoryVals2)
         } else {

@@ -224,7 +224,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                     evidence$minRp<-exploreResult$vals
                   }
                   
-                  nulls<-abs(result$rpval)<=matrix(evidence$minRp,nrow(result$rpval),ncol(result$rpval),byrow=TRUE)
+                  nulls<-abs(exploreResult$result$rpval)<=matrix(evidence$minRp,nrow(exploreResult$result$rpval),ncol(exploreResult$result$rpval),byrow=TRUE)
                   sigs<-nulls*0
                   for (i in 1:length(exploreResult$vals)){
                     if (explore$exploreType=="Alpha") {
