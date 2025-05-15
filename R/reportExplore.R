@@ -220,8 +220,11 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                 "NHST"={
                   ng<-2
                   showLabels<-c("sig","ns")
+                  if (explore$exploreType=="minRp") {
+                    evidence$minRp<-exploreResult$vals
+                  }
                   
-                  nulls<-abs(exploreResult$result$rpval)<=evidence$minRp
+                  nulls<-abs(result$rpval)<=matrix(evidence$minRp,nrow(result$rpval),ncol(result$rpval),byrow=TRUE)
                   sigs<-nulls*0
                   for (i in 1:length(exploreResult$vals)){
                     if (explore$exploreType=="Alpha") {
@@ -313,14 +316,17 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                       if (explore$exploreType=="Alpha") {
                         braw.env$alphaSig<-exploreResult$vals[i]
                       }
+                      if (explore$exploreType=="minRp") {
+                        evidence$minRp<-exploreResult$vals
+                      }
                       sigs<-isSignificant(braw.env$STMethod,pVals[,i],rVals[,i],nVals[,i],df1Vals[,i],exploreResult$evidence)
-                      nulls<-abs(exploreResult$result$rpval[,i])<=evidence$minRp
-                      p<-sum(!sigs & !nulls,na.rm=TRUE)/sum(!sigs)
+                      nulls<-abs(exploreResult$result$rpval[,i])<=evidence$minRp[i]
+                      p<-sum(sigs & !nulls,na.rm=TRUE)/sum(sigs)
                       y50[i]<-p
                       y75[i]<-p+sqrt(p*(1-p)/length(pVals[,i]))
                       y25[i]<-p-sqrt(p*(1-p)/length(pVals[,i]))
                       yiqr[i]<-sqrt(p*(1-p)/length(pVals[,i]))
-                      p<-sum(sigs & nulls,na.rm=TRUE)/sum(sigs)
+                      p<-sum(!sigs & nulls,na.rm=TRUE)/sum(!sigs)
                       y50e[i]<-p
                       y75e[i]<-p+sqrt(p*(1-p)/length(pVals[,i]))
                       y25e[i]<-p-sqrt(p*(1-p)/length(pVals[,i]))
@@ -355,6 +361,58 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                   }
                   y_label<-"Misses"
                 },
+                "Source"={
+                  if (effect$world$worldOn) {
+                    for (i in 1:length(exploreResult$vals)){
+                      if (explore$exploreType=="Alpha") {
+                        braw.env$alphaSig<-exploreResult$vals[i]
+                      }
+                      if (explore$exploreType=="minRp") {
+                        evidence$minRp<-exploreResult$vals
+                      }
+                      sigs<-isSignificant(braw.env$STMethod,pVals[,i],rVals[,i],nVals[,i],df1Vals[,i],exploreResult$evidence)
+                      nulls<-abs(exploreResult$result$rpval[,i])<=evidence$minRp[i]
+                      p<-sum(sigs & !nulls,na.rm=TRUE)/sum(!nulls)
+                      y50[i]<-p
+                      y75[i]<-p+sqrt(p*(1-p)/length(pVals[,i]))
+                      y25[i]<-p-sqrt(p*(1-p)/length(pVals[,i]))
+                      yiqr[i]<-sqrt(p*(1-p)/length(pVals[,i]))
+                      p<-sum(sigs & nulls,na.rm=TRUE)/sum(nulls)
+                      y50e[i]<-p
+                      y75e[i]<-p+sqrt(p*(1-p)/length(pVals[,i]))
+                      y25e[i]<-p-sqrt(p*(1-p)/length(pVals[,i]))
+                      yiqre[i]<-sqrt(p*(1-p)/length(pVals[,i]))
+                    }
+                  } else {
+                    for (i in 1:length(exploreResult$vals)){
+                      if (explore$exploreType=="Alpha") {
+                        braw.env$alphaSig<-exploreResult$vals[i]
+                      }
+                      p<-mean(isSignificant(braw.env$STMethod,pVals[,i],rVals[,i],nVals[,i],df1Vals[,i],exploreResult$evidence),na.rm=TRUE)
+                      y50[i]<-p
+                      y75[i]<-p+sqrt(p*(1-p)/length(pVals[,i]))
+                      y25[i]<-p-sqrt(p*(1-p)/length(pVals[,i]))
+                      yiqr[i]<-sqrt(p*(1-p)/length(pVals[,i]))
+                    }
+                    
+                    peVals<-exploreResult$nullresult$pIVs
+                    reVals<-exploreResult$nullresult$rIVs
+                    neVals<-exploreResult$nullresult$nvals
+                    df1eVals<-exploreResult$nullresult$df1
+                    for (i in 1:length(exploreResult$vals)){
+                      if (explore$exploreType=="Alpha") {
+                        braw.env$alphaSig<-exploreResult$vals[i]
+                      }
+                      p<-mean(isSignificant(braw.env$STMethod,peVals[,i],reVals[,i],neVals[,i],df1eVals[,i],exploreResult$evidence),na.rm=TRUE)
+                      y50e[i]<-p
+                      y75e[i]<-p+sqrt(p*(1-p)/length(peVals[,i]))
+                      y25e[i]<-p-sqrt(p*(1-p)/length(peVals[,i]))
+                      yiqre[i]<-sqrt(p*(1-p)/length(pVals[,i]))
+                    }
+                  }
+                  y_label<-"Misses"
+                },
+                
                 "SEM"={
                   rarrow<-'\u2192'
                   barrow<-'\u2190\u2192'
@@ -536,31 +594,17 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
           }
         }
         
-        if (is.element(showType,c("Inference")) ){
-          y1_label<-"\bFalse Hits"
-          y2_label<-"\bFalse Misses"
-
-          if (reportQuants){
-            outputText<-c(outputText,"","-se ")
-            for (i in 1:length(useVals)) {
-              outputText<-c(outputText,paste0("!j",brawFormat(y25e[useVals[i]],digits=precision)))
-            }
-          }
-          outputText<-c(outputText,paste0("",y1_label)," ")
-          for (i in 1:length(useVals)) {
-            outputText<-c(outputText,paste0("!j",brawFormat(y50e[useVals[i]],digits=precision)))
-          }
-          if (!reportQuants) {
-            outputText<-c(outputText,"!U","\u00B1se")
-            for (i in 1:length(useVals)) {
-              outputText<-c(outputText,paste0("!j",brawFormat(yiqre[useVals[i]],digits=precision)))
-            }
-          } else {
-            outputText<-c(outputText,"!U","+se ")
-            for (i in 1:length(useVals)) {
-              outputText<-c(outputText,paste0("!j",brawFormat(y75e[useVals[i]],digits=precision)))
-            }
-          }
+        if (is.element(showType,c("Inference","Source")) ){
+          switch(showType,
+                 "Inference"={
+                   y1_label<-"\bCorrect Hits"
+                   y2_label<-"\bCorrect Misses"
+                 },
+                 "Source"={
+                   y1_label<-"\bSig Non Nulls"
+                   y2_label<-"\bSig Nulls"
+                 }
+          )
           
           if (reportQuants){
             outputText<-c(outputText,"","-se ")
@@ -568,7 +612,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
               outputText<-c(outputText,paste0("!j",brawFormat(y25[useVals[i]],digits=precision)))
             }
           }
-          outputText<-c(outputText,paste0("",y2_label)," ")
+          outputText<-c(outputText,paste0("",y1_label)," ")
           for (i in 1:length(useVals)) {
             outputText<-c(outputText,paste0("!j",brawFormat(y50[useVals[i]],digits=precision)))
           }
@@ -581,6 +625,28 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
             outputText<-c(outputText,"!U","+se ")
             for (i in 1:length(useVals)) {
               outputText<-c(outputText,paste0("!j",brawFormat(y75[useVals[i]],digits=precision)))
+            }
+          }
+          
+          if (reportQuants){
+            outputText<-c(outputText,"","-se ")
+            for (i in 1:length(useVals)) {
+              outputText<-c(outputText,paste0("!j",brawFormat(y25e[useVals[i]],digits=precision)))
+            }
+          }
+          outputText<-c(outputText,paste0("",y2_label)," ")
+          for (i in 1:length(useVals)) {
+            outputText<-c(outputText,paste0("!j",brawFormat(y50e[useVals[i]],digits=precision)))
+          }
+          if (!reportQuants) {
+            outputText<-c(outputText,"!U","\u00B1se")
+            for (i in 1:length(useVals)) {
+              outputText<-c(outputText,paste0("!j",brawFormat(yiqre[useVals[i]],digits=precision)))
+            }
+          } else {
+            outputText<-c(outputText,"!U","+se ")
+            for (i in 1:length(useVals)) {
+              outputText<-c(outputText,paste0("!j",brawFormat(y75e[useVals[i]],digits=precision)))
             }
           }
         }
