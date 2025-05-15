@@ -286,7 +286,10 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     } else {
       exploreTypeShow<-paste0("r[p]~",gsub("^r","",explore$exploreType))
     }
-  } else exploreTypeShow<-explore$exploreType
+  } else {
+    if (explore$exploreType=="minRp") exploreTypeShow<-"min(r[p])"
+  }
+    
   
   for (whichEffect in whichEffects) {
     yi<-which(whichEffect == whichEffects)
@@ -903,11 +906,11 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
           }
         } # end of line and point
         }
-        if (showType=="Inference") {
+        if (showType[si]=="Inference") {
           data<-data.frame(colours=ycols,names=c("Hits","Misses"))
           g<-addG(g,dataLegend(data=data,title=showType))
         }
-        if (showType=="Source") {
+        if (showType[si]=="Source") {
           data<-data.frame(colours=ycols,names=c("Non Nulls","Nulls"))
           g<-addG(g,dataLegend(data=data,title=showType))
         }

@@ -545,6 +545,8 @@ drawText<-function(data,label, hjust=0, vjust=0, colour="black",fill="white",siz
     mathlabel<-grepl("['^']{1}",label) | grepl("['[']{1}",label)
     if (any(mathlabel)) {
       label<-gsub("\\[([^ ]*)\\]","\\['\\1'\\]",label)
+      label<-gsub("\\(","\\(\\(",label)
+      label<-gsub("\\)","\\)\\)",label)
       label<-gsub("=","==",label)
       label<-gsub(" ","~",label)
       label<-gsub("\u00B1([0-9.]*)","~'\u00B1 \\1'",label)
@@ -552,12 +554,6 @@ drawText<-function(data,label, hjust=0, vjust=0, colour="black",fill="white",siz
       # if (fontface=="bold") label<-paste0('bold(',label,')')
     }
     
-    #   mathlabel<-grepl("['[']{1}",label) #| grepl("[\\^]{1}",label)
-    # if (any(mathlabel)) {
-    #   label<-gsub("=","==",label)
-    #   parse=TRUE
-    #   if (fontface=="bold") label<-paste0('bold(',label,')')
-    # }
     if (braw.env$plotLimits$orientation=="vert") {
       a<-hjust; hjust<-vjust; vjust<-a
     }
