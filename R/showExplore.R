@@ -62,7 +62,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
 
 # do we need more simulations  
   if (is.null(exploreResult)) exploreResult=doExplore()
-  if (!exploreResult$hypothesis$effect$world$worldOn && is.element(showType[1],c("NHST","Inference","Hits","Misses"))) {
+  if (!exploreResult$hypothesis$effect$world$worldOn && is.element(showType[1],c("NHST","Inference","Source","Hits","Misses"))) {
     if (exploreResult$nullcount<exploreResult$count) {
       exploreResult<-doExplore(0,exploreResult,doingNull=TRUE)
     }
@@ -76,7 +76,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   
 # sort out what we are showing
   
-  if (is.element(showType[1],c("NHST","Inference","Hits","Misses"))) showHist<-FALSE
+  if (is.element(showType[1],c("NHST","Inference","Source","Hits","Misses","p(sig)"))) showHist<-FALSE
   
   showType<-strsplit(showType,";")[[1]]
   if (length(showType)==1) {
@@ -237,7 +237,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   ylines<-yaxis$lines
   ySecond<-NULL
   
-  if (is.element(showType[si],c("p(sig)","NHST","Inference","Hits","Misses","SEM"))) ylim<-c(0,1)
+  if (is.element(showType[si],c("p(sig)","NHST","Inference","Source","Hits","Misses","SEM"))) ylim<-c(0,1)
   if (showType[si]=="AIC") {
     ylim<-c(-1,0.1)*design$sN*hypothesis$DV$sd
     ylabel<-"diff(AIC)"
@@ -430,7 +430,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
           theoryVals<-c(theoryVals,r)
         }
       }
-      if (is.element(showType[si],c("NHST","Inference","Hits","Misses"))) {
+      if (is.element(showType[si],c("NHST","Inference","Source","Hits","Misses"))) {
         Nullp<-hypothesis$effect$world$populationNullp
         hypothesis$effect$world$populationNullp<-0
         theoryVals1<-c()
@@ -446,6 +446,11 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                  theoryVals1<-theoryVals1*(1-nullPs)
                  theoryVals0<-theoryVals1*0+alphas*nullPs
                  theoryVals2<-theoryVals0*0+nullPs
+               },
+               "Source"={
+                 theoryVals0<-theoryVals1*(1-nullPs)/(theoryVals1*(1-nullPs)+alphas*nullPs)
+                 theoryVals2<-(1-theoryVals1)*(1-nullPs)/((1-theoryVals1)*(1-nullPs)+(1-alphas)*nullPs)
+                 theoryVals1<-c()
                },
                "Inference"={
                  theoryVals0<-theoryVals1*(1-nullPs)/(theoryVals1*(1-nullPs)+alphas*nullPs)
@@ -597,12 +602,15 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                 if (explore$exploreType=="Alpha") {
                   braw.env$alphaSig<-exploreResult$vals
                 }
+                if (explore$exploreType=="minRp") {
+                  evidence$minRp<-exploreResult$vals
+                }
                 if (design$sBudgetOn) {
                   getStat<-function(x,n) {colMeans(x)*max(n)/colMeans(n)}
                 } else {
                   getStat<-function(x,n) {colMeans(x)}
                 }
-                nulls<-abs(result$rpval)<=evidence$minRp
+                nulls<-abs(result$rpval)<=matrix(evidence$minRp,nrow(result$rpval),ncol(result$rpval),byrow=TRUE)
                 sigs<-isSignificant(braw.env$STMethod,pVals,rVals,nVals,df1Vals,evidence,braw.env$alphaSig)
                 if (any(!nulls)) {
                   showMeans<-getStat(abs(sigs & !nulls),nVals)
@@ -625,7 +633,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                 if (explore$exploreType=="Alpha") {
                   braw.env$alphaSig<-exploreResult$vals
                 }
-                nulls<-abs(result$rpval)<=evidence$minRp
+                nulls<-abs(result$rpval)<=matrix(evidence$minRp,nrow(result$rpval),ncol(result$rpval),byrow=TRUE)
                 sigs<-isSignificant(braw.env$STMethod,pVals,rVals,nVals,df1Vals,evidence,braw.env$alphaSig)
                 showMeans<-1-colMeans(abs(sigs & nulls))/colMeans(abs(sigs))
                 showSE<-NULL
@@ -634,17 +642,35 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                 if (explore$exploreType=="Alpha") {
                   braw.env$alphaSig<-exploreResult$vals
                 }
-                nulls<-abs(result$rpval)<=evidence$minRp
+                if (explore$exploreType=="minRp") {
+                  evidence$minRp<-exploreResult$vals
+                }
+                nulls<-abs(result$rpval)<=matrix(evidence$minRp,nrow(result$rpval),ncol(result$rpval),byrow=TRUE)
                 sigs<-isSignificant(braw.env$STMethod,pVals,rVals,nVals,df1Vals,evidence,braw.env$alphaSig)
                 showMeans<-colMeans(abs(sigs & !nulls))/colMeans(abs(sigs))
-                showMeans<-rbind(showMeans,colMeans(abs(!sigs & !nulls))/colMeans(abs(!sigs)))
+                showMeans<-rbind(showMeans,colMeans(abs(!sigs & nulls))/colMeans(abs(!sigs)))
+              },
+              "Source"={
+                if (explore$exploreType=="Alpha") {
+                  braw.env$alphaSig<-exploreResult$vals
+                }
+                if (explore$exploreType=="minRp") {
+                  evidence$minRp<-exploreResult$vals
+                }
+                nulls<-abs(result$rpval)<=matrix(evidence$minRp,nrow(result$rpval),ncol(result$rpval),byrow=TRUE)
+                sigs<-isSignificant(braw.env$STMethod,pVals,rVals,nVals,df1Vals,evidence,braw.env$alphaSig)
+                showMeans<-colMeans(abs(sigs & !nulls))/colMeans(abs(!nulls))
+                showMeans<-rbind(showMeans,colMeans(abs(sigs & nulls))/colMeans(abs(nulls)))
               },
               "Hits"={
                 showVals<-NULL
                 if (explore$exploreType=="Alpha") {
                   braw.env$alphaSig<-exploreResult$vals
                 }
-                nulls<-abs(result$rpval)<=evidence$minRp
+                if (explore$exploreType=="minRp") {
+                  evidence$minRp<-exploreResult$vals
+                }
+                nulls<-abs(result$rpval)<=matrix(evidence$minRp,nrow(result$rpval),ncol(result$rpval),byrow=TRUE)
                 sigs<-isSignificant(braw.env$STMethod,pVals,rVals,nVals,df1Vals,evidence,braw.env$alphaSig)
                 showMeans<-colMeans(abs(sigs & !nulls))/colMeans(abs(sigs))
                 showSE<-NULL
@@ -654,18 +680,23 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                 if (explore$exploreType=="Alpha") {
                   braw.env$alphaSig<-exploreResult$vals
                 }
-                nulls<-abs(result$rpval)<=evidence$minRp
+                if (explore$exploreType=="minRp") {
+                  evidence$minRp<-exploreResult$vals
+                }
+                nulls<-abs(result$rpval)<=matrix(evidence$minRp,nrow(result$rpval),ncol(result$rpval),byrow=TRUE)
                 sigs<-isSignificant(braw.env$STMethod,pVals,rVals,nVals,df1Vals,evidence,braw.env$alphaSig)
                 showMeans<-colMeans(abs(!sigs & !nulls))/colMeans(abs(!sigs))
                 showSE<-NULL
               },
-              
               "NHST"={
                 if (explore$exploreType=="Alpha") {
                   braw.env$alphaSig<-exploreResult$vals
                 }
+                if (explore$exploreType=="minRp") {
+                  evidence$minRp<-exploreResult$vals
+                }
+                nulls<-abs(result$rpval)<=matrix(evidence$minRp,nrow(result$rpval),ncol(result$rpval),byrow=TRUE)
                 sigs<-isSignificant(braw.env$STMethod,pVals,rVals,nVals,df1Vals,evidence,braw.env$alphaSig)
-                nulls<-abs(rpVals)<=evidence$minRp
                 if (braw.env$STMethod=="NHST") {
                   d<-sigs
                 } else {
@@ -686,6 +717,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                 showSplit<-3
                 lines<-c(0.05)
               },
+              
               "PDF"={
                 showVals<-NULL
                 showMeans<-colMeans(result$dists==effect$world$populationPDF,na.rm=TRUE)
@@ -736,7 +768,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       }
       if (!is.element(showType[si],c("NHST","SEM"))) {
         # draw the basic line and point data
-        if (is.element(showType[si],c("p(sig)","Hits","Misses","Inference"))) {
+        if (is.element(showType[si],c("p(sig)","Hits","Misses","Inference","Source"))) {
           y50<-showMeans
           y75<-NULL
           y25<-NULL
@@ -749,7 +781,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
         }
       }
       
-      if (autoYlim) {
+      if (autoYlim && showType!="NHST") {
         if (showHist) {
           use_y<-c(showVals,theoryVals,theoryLower,theoryVals1,theoryVals0,theoryVals2)
         } else {
@@ -869,6 +901,14 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
             # g<-addG(g,dataErrorBar(pts1f,colour=col))
           }
         } # end of line and point
+        }
+        if (showType=="Inference") {
+          data<-data.frame(colours=ycols,names=c("Hits","Misses"))
+          g<-addG(g,dataLegend(data=data,title=showType))
+        }
+        if (showType=="Source") {
+          data<-data.frame(colours=ycols,names=c("Non Nulls","Nulls"))
+          g<-addG(g,dataLegend(data=data,title=showType))
         }
       } # end of !("NHST","SEM")
       else {

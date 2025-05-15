@@ -57,6 +57,7 @@ getExploreRange<-function(explore) {
          "DVcats"=range<-list(minVal=2,maxVal=6,logScale=FALSE,np=5),
          "WithinCorr"=range<-list(minVal=0,maxVal=1,logScale=FALSE,np=13),
          "Alpha"=range<-list(minVal=0.001,maxVal=0.5,logScale=TRUE,np=13),
+         "minRp"=range<-list(minVal=0.0,maxVal=0.5,logScale=FALSE,np=13),
          "Power"=range<-list(minVal=0.1,maxVal=0.9,logScale=FALSE,np=13),
          "Repeats"=range<-list(minVal=0,maxVal=8,logScale=FALSE,np=9),
          "pNull"=range<-list(minVal=0,maxVal=1,logScale=FALSE,np=13),
@@ -392,7 +393,8 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
           "DVRange"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Cheating"={vals<-c("None","Grow","Prune","Replace","Retry")},
           "CheatingAmount"={vals<-seq(minVal*design$sN,maxVal*design$sN,length.out=npoints)},
-          "Alpha"={vals<-vals<-seq(minVal,maxVal,length.out=npoints)},
+          "Alpha"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "minRp"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Transform"={vals<-c("None","Log","Exp")},
           "InteractionOn"={vals<-c(FALSE,TRUE)},
           "EqualVar"={vals<-c(FALSE,TRUE)},
@@ -763,6 +765,9 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
                 },
                 "Alpha"={
                   evidence$alphaSig<-vals[vi]
+                },
+                "minRp"={
+                  evidence$minRp<-vals[vi]
                 },
                 "EqualVar"={
                   evidence$Welch<-!vals[vi]
