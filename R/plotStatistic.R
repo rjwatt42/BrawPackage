@@ -150,6 +150,9 @@ makeTheoryMultiple<-function(hypothesis,design,showType,orientation) {
                     ns<-braw.env$minN:braw.env$maxN
                     nd<-nDistrDens(ns,design)
                     nd<-nd/sum(nd)
+                    use<-which(nd>max(nd)/100)
+                    nd<-nd[use]
+                    ns<-ns[use]
                     # we do each population separately
                     if (!design$Replication$On) {
                       for (ri in 1:npt) {
@@ -165,10 +168,11 @@ makeTheoryMultiple<-function(hypothesis,design,showType,orientation) {
                         for (ni2 in 1:length(ns)) {
                           rd<-rSamplingDistr(theoryVals,theoryVals[ri1],ns[ni2])
                           rd<-rd/sum(rd)
-                          nrep<-rw2n(theoryVals,design$Replication$Power)
+                          use<-which(rd>max(rd)/100)
+                          nrep<-rw2n(theoryVals[use],design$Replication$Power)
                           if (design$Replication$Keep=="MetaAnalysis")
                             nrep<-nrep+ns[ni2]
-                          w2<-w2+sum(rn2w(theoryVals[ri1],nrep)*rd)*nd[ni2]
+                          w2<-w2+sum(rn2w(theoryVals[ri1],nrep)*rd[use])*nd[ni2]
                         }
                         if (design$Replication$Keep=="MetaAnalysis") psig<-sum(w2)
                         else psig<-sum(w1*w2)
