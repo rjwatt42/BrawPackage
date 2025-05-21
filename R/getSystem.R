@@ -9,17 +9,17 @@ getWorld<-function(name,result=braw.res$result) {
   switch(name,         
          "Sample"={
            world<-list(worldOn=TRUE,
-                       populationPDF="sample",
+                       populationPDFsample=TRUE,
                        populationRZ="r",
-                       populationPDFsd=1/sqrt(result$nval-3),
+                       populationPDFsd=result$nval,
                        populationPDFmu=result$rIV,
                        populationNullp=0.0)
          },
          "SampleB"={
            world<-list(worldOn=TRUE,
-                       populationPDF="sample",
+                       populationPDFsample=TRUE,
                        populationRZ="r",
-                       populationPDFsd=1/sqrt(result$nval-3),
+                       populationPDFsd=result$nval,
                        populationPDFmu=result$rIV,
                        populationNullp=1.0)
          },
@@ -29,7 +29,9 @@ getWorld<-function(name,result=braw.res$result) {
                        populationRZ="z",
                        populationPDFk=0,
                        populationPDFmu=0,
-                       populationNullp=0)
+                       populationNullp=0,
+                       populationPDFsample=FALSE
+           )
          },
          "Uniform"={
            world<-list(worldOn=TRUE,
@@ -37,7 +39,8 @@ getWorld<-function(name,result=braw.res$result) {
                        populationRZ="r",
                        populationPDFk=0.3,
                        populationPDFmu=0,
-                       populationNullp=0.0)
+                       populationNullp=0.0,
+                       populationPDFsample=FALSE)
          },
          "Single"={
            world<-list(worldOn=TRUE,
@@ -45,7 +48,8 @@ getWorld<-function(name,result=braw.res$result) {
                        populationRZ="r",
                        populationPDFk=0.3,
                        populationPDFmu=0,
-                       populationNullp=0.5)
+                       populationNullp=0.5,
+                       populationPDFsample=FALSE)
          },
          "Double"={
            world<-list(worldOn=TRUE,
@@ -53,7 +57,8 @@ getWorld<-function(name,result=braw.res$result) {
                        populationRZ="r",
                        populationPDFk=0.3,
                        populationPDFmu=0,
-                       populationNullp=0)
+                       populationNullp=0,
+                       populationPDFsample=FALSE)
          },
          "Psych"={
            world<-list(worldOn=TRUE,
@@ -61,7 +66,8 @@ getWorld<-function(name,result=braw.res$result) {
                        populationRZ="z",
                        populationPDFk=0.3,
                        populationPDFmu=0,
-                       populationNullp=0.74)
+                       populationNullp=0.74,
+                       populationPDFsample=FALSE)
          },
          "PsychF"={
            world<-list(worldOn=TRUE,
@@ -69,7 +75,8 @@ getWorld<-function(name,result=braw.res$result) {
                        populationRZ="z",
                        populationPDFk=0.3,
                        populationPDFmu=0,
-                       populationNullp=0.0)
+                       populationNullp=0.0,
+                       populationPDFsample=FALSE)
          }
   )
   return(world)

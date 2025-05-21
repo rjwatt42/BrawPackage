@@ -153,6 +153,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
           braw.env$r_range<-0.99
           braw.env$d_range<-5
           braw.env$w_range<-c(0.05,1)
+          braw.env$npoints<-101
           braw.env$fullRange<-3
           braw.env$nNpoints<-201
           braw.env$worldNPoints<-201
@@ -222,7 +223,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
           useLabels<-list(hypLabel="H",psig="psig",UD="D",P="0")
           
           Pchar<-"\u03c6"
-          Zchar<-useLabels$hypLabel
+          HypChar<-useLabels$hypLabel
           Lchar<-'\u03bb'
           
           switch(useLabels$psig,
@@ -231,6 +232,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
           )
           
           posChar<-"+"
+          negChar<-"n"
           switch(useLabels$P,
                  "+"={
                    nullChar<-"0"
@@ -256,20 +258,21 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
                     Plabel<-paste0(Pchar,"^",Ptypechar)
                     Llabel<-paste0(Lchar,"^",Ltypechar)
                     
-                    nullSig<-paste0(Zchar,"^",nullChar,'(sig)')  # "Z+ +ve"
-                    nullPositive<-paste0(Zchar,"^",nullChar,'(+sig)')  # "Z+ +ve"
-                    nullNS<-paste0(Zchar,"^",nullChar,'(ns) ')  # "Z+ -ve"
-                    nullNegative<-paste0(Zchar,"^",nullChar,'(-sig)')  # "Z+ -ve"
-                    nonNullSig<-paste0(Zchar,"^",posChar,'(sig)')  # "Z+ +ve"
-                    nonNullPositive<-paste0(Zchar,"^",posChar,'(+sig)')  # "Z+ +ve"
-                    nonNullNS<-paste0(Zchar,"^",posChar,'(ns) ')  # "Z+ -ve"
-                    nonNullNegative<-paste0(Zchar,"^",posChar,'(-sig)')  # "Z+ -ve"
+                    nullSig<-paste0(HypChar,"^",nullChar,'(sig)')  # "Z+ +ve"
+                    nullPositive<-paste0(HypChar,"^",nullChar,'(+sig)')  # "Z+ +ve"
+                    nullNS<-paste0(HypChar,"^",nullChar,'(ns) ')  # "Z+ -ve"
+                    nullNegative<-paste0(HypChar,"^",nullChar,'(-sig)')  # "Z+ -ve"
+                    nonNullSig<-paste0(HypChar,"^",posChar,'(sig)')  # "Z+ +ve"
+                    nonNullPositive<-paste0(HypChar,"^",posChar,'(+sig)')  # "Z+ +ve"
+                    nonNullNS<-paste0(HypChar,"^",posChar,'(ns) ')  # "Z+ -ve"
+                    nonNullNegative<-paste0(HypChar,"^",posChar,'(-sig)')  # "Z+ -ve"
                   },
                   "D"= {
-                    braw.env$nonNull<-paste0(Zchar,"[",posChar,"]")
-                    braw.env$Null<-paste0(Zchar,"[",nullChar,"]")
-                    # braw.env$nonNull<-paste0(Zchar,posChar)
-                    # braw.env$Null<-paste0(Zchar,nullChar)
+                    braw.env$nonNull<-paste0(HypChar,"[",posChar,"]")
+                    braw.env$Null<-paste0(HypChar,"[",nullChar,"]")
+                    braw.env$Inactive<-paste0(HypChar,"[",negChar,"]")
+                    # braw.env$nonNull<-paste0(HypChar,posChar)
+                    # braw.env$Null<-paste0(HypChar,nullChar)
                     
                     Plabel<-paste0(Pchar,"[",Ptypechar,"]")
                     Llabel<-paste0(Lchar,"[",Ltypechar,"]")
@@ -287,7 +290,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
           
           braw.env$pPlus<-pPlus 
           braw.env$Pchar<-Pchar 
-          braw.env$Zchar<-Zchar
+          braw.env$HypChar<-HypChar
           braw.env$Lchar<-Lchar
           
           braw.env$pSigLabel<-pSigLabel
@@ -308,18 +311,26 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
           braw.env$nullPositive<-nullPositive
           braw.env$nullNS<-nullNS
           braw.env$nullNegative<-nullNegative
-          braw.env$nonNullSig<-"H[+](sig)"
+          braw.env$nonNullSig<-"H[+]~sig"
           braw.env$nonNullPositive<-nonNullPositive
-          braw.env$nonNullNS<-"H[+](ns)"
+          braw.env$nonNullNS<-"H[+]~ns"
           braw.env$nonNullNegative<-nonNullNegative
-          braw.env$nullSig<-"H[0](sig)"
+          braw.env$nullSig<-"H[0]~sig"
+          braw.env$inactiveSig<-"H[n]~sig"
           braw.env$nullPositive<-nullPositive
-          braw.env$nullNS<-"H[0](ns)"
+          braw.env$nullNS<-"H[0]~ns"
+          braw.env$inactiveNS<-"H[n]~ns"
           braw.env$nullNegative<-nullNegative
           
-          braw.env$allPositive<-paste0(Zchar,"+ve")
-          braw.env$allNegative<-paste0(Zchar,"ns")
-
+          braw.env$allPositive<-paste0(HypChar,"+ve")
+          braw.env$allNegative<-paste0(HypChar,"ns")
+          
+          braw.env$activeTitle<-"Active"
+          braw.env$inactiveTitle<-"Inactive"
+          
+          braw.env$nonnullTitle<-"Non Null"
+          braw.env$nullTitle<-"Null"
+          
           braw.env$timeLimit<-timeLimit # seconds
           
 

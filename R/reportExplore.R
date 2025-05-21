@@ -601,8 +601,13 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                    y2_label<-"\bCorrect Misses"
                  },
                  "Source"={
-                   y1_label<-"\bSig Non Nulls"
-                   y2_label<-"\bSig Nulls"
+                   if (exploreResult$evidence$minRp!=0) {
+                     y1_label<-paste0("\bSig ",braw.env$activeTitle)
+                     y2_label<-paste0("\bSig ",braw.env$inactiveTitle)
+                   } else {
+                     y1_label<-paste0("\bSig ",braw.env$nonnullTitle)
+                     y2_label<-paste0("\bSig ",braw.env$nullTitle)
+                   }
                  }
           )
           

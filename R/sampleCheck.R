@@ -160,8 +160,8 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
     }
     
     resPrevious<-res
-    if (Replication$applySigOriginal && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence))
-      Replication$Repeats<-0
+    # if (Replication$Keep!="MetaAnalysis" && Replication$applySigOriginal && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence))
+    #   Replication$Repeats<-0
     
     if (Replication$Repeats>0)
     for (i in 1:Replication$Repeats) {

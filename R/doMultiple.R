@@ -123,7 +123,7 @@ doMultiple <- function(nsims=10,multipleResult=NA,hypothesis=braw.def$hypothesis
     return(metaMultiple)
   }
   
-  if (nsims>0)
+  # if (nsims>0)
     multipleResult<-c(resetMultiple(nsims,evidence,multipleResult),
                       list(hypothesis=hypothesis,
                            design=design,

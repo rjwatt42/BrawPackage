@@ -271,12 +271,12 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   lb0<-braw.env$nonNullPositive
   lb1<-braw.env$nonNullNegative
   lb2<-braw.env$nonNullNS
-  lb3<-braw.env$nullNS
+  if (evidence$minRp!=0) lb3<-braw.env$ignoreNS else lb3<-braw.env$nullNS
   lb4<-braw.env$nullNegative
   lb5<-braw.env$nullPositive
   if (braw.env$STMethod=="NHST") {
     lb0<-braw.env$nonNullSig
-    lb5<-braw.env$nullSig
+    if (evidence$minRp!=0) lb5<-braw.env$ignoreSig else lb5<-braw.env$nullSig
   }
   
   exploreTypeShow<-explore$exploreType
@@ -911,8 +911,11 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
           g<-addG(g,dataLegend(data=data,title=showType))
         }
         if (showType[si]=="Source") {
-          data<-data.frame(colours=ycols,names=c("Non Nulls","Nulls"))
-          g<-addG(g,dataLegend(data=data,title=showType))
+          if (exploreResult$evidence$minRp!=0 || explore$exploreType=="minRp") 
+            data<-data.frame(colours=ycols,names=c(braw.env$activeTitle,braw.env$inactiveTitle))
+            else
+              data<-data.frame(colours=ycols,names=c(braw.env$nonnullTitle,braw.env$nullTitle))
+            g<-addG(g,dataLegend(data=data,title=showType))
         }
       } # end of !("NHST","SEM")
       else {

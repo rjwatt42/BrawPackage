@@ -1,3 +1,361 @@
+theoryPlot<-function(g,theory,orientation,baseColour,theoryAlpha,xoff) {
+  theoryVals<-theory$theoryVals
+  theoryDens_all<-theory$theoryDens_all
+  theoryDens_sig<-theory$theoryDens_sig
+  
+  switch(orientation,
+         "horz"={
+           ln<-length(theoryVals)
+           theory_all<-data.frame(x=theoryVals[c(1,1:ln,ln)],y=c(0,theoryDens_all,0)+xoff)
+         },
+         "vert"={
+           theory_all<-data.frame(y=c(theoryVals,rev(theoryVals)),x=c(theoryDens_all,-rev(theoryDens_all))+xoff)
+         })
+  if (is.null(theoryDens_sig)) baseColour<-"white"
+  g<-addG(g,dataPolygon(data=theory_all,colour=NA,fill=baseColour,alpha=theoryAlpha))
+  g<-addG(g,dataPath(data=theory_all,colour="black",linewidth=0.1))
+  
+  if (!is.null(theoryDens_sig)) {
+    i2<-0
+    while (i2<length(theoryDens_sig)) {
+      i1<-i2+min(which(c(theoryDens_sig[(i2+1):length(theoryDens_sig)],1)>0))
+      i2<-(i1-1)+min(which(c(theoryDens_sig[i1:length(theoryDens_sig)],0)==0))
+      use<-i1:(i2-1)
+      switch(orientation,
+             "horz"={
+               ln<-length(theoryVals[use])
+               theory_sig<-data.frame(x=theoryVals[use[c(1,1:ln,ln)]],y=c(0,theoryDens_sig[use],0)+xoff)
+             },
+             "vert"={
+               theory_sig<-data.frame(y=c(theoryVals[use],rev(theoryVals[use])),x=c(theoryDens_sig[use],-rev(theoryDens_sig[use]))+xoff)
+             })
+      g<-addG(g,dataPolygon(data=theory_sig,colour=NA,fill=braw.env$plotColours$infer_sigC,alpha=theoryAlpha))
+      g<-addG(g,dataPath(data=theory_sig,colour="white",linewidth=0.1))
+    }
+  }
+  return(g)
+}
+makeTheoryMultiple<-function(hypothesis,design,showType,orientation) {
+  effect<-hypothesis$effect
+  
+  effectTheory<-effect
+  if (!effectTheory$world$worldOn) {
+    effectTheory$world$worldOn<-TRUE
+    effectTheory$world$populationPDF<-"Single"
+    effectTheory$world$populationRZ<-"r"
+    switch(whichEffect,
+           "Model"=effectTheory$world$populationPDFk<-sqrt(effect$rIV^2+effect$rIV2^2+effect$rIVIV2DV^2+effect$rIV*effect$rIV2*effect$rIVIV2),
+           "Main 1"=effectTheory$world$populationPDFk<-effect$rIV,
+           "Main 2"=effectTheory$world$populationPDFk<-effect$rIV2,
+           "Interaction"=effectTheory$world$populationPDFk<-effect$rIVIV2DV
+    )
+    effectTheory$world$populationNullp<-0
+  }
+  
+  theoryDens_sig<-NULL
+  theoryDens_all<-NULL
+  histGain<-NA
+  
+  if (is.element(showType,c("p","e1p","e2p","po"))) {
+    npt<-201
+    if (logScale) {
+      theoryVals<-seq(0,ylim[1],length.out=npt)
+      yvUse<-10^theoryVals
+    }else{
+      theoryVals<-seq(1,0,length.out=npt)
+      yvUse<-theoryVals
+    }
+    oldEffect<-effectTheory
+    if (showType=="e1p") effectTheory$world$populationNullp<-1
+    if (showType=="e2p") effectTheory$world$populationNullp<-0
+    theoryDens_all<-fullRSamplingDist(yvUse,effectTheory$world,design,"p",logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
+    theoryDens_sig<-fullRSamplingDist(yvUse,effectTheory$world,design,"p",logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
+    effectTheory<-oldEffect
+  }
+  
+  if (is.element(showType,c("rs","rse","rse1","rse2","rs1","rs2","rss","re","ro","ci1","ci2","e1r","e2r","e1+","e2+","e1-","e2-"))) {
+    npt<-braw.env$npoints
+    if (is.element(showType,c("e1r","e1+","e1-"))) effectTheory$world$populationNullp<-1
+    if (is.element(showType,c("e2r","e2+","e2-"))) effectTheory$world$populationNullp<-0
+    if (showType=="re") rOff<-"re"
+    else rOff<-"rs"
+    switch(braw.env$RZ,
+           "r"={
+             if (!design$sNRand) {
+               cr<-tanh(pn2z(braw.env$alphaSig,design$sN))
+               inc<-cr/ceiling(cr/(2/npt))
+               rvals<-seq(inc,0.99,inc)
+               rvals<-c(-rev(rvals),0,rvals)
+             } else 
+               rvals<-seq(-1,1,length.out=npt)*0.99
+             switch(showType,
+                    "rse1"={
+                      theoryDens_all<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
+                      theoryDens_sig<-theoryDens_all
+                    },
+                    "rse2"={
+                      theoryDens_all<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
+                      theoryDens_sig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
+                      theoryDens_all<-theoryDens_all-theoryDens_sig
+                      theoryDens_sig<-theoryDens_sig*0
+                    },
+                    "rs1"={
+                      ew<-effectTheory$world
+                      ew$populationNullp<-0
+                      theoryDens_all<-fullRSamplingDist(rvals,ew,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
+                      theoryDens_sig<-fullRSamplingDist(rvals,ew,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
+                    },
+                    "rs2"={
+                      ew<-effectTheory$world
+                      ew$populationNullp<-1
+                      theoryDens_all<-fullRSamplingDist(rvals,ew,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
+                      theoryDens_sig<-fullRSamplingDist(rvals,ew,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
+                    },
+                    {
+                      theoryDens_all<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
+                      theoryDens_sig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
+                    }
+             )
+             theoryVals<-rvals
+             if (whichEffect=="Model") {
+               theoryDens_all[theoryVals<0]<-0
+               theoryDens_sig[theoryVals<0]<-0
+             }
+           },
+           "z"={
+             zvals<-seq(-1,1,length.out=npt*2)*braw.env$z_range*2
+             rvals<-tanh(zvals)
+             # rvals<-seq(-1,1,length.out=npt)*0.99
+             theoryDens_all<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
+             theoryDens_sig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
+             theoryDens_all<-rdens2zdens(theoryDens_all,rvals)
+             theoryDens_sig<-rdens2zdens(theoryDens_sig,rvals)
+             theoryVals<-atanh(rvals)
+             use<-abs(zvals)<=braw.env$z_range
+             theoryVals<-theoryVals[use]
+             theoryDens_all<-theoryDens_all[use]
+             theoryDens_sig<-theoryDens_sig[use]
+           }
+    )
+  }
+  
+  npt<-braw.env$npoints
+  switch(showType,
+         "rp"={
+           switch(braw.env$RZ,
+                  "r"={
+                    theoryVals<-seq(-1,1,length.out=npt)*0.99
+                    theoryDens_all<-rPopulationDist(theoryVals,effectTheory$world)
+                    theoryDens_sig<-theoryDens_all
+                    ns<-braw.env$minN:braw.env$maxN
+                    nd<-nDistrDens(ns,design)
+                    nd<-nd/sum(nd)
+                    # we do each population separately
+                    if (!design$Replication$On) {
+                      for (ri in 1:npt) {
+                        w<-rn2w(theoryVals[ri],ns)
+                        psig<-sum(nd*w)
+                        theoryDens_sig[ri]<-theoryDens_all[ri]*psig
+                      }
+                    } else {
+                      # for each of the possible sample rs
+                      for (ri1 in 1:npt) {
+                        w1<-rn2w(theoryVals[ri1],ns)*nd
+                        w2<-0
+                        for (ni2 in 1:length(ns)) {
+                          rd<-rSamplingDistr(theoryVals,theoryVals[ri1],ns[ni2])
+                          rd<-rd/sum(rd)
+                          nrep<-rw2n(theoryVals,design$Replication$Power)
+                          if (design$Replication$Keep=="MetaAnalysis")
+                            nrep<-nrep+ns[ni2]
+                          w2<-w2+sum(rn2w(theoryVals[ri1],nrep)*rd)*nd[ni2]
+                        }
+                        if (design$Replication$Keep=="MetaAnalysis") psig<-sum(w2)
+                        else psig<-sum(w1*w2)
+                        theoryDens_sig[ri1]<-theoryDens_all[ri1]*psig
+                      }
+                    }
+                  },
+                  "z"={
+                    theoryVals<-seq(-1,1,length.out=npt)*braw.env$z_range
+                    theoryDens_all<-rPopulationDist(tanh(theoryVals),effectTheory$world)
+                    theoryDens_all<-rdens2zdens(theoryDens_all,tanh(theoryVals))
+                  })
+         },
+         "n"={
+           ndist<-getNDist(analysis$design,effectTheory$world,logScale=logScale,sigOnly=TRUE)
+           if (logScale) {
+             theoryVals<-log10(ndist$nvals)
+           } else {
+             theoryVals<-ndist$nvals
+           }
+           theoryDens_all<-ndist$ndens
+           theoryDens_sig<-ndist$ndensSig
+         },
+         "ws"={
+           theoryVals<-seq(braw.env$alphaSig*(1+dw),1/(1+dw),length.out=npt)
+           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"ws",logScale=logScale,sigOnly=sigOnly)
+         },
+         "log(lrs)"={
+           theoryVals<-seq(0,braw.env$lrRange,length.out=npt)
+           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"log(lrs)",logScale=logScale,sigOnly=sigOnly)
+         },
+         "log(lrd)"={
+           theoryVals<-seq(-braw.env$lrRange,braw.env$lrRange,length.out=npt)
+           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
+         },
+         "e1d"={
+           theoryVals<-seq(-braw.env$lrRange,braw.env$lrRange,length.out=npt)
+           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
+         },
+         "e2d"={
+           theoryVals<-seq(-braw.env$lrRange,braw.env$lrRange,length.out=npt)
+           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
+         },
+         "nw"={
+           if (logScale) {
+             theoryVals<-seq(log10(5),log10(braw.env$max_nw),length.out=npt)
+             yvUse<-10^theoryVals
+           }else{
+             theoryVals<-5+seq(0,braw.env$max_nw,length.out=npt)
+             yvUse<-theoryVals
+           }
+           theoryDens_all<-fullRSamplingDist(yvUse,effectTheory$world,design,"nw",logScale=logScale,sigOnly=sigOnly)
+           theoryDens_all<-abs(theoryDens_all)
+         },
+         "wp"={
+           theoryVals<-seq(braw.env$alphaSig*(1+dw),1/(1+dw),length.out=npt)
+           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"wp",logScale=logScale,sigOnly=sigOnly)
+         },
+         "iv.mn"={
+           var<-hypothesis$IV
+           n<-design$sN
+           theoryVals<-seq(ylim[1],ylim[2],length.out=npt)
+           theoryDens_all<-dnorm(theoryVals,var$mu,var$sd/sqrt(n))
+         },
+         "iv.sd"={
+           var<-hypothesis$IV
+           n<-design$sN
+           theoryVals<-seq(ylim[1],ylim[2],length.out=npt)
+           yvuse<-theoryVals/var$sd
+           # theoryDens_all<-exp(-n/2*yvuse^2+(n-2)*log(theoryVals))
+           # theoryDens_all<-exp(-n/2*yvuse^2+n*log(theoryVals)-n*2/n*log(theoryVals))
+           # theoryDens_all<-exp(n*(-1/2*yvuse^2+log(theoryVals)-2/n*log(theoryVals)))
+           # theoryDens_all<-exp(n*(-1/2*yvuse^2+log(theoryVals)-2/n*log(theoryVals)))
+           xd1<-exp(-1/2*yvuse^2+log(theoryVals)-2/n*log(theoryVals))
+           xd1<-xd1/max(xd1)
+           theoryDens_all<-xd1^n
+           if (max(theoryDens_all)==0) theoryDens_all<-NULL # for n>1000 because of underflow
+         },
+         "iv.sk"={
+           n<-design$sN
+           theoryVals<-seq(ylim[1],ylim[2],length.out=npt)
+           sksd<-sqrt(6*n*(n-1)/(n-2)/(n+1)/(n+3))
+           theoryDens_all<-dnorm(theoryVals,0,sksd)
+         },
+         "iv.kt"={
+           n<-design$sN
+           theoryVals<-seq(ylim[1],ylim[2],length.out=npt)
+           ktsd<-sqrt(24*n*(n-2)*(n-3)/(n+1)^2/(n+3)/(n+5))
+           theoryDens_all<-dnorm(theoryVals,0,ktsd)
+         },
+         "dv.mn"={
+           var<-hypothesis$DV
+           n<-design$sN
+           theoryVals<-seq(ylim[1],ylim[2],length.out=npt)
+           theoryDens_all<-dnorm(theoryVals,var$mu,var$sd/sqrt(n))
+         },
+         "dv.sd"={
+           var<-hypothesis$DV
+           n<-design$sN
+           theoryVals<-seq(ylim[1],ylim[2],length.out=npt)
+           yvuse<-theoryVals/var$sd
+           # theoryDens_all<-exp(-n/2*yvuse^2+(n-2)*log(theoryVals))
+           # theoryDens_all<-exp(-n/2*yvuse^2+n*log(theoryVals)-n*2/n*log(theoryVals))
+           # theoryDens_all<-exp(n*(-1/2*yvuse^2+log(theoryVals)-2/n*log(theoryVals)))
+           # theoryDens_all<-exp(n*(-1/2*yvuse^2+log(theoryVals)-2/n*log(theoryVals)))
+           xd1<-exp(-1/2*yvuse^2+log(theoryVals)-2/n*log(theoryVals))
+           xd1<-xd1/max(xd1)
+           theoryDens_all<-xd1^n
+           if (max(theoryDens_all)==0) theoryDens_all<-NULL # for n>1000 because of underflow
+         },
+         "dv.sk"={
+           n<-design$sN
+           theoryVals<-seq(ylim[1],ylim[2],length.out=npt)
+           sksd<-sqrt(6*n*(n-1)/(n-2)/(n+1)/(n+3))
+           theoryDens_all<-dnorm(theoryVals,0,sksd)
+         },
+         "dv.kt"={
+           n<-design$sN
+           theoryVals<-seq(ylim[1],ylim[2],length.out=npt)
+           ktsd<-sqrt(24*n*(n-2)*(n-3)/(n+1)^2/(n+3)/(n+5))
+           theoryDens_all<-dnorm(theoryVals,0,ktsd)
+         },
+         "er.mn"={
+           var<-hypothesis$DV
+           n<-design$sN
+           theoryVals<-seq(ylim[1],ylim[2],length.out=npt)
+           mnsd<-1/sqrt(n)*var$sd*sqrt(1-hypothesis$effect$rIV^2)
+           theoryDens_all<-dnorm(theoryVals,0,mnsd)
+         },
+         "er.sd"={
+           var<-hypothesis$DV
+           n<-design$sN
+           theoryVals<-seq(ylim[1],ylim[2],length.out=npt)
+           sdsd<-var$sd*sqrt(1-hypothesis$effect$rIV^2)
+           yvuse<-theoryVals/sdsd
+           # theoryDens_all<-exp(-n/2*yvuse^2+(n-2)*log(theoryVals))
+           # theoryDens_all<-exp(-n/2*yvuse^2+n*log(theoryVals)-n*2/n*log(theoryVals))
+           # theoryDens_all<-exp(n*(-1/2*yvuse^2+log(theoryVals)-2/n*log(theoryVals)))
+           # theoryDens_all<-exp(n*(-1/2*yvuse^2+log(theoryVals)-2/n*log(theoryVals)))
+           xd1<-exp(-1/2*yvuse^2+log(theoryVals)-2/n*log(theoryVals))
+           xd1<-xd1/max(xd1)
+           theoryDens_all<-xd1^n
+           if (max(theoryDens_all)==0) theoryDens_all<-NULL # for n>1000 because of underflow
+         },
+         "er.sk"={
+           n<-design$sN
+           theoryVals<-seq(ylim[1],ylim[2],length.out=npt)
+           sksd<-sqrt(6*n*(n-1)/(n-2)/(n+1)/(n+3))
+           theoryDens_all<-dnorm(theoryVals,0,sksd)
+         },
+         "er.kt"={
+           n<-design$sN
+           theoryVals<-seq(ylim[1],ylim[2],length.out=npt)
+           ktsd<-sqrt(24*n*(n-2)*(n-3)/(n+1)^2/(n+3)/(n+5))
+           theoryDens_all<-dnorm(theoryVals,0,ktsd)
+         },
+         { } # do nothing
+  )
+  if (is.element(showType,c("p","e1p","e2p","po"))) {
+    if (!labelNSig) {
+      theoryDens_all<-theoryDens_all-theoryDens_sig
+      theoryDens_sig<-NA
+    }
+    if (!labelSig) theoryDens_all<-theoryDens_sig
+  }
+  
+  if (!is.null(theoryDens_all)) {
+    switch(orientation,
+           "horz"={
+             distMax<-0.8
+           },
+           "vert"={
+             distMax<-0.8/2
+           })
+    
+    theoryDens_all[is.na(theoryDens_all)]<-0
+    theoryGain<-1/max(theoryDens_all)*distMax
+    if (is.infinite(theoryGain)) theoryGain<-0
+    theoryDens_all<-theoryDens_all*theoryGain
+    
+    theoryDens_sig<-theoryDens_sig*theoryGain
+    theoryDens_sig[is.na(theoryDens_sig)]<-0
+    
+  }
+  
+  return(list(theoryVals=theoryVals,theoryDens_all=theoryDens_all,theoryDens_sig=theoryDens_sig))
+}
 
 
 collectData<-function(analysis,whichEffect) {
@@ -100,13 +458,13 @@ makeFiddle<-function(y,yd,orientation="horz"){
       distances1=dy2+(xzR-this_x)^2
       use1<-min(distances1)
       if (orientation=="vert") {
-      this_xneg<- -this_x
-      distances2=dy2+(xzR-this_xneg)^2
-      use2<-min(distances2)
-      if (all(c(use1,use2)>d2)) {
-        if (use2>use1) possible_x<- -possible_x
-        break
-      }
+        this_xneg<- -this_x
+        distances2=dy2+(xzR-this_xneg)^2
+        use2<-min(distances2)
+        if (all(c(use1,use2)>d2)) {
+          if (use2>use1) possible_x<- -possible_x
+          break
+        }
       } else {
         if (all(use1>d2)) break
       }
@@ -137,7 +495,6 @@ get_lowerEdge<-function(allvals,svals) {
     target<-(target1+target2)/2
   } else {target<-target1-0.5}
 }
-
 getBins<-function(vals,nsvals,target,minVal,maxVal,fixed=FALSE) {
   if (min(vals,na.rm=TRUE)==max(vals,na.rm=TRUE)) {
     bins<-min(vals)+min(vals)/10*c(-1.5,-0.5,0.5,1.5)
@@ -221,7 +578,7 @@ getBins<-function(vals,nsvals,target,minVal,maxVal,fixed=FALSE) {
   return(bins)
 }
 
-expected_hist<-function(pts,valType,ylim,histGain,histGainrange){
+simulations_hist<-function(pts,valType,ylim,histGain,histGainrange){
   
   vals<-pts$y1
   svals<-pts$y1[pts$y2]
@@ -347,7 +704,7 @@ expected_hist<-function(pts,valType,ylim,histGain,histGainrange){
   # data.frame(y1=c(-y1,rev(y1)), y2=c(-y2,rev(y2)), x=c(x,rev(x)))
 }
 
-expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
+simulations_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
                         i=1,scale=1,width=1,col="white",alpha=1,useSignificanceCols=braw.env$useSignificanceCols,
                         histStyle="width",orientation="vert",ylim,histGain=NA,histGainrange=NA,npointsMax=200){
   se_arrow<-0.3
@@ -460,7 +817,7 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
     }
     switch(orientation,
            "horz"={
-             sigNonNullData<-data.frame(x=pts_sigNonNull$x,y=pts_sigNonNull$y1)
+             sigNonNullData<-data.frame(x=pts_sigNonNull$y1,y=pts_sigNonNull$x)
              nsNonNullData<-data.frame(x=pts_nsNonNull$y1,y=pts_nsNonNull$x)
              sigNullData<-data.frame(x=pts_sigNull$y1,y=pts_sigNull$x)
              nsNullData<-data.frame(x=pts_nsNull$y1,y=pts_nsNull$x)
@@ -497,9 +854,9 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
       }
   } else { # more than 250 points
     if (is.logical(pts$y2)) {
-      hists<-expected_hist(pts,showType,ylim,histGain,histGainrange)
+      hists<-simulations_hist(pts,showType,ylim,histGain,histGainrange)
     } else {
-      hists<-expected_hist(pts,showType,ylim,histGain,histGainrange)
+      hists<-simulations_hist(pts,showType,ylim,histGain,histGainrange)
     }
     xoff<-pts$x[1]
     if (orientation=="vert") {
@@ -554,7 +911,7 @@ expected_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
     if (!is.null(showType))
       if (is.element(showType,c("e1d","e2d"))) {
         if (is.logical(pts$y3)) {
-          hist1<-expected_hist(pts,showType,ylim)
+          hist1<-simulations_hist(pts,showType,ylim)
         }
         g<-addG(g,
           dataPolygon(data=data.frame(y=hist1$x,x=hist1$y2+xoff),colour=NA, fill = c3,alpha=simAlpha))
@@ -567,6 +924,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                  orientation="vert",whichEffect="Main 1",effectType="all",showTheory=TRUE,g=NULL){
 
   baseColour<-braw.env$plotColours$infer_nsigC
+  theoryFirst<-FALSE
   npct<-0
   showSig<-TRUE
   labelSig<-TRUE
@@ -656,10 +1014,6 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   effect<-hypothesis$effect
   design<-analysis$design
   evidence<-analysis$evidence
-  
-  histGain<-NA
-  histGainrange<-c(NA,NA)
-  
   
   r<-effect$rIV
   if (!is.null(hypothesis$IV2)){
@@ -753,6 +1107,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
          })
   
   dw<-0.01
+  sampleVals<-c()
   if (!all(is.na(analysis$rIV)) || doingMetaAnalysis) {
     data<-collectData(analysis,whichEffect)
     # if (length(data$rs)>0) dw<-1/max(250,length(data$rs))
@@ -764,402 +1119,91 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
              data$ro<-atanh(data$ro)
            })
     switch (showType,
-            "rs"={showVals<-data$rs},
-            "rse"={showVals<-data$rs},
-            "rse1"={showVals<-data$rs},
-            "rse2"={showVals<-data$rs},
-            "rs1"={showVals<-data$rs},
-            "rs2"={showVals<-data$rs},
-            "rss"={showVals<-data$rs},
-            "rp"={showVals<-data$rp},
-            "ro"={showVals<-data$ro},
-            "re"={showVals<-data$rs-data$rp},
-            "p"={showVals<-data$ps},
-            "po"={showVals<-data$po},
-            "metaRiv"={showVals<-cbind(analysis$bestParam1)},
-            "metaRsd"={showVals<-cbind(analysis$bestParam2)},
-            "metaBias"={showVals<-cbind(analysis$bestParam3)},
-            "metaS"={showVals<-cbind(analysis$bestS)},
-            "llknull"={showVals<-exp(cbind(-0.5*(analysis$aic-analysis$aicNull)))},
-            "sLLR"={showVals<-cbind(res2llr(analysis,"sLLR"))},
-            "log(lrs)"={showVals<-cbind(res2llr(analysis,"sLLR"))},
-            "log(lrd)"={showVals<-cbind(res2llr(analysis,"dLLR"))},
-            "e1d"={showVals<-cbind(res2llr(analysis,"dLLR"))},
-            "e2d"={showVals<-cbind(res2llr(analysis,"dLLR"))},
-            "n"={showVals<-data$ns},
-            "ws"={showVals<-rn2w(data$rs,data$ns)},
-            "wp"={showVals<-rn2w(data$rp,data$ns)},
-            "nw"={showVals<-rw2n(data$rs,0.8,design$Replication$Tails)},
-            "ci1"={showVals<-r2ci(data$rs,data$ns,-1)},
-            "ci2"={showVals<-r2ci(data$rs,data$ns,+1)},
-            "e1r"={showVals<-data$rs},
-            "e2r"={showVals<-data$rs},
-            "e1+"={showVals<-data$rs},
-            "e2+"={showVals<-data$rs},
-            "e1-"={showVals<-data$rs},
-            "e2-"={showVals<-data$rs},
-            "e1p"={showVals<-data$ps},
-            "e2p"={showVals<-data$ps},
-            "iv.mn"=showVals<-data$iv.mn,
-            "iv.sd"=showVals<-data$iv.sd,
-            "iv.sk"=showVals<-data$iv.sk,
-            "iv.kt"=showVals<-data$iv.kt,
-            "dv.mn"=showVals<-data$dv.mn,
-            "dv.sd"=showVals<-data$dv.sd,
-            "dv.sk"=showVals<-data$dv.sk,
-            "dv.kt"=showVals<-data$dv.kt,
-            "er.mn"=showVals<-data$er.mn,
-            "er.sd"=showVals<-data$er.sd,
-            "er.sk"=showVals<-data$er.sk,
-            "er.kt"=showVals<-data$er.kt,
+            "rs"={sampleVals<-data$rs},
+            "rse"={sampleVals<-data$rs},
+            "rse1"={sampleVals<-data$rs},
+            "rse2"={sampleVals<-data$rs},
+            "rs1"={sampleVals<-data$rs},
+            "rs2"={sampleVals<-data$rs},
+            "rss"={sampleVals<-data$rs},
+            "rp"={sampleVals<-data$rp},
+            "ro"={sampleVals<-data$ro},
+            "re"={sampleVals<-data$rs-data$rp},
+            "p"={sampleVals<-data$ps},
+            "po"={sampleVals<-data$po},
+            "metaRiv"={sampleVals<-cbind(analysis$bestParam1)},
+            "metaRsd"={sampleVals<-cbind(analysis$bestParam2)},
+            "metaBias"={sampleVals<-cbind(analysis$bestParam3)},
+            "metaS"={sampleVals<-cbind(analysis$bestS)},
+            "llknull"={sampleVals<-exp(cbind(-0.5*(analysis$aic-analysis$aicNull)))},
+            "sLLR"={sampleVals<-cbind(res2llr(analysis,"sLLR"))},
+            "log(lrs)"={sampleVals<-cbind(res2llr(analysis,"sLLR"))},
+            "log(lrd)"={sampleVals<-cbind(res2llr(analysis,"dLLR"))},
+            "e1d"={sampleVals<-cbind(res2llr(analysis,"dLLR"))},
+            "e2d"={sampleVals<-cbind(res2llr(analysis,"dLLR"))},
+            "n"={sampleVals<-data$ns},
+            "ws"={sampleVals<-rn2w(data$rs,data$ns)},
+            "wp"={sampleVals<-rn2w(data$rp,data$ns)},
+            "nw"={sampleVals<-rw2n(data$rs,0.8,design$Replication$Tails)},
+            "ci1"={sampleVals<-r2ci(data$rs,data$ns,-1)},
+            "ci2"={sampleVals<-r2ci(data$rs,data$ns,+1)},
+            "e1r"={sampleVals<-data$rs},
+            "e2r"={sampleVals<-data$rs},
+            "e1+"={sampleVals<-data$rs},
+            "e2+"={sampleVals<-data$rs},
+            "e1-"={sampleVals<-data$rs},
+            "e2-"={sampleVals<-data$rs},
+            "e1p"={sampleVals<-data$ps},
+            "e2p"={sampleVals<-data$ps},
+            "iv.mn"=sampleVals<-data$iv.mn,
+            "iv.sd"=sampleVals<-data$iv.sd,
+            "iv.sk"=sampleVals<-data$iv.sk,
+            "iv.kt"=sampleVals<-data$iv.kt,
+            "dv.mn"=sampleVals<-data$dv.mn,
+            "dv.sd"=sampleVals<-data$dv.sd,
+            "dv.sk"=sampleVals<-data$dv.sk,
+            "dv.kt"=sampleVals<-data$dv.kt,
+            "er.mn"=sampleVals<-data$er.mn,
+            "er.sd"=sampleVals<-data$er.sd,
+            "er.sk"=sampleVals<-data$er.sk,
+            "er.kt"=sampleVals<-data$er.kt,
     )
     if (logScale) {
-      showVals<-log10(showVals)
-      showVals[showVals<(-10)]<--10
+      sampleVals<-log10(sampleVals)
+      sampleVals[sampleVals<(-10)]<--10
     }  
+    if (nrow(sampleVals)<200) theoryFirst<-TRUE
   }    
   sigOnly<-evidence$sigOnly
   
   if (!all(is.na(analysis$rIV)) || doingMetaAnalysis) { theoryAlpha<-0.5} else {theoryAlpha<-1}
   
   for (i in 1:length(xoff)){
+    histGain<-NA
+    histGainrange<-c(NA,NA)
+    
     if (showTheory) {
-      # theory<-doMultipleTheory(showType,logScale,hypothesis,design,i)
-      # yv<-theory$yv
-      # xd<-theory$xd
-      # xdsig<-theory$xdsig
+      theory<-makeTheoryMultiple(hypothesis,design,showType,orientation)
+      theoryVals<-theory$theoryVals
+      theoryDens_all<-theory$theoryDens_all
+      theoryDens_sig<-theory$theoryDens_sig
       
-      effectTheory<-effect
-      if (!effectTheory$world$worldOn) {
-        effectTheory$world$worldOn<-TRUE
-        effectTheory$world$populationPDF<-"Single"
-        effectTheory$world$populationRZ<-"r"
-        switch(whichEffect,
-               "Model"=effectTheory$world$populationPDFk<-sqrt(effect$rIV^2+effect$rIV2^2+effect$rIVIV2DV^2+effect$rIV*effect$rIV2*effect$rIVIV2),
-               "Main 1"=effectTheory$world$populationPDFk<-effect$rIV,
-               "Main 2"=effectTheory$world$populationPDFk<-effect$rIV2,
-               "Interaction"=effectTheory$world$populationPDFk<-effect$rIVIV2DV
-        )
-        effectTheory$world$populationNullp<-0
-      }
+      if (theoryFirst)
+      g<-theoryPlot(g,theory,orientation,baseColour,theoryAlpha,xoff[i])
       
-      xdsig<-NULL
-      xd<-NULL
-      histGain<-NA
-      
-      if (is.element(showType,c("p","e1p","e2p","po"))) {
-        npt<-201
-        if (logScale) {
-          yv<-seq(0,ylim[1],length.out=npt)
-          yvUse<-10^yv
-        }else{
-          yv<-seq(1,0,length.out=npt)
-          yvUse<-yv
-        }
-        oldEffect<-effectTheory
-        if (showType=="e1p") effectTheory$world$populationNullp<-1
-        if (showType=="e2p") effectTheory$world$populationNullp<-0
-        xd<-fullRSamplingDist(yvUse,effectTheory$world,design,"p",logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
-        xdsig<-fullRSamplingDist(yvUse,effectTheory$world,design,"p",logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
-        effectTheory<-oldEffect
-      }
-      
-      if (is.element(showType,c("rs","rse","rse1","rse2","rs1","rs2","rss","re","ro","ci1","ci2","e1r","e2r","e1+","e2+","e1-","e2-"))) {
-        npt<-101
-        if (is.element(showType,c("e1r","e1+","e1-"))) effectTheory$world$populationNullp<-1
-        if (is.element(showType,c("e2r","e2+","e2-"))) effectTheory$world$populationNullp<-0
-        if (showType=="re") rOff<-"re"
-        else rOff<-"rs"
-        switch(braw.env$RZ,
-               "r"={
-                 if (!design$sNRand) {
-                   cr<-tanh(pn2z(braw.env$alphaSig,design$sN))
-                   inc<-cr/ceiling(cr/(2/npt))
-                   rvals<-seq(inc,0.99,inc)
-                   rvals<-c(-rev(rvals),0,rvals)
-                 } else 
-                   rvals<-seq(-1,1,length.out=npt)*0.99
-                 switch(showType,
-                        "rse1"={
-                          xd<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
-                          xdsig<-xd
-                        },
-                        "rse2"={
-                          xd<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
-                          xdsig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
-                          xd<-xd-xdsig
-                          xdsig<-xdsig*0
-                        },
-                        "rs1"={
-                          ew<-effectTheory$world
-                          ew$populationNullp<-0
-                          xd<-fullRSamplingDist(rvals,ew,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
-                          xdsig<-fullRSamplingDist(rvals,ew,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
-                        },
-                        "rs2"={
-                          ew<-effectTheory$world
-                          ew$populationNullp<-1
-                          xd<-fullRSamplingDist(rvals,ew,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
-                          xdsig<-fullRSamplingDist(rvals,ew,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
-                        },
-                        {
-                          xd<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
-                          xdsig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
-                        }
-                        )
-                 yv<-rvals
-                 if (whichEffect=="Model") {
-                   xd[yv<0]<-0
-                   xdsig[yv<0]<-0
-                 }
-               },
-               "z"={
-                 zvals<-seq(-1,1,length.out=npt*2)*braw.env$z_range*2
-                 rvals<-tanh(zvals)
-                 # rvals<-seq(-1,1,length.out=npt)*0.99
-                 xd<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
-                 xdsig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
-                 xd<-rdens2zdens(xd,rvals)
-                 xdsig<-rdens2zdens(xdsig,rvals)
-                 yv<-atanh(rvals)
-                 use<-abs(zvals)<=braw.env$z_range
-                 yv<-yv[use]
-                 xd<-xd[use]
-                 xdsig<-xdsig[use]
-               }
-               )
-      }
-      
-      npt<-101
-      switch(showType,
-             "rp"={
-               switch(braw.env$RZ,
-                      "r"={
-                        yv<-seq(-1,1,length.out=npt)*0.99
-                        xd<-rPopulationDist(yv,effectTheory$world)
-                      },
-                      "z"={
-                        yv<-seq(-1,1,length.out=npt)*braw.env$z_range
-                        xd<-rPopulationDist(tanh(yv),effectTheory$world)
-                        xd<-rdens2zdens(xd,tanh(yv))
-                      })
-             },
-             "n"={
-               ndist<-getNDist(analysis$design,effectTheory$world,logScale=logScale,sigOnly=TRUE)
-               if (logScale) {
-                 yv<-log10(ndist$nvals)
-               } else {
-                 yv<-ndist$nvals
-               }
-               xd<-ndist$ndens
-               xdsig<-ndist$ndensSig
-             },
-             "ws"={
-               yv<-seq(braw.env$alphaSig*(1+dw),1/(1+dw),length.out=npt)
-               xd<-fullRSamplingDist(yv,effectTheory$world,design,"ws",logScale=logScale,sigOnly=sigOnly)
-             },
-             "log(lrs)"={
-               yv<-seq(0,braw.env$lrRange,length.out=npt)
-               xd<-fullRSamplingDist(yv,effectTheory$world,design,"log(lrs)",logScale=logScale,sigOnly=sigOnly)
-             },
-             "log(lrd)"={
-               yv<-seq(-braw.env$lrRange,braw.env$lrRange,length.out=npt)
-               xd<-fullRSamplingDist(yv,effectTheory$world,design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
-             },
-             "e1d"={
-               yv<-seq(-braw.env$lrRange,braw.env$lrRange,length.out=npt)
-               xd<-fullRSamplingDist(yv,effectTheory$world,design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
-             },
-             "e2d"={
-               yv<-seq(-braw.env$lrRange,braw.env$lrRange,length.out=npt)
-               xd<-fullRSamplingDist(yv,effectTheory$world,design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
-             },
-             "nw"={
-               if (logScale) {
-                 yv<-seq(log10(5),log10(braw.env$max_nw),length.out=npt)
-                 yvUse<-10^yv
-               }else{
-                 yv<-5+seq(0,braw.env$max_nw,length.out=npt)
-                 yvUse<-yv
-               }
-               xd<-fullRSamplingDist(yvUse,effectTheory$world,design,"nw",logScale=logScale,sigOnly=sigOnly)
-               xd<-abs(xd)
-             },
-             "wp"={
-               yv<-seq(braw.env$alphaSig*(1+dw),1/(1+dw),length.out=npt)
-               xd<-fullRSamplingDist(yv,effectTheory$world,design,"wp",logScale=logScale,sigOnly=sigOnly)
-             },
-             "iv.mn"={
-               var<-hypothesis$IV
-               n<-design$sN
-               yv<-seq(ylim[1],ylim[2],length.out=npt)
-               xd<-dnorm(yv,var$mu,var$sd/sqrt(n))
-             },
-             "iv.sd"={
-               var<-hypothesis$IV
-               n<-design$sN
-               yv<-seq(ylim[1],ylim[2],length.out=npt)
-               yvuse<-yv/var$sd
-               # xd<-exp(-n/2*yvuse^2+(n-2)*log(yv))
-               # xd<-exp(-n/2*yvuse^2+n*log(yv)-n*2/n*log(yv))
-               # xd<-exp(n*(-1/2*yvuse^2+log(yv)-2/n*log(yv)))
-               # xd<-exp(n*(-1/2*yvuse^2+log(yv)-2/n*log(yv)))
-               xd1<-exp(-1/2*yvuse^2+log(yv)-2/n*log(yv))
-               xd1<-xd1/max(xd1)
-               xd<-xd1^n
-               if (max(xd)==0) xd<-NULL # for n>1000 because of underflow
-             },
-             "iv.sk"={
-               n<-design$sN
-               yv<-seq(ylim[1],ylim[2],length.out=npt)
-               sksd<-sqrt(6*n*(n-1)/(n-2)/(n+1)/(n+3))
-               xd<-dnorm(yv,0,sksd)
-             },
-             "iv.kt"={
-               n<-design$sN
-               yv<-seq(ylim[1],ylim[2],length.out=npt)
-               ktsd<-sqrt(24*n*(n-2)*(n-3)/(n+1)^2/(n+3)/(n+5))
-               xd<-dnorm(yv,0,ktsd)
-             },
-             "dv.mn"={
-               var<-hypothesis$DV
-               n<-design$sN
-               yv<-seq(ylim[1],ylim[2],length.out=npt)
-               xd<-dnorm(yv,var$mu,var$sd/sqrt(n))
-             },
-             "dv.sd"={
-               var<-hypothesis$DV
-               n<-design$sN
-               yv<-seq(ylim[1],ylim[2],length.out=npt)
-               yvuse<-yv/var$sd
-               # xd<-exp(-n/2*yvuse^2+(n-2)*log(yv))
-               # xd<-exp(-n/2*yvuse^2+n*log(yv)-n*2/n*log(yv))
-               # xd<-exp(n*(-1/2*yvuse^2+log(yv)-2/n*log(yv)))
-               # xd<-exp(n*(-1/2*yvuse^2+log(yv)-2/n*log(yv)))
-               xd1<-exp(-1/2*yvuse^2+log(yv)-2/n*log(yv))
-               xd1<-xd1/max(xd1)
-               xd<-xd1^n
-               if (max(xd)==0) xd<-NULL # for n>1000 because of underflow
-             },
-             "dv.sk"={
-               n<-design$sN
-               yv<-seq(ylim[1],ylim[2],length.out=npt)
-               sksd<-sqrt(6*n*(n-1)/(n-2)/(n+1)/(n+3))
-               xd<-dnorm(yv,0,sksd)
-             },
-             "dv.kt"={
-               n<-design$sN
-               yv<-seq(ylim[1],ylim[2],length.out=npt)
-               ktsd<-sqrt(24*n*(n-2)*(n-3)/(n+1)^2/(n+3)/(n+5))
-               xd<-dnorm(yv,0,ktsd)
-             },
-             "er.mn"={
-               var<-hypothesis$DV
-               n<-design$sN
-               yv<-seq(ylim[1],ylim[2],length.out=npt)
-               mnsd<-1/sqrt(n)*var$sd*sqrt(1-hypothesis$effect$rIV^2)
-               xd<-dnorm(yv,0,mnsd)
-             },
-             "er.sd"={
-               var<-hypothesis$DV
-               n<-design$sN
-               yv<-seq(ylim[1],ylim[2],length.out=npt)
-               sdsd<-var$sd*sqrt(1-hypothesis$effect$rIV^2)
-               yvuse<-yv/sdsd
-               # xd<-exp(-n/2*yvuse^2+(n-2)*log(yv))
-               # xd<-exp(-n/2*yvuse^2+n*log(yv)-n*2/n*log(yv))
-               # xd<-exp(n*(-1/2*yvuse^2+log(yv)-2/n*log(yv)))
-               # xd<-exp(n*(-1/2*yvuse^2+log(yv)-2/n*log(yv)))
-               xd1<-exp(-1/2*yvuse^2+log(yv)-2/n*log(yv))
-               xd1<-xd1/max(xd1)
-               xd<-xd1^n
-               if (max(xd)==0) xd<-NULL # for n>1000 because of underflow
-             },
-             "er.sk"={
-               n<-design$sN
-               yv<-seq(ylim[1],ylim[2],length.out=npt)
-               sksd<-sqrt(6*n*(n-1)/(n-2)/(n+1)/(n+3))
-               xd<-dnorm(yv,0,sksd)
-             },
-             "er.kt"={
-               n<-design$sN
-               yv<-seq(ylim[1],ylim[2],length.out=npt)
-               ktsd<-sqrt(24*n*(n-2)*(n-3)/(n+1)^2/(n+3)/(n+5))
-               xd<-dnorm(yv,0,ktsd)
-             },
-             { } # do nothing
-      )
-      if (is.element(showType,c("p","e1p","e2p","po"))) {
-        if (!labelNSig) {
-          xd<-xd-xdsig
-          xdsig<-NA
-        }
-        if (!labelSig) xd<-xdsig
-      }
-      
-      if (!is.null(xd)) {
-        switch(orientation,
-               "horz"={
-                 distMax<-0.8
-               },
-               "vert"={
-                 distMax<-0.8/2
-               })
-      
-
-      xd[is.na(xd)]<-0
-      theoryGain<-1/max(xd)*distMax
-      if (is.infinite(theoryGain)) theoryGain<-0
-      xd<-xd*theoryGain
-      histGain<-abs(sum(xd*c(0,diff(yv))))
-      histGainrange<-sort(c(yv[1],yv[length(yv)]))
+      histGain<-abs(sum(theoryDens_all*c(0,diff(theoryVals))))
+      histGainrange<-sort(c(theoryVals[1],theoryVals[length(theoryVals)]))
       if (is.element(showType,c("wp","ws"))) {
         histGainrange<-c(0.06,0.99)
-        use<-yv>=histGainrange[1] & yv<=histGainrange[2]
-        histGain<-abs(sum(xd[use]*c(0,diff(yv[use]))))
+        use<-theoryVals>=histGainrange[1] & theoryVals<=histGainrange[2]
+        histGain<-abs(sum(theoryDens_all[use]*c(0,diff(theoryVals[use]))))
       }
-      switch(orientation,
-             "horz"={
-               ln<-length(yv)
-               ptsp<-data.frame(x=yv[c(1,1:ln,ln)],y=c(0,xd,0)+xoff[i])
-             },
-             "vert"={
-               ptsp<-data.frame(y=c(yv,rev(yv)),x=c(xd,-rev(xd))+xoff[i])
-             })
-      if (is.element(showType,c("rs","rse","rse1","rse2","rs1","rs2","rss","n","p","e1r","e2r","e1p","e2p"))) {
-        xdsig<-xdsig*theoryGain
-        xdsig[is.na(xdsig)]<-0
-        if (!all(xd==xdsig))
-          g<-addG(g,dataPolygon(data=ptsp,colour=NA,fill=baseColour,alpha=theoryAlpha))
-        # xdsig[xdsig==0]<-NA
-        i2<-0
-        while (i2<length(xdsig)) {
-          i1<-i2+min(which(c(xdsig[(i2+1):length(xdsig)],1)>0))
-          i2<-(i1-1)+min(which(c(xdsig[i1:length(xdsig)],0)==0))
-          use<-i1:(i2-1)
-          switch(orientation,
-                 "horz"={
-                   ln<-length(yv[use])
-                   ptsp1<-data.frame(x=yv[use[c(1,1:ln,ln)]],y=c(0,xd[use],0)+xoff[i])
-                 },
-                 "vert"={
-                   ptsp1<-data.frame(y=c(yv[use],rev(yv[use])),x=c(xdsig[use],-rev(xdsig[use]))+xoff[i])
-                 })
-          g<-addG(g,dataPolygon(data=ptsp1,colour=NA,fill=braw.env$plotColours$infer_sigC,alpha=theoryAlpha))
-        }
-        # g<-addG(g,dataPath(data=ptsp1,colour="black",linewidth=0.1, orientation=orientation))
-        g<-addG(g,dataPath(data=ptsp,colour="black",linewidth=0.1))
-      } else {
-        g<-addG(g,dataPolygon(data=ptsp,colour=NA,fill="white",alpha=theoryAlpha))
-        g<-addG(g,dataPath(data=ptsp,colour="black",linewidth=0.1))
-      }
-      } 
-    } 
+    }
     
     # then the samples
     rvals<-c()
     if (!all(is.na(analysis$rIV)) || doingMetaAnalysis) {
-      shvals<-showVals[,iUse[i]]
+      shvals<-sampleVals[,iUse[i]]
       if (showSig) {
         if (showType=="rss") 
           resSig<-(analysis$sem[,8]==2)
@@ -1195,7 +1239,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
           pts<-data.frame(x=shvals*0+xoff[i],y1=shvals,y2=resSig,y0=resNotNull,n=nvals)
       }
       
-      g<-expected_plot(g,pts,showType,analysis,IV,DV,i,orientation=orientation,
+      g<-simulations_plot(g,pts,showType,analysis,IV,DV,i,orientation=orientation,
                        ylim=ylim,histGain=histGain,histGainrange=histGainrange,npointsMax=200)
       
       ns<-c()
@@ -1282,6 +1326,9 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
               }
       )
     }
+    if (!theoryFirst)
+      g<-theoryPlot(g,theory,orientation,baseColour,theoryAlpha/2,xoff[i])
+    
     if (length(rvals)>1 && (is.element(showType,c("rse","rse1","rse2","rs1","rs2")) || effectType!="all"))
     if (is.element(showType,c("rs","rse","rse1","rse2","rs1","rs2","rss","p","e1r","e2r","e1+","e2+","e1-","e2-",
                               "e1p","e2p","e1d","e2d"))) {
@@ -1293,6 +1340,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       colours<-c()
       title<-""
       npad<-function(a) {if (nchar(a)<2) return(paste0("  ",a)) else return(a)}
+      if (evidence$minRp!=0) nlab<-braw.env$Inactive else nlab<-braw.env$Null
       switch (showType,
               "rs"={
                 if (!is.null(s)) {
@@ -1315,11 +1363,11 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                   colours<-c(colours,braw.env$plotColours$infer_sigNonNull)
                 }
                 if (!is.null(se)) {
-                  labels<-c(labels,paste0(braw.env$Null," '",brawFormat(se*100,digits=npct),"%'"," error"))
+                  labels<-c(labels,paste0(nlab," '",brawFormat(se*100,digits=npct),"%'"," error"))
                   colours<-c(colours,braw.env$plotColours$infer_sigNull)
                 }
                 if (!is.null(nsc)) {
-                  labels<-c(labels,paste0(braw.env$Null," '",brawFormat(nsc*100,digits=npct),"%'"," correct"))
+                  labels<-c(labels,paste0(nlab," '",brawFormat(nsc*100,digits=npct),"%'"," correct"))
                   colours<-c(colours,braw.env$plotColours$infer_nsigNull)
                 }
               },
@@ -1330,14 +1378,14 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                   colours<-c(colours,braw.env$plotColours$infer_sigNonNull)
                 }
                 if (!is.null(se)) {
-                  labels<-c(labels,paste0(braw.env$Null," '",brawFormat(se*100,digits=npct),"%'"," error"))
+                  labels<-c(labels,paste0(nlab," '",brawFormat(se*100,digits=npct),"%'"," error"))
                   colours<-c(colours,braw.env$plotColours$infer_sigNull)
                 }
               },
               "rse2"={
                 title<-"Misses"
                 if (!is.null(nsc)) {
-                  labels<-c(labels,paste0(braw.env$Null," '",brawFormat(nsc*100,digits=npct),"%'"," correct"))
+                  labels<-c(labels,paste0(nlab," '",brawFormat(nsc*100,digits=npct),"%'"," correct"))
                   colours<-c(colours,braw.env$plotColours$infer_nsigNull)
                 }
                 if (!is.null(nse)) {
@@ -1346,7 +1394,11 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                 }
               },
               "rs1"={
-                title<-"Non Nulls"
+                if (analysis$evidence$minRp!=0)
+                  title<-braw.env$activeTitle
+                else
+                  title<-braw.env$nonnullTitle
+                
                 if (!is.null(sc)) {
                   labels<-c(labels,paste0(braw.env$nonNull," '",brawFormat(sc*100,digits=npct),"%'"," correct"))
                   colours<-c(colours,braw.env$plotColours$infer_sigNonNull)
@@ -1357,13 +1409,17 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                 }
               },
               "rs2"={
-                title<-"Nulls"
+                if (analysis$evidence$minRp!=0)
+                  title<-braw.env$inactiveTitle
+                else
+                  title<-braw.env$nullTitle
+
                 if (!is.null(nsc)) {
-                  labels<-c(labels,paste0(braw.env$Null," '",brawFormat(nsc*100,digits=npct),"%'"," correct"))
+                  labels<-c(labels,paste0(nlab," '",brawFormat(nsc*100,digits=npct),"%'"," correct"))
                   colours<-c(colours,braw.env$plotColours$infer_nsigNull)
                 }
                 if (!is.null(se)) {
-                  labels<-c(labels,paste0(braw.env$Null," '",brawFormat(se*100,digits=npct),"%'"," error"))
+                  labels<-c(labels,paste0(nlab," '",brawFormat(se*100,digits=npct),"%'"," error"))
                   colours<-c(colours,braw.env$plotColours$infer_sigNull)
                 }
               },
@@ -1604,9 +1660,13 @@ ps_plot<-function(analysis,disp,showTheory=TRUE,g=NULL){
       # lb5<-paste0(braw.env$nullNS," ~ ",brawFormat(mean(nulls & !sigs)*100,digits=0),'~"%"')
       lb0<-paste0(braw.env$nonNullNS," '",brawFormat(mean(!nulls & !sigs)*100,digits=0),"%'")
       lb2<-paste0(braw.env$nonNullSig," '",brawFormat(mean(!nulls & sigs)*100,digits=0),"%'")
-      lb3<-paste0(braw.env$nullSig," '",brawFormat(mean(nulls & sigs)*100,digits=0),"%'")
-      lb5<-paste0(braw.env$nullNS," '",brawFormat(mean(nulls & !sigs)*100,digits=0),"%'")
-      
+      if (analysis$evidence$minRp!=0) {
+        lb3<-paste0(braw.env$inactiveSig," '",brawFormat(mean(nulls & sigs)*100,digits=0),"%'")
+        lb5<-paste0(braw.env$inactiveNS," '",brawFormat(mean(nulls & !sigs)*100,digits=0),"%'")
+      } else {
+        lb3<-paste0(braw.env$nullSig," '",brawFormat(mean(nulls & sigs)*100,digits=0),"%'")
+        lb5<-paste0(braw.env$nullNS," '",brawFormat(mean(nulls & !sigs)*100,digits=0),"%'")
+      }
       cols<-c()
       nms<-c()
       y<-1
