@@ -1,4 +1,23 @@
 ################################################################        
+# Convenience functions
+#
+
+#' @export
+doShortHand<-function() {
+  evidence<-braw.def$evidence
+  evidence$shortHand<-TRUE
+  setBrawDef("evidence",makeEvidence(TRUE))
+}
+
+#' @export
+undoShortHand<-function() {
+  evidence<-braw.def$evidence
+  evidence$shortHand<-FALSE
+  setBrawDef("evidence",makeEvidence(TRUE))
+}
+
+
+################################################################        
 # Hypothesis objects
 #
 
@@ -153,6 +172,7 @@ makeSampling<-function(type="Random") {
 makeReplication<-function(On=FALSE,Repeats=1,Keep="Cautious",RepAlpha=0.05,
                           PowerOn=TRUE,Power=0.8,Tails=2,PowerPrior="None",
                           forceSigOriginal=FALSE,forceSign=TRUE,
+                          maxN=2000,
                           BudgetType="Unlimited",Budget=1000,
                           RepNoStudies=1
                           ) {
@@ -160,6 +180,7 @@ makeReplication<-function(On=FALSE,Repeats=1,Keep="Cautious",RepAlpha=0.05,
   replication<-list(On=On,Repeats=Repeats,Keep=Keep,RepAlpha=RepAlpha,
                     PowerOn=PowerOn,Power=Power,Tails=Tails,PowerPrior=PowerPrior,
                     forceSigOriginal=forceSigOriginal,forceSign=forceSign,
+                    maxN=maxN,
                     BudgetType=BudgetType,Budget=Budget
                     )
 }

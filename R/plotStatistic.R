@@ -191,7 +191,7 @@ makeTheoryMultiple<-function(hypothesis,design,showType,whichEffect,logScale,yli
                   })
          },
          "n"={
-           ndist<-getNDist(analysis$design,effectTheory$world,logScale=logScale,sigOnly=TRUE)
+           ndist<-getNDist(design,effectTheory$world,logScale=logScale,sigOnly=TRUE)
            if (logScale) {
              theoryVals<-log10(ndist$nvals)
            } else {

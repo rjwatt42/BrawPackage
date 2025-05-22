@@ -134,6 +134,7 @@ replicationNewN<-function(rs,n,hypothesis,design) {
     # get the new sample size
     nrep<-rw2n(r,Replication$Power,Replication$Tails)
   } else nrep<-n
+  nrep[nrep>Replication$maxN]<-Replication$maxN
   return(nrep)
 }
 
