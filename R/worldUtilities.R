@@ -105,18 +105,23 @@ rSamp2Pop<-function(r_s,n,world=NULL) {
   if (is.null(world)) {world<-list(populationPDF="Uniform",populationRZ="r",populationPDFk<-0)}
   k<-world$populationPDFk
   z_s<-atanh(r_s)
-  if (is.na(z_s)) {return(NA)}
+  if (all(is.na(z_s))) {return(NA)}
   switch(world$populationPDF,
          "Uniform"={mlEst<-z_s},
          "Single"={mlEst<-z_s},
          "Gauss"={mlEst<-z_s*k^2*(n-3)/(k^2*(n-3) + 1)},
          "Exp"={
            overEst<-1/k/(n-3)
-           if (z_s<0) {
-             mlEst<-min(z_s+overEst,0)
-           } else {
-             mlEst<-max(z_s-overEst,0)
-           }
+           mlEst<-z_s*0
+           use<- z_s<(-overEst)
+           if (any(use)) mlEst[use]<-z_s[use]+overEst
+           use<- z_s>(overEst)
+           if (any(use)) mlEst[use]<-z_s[use]-overEst
+           #  if (z_s<0) {
+           #   mlEst<-min(z_s+overEst,0)
+           # } else {
+           #   mlEst<-max(z_s-overEst,0)
+           # }
            }
          )
   tanh(mlEst)

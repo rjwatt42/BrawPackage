@@ -169,7 +169,7 @@ makeTheoryMultiple<-function(hypothesis,design,showType,orientation) {
                           rd<-rSamplingDistr(theoryVals,theoryVals[ri1],ns[ni2])
                           rd<-rd/sum(rd)
                           use<-which(rd>max(rd)/50)
-                          nrep<-rw2n(theoryVals[use],design$Replication$Power)
+                          nrep<-replicationNewN(theoryVals[use],ns[ni2],hypothesis,design)
                           if (design$Replication$Keep=="MetaAnalysis")
                             nrep<-nrep+ns[ni2]
                           w2<-w2+sum(rn2w(theoryVals[ri1],nrep)*rd[use])*nd[ni2]

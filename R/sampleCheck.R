@@ -123,6 +123,20 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
   
 }
 
+replicationNewN<-function(rs,n,hypothesis,design) {
+  Replication<-design$Replication
+  if (Replication$PowerOn && (Replication$Power>0)) {
+    switch(Replication$PowerPrior,
+           "None"={r<-rs},
+           "World"={r<-rSamp2Pop(rs,n,hypothesis$effect$world)},
+           "Prior"={r<-rSamp2Pop(rs,n,evidence$prior)}
+    ) 
+    # get the new sample size
+    nrep<-rw2n(r,Replication$Power,Replication$Tails)
+  } else nrep<-n
+  return(nrep)
+}
+
 replicateSample<-function(hypothesis,design,evidence,sample,res) {
 
   oldAlpha<-braw.env$alphaSig
@@ -169,17 +183,9 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
         break
       }
       # get the relevant sample effect size for the power calc
-      if (Replication$PowerOn && (Replication$Power>0)) {
-        switch(Replication$PowerPrior,
-               "None"={r<-res$rIV},
-               "World"={r<-rSamp2Pop(res$rIV,res$nval,hypothesis$effect$world)},
-               "Prior"={r<-rSamp2Pop(res$rIV,res$nval,evidence$prior)}
-        ) 
-        # get the new sample size
-        design1$sN<-rw2n(r,Replication$Power,Replication$Tails)
-        if (Replication$BudgetType=="Fixed") {
-          design1$sN<-min(design1$sN,Replication$Budget-budgetUse)
-        }
+      design1$sN<-replicationNewN(res$rIV,res$nval,hypothesis,design)
+      if (Replication$BudgetType=="Fixed") {
+        design1$sN<-min(design1$sN,Replication$Budget-budgetUse)
       }
       
       # now do the replication
