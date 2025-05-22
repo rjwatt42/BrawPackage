@@ -13,7 +13,6 @@ theoryPlot<-function(g,theory,orientation,baseColour,theoryAlpha,xoff) {
          })
   if (is.null(theoryDens_sig)) baseColour<-"white"
   g<-addG(g,dataPolygon(data=theory_all,colour=NA,fill=baseColour,alpha=theoryAlpha))
-  g<-addG(g,dataPath(data=theory_all,colour="black",linewidth=0.1))
   
   if (!is.null(theoryDens_sig)) {
     i2<-0
@@ -33,9 +32,12 @@ theoryPlot<-function(g,theory,orientation,baseColour,theoryAlpha,xoff) {
       g<-addG(g,dataPath(data=theory_sig,colour="white",linewidth=0.1))
     }
   }
+  
+  g<-addG(g,dataPath(data=theory_all,colour="black",linewidth=0.2))
+  
   return(g)
 }
-makeTheoryMultiple<-function(hypothesis,design,showType,orientation) {
+makeTheoryMultiple<-function(hypothesis,design,showType,whichEffect,logScale,ylim,labelNSig,labelSig,orientation) {
   effect<-hypothesis$effect
   
   effectTheory<-effect
@@ -147,8 +149,10 @@ makeTheoryMultiple<-function(hypothesis,design,showType,orientation) {
                     theoryVals<-seq(-1,1,length.out=npt)*0.99
                     theoryDens_all<-rPopulationDist(theoryVals,effectTheory$world)
                     theoryDens_sig<-theoryDens_all
-                    ns<-braw.env$minN:braw.env$maxN
-                    nd<-nDistrDens(ns,design)
+                    ndist<-getNDist(design,hypothesis$effect$world)
+                    ns<-ndist$nvals
+                    # nd<-nDistrDens(ns,design)
+                    nd<-ndist$ndens
                     nd<-nd/sum(nd)
                     use<-which(nd>max(nd)/50)
                     nd<-nd[use]
@@ -1187,7 +1191,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
     histGainrange<-c(NA,NA)
     
     if (showTheory) {
-      theory<-makeTheoryMultiple(hypothesis,design,showType,orientation)
+      theory<-makeTheoryMultiple(hypothesis,design,showType,whichEffect,logScale,ylim,labelNSig,labelSig,orientation)
       theoryVals<-theory$theoryVals
       theoryDens_all<-theory$theoryDens_all
       theoryDens_sig<-theory$theoryDens_sig

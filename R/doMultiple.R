@@ -106,7 +106,8 @@ doMultiple <- function(nsims=10,multipleResult=NA,hypothesis=braw.def$hypothesis
   if (length(multipleResult)==1 && is.na(multipleResult)) {
       if (identical(hypothesis,braw.res$multiple$hypothesis) &&
           identical(design,braw.res$multiple$design) &&
-          identical(evidence,braw.res$multiple$evidence) 
+          identical(evidence,braw.res$multiple$evidence) &&
+          nsims>0
       )   
         multipleResult<-braw.res$multiple
       else 
@@ -162,7 +163,8 @@ doMultiple <- function(nsims=10,multipleResult=NA,hypothesis=braw.def$hypothesis
   }
 
   multipleResult<-c(list(type="multiple"),multipleResult)
-  setBrawRes("multiple",multipleResult)
+  if (multipleResult$count>0)
+    setBrawRes("multiple",multipleResult)
   return(multipleResult)
 }
 
