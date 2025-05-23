@@ -55,7 +55,7 @@ g<-startPlot(xlim=c(-1,1),ylim=c(-1,1),
   # z vertical axis
   g<-addG(g,dataPath(rotate3D(data.frame(x=c(0,0)+xlim[2],
                                          y=c(0,0)+ylim[1],
-                                         z=zlim),mapping),colour="black")
+                                         z=zlim),mapping),colour="#000000")
   )
   # z ticks
   plot_ticks<-seq(zlim[1],zlim[2],diff(zlim)/10)
@@ -81,7 +81,7 @@ g<-startPlot(xlim=c(-1,1),ylim=c(-1,1),
   # x ticks
   g<-addG(g,dataPath(rotate3D(data.frame(x=xlim,
                                          y=c(ylim[2],ylim[2]),
-                                         z=c(zlim[1],zlim[1])),mapping),colour="black")
+                                         z=c(zlim[1],zlim[1])),mapping),colour="#000000")
   )
   plot_ticks<-seq(ceil(xlim[1]*10),floor(xlim[2]*10))/10
   long_ticks<-seq(ceil(xlim[1]*2),floor(xlim[2]*2))/2
@@ -107,7 +107,7 @@ g<-startPlot(xlim=c(-1,1),ylim=c(-1,1),
   # y ticks
   g<-addG(g,dataPath(rotate3D(data.frame(x=c(xlim[2],xlim[2]),
                                          y=ylim,
-                                         z=c(zlim[1],zlim[1])),mapping),colour="black")
+                                         z=c(zlim[1],zlim[1])),mapping),colour="#000000")
   )
   plot_ticks<-seq(ceil(ylim[1]*4),floor(ylim[2]*4))/4
   long_ticks<-seq(ceil(ylim[1]),floor(ylim[2]))

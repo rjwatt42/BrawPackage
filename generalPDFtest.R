@@ -22,7 +22,7 @@ zvals<-(zbins[1:(nb-1)]+zbins[2:nb])/2
 zbinwidth<-zbins[2]-zbins[1]
 
 hist(zs,breaks=zbins)
-abline(v=quantile(zs,quants),col="black",lwd=2)
+abline(v=quantile(zs,quants),col="#000000",lwd=2)
 lines(zvals,dens_z(zvals,atanh(R),n)*np*zbinwidth,col="red",lwd=2)
 abline(v=quant_z(quants,atanh(R),n),col="red",lwd=2,lty="dotted")
 
@@ -35,7 +35,7 @@ rvals<-(rbins[1:(nb-1)]+rbins[2:nb])/2
 rbinwidth<-rbins[2]-rbins[1]
 
 hist(rs,breaks=rbins)
-abline(v=quantile(rs,quants),col="black",lwd=2)
+abline(v=quantile(rs,quants),col="#000000",lwd=2)
 lines(rvals,dens_r(rvals,R,n)*np*rbinwidth,col="red",lwd=2)
 abline(v=quant_r(quants,R,n),col="red",lwd=2,lty="dotted")
 
@@ -48,7 +48,7 @@ pvals<-(pbins[1:(nb-1)]+pbins[2:nb])/2
 pbinwidth<-pbins[2]-pbins[1]
 
 hist(ps,breaks=pbins)
-abline(v=quantile(ps,quants),col="black",lwd=2)
+abline(v=quantile(ps,quants),col="#000000",lwd=2)
 lines(pvals,dens_p(pvals,R,n)*np*pbinwidth,col="red",lwd=2)
 abline(v=quant_p(quants,R,n),col="red",lwd=2,lty="dotted")
 
@@ -61,7 +61,7 @@ plogvals<-(plogbins[1:(nb-1)]+plogbins[2:nb])/2
 plogbinwidth<-plogbins[2]-plogbins[1]
 
 hist(log10(ps[log10(ps)>=-6]),breaks=plogbins)
-abline(v=log10(quantile(ps,quants)),col="black",lwd=2)
+abline(v=log10(quantile(ps,quants)),col="#000000",lwd=2)
 lines(plogvals,dens_logp(10^plogvals,R,n)*np*plogbinwidth,col="red",lwd=2)
 abline(v=log10(quant_p(quants,R,n)),col="red",lwd=2,lty="dotted")
 
@@ -73,7 +73,7 @@ wvals<-seq(0.051,0.999,length.out=nb*2+1)
 wbinwidth<-wbins[2]-wbins[1]
 
 hist(ws,breaks=wbins)
-abline(v=quantile(ws,quants),col="black",lwd=2)
+abline(v=quantile(ws,quants),col="#000000",lwd=2)
 lines(wvals,dens_w(wvals,R,n)*np*wbinwidth,col="red",lwd=2)
 abline(v=quant_w(quants,R,n),col="red",lwd=2,lty="dotted")
 

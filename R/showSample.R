@@ -12,7 +12,7 @@ plotSample<-function(IV,DV,effect,ivplot,dvplot,g=NULL) {
   x<-ivplot
   y<-dvplot
   pts<-data.frame(x=x,y=y)
-  g<-addG(g,dataPoint(data=pts,shape=braw.env$plotShapes$data, colour = "black", fill = braw.env$plotColours$sampleC, size = dotSize))
+  g<-addG(g,dataPoint(data=pts,shape=braw.env$plotShapes$data, colour = "#000000", fill = braw.env$plotColours$sampleC, size = dotSize))
   if (braw.env$showMedians) {
     if (sample$type=="Categorical") {yuse<-0.5} else {yuse<-median(y)}
     g<-addG(g,horizLine(intercept=yuse,col="red"))

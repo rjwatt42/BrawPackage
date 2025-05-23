@@ -343,11 +343,11 @@ drawMeta<-function(metaResult=doMetaMultiple(),whichMeta="Single",showType="meta
       dotSize=16*min(0.25,2.5/sqrt(length(x)))
       
       g<-addG(g,dataPoint(data=pts,shape=braw.env$plotShapes$meta, 
-                          colour="black", fill="grey", alpha=min(1,2.5/sqrt(length(x))), 
+                          colour="#000000", fill="grey", alpha=min(1,2.5/sqrt(length(x))), 
                           size = dotSize))
       pts<-data.frame(x=x[useBest],y=y[useBest])
       g<-addG(g,dataPoint(data=pts,shape=braw.env$plotShapes$meta,
-                          colour="black", fill=braw.env$plotColours$metaMultiple, alpha=min(1,2.5/sqrt(length(x))), 
+                          colour="#000000", fill=braw.env$plotColours$metaMultiple, alpha=min(1,2.5/sqrt(length(x))), 
                           size = dotSize))
       
       if (showType=="metaS;metaS") {
@@ -576,7 +576,7 @@ drawWorld<-function(hypothesis,design,metaResult,showType="n",g,colour="white",
   # filled is the best fit world
   if (showTheory) {
     ptsa<-list(x=z,y=n,z=za)
-    g<-addG(g,dataContour(data=ptsa,colour="black",linewidth=0.5,linetype="dotted"))
+    g<-addG(g,dataContour(data=ptsa,colour="#000000",linewidth=0.5,linetype="dotted"))
   }
   
   if (showLines) {

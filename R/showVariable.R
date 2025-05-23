@@ -17,10 +17,10 @@ drawVar<-function(pts,ticks,var,plotArea=c(0,0,1,1),g){
     dataPolygon(pts,fill=braw.env$plotColours$variableC,colour=braw.env$plotColours$variableC,linewidth=0.25)
     )
   g<-addG(g,
-          dataLine(pts,colour="black",linewidth=0.25)
+          dataLine(pts,colour="#000000",linewidth=0.25)
           )
   g<-addG(g,
-          dataLine(data.frame(x=braw.env$plotLimits$xlim,y=braw.env$plotLimits$ylim[1]),colour="black",linewidth=0.25)
+          dataLine(data.frame(x=braw.env$plotLimits$xlim,y=braw.env$plotLimits$ylim[1]),colour="#000000",linewidth=0.25)
     )
 }
 

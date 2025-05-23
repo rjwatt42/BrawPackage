@@ -8,7 +8,7 @@ drawNHSTBar<-function(i,npts,pts1,bwidth,col1) {
   dataPolygon(data=pts,fill=col1)
 }
 drawNHSTLabel<-function(lb1,lb1xy,xoff,col1,vjust=NULL) {
-  if (sum(col2rgb(col1))>128*3) col<-"black" else col<-"white"
+  if (sum(col2rgb(col1))>128*3) col<-"#000000" else col<-"white"
   lb1xy$x<-lb1xy$x+xoff
   if (is.null(vjust))
     if (lb1xy$y>0.5) vjust<-1 else vjust<-0
@@ -835,7 +835,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       }
       if (!is.null(theoryVals2)) {
         theory<-data.frame(x=newvals, y=theoryVals2)
-        g<-addG(g,dataLine(theory,colour="black",linewidth=0.5))
+        g<-addG(g,dataLine(theory,colour="#000000",linewidth=0.5))
       }
       
       # plot results
@@ -899,8 +899,8 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
           if (length(vals)>=25) pts0f<-pts0f[seq(1,length(vals),round(length(vals)/13)),]
           g<-addG(g,dataPoint(data=pts0f,fill=col,size=4))
           if (!is.null(y75)) {
-            g<-addG(g,dataLine(data.frame(x=vals,y=y25),colour="black",alpha=0.9))
-            g<-addG(g,dataLine(data.frame(x=vals,y=y75),colour="black",alpha=0.9))
+            g<-addG(g,dataLine(data.frame(x=vals,y=y25),colour="#000000",alpha=0.9))
+            g<-addG(g,dataLine(data.frame(x=vals,y=y75),colour="#000000",alpha=0.9))
             pts1f<-data.frame(x=vals,ymin=y25,ymax=y75)
             # g<-addG(g,dataErrorBar(pts1f,colour=col))
           }
@@ -942,7 +942,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
               g<-addG(g,dataPoint(data=ptsShow,fill=colShow))
             } else {
               if (doLine) {
-                g<-addG(g,dataPolygon(data=ptsShow,fill=colShow,colour="black",linewidth=0.1))
+                g<-addG(g,dataPolygon(data=ptsShow,fill=colShow,colour="#000000",linewidth=0.1))
               } else {
                   npts<-length(vals)
                   bwidth<-0.4*(ptsShow$x[2]-ptsShow$x[1])
@@ -970,7 +970,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
         yvals<-rn2w(r_est,nvals)
         if (explore$xlog=="log10") ptsn<-data.frame(x=log10(nvals),y=yvals)
         else          ptsn<-data.frame(x=nvals,y=yvals)
-        g<-addG(g,dataLine(data=ptsn,colour="black",linetype="dotted",linewidth=0.25))
+        g<-addG(g,dataLine(data=ptsn,colour="#000000",linetype="dotted",linewidth=0.25))
         
         minnw<-function(n,r,w){sum(abs(w-rn2w(r,n)),na.rm=TRUE)}
         n80<-optimize(minnw,c(min(n),max(n)),w=0.8,r=r_est)
@@ -1017,7 +1017,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       }
     }
     
-    lineCol<-"black"
+    lineCol<-"#000000"
     if (is.element(showType[si],c("p","e1p","e2p","e1d","e2d"))) lineCol<-"green"
     for (yl in ylines) {
       g<-addG(g,horzLine(yl,linetype="dotted",colour=lineCol))
@@ -1147,12 +1147,12 @@ showExplore2D<-function(exploreResult=braw.res$explore,showType=c("rs","p"),show
                box="both",top=TRUE,g=g)
   g<-addG(g,plotTitle(paste0("explore: ",explore$exploreType),size=1,fontface="plain",position="left"))
 
-  lineCol<-"black"
+  lineCol<-"#000000"
   if (is.element(showType[1],c("p","e1p","e2p","e1d","e2d"))) lineCol<-"green"
   for (xl in xlines) {
     g<-addG(g,vertLine(xl,linetype="dotted",colour=lineCol,linewidth=0.5))
   }
-  lineCol<-"black"
+  lineCol<-"#000000"
   if (is.element(showType[2],c("p","e1p","e2p","e1d","e2d"))) lineCol<-"green"
   for (yl in ylines) {
     g<-addG(g,horzLine(yl,linetype="dotted",colour=lineCol,linewidth=0.5))

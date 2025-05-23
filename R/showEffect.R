@@ -1,4 +1,4 @@
-drawArrow<-function(start,len,direction,ends,col="black",fill="white",alpha=1, width=0.1,position="start",finAngle=45) {
+drawArrow<-function(start,len,direction,ends,col="#000000",fill="white",alpha=1, width=0.1,position="start",finAngle=45) {
   if (position=="centre") {
     start<-c(
       start[1]-len/2*sin((direction-90)/(180/pi)),

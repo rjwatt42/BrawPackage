@@ -33,7 +33,7 @@ theoryPlot<-function(g,theory,orientation,baseColour,theoryAlpha,xoff) {
     }
   }
   
-  g<-addG(g,dataPath(data=theory_all,colour="black",linewidth=0.2))
+  g<-addG(g,dataPath(data=theory_all,colour="#000000",linewidth=0.2))
   
   return(g)
 }
@@ -715,7 +715,6 @@ simulations_hist<-function(pts,valType,ylim,histGain,histGainrange){
 simulations_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
                         i=1,scale=1,width=1,col="white",alpha=1,useSignificanceCols=braw.env$useSignificanceCols,
                         histStyle="width",orientation="vert",ylim,histGain=NA,histGainrange=NA,npointsMax=200){
-  se_arrow<-0.3
   se_size<-0.25
   
   c1=col
@@ -783,7 +782,7 @@ simulations_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
           x<-pts$x
           if (length(x)<length(rCI)) x<-rep(x,length(rCI))
           pts1se<-data.frame(y=rCI[1,],x=x)
-          g<-addG(g,dataLine(data=pts1se,arrow=arrow(length=unit(se_arrow,"cm"),ends="both"),colour="white",linewidth=se_size))
+          g<-addG(g,dataLine(data=pts1se,colour="white",linewidth=se_size))
         }
     }
     
@@ -806,8 +805,8 @@ simulations_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
       co1<-c1
       co2<-c2
     } else {
-      co1<-"black"
-      co2<-"black"
+      co1<-"#000000"
+      co2<-"#000000"
     }
     co1<-darken(c1,off=-colgain)
     co2<-darken(c2,off=-colgain)
@@ -1102,7 +1101,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                box=box,top=top,orientation=orient,g=g)
   # g<-addG(g,yAxisTicks(logScale=yaxis$logScale),yAxisLabel(ylabel))
     # g<-addG(g,xAxisTicks(breaks=c(0,2,4),c("direct","unique","total")))
-  lineCol<-"black"
+  lineCol<-"#000000"
   if (is.element(showType,c("p","e1p","e2p","e1d","e2d"))) lineCol<-"green"
   switch(orientation,
          "horz"={

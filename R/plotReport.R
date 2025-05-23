@@ -266,7 +266,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
       x<-x+cellSize[i]-characterWidth
     }
     fill<-bg
-    col<-"black"
+    col<-"#000000"
     if (bluelabels[i]) col="#0000DD"
     if (greenlabels[i]) col="#00DD00"
     if (redlabels[i]) col="#DD0000"

@@ -522,7 +522,7 @@ showPossible <- function(possibleResult=NULL,
       }
       g<-addG(g,dataPath(rotate3D(data.frame(x=c(zx,zx),
                     y=c(zy,zy),
-                    z=zlim),mapping),colour="black")
+                    z=zlim),mapping),colour="#000000")
       )
       # short ticks
       if (boxed) {
@@ -553,7 +553,7 @@ showPossible <- function(possibleResult=NULL,
     # x ticks
     g<-addG(g,dataPath(rotate3D(data.frame(x=xlim,
                                            y=c(ylim[1],ylim[1]),
-                                           z=c(zlim[1],zlim[1])),mapping),colour="black")
+                                           z=c(zlim[1],zlim[1])),mapping),colour="#000000")
     )
     plot_ticks<-seq(ceil(xlim[1]*10),floor(xlim[2]*10))/10
     long_ticks<-seq(ceil(xlim[1]*2),floor(xlim[2]*2))/2
@@ -579,7 +579,7 @@ showPossible <- function(possibleResult=NULL,
     # y ticks
     g<-addG(g,dataPath(rotate3D(data.frame(x=c(xlim[2],xlim[2]),
                                            y=ylim,
-                                           z=c(zlim[1],zlim[1])),mapping),colour="black")
+                                           z=c(zlim[1],zlim[1])),mapping),colour="#000000")
     )
     plot_ticks<-seq(ceil(ylim[1]*10),floor(ylim[2]*10))/10
     long_ticks<-seq(ceil(xlim[1]*2),floor(xlim[2]*2))/2
@@ -642,7 +642,7 @@ showPossible <- function(possibleResult=NULL,
             }
             if (showType=="Samples" && !is.null(possible$targetSample))
                 g<-addG(g,
-                        dataPath(rotate3D(data.frame(x=xlim,y=c(0,0)++possible$targetSample,z=c(0,0)+zlim[1]),mapping),colour="black",linetype="dotted")
+                        dataPath(rotate3D(data.frame(x=xlim,y=c(0,0)++possible$targetSample,z=c(0,0)+zlim[1]),mapping),colour="#000000",linetype="dotted")
                 )
             
             if (showType=="Samples" && !any(is.na(sourceRVals)) && length(sourceRVals)<8) {
@@ -692,7 +692,7 @@ showPossible <- function(possibleResult=NULL,
               z<-z/max(z)
               if (max(z)==min(z)) z<-z/2
               if (logZ) z<-log10(z)
-              g<-drawDistribution(x,y,z,xlim,ylim,zlim,mapping,colP,"black",0.25,draw_lower_limit=0,g)
+              g<-drawDistribution(x,y,z,xlim,ylim,zlim,mapping,colP,"#000000",0.25,draw_lower_limit=0,g)
               # use<- which((x>=xlim[1]) & (x<=xlim[2]) & (z>=zlim[1]))
               # g<-addG(g,
               #         dataPolygon(rotate3D(data.frame(x=c(x[use[1]],x[use],x[use[length(use)]]),y=c(y[use[1]],y[use],y[use[length(use)]]),z=c(zlim[1],z[use],zlim[1])*wallHeight),mapping),fill=colP,alpha=0.25)
@@ -761,7 +761,7 @@ showPossible <- function(possibleResult=NULL,
                 ztotal<-log10(ztotal)
                 ztotal[ztotal<zlim[1]]<-zlim[1]
               }
-              g<-drawDistribution(x,y,ztotal,xlim,ylim,zlim,mapping,colSsum,"black",1,draw_lower_limit=0,g)
+              g<-drawDistribution(x,y,ztotal,xlim,ylim,zlim,mapping,colSsum,"#000000",1,draw_lower_limit=0,g)
                 # split into 2 parts  
                 if (possible$source$worldOn && possible$source$populationNullp>0){
                   if (!any(is.na(sampleBackwall$rsw_dens_null))) {
@@ -923,7 +923,7 @@ showPossible <- function(possibleResult=NULL,
                             if (sourceRVals[i]==min(sourceRVals)) alpha=1 else alpha=theoryAlpha
                             if (logZ) z_use<-log10(z_use)
                             g<-drawDistribution(rep(sourceRVals[i],length(rs)),rs,z_use*sampDensGain,xlim,ylim,zlim,
-                                                mapping,colS,"black",alpha,draw_lower_limit,g)
+                                                mapping,colS,"#000000",alpha,draw_lower_limit,g)
                             
                           if (!cutaway && !is.na(sRho)) {
                             z_use<-sourceSampDens_r_plus[i,]*pgain
@@ -932,7 +932,7 @@ showPossible <- function(possibleResult=NULL,
                             z_use[1:use-1]<-0
                             if (logZ) z_use<-log10(z_use)
                             g<-drawDistribution(rep(sourceRVals[i],length(rs)),rs,z_use*sampDensGain,xlim,ylim,zlim,
-                                                mapping,braw.env$plotColours$descriptionC,"black",theoryAlpha*2,draw_lower_limit,g)
+                                                mapping,braw.env$plotColours$descriptionC,"#000000",theoryAlpha*2,draw_lower_limit,g)
                             
                           }
                           if (showP>0 && !is.na(sRho)) {
@@ -999,7 +999,7 @@ showPossible <- function(possibleResult=NULL,
                                                                 z = c(zlim[1],cutZ,zlim[1])),mapping),fill=colP,colour=colP,alpha=0.8),
                                 dataPath(rotate3D(data.frame(x = c(sourceRVals[use[1]],sourceRVals[use],sourceRVals[use[length(use)]]),
                                                              y = c(0,use*0,0)+sRho[1], 
-                                                             z = c(zlim[1],cutZ[use],zlim[1])),mapping),colour="black")
+                                                             z = c(zlim[1],cutZ[use],zlim[1])),mapping),colour="#000000")
                         )
                       }
                     },
@@ -1309,7 +1309,7 @@ showPossible <- function(possibleResult=NULL,
                                                            y=c(0,rpd,0)*zgain),fill="white",colour=NA))
                           g<-addG(g,dataPolygon(data.frame(x=rs[c(1,1:length(rs),length(rs))],
                                                            y=c(0,rsd,0)*zgain),fill=colSsum,alpha=0.8))
-                          g<-addG(g,dataPath(data.frame(x=rs,y=rsd*zgain),colour="black",linewidth=0.35))
+                          g<-addG(g,dataPath(data.frame(x=rs,y=rsd*zgain),colour="#000000",linewidth=0.35))
                           if (world$worldOn) {
                             if (world$populationNullp>0) {
                               g<-addG(g,dataPath(data.frame(x=rs,y=sampleBackwall$rsw_dens_null*zgain),colour=colNullS,linewidth=0.5))
@@ -1340,18 +1340,18 @@ showPossible <- function(possibleResult=NULL,
                           dens_at_zero<-approx(rp,sampleLikelihoodTotal_r,0)$y
                           dens_at_sample<-approx(rp,sampleLikelihoodTotal_r,sRho[1])$y
                           dens_at_ci<-approx(rp,sampleLikelihoodTotal_r,rp_ci)$y
-                          # lines(x=c(sRho[1],sRho[1]),y=c(0,dens_at_sample-0.01),col="black",lwd=1.5)
+                          # lines(x=c(sRho[1],sRho[1]),y=c(0,dens_at_sample-0.01),col="#000000",lwd=1.5)
                           if (world$populationPDF!="Uniform_r" && !is.null(rp_peak)){
-                            lines(x=c(0,0),y=c(0,dens_at_zero-0.01),col="black",lwd=1.5)
-                            lines(x=c(rp_peak,rp_peak),y=c(0,dens_at_peak-0.01),col="black",lwd=1.5)
-                            # lines(x=c(rp_peak,rp_peak),y=c(0,dens_at_peak-0.01),col="black",lwd=2.5)
+                            lines(x=c(0,0),y=c(0,dens_at_zero-0.01),col="#000000",lwd=1.5)
+                            lines(x=c(rp_peak,rp_peak),y=c(0,dens_at_peak-0.01),col="#000000",lwd=1.5)
+                            # lines(x=c(rp_peak,rp_peak),y=c(0,dens_at_peak-0.01),col="#000000",lwd=2.5)
                             # lines(x=c(rp_peak,rp_peak),y=c(0,dens_at_peak-0.01),col="white",lwd=2)
                             # lines(x=c(rp_peak,rp_peak),y=c(0,dens_at_peak-0.01),col="red",lty=3,lwd=2)
                             
-                            lines(x=c(0,0)+rp_ci[1],y=c(0,dens_at_ci[1]-0.01),col="black",lwd=2.5)
+                            lines(x=c(0,0)+rp_ci[1],y=c(0,dens_at_ci[1]-0.01),col="#000000",lwd=2.5)
                             lines(x=c(0,0)+rp_ci[1],y=c(0,dens_at_ci[1]-0.01),col="white",lwd=2)
                             lines(x=c(0,0)+rp_ci[1],y=c(0,dens_at_ci[1]-0.01),col="red",lty=3,lwd=2)
-                            lines(x=c(0,0)+rp_ci[2],y=c(0,dens_at_ci[2]-0.01),col="black",lwd=2.5)
+                            lines(x=c(0,0)+rp_ci[2],y=c(0,dens_at_ci[2]-0.01),col="#000000",lwd=2.5)
                             lines(x=c(0,0)+rp_ci[2],y=c(0,dens_at_ci[2]-0.01),col="white",lwd=2)
                             lines(x=c(0,0)+rp_ci[2],y=c(0,dens_at_ci[2]-0.01),col="red",lty=3,lwd=2)
                           }

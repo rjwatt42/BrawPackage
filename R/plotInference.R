@@ -285,7 +285,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
     shape<-braw.env$plotShapes$meta
   }
   pts1=pts[use,]
-  if (length(d1)>100) {b1<-c1;b2<-c2} else {b1<-b2<-"black"}
+  if (length(d1)>100) {b1<-c1;b2<-c2} else {b1<-b2<-"#000000"}
   g<-addG(g,dataPoint(data=pts1,shape=shape, colour = b2, fill = c2, size = dotSize))
   pts2=pts[!use,]
   g<-addG(g,dataPoint(data=pts2,shape=shape, colour = b1, fill = c1, size = dotSize))

@@ -171,14 +171,14 @@ plotCatParPrediction<-function(g,IV,DV,rho,n,offset=1, within=FALSE){
     }
     se_pts<-data.frame(x=b+xoff,ymin=d-se,ymax=d+se)
     if (ni==1) {col1<-col;lw<-2}
-    if (ni>1 && ni<4) {col1<-"black";lw<-1}
+    if (ni>1 && ni<4) {col1<-"#000000";lw<-1}
     if (ni==4) {col1<-"white";lw=1}
-    g<-addG(g,dataErrorBar(data=se_pts,colour="black",linewidth=0.25))
+    g<-addG(g,dataErrorBar(data=se_pts,colour="#000000",linewidth=0.25))
   }
   if (colindex>1) {
-    g<-addG(g,dataPoint(data=mn_pts, shape=braw.env$plotShapes$data, colour = "black", fill=col, size = braw.env$dotSize))
+    g<-addG(g,dataPoint(data=mn_pts, shape=braw.env$plotShapes$data, colour = "#000000", fill=col, size = braw.env$dotSize))
   }  else {
-    g<-addG(g,dataPoint(data=mn_pts,shape=braw.env$plotShapes$data, colour = "black", fill=col, size = braw.env$dotSize))
+    g<-addG(g,dataPoint(data=mn_pts,shape=braw.env$plotShapes$data, colour = "#000000", fill=col, size = braw.env$dotSize))
   }
   g
   
@@ -218,7 +218,7 @@ plotParOrdPrediction<-function(g,IV,DV,rho,n,offset=1){
     g<-addG(g,dataLine(data=pts,colour=col,linewidth=2))
   } else {
     pts<-data.frame(x=xv,y=yv)
-    if (ni<4) g<-addG(g,dataLine(data=pts,colour="black",linewidth=2))
+    if (ni<4) g<-addG(g,dataLine(data=pts,colour="#000000",linewidth=2))
     else g<-addG(g,dataLine(data=pts,colour="white",linewidth=2))
   }
   }
@@ -268,7 +268,7 @@ plotCatOrdPrediction<-function(g,IV,DV,rho,n,offset= 1,within=FALSE){
   se_pts<-data.frame(x=b+xoff,ymin=d-se,ymax=d+se)
   g<-addG(g,
     dataErrorBar(data=se_pts),
-    dataPoint(data=mn_pts,shape=braw.env$plotShapes$data, colour = "black", fill = col, size = 7)
+    dataPoint(data=mn_pts,shape=braw.env$plotShapes$data, colour = "#000000", fill = col, size = 7)
   )
   g
   
@@ -318,7 +318,7 @@ plotParCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
   
   if (plotBaseline) {
     pts1<-data.frame(x=c(-1,1)*braw.env$fullRange*IV$sd+IV$mu,y=c(0,0))
-    g<-addG(g,dataLine(data=pts1,colour="black"))
+    g<-addG(g,dataLine(data=pts1,colour="#000000"))
   }
   
   g
@@ -371,7 +371,7 @@ plotCatCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
   g<-addG(g,dataBar(data=pts,barwidth=barwidth,fill=full_c))
 
   pts1<-data.frame(x=c(0,ncats1+1),y=c(0,0))
-  g<-addG(g,dataLine(data=pts1,colour="black"))
+  g<-addG(g,dataLine(data=pts1,colour="#000000"))
   g
   
 }
