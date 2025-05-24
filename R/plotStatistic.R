@@ -201,6 +201,7 @@ makeTheoryMultiple<-function(hypothesis,design,showType,whichEffect,logScale,yli
            theoryDens_sig<-ndist$ndensSig
          },
          "ws"={
+           dw<-0.01
            theoryVals<-seq(braw.env$alphaSig*(1+dw),1/(1+dw),length.out=npt)
            theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"ws",logScale=logScale,sigOnly=sigOnly)
          },
@@ -232,6 +233,7 @@ makeTheoryMultiple<-function(hypothesis,design,showType,whichEffect,logScale,yli
            theoryDens_all<-abs(theoryDens_all)
          },
          "wp"={
+           dw<-0.01
            theoryVals<-seq(braw.env$alphaSig*(1+dw),1/(1+dw),length.out=npt)
            theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"wp",logScale=logScale,sigOnly=sigOnly)
          },
@@ -1113,7 +1115,6 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
              g<-addG(g,horzLine(intercept=yl,linewidth=0.25,linetype="dashed",colour=lineCol))
          })
   
-  dw<-0.01
   sampleVals<-c()
   if (!all(is.na(analysis$rIV)) || doingMetaAnalysis) {
     data<-collectData(analysis,whichEffect)

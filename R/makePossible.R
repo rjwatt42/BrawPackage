@@ -73,6 +73,7 @@ makePossible<-function(targetSample=NULL,targetSampleN=NULL,UseSource="world",
     hypothesis$effect$world$populationRZ<-"r"
     hypothesis$effect$world$populationPDFk<-hypothesis$effect$rIV
     hypothesis$effect$world$populationNullp<-0
+    hypothesis$effect$world$populationPDFsample<-FALSE
   }
   
   possible<-

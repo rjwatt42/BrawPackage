@@ -360,7 +360,12 @@ showPossible <- function(possibleResult=NULL,
   rsw_dens<-rsw_dens_plus+rsw_dens_null
   
   offRange<-0
-  if (axisScale>1 && !is.null(possible$targetSample)) offRange<-possible$targetSample  
+  if (length(axisScale)==2) {
+    offRange<-mean(axisScale)
+    axisScale<-2/diff(axisScale)
+  } else {
+    if (axisScale>1 && !is.null(possible$targetSample)) offRange<-possible$targetSample  
+  }
   switch(braw.env$RZ,
          "r"={
            xlim<-c(-1,1)/axisScale+offRange # population

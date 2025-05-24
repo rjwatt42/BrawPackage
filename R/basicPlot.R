@@ -269,10 +269,10 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=0,
   
   
   if (!is.null(xticks) && !is.null(xticks$labels))
-    maxtick<-max(nchar(xticks$labels))
+    maxtick<-max(strNChar(xticks$labels))
   else maxtick<-0
   if (!is.null(yticks) && !is.null(yticks$labels))
-    maxtick<-max(c(maxtick,nchar(yticks$labels)))
+    maxtick<-max(c(maxtick,strNChar(yticks$labels)))
   tickSize<-5/max(7,maxtick)
   
   tickGap<-unitGap*tickSize
@@ -288,7 +288,7 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=0,
     if (is.null(xticks$labels))
       xticks$labels<-as.character(xticks$breaks)
     if (!ymax)
-      bottomGap<-labelGapx+max(nchar(xticks$labels))*tickGap
+      bottomGap<-labelGapx+max(strNChar(xticks$labels))*tickGap
     if (!is.character(xticks$labels)) xticks$labels<-brawFormat(xticks$labels,digits=-2)
   } else {
     bottomGap<-minGap
@@ -299,7 +299,7 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=0,
     if (is.null(yticks$labels))
       yticks$labels<-as.character(yticks$breaks)
     if (!xmax)
-      leftGap<-labelGapy+max(nchar(yticks$labels))*tickGap
+      leftGap<-labelGapy+max(strNChar(yticks$labels))*tickGap
     if (!is.character(yticks$labels)) yticks$labels<-brawFormat(yticks$labels,digits=-2)
   } else {
     leftGap<-minGap
@@ -386,7 +386,7 @@ xAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE,angle=0,size=NULL){
   if (logScale) breaks<-log10(breaks)
   # labels<-as.character(labels)
   
-  if (is.null(size)) size<-7/max(7,max(nchar(labels)))
+  if (is.null(size)) size<-7/max(7,max(strNChar(labels)))
   
   voff<-braw.env$plotLimits$ylim[1]
   ticksBottom<-data.frame(x=reRangeX(breaks),y=reRangeY(voff))
@@ -427,7 +427,7 @@ yAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE,angle=0,size=NULL){
   # labels<-as.character(labels)
   
   ticks<-data.frame(x=reRangeX(braw.env$plotLimits$xlim[1]),y=reRangeY(breaks))
-  if (is.null(size)) size<-4/max(4,max(nchar(labels)))
+  if (is.null(size)) size<-4/max(4,max(strNChar(labels)))
   
   switch(braw.env$plotLimits$orientation,
          "vert"={
@@ -553,7 +553,7 @@ drawText<-function(data,label, hjust=0, vjust=0, colour="#000000",fill="white",s
              g<-geom_label(data=data,aes(x = x, y = y), label=label, angle=angle,
                            hjust=hjust, vjust=vjust,
                            fill=fill,color=colour,fontface=fontface,
-                           label.padding=unit(0.1, "lines"),label.size=label.size,
+                           label.padding=unit(0.1, "lines"),label.size=0.25,
                            size=reSizeFont(size)*0.8,parse=parser)
            } else {
              g<-geom_text(data=data,aes(x = x, y = y), label=label, angle=angle,
@@ -815,16 +815,21 @@ dataErrorBar<-function(data,colour="#000000",linewidth=0.25) {
   }
   return(g)
 }
-
-dataLegend<-function(data,title="title",fontsize=0.6,shape=21) {
+strNChar<-function(str) {
+  str1<-gsub("'","",str)
+  str2<-gsub("\\[[[:punct:][:alnum:]]*\\]","",str1)
+  nsub<-nchar(str1)-nchar(str2)
+  nsub[nsub>0]<-nsub[nsub>0]-2
+  nother<-nchar(str2)
+  return(nother+nsub*0.6)
+}
+dataLegend<-function(data,title="",fontsize=0.6,shape=21) {
   dy=0.06*fontsize
   dx=0.022*fontsize/braw.env$plotArea[3] # because rangeX() below
-  names<-data$names
-  names1<-gsub("\\]","",gsub("\\[","",gsub("'","",names)))
   if (nchar(title)>0) tn<-1.2 else tn<-0
   nrows<-tn+length(data$names)+1
-  # ncols<-max(c(nchar(title),nchar(names1)))+2
-  ncols<-max(strwidth(parse(text=mathPrepText(c(title,data$names)))))/strwidth("e")+2
+  ncols<-max(strNChar(c(title,data$names)))+2
+  # ncols<-max(strwidth(parse(text=mathPrepText(c(title,data$names)))))/strwidth("e")+2
   g<-list(axisPolygon(data=data.frame(x=rangeX(c(1-ncols*dx,1,1,1-ncols*dx,1-ncols*dx)),
                                       y=rangeY(c(1-nrows*dy,1-nrows*dy,1,1,1-nrows*dy))),
                       fill="white",colour="white",linewidth=0.5)
@@ -837,8 +842,8 @@ dataLegend<-function(data,title="title",fontsize=0.6,shape=21) {
     g<-c(g,list(axisText(data=data.frame(x=rangeX(1-ncols*dx+2*dx),y=rangeY(1-dy*tn)),label=title,size=fontsize,fontface="bold"))
     )
   
-  if (length(shape)<length(names)) shape<-rep(shape,length(names))
-  for (i in 1:length(names)) {
+  if (length(shape)<length(data$names)) shape<-rep(shape,length(data$names))
+  for (i in 1:length(data$names)) {
     if (!is.na(data$colours[i]))
       g<-c(g,
            list(axisPoint(data=data.frame(x=rangeX(1-ncols*dx+dx*1.5),y=rangeY(1-dy*(i+tn))),

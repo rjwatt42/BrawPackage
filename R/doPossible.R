@@ -71,12 +71,14 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
                               populationPDF="Uniform",
                               populationPDFk=1,
                               populationRZ="r",
-                              populationNullp=0.0) },
+                              populationNullp=0.0,
+                              populationPDFsample=FALSE) },
          "hypothesis"={prior<-list(worldOn=FALSE,
                                     populationPDF="Single",
                                     populationPDFk=hypothesis$effect$rIV,
                                     populationRZ="r",
-                                    populationNullp=0.5) },
+                                    populationNullp=0.5,
+                                   populationPDFsample=FALSE) },
          "world"={ prior<-world },
          "prior"={ prior<-possible$prior }
   )

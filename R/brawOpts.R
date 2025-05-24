@@ -30,7 +30,6 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
   braw.res <- new.env(parent = emptyenv())
   
   # if (is.null(height)) height<-convertHeight(unit(1, "npc"),"pt",valueOnly = TRUE)
-  
   if (newDev) {
     while (dev.cur()!=1) dev.off()
     dev.new(width=height*aspect/144, height=height/144, noRStudioGD = TRUE)
