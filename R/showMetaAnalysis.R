@@ -161,7 +161,7 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showType="n",showTheory=
   g<-addG(g,dataLegend(data.frame(names=names,colours=colours),title="",shape=22))
   # g<-addG(g,plotTitle(lb,"left",size=1))
   
-  if (braw.env$graphHTML && braw.env$autoShow) {
+  if (braw.env$graphicsType=="HTML" && braw.env$autoShow) {
     showHTML(g)
     return(invisible(g))
   }
@@ -216,7 +216,7 @@ showMetaMultiple<-function(metaResult=braw.res$metaMultiple,showType=NULL,dimens
       }
     }
   }
-  if (braw.env$graphHTML && braw.env$autoShow) {
+  if (braw.env$graphicsType=="HTML" && braw.env$autoShow) {
     showHTML(g)
     return(invisible(g))
   }

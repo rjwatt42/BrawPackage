@@ -20,7 +20,7 @@ newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
 
 #' @export
 BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16,10),
-                   reportHTML=FALSE, graphHTML=FALSE,
+                   reportHTML=FALSE, graphicsType="ggplot",
                    newDev=FALSE,height=400,aspect=1.3,autoShow=FALSE,timeLimit=Inf,fullGraphSize=1,
                    reducedOutput=FALSE) {
   if (graphC=="white") graphC<-"#FFFFFF"
@@ -141,7 +141,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
           # display choices
           
           braw.env$reportHTML<-reportHTML
-          braw.env$graphHTML<-graphHTML
+          braw.env$graphicsType<-graphicsType
           braw.env$newSampleDisplay<-TRUE
           
           braw.env$report_precision<-3

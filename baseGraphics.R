@@ -2,7 +2,9 @@
 makeCol<-function(col,alpha) {
   if (col=="black") col<-"#000000"
   if (col=="white") col<-"#FFFFFF"
-  paste0(col,as.hexmode(floor(alpha*255)))
+  if (alpha<1)
+  col<-paste0(col,as.hexmode(floor(alpha*255)))
+  return(col)
 }
 
 makeFont<-function(f) {
@@ -11,7 +13,7 @@ makeFont<-function(f) {
           "bold"={font<-2},
           "italic"={font<-3},
           font<-1)
-  
+  return(font)
 }
 
 boxtext <- function(x, y, labels = NA, col = NULL, bg = NA, 
@@ -21,6 +23,8 @@ boxtext <- function(x, y, labels = NA, col = NULL, bg = NA,
   ## The Character expansion factor to be used:
   theCex <- graphics::par('cex')*cex
   
+  labels<-parse(text=mathPrepText(labels))
+
   ## Width and height of text
   textHeight <- graphics::strheight(labels, cex = theCex, font = font)
   textWidth <- graphics::strwidth(labels, cex = theCex, font = font)
@@ -77,7 +81,7 @@ boxtext <- function(x, y, labels = NA, col = NULL, bg = NA,
                  col = bg, border = border)
   
   ## Place the text:
-  graphics::text(xMid, yMid, labels, col = col, cex = theCex, font = font, 
+  graphics::text(xMid, yMid, labels, col = col, cex = theCex, font = font, srt=srt,
                  adj = c(0.5, 0.5))    
   
   ## Return value:
@@ -98,7 +102,6 @@ doGraphElementBase<-function(element) {
            plot.new()
          },
          "Start"={
-           braw.env$plotLimits<-args
          },
          "Text"={ 
            font<-makeFont(args[[11]])
@@ -112,15 +115,15 @@ doGraphElementBase<-function(element) {
          },
          "Point"={
            col<-makeCol(args[[3]],args[[5]])
-           points(x=args[[1]]$x,y=args[[1]]$y,pch=args[[2]],col=args[[3]],bg=args[[4]],cex=args[[6]])
+           points(x=args[[1]]$x,y=args[[1]]$y,pch=args[[2]],col=args[[3]],bg=args[[4]],cex=args[[6]]/2)
          },
          "Path"={
            col<-makeCol(args[[3]],args[[6]])
-           lines(x=args[[1]]$x,y=args[[1]]$y,col=col,lty=args[[4]],lwd=args[[5]])
+           lines(x=args[[1]]$x,y=args[[1]]$y,col=col,lty=args[[4]],lwd=args[[5]]*2)
          },
          "Polygon"={
            col<-makeCol(args[[3]],args[[4]])
-           polygon(x=args[[1]]$x,y=args[[1]]$y,border=args[[2]],col=col,lwd=args[[5]])
+           polygon(x=args[[1]]$x,y=args[[1]]$y,border=args[[2]],col=col,lwd=args[[5]]*2)
          }
   )
   return(g)

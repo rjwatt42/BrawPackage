@@ -1228,7 +1228,7 @@ showPossible <- function(possibleResult=NULL,
                                         mapping),colour=BoxCol)
               )
             }
-            if (braw.env$graphHTML && braw.env$autoShow) {
+            if (braw.env$graphicsType=="HTML" && braw.env$autoShow) {
               showHTML(g)
               return(invisible(g))
             }

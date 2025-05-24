@@ -48,7 +48,7 @@ showMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
   ) 
   # if (is.null(multipleResult$hypothesis$IV2) || !is.element(whichEffect,c("All","Mains")))
     # g<-addG(g,plotTitle(paste0("Multiple: ",brawFormat(multipleResult$count)),"right",size=0.85))
-  if (braw.env$graphHTML && braw.env$autoShow) {
+  if (braw.env$graphicsType=="HTML" && braw.env$autoShow) {
     showHTML(g)
     return(invisible(g))
   }

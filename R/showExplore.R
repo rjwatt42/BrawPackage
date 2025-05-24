@@ -1036,7 +1036,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   }
   # if (exploreResult$count>0)
   # g<-addG(g,plotTitle(paste0("nsims=",brawFormat(exploreResult$count)),"right",size=1,fontface="plain"))
-  if (braw.env$graphHTML && braw.env$autoShow) {
+  if (braw.env$graphicsType=="HTML" && braw.env$autoShow) {
     showHTML(g)
     return(invisible(g))
   }
@@ -1163,7 +1163,7 @@ showExplore2D<-function(exploreResult=braw.res$explore,showType=c("rs","p"),show
   
   # if (exploreResult$count>0)
   #   g<-addG(g,plotTitle(paste0("nsims=",brawFormat(exploreResult$count)),"right",size=1))
-  if (braw.env$graphHTML && braw.env$autoShow) {
+  if (braw.env$graphicsType=="HTML" && braw.env$autoShow) {
     showHTML(g)
     return(invisible(NULL))
   }

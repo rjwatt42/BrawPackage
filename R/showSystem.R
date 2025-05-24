@@ -45,7 +45,7 @@ showSystem<-function(whichShow="all",hypothesis=braw.def$hypothesis,design=braw.
   )
   braw.env$addHistory<-TRUE
   
-  if (braw.env$graphHTML && braw.env$autoShow) {
+  if (braw.env$graphicsType=="HTML" && braw.env$autoShow) {
     showHTML(g)
     return(invisible(g))
   }
@@ -134,7 +134,7 @@ showHypothesis<-function(hypothesis=braw.def$hypothesis,evidence=braw.def$eviden
            if (doWorld) g<-showWorld(hypothesis,plotArea=c(xoff+0.27,0.3*ygain,0.275*wgain,0.38*wgain*ygain),g=g)
          })
   braw.env$plotArea<-plotArea
-  if (braw.env$graphHTML && autoShow) {
+  if (braw.env$graphicsType=="HTML" && autoShow) {
     showHTML(g)
     return(invisible(g))
   }
@@ -199,7 +199,7 @@ showWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),autoShow=
   g<-addG(g,dataPolygon(pts,fill=braw.env$plotColours$populationC,colour=NA))
   g<-addG(g,dataLine(pts))
   
-  if (braw.env$graphHTML && autoShow) {
+  if (braw.env$graphicsType=="HTML" && autoShow) {
     showHTML(g)
     return(invisible(g))
   }
@@ -284,7 +284,7 @@ showDesign<-function(design=braw.def$design,hypothesis=braw.def$hypothesis,plotA
     g<-addG(g,dataPolygon(data=pts,fill=braw.env$plotColours$replicationC,alpha=0.5))
     g<-addG(g,dataLine(data=pts))
   }
-  if (braw.env$graphHTML && autoShow) {
+  if (braw.env$graphicsType=="HTML" && autoShow) {
     showHTML(g)
     return(invisible(g))
   }
@@ -328,7 +328,7 @@ showPopulation <- function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),au
             g<-plotPopulation(IV2,DV,effect2,g=g)
           }
   )
-  if (braw.env$graphHTML && autoShow) {
+  if (braw.env$graphicsType=="HTML" && autoShow) {
     showHTML(g)
     return(invisible(g))
   }
@@ -395,7 +395,7 @@ showPrediction <- function(hypothesis=braw.def$hypothesis,design=braw.def$design
           }
   )
   
-  if (braw.env$graphHTML && autoShow) {
+  if (braw.env$graphicsType=="HTML" && autoShow) {
     showHTML(g)
     return(invisible(g))
   }

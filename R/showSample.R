@@ -34,7 +34,7 @@ showSample<-function(sample=braw.res$result,marginals=FALSE){
   
   if (marginals) {
     g<-showMarginals(sample)
-    if (braw.env$graphHTML && braw.env$autoShow) {
+    if (braw.env$graphicsType=="HTML" && braw.env$autoShow) {
       return(invisible(g))
     }
     else return(g)  
@@ -59,7 +59,7 @@ showSample<-function(sample=braw.res$result,marginals=FALSE){
   }
   # braw.env$plotArea<-c(0,0,1,1)
   
-  if (braw.env$graphHTML && braw.env$autoShow) {
+  if (braw.env$graphicsType=="HTML" && braw.env$autoShow) {
     showHTML(g)
     return(invisible(g))
   }

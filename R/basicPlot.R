@@ -95,7 +95,7 @@ joinHTML<-function(p1,p2) {
 }
 
 addG<-function(g,...) {
-  if (braw.env$graphHTML) {
+  if (braw.env$graphicsType=="HTML") {
     for (i in list(...)) 
       for (j in 1:length(i))
         g<-paste0(g,i[j])
@@ -182,7 +182,7 @@ reOrientXY<-function(data,orientation=braw.env$plotLimits$orientation) {
   return(data)
 }
 reSizeFont<-function(size) {
-  if (braw.env$graphHTML) return(size*braw.env$plotLimits$fontScale*3.5)
+  if (braw.env$graphicsType=="HTML") return(size*braw.env$plotLimits$fontScale*3.5)
   else return(size*braw.env$plotLimits$fontScale*1.5)
 }
 
@@ -207,18 +207,24 @@ nullPlot<-function() {
 }
 
 drawNullPlot<-function() {  
-  if (braw.env$graphHTML) {
-    if (braw.env$plotColours$graphC=="#FFFFFF") col<-"rgba(0,0,0,0)"
-    else col<-braw.env$plotColours$graphC
-    g<-paste0(
-      '<svg width=',format(svgBoxX()),' height=',format(svgBoxY()),
-      ' padding:0;',
-      ' style="','background-color: ',col,';','display: block; margin: auto;','" ',
-      ' xmlns="http://www.w3.org/2000/svg">'
-    )
-  } else {
-    g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
-  }
+  switch(braw.env$graphicsType,
+         "ggplot"={
+           g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
+         },
+         "HTML"={
+           if (braw.env$plotColours$graphC=="#FFFFFF") col<-"rgba(0,0,0,0)"
+           else col<-braw.env$plotColours$graphC
+           g<-paste0(
+             '<svg width=',format(svgBoxX()),' height=',format(svgBoxY()),
+             ' padding:0;',
+             ' style="','background-color: ',col,';','display: block; margin: auto;','" ',
+             ' xmlns="http://www.w3.org/2000/svg">'
+           )
+         },
+         "base"={
+           g<-NULL
+         }
+         )
   return(g)
 }
 
@@ -470,6 +476,15 @@ dataBar<-function(data,colour="#000000",fill="white",alpha=1,barwidth=0.85) {
 # axisPoint
 # axisPolygon
 # dataContour
+mathPrepText<-function(label) {
+  label<-gsub("\\[([^ ]*)\\]","\\['\\1'\\]",label)
+  label<-gsub("\\(","\\(\\(",label)
+  label<-gsub("\\)","\\)\\)",label)
+  label<-gsub("=","==",label)
+  label<-gsub(" ","~",label)
+  label<-gsub("\u00B1([0-9.]*)","~'\u00B1 \\1'",label)
+  return(label)
+}
 dataLabel<-function(data,label, hjust=0, vjust=0, fill="white",colour="#000000",size=0.8,angle=0,fontface="plain",background=FALSE,parser=TRUE,label.size=0.25) {
   if (is.character(data)) 
     switch(data,
@@ -506,28 +521,7 @@ axisLabel<-function(data,label, hjust=0, vjust=0, angle=0, fill="white",colour="
   drawLabel(data,label, hjust, vjust, angle, fill,colour,parser,fontface,size,label.size) 
 }
 drawLabel<-function(data,label, hjust=0, vjust=0, angle=0, fill="white",colour="#000000",parser=TRUE,fontface="plain",size=0.8,label.size=0.25) {
-  if (!braw.env$graphHTML) {
-    mathlabel<-grepl("['^']{1}",label) | grepl("['[']{1}",label)
-    if (any(mathlabel)) {
-      label<-gsub("\\[([^ ]*)\\]","\\['\\1'\\]",label)
-      label<-gsub("=","==",label)
-      parser<-TRUE
-      voff<-0
-    } else {
-      if (parser) label<-deparse(bquote(.(label)))
-      voff<-0
-    }
-    if (braw.env$plotLimits$orientation=="vert") {
-      a<-hjust; hjust<-vjust; vjust<-a
-    }
-    g<-geom_label(data=data,aes(x = x, y = y), label=label, angle=angle,
-                  hjust=hjust, vjust=vjust, nudge_y=voff,
-                  fill=fill,color=colour,fontface=fontface,
-                  label.padding=unit(0.1, "lines"),label.size=label.size,
-                  size=reSizeFont(size)*0.8,parse=parser)
-  } else {
-    g<-axisText(data,label, hjust=hjust, vjust=vjust, angle=angle, colour=colour,fontface=fontface,size=size,background=TRUE,fill=fill)
-  }
+  g<-drawText(data,label, hjust=hjust, vjust=vjust, angle=angle, colour=colour,fontface=fontface,size=size,background=TRUE,fill=fill)
   return(g)
 }
 dataText<-function(data,label, hjust=0, vjust=0, colour="#000000",size=1,angle=0,fontface="plain",background=FALSE,fill="white") {
@@ -539,98 +533,102 @@ axisText<-function(data,label, hjust=0, vjust=0, colour="#000000",size=1,angle=0
   addGraphElement(list(type="Text",args=list(data,label,hjust,vjust,colour,fill,size,angle,dx,dy,fontface,background)))
   drawText(data,label, hjust, vjust, colour,fill,size,angle,dx,dy,fontface,background)
 }
-mathPrepText<-function(label) {
-label<-gsub("\\[([^ ]*)\\]","\\['\\1'\\]",label)
-label<-gsub("\\(","\\(\\(",label)
-label<-gsub("\\)","\\)\\)",label)
-label<-gsub("=","==",label)
-label<-gsub(" ","~",label)
-label<-gsub("\u00B1([0-9.]*)","~'\u00B1 \\1'",label)
-return(label)
-}
 drawText<-function(data,label, hjust=0, vjust=0, colour="#000000",fill="white",size=1,angle=0,dx=0,dy=0,fontface="plain",background=FALSE) {
-  if (!braw.env$graphHTML) {
-    parse<-FALSE
-    mathlabel<-grepl("['^']{1}",label) | grepl("['[']{1}",label)
-    if (any(mathlabel)) {
-      label<-mathPrepText(label)
-      parse=TRUE
-      # if (fontface=="bold") label<-paste0('bold(',label,')')
-    }
-    
-    if (braw.env$plotLimits$orientation=="vert") {
-      a<-hjust; hjust<-vjust; vjust<-a
-    }
-    g<-geom_text(data=data,aes(x = x, y = y), label=label, hjust=hjust, vjust=vjust, 
-                 color=colour,fontface=fontface,angle=angle,
-                 size=reSizeFont(size)*0.8,parse=parse)
-  } else {
-    halign<-' text-anchor="start"' 
-    if (hjust==0.5) halign<-' text-anchor="middle"' 
-    if (hjust>0.5) halign<-' text-anchor="end"' 
-    
-    if (fontface=="plain") fontface="normal"
-    valign<-' dominant-baseline="auto"' 
-    if (vjust==0.5) valign<-' dominant-baseline="middle"'
-    if (vjust>0.5) valign<-' dominant-baseline="text-before-edge"'
-    
-    if (fontface=="plain") fontface="normal"
-    
-    x<-svgX(data$x)
-    y<-svgY(data$y)
-    # if (containsSubscript(label)) y<-y-0.025*braw.env$plotArea[4]*svgBoxY()
-    labels<-""
-    
-    if (!background) filter<-'' else {
-      labels<-paste0(
-        '  <filter x="0" y="0" width="1" height="1" id="bg-',fill,'">',
-        '  <feFlood flood-color="',fill,'"/>',
-        '  <feComposite in="SourceGraphic" />',
-        '  </filter>'
-      )
-      filter<-paste0(' filter="url(#bg-',fill,')"')
-    }
-    
-    for (i in 1:length(x)) {
-      thisLabel<-label[i]
-      thisLabel<-gsub('\\[([^ ]*?)\\]',
-                      paste0('</tspan><tspan baseline-shift="sub" font-size="',
-                             reSizeFont(size)*0.8,'">\\1</tspan><tspan>'),
-                      thisLabel)
-      thisLabel<-gsub('\\^([^ ]*?) ',
-                      paste0('</tspan><tspan baseline-shift="super" font-size="',
-                             reSizeFont(size)*0.8,'">\\1</tspan><tspan>'),
-                      thisLabel)
-      thisLabel<-paste0(
-        '<tspan',halign,valign,
-        ' dx=',dx,'px',
-        ' dy=',-dy,'px',
-        '>',
-        thisLabel,
-        '</tspan>'
-      )
-      
-      labels<-paste0(labels,
-                     '<text ',
-                     filter,
-                     ' x="',x[i],'"',
-                     ' y="',y[i],'"',
-                     ' fill="',colour,'"',
-                     ' text-anchor="middle"', valign,
-                     ' transform="rotate(',-angle,',',x[1],',',y[1],')"',
-                     ' font-size="',reSizeFont(size),'"',
-                     ' font-weight="',fontface,'"',
-                     ' font-family="Arial, Helvetica, sans-serif"',
-                     '>',
-                     thisLabel,
-                     '</text>'
-      )
-    }
-    g<-labels
-  }
+  switch(braw.env$graphicsType,
+         "ggplot"={
+           parser<-FALSE
+           mathlabel<-grepl("['^']{1}",label) | grepl("['[']{1}",label)
+           if (any(mathlabel)) {
+             label<-mathPrepText(label)
+             parser=TRUE
+           } 
+           
+           if (braw.env$plotLimits$orientation=="vert") {
+             a<-hjust; hjust<-vjust; vjust<-a
+           }
+           if (background) {
+             if (parser && !any(mathlabel)) label<-deparse(bquote(.(label)))
+             g<-geom_label(data=data,aes(x = x, y = y), label=label, angle=angle,
+                           hjust=hjust, vjust=vjust,
+                           fill=fill,color=colour,fontface=fontface,
+                           label.padding=unit(0.1, "lines"),label.size=label.size,
+                           size=reSizeFont(size)*0.8,parse=parser)
+           } else {
+             g<-geom_text(data=data,aes(x = x, y = y), label=label, angle=angle,
+                          hjust=hjust, vjust=vjust, 
+                          color=colour,fontface=fontface,
+                          size=reSizeFont(size)*0.8,parse=parser)
+           }
+         },
+         "HTML"={
+           halign<-' text-anchor="start"' 
+           if (hjust==0.5) halign<-' text-anchor="middle"' 
+           if (hjust>0.5) halign<-' text-anchor="end"' 
+           
+           if (fontface=="plain") fontface="normal"
+           valign<-' dominant-baseline="auto"' 
+           if (vjust==0.5) valign<-' dominant-baseline="middle"'
+           if (vjust>0.5) valign<-' dominant-baseline="text-before-edge"'
+           
+           if (fontface=="plain") fontface="normal"
+           
+           x<-svgX(data$x)
+           y<-svgY(data$y)
+           # if (containsSubscript(label)) y<-y-0.025*braw.env$plotArea[4]*svgBoxY()
+           labels<-""
+           
+           if (!background) filter<-'' else {
+             labels<-paste0(
+               '  <filter x="0" y="0" width="1" height="1" id="bg-',fill,'">',
+               '  <feFlood flood-color="',fill,'"/>',
+               '  <feComposite in="SourceGraphic" />',
+               '  </filter>'
+             )
+             filter<-paste0(' filter="url(#bg-',fill,')"')
+           }
+           
+           for (i in 1:length(x)) {
+             thisLabel<-label[i]
+             thisLabel<-gsub('\\[([^ ]*?)\\]',
+                             paste0('</tspan><tspan baseline-shift="sub" font-size="',
+                                    reSizeFont(size)*0.8,'">\\1</tspan><tspan>'),
+                             thisLabel)
+             thisLabel<-gsub('\\^([^ ]*?) ',
+                             paste0('</tspan><tspan baseline-shift="super" font-size="',
+                                    reSizeFont(size)*0.8,'">\\1</tspan><tspan>'),
+                             thisLabel)
+             thisLabel<-paste0(
+               '<tspan',halign,valign,
+               ' dx=',dx,'px',
+               ' dy=',-dy,'px',
+               '>',
+               thisLabel,
+               '</tspan>'
+             )
+             
+             labels<-paste0(labels,
+                            '<text ',
+                            filter,
+                            ' x="',x[i],'"',
+                            ' y="',y[i],'"',
+                            ' fill="',colour,'"',
+                            ' text-anchor="middle"', valign,
+                            ' transform="rotate(',-angle,',',x[1],',',y[1],')"',
+                            ' font-size="',reSizeFont(size),'"',
+                            ' font-weight="',fontface,'"',
+                            ' font-family="Arial, Helvetica, sans-serif"',
+                            '>',
+                            thisLabel,
+                            '</text>'
+             )
+           }
+           g<-labels
+         },
+         "base"={
+           g<-NULL
+         })
   return(g)
 }
-
 
 dataPath<-function(data,arrow=NULL,colour="#000000",linetype="solid",linewidth=0.25,alpha=1) {
   data<-reRangeXY(data)
@@ -641,7 +639,7 @@ axisPath<-function(data,arrow=NULL,colour="#000000",linetype="solid",linewidth=0
   drawPath(data,arrow,colour,linetype,linewidth,alpha)
 }
 drawPath<-function(data,arrow=NULL,colour="#000000",linetype="solid",linewidth=0.25,alpha=1) {
-  if (!braw.env$graphHTML) {
+  if (!braw.env$graphicsType=="HTML") {
     g<-geom_path(data=data,aes(x=x,y=y),arrow=arrow,color=colour,alpha=alpha,
                  linetype=linetype,linewidth=linewidth)
   } else {
@@ -679,7 +677,7 @@ axisPoint<-function(data,shape=21,colour="#000000",fill="white",alpha=1,size=3) 
 drawPoint<-function(data,shape=21,colour="#000000",fill="white",alpha=1,size=3) {
   size<-0.75*size*(braw.env$plotArea[4])^0.5
   # if (alpha<1) colour=fill
-  if (!braw.env$graphHTML) {
+  if (!braw.env$graphicsType=="HTML") {
     size<-size*1.5
     if (is.null(data$fill)) {
       g<-geom_point(data=data,aes(x=x,y=y),shape=shape,colour=colour,fill=fill,alpha=alpha,size=size*0.9)
@@ -731,7 +729,7 @@ axisPolygon<-function(data,colour="#000000",fill="white",alpha=1,linewidth=0.25)
   drawPolygon(data,colour,fill,alpha,linewidth)
 }
 drawPolygon<-function(data,colour="#000000",fill="white",alpha=1,linewidth=0.25) {
-  if (!braw.env$graphHTML) {
+  if (!braw.env$graphicsType=="HTML") {
     if (!is.na(colour) && colour=="none") colour=NA
     if (!is.null(data$ids)) {
       g<-geom_polygon(data=data,aes(x=x,y=y,group=ids,alpha=alpha*value),colour = colour, fill = fill,linewidth=linewidth)
@@ -803,13 +801,13 @@ dataErrorBar<-function(data,colour="#000000",linewidth=0.25) {
 
 dataLegend<-function(data,title="title",fontsize=0.6,shape=21) {
   dy=0.06*fontsize
-  dx=0.02*fontsize/braw.env$plotArea[3] # because rangeX() below
+  dx=0.022*fontsize/braw.env$plotArea[3] # because rangeX() below
   names<-data$names
   names1<-gsub("\\]","",gsub("\\[","",gsub("'","",names)))
   if (nchar(title)>0) tn<-1.2 else tn<-0
   nrows<-tn+length(data$names)+1
   # ncols<-max(c(nchar(title),nchar(names1)))+2
-  ncols<-max(c(strwidth(parse(text=mathPrepText(title))),strwidth(parse(text=mathPrepText(data$names)))))/strwidth("e")+2.5
+  ncols<-max(strwidth(parse(text=mathPrepText(c(title,data$names)))))/strwidth("e")+2
   g<-list(axisPolygon(data=data.frame(x=rangeX(c(1-ncols*dx,1,1,1-ncols*dx,1-ncols*dx)),
                                       y=rangeY(c(1-nrows*dy,1-nrows*dy,1,1,1-nrows*dy))),
                       fill="white",colour="white",linewidth=0.5)

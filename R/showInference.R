@@ -206,7 +206,7 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
     }
   }
 
-  if (braw.env$graphHTML && braw.env$autoShow) {
+  if (braw.env$graphicsType=="HTML" && braw.env$autoShow) {
     showHTML(g1)
     return(invisible(g1))
   }
