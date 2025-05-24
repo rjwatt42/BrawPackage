@@ -639,31 +639,36 @@ axisPath<-function(data,arrow=NULL,colour="#000000",linetype="solid",linewidth=0
   drawPath(data,arrow,colour,linetype,linewidth,alpha)
 }
 drawPath<-function(data,arrow=NULL,colour="#000000",linetype="solid",linewidth=0.25,alpha=1) {
-  if (!braw.env$graphicsType=="HTML") {
-    g<-geom_path(data=data,aes(x=x,y=y),arrow=arrow,color=colour,alpha=alpha,
-                 linetype=linetype,linewidth=linewidth)
-  } else {
-    ls<-''
-    if (linetype=="dotted") ls<-' stroke-dasharray="2,2"'
-    if (linetype=="dashed") ls<-' stroke-dasharray="4,1"'
-    linestyle<-paste0(' fill="none" stroke="',colour,'"',
-                      ls,
-                      ' stroke-width="',linewidth,'"',
-                      ' stroke-opacity="',alpha,'"')
-    x<-svgX(data$x)
-    y<-svgY(data$y)
-    points<-' points="'
-    for (i in 1:length(x)) 
-      points<-paste0(points,' ',format(x[i]),',',format(y[i]))
-    points<-paste0(points,'"')
-    
-    g<-paste0(
-      '<polyline',
-      points,
-      linestyle,
-      ' />'
-    )
-  }
+  switch(braw.env$graphicsType,
+         "ggplot"={
+           g<-geom_path(data=data,aes(x=x,y=y),arrow=arrow,color=colour,alpha=alpha,
+                        linetype=linetype,linewidth=linewidth)
+         },
+         "HTML"={
+           ls<-''
+           if (linetype=="dotted") ls<-' stroke-dasharray="2,2"'
+           if (linetype=="dashed") ls<-' stroke-dasharray="4,1"'
+           linestyle<-paste0(' fill="none" stroke="',colour,'"',
+                             ls,
+                             ' stroke-width="',linewidth,'"',
+                             ' stroke-opacity="',alpha,'"')
+           x<-svgX(data$x)
+           y<-svgY(data$y)
+           points<-' points="'
+           for (i in 1:length(x)) 
+             points<-paste0(points,' ',format(x[i]),',',format(y[i]))
+           points<-paste0(points,'"')
+           
+           g<-paste0(
+             '<polyline',
+             points,
+             linestyle,
+             ' />'
+           )
+         },
+         "base"={
+           
+         })
   return(g)
 }
 dataPoint<-function(data,shape=21,colour="#000000",fill="white",alpha=1,size=3) {
@@ -677,46 +682,51 @@ axisPoint<-function(data,shape=21,colour="#000000",fill="white",alpha=1,size=3) 
 drawPoint<-function(data,shape=21,colour="#000000",fill="white",alpha=1,size=3) {
   size<-0.75*size*(braw.env$plotArea[4])^0.5
   # if (alpha<1) colour=fill
-  if (!braw.env$graphicsType=="HTML") {
-    size<-size*1.5
-    if (is.null(data$fill)) {
-      g<-geom_point(data=data,aes(x=x,y=y),shape=shape,colour=colour,fill=fill,alpha=alpha,size=size*0.9)
-    } else {
-      g<-geom_point(data=data,aes(x=x,y=y,fill=fill),shape=shape,colour=colour,alpha=alpha,size=size*0.9)
-    }
-  } else {
-    x<-svgX(data$x)
-    y<-svgY(data$y)
-    if (length(x)==0) return("")
-    if (shape==21) {
-      sz<-size*4/pi
-      g<-""
-      for (i in 1:length(x)) {
-        g<-paste0(g,
-                  '<circle cx="',format(x[i]),'" cy="',format(y[i]),'" r="',sz,'"',
-                  ' fill="',fill,'"',
-                  ' stroke="',colour,'" stroke-width="1"',
-                  ' />'
-        )
-      }
-    } else {
-      sz<-size*3
-      if (shape==22) tr="" 
-      else           tr=paste0(' transform=rotate(45,',format(x[i]),',',format(y[i]),')')
-      g<-""
-      for (i in 1:length(x)) {
-        g<-paste0(g,
-                  '<rect x="',format(x[i]-sz/2),'" y="',format(y[i]-sz/2),'"',
-                  ' width="',sz,'"',' height="',sz,'"',
-                  ' rx="0" ry="0"',
-                  ' fill="',fill,'"',
-                  ' stroke="',colour,'" stroke-width="1"',
-                  tr,
-                  ' />'
-        )
-      }
-    }
-  }
+  switch(braw.env$graphicsType,
+         "ggplot"={
+           size<-size*1.5
+           if (is.null(data$fill)) {
+             g<-geom_point(data=data,aes(x=x,y=y),shape=shape,colour=colour,fill=fill,alpha=alpha,size=size*0.9)
+           } else {
+             g<-geom_point(data=data,aes(x=x,y=y,fill=fill),shape=shape,colour=colour,alpha=alpha,size=size*0.9)
+           }
+         },
+         "HTML"={
+           x<-svgX(data$x)
+           y<-svgY(data$y)
+           if (length(x)==0) return("")
+           if (shape==21) {
+             sz<-size*4/pi
+             g<-""
+             for (i in 1:length(x)) {
+               g<-paste0(g,
+                         '<circle cx="',format(x[i]),'" cy="',format(y[i]),'" r="',sz,'"',
+                         ' fill="',fill,'"',
+                         ' stroke="',colour,'" stroke-width="1"',
+                         ' />'
+               )
+             }
+           } else {
+             sz<-size*3
+             if (shape==22) tr="" 
+             else           tr=paste0(' transform=rotate(45,',format(x[i]),',',format(y[i]),')')
+             g<-""
+             for (i in 1:length(x)) {
+               g<-paste0(g,
+                         '<rect x="',format(x[i]-sz/2),'" y="',format(y[i]-sz/2),'"',
+                         ' width="',sz,'"',' height="',sz,'"',
+                         ' rx="0" ry="0"',
+                         ' fill="',fill,'"',
+                         ' stroke="',colour,'" stroke-width="1"',
+                         tr,
+                         ' />'
+               )
+             }
+           }
+         },
+         "base"={
+           
+         })
   return(g)
 }
 dataPolygon<-function(data,colour="#000000",fill="white",alpha=1,linewidth=0.25) {
@@ -729,56 +739,61 @@ axisPolygon<-function(data,colour="#000000",fill="white",alpha=1,linewidth=0.25)
   drawPolygon(data,colour,fill,alpha,linewidth)
 }
 drawPolygon<-function(data,colour="#000000",fill="white",alpha=1,linewidth=0.25) {
-  if (!braw.env$graphicsType=="HTML") {
-    if (!is.na(colour) && colour=="none") colour=NA
-    if (!is.null(data$ids)) {
-      g<-geom_polygon(data=data,aes(x=x,y=y,group=ids,alpha=alpha*value),colour = colour, fill = fill,linewidth=linewidth)
-    } else {
-      if (!is.null(data$fill)) {
-        g<-geom_polygon(data=data,aes(x=x,y=y, fill = fill),colour = colour,alpha=alpha,linewidth=linewidth)
-      } else {
-        g<-geom_polygon(data=data,aes(x=x,y=y),colour = colour, fill = fill,alpha=alpha,linewidth=linewidth)
-      }
-    }
-  } else {
-    x<-svgX(data$x)
-    y<-svgY(data$y)
-    if (!is.null(data$ids)) {
-      g<-""
-      for (i in seq(1,length(x),4)) {
-        linestyle<-paste0(' fill="',fill,'" stroke="',colour,'"',
-                          ' fill-opacity="',alpha*data$value[i],'"',
-                          ' stroke="',colour,'"',
-                          ' stroke-width="',linewidth*2,'"',
-                          ' stroke-opacity="',1,'"')
-        points<-' points="'
-        for (j in 1:4)  points<-paste0(points,' ',format(x[i+j-1]),',',format(y[i+j-1]))
-        points<-paste0(points,'"')
-        g<-paste0(g,
-                  '<polyline',
-                  points,
-                  linestyle,
-                  ' />'
-        )
-      }
-    } else {
-      linestyle<-paste0(' fill="',fill,'" stroke="',colour,'"',
-                        ' fill-opacity="',alpha,'"',
-                        ' stroke-width="',linewidth*2,'"',
-                        ' stroke-opacity="',1,'"')
-      points<-' points="'
-      for (i in 1:length(x)) points<-paste0(points,' ',format(x[i]),',',format(y[i]))
-      # points<-paste0(points,' ',format(x[1]),',',format(y[1]))
-      points<-paste0(points,'"')
-      
-      g<-paste0(
-        '<polyline',
-        points,
-        linestyle,
-        ' />'
-      )
-    }
-  }
+  switch(braw.env$graphicsType,
+         "ggplot"={
+           if (!is.na(colour) && colour=="none") colour=NA
+           if (!is.null(data$ids)) {
+             g<-geom_polygon(data=data,aes(x=x,y=y,group=ids,alpha=alpha*value),colour = colour, fill = fill,linewidth=linewidth)
+           } else {
+             if (!is.null(data$fill)) {
+               g<-geom_polygon(data=data,aes(x=x,y=y, fill = fill),colour = colour,alpha=alpha,linewidth=linewidth)
+             } else {
+               g<-geom_polygon(data=data,aes(x=x,y=y),colour = colour, fill = fill,alpha=alpha,linewidth=linewidth)
+             }
+           }
+         },
+         "HTML"={
+           x<-svgX(data$x)
+           y<-svgY(data$y)
+           if (!is.null(data$ids)) {
+             g<-""
+             for (i in seq(1,length(x),4)) {
+               linestyle<-paste0(' fill="',fill,'" stroke="',colour,'"',
+                                 ' fill-opacity="',alpha*data$value[i],'"',
+                                 ' stroke="',colour,'"',
+                                 ' stroke-width="',linewidth*2,'"',
+                                 ' stroke-opacity="',1,'"')
+               points<-' points="'
+               for (j in 1:4)  points<-paste0(points,' ',format(x[i+j-1]),',',format(y[i+j-1]))
+               points<-paste0(points,'"')
+               g<-paste0(g,
+                         '<polyline',
+                         points,
+                         linestyle,
+                         ' />'
+               )
+             }
+           } else {
+             linestyle<-paste0(' fill="',fill,'" stroke="',colour,'"',
+                               ' fill-opacity="',alpha,'"',
+                               ' stroke-width="',linewidth*2,'"',
+                               ' stroke-opacity="',1,'"')
+             points<-' points="'
+             for (i in 1:length(x)) points<-paste0(points,' ',format(x[i]),',',format(y[i]))
+             # points<-paste0(points,' ',format(x[1]),',',format(y[1]))
+             points<-paste0(points,'"')
+             
+             g<-paste0(
+               '<polyline',
+               points,
+               linestyle,
+               ' />'
+             )
+           }
+         },
+         "base"={
+           
+         })
   return(g)
 }
 dataErrorBar<-function(data,colour="#000000",linewidth=0.25) {
