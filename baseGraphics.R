@@ -16,6 +16,10 @@ makeFont<-function(f) {
   return(font)
 }
 
+is.mathLabel<-function(label) {
+  return(grepl("['^']{1}",label) | grepl("['[']{1}",label))
+}
+
 boxtext <- function(x, y, labels = NA, col = NULL, bg = NA, 
                     border = NA, adj = NULL, pos = NULL, offset = 0.5, 
                     padding = c(0.5, 0.5), cex = 1, font = graphics::par('font'),srt=0){
@@ -23,8 +27,6 @@ boxtext <- function(x, y, labels = NA, col = NULL, bg = NA,
   ## The Character expansion factor to be used:
   theCex <- graphics::par('cex')*cex
   
-  labels<-parse(text=mathPrepText(labels))
-
   ## Width and height of text
   textHeight <- graphics::strheight(labels, cex = theCex, font = font)
   textWidth <- graphics::strwidth(labels, cex = theCex, font = font)
@@ -104,13 +106,25 @@ doGraphElementBase<-function(element) {
          "Start"={
          },
          "Text"={ 
+           labels<-args[[2]]
            font<-makeFont(args[[11]])
-           boxtext(x=args[[1]]$x,y=args[[1]]$y,labels=args[[2]],adj=c(args[[3]],args[[4]]),
+           if (any(is.mathLabel(labels))) {
+             labels<-mathPrepText(labels)
+             if (font==2) labels<-paste0("bold(",labels,")")
+             labels<-parse(text=labels)
+           }
+           boxtext(x=args[[1]]$x,y=args[[1]]$y,labels=labels,adj=c(args[[3]],args[[4]]),
                 cex=args[[7]],col=args[[5]],font=font,srt=args[[8]])
          },
          "Label"={
+           labels<-args[[2]]
            font<-makeFont(args[[8]])
-           boxtext(x=args[[1]]$x,y=args[[1]]$y,labels=args[[2]],adj=c(args[[3]],args[[4]]),
+           if (any(is.mathLabel(labels))) {
+             labels<-mathPrepText(labels)
+             if (font==2) labels<-paste0("bold(",labels,")")
+             labels<-parse(text=labels)
+           }
+           boxtext(x=args[[1]]$x,y=args[[1]]$y,labels=labels,adj=c(args[[3]],args[[4]]),
                 cex=args[[9]],col=args[[6]],bg=args[[5]],font=font,padding=args[[10]])
          },
          "Point"={
@@ -130,7 +144,9 @@ doGraphElementBase<-function(element) {
 }
 
 buildGraphBase<-function(g1=NULL) {
-  if (is.null(g1)) g1<-braw.env$history[[length(braw.env$history)]]
+  n<-length(braw.env$history)
+  if (is.null(g1)) g1<-braw.env$history[[n]]
+  if (is.numeric(g1)) g1<-braw.env$history[[max(min(n-g1,n),1)]]
   for (i in 1:length(g1)) {
     doGraphElementBase(g1[[i]])
   }

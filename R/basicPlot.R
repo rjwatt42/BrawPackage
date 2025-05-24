@@ -476,6 +476,9 @@ dataBar<-function(data,colour="#000000",fill="white",alpha=1,barwidth=0.85) {
 # axisPoint
 # axisPolygon
 # dataContour
+is.mathLabel<-function(label) {
+  return(grepl("['^']{1}",label) | grepl("['[']{1}",label))
+}
 mathPrepText<-function(label) {
   label<-gsub("\\[([^ ]*)\\]","\\['\\1'\\]",label)
   label<-gsub("\\(","\\(\\(",label)
@@ -537,8 +540,7 @@ drawText<-function(data,label, hjust=0, vjust=0, colour="#000000",fill="white",s
   switch(braw.env$graphicsType,
          "ggplot"={
            parser<-FALSE
-           mathlabel<-grepl("['^']{1}",label) | grepl("['[']{1}",label)
-           if (any(mathlabel)) {
+           if (any(is.mathLabel(label))) {
              label<-mathPrepText(label)
              parser=TRUE
            } 
@@ -547,7 +549,7 @@ drawText<-function(data,label, hjust=0, vjust=0, colour="#000000",fill="white",s
              a<-hjust; hjust<-vjust; vjust<-a
            }
            if (background) {
-             if (parser && !any(mathlabel)) label<-deparse(bquote(.(label)))
+             if (parser && !any(is.mathLabel(label))) label<-deparse(bquote(.(label)))
              g<-geom_label(data=data,aes(x = x, y = y), label=label, angle=angle,
                            hjust=hjust, vjust=vjust,
                            fill=fill,color=colour,fontface=fontface,
