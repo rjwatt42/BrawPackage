@@ -266,12 +266,12 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
    if (braw.env$pPlotScale=="log10")  ps<-log10(ps)
    g<-addG(g,horzLine(ps,linetype="dotted",colour=braw.env$plotColours$infer_sigC,linewidth=1))
  }
-  gain<-7/max(7,sqrt(length(d1)))
+  gain<-10/max(10,sqrt(length(d1)))
   dotSize<-braw.env$dotSize*gain
 
   if (!metaPlot && braw.env$useSignificanceCols){
-    c1=darken(braw.env$plotColours$infer_sigC,off=0.2)
-    c2=braw.env$plotColours$infer_nsigC
+    c1=darken(braw.env$plotColours$infer_sigC,gain=1/gain^0.8)
+    c2=darken(braw.env$plotColours$infer_nsigC,gain=1)
   } else {
     c1=braw.env$plotColours$descriptionC
     c2=braw.env$plotColours$descriptionC

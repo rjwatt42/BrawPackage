@@ -1,4 +1,12 @@
 ###################
+
+h<-getHypothesis("PsychF")
+d<-getDesign("Psych")
+
+showMultiple(doMultiple(100,hypothesis=h,design=d),showType="ws;wp",dimension="2D")
+
+
+###################
 n=42
 
 h<-makeHypothesis(effect=makeEffect(0))

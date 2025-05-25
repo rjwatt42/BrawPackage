@@ -37,7 +37,7 @@ theoryPlot<-function(g,theory,orientation,baseColour,theoryAlpha,xoff) {
   
   return(g)
 }
-makeTheoryMultiple<-function(hypothesis,design,showType,whichEffect,logScale,ylim,labelNSig,labelSig,orientation) {
+makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,logScale,ylim,labelNSig,labelSig,orientation) {
   effect<-hypothesis$effect
   
   effectTheory<-effect
@@ -203,23 +203,23 @@ makeTheoryMultiple<-function(hypothesis,design,showType,whichEffect,logScale,yli
          "ws"={
            dw<-0.01
            theoryVals<-seq(braw.env$alphaSig*(1+dw),1/(1+dw),length.out=npt)
-           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"ws",logScale=logScale,sigOnly=sigOnly)
+           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"ws",logScale=logScale,sigOnly=evidence$sigOnly)
          },
          "log(lrs)"={
            theoryVals<-seq(0,braw.env$lrRange,length.out=npt)
-           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"log(lrs)",logScale=logScale,sigOnly=sigOnly)
+           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"log(lrs)",logScale=logScale,sigOnly=evidence$sigOnly)
          },
          "log(lrd)"={
            theoryVals<-seq(-braw.env$lrRange,braw.env$lrRange,length.out=npt)
-           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
+           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"log(lrd)",logScale=logScale,sigOnly=evidence$sigOnly)
          },
          "e1d"={
            theoryVals<-seq(-braw.env$lrRange,braw.env$lrRange,length.out=npt)
-           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
+           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"log(lrd)",logScale=logScale,sigOnly=evidence$sigOnly)
          },
          "e2d"={
            theoryVals<-seq(-braw.env$lrRange,braw.env$lrRange,length.out=npt)
-           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
+           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"log(lrd)",logScale=logScale,sigOnly=evidence$sigOnly)
          },
          "nw"={
            if (logScale) {
@@ -229,13 +229,13 @@ makeTheoryMultiple<-function(hypothesis,design,showType,whichEffect,logScale,yli
              theoryVals<-5+seq(0,braw.env$max_nw,length.out=npt)
              yvUse<-theoryVals
            }
-           theoryDens_all<-fullRSamplingDist(yvUse,effectTheory$world,design,"nw",logScale=logScale,sigOnly=sigOnly)
+           theoryDens_all<-fullRSamplingDist(yvUse,effectTheory$world,design,"nw",logScale=logScale,sigOnly=evidence$sigOnly)
            theoryDens_all<-abs(theoryDens_all)
          },
          "wp"={
            dw<-0.01
            theoryVals<-seq(braw.env$alphaSig*(1+dw),1/(1+dw),length.out=npt)
-           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"wp",logScale=logScale,sigOnly=sigOnly)
+           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"wp",logScale=logScale,sigOnly=evidence$sigOnly)
          },
          "iv.mn"={
            var<-hypothesis$IV
@@ -1191,7 +1191,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
     histGainrange<-c(NA,NA)
     
     if (showTheory) {
-      theory<-makeTheoryMultiple(hypothesis,design,showType,whichEffect,logScale,ylim,labelNSig,labelSig,orientation)
+      theory<-makeTheoryMultiple(hypothesis,design,evidence,showType,whichEffect,logScale,ylim,labelNSig,labelSig,orientation)
       theoryVals<-theory$theoryVals
       theoryDens_all<-theory$theoryDens_all
       theoryDens_sig<-theory$theoryDens_sig

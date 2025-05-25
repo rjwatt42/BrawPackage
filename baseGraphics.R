@@ -120,8 +120,7 @@ doGraphElementBase<-function(element) {
            labels<-args[[2]]
            font<-makeFont(args[[8]])
            if (any(is.mathLabel(labels))) {
-             labels<-mathPrepText(labels)
-             if (font==2) labels<-paste0("bold(",labels,")")
+             labels<-mathPrepText(labels,font==2)
              labels<-parse(text=labels)
            }
            boxtext(x=args[[1]]$x,y=args[[1]]$y,labels=labels,adj=c(args[[3]],args[[4]]),

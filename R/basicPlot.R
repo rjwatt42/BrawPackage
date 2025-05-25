@@ -257,16 +257,31 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=0,
     fontDimensions<-c(fontDimensions,braw.env$plotArea[3])
   if (!is.null(yticks) || !is.null(ylabel)) 
     fontDimensions<-c(fontDimensions,braw.env$plotArea[4])
-  ez<-2
+  ez<-1
   fontShrink<-max(0.3,min(fontDimensions))^(1/ez)
   fontScale<-fontScale*fontShrink
   
   minGap<-0.1
   unitGap<-0.75
   labelGapx<-labelGapy<-unitGap*1.5
-  if (containsSubscript(xlabel$label) || containsSuperscript(xlabel$label)) labelGapx<-labelGapx*1.85
-  if (containsSubscript(ylabel$label) || containsSuperscript(ylabel$label)) labelGapy<-labelGapy*1.85
+  if (containsSubscript(xlabel$label) || containsSuperscript(xlabel$label)) labelGapx<-labelGapx*1.6
+  if (containsSubscript(ylabel$label) || containsSuperscript(ylabel$label)) labelGapy<-labelGapy*1.6
   
+  if (!is.null(xticks)) {
+    if (is.null(xticks$breaks))
+      xticks$breaks<-axisTicks(usr=xlim, log=xticks$logScale, axp = NULL, nint = 5)
+    if (is.null(xticks$labels))
+      xticks$labels<-as.character(xticks$breaks)
+    if (!is.character(xticks$labels)) xticks$labels<-brawFormat(xticks$labels,digits=-2)
+  }
+  
+  if (!is.null(yticks)) {
+    if (is.null(yticks$breaks))
+      yticks$breaks<-axisTicks(usr=ylim, log=yticks$logScale, axp = NULL, nint = 5)
+    if (is.null(yticks$labels))
+      yticks$labels<-as.character(yticks$breaks)
+    if (!is.character(yticks$labels)) yticks$labels<-brawFormat(yticks$labels,digits=-2)
+  }
   
   if (!is.null(xticks) && !is.null(xticks$labels))
     maxtick<-max(strNChar(xticks$labels))
@@ -275,32 +290,22 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=0,
     maxtick<-max(c(maxtick,strNChar(yticks$labels)))
   tickSize<-5/max(7,maxtick)
   
-  tickGap<-unitGap*tickSize
-  
-  bottomGap<-labelGapx+2*unitGap
+  tickGap<-unitGap*maxtick/5
+
+  bottomGap<-labelGapx+3*unitGap
   if (top>0) topGap<-top*unitGap*3.125 else topGap<-minGap
   leftGap<-labelGapy+4*tickGap
   rightGap<-minGap
   
   if (!is.null(xticks)) {
-    if (is.null(xticks$breaks))
-      xticks$breaks<-axisTicks(usr=xlim, log=xticks$logScale, axp = NULL, nint = 5)
-    if (is.null(xticks$labels))
-      xticks$labels<-as.character(xticks$breaks)
-    if (!ymax)
-      bottomGap<-labelGapx+max(strNChar(xticks$labels))*tickGap
-    if (!is.character(xticks$labels)) xticks$labels<-brawFormat(xticks$labels,digits=-2)
+    # if (!ymax)
+    #   bottomGap<-labelGapx+max(strNChar(xticks$labels))*unitGap
   } else {
     bottomGap<-minGap
   }
   if (!is.null(yticks)) {
-    if (is.null(yticks$breaks))
-      yticks$breaks<-axisTicks(usr=ylim, log=yticks$logScale, axp = NULL, nint = 5)
-    if (is.null(yticks$labels))
-      yticks$labels<-as.character(yticks$breaks)
-    if (!xmax)
-      leftGap<-labelGapy+max(strNChar(yticks$labels))*tickGap
-    if (!is.character(yticks$labels)) yticks$labels<-brawFormat(yticks$labels,digits=-2)
+    # if (!xmax)
+    #   leftGap<-labelGapy+max(strNChar(yticks$labels))*unitGap
   } else {
     leftGap<-minGap
   }
@@ -401,7 +406,7 @@ xAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE,angle=0,size=NULL){
            } else {
              hjust=1.1
            }
-           axisText(ticksBottom,label=labels, hjust=hjust, vjust=1, dy=-2, colour="#000000",size=size,fontface="plain")
+           axisText(ticksBottom,label=labels, hjust=hjust, vjust=1.2, dy=-2, colour="#000000",size=size,fontface="plain")
          }
   )
 }
@@ -479,13 +484,14 @@ dataBar<-function(data,colour="#000000",fill="white",alpha=1,barwidth=0.85) {
 is.mathLabel<-function(label) {
   return(grepl("['^']{1}",label) | grepl("['[']{1}",label))
 }
-mathPrepText<-function(label) {
+mathPrepText<-function(label,bold=FALSE) {
   label<-gsub("\\[([^ ]*)\\]","\\['\\1'\\]",label)
   label<-gsub("\\(","\\(\\(",label)
   label<-gsub("\\)","\\)\\)",label)
   label<-gsub("=","==",label)
   label<-gsub(" ","~",label)
   label<-gsub("\u00B1([0-9.]*)","~'\u00B1 \\1'",label)
+  if (bold) label<-paste0("bold(",label,")")
   return(label)
 }
 dataLabel<-function(data,label, hjust=0, vjust=0, fill="white",colour="#000000",size=0.8,angle=0,fontface="plain",background=FALSE,parser=TRUE,label.size=0.25) {
@@ -541,7 +547,7 @@ drawText<-function(data,label, hjust=0, vjust=0, colour="#000000",fill="white",s
          "ggplot"={
            parser<-FALSE
            if (any(is.mathLabel(label))) {
-             label<-mathPrepText(label)
+             label<-mathPrepText(label,fontface=="bold")
              parser=TRUE
            } 
            
@@ -820,7 +826,9 @@ strNChar<-function(str) {
   str2<-gsub("\\[[[:punct:][:alnum:]]*\\]","",str1)
   nsub<-nchar(str1)-nchar(str2)
   nsub[nsub>0]<-nsub[nsub>0]-2
+  nsub<-nsub+(is.mathLabel(str) & grepl("=",str))*2
   nother<-nchar(str2)
+  nother<-nother-(is.mathLabel(str) & grepl("=",str))*1
   return(nother+nsub*0.6)
 }
 dataLegend<-function(data,title="",fontsize=0.6,shape=21) {
