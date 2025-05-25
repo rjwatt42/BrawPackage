@@ -1648,7 +1648,7 @@ ps_plot<-function(analysis,disp,showTheory=TRUE,g=NULL){
   
   if (is.null(analysis$hypothesis$IV2)) {
     sigs<-isSignificant(braw.env$STMethod,analysis$pIV,analysis$rIV,analysis$nval,analysis$df1,analysis$evidence)
-    nulls<-abs(analysis$rp)<=analysis$evidence$minRp
+    nulls<-abs(analysis$rpIV)<=analysis$evidence$minRp
     if ((all(nulls) || all(!nulls)) && disp=="ps") {
       g<-startPlot(xlim=c(-1,1),ylim=c(0,1),
                    yticks=makeTicks(),ylabel=makeLabel("p(sig)"),

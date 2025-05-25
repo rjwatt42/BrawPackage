@@ -1,9 +1,9 @@
 ########################
 
 setBrawEnv("npoints",1001)
-rs<-0.2
+rs<-0.3
 ps<-0.05
-w<-0.99
+w<-0.8
 
 n<-round(rp2n(rs,ps))
 # n<-42
@@ -19,14 +19,58 @@ showMultiple(doMultiple(0,NULL,hypothesis=h1,design=d1),showType = "wp",orientat
 
 setBrawEnv("npoints",1001)
 
-world<-getWorld("Psych")
-world$populationNullp<-0
+world<-getWorld("PsychF")
 h1<-makeHypothesis(effect=makeEffect(world=world))
 d1<-getDesign("Psych")
 d1$Replication$On<-TRUE
 d1$Replication$PowerPrior<-"World"
 showMultiple(doMultiple(0,NULL,hypothesis=h1,design=d1),showType = "wp",orientation="horz")
 
+
+########################
+
+setBrawEnv("npoints",1001)
+
+world<-getWorld("PsychF")
+h1<-makeHypothesis(effect=makeEffect(world=world))
+d1<-getDesign("Psych")
+d1$Replication$On<-FALSE
+d1$Replication$PowerPrior<-"World"
+showMultiple(doMultiple(0,NULL,hypothesis=h1,design=d1),showType = "rp",orientation="horz")
+
+
+########################
+
+setBrawEnv("npoints",1001)
+
+world<-getWorld("PsychF")
+h1<-makeHypothesis(effect=makeEffect(world=world))
+d1<-getDesign("Psych")
+d1$Replication$On<-TRUE
+d1$Replication$Keep="Cautious"
+d1$Replication$PowerPrior<-"None"
+showMultiple(doMultiple(0,NULL,hypothesis=h1,design=d1),showType = "rp",orientation="horz")
+
+########################
+
+setBrawEnv("npoints",1001)
+
+world<-getWorld("PsychF")
+h1<-makeHypothesis(effect=makeEffect(world=world))
+d1<-getDesign("Psych")
+d1$Replication$On<-TRUE
+d1$Replication$Keep="MetaAnalysis"
+d1$Replication$PowerPrior<-"None"
+showMultiple(doMultiple(0,NULL,hypothesis=h1,design=d1),showType = "rp",orientation="horz")
+
+########################
+
+h1<-makeHypothesis(effect=makeEffect(0))
+d1<-getDesign("Psych")
+d1$Replication$On<-TRUE
+d1$Replication$Keep="MetaAnalysis"
+d1$Replication$PowerPrior<-"None"
+showMultiple(doMultiple(1000,NULL,hypothesis=h1,design=d1),showType = "NHST",orientation="horz")
 
 ########################
 

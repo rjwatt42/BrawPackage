@@ -2,8 +2,9 @@
 
 h<-getHypothesis("PsychF")
 d<-getDesign("Psych")
+d$Replication<-makeReplication(TRUE)
 
-showMultiple(doMultiple(100,hypothesis=h,design=d),showType="ws;wp",dimension="2D")
+showMultiple(doMultiple(400,hypothesis=h,design=d),showType="ws;wp",dimension="2D")
 
 
 ###################
@@ -59,7 +60,7 @@ d<-makeDesign(n)
 setBrawDef("hypothesis",h)
 setBrawDef("design",d)
 p<-doPossible(makePossible(wn2r(0.51,n),n,sigOnly=TRUE,sigOnlyCompensate = TRUE))
-print(showPossible(p,"Populations",view="3D",axisScale=1.2,walls="none"))
+print(showPossible(p,"Populations",view="3D",axisScale=c(-0.5,1),walls="none"))
 # p<-doPossible(makePossible(0.3,42,UseSource="prior",UsePrior="prior",prior=w))
 # print(showPossible(p,"Populations",view="3D",axisScale=1.2,walls="populations"))
 
@@ -85,10 +86,23 @@ d<-makeDesign(n)
 setBrawDef("hypothesis",h)
 setBrawDef("design",d)
 
-showExplore(doExplore(100,explore=makeExplore('rIV',17,0,0.8)),"p(sig)")
+showExplore(doExplore(400,explore=makeExplore('rIV',17,0,0.8)),"p(sig)")
 
-##################
+########################
 
-world<-makeWorld(TRUE,"biasedsample",populationPDFmu = 0.3,populationPDFk = 42,populationNullp = 0.)
-h<-makeHypothesis(effect=makeEffect(world=world))
-showSystem("hypothesis",hypothesis=h)
+setBrawEnv("npoints",1001)
+rs<-0.3
+ps<-0.05
+w<-0.8
+
+n<-round(rp2n(rs,ps))
+# n<-42
+nn<-round(rw2n(rs,w))
+# nn<-154
+
+world<-makeWorld(TRUE,populationPDFsample=TRUE,populationSamplemn=rs,populationSamplesd=n,populationNullp=0)
+h1<-makeHypothesis(effect=makeEffect(world=world))
+d1<-makeDesign(nn)
+showMultiple(doMultiple(0,NULL,hypothesis=h1,design=d1),showType = "wp",orientation="horz")
+
+########################

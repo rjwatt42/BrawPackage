@@ -882,7 +882,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
             for (i in 1:length(vals)) {
               if (i==1) left=(vals[i+1]-vals[i])*0.35 else left=(vals[i]-vals[i-1])*0.35
               if (i==length(vals)) right=(vals[i]-vals[i-1])*0.35 else right=(vals[i+1]-vals[i])*0.35
-              g<-expected_plot(g,
+              g<-simulations_plot(g,
                                data.frame(x=vals[i],y1=showVals[,i],y2=sigVals[,i]),
                                showType=showType[si],ylim=ylim,
                                scale=3/(length(vals)+1),

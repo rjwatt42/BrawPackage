@@ -263,7 +263,7 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=0,
   
   minGap<-0.1
   unitGap<-0.75
-  labelGapx<-labelGapy<-unitGap*1.5
+  labelGapx<-labelGapy<-unitGap*1.7
   if (containsSubscript(xlabel$label) || containsSuperscript(xlabel$label)) labelGapx<-labelGapx*1.6
   if (containsSubscript(ylabel$label) || containsSuperscript(ylabel$label)) labelGapy<-labelGapy*1.6
   
