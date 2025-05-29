@@ -22,9 +22,9 @@ showMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
   if (is.null(multipleResult)) multipleResult=doMultiple(autoShow=FALSE)
   if (is.numeric(multipleResult)) multipleResult=doMultiple(multipleResult,autoShow=FALSE)
 
-    if (!multipleResult$hypothesis$effect$world$worldOn && is.element(showType[1],c("NHST","Hits","Misses"))) {
+    if (!multipleResult$hypothesis$effect$world$worldOn && multipleResult$hypothesis$effect$rIV!=0 && is.element(showType[1],c("NHST","Hits","Misses"))) {
       if (multipleResult$nullcount<multipleResult$count) {
-        multipleResult<-doMultiple(0,multipleResult,doingNull=TRUE)
+        multipleResult<-doMultiple(multipleResult$count-multipleResult$nullcount,multipleResult,doingNull=TRUE)
       }
     }
     

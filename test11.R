@@ -197,9 +197,20 @@ d1<-makeDesign(42,Replication=makeReplication(TRUE,Keep="MetaAnalysis"))
 d1<-makeDesign(42,Replication=makeReplication(TRUE,Keep="Cautious"))
 
 explore<-makeExplore("n",minVal=10,maxVal=5000,xlog=TRUE)
-d<-doExplore(1000,explore=explore,hypothesis=h1,design=d1)
-showExplore(d,showType="p(w80)",autoYlim=FALSE)
+d<-doExplore(8000,explore=explore,hypothesis=h1,design=d1)
 showExplore(d,showType="p(sig)",autoYlim=FALSE)
+showExplore(d,showType="p(w80)",autoYlim=FALSE)
+
+########################
+
+h1<-makeHypothesis(effect=makeEffect(0))
+d1<-makeDesign(42,Replication=makeReplication(TRUE,Keep="MetaAnalysis",forceSigOriginal = TRUE))
+# d1<-makeDesign(42,Replication=makeReplication(TRUE,Keep="Cautious"))
+
+m<-doMultiple(100,hypothesis=h1,design=d1)
+print(mean(m$result$pIV>0.05))
+showMultiple(m,showType="NHST")
+
 ########################
 
 world<-makeWorld(TRUE,"Exp","z",0.3,0)

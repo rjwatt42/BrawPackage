@@ -1227,7 +1227,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
             )
           resNotNull<-abs(data$rp)>evidence$minRp
         else
-          resNotNull<-rep(NA,length(data$rp))
+          resNotNull<-rep(FALSE,length(data$rp))
       } else {
         resSig<-rep(FALSE,length(shvals))
         resNotNull<-rep(FALSE,length(shvals))
