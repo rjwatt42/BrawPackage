@@ -161,7 +161,7 @@ plotAxis<-function(showType,hypothesis,design=NULL,result=NULL) {
             ymins<-rmins
             ylabel<-rplab
             use_cols<-c(hsv(base_hue_r,1,1),hsv(base_hue_r+hue_diff,1,1),hsv(base_hue_r+hue_diff*2,1,1))
-            ylines<-c(0)
+            # ylines<-c(0)
           },
           "re"={
             ylim<-rlims
@@ -492,7 +492,19 @@ plotAxis<-function(showType,hypothesis,design=NULL,result=NULL) {
                         braw.env$plotColours$infer_sigNull,
                         braw.env$plotColours$infer_nsigNull)
             
-            },
+          },
+          "p(w80)"={
+            ylim<-c(0,1)
+            ytick<-seq(0,1,0.2)
+            ymins<-seq(0,1,0.1)
+            ylabel<-"p(w>0.8)"
+            lines<-c()
+            use_cols<-c(braw.env$plotColours$infer_sigC,
+                        braw.env$plotColours$infer_nsigC,
+                        braw.env$plotColours$infer_sigNull,
+                        braw.env$plotColours$infer_nsigNull)
+            
+          },
           "Misses"={
             ylim<-c(0,1)
             ytick<-seq(0,1,0.2)

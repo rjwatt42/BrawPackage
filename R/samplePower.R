@@ -69,7 +69,9 @@ wn2r<-function(w,n,t=2,alpha=NA){
       print("w error")
       w[w>1]<-1
     }
-    z<-(qnorm(w)-qnorm(alpha/2))/sqrt(n-3)
+    gs<-function(z,n,w) {abs(zn2w(z,n)-w)}
+    z<-optim(0,gs,NULL,n,w,method="Brent",lower=0,upper=1)$par
+    # z<-(qnorm(w)-qnorm(alpha/2))/sqrt(n-3)
   }
   tanh(z)
 }

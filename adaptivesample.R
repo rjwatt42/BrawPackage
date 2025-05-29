@@ -1,19 +1,20 @@
 ########################
 
 setBrawEnv("npoints",1001)
+
+world<-makeWorld(TRUE,"Exp","z",0.3,0)
+no<-800
 rs<-0.3
-ps<-0.05
+r.est<-rSamp2Pop(rs,no,world)
+
 w<-0.8
+nn<-round(rw2n(r.est,w))
 
-n<-round(rp2n(rs,ps))
-# n<-42
-nn<-round(rw2n(rs,w))
-# nn<-154
-
-world<-makeWorld(TRUE,populationPDFsample=TRUE,populationSamplemn=rs,populationSamplesd=n,populationNullp=0)
+world<-makeWorld(TRUE,populationPDFsample=TRUE,populationSamplemn=rs,populationSamplesd=no,populationNullp=0)
 h1<-makeHypothesis(effect=makeEffect(world=world))
 d1<-makeDesign(nn)
-showMultiple(doMultiple(0,NULL,hypothesis=h1,design=d1),showType = "wp",orientation="horz")
+m<-doMultiple(0,NULL,hypothesis=h1,design=d1)
+showMultiple(m,showType = "wp",orientation="horz")
 
 ########################
 

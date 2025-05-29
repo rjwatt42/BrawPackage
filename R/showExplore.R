@@ -113,6 +113,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   
   quants<-(1-quantileShow)/2
   showPower<-TRUE # show power calculations?
+  showPowerR<-FALSE # show power calculations?
   
   oldAlpha<-braw.env$alphaSig
   on.exit(setBrawEnv("alphaSig",oldAlpha),add=TRUE)
@@ -237,7 +238,8 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   ylines<-yaxis$lines
   ySecond<-NULL
   
-  if (is.element(showType[si],c("p(sig)","NHST","Inference","Source","Hits","Misses","SEM"))) ylim<-c(0,1)
+  if (is.element(showType[si],c("p(sig)","p(w80)","NHST","Inference","Source","Hits","Misses","SEM"))) 
+    ylim<-c(0,1)
   if (showType[si]=="AIC") {
     ylim<-c(-1,0.1)*design$sN*hypothesis$DV$sd
     ylabel<-"diff(AIC)"
@@ -599,7 +601,12 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
               "metaS"={
                 showVals<-result$S
               },
-              
+              "p(w80)"={
+                w<-rn2w(result$rpval,result$nval)
+                showMeans<-colMeans(w>=0.8)
+                showSE<-NULL
+                showVals<-NULL
+              },
               "p(sig)"={
                 showVals<-NULL
                 if (explore$exploreType=="Alpha") {
@@ -771,7 +778,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       }
       if (!is.element(showType[si],c("NHST","SEM"))) {
         # draw the basic line and point data
-        if (is.element(showType[si],c("p(sig)","Hits","Misses","Inference","Source"))) {
+        if (is.element(showType[si],c("p(sig)","p(w80)","Hits","Misses","Inference","Source"))) {
           y50<-showMeans
           y75<-NULL
           y25<-NULL
@@ -960,8 +967,10 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
 
       
       # find n80
-      if (is.null(hypothesis$IV2) && showType[si]=="p(sig)" && explore$exploreType=="n" && effect$world$populationPDF=="Single" && showPower){
-        w<-y50
+      if (is.null(hypothesis$IV2) && showPower && 
+          showType[si]=="p(sig)" && explore$exploreType=="n" && 
+          (!effect$world$worldOn || effect$world$populationPDF=="Single")){
+          w<-y50
         n<-exploreResult$vals
         minrw<-function(r,w,n){sum(abs(w-rn2w(r,n)),na.rm=TRUE)}
         r_est<-optimize(minrw,c(0,0.9),w=w,n=n)
@@ -987,7 +996,9 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       }
       
       # find r80
-      if (is.null(hypothesis$IV2) && showType[si]=="p(sig)" && explore$exploreType=="rIV" && showPower){
+      if (is.null(hypothesis$IV2) && showPowerR &&
+          showType[si]=="p(sig)" && explore$exploreType=="rIV" &&
+          (!effect$world$worldOn || effect$world$populationPDF=="Single")){
         w<-y50
         r<-exploreResult$vals
         minrw<-function(r,w,n){sum(abs(w-rn2w(r,n)),na.rm=TRUE)}
