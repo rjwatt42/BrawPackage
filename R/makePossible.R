@@ -27,7 +27,7 @@ makePossible<-function(targetSample=NULL,targetSampleN=NULL,UseSource="world",
   }
   if (is.null(targetSample)) {
     if (is.null(braw.res$result)) {
-      targetSample<-0.3
+      targetSample<-NA
       targetSampleN<-design$sN
     } else {
       targetSample<-braw.res$result

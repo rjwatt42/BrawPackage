@@ -239,15 +239,16 @@ showPossible <- function(possibleResult=NULL,
   BoxColSamples<-darken(BoxCol,off=0.35)
   BoxColPopulations<-darken(BoxCol,off=0.4)
   
-  colS<-braw.env$plotColours$metaAnalysis
+  colS<-"#FFEE00"
   if (showP>0)  colS<-braw.env$plotColours$infer_nsigC
   colSsum<-"#FFBB88"
+  colSsum<-darken(colS,off=-0.45)
   colSdark=darken(colS,off=-0.67)
   colSlight=darken(colS,off=0.2)
   colSsim=darken(colS,off=0.0)
   
-  colP=braw.env$plotColours$descriptionC
   colP="#88AAFF"
+  colPsum<-darken(colP,off=-0.45)
   colPdark=darken(colP,off=-0.67)
   colPlight=darken(colP,off=0.25)
   colPsim=darken(colP,off=-0.33)
@@ -283,7 +284,7 @@ showPossible <- function(possibleResult=NULL,
   showNull<-FALSE
   normSampDist<-FALSE
   endFace<-TRUE
-  continuousSampling<-4
+  continuousSampling<-2
   
   offRange<-0
   if (length(axisScale)==2) {
@@ -719,7 +720,7 @@ showPossible <- function(possibleResult=NULL,
               z<-z/max(z)
               if (max(z)==min(z)) z<-z/2
               if (logZ) z<-log10(z)
-              g<-drawDistribution(x,y,z,xlim,ylim,zlim,mapping,colP,"#000000",1,draw_lower_limit=0,g)
+              g<-drawDistribution(x,y,z,xlim,ylim,zlim,mapping,colPsum,"#000000",1,draw_lower_limit=0,g)
               # use<- which((x>=xlim[1]) & (x<=xlim[2]) & (z>=zlim[1]))
               # g<-addG(g,
               #         dataPolygon(rotate3D(data.frame(x=c(x[use[1]],x[use],x[use[length(use)]]),y=c(y[use[1]],y[use],y[use[length(use)]]),z=c(zlim[1],z[use],zlim[1])*wallHeight),mapping),fill=colP,alpha=0.25)

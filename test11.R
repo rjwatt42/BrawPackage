@@ -59,6 +59,28 @@ print(showPossible(wn2r(0.5,n),"Samples",view="3D",
                    showSig=TRUE,doTextResult=FALSE))
 
 ###################
+n=85
+
+w<-makeWorld(TRUE,populationPDFsample=TRUE,populationSamplemn = 0.3,populationSamplesd=42,populationNullp = 0.0)
+h<-makeHypothesis(effect=makeEffect(world=w))
+d<-makeDesign(n)
+
+p<-doPossible(makePossible(NA,UsePrior="world",hypothesis=h,design=d))
+print(showPossible(p,"Populations",view="3D",
+                   axisScale=c(-0.5,1),walls="populations",
+                   showSig=FALSE,doTextResult=FALSE,azimuth=35))
+print(showPossible(p,"Samples",view="3D",
+                   axisScale=c(-0.5,1),walls="both",
+                   showSig=FALSE,doTextResult=FALSE))
+p<-doPossible(makePossible(wn2r(0.5,85),UsePrior="world",hypothesis=h,design=d))
+print(showPossible(p,"Samples",view="3D",
+                   axisScale=c(-0.5,1),walls="both",
+                   showSig=FALSE,doTextResult=FALSE))
+print(showPossible(p,"Samples",view="3D",
+                   axisScale=c(-0.5,1),walls="both",
+                   showSig=TRUE,doTextResult=FALSE))
+
+###################
 n=42
 
 h<-makeHypothesis(effect=makeEffect(0.3))
@@ -79,9 +101,8 @@ d<-makeDesign(n)
 
 setBrawDef("hypothesis",h)
 setBrawDef("design",d)
-p<-doPossible(makePossible(NA,n))
-print(showPossible(p,"Samples",axisScale=axisScale,walls="populations"))
-print(showPossible(p,"Samples",axisScale=axisScale,walls="both"))
+p<-doPossible(makePossible(NA,n,UsePrior="world"))
+print(showPossible(p,"Populations",axisScale=axisScale,walls="populations",azimuth=35))
 ###################
 
 p<-doPossible(makePossible(0.3,n,UsePrior = "world"))
