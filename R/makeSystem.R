@@ -17,6 +17,19 @@ undoShortHand<-function() {
 }
 
 
+#' @export
+doNHST<-function() {
+  setBrawEnv("STMethod","NHST")
+}
+
+#' @export
+doDLLR<-function() {
+  evidence<-braw.def$evidence
+  evidence$prior<-getWorld("Psych")
+  setBrawDef("evidence",evidence)
+  setBrawEnv("STMethod","dLLR")
+}
+
 ################################################################        
 # Hypothesis objects
 #
@@ -219,6 +232,9 @@ makeDesign<-function(sN=42, sMethod=makeSampling("Random"),sMethodSeverity=0.1,
                      Replication=makeReplication()
 ) {
   
+  if (is.character(sN)) 
+    design<-getDesign(sN)
+  else
   design<-list(sN=sN, sMethod=sMethod, sMethodSeverity=sMethodSeverity,
                sNRand=sNRand,sNRandSD=sNRandSD,sNRandDist=sNRandDist,
                sIV1Use=sIV1Use,sIV2Use=sIV2Use, 
