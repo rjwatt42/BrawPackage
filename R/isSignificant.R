@@ -1,4 +1,5 @@
-alphaLLR<-function(alphaSig=braw.env$alphaSig) dnorm(qnorm(1-0.05/2))/dnorm(0) # 0.5*qnorm(1-alphaSig/2)^2
+alphaLLR<-function(alphaSig=braw.env$alphaSig) 2*dnorm(qnorm(1-alphaSig/2))/dnorm(0) 
+# 0.5*qnorm(1-alphaSig/2)^2
 
 isSignificant<-function(method="NHST",p,r,n,df1,evidence=braw.def$evidence,alphaLocal=braw.env$alphaSig) {
   if (length(alphaLocal)>1) {

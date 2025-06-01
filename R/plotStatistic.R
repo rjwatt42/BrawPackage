@@ -923,17 +923,17 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
                    data<-data.frame(y=c(hists$x[i],hists$x[i],hists$x[i+1],hists$x[i+1]),
                                     x=(c(-w,0,0,-w)-ystart)*width[1]+xoff)
                    g<-addG(g,dataPolygon(data=data,
-                                         colour=NA, fill = cols[j],alpha=alpha))
+                                         colour=cols[j], fill = cols[j],alpha=alpha))
                    data<-data.frame(y=c(hists$x[i],hists$x[i],hists$x[i+1],hists$x[i+1]),
                                     x=(c(w,0,0,w)+ystart)*width[2]+xoff)
                    g<-addG(g,dataPolygon(data=data,
-                                         colour=NA, fill = cols[j],alpha=alpha))
+                                         colour=cols[j], fill = cols[j],alpha=alpha))
                  },
                  "horz"={
                    data<-data.frame(x=c(hists$x[i],hists$x[i],hists$x[i+1],hists$x[i+1]),
                                     y=(c(w,0,0,w)+ystart)*width[1]+xoff)
                    g<-addG(g,dataPolygon(data=data,
-                                         colour=NA, fill = cols[j],alpha=alpha))
+                                         colour=cols[j], fill = cols[j],alpha=alpha))
                  })
         if (histStyle=="width") ystart<-ystart+dens[j]
         }
