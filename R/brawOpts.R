@@ -53,6 +53,8 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
   nsCol<-"#FF4400"
   sigNullCol<-darken(sigCol,gain=0.7)
   nsNonNullCol<-darken(nsCol,gain=0.7)
+  isigNullCol<-darken(sigCol,off=0.5)
+  isigNonNullCol<-darken(nsCol,off=0.5)
   # graph themes
   plotColours<-list(graphC=graphC,graphBack="#999999",
                     variableC="#FFCC00",maineffectES="#DD8844",covariationES="#FF1100",interactionES="#0011FF",
@@ -62,8 +64,8 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
                     descriptionTotal=darken(desat("#DD8844",0.1),0.7),descriptionsUnique=darken(desat("#DD8844",0.1),1.3),
                     metaAnalysis="#FFEE00",metaMultiple="#FF8800",metaAnalysisTheory="#FFFFFF",
                     infer_sigC=sigCol,infer_nsigC=nsCol,infer_none="#AAAAAA",infer_miss=NULL,
-                    infer_sigNonNull=sigCol,infer_nsigNonNull=nsNonNullCol,infer_isigNonNull="#881100",infer_nsdNonNull="#DDCCCC",
-                    infer_sigNull=sigNullCol,infer_nsigNull=nsCol,infer_isigNull="#FF4400",infer_nsdNull="#CCDDCC",
+                    infer_sigNonNull=sigCol,infer_nsigNonNull=nsNonNullCol,infer_isigNonNull=isigNonNullCol,infer_nsdNonNull="#DDCCCC",
+                    infer_sigNull=sigNullCol,infer_nsigNull=nsCol,infer_isigNull=isigNullCol,infer_nsdNull="#CCDDCC",
                     psig="#FFAA00",alpha="#44FF22",
                     fdr="#227700",fmr="#BB5555",
                     powerPopulation="#0049FF",powerSample="#88BDFF")

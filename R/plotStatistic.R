@@ -591,7 +591,7 @@ getBins<-function(vals,nsvals,target,minVal,maxVal,fixed=FALSE) {
 simulations_hist<-function(pts,valType,ylim,histGain,histGainrange){
   
   vals<-pts$y1
-  svals<-pts$y1[pts$sig]
+  svals<-pts$y1[pts$sig>0]
   
   if (is.null(valType)) valType<-"rs"
   if (is.element(valType,c("rse","rse1","rse2","rs1","rs2","rss","ro","ci1","ci2","llknull","metaRiv"))) valType<-"rs"
@@ -680,23 +680,37 @@ simulations_hist<-function(pts,valType,ylim,histGain,histGainrange){
   nonnulls<-pts$notNull[use]
   if (all(is.na(nonnulls))) nonnulls<-rep(TRUE,length(vals))
   
-  vals1<-vals[nonnulls & !sigs]
+  vals1<-vals[nonnulls & sigs==0]
   dens1<-hist(vals1,breaks=bins,plot=FALSE,warn.unused = FALSE,right=TRUE)
   dens1<-dens1$counts
   
-  vals2<-vals[nonnulls & sigs]
+  vals2<-vals[nonnulls & sigs==1]
   dens2<-hist(vals2,breaks=bins,plot=FALSE,warn.unused = FALSE,right=TRUE)
   dens2<-dens2$counts
   
-  vals3<-vals[!nonnulls & sigs]
+  vals3<-vals[!nonnulls & sigs==1]
   dens3<-hist(vals3,breaks=bins,plot=FALSE,warn.unused = FALSE,right=TRUE)
   dens3<-dens3$counts
   
-  vals4<-vals[!nonnulls & !sigs]
+  vals4<-vals[!nonnulls & sigs==0]
   dens4<-hist(vals4,breaks=bins,plot=FALSE,warn.unused = FALSE,right=TRUE)
   dens4<-dens4$counts
-  
   dens0<-dens1+dens2+dens3+dens4
+  
+  if (is.numeric(sigs)) {
+    vals5<-vals[nonnulls & sigs==-1]
+    dens5<-hist(vals5,breaks=bins,plot=FALSE,warn.unused = FALSE,right=TRUE)
+    dens5<-dens5$counts
+    
+    vals6<-vals[!nonnulls & sigs==-1]
+    dens6<-hist(vals6,breaks=bins,plot=FALSE,warn.unused = FALSE,right=TRUE)
+    dens6<-dens6$counts
+    
+    dens0<-dens0+dens5+dens6
+  } else {
+    dens5<-NULL
+    dens6<-NULL
+  }
   
   if (is.na(histGain)) {
     scale<-0.35/max(dens0)
@@ -706,7 +720,7 @@ simulations_hist<-function(pts,valType,ylim,histGain,histGainrange){
     scale<-histGain/gain
   }
   # x<-(bins[1:(length(bins)-1)]+bins[2:(length(bins))])/2
-  return(list(x=bins,h1=dens1*scale,h2=dens2*scale,h3=dens3*scale,h4=dens4*scale))
+  return(list(x=bins,h1=dens1*scale,h2=dens2*scale,h3=dens3*scale,h4=dens4*scale,h5=dens5*scale,h6=dens6*scale))
   # # browser()
   # x<-as.vector(matrix(c(bins,bins),2,byrow=TRUE))
   # y1<-c(0,as.vector(matrix(c(dens,dens),2,byrow=TRUE)),0)
@@ -724,8 +738,18 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
   c3=col
   c4=col
   
+  doingDLLR<-FALSE
   if (!is.null(showType)) {
     if (useSignificanceCols){
+      if (is.numeric(pts$sig)) {
+        c1<-braw.env$plotColours$infer_sigNonNull
+        c2<-braw.env$plotColours$infer_nsigNull
+        c3<-braw.env$plotColours$infer_sigNull
+        c4<-braw.env$plotColours$infer_nsigNonNull
+        c5<-braw.env$plotColours$infer_isigNonNull
+        c6<-braw.env$plotColours$infer_isigNull
+        doingDLLR<-TRUE
+      }
       if (simWorld) {
         c1<-braw.env$plotColours$infer_sigNonNull
         c2<-braw.env$plotColours$infer_nsigNull
@@ -769,11 +793,7 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
     }
   }
   if (length(pts$y1)<=npointsMax) {
-    if (is.logical(pts$sig)) {
-      p1<-pts$y1[pts$sig]
-      p2<-pts$y1[!pts$sig]
-    }
-    
+
     if (is.element(showType,c("rs","rse","rse1","rse2","rs1","rs2","rss","p")) && length(pts$y1)==1) {
         if (is.element(showType,c("rs","rse","rse1","rse2","rs1","rs2","rss"))){
           n<-pts$n
@@ -812,38 +832,42 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
     co1<-darken(c1,off=-colgain)
     co2<-darken(c2,off=-colgain)
     shape<-braw.env$plotShapes$study
-    
-    if (useSignificanceCols) {
-    pts_sigNonNull=pts[pts$sig & pts$notNull,]
-    pts_nsNonNull=pts[!pts$sig & pts$notNull,]
-    pts_sigNull=pts[pts$sig & !pts$notNull,]
-    pts_nsNull<-pts[!pts$sig & !pts$notNull,]
-    
     if (is.element(showType,c("metaRiv","metaRsd","metaBias","metaS"))) { # metaAnalysis
       shape<-braw.env$plotShapes$meta
       c1<-c2<-c3<-c4<-braw.env$plotColours$metaMultiple
     }
-    switch(orientation,
-           "horz"={
-             sigNonNullData<-data.frame(x=pts_sigNonNull$y1,y=pts_sigNonNull$x)
-             nsNonNullData<-data.frame(x=pts_nsNonNull$y1,y=pts_nsNonNull$x)
-             sigNullData<-data.frame(x=pts_sigNull$y1,y=pts_sigNull$x)
-             nsNullData<-data.frame(x=pts_nsNull$y1,y=pts_nsNull$x)
-           },
-           "vert"={
-             sigNonNullData<-data.frame(x=pts_sigNonNull$x,y=pts_sigNonNull$y1)
-             nsNonNullData<-data.frame(x=pts_nsNonNull$x,y=pts_nsNonNull$y1)
-             sigNullData<-data.frame(x=pts_sigNull$x,y=pts_sigNull$y1)
-             nsNullData<-data.frame(x=pts_nsNull$x,y=pts_nsNull$y1)
-           })
-    g<-addG(g,dataPoint(data=sigNonNullData,shape=shape, 
-                        colour = darken(c1,off=-colgain), alpha=alpha, fill = c1, size = dotSize))
-    g<-addG(g,dataPoint(data=nsNonNullData,shape=shape, 
-                        colour = darken(c4,off=-colgain), alpha=alpha, fill = c4, size = dotSize))
-    g<-addG(g,dataPoint(data=sigNullData,shape=shape, 
-                        colour = darken(c3,off=-colgain), alpha=alpha, fill = c3, size = dotSize))
-    g<-addG(g,dataPoint(data=nsNullData,shape=shape, 
-                        colour = darken(c2,off=-colgain), alpha=alpha, fill = c2, size = dotSize))
+    
+    if (useSignificanceCols) {
+      makeData<-function(x,y,or) switch(or,"horz"={data.frame(x=x,y=y)},"vert"={data.frame(x=y,y=x)})
+      pts_sigNonNull=pts[pts$sig==1 & pts$notNull,]
+      pts_nsNonNull=pts[pts$sig==0 & pts$notNull,]
+      pts_sigNull=pts[pts$sig==1 & !pts$notNull,]
+      pts_nsNull<-pts[pts$sig==0 & !pts$notNull,]
+      sigNonNullData<-makeData(x=pts_sigNonNull$y1,y=pts_sigNonNull$x,orientation)
+      nsNonNullData<-makeData(x=pts_nsNonNull$y1,y=pts_nsNonNull$x,orientation)
+      sigNullData<-makeData(x=pts_sigNull$y1,y=pts_sigNull$x,orientation)
+      nsNullData<-makeData(x=pts_nsNull$y1,y=pts_nsNull$x,orientation)
+      
+      g<-addG(g,dataPoint(data=sigNonNullData,shape=shape, 
+                          colour = darken(c1,off=-colgain), alpha=alpha, fill = c1, size = dotSize))
+      g<-addG(g,dataPoint(data=nsNonNullData,shape=shape, 
+                          colour = darken(c4,off=-colgain), alpha=alpha, fill = c4, size = dotSize))
+      g<-addG(g,dataPoint(data=sigNullData,shape=shape, 
+                          colour = darken(c3,off=-colgain), alpha=alpha, fill = c3, size = dotSize))
+      g<-addG(g,dataPoint(data=nsNullData,shape=shape, 
+                          colour = darken(c2,off=-colgain), alpha=alpha, fill = c2, size = dotSize))
+      if (doingDLLR) {
+        pts_isigNonNull=pts[pts$sig==-1 & pts$notNull,]
+        pts_isigNull=pts[pts$sig==-1 & !pts$notNull,]
+        isigNonNullData<-makeData(x=pts_isigNonNull$y1,y=pts_isigNonNull$x,orientation)
+        isigNullData<-makeData(x=pts_isigNull$y1,y=pts_isigNull$x,orientation)
+        if (length(isigNonNullData)>0)
+        g<-addG(g,dataPoint(data=isigNonNullData,shape=shape, 
+                            colour = darken(c5,off=-colgain), alpha=alpha, fill = c5, size = dotSize))
+        if (length(isigNullData)>0)
+          g<-addG(g,dataPoint(data=isigNullData,shape=shape, 
+                            colour = darken(c6,off=-colgain), alpha=alpha, fill = c6, size = dotSize))
+      }
     } else {
       switch(orientation,
              "horz"={
@@ -861,11 +885,7 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
         g<-addG(g,dataPoint(data=data.frame(x=pts_wsig$x,y=pts_wsig$y1),shape=braw.env$plotShapes$study, colour = co1, alpha=alpha, fill = c3, size = dotSize))
       }
   } else { # more than 250 points
-    if (is.logical(pts$sig)) {
-      hists<-simulations_hist(pts,showType,ylim,histGain,histGainrange)
-    } else {
-      hists<-simulations_hist(pts,showType,ylim,histGain,histGainrange)
-    }
+    hists<-simulations_hist(pts,showType,ylim,histGain,histGainrange)
     xoff<-pts$x[1]
     if (orientation=="vert") {
       simAlpha<-0.85
@@ -874,13 +894,18 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
     }
     dx<-diff(hists$x[1:2])
     cols<-c(c2,c1,c3,c4)
+    if (doingDLLR) cols<-c(c2,c1,c5,c3,c4,c6)
     
     if (length(width)==1) width=c(width,width)
     for (i in 1:length(hists$h1)) {
       dens<-c(hists$h4[i],hists$h2[i],hists$h3[i],hists$h1[i])
+      use<-c(2,3,4,1)
+      if (doingDLLR) {
+        dens<-c(hists$h4[i],hists$h2[i],hists$h5[i],hists$h3[i],hists$h1[i],hists$h6[i])
+        use<-c(2,3,5,4,1,6)
+      }
       # if (showType=="rse2") dens<-rev(dens)
       # if (showType=="rse2") cols<-rev(cols)
-      use<-c(2,3,4,1)
       ystart<-0
       for (j in use) {
         if (dens[j]>0) {
