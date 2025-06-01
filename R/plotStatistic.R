@@ -591,7 +591,7 @@ getBins<-function(vals,nsvals,target,minVal,maxVal,fixed=FALSE) {
 simulations_hist<-function(pts,valType,ylim,histGain,histGainrange){
   
   vals<-pts$y1
-  svals<-pts$y1[pts$y2]
+  svals<-pts$y1[pts$sig]
   
   if (is.null(valType)) valType<-"rs"
   if (is.element(valType,c("rse","rse1","rse2","rs1","rs2","rss","ro","ci1","ci2","llknull","metaRiv"))) valType<-"rs"
@@ -676,8 +676,8 @@ simulations_hist<-function(pts,valType,ylim,histGain,histGainrange){
   use<-vals>=bins[1] & vals<bins[length(bins)]
   
   vals<-pts$y1[use]
-  sigs<-pts$y2[use]
-  nonnulls<-pts$y0[use]
+  sigs<-pts$sig[use]
+  nonnulls<-pts$notNull[use]
   if (all(is.na(nonnulls))) nonnulls<-rep(TRUE,length(vals))
   
   vals1<-vals[nonnulls & !sigs]
@@ -714,7 +714,7 @@ simulations_hist<-function(pts,valType,ylim,histGain,histGainrange){
   # data.frame(y1=c(-y1,rev(y1)), y2=c(-y2,rev(y2)), x=c(x,rev(x)))
 }
 
-simulations_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
+simulations_plot<-function(g,pts,showType=NULL,simWorld,
                         i=1,scale=1,width=1,col="white",alpha=1,useSignificanceCols=braw.env$useSignificanceCols,
                         histStyle="width",orientation="vert",ylim,histGain=NA,histGainrange=NA,npointsMax=200){
   se_size<-0.25
@@ -726,7 +726,7 @@ simulations_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
   
   if (!is.null(showType)) {
     if (useSignificanceCols){
-      if (!all(is.na(pts$y0))){
+      if (simWorld) {
         c1<-braw.env$plotColours$infer_sigNonNull
         c2<-braw.env$plotColours$infer_nsigNull
         c3<-braw.env$plotColours$infer_sigNull
@@ -736,9 +736,9 @@ simulations_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
         c2<-braw.env$plotColours$infer_nsigNull
         c3<-braw.env$plotColours$infer_sigNonNull
         c4<-braw.env$plotColours$infer_nsigNull
-        pts$y0<-rep(TRUE,length(pts$y2))
       }
-      
+      if (all(is.na(pts$notNull))) pts$notNull<-rep(TRUE,length(pts$sig))
+
       if (showType=="e1r") {
         c1=braw.env$plotColours$infer_sigNull
         c2=braw.env$plotColours$infer_nsigNull
@@ -769,18 +769,17 @@ simulations_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
     }
   }
   if (length(pts$y1)<=npointsMax) {
-    if (is.logical(pts$y2)) {
-      p1<-pts$y1[pts$y2]
-      p2<-pts$y1[!pts$y2]
+    if (is.logical(pts$sig)) {
+      p1<-pts$y1[pts$sig]
+      p2<-pts$y1[!pts$sig]
     }
     
-    if (!is.null(analysis) && is.element(showType,c("rs","rse","rse1","rse2","rs1","rs2","rss","p")) && length(pts$y1)==1) {
-      # if (is.null(analysis$hypothesis$IV2)) {
+    if (is.element(showType,c("rs","rse","rse1","rse2","rs1","rs2","rss","p")) && length(pts$y1)==1) {
         if (is.element(showType,c("rs","rse","rse1","rse2","rs1","rs2","rss"))){
           n<-pts$n
           r<-pts$y1
           rCI<-r2ci(r,n)
-          if (pts$y2) c<-c1 else c=c2
+          if (pts$sig) c<-c1 else c=c2
           x<-pts$x
           if (length(x)<length(rCI)) x<-rep(x,length(rCI))
           pts1se<-data.frame(y=rCI[1,],x=x)
@@ -815,10 +814,10 @@ simulations_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
     shape<-braw.env$plotShapes$study
     
     if (useSignificanceCols) {
-    pts_sigNonNull=pts[pts$y2 & pts$y0,]
-    pts_nsNonNull=pts[!pts$y2 & pts$y0,]
-    pts_sigNull=pts[pts$y2 & !pts$y0,]
-    pts_nsNull<-pts[!pts$y2 & !pts$y0,]
+    pts_sigNonNull=pts[pts$sig & pts$notNull,]
+    pts_nsNonNull=pts[!pts$sig & pts$notNull,]
+    pts_sigNull=pts[pts$sig & !pts$notNull,]
+    pts_nsNull<-pts[!pts$sig & !pts$notNull,]
     
     if (is.element(showType,c("metaRiv","metaRsd","metaBias","metaS"))) { # metaAnalysis
       shape<-braw.env$plotShapes$meta
@@ -862,7 +861,7 @@ simulations_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
         g<-addG(g,dataPoint(data=data.frame(x=pts_wsig$x,y=pts_wsig$y1),shape=braw.env$plotShapes$study, colour = co1, alpha=alpha, fill = c3, size = dotSize))
       }
   } else { # more than 250 points
-    if (is.logical(pts$y2)) {
+    if (is.logical(pts$sig)) {
       hists<-simulations_hist(pts,showType,ylim,histGain,histGainrange)
     } else {
       hists<-simulations_hist(pts,showType,ylim,histGain,histGainrange)
@@ -874,11 +873,11 @@ simulations_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
       simAlpha<-0.85
     }
     dx<-diff(hists$x[1:2])
-    cols<-c(c4,c1,c3,c2)
+    cols<-c(c2,c1,c3,c4)
     
     if (length(width)==1) width=c(width,width)
     for (i in 1:length(hists$h1)) {
-      dens<-c(hists$h1[i],hists$h2[i],hists$h3[i],hists$h4[i])
+      dens<-c(hists$h4[i],hists$h2[i],hists$h3[i],hists$h1[i])
       # if (showType=="rse2") dens<-rev(dens)
       # if (showType=="rse2") cols<-rev(cols)
       use<-c(2,3,4,1)
@@ -890,8 +889,10 @@ simulations_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
             w<-dens[j]
           } else {
             alpha<-(dens[j]/0.35)^0.6
+            alpha<-1
             w<-0.5/0.35
           }
+          alpha<-1
           switch(orientation,
                  "vert"={
                    data<-data.frame(y=c(hists$x[i],hists$x[i],hists$x[i+1],hists$x[i+1]),
@@ -915,7 +916,7 @@ simulations_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
     }
     # g<-addG(g,
     #   dataPolygon(data=data.frame(y=hist1$x,x=hist1$y1+xoff),colour=NA, fill = c2,alpha=simAlpha),
-    #   dataPolygon(data=data.frame(y=hist1$x,x=hist1$y2+xoff),colour=NA, fill = c1,alpha=simAlpha)
+    #   dataPolygon(data=data.frame(y=hist1$x,x=hist1$sig+xoff),colour=NA, fill = c1,alpha=simAlpha)
     # )
     if (!is.null(showType))
       if (is.element(showType,c("e1d","e2d"))) {
@@ -923,7 +924,7 @@ simulations_plot<-function(g,pts,showType=NULL,analysis=NULL,IV=NULL,DV=NULL,
           hist1<-simulations_hist(pts,showType,ylim)
         }
         g<-addG(g,
-          dataPolygon(data=data.frame(y=hist1$x,x=hist1$y2+xoff),colour=NA, fill = c3,alpha=simAlpha))
+          dataPolygon(data=data.frame(y=hist1$x,x=hist1$sig+xoff),colour=NA, fill = c3,alpha=simAlpha))
       }
   }
   g
@@ -1180,11 +1181,11 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       sampleVals<-log10(sampleVals)
       sampleVals[sampleVals<(-10)]<--10
     }  
-    if (nrow(sampleVals)<200) theoryFirst<-TRUE
+    if (nrow(sampleVals)<100000) theoryFirst<-TRUE
   }    
   sigOnly<-evidence$sigOnly
   
-  if (!all(is.na(analysis$rIV)) || doingMetaAnalysis) { theoryAlpha<-0.5} else {theoryAlpha<-1}
+  if (doingMetaAnalysis) { theoryAlpha<-0.5} else {theoryAlpha<-1}
   
   for (i in 1:length(xoff)){
     histGain<-NA
@@ -1221,13 +1222,14 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
           nvals<-data$ns
           resSig<-isSignificant(braw.env$STMethod,pvals,rvals,nvals,data$df1,evidence)
         }
-        if (is.element(showType,c("rse","rse1","rse2","rs1","rs2","rss")) && 
-            ((hypothesis$effect$world$worldOn)
-              || (!all(abs(data$rp)>evidence$minRp) && !all(abs(data$rp)<=evidence$minRp)))
-            )
-          resNotNull<-abs(data$rp)>evidence$minRp
-        else
-          resNotNull<-rep(FALSE,length(data$rp))
+        resNotNull<-abs(data$rp)>evidence$minRp
+        # if (is.element(showType,c("rse","rse1","rse2","rs1","rs2","rss")) && 
+        #     ((hypothesis$effect$world$worldOn)
+        #       || (!all(abs(data$rp)>evidence$minRp) && !all(abs(data$rp)<=evidence$minRp)))
+        #     )
+        #   resNotNull<-abs(data$rp)>evidence$minRp
+        # else
+        #   resNotNull<-rep(TRUE,length(data$rp))
       } else {
         resSig<-rep(FALSE,length(shvals))
         resNotNull<-rep(FALSE,length(shvals))
@@ -1242,14 +1244,14 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
         d<-res2llr(analysis,braw.env$STMethod)
         err<-(d<0 & abs(data$rp)>evidence$minRp) | (d>0 & abs(data$rp)<=evidence$minRp)
         resWSig<-resSig & err
-        pts<-data.frame(x=shvals*0+xoff[i],y1=shvals,y2=resSig,y3=resWSig,y0=resNotNull,n=nvals)
+        pts<-data.frame(x=shvals*0+xoff[i],y1=shvals,sig=resSig,y3=resWSig,notNull=resNotNull,n=nvals)
       } else {
-          pts<-data.frame(x=shvals*0+xoff[i],y1=shvals,y2=resSig,y0=resNotNull,n=nvals)
+          pts<-data.frame(x=shvals*0+xoff[i],y1=shvals,sig=resSig,notNull=resNotNull,n=nvals)
       }
       
-      g<-simulations_plot(g,pts,showType,analysis,IV,DV,i,orientation=orientation,
+      g<-simulations_plot(g,pts,showType,analysis$hypothesis$effect$world$worldOn,i,orientation=orientation,
                        ylim=ylim,histGain=histGain,histGainrange=histGainrange,npointsMax=200)
-      
+
       ns<-c()
       s<-c()
       if (length(rvals)>1 && is.element(showType,c("rs","rse","rse1","rse2","rs1","rs2","rss","p",

@@ -141,9 +141,10 @@ r2llr<-function(r,n,df1,method=braw.env$STMethod,llr=list(e1=c(),e2=0),world=NUL
       world$populationPDF<-"Single"
       world$populationNullp<-0.5
     }
-    lk<-getLogLikelihood(z,n,df1,world$populationPDF,world$populationPDFk,spread=c(0,1),bias=FALSE)
-    lk1<-lk[,,1]+log(1-world$populationNullp)
-    lk2<-lk[,,2]+log(world$populationNullp)
+    lk1<-getLogLikelihood(z,n,df1,world$populationPDF,world$populationPDFk,spread=0,bias=FALSE,returnVals=TRUE)
+    lk2<-getLogLikelihood(z,n,df1,world$populationPDF,world$populationPDFk,spread=1,bias=FALSE,returnVals=TRUE)
+    lk1<-lk1+log(1-world$populationNullp)
+    lk2<-lk2+log(world$populationNullp)
     llk<-lk1-lk2
   } else {
     if (isempty(llr$e1) || is.na(llr$e1)) { llr1=z }

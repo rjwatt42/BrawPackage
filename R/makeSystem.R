@@ -6,14 +6,14 @@
 doShortHand<-function() {
   evidence<-braw.def$evidence
   evidence$shortHand<-TRUE
-  setBrawDef("evidence",makeEvidence(TRUE))
+  setBrawDef("evidence",evidence)
 }
 
 #' @export
 undoShortHand<-function() {
   evidence<-braw.def$evidence
   evidence$shortHand<-FALSE
-  setBrawDef("evidence",makeEvidence(TRUE))
+  setBrawDef("evidence",evidence)
 }
 
 

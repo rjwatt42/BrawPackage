@@ -16,6 +16,24 @@ SingleSamplingPDF<-function(z,lambda,sigma,shape=0,bias=FALSE,df1=1) {
 }
 
 
+UniformSamplingPDF<-function(z,lambda,sigma,shape=0,bias=FALSE,df1=1) {
+  # shape is additional normal error distribution
+  d1<-z*0+1
+  sigmad<-sigma^2+shape
+  sigmad[sigmad<0]<-0
+  sigmad<-sqrt(sigmad)
+  d1<-exp(-0.5*((z-lambda)^2/sigmad^2))/sqrt(2*pi*sigmad^2)
+  if (bias>0) {
+    zcrit<-atanh(p2r(braw.env$alphaSig,1/sigma^2+3,df1))
+    d1[abs(z)<zcrit]<-d1[abs(z)<zcrit]*(1-bias)
+    d0<-1-(pnorm(zcrit,lambda,sigmad)-pnorm(-zcrit,lambda,sigmad))*bias
+  } else {
+    d0<-1
+  }
+  return(list(pdf=d1,sig_pdf=d0))
+}
+
+
 GaussSamplingPDF<-function(z,lambda,sigma,offset=0,shape=NA,bias=FALSE,df1=1) {
   sigma2<-sqrt(lambda^2+sigma^2)
   d1<-exp(-0.5*(z-offset)^2/sigma2^2)/sqrt(2*pi*sigma2^2)
@@ -167,6 +185,9 @@ GenExpSamplingPDF<-function(z,lambda,sigma,genexp_shape=1,bias=FALSE,df1=1) {
 getLogLikelihood<-function(z,n,df1,distribution,location,spread=0,bias=FALSE,returnVals=FALSE) {
   if (is.null(spread)) spread<-0
   sigma<-1/sqrt(n-3)
+  if (length(sigma)==1) sigma<-sigma[1,1]
+  if (length(z)==1) z<-z[1,1]
+  
   lambda2<-0
   zcrit<-atanh(p2r(braw.env$alphaSig,n,df1))
 
@@ -210,7 +231,7 @@ getLogLikelihood<-function(z,n,df1,distribution,location,spread=0,bias=FALSE,ret
   # get nulls ready first
   nulls<-spread
   if (any(nulls>0)) {
-    nullPDF<-SingleSamplingPDF(z,0,sigma,NA,bias,df1)
+    nullPDF<-SingleSamplingPDF(z,0,sigma,0,bias,df1)
   } else {
     nullPDF<-list(pdf=0,sig_pdf=1)
     zcrit<-0
@@ -218,6 +239,9 @@ getLogLikelihood<-function(z,n,df1,distribution,location,spread=0,bias=FALSE,ret
   shape<-NA
   res<-matrix(-Inf,nrow=length(location),ncol=length(nulls))
   switch(distribution,
+         "Uniform"={
+           PDF<-UniformSamplingPDF
+         },
          "Single"={
            PDF<-SingleSamplingPDF
          },
@@ -247,7 +271,7 @@ getLogLikelihood<-function(z,n,df1,distribution,location,spread=0,bias=FALSE,ret
       likelihoods<-sourcePDF/(mainPDF$sig_pdf*(1-nullP)+nullPDF$sig_pdf*nullP)
       likelihoods[(likelihoods<1e-300)]<- 1e-300
       res[i,j]<-sum(log(likelihoods[likelihoods>1e-300]),na.rm=TRUE)
-      if (res[i,j]==max(res,na.rm=TRUE)) lksHold<-likelihoods
+      if (res[i,j]==max(res,na.rm=TRUE)) lksHold<-log(likelihoods)
     }
   }
   if (returnVals) return(lksHold)

@@ -1,6 +1,6 @@
 alphaLLR<-function(alphaSig=braw.env$alphaSig) 0.5*qnorm(1-alphaSig/2)^2
 
-isSignificant<-function(method="NHST",p,r,n,df1,evidence,alphaLocal=braw.env$alphaSig) {
+isSignificant<-function(method="NHST",p,r,n,df1,evidence=braw.def$evidence,alphaLocal=braw.env$alphaSig) {
   if (length(alphaLocal)>1) {
     alphaLocal<-rep(alphaLocal,each=nrow(p))
   }
@@ -15,7 +15,7 @@ isSignificant<-function(method="NHST",p,r,n,df1,evidence,alphaLocal=braw.env$alp
           "dLLR"={
             r[abs(r)>1]<-1
             d<-r2llr(abs(r),n,df1,"dLLR",evidence$llr,evidence$prior)
-            sig<-abs(d)>(alphaLLR(alphaLocal)*sign(d))
+            sig<-(abs(d)>alphaLLR(alphaLocal))*sign(d)
           }
   )
   return(sig)

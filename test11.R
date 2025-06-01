@@ -206,9 +206,10 @@ nn<-round(rw2n(rs,w))
 # nn<-154
 
 world<-makeWorld(TRUE,populationPDFsample=TRUE,populationSamplemn=rs,populationSamplesd=n,populationNullp=0)
+world<-getWorld("PsychF")
 h1<-makeHypothesis(effect=makeEffect(world=world))
-d1<-makeDesign(nn)
-showMultiple(doMultiple(0,NULL,hypothesis=h1,design=d1),showType = "wp",orientation="horz")
+d1<-makeDesign(42,Replication=makeReplication(TRUE,forceSigOriginal = FALSE))
+print(showMultiple(doMultiple(0,NULL,hypothesis=h1,design=d1),showType = "wp",orientation="horz"))
 
 ########################
 
