@@ -1284,31 +1284,29 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                                                    "e1p","e2p","e1d","e2d"))) {
         n<-length(pvals)
         if (!is.null(otheranalysis) && effect$world$worldOn) n<-n+length(otheranalysis$pIV)
-        ns<-sum(!resSig,na.rm=TRUE)/n
-        s<-sum(resSig,na.rm=TRUE)/n
-        if (is.element(showType,c("rse","rse1","rse2","rss"))) {
-          sc<-sum((resSig)&(resNotNull))/n
-          nse<-sum((!resSig)&(resNotNull))/n
-          se<-sum((resSig)&(!resNotNull))/n
-          nsc<-sum((!resSig)&(!resNotNull))/n
-        }
-        if (is.element(showType,c("rs1","rs2"))) {
-          sc<-sum((resSig)&(resNotNull))/n
-          nse<-sum((!resSig)&(resNotNull))/n
-          se<-sum((resSig)&(!resNotNull))/n
-          nsc<-sum((!resSig)&(!resNotNull))/n
+        ns<-sum(resSig==0,na.rm=TRUE)/n
+        s<-sum(resSig>0,na.rm=TRUE)/n
+        if (is.element(showType,c("rse","rse1","rse2","rss","rs1","rs2"))) {
+          sc<-sum((resSig>0)&(resNotNull))/n
+          nse<-sum((resSig==0)&(resNotNull))/n
+          se<-sum((resSig>0)&(!resNotNull))/n
+          nsc<-sum((resSig==0)&(!resNotNull))/n
+          if (braw.env$STMethod=="dLLR") {
+            isc<-sum((resSig<0)&(!resNotNull))/n
+            inse<-sum((resSig<0)&(resNotNull))/n
+          }
         }
         if (is.element(showType,c("e1d","e2d"))) {
-          s2<-sum(resSig & shvals<0,na.rm=TRUE)/n
-          s1<-sum(resSig & shvals>0,na.rm=TRUE)/n
+          s2<-sum(resSig>0 & shvals<0,na.rm=TRUE)/n
+          s1<-sum(resSig>0 & shvals>0,na.rm=TRUE)/n
         }
         if (is.element(showType,c("e1+","e2+"))) {
-          s2<-sum(resSig,na.rm=TRUE)/n
-          s1<-sum(resSig,na.rm=TRUE)/n
+          s2<-sum(resSig>0,na.rm=TRUE)/n
+          s1<-sum(resSig>0,na.rm=TRUE)/n
         }
         if (is.element(showType,c("e1-","e2-"))) {
-          s2<-sum(!resSig,na.rm=TRUE)/n
-          s1<-sum(!resSig,na.rm=TRUE)/n
+          s2<-sum(resSig==0,na.rm=TRUE)/n
+          s1<-sum(resSig==0,na.rm=TRUE)/n
         }
       }
     }  else {
@@ -1374,6 +1372,9 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       labels<-c()
       colours<-c()
       title<-""
+      if (braw.env$STMethod=="dLLR") nsLabel<-" ns" else nsLabel<-" error"
+      if (braw.env$STMethod=="dLLR") sLabel<-" ns" else sLabel<-" correct"
+      
       npad<-function(a) {if (nchar(a)<2) return(paste0("  ",a)) else return(a)}
       if (evidence$minRp!=0) nlab<-braw.env$Inactive else nlab<-braw.env$Null
       switch (showType,
@@ -1389,21 +1390,31 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
               },
               "rse"={
                 title<-""
+                if (braw.env$STMethod=="dLLR")
+                  if (!is.null(inse)) {
+                    labels<-c(labels,paste0(braw.env$nonNull," '",brawFormat(inse*100,digits=npct),"%'"," error"))
+                    colours<-c(colours,braw.env$plotColours$infer_isigNonNull)
+                  }
                 if (!is.null(nse)) {
-                  labels<-c(labels,paste0(braw.env$nonNull," '",brawFormat(nse*100,digits=npct),"%'"," error"))
+                  labels<-c(labels,paste0(braw.env$nonNull," '",brawFormat(nse*100,digits=npct),"%'",nsLabel))
                   colours<-c(colours,braw.env$plotColours$infer_nsigNonNull)
                 }
                 if (!is.null(sc)) {
                   labels<-c(labels,paste0(braw.env$nonNull," '",brawFormat(sc*100,digits=npct),"%'"," correct"))
                   colours<-c(colours,braw.env$plotColours$infer_sigNonNull)
                 }
+                if (braw.env$STMethod=="dLLR") 
+                  if (!is.null(isc)) {
+                    labels<-c(labels,paste0(braw.env$Null," '",brawFormat(isc*100,digits=npct),"%'"," correct"))
+                    colours<-c(colours,braw.env$plotColours$infer_isigNull)
+                  }
+                if (!is.null(nsc)) {
+                  labels<-c(labels,paste0(nlab," '",brawFormat(nsc*100,digits=npct),"%'",sLabel))
+                  colours<-c(colours,braw.env$plotColours$infer_nsigNull)
+                }
                 if (!is.null(se)) {
                   labels<-c(labels,paste0(nlab," '",brawFormat(se*100,digits=npct),"%'"," error"))
                   colours<-c(colours,braw.env$plotColours$infer_sigNull)
-                }
-                if (!is.null(nsc)) {
-                  labels<-c(labels,paste0(nlab," '",brawFormat(nsc*100,digits=npct),"%'"," correct"))
-                  colours<-c(colours,braw.env$plotColours$infer_nsigNull)
                 }
               },
               "rse1"={
@@ -1688,41 +1699,57 @@ ps_plot<-function(analysis,disp,showTheory=TRUE,g=NULL){
       col0<-braw.env$plotColours$infer_nsigNonNull
       col2<-braw.env$plotColours$infer_sigNonNull
       col3<-braw.env$plotColours$infer_sigNull
-      col5<-braw.env$plotColours$infer_nsigNull
+      col4<-braw.env$plotColours$infer_nsigNull
+      col5<-braw.env$plotColours$infer_isigNonNull
+      col6<-braw.env$plotColours$infer_isigNull
       # lb0<-paste0(braw.env$nonNullNS," ~ ",brawFormat(mean(!nulls & !sigs)*100,digits=0),'~"%"')
       # lb2<-paste0(braw.env$nonNullSig," ~ ",brawFormat(mean(!nulls & sigs)*100,digits=0),'~"%"')
       # lb3<-paste0(braw.env$nullSig," ~ ",brawFormat(mean(nulls & sigs)*100,digits=0),'~"%"')
       # lb5<-paste0(braw.env$nullNS," ~ ",brawFormat(mean(nulls & !sigs)*100,digits=0),'~"%"')
-      lb0<-paste0(braw.env$nonNullNS," '",brawFormat(mean(!nulls & !sigs)*100,digits=0),"%'")
-      lb2<-paste0(braw.env$nonNullSig," '",brawFormat(mean(!nulls & sigs)*100,digits=0),"%'")
+      lb0<-paste0(braw.env$nonNullNS," '",brawFormat(mean(!nulls & sigs==0)*100,digits=0),"%'")
+      lb2<-paste0(braw.env$nonNullSig," '",brawFormat(mean(!nulls & sigs>0)*100,digits=0),"%'")
       if (analysis$evidence$minRp!=0) {
-        lb3<-paste0(braw.env$inactiveSig," '",brawFormat(mean(nulls & sigs)*100,digits=0),"%'")
-        lb5<-paste0(braw.env$inactiveNS," '",brawFormat(mean(nulls & !sigs)*100,digits=0),"%'")
+        lb3<-paste0(braw.env$inactiveSig," '",brawFormat(mean(nulls & sigs>0)*100,digits=0),"%'")
+        lb4<-paste0(braw.env$inactiveNS," '",brawFormat(mean(nulls & sigs==0)*100,digits=0),"%'")
       } else {
-        lb3<-paste0(braw.env$nullSig," '",brawFormat(mean(nulls & sigs)*100,digits=0),"%'")
-        lb5<-paste0(braw.env$nullNS," '",brawFormat(mean(nulls & !sigs)*100,digits=0),"%'")
+        lb3<-paste0(braw.env$nullSig," '",brawFormat(mean(nulls & sigs>0)*100,digits=0),"%'")
+        lb4<-paste0(braw.env$nullNS," '",brawFormat(mean(nulls & sigs==0)*100,digits=0),"%'")
+      }
+      if (braw.env$STMethod=="dLLR") {
+        lb3<-paste0("H[0]~err"," '",brawFormat(mean(nulls & sigs>0)*100,digits=0),"%'")
+        lb5<-paste0("H[+]~err"," '",brawFormat(mean(!nulls & sigs<0)*100,digits=0),"%'")
+      lb6<-paste0(braw.env$nullSig," '",brawFormat(mean(nulls & sigs<0)*100,digits=0),"%'")
       }
       cols<-c()
       nms<-c()
       y<-1
       if (!all(nulls)) {
-        y1<-y-mean(!nulls & !sigs)/2
+        if (braw.env$STMethod=="dLLR") {
+          g<-addG(g,dataBar(data=data.frame(x=0,y=y),fill=col5,barwidth=0.4))
+          y<-y-mean(!nulls & sigs<0)
+          cols<-c(cols,col5)
+          nms<-c(nms,lb5)
+        }
         g<-addG(g,dataBar(data=data.frame(x=0,y=y),fill=col0,barwidth=0.4))
-        y<-y-mean(!nulls & !sigs)
-        y2<-y-mean(!nulls & sigs)/2
+        y<-y-mean(!nulls & sigs==0)
         g<-addG(g,dataBar(data=data.frame(x=0,y=y),fill=col2,barwidth=0.4))
+        y<-y-mean(!nulls & sigs>0)
         cols<-c(cols,col0,col2)
         nms<-c(nms,lb0,lb2)
-        y<-y-mean(!nulls & sigs)
       }
       if (!all(!nulls)) {
-        y3<-y-mean(nulls & sigs)/2
+        if (braw.env$STMethod=="dLLR") {
+          g<-addG(g,dataBar(data=data.frame(x=0,y=y),fill=col6,barwidth=0.4))
+          y<-y-mean(nulls & sigs<0)
+          cols<-c(cols,col6)
+          nms<-c(nms,lb6)
+        }
+        g<-addG(g,dataBar(data=data.frame(x=0,y=y),fill=col4,barwidth=0.4))
+        y<-y-mean(nulls & sigs==0)
         g<-addG(g,dataBar(data=data.frame(x=0,y=y),fill=col3,barwidth=0.4))
-        y<-y-mean(nulls & sigs)
-        y4<-mean(nulls & !sigs)/2
-        g<-addG(g,dataBar(data=data.frame(x=0,y=y),fill=col5,barwidth=0.4))
-        cols<-c(cols,col3,col5)
-        nms<-c(nms,lb3,lb5)
+        y<-y-mean(nulls & sigs>0)
+        cols<-c(cols,col4,col3)
+        nms<-c(nms,lb4,lb3)
       }        
       g<-addG(g,dataLegend(data.frame(colours=cols,names=nms),title="",shape=22))
 
