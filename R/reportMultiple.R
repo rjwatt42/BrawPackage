@@ -237,11 +237,11 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
             e5=paste0("!j",brawFormat(sum(nullSigW)/length(nullSig)*100,digits=1),"%")
             e6=paste0("!j",brawFormat(sum(resSigW)/length(resSig)*100,digits=1),"%")
             if (result$evidence$minRp!=0) {
-              outputText<-c(outputText,"","!j",braw.env$inactiveTitle,e1,e3,e5,rep("",nc-6))
-            outputText<-c(outputText,"","!j",braw.env$activeTitle,e2,e4,e6,rep("",nc-6))
+              outputText<-c(outputText,"",paste0("!j",braw.env$inactiveTitle),e1,e3,e5,rep("",nc-5))
+            outputText<-c(outputText,"",paste0("!j",braw.env$activeTitle),e2,e4,e6,rep("",nc-5))
             } else {
-              outputText<-c(outputText,"","!j",braw.env$nullTitle,e1,e3,e5,rep("",nc-6))
-              outputText<-c(outputText,"","!j",braw.env$nonnullTitle,e2,e4,e6,rep("",nc-6))
+              outputText<-c(outputText,"",paste0("!j",braw.env$nullTitle),e1,e3,e5,rep("",nc-5))
+              outputText<-c(outputText,"",paste0("!j",braw.env$nonnullTitle),e2,e4,e6,rep("",nc-5))
             }
             e1b=paste0("!j",brawFormat((sum(nullSigW)+sum(resSigW))/nr*100,digits=1),"%")
             e2b=paste0("!j",brawFormat((sum(nullSigC)+sum(resSigC))/nr*100,digits=1),"%")

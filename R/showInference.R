@@ -15,30 +15,28 @@ useData<-function(analysis,use) {
   return(analysis)
 }
 
-getNulls<-function(analysis,useSig=FALSE,useNSig=FALSE) {
-  nonnulls<-which(abs(analysis$rpIV)>analysis$evidence$minRp)
-  nulls<-which(abs(analysis$rpIV)<=analysis$evidence$minRp)
+getNulls<-function(analysisOld,useSig=FALSE,useNSig=FALSE) {
+  nonnulls<-which(abs(analysisOld$rpIV)>analysisOld$evidence$minRp)
+  nulls<-which(abs(analysisOld$rpIV)<=analysisOld$evidence$minRp)
   if (useSig) {
     sigs<-isSignificant(braw.env$STMethod,
-                        analysis$pIV,analysis$rIV,analysis$nval,analysis$df1,analysis$evidence)
+                        analysisOld$pIV,analysisOld$rIV,analysisOld$nval,analysisOld$df1,analysisOld$evidence)
     
-    nonnulls<-which(abs(analysis$rpIV)>analysis$evidence$minRp & sigs)
-    nulls<-which(abs(analysis$rpIV)<=analysis$evidence$minRp & sigs)
+    nonnulls<-which(abs(analysisOld$rpIV)>analysisOld$evidence$minRp & sigs)
+    nulls<-which(abs(analysisOld$rpIV)<=analysisOld$evidence$minRp & sigs)
   }
   if (useNSig) {
     sigs<-isSignificant(braw.env$STMethod,
-                        analysis$pIV,analysis$rIV,analysis$nval,analysis$df1,analysis$evidence)
+                        analysisOld$pIV,analysisOld$rIV,analysisOld$nval,analysisOld$df1,analysisOld$evidence)
     
-    nonnulls<-which(abs(analysis$rpIV)>analysis$evidence$minRp & !sigs)
-    nulls<-which(abs(analysis$rpIV)<=analysis$evidence$minRp & !sigs)
+    nonnulls<-which(abs(analysisOld$rpIV)>analysisOld$evidence$minRp & !sigs)
+    nulls<-which(abs(analysisOld$rpIV)<=analysisOld$evidence$minRp & !sigs)
   }
   
-    nullanalysis<-analysis
-    nullanalysis<-useData(nullanalysis,nulls)
+    nullanalysis<-useData(analysisOld,nulls)
     nullanalysis$count<-sum(!is.na(nullanalysis$rIV))
     
-    analysis$rIV<-analysis$rIV[nonnulls]
-    analysis<-useData(analysis,nonnulls)
+    analysis<-useData(analysisOld,nonnulls)
     analysis$count<-sum(!is.na(analysis$rIV))
 
     list(analysis=analysis,nullanalysis=nullanalysis)
