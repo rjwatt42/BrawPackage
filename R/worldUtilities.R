@@ -376,7 +376,7 @@ fullRSamplingDist<-function(vals,world,design,doStat="rs",logScale=FALSE,sigOnly
                 },
                 "log(lrd)"={ #XXXXXXXX
                   # z^2*(n-3)/2
-                  rp<-tanh(sqrt(vals*2/(n[ni]-3)))
+                  rp<-tanh(sqrt(vals*2/(nvals[ni]-3)))
                   addition<-rSamplingDistr(rp,rvals[ei],nvals[ni])+
                             rSamplingDistr(-rp,rvals[ei],nvals[ni])
                   dzs<-vals*(nvals[ni]-3)

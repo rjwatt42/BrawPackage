@@ -1,3 +1,19 @@
+useData<-function(analysis,use) {
+  analysis$rIV<-analysis$rIV[use]
+  analysis$pIV<-analysis$pIV[use]
+  analysis$rpIV<-analysis$rpIV[use]
+  analysis$roIV<-analysis$roIV[use]
+  analysis$poIV<-analysis$poIV[use]
+  analysis$nval<-analysis$nval[use]
+  analysis$noval<-analysis$noval[use]
+  analysis$df1<-analysis$df1[use]
+  analysis$rFull<-analysis$rFull[use]
+  analysis$pFull<-analysis$pFull[use]
+  analysis$aic<-analysis$aic[use]
+  analysis$aicNull<-analysis$aicNull[use]
+  analysis$sem<-analysis$sem[use]
+  return(analysis)
+}
 
 getNulls<-function(analysis,useSig=FALSE,useNSig=FALSE) {
   nonnulls<-which(abs(analysis$rpIV)>analysis$evidence$minRp)
@@ -18,28 +34,13 @@ getNulls<-function(analysis,useSig=FALSE,useNSig=FALSE) {
   }
   
     nullanalysis<-analysis
-    nullanalysis$rIV<-analysis$rIV[nulls]
-    nullanalysis$pIV<-analysis$pIV[nulls]
-    nullanalysis$rpIV<-analysis$rpIV[nulls]
-    nullanalysis$roIV<-analysis$roIV[nulls]
-    nullanalysis$poIV<-analysis$poIV[nulls]
-    nullanalysis$nval<-analysis$nval[nulls]
-    nullanalysis$df1<-analysis$df1[nulls]
+    nullanalysis<-useData(nullanalysis,nulls)
+    nullanalysis$count<-sum(!is.na(nullanalysis$rIV))
     
     analysis$rIV<-analysis$rIV[nonnulls]
-    analysis$pIV<-analysis$pIV[nonnulls]
-    analysis$rpIV<-analysis$rpIV[nonnulls]
-    analysis$roIV<-analysis$roIV[nonnulls]
-    analysis$poIV<-analysis$poIV[nonnulls]
-    analysis$nval<-analysis$nval[nonnulls]
-    analysis$df1<-analysis$df1[nonnulls]
-    
+    analysis<-useData(analysis,nonnulls)
     analysis$count<-sum(!is.na(analysis$rIV))
-    # analysis$hypothesis$effect$world$populationNullp<-0
-    
-    nullanalysis$count<-sum(!is.na(nullanalysis$rIV))
-    # nullanalysis$hypothesis$effect$world$populationNullp<-1
-    
+
     list(analysis=analysis,nullanalysis=nullanalysis)
   }
 
@@ -89,31 +90,16 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
              showType<-c("rs1","rs2");dimension<-"1D"
              
              use<-abs(analysis1$rpIV)>analysis$evidence$minRp
-             analysis1$rIV<-analysis1$rIV[use]
-             analysis1$pIV<-analysis1$pIV[use]
-             analysis1$rpIV<-analysis1$rpIV[use]
-             analysis1$nval<-analysis1$nval[use]
+             analysis1<-useData(analysis1,use)
+             analysis2<-useData(analysis2,!use)
              
-             use<-!use
-             analysis2$rIV<-analysis2$rIV[use]
-             analysis2$pIV<-analysis2$pIV[use]
-             analysis2$rpIV<-analysis2$rpIV[use]
-             analysis2$nval<-analysis2$nval[use]
            },
            "Inference"={
              showType<-c("rse1","rse2");dimension<-"1D"
              
-             use<-analysis1$pIV<0.05
-             analysis1$rIV<-analysis1$rIV[use]
-             analysis1$pIV<-analysis1$pIV[use]
-             analysis1$rpIV<-analysis1$rpIV[use]
-             analysis1$nval<-analysis1$nval[use]
-
-             use<-!use
-             analysis2$rIV<-analysis2$rIV[use]
-             analysis2$pIV<-analysis2$pIV[use]
-             analysis2$rpIV<-analysis2$rpIV[use]
-             analysis2$nval<-analysis2$nval[use]
+             use<-isSignificant(braw.env$STMethod,analysis$pIV,analysis$rIV,analysis$nval,analysis$df1,analysis$evidence)
+             analysis1<-useData(analysis1,use!=0)
+             analysis2<-useData(analysis2,use==0)
            },
            "Hits"=       {
              showType<-c("e2+","e1+");dimension<-"1D"

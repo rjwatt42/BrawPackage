@@ -69,8 +69,8 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     if (is.null(IV2) || effectType!="all") {nc=4+length(pars)}
     else { nc=4+length(pars)*9 }
     
-    if (is.element(showType,c("NHST","SEM"))) {nc=6}
-    if (is.element(showType,c("Hits","Misses","Inference"))) {
+    if (is.element(showType,c("SEM"))) {nc=6}
+    if (is.element(showType,c("NHST","Hits","Misses","Inference"))) {
       if (braw.env$STMethod=="NHST") nc=4 else nc=5
       }
     nc<-nc+1
@@ -121,18 +121,18 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     }
     
     # column labels
-    if (is.element(showType,c("tDR","Hits","Misses","Inference"))) {
+    if (is.element(showType,c("NHST","Hits","Misses","Inference"))) {
       if (braw.env$STMethod=="NHST")
         outputText1<-c("!H ","!H!CSources:","sig","ns",rep("",nc-4))
       else
         outputText1<-c("!H ","!H!CSources:","sig","ns","err",rep("",nc-5))
     }
     else 
-      if (is.element(showType,c("NHST","SEM"))) {
-        if (showType=="SEM") use<-evidence$useAIC else use<-"r[s]"
+      if (is.element(showType,c("SEM"))) {
+        use<-evidence$useAIC 
         outputText1<-c("","!HResult","!H!C%","",paste0("mean(",use,")"),
                                          paste0("sd(",use,")"),rep("",nc-6))
-        if (showType=="SEM") outputText1[2]<-"!HModel"
+        outputText1[2]<-"!HModel"
       } else {
       if (!is.null(IV2)){
         
@@ -166,7 +166,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     
     for (whichEffect in whichEffects)  {
       
-      if (is.element(showType,c("Hits","Misses","Inference","Source"))){
+      if (is.element(showType,c("NHST","Hits","Misses","Inference","Source"))){
         nullSig<-isSignificant(braw.env$STMethod,nullresult$pIV,nullresult$rIV,nullresult$nval,nullresult$df1,nullresult$evidence)
         resSig<-isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,result$evidence)
         if (braw.env$STMethod=="dLLR") {
@@ -271,30 +271,16 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
         }
         
       } else 
-        if (is.element(showType,c("NHST","SEM"))) {
+        if (is.element(showType,c("SEM"))) {
           nulls<-abs(result$rp)<=evidence$minRp
           sigs<-isSignificant(braw.env$STMethod,
                               result$pIV,result$rIV,
                               result$nval,result$df1,
                               result$evidence)
-          switch(showType,
-                 "NHST"={
-                   outcomes<-sigs+1
-                   data<-matrix(c(result$rIV,
-                                  result$rIV),
-                                ncol=2,byrow=FALSE)
-                   colnames(data)<-c("nsig","sig")
-                   data[sigs>0,1]<-NA
-                   data[sigs==0,2]<-NA
-                   digits=3
-                   nbar<-2
-                 },
-                 "SEM"={
-                   outcomes<-multipleResult$result$sem[,8]
-                   data<-multipleResult$result$sem[,1:7]
-                   digits=1
-                   nbar<-sum(!is.na(data[1,]))
-                 })
+          outcomes<-multipleResult$result$sem[,8]
+          data<-multipleResult$result$sem[,1:7]
+          digits=1
+          nbar<-sum(!is.na(data[1,]))
           
           if (!all(nulls) && !all(!nulls)) {
             for (ig in nbar:1) {
