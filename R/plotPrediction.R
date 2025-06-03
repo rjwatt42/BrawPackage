@@ -378,7 +378,7 @@ plotCatCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
 
 
 plotPrediction<-function(IV=braw.def$hypothesis$IV,IV2=braw.def$hypothesis$IV2,DV=braw.def$hypothesis$DV,
-                         effect=braw.def$effect,design=braw.def$design,
+                         effect=braw.def$hypothesis$effect,design=braw.def$design,
                          offset=1,range=NULL,correction=FALSE,
                          g=NULL){
   if (is.null(g)) {

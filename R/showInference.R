@@ -60,7 +60,7 @@ getNulls<-function(analysisOld,useSig=FALSE,useNSig=FALSE) {
 #'               showTheory=TRUE)
 #' @export
 showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D",orientation="vert",
-                        whichEffect="All",effectType="all",showTheory=braw.env$showTheory
+                        whichEffect="All",effectType="all",showTheory=braw.env$showTheory,showLegend=FALSE
 ) {
   if (is.null(analysis)) analysis<-doSingle(autoShow=FALSE)
   
@@ -85,19 +85,35 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
              showType<-c("rse","ps1");dimension<-"1D"
              },
            "Source"={
-             showType<-c("rs1","rs2");dimension<-"1D"
+             showType<-c("nonnulls","nulls");dimension<-"1D"
              
              use<-abs(analysis1$rpIV)>analysis$evidence$minRp
              analysis1<-useData(analysis1,use)
              analysis2<-useData(analysis2,!use)
              
            },
+           "nonnulls"={
+             use<-abs(analysis1$rpIV)>analysis$evidence$minRp
+             analysis1<-useData(analysis1,use)
+           },
+           "nulls"={
+             use<-abs(analysis1$rpIV)>analysis$evidence$minRp
+             analysis1<-useData(analysis1,!use)
+           },
            "Inference"={
-             showType<-c("rse1","rse2");dimension<-"1D"
+             showType<-c("sig","ns");dimension<-"1D"
              
              use<-isSignificant(braw.env$STMethod,analysis$pIV,analysis$rIV,analysis$nval,analysis$df1,analysis$evidence)
              analysis1<-useData(analysis1,use!=0)
              analysis2<-useData(analysis2,use==0)
+           },
+           "sig"={
+             use<-isSignificant(braw.env$STMethod,analysis$pIV,analysis$rIV,analysis$nval,analysis$df1,analysis$evidence)
+             analysis1<-useData(analysis1,use!=0)
+           },
+           "ns"={
+             use<-isSignificant(braw.env$STMethod,analysis$pIV,analysis$rIV,analysis$nval,analysis$df1,analysis$evidence)
+             analysis1<-useData(analysis1,use==0)
            },
            "Hits"=       {
              showType<-c("e2+","e1+");dimension<-"1D"
@@ -157,21 +173,21 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
         braw.env$plotArea<-c(0.0,0.5,0.45,0.5)
         g1<-plotInference(analysis1,otheranalysis=other1,disp=showType[1],
                           whichEffect=whichEffect[fi],effectType=effectType,
-                          orientation=orientation,showTheory=showTheory,g=g1)
+                          orientation=orientation,showTheory=showTheory,showLegend=showLegend,g=g1)
           braw.env$plotArea<-c(0.0,0,0.45,0.5)
           g1<-plotInference(analysis2,otheranalysis=other2,disp=showType[2],
                             whichEffect=whichEffect[fi],effectType=effectType,
-                            orientation=orientation,showTheory=showTheory,g=g1)
+                            orientation=orientation,showTheory=showTheory,showLegend=showLegend,g=g1)
           if (showType[3]=="SEM") braw.env$plotArea<-c(0.55,0,0.45,1)
           else                    braw.env$plotArea<-c(0.55,0.5,0.45,0.5)
         g1<-plotInference(analysis1,otheranalysis=other1,disp=showType[3],
                           whichEffect=whichEffect[fi],effectType=effectType,
-                          orientation=orientation,showTheory=showTheory,g=g1)
+                          orientation=orientation,showTheory=showTheory,showLegend=showLegend,g=g1)
         if (showType[4]!="SEM") {
           braw.env$plotArea<-c(0.55,0,0.45,0.5)
           g1<-plotInference(analysis2,otheranalysis=other2,disp=showType[4],
                             whichEffect=whichEffect[fi],effectType=effectType,
-                            orientation=orientation,showTheory=showTheory,g=g1)
+                            orientation=orientation,showTheory=showTheory,showLegend=showLegend,g=g1)
         }
       }
     } 
@@ -181,12 +197,12 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
           braw.env$plotArea<-c((1-1)/nplots+0.05,area.x[fi],min(minWidth,0.9/nplots),area.y[fi])
           g1<-plotInference(analysis1,otheranalysis=other1,disp=showType[1],
                             whichEffect=whichEffect[fi],effectType=effectType,
-                            orientation=orientation,showTheory=showTheory,g=g1)
+                            orientation=orientation,showTheory=showTheory,showLegend=showLegend,g=g1)
           if (nplots==2) {
           braw.env$plotArea<-c((2-1)/nplots+0.05,area.x[fi],min(minWidth,0.9/nplots),area.y[fi])
           g1<-plotInference(analysis2,otheranalysis=other2,disp=showType[2],
                             whichEffect=whichEffect[fi],effectType=effectType,
-                            orientation=orientation,showTheory=showTheory,g=g1)
+                            orientation=orientation,showTheory=showTheory,showLegend=showLegend,g=g1)
           }
       }
     }

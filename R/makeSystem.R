@@ -46,7 +46,7 @@ doDLLR<-function() {
 #'                     populationPDFk=0.2,populationNullp=0,worldAbs=FALSE
 #' )
 #' @export
-makeWorld<-function(worldOn=FALSE,populationPDF="Uniform",populationRZ="r",
+makeWorld<-function(worldOn=TRUE,populationPDF="Uniform",populationRZ="r",
                     populationPDFk=0.0,populationPDFmu=0.0,populationNullp=0,
                     populationPDFsample=FALSE,populationSamplemn=0.0,populationSamplesd=0.0,populationSamplebias=FALSE,
                     sigOnly=FALSE,worldAbs=FALSE) {
@@ -69,7 +69,7 @@ makeWorld<-function(worldOn=FALSE,populationPDF="Uniform",populationRZ="r",
 #' )
 #' @export
 makeEffect<-function(rIV=0,rIV2=0,rIVIV2=0,rIVIV2DV=0,rSD=0,Heteroscedasticity=0,
-                     ResidDistr="normal",world=braw.def$world){
+                     ResidDistr="normal",world=makeWorld(FALSE)){
 
   # check effect sizes before going any further
   fullES<-rIV^2+rIV2^2+2*rIV*rIV2*rIVIV2+rIVIV2DV^2
@@ -95,7 +95,7 @@ makeEffect<-function(rIV=0,rIV2=0,rIVIV2=0,rIVIV2DV=0,rSD=0,Heteroscedasticity=0
 #' @examples
 #' makeHypothesis(IV=makeVariable("IV"),IV2=NULL,DV=makeVariable("DV"),effect=makeEffect())
 #' @export
-makeHypothesis<-function(IV=braw.def$IV,IV2=braw.def$IV2,DV=braw.def$DV,effect=braw.def$effect,layout="normal") {
+makeHypothesis<-function(IV=braw.def$IV,IV2=braw.def$IV2,DV=braw.def$DV,effect=makeEffect(),layout="normal") {
   hypothesis<-list(IV=IV,IV2=IV2,DV=DV,effect=effect,layout=layout)
   # assign("hypothesis",hypothesis,braw.def)
   # braw.def$hypothesis<<-hypothesis
@@ -182,7 +182,7 @@ makeSampling<-function(type="Random") {
 #'                 BudgetType="Unlimited",Budget=1000
 #'                 )
 #' @export
-makeReplication<-function(On=FALSE,Repeats=1,Keep="Cautious",RepAlpha=0.05,
+makeReplication<-function(On=TRUE,Repeats=1,Keep="Cautious",RepAlpha=0.05,
                           PowerOn=TRUE,Power=0.8,Tails=2,PowerPrior="None",
                           forceSigOriginal=FALSE,forceSign=TRUE,
                           maxN=2000,
@@ -229,7 +229,7 @@ makeDesign<-function(sN=42, sMethod=makeSampling("Random"),sMethodSeverity=0.1,
                      sRangeOn=FALSE, sIVRange=c(-1,1)*4, sDVRange=c(-1,1)*4, 
                      sDependence=0, sOutliers=0, sNonResponse=0,
                      sCheating="None",sCheatingAttempts=5,sCheatingLimit="Fixed",sCheatingBudget=1000,
-                     Replication=makeReplication()
+                     Replication=makeReplication(FALSE)
 ) {
   
   if (is.character(sN)) 
