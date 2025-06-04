@@ -40,8 +40,8 @@ plotAxis<-function(showType,hypothesis,design=NULL,result=NULL) {
   polabel<-"p[o]"
   switch(braw.env$pPlotScale,
          "log10"={
-           plim<-c(-4,0)
-           pticks<-seq(-4,0,1)
+           plim<-c(log10(braw.env$min_p),0)
+           pticks<-seq(log10(braw.env$min_p),0,1)
            pmins<-log10(c(seq(1,10)/10000,seq(1,10)/1000,seq(1,10)/100,seq(1,10)/10))
            plines<-log10(c(0.05,0.01,0.005,0.001))
            if (explicitLog) {
