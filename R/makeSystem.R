@@ -2,6 +2,7 @@
 # Convenience functions
 #
 
+# convenience
 #' @export
 doShortHand<-function() {
   evidence<-braw.def$evidence
@@ -9,6 +10,7 @@ doShortHand<-function() {
   setBrawDef("evidence",evidence)
 }
 
+# convenience
 #' @export
 undoShortHand<-function() {
   evidence<-braw.def$evidence
@@ -17,11 +19,13 @@ undoShortHand<-function() {
 }
 
 
+# convenience
 #' @export
 doNHST<-function() {
   setBrawEnv("STMethod","NHST")
 }
 
+# convenience
 #' @export
 doDLLR<-function() {
   evidence<-braw.def$evidence
