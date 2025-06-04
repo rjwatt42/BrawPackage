@@ -72,7 +72,7 @@ print(showMultiple(doMultiple(200,NULL,hypothesis = h4b, design = d4),showType="
 h5<-makeHypothesis(DV=getVariable("ExamGrade"),IV=makeVariable("Perfectionism"),IV2=makeVariable("Anxiety"),
                    effect=makeEffect(0.25,-0.5,0.5))
 h5a<-makeHypothesis(DV=getVariable("ExamGrade"),IV=makeVariable("Perfectionism"),IV2=makeVariable("Anxiety"),
-                   effect=makeEffect(0.25,0,0.5))
+                   effect=makeEffect(0.25,-0.5,0))
 d5<-makeDesign(150)
 
 print(showMultiple(doMultiple(200,NULL,hypothesis=h5,design=d5),whichEffect="Main 1",effectType="total",showType="rs",orientation=orientation,showTheory=FALSE))
