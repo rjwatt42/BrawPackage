@@ -366,14 +366,17 @@ braw.res<<-braw.res
 
 }
 
+#' @export
 setBrawEnv<-function(which,value) {
   assign(which,value,braw.env)
 }
 
+#' @export
 setBrawRes<-function(which,value) {
   assign(which,value,braw.res)
 }
 
+#' @export
 setBrawDef<-function(which,value) {
   assign(which,value,braw.def)
   if (is.element(which,c("world"))) {
