@@ -8,7 +8,7 @@ plotAxis<-function(showType,hypothesis,design=NULL,result=NULL) {
   base_hue_w<-0.65
   hue_diff<-0.03
   
-  logScale<-(is.element(showType,c("p","e1p","e2p")) && braw.env$pPlotScale=="log10") ||
+  logScale<-(is.element(showType,c("p","po","e1p","e2p")) && braw.env$pPlotScale=="log10") ||
     (is.element(showType,c("ws","wp")) && braw.env$wPlotScale=="log10") ||
     (is.element(showType,c("n","no")) && braw.env$nPlotScale=="log10") ||
     (is.element(showType,c("nw","llknull")))
