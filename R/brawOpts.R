@@ -125,6 +125,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
           braw.env$graphicsSize<-graphicsSize
           braw.env$labelSize<-height/150*fontScale
           braw.env$dotSize<-braw.env$labelSize*1.25
+          braw.env$fontSize<-1
           
           braw.env$autoShow<-autoShow
           braw.env$plotRect<-ggplot2::coord_cartesian(xlim=c(0,1),ylim=c(0,1))

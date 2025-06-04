@@ -1074,9 +1074,9 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   logScale<-yaxis$logScale
   if (is.element(showType,c("rs","rse","sig","ns","nonnulls","nulls","rss")) && (!is.null(hypothesis$IV2))) 
     switch(whichEffect,"Model"={ylabel<-"Model";ylines<-c(0)},
-                       "Main 1"={ylabel<-"Main 1";ylines<-c(0,hypothesis$effect$rIV)},
-                       "Main 2"={ylabel<-"Main 2";ylines<-c(0,hypothesis$effect$rIV2)},
-                       "Interaction"={ylabel<-"Interaction";ylines<-c(0,hypothesis$effect$rIVIV2DV)}
+                       "Main 1"={ylabel<-hypothesis$IV$name;ylines<-c(0,hypothesis$effect$rIV)},
+                       "Main 2"={ylabel<-hypothesis$IV2$name;ylines<-c(0,hypothesis$effect$rIV2)},
+                       "Interaction"={ylabel<-paste0(hypothesis$IV$name,"x",hypothesis$IV2$name);ylines<-c(0,hypothesis$effect$rIVIV2DV)}
            )
   
   
@@ -1135,8 +1135,8 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   if (is.element(showType,c("p","e1p","e2p","e1d","e2d"))) lineCol<-"green"
   switch(orientation,
          "horz"={
-           for (yl in ylines)
-             g<-addG(g,vertLine(intercept=yl,linewidth=0.25,linetype="dashed",colour=lineCol))
+           # for (yl in ylines)
+           #   g<-addG(g,vertLine(intercept=yl,linewidth=0.25,linetype="dashed",colour=lineCol))
          },
          "vert"={
            for (yl in ylines)
@@ -1564,14 +1564,13 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
     }
     
     if (!is.null(hypothesis$IV2)) {
-      switch(effectType,
-             "all"={
+      if(effectType=="all"){
                g<-addG(g,dataText(data.frame(x=xoff[1],y=ylim[2]-diff(ylim)*0.05),"direct",hjust=0.5,size=0.75))
                g<-addG(g,dataText(data.frame(x=xoff[2],y=ylim[2]-diff(ylim)*0.05),"unique",hjust=0.5,size=0.75))
                g<-addG(g,dataText(data.frame(x=xoff[3],y=ylim[2]-diff(ylim)*0.05),"total",hjust=0.5,size=0.75))
-             },
-             g<-addG(g,dataText(data.frame(x=xoff,y=ylim[2]-diff(ylim)*0.05),effectType,hjust=0.5,size=0.75))
-      )
+      } else {
+        # g<-addG(g,dataText(data.frame(x=xoff,y=ylim[2]-diff(ylim)*0.05),effectType,hjust=0.5,size=0.75))
+      }
     }
   }
   

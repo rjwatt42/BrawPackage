@@ -262,7 +262,7 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=0,
   fontScale<-fontScale*fontShrink
   
   minGap<-0.1
-  unitGap<-0.75
+  unitGap<-0.75*braw.env$fontSize
   labelGapx<-labelGapy<-unitGap*1.7
   if (containsSubscript(xlabel$label) || containsSuperscript(xlabel$label)) labelGapx<-labelGapx*1.6
   if (containsSubscript(ylabel$label) || containsSuperscript(ylabel$label)) labelGapy<-labelGapy*1.6
@@ -288,8 +288,8 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=0,
   else maxtick<-0
   if (!is.null(yticks) && !is.null(yticks$labels))
     maxtick<-max(c(maxtick,strNChar(yticks$labels)))
-  tickSize<-5/max(7,maxtick)
   
+  tickSize<-5/max(7,maxtick)
   tickGap<-unitGap*maxtick/5
 
   bottomGap<-labelGapx+3*unitGap
@@ -338,14 +338,14 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=0,
          }
   )
   if (!is.null(xticks)) 
-    g<-addG(g,xAxisTicks(breaks=xticks$breaks,labels=xticks$labels,logScale=xticks$logScale,angle=xticks$angle,size=tickSize))
+    g<-addG(g,xAxisTicks(breaks=xticks$breaks,labels=xticks$labels,logScale=xticks$logScale,angle=xticks$angle,size=tickSize*braw.env$fontSize))
   if (!is.null(yticks)) 
-    g<-addG(g,yAxisTicks(breaks=yticks$breaks,labels=yticks$labels,logScale=yticks$logScale,angle=yticks$angle,size=tickSize))
+    g<-addG(g,yAxisTicks(breaks=yticks$breaks,labels=yticks$labels,logScale=yticks$logScale,angle=yticks$angle,size=tickSize*braw.env$fontSize))
   # braw.env$plotLimits$fontScale<-braw.env$plotLimits$fontScale/fontShrink
   if (!is.null(xlabel))
-    g<-addG(g,xAxisLabel(label=xlabel$label,size=tickSize*1.5))
+    g<-addG(g,xAxisLabel(label=xlabel$label,size=tickSize*1.5*braw.env$fontSize))
   if (!is.null(ylabel))
-    g<-addG(g,yAxisLabel(label=ylabel$label,size=tickSize*1.5))
+    g<-addG(g,yAxisLabel(label=ylabel$label,size=tickSize*1.5*braw.env$fontSize))
   # braw.env$plotLimits$fontScale<-braw.env$plotLimits$fontScale*fontShrink
   return(g)  
 }
@@ -406,7 +406,7 @@ xAxisTicks<-function(breaks=NULL,labels=NULL,logScale=FALSE,angle=0,size=NULL){
            } else {
              hjust=1.1
            }
-           axisText(ticksBottom,label=labels, hjust=hjust, vjust=1.2, dy=-2, colour="#000000",size=size,fontface="plain")
+           axisText(ticksBottom,label=labels, hjust=hjust, vjust=1.5, dy=-2, colour="#000000",size=size,fontface="plain")
          }
   )
 }
@@ -831,7 +831,8 @@ strNChar<-function(str) {
   nother<-nother-(is.mathLabel(str) & grepl("=",str))*1
   return(nother+nsub*0.6)
 }
-dataLegend<-function(data,title="",fontsize=0.6,shape=21) {
+dataLegend<-function(data,title="",fontsize=1,shape=21) {
+  fontsize=0.6*fontsize*braw.env$fontSize
   dy=0.06*fontsize
   dx=0.022*fontsize/braw.env$plotArea[3] # because rangeX() below
   if (nchar(title)>0) tn<-1.2 else tn<-0

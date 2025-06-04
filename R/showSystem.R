@@ -59,7 +59,7 @@ showSystem<-function(whichShow="all",hypothesis=braw.def$hypothesis,design=braw.
 #' showHypothesis(hypothesis=makeHypothesis())
 #' @export
 showHypothesis<-function(hypothesis=braw.def$hypothesis,evidence=braw.def$evidence,
-                         doWorld=TRUE,plotArea=NULL,autoShow=FALSE,g=NULL) {
+                         doWorld=TRUE,showValue=TRUE,plotArea=NULL,autoShow=FALSE,g=NULL) {
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV
@@ -72,7 +72,7 @@ showHypothesis<-function(hypothesis=braw.def$hypothesis,evidence=braw.def$eviden
     else           plotArea<-c(0.1,0.0,0.8,1)
   }
   doWorld<-doWorld && effect$world$worldOn
-  if (doWorld) effect$rIV<-NULL
+  if (doWorld) {effect$rIV<-NULL; showValue=FALSE}
   ygain<-plotArea[4]
   yoff<-plotArea[2]
   switch(no_ivs,
@@ -80,7 +80,7 @@ showHypothesis<-function(hypothesis=braw.def$hypothesis,evidence=braw.def$eviden
            xoff<-plotArea[1]
            g<-showVariable(IV,plotArea=c(xoff,yoff+0.65*ygain,xgain,0.35*ygain),g=g)
            g<-showVariable(DV,plotArea=c(xoff,yoff,xgain,0.35*ygain),g=g)
-           g<-showEffect(c(effect$rIV,effect$rSD),showValue=!doWorld,plotArea=c(xoff,yoff+0.35*ygain,xgain,0.3*ygain),1,g)
+           g<-showEffect(c(effect$rIV,effect$rSD),showValue=showValue,plotArea=c(xoff,yoff+0.35*ygain,xgain,0.3*ygain),1,g)
            if (doWorld) g<-showWorld(hypothesis,plotArea=c(xoff+0.23,0.4*ygain,xgain*0.65,0.27*ygain),g=g)
          },
          {
@@ -99,34 +99,34 @@ showHypothesis<-function(hypothesis=braw.def$hypothesis,evidence=braw.def$eviden
                     g<-showVariable(IV,plotArea=c(xoff-xgain*0.3,yoff+0.65*ygain,xgain,0.35*ygain),g=g)
                     g<-showVariable(IV2,plotArea=c(xoff+xgain*1.3,yoff+0.65*ygain,xgain,0.35*ygain),g=g)
                     g<-showVariable(DV,plotArea=c(xoff+xgain/2,yoff,xgain,0.35*ygain),g=g)
-                    g<-showEffect(r1,2,showValue=!doWorld,plotArea=c(xoff-xgain*0.3,yoff+0.35*ygain,xgain,0.3*ygain),g)
-                    g<-showEffect(r2,3,showValue=!doWorld,plotArea=c(xoff+xgain*1.3,yoff+0.35*ygain,xgain,0.3*ygain),g)
+                    g<-showEffect(r1,2,showValue=showValue,plotArea=c(xoff-xgain*0.3,yoff+0.35*ygain,xgain,0.3*ygain),g)
+                    g<-showEffect(r2,3,showValue=showValue,plotArea=c(xoff+xgain*1.3,yoff+0.35*ygain,xgain,0.3*ygain),g)
                   },
                   "normal"={
                     g<-showVariable(IV,plotArea=c(xoff-xgain*0.3,yoff+0.65*ygain,xgain,0.35*ygain),g=g)
                     g<-showVariable(IV2,plotArea=c(xoff+xgain*1.3,yoff+0.65*ygain,xgain,0.35*ygain),g=g)
                     g<-showVariable(DV,plotArea=c(xoff+xgain/2,yoff,xgain,0.35*ygain),g=g)
-                    g<-showEffect(r1,2,showValue=!doWorld,plotArea=c(xoff-xgain*0.3,yoff+0.35*ygain,xgain,0.3*ygain),g)
-                    g<-showEffect(r2,3,showValue=!doWorld,plotArea=c(xoff+xgain*1.3,yoff+0.35*ygain,xgain,0.3*ygain),g)
-                    g<-showEffect(r12,4,showValue=!doWorld,plotArea=c(xoff+xgain/2,yoff+0.7*ygain,xgain,0.22*ygain),g)
+                    g<-showEffect(r1,2,showValue=showValue,plotArea=c(xoff-xgain*0.3,yoff+0.35*ygain,xgain,0.3*ygain),g)
+                    g<-showEffect(r2,3,showValue=showValue,plotArea=c(xoff+xgain*1.3,yoff+0.35*ygain,xgain,0.3*ygain),g)
+                    g<-showEffect(r12,4,showValue=showValue,plotArea=c(xoff+xgain/2,yoff+0.7*ygain,xgain,0.22*ygain),g)
                     if (evidence$rInteractionOn)
-                      g<-showEffect(effect$rIVIV2DV,5,showValue=!doWorld,plotArea=c(xoff+xgain/2,yoff+0.35*ygain,xgain,0.3*ygain),g)
+                      g<-showEffect(effect$rIVIV2DV,5,showValue=showValue,plotArea=c(xoff+xgain/2,yoff+0.35*ygain,xgain,0.3*ygain),g)
                   },
                   "path"={
                     g<-showVariable(IV,plotArea=c(xoff,yoff+0.65*ygain,xgain*0.9,0.35*ygain),g=g)
                     g<-showVariable(IV2,plotArea=c(xoff+xgain*1.1,yoff+0.35*ygain,xgain*0.9,0.35*ygain),g=g)
                     g<-showVariable(DV,plotArea=c(xoff,yoff,xgain,0.35*ygain),g=g)
-                    g<-showEffect(r1,6,showValue=!doWorld,plotArea=c(xoff,yoff+0.35*ygain,xgain,0.3*ygain),g)
-                    g<-showEffect(r2,7,showValue=!doWorld,plotArea=c(xoff+xgain*1.1/2,yoff+0.05*ygain,xgain,0.3*ygain),g)
-                    g<-showEffect(r12,8,showValue=!doWorld,plotArea=c(xoff+xgain*1.1/2,yoff+0.65*ygain,xgain,0.3*ygain),g)
+                    g<-showEffect(r1,6,showValue=showValue,plotArea=c(xoff,yoff+0.35*ygain,xgain,0.3*ygain),g)
+                    g<-showEffect(r2,7,showValue=showValue,plotArea=c(xoff+xgain*1.1/2,yoff+0.05*ygain,xgain,0.3*ygain),g)
+                    g<-showEffect(r12,8,showValue=showValue,plotArea=c(xoff+xgain*1.1/2,yoff+0.65*ygain,xgain,0.3*ygain),g)
                   },
                   "lpath"={
                     g<-showVariable(IV2,plotArea=c(xoff+xgain*1.1,yoff+0.65*ygain,xgain*0.9,0.35*ygain),g=g)
                     g<-showVariable(IV,plotArea=c(xoff,yoff+0.35*ygain,xgain*0.9,0.35*ygain),g=g)
                     g<-showVariable(DV,plotArea=c(xoff+xgain*1.1,yoff,xgain,0.35*ygain),g=g)
-                    g<-showEffect(r1,9,showValue=!doWorld,plotArea=c(xoff,yoff+0.05*ygain,xgain,0.3*ygain),g)
-                    g<-showEffect(r2,10,showValue=!doWorld,plotArea=c(xoff+xgain*1.1/2,yoff+0.35*ygain,xgain,0.3*ygain),g)
-                    g<-showEffect(r12,11,showValue=!doWorld,plotArea=c(xoff,yoff+0.65*ygain,xgain,0.3*ygain),g)
+                    g<-showEffect(r1,9,showValue=showValue,plotArea=c(xoff,yoff+0.05*ygain,xgain,0.3*ygain),g)
+                    g<-showEffect(r2,10,showValue=showValue,plotArea=c(xoff+xgain*1.1/2,yoff+0.35*ygain,xgain,0.3*ygain),g)
+                    g<-showEffect(r12,11,showValue=showValue,plotArea=c(xoff,yoff+0.65*ygain,xgain,0.3*ygain),g)
                   }
              
            )

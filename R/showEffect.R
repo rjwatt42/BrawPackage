@@ -186,8 +186,8 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
       else {
         lbl<-brawFormat(r,digits=2)
         if (!is.null(rUN)) {
-          if (t==2) lbl<-paste0("(",brawFormat(rUN,digits=2),") ",lbl)
-          if (t==3) lbl<-paste0(lbl," (",brawFormat(rUN,digits=2),")")
+          # if (t==2) lbl<-paste0("(",brawFormat(rUN,digits=2),") ",lbl)
+          # if (t==3) lbl<-paste0(lbl," (",brawFormat(rUN,digits=2),")")
         }
       }
     }
