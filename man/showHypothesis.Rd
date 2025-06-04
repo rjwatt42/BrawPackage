@@ -8,6 +8,7 @@ showHypothesis(
   hypothesis = braw.def$hypothesis,
   evidence = braw.def$evidence,
   doWorld = TRUE,
+  showValue = TRUE,
   plotArea = NULL,
   autoShow = FALSE,
   g = NULL

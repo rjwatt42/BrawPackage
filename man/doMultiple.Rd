@@ -6,7 +6,7 @@
 \usage{
 doMultiple(
   nsims = 10,
-  multipleResult = braw.res$multiple,
+  multipleResult = NA,
   hypothesis = braw.def$hypothesis,
   design = braw.def$design,
   evidence = braw.def$evidence,

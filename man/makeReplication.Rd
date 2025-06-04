@@ -5,7 +5,7 @@
 \title{make a replication object}
 \usage{
 makeReplication(
-  On = FALSE,
+  On = TRUE,
   Repeats = 1,
   Keep = "Cautious",
   RepAlpha = 0.05,
@@ -15,8 +15,10 @@ makeReplication(
   PowerPrior = "None",
   forceSigOriginal = FALSE,
   forceSign = TRUE,
+  maxN = 2000,
   BudgetType = "Unlimited",
-  Budget = 1000
+  Budget = 1000,
+  RepNoStudies = 1
 )
 }
 \arguments{

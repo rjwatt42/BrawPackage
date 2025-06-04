@@ -4,7 +4,7 @@
 \alias{getWorld}
 \title{make a specific hypothesis}
 \usage{
-getWorld(name)
+getWorld(name, result = braw.res$result)
 }
 \arguments{
 \item{name}{"Psych","PsychF"}

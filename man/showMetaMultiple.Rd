@@ -7,7 +7,7 @@
 showMetaMultiple(
   metaResult = braw.res$metaMultiple,
   showType = NULL,
-  dimension = "2D"
+  dimension = "1D"
 )
 }
 \value{

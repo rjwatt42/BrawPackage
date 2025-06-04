@@ -6,7 +6,7 @@
 \usage{
 doExplore(
   nsims = 10,
-  exploreResult = braw.res$explore,
+  exploreResult = NA,
   explore = braw.def$explore,
   hypothesis = braw.def$hypothesis,
   design = braw.def$design,

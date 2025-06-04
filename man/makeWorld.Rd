@@ -6,11 +6,17 @@
  an object that specifies the distribution of effect sizes}
 \usage{
 makeWorld(
-  worldOn = FALSE,
-  populationPDF = "Single",
+  worldOn = TRUE,
+  populationPDF = "Uniform",
   populationRZ = "r",
   populationPDFk = 0,
+  populationPDFmu = 0,
   populationNullp = 0,
+  populationPDFsample = FALSE,
+  populationSamplemn = 0,
+  populationSamplesd = 0,
+  populationSamplebias = FALSE,
+  sigOnly = FALSE,
   worldAbs = FALSE
 )
 }

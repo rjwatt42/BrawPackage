@@ -11,7 +11,8 @@ showMultiple(
   orientation = "vert",
   whichEffect = "All",
   effectType = "all",
-  showTheory = braw.env$showTheory
+  showTheory = braw.env$showTheory,
+  showLegend = TRUE
 )
 }
 \arguments{

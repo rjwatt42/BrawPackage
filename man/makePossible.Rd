@@ -6,17 +6,20 @@
 \usage{
 makePossible(
   targetSample = NULL,
+  targetSampleN = NULL,
   UseSource = "world",
   targetPopulation = NULL,
   UsePrior = "none",
   prior = getWorld("Psych"),
-  sims = braw.res$multiple$result,
   sigOnly = FALSE,
   sigOnlyCompensate = FALSE,
+  axisType = braw.env$RZ,
+  sims = NULL,
   hypothesis = braw.def$hypothesis,
   design = braw.def$design,
   simSlice = 0.1,
-  correction = TRUE
+  correction = TRUE,
+  HQ = FALSE
 )
 }
 \arguments{

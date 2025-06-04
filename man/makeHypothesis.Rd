@@ -8,7 +8,7 @@ makeHypothesis(
   IV = braw.def$IV,
   IV2 = braw.def$IV2,
   DV = braw.def$DV,
-  effect = braw.def$effect,
+  effect = makeEffect(),
   layout = "normal"
 )
 }

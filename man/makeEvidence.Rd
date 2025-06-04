@@ -17,6 +17,7 @@ makeEvidence(
   Welch = FALSE,
   Transform = "None",
   McFaddens = TRUE,
+  minRp = 0,
   prior = makeWorld(TRUE, "Uniform", "r"),
   metaAnalysis = makeMetaAnalysis()
 )

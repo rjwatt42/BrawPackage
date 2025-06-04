@@ -12,7 +12,7 @@ makeEffect(
   rSD = 0,
   Heteroscedasticity = 0,
   ResidDistr = "normal",
-  world = braw.def$world
+  world = makeWorld(FALSE)
 )
 }
 \arguments{

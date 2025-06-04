@@ -26,7 +26,7 @@ makeDesign(
   sCheatingAttempts = 5,
   sCheatingLimit = "Fixed",
   sCheatingBudget = 1000,
-  Replication = makeReplication()
+  Replication = makeReplication(FALSE)
 )
 }
 \arguments{
