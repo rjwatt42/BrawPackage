@@ -1,7 +1,7 @@
 Package: BrawPack
 Type: Package
 Title: BrawStats Simulator for Understanding Statistics
-Version: 1.0.0.0
+Version: 1.1.0.0
 Imports:
     ggplot2,
     ggtext,
