@@ -5,6 +5,25 @@
   BrawOpts()
 }
 
+
+
+#' @import ggplot2
+#' @import ggtext
+#' @import grDevices
+#' @import grid
+
+#' @import mnormt
+#' @import lme4
+#' @import readxl
+#' @import writexl
+#' @import stringr
+#' @import clipr
+#' @import car
+#' @import pracma
+#' @import abind
+#' @import meta
+
+
 #' @export
 newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
   while (dev.cur()!=1) dev.off()
