@@ -4,7 +4,30 @@
 \alias{setDesign}
 \title{set default design}
 \usage{
-setDesign(...)
+setDesign(
+  sN = braw.def$design$sN,
+  sMethod = braw.def$design$sMethod,
+  sMethodSeverity = braw.def$design$sMethodSeverity,
+  sNRand = braw.def$design$sNRand,
+  sNRandSD = braw.def$design$sNRandSD,
+  sNRandDist = braw.def$design$sNRandDist,
+  sIV1Use = braw.def$design$sIV1Use,
+  sIV2Use = braw.def$design$sIV2Use,
+  sWithinCor = braw.def$design$sWithinCor,
+  sBudgetOn = braw.def$design$sBudgetOn,
+  sNBudget = braw.def$design$sNBudget,
+  sRangeOn = braw.def$design$sRangeOn,
+  sIVRange = braw.def$design$sIVRange,
+  sDVRange = braw.def$design$sDVRange,
+  sDependence = braw.def$design$sDependence,
+  sOutliers = braw.def$design$sOutliers,
+  sNonResponse = braw.def$design$sNonResponse,
+  sCheating = braw.def$design$sCheating,
+  sCheatingAttempts = braw.def$design$sCheatingAttempts,
+  sCheatingLimit = braw.def$design$sCheatingLimit,
+  sCheatingBudget = braw.def$design$sCheatingBudget,
+  Replication = braw.def$design$Replication
+)
 }
 \description{
 set default design

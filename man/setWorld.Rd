@@ -4,7 +4,20 @@
 \alias{setWorld}
 \title{set default world}
 \usage{
-setWorld(...)
+setWorld(
+  worldOn = braw.def$hypothesis$effect$world$worldOn,
+  populationPDF = braw.def$hypothesis$effect$world$populationPDF,
+  populationRZ = braw.def$hypothesis$effect$world$populationRZ,
+  populationPDFk = braw.def$hypothesis$effect$world$populationPDFk,
+  populationPDFmu = braw.def$hypothesis$effect$world$populationPDFmu,
+  populationNullp = braw.def$hypothesis$effect$world$populationNullp,
+  populationPDFsample = braw.def$hypothesis$effect$world$populationPDFsample,
+  populationSamplemn = braw.def$hypothesis$effect$world$populationSamplemn,
+  populationSamplesd = braw.def$hypothesis$effect$world$populationSamplesd,
+  populationSamplebias = braw.def$hypothesis$effect$world$populationSamplebias,
+  sigOnly = braw.def$hypothesis$effect$world$sigOnly,
+  worldAbs = braw.def$hypothesis$effect$world$worldAbs
+)
 }
 \description{
 set default world

@@ -4,7 +4,16 @@
 \alias{setEffect}
 \title{set default effect}
 \usage{
-setEffect(...)
+setEffect(
+  rIV = braw.def$hypothesis$effect$rIV,
+  rIV2 = braw.def$hypothesis$effect$rIV2,
+  rIVIV2 = braw.def$hypothesis$effect$rIVIV2,
+  rIVIV2DV = braw.def$hypothesis$effect$rIVIV2DV,
+  rSD = braw.def$hypothesis$effect$rSD,
+  Heteroscedasticity = braw.def$hypothesis$effect$Heteroscedasticity,
+  ResidDistr = braw.def$hypothesis$effect$ResidDistr,
+  world = braw.def$hypothesis$effect$world
+)
 }
 \description{
 set default effect

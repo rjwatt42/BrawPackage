@@ -254,7 +254,7 @@ makeDesign<-function(sN=42, sMethod=makeSampling("Random"),sMethodSeverity=0.1,
                sBudgetOn=sBudgetOn,sNBudget=sNBudget,
                sRangeOn=sRangeOn, sIVRange=sIVRange, sDVRange=sDVRange, 
                sDependence=sDependence, sOutliers=sOutliers,sNonResponse=sNonResponse,
-               sCheating=sCheating,sCheatingLimit=sCheatingLimit,sCheatingAttempts=sCheatingAttempts,sCheatingBudget=sCheatingBudget,
+               sCheating=sCheating,sCheatingAttempts=sCheatingAttempts,sCheatingLimit=sCheatingLimit,sCheatingBudget=sCheatingBudget,
                Replication=Replication
                )
   # assign("design",design,braw.def)
@@ -312,15 +312,20 @@ makeEvidence<-function(shortHand=FALSE,sigOnly=FALSE,
 
 #' set default hypothesis
 #' @export
-setHypothesis<-function(...) {
-  e<-makeHypothesis(...)
+setHypothesis<-function(IV=braw.def$hypothesis$IV,IV2=braw.def$hypothesis$IV2,DV=braw.def$hypothesis$DV,
+                        effect=braw.def$hypothesis$effect,layout=braw.def$hypothesis$layout) {
+  e<-makeHypothesis(IV=IV,IV2=IV2,DV=DV,effect=effect,layout=layout)
   setBrawDef("hypothesis",e)
 }
 
 #' set default effect
 #' @export
-setEffect<-function(...) {
-  e<-makeEffect(...)
+setEffect<-function(rIV=braw.def$hypothesis$effect$rIV,rIV2=braw.def$hypothesis$effect$rIV2,rIVIV2=braw.def$hypothesis$effect$rIVIV2,rIVIV2DV=braw.def$hypothesis$effect$rIVIV2DV,rSD=braw.def$hypothesis$effect$rSD,
+                    Heteroscedasticity=braw.def$hypothesis$effect$Heteroscedasticity,ResidDistr=braw.def$hypothesis$effect$ResidDistr,
+                    world=braw.def$hypothesis$effect$world) {
+  e<-makeEffect(rIV=rIV,rIV2=rIV2,rIVIV2=rIVIV2,rIVIV2DV=rIVIV2DV,rSD=rSD,
+                Heteroscedasticity=Heteroscedasticity,ResidDistr=ResidDistr,
+                world=world)
   h<-braw.def$hypothesis
   h$effect<-e
   setBrawDef("hypothesis",h)
@@ -328,8 +333,16 @@ setEffect<-function(...) {
 
 #' set default world
 #' @export
-setWorld<-function(...) {
-  e<-makeWorld(...)
+setWorld<-function(worldOn=braw.def$hypothesis$effect$world$worldOn,
+                   populationPDF=braw.def$hypothesis$effect$world$populationPDF,populationRZ=braw.def$hypothesis$effect$world$populationRZ,
+                   populationPDFk=braw.def$hypothesis$effect$world$populationPDFk,populationPDFmu=braw.def$hypothesis$effect$world$populationPDFmu,populationNullp=braw.def$hypothesis$effect$world$populationNullp,
+                   populationPDFsample=braw.def$hypothesis$effect$world$populationPDFsample,populationSamplemn=braw.def$hypothesis$effect$world$populationSamplemn,populationSamplesd=braw.def$hypothesis$effect$world$populationSamplesd,populationSamplebias=braw.def$hypothesis$effect$world$populationSamplebias,
+                   sigOnly=braw.def$hypothesis$effect$world$sigOnly,worldAbs=braw.def$hypothesis$effect$world$worldAbs) {
+  e<-makeWorld(worldOn=worldOn,
+               populationPDF=populationPDF,populationRZ=populationRZ,
+               populationPDFk=populationPDFk,populationPDFmu=populationPDFmu,populationNullp=populationNullp,
+               populationPDFsample=populationPDFsample,populationSamplemn=populationSamplemn,populationSamplesd=populationSamplesd,populationSamplebias=populationSamplebias,
+               sigOnly=sigOnly,worldAbs=worldAbs)
   h<-braw.def$hypothesis
   h$effect$world<-e
   setBrawDef("hypothesis",h)
@@ -337,15 +350,45 @@ setWorld<-function(...) {
 
 #' set default design
 #' @export
-setDesign<-function(...) {
-  e<-makeDesign(...)
+setDesign<-function(sN=braw.def$design$sN, sMethod=braw.def$design$sMethod, sMethodSeverity=braw.def$design$sMethodSeverity,
+                    sNRand=braw.def$design$sNRand,sNRandSD=braw.def$design$sNRandSD,sNRandDist=braw.def$design$sNRandDist,
+                    sIV1Use=braw.def$design$sIV1Use,sIV2Use=braw.def$design$sIV2Use, 
+                    sWithinCor=braw.def$design$sWithinCor,
+                    sBudgetOn=braw.def$design$sBudgetOn,sNBudget=braw.def$design$sNBudget,
+                    sRangeOn=braw.def$design$sRangeOn, sIVRange=braw.def$design$sIVRange, sDVRange=braw.def$design$sDVRange, 
+                    sDependence=braw.def$design$sDependence, sOutliers=braw.def$design$sOutliers,sNonResponse=braw.def$design$sNonResponse,
+                    sCheating=braw.def$design$sCheating,sCheatingAttempts=braw.def$design$sCheatingAttempts,sCheatingLimit=braw.def$design$sCheatingLimit,sCheatingBudget=braw.def$design$sCheatingBudget,
+                    Replication=braw.def$design$Replication) {
+  e<-makeDesign(sN=sN, sMethod=sMethod, sMethodSeverity=sMethodSeverity,
+                sNRand=sNRand,sNRandSD=sNRandSD,sNRandDist=sNRandDist,
+                sIV1Use=sIV1Use,sIV2Use=sIV2Use, 
+                sWithinCor=sWithinCor,
+                sBudgetOn=sBudgetOn,sNBudget=sNBudget,
+                sRangeOn=sRangeOn, sIVRange=sIVRange, sDVRange=sDVRange, 
+                sDependence=sDependence, sOutliers=sOutliers,sNonResponse=sNonResponse,
+                sCheating=sCheating,sCheatingAttempts=sCheatingAttempts,sCheatingLimit=sCheatingLimit,sCheatingBudget=sCheatingBudget,
+                Replication=Replication)
   setBrawDef("design",e)
 }
 
 #' set default evidence
 #' @export
-setEvidence<-function(...) {
-  e<-makeEvidence(...)
+setEvidence<-function(shortHand=braw.def$evidence$shortHand,sigOnly=braw.def$evidence$sigOnly,
+                      rInteractionOn=braw.def$evidence$rInteractionOn,rInteractionOnly=braw.def$evidence$rInteractionOnly,ssqType=braw.def$evidence$ssqType,
+                      caseOrder=braw.def$evidence$caseOrder,
+                      llr=braw.def$evidence$llr,useAIC=braw.def$evidence$useAIC,doSEM=braw.def$evidence$doSEM,
+                      Welch=braw.def$evidence$Welch,Transform=braw.def$evidence$Transform,McFaddens=braw.def$evidence$McFaddens,
+                      minRp=braw.def$evidence$minRp,
+                      prior=braw.def$evidence$prior,
+                      metaAnalysis=braw.def$evidence$metaAnalysis) {
+  e<-makeEvidence(shortHand=shortHand,sigOnly=sigOnly,
+                  rInteractionOn=rInteractionOn,rInteractionOnly=rInteractionOnly,ssqType=ssqType,
+                  caseOrder=caseOrder,
+                  llr=llr,useAIC=useAIC,doSEM=doSEM,
+                  Welch=Welch,Transform=Transform,McFaddens=McFaddens,
+                  minRp=minRp,
+                  prior=prior,
+                  metaAnalysis=metaAnalysis)
   setBrawDef("evidence",e)
 }
 

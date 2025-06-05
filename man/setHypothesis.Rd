@@ -4,7 +4,13 @@
 \alias{setHypothesis}
 \title{set default hypothesis}
 \usage{
-setHypothesis(...)
+setHypothesis(
+  IV = braw.def$hypothesis$IV,
+  IV2 = braw.def$hypothesis$IV2,
+  DV = braw.def$hypothesis$DV,
+  effect = braw.def$hypothesis$effect,
+  layout = braw.def$hypothesis$layout
+)
 }
 \description{
 set default hypothesis

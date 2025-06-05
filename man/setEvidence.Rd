@@ -4,7 +4,23 @@
 \alias{setEvidence}
 \title{set default evidence}
 \usage{
-setEvidence(...)
+setEvidence(
+  shortHand = braw.def$evidence$shortHand,
+  sigOnly = braw.def$evidence$sigOnly,
+  rInteractionOn = braw.def$evidence$rInteractionOn,
+  rInteractionOnly = braw.def$evidence$rInteractionOnly,
+  ssqType = braw.def$evidence$ssqType,
+  caseOrder = braw.def$evidence$caseOrder,
+  llr = braw.def$evidence$llr,
+  useAIC = braw.def$evidence$useAIC,
+  doSEM = braw.def$evidence$doSEM,
+  Welch = braw.def$evidence$Welch,
+  Transform = braw.def$evidence$Transform,
+  McFaddens = braw.def$evidence$McFaddens,
+  minRp = braw.def$evidence$minRp,
+  prior = braw.def$evidence$prior,
+  metaAnalysis = braw.def$evidence$metaAnalysis
+)
 }
 \description{
 set default evidence
