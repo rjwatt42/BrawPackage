@@ -1,6 +1,6 @@
 ###########################
 # defaults
-print("OK
+print("OK")
 orientation<-"horz"
 setBrawEnv("fontSize",1.5)
 
