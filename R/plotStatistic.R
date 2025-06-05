@@ -911,29 +911,32 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
         if (dens[j]>0) {
           if (histStyle=="width") {
             alpha<-simAlpha
+            alpha<-1
+            colour<-cols[j]
             w<-dens[j]
           } else {
             alpha<-(dens[j]/0.35)^0.6
-            alpha<-1
+            colour<-NA
+            # alpha<-1
             w<-0.5/0.35
           }
-          alpha<-1
+          # alpha<-1
           switch(orientation,
                  "vert"={
                    data<-data.frame(y=c(hists$x[i],hists$x[i],hists$x[i+1],hists$x[i+1]),
                                     x=(c(-w,0,0,-w)-ystart)*width[1]+xoff)
                    g<-addG(g,dataPolygon(data=data,
-                                         colour=cols[j], fill = cols[j],alpha=alpha))
+                                         colour=colour, fill = cols[j],alpha=alpha))
                    data<-data.frame(y=c(hists$x[i],hists$x[i],hists$x[i+1],hists$x[i+1]),
                                     x=(c(w,0,0,w)+ystart)*width[2]+xoff)
                    g<-addG(g,dataPolygon(data=data,
-                                         colour=cols[j], fill = cols[j],alpha=alpha))
+                                         colour=colour, fill = cols[j],alpha=alpha))
                  },
                  "horz"={
                    data<-data.frame(x=c(hists$x[i],hists$x[i],hists$x[i+1],hists$x[i+1]),
                                     y=(c(w,0,0,w)+ystart)*width[1]+xoff)
                    g<-addG(g,dataPolygon(data=data,
-                                         colour=cols[j], fill = cols[j],alpha=alpha))
+                                         colour=colour, fill = cols[j],alpha=alpha))
                  })
         if (histStyle=="width") ystart<-ystart+dens[j]
         }

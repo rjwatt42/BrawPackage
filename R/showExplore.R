@@ -890,12 +890,12 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
               if (i==1) left=(vals[i+1]-vals[i])*0.35 else left=(vals[i]-vals[i-1])*0.35
               if (i==length(vals)) right=(vals[i]-vals[i-1])*0.35 else right=(vals[i+1]-vals[i])*0.35
               g<-simulations_plot(g,
-                               data.frame(x=vals[i],y1=showVals[,i],y2=sigVals[,i]),
+                               data.frame(x=vals[i],y1=showVals[,i],sig=sigVals[,i]),
                                showType=showType[si],ylim=ylim,
                                scale=3/(length(vals)+1),
                                width=c(left,right),
                                col=col,useSignificanceCols=FALSE,
-                               histStyle="wide",
+                               histStyle="dense",
                                alpha=min(1,2.5/sqrt(length(showVals[,i]))),
                                npointsMax=500/length(vals)
               )
