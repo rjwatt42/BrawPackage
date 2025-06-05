@@ -194,10 +194,6 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
     g<-addG(g,dataText(data=labelpts, label = lbl, size=size*1, hjust=hjust, colour=col, fontface="bold"))
   }
   
-  if (braw.env$graphicsType=="ggplot" && braw.env$autoShow) {
-    print(g)
-    return(invisible(g))
-  }
   return(g)  
 
 }

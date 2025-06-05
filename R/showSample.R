@@ -63,7 +63,7 @@ showSample<-function(sample=braw.res$result,marginals=FALSE,plotArea=c(0,0,1,1))
     showHTML(g)
     return(invisible(g))
   }
-  if (braw.env$graphicsType=="ggplot" && braw.env$autoShow) {
+  if (braw.env$graphicsType=="ggplot" && braw.env$autoPrint) {
     print(g)
     return(invisible(g))
   }

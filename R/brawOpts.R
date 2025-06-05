@@ -40,7 +40,7 @@ newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
 #' @export
 BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16,10),
                    reportHTML=FALSE, graphicsType="ggplot",
-                   newDev=FALSE,height=400,aspect=1.3,autoShow=FALSE,timeLimit=Inf,fullGraphSize=1,
+                   newDev=FALSE,height=400,aspect=1.3,autoShow=FALSE,autoPrint=TRUE,timeLimit=Inf,fullGraphSize=1,
                    reducedOutput=FALSE) {
   if (graphC=="white") graphC<-"#FFFFFF"
   if (graphC=="normal") graphC<-"#BFECFF"
@@ -147,6 +147,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
           braw.env$fontSize<-1
           
           braw.env$autoShow<-autoShow
+          braw.env$autoPrint<-autoPrint
           braw.env$plotRect<-ggplot2::coord_cartesian(xlim=c(0,1),ylim=c(0,1))
           
           braw.env$addHistory<-TRUE

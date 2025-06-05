@@ -53,7 +53,7 @@ showMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     showHTML(g)
     return(invisible(g))
   }
-  if (braw.env$graphicsType=="ggplot" && braw.env$autoShow) {
+  if (braw.env$graphicsType=="ggplot" && braw.env$autoPrint) {
     print(g)
     return(invisible(g))
   }

@@ -165,8 +165,11 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showType="n",showTheory=
     showHTML(g)
     return(invisible(g))
   }
-  else return(g)  
-
+  if (braw.env$graphicsType=="ggplot" && braw.env$autoPrint) {
+    print(g)
+    return(invisible(g))
+  }
+  
 }
 
 #' show a multiple meta-analyses
@@ -220,7 +223,7 @@ showMetaMultiple<-function(metaResult=braw.res$metaMultiple,showType=NULL,dimens
     showHTML(g)
     return(invisible(g))
   }
-  if (braw.env$graphicsType=="ggplot" && braw.env$autoShow) {
+  if (braw.env$graphicsType=="ggplot" && braw.env$autoPrint) {
     print(g)
     return(invisible(g))
   }
