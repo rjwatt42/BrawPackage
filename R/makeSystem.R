@@ -2,7 +2,7 @@
 # Convenience functions
 #
 
-# convenience
+#' set shortHand to true
 #' @export
 doShortHand<-function() {
   evidence<-braw.def$evidence
@@ -10,7 +10,7 @@ doShortHand<-function() {
   setBrawDef("evidence",evidence)
 }
 
-# convenience
+#' set shortHand to false
 #' @export
 undoShortHand<-function() {
   evidence<-braw.def$evidence
@@ -19,13 +19,21 @@ undoShortHand<-function() {
 }
 
 
-# convenience
+#' switch Replication on
+#' @export
+doReplication<-function() {
+  e<-braw.def$design
+  e$Replication$On<-TRUE
+  setBrawDef("design",e)
+}
+
+#' set inference method to NHST
 #' @export
 doNHST<-function() {
   setBrawEnv("STMethod","NHST")
 }
 
-# convenience
+#' set inference method to dLLR
 #' @export
 doDLLR<-function() {
   evidence<-braw.def$evidence
@@ -298,6 +306,47 @@ makeEvidence<-function(shortHand=FALSE,sigOnly=FALSE,
 
   # braw.def$evidence<<-evidence
   evidence
+}
+
+##############################################
+
+#' set default hypothesis
+#' @export
+setHypothesis<-function(...) {
+  e<-makeHypothesis(...)
+  setBrawDef("hypothesis",e)
+}
+
+#' set default effect
+#' @export
+setEffect<-function(...) {
+  e<-makeEffect(...)
+  h<-braw.def$hypothesis
+  h$effect<-e
+  setBrawDef("hypothesis",h)
+}
+
+#' set default world
+#' @export
+setWorld<-function(...) {
+  e<-makeWorld(...)
+  h<-braw.def$hypothesis
+  h$effect$world<-e
+  setBrawDef("hypothesis",h)
+}
+
+#' set default design
+#' @export
+setDesign<-function(...) {
+  e<-makeDesign(...)
+  setBrawDef("design",e)
+}
+
+#' set default evidence
+#' @export
+setEvidence<-function(...) {
+  e<-makeEvidence(...)
+  setBrawDef("evidence",e)
 }
 
 ##################################################################################  

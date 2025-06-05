@@ -5,6 +5,7 @@
 # report (sample, describe, infer)
 #    
 
+#' do a meta-analysis
 #' @return metaResult object 
 #' @examples
 #' doMetaAnalysis<-function(metaSingle=NULL,metaAnalysis=makeMetaAnalysis(),
@@ -40,6 +41,7 @@ doMetaAnalysis<-function(metaSingle=braw.res$metaSingle,metaAnalysis=braw.def$me
   metaSingle
 }
 
+#' do multiple meta-analyses
 #' @return metaResult object 
 #' @examples
 #' doMetaMultiple<-function(nsims=100,metaMultiple=braw.res$metaMultiple,metaAnalysis=braw.def$metaAnalysis,
