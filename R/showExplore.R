@@ -1051,7 +1051,11 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     showHTML(g)
     return(invisible(g))
   }
-  else return(g)  
+  if (braw.env$graphicsType=="ggplot" && braw.env$autoShow) {
+    print(g)
+    return(invisible(g))
+  }
+  return(g)  
 }
 
 showExplore2D<-function(exploreResult=braw.res$explore,showType=c("rs","p"),showTheory=FALSE,
@@ -1178,5 +1182,9 @@ showExplore2D<-function(exploreResult=braw.res$explore,showType=c("rs","p"),show
     showHTML(g)
     return(invisible(NULL))
   }
-  else return(g)  
+  if (braw.env$graphicsType=="ggplot" && braw.env$autoShow) {
+    print(g)
+    return(invisible(g))
+  }
+  return(g)  
 }

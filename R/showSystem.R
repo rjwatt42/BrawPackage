@@ -49,7 +49,11 @@ showSystem<-function(whichShow="all",hypothesis=braw.def$hypothesis,design=braw.
     showHTML(g)
     return(invisible(g))
   }
-  else return(g)  
+  if (braw.env$graphicsType=="ggplot" && braw.env$autoShow) {
+    print(g)
+    return(invisible(g))
+  }
+  return(g)  
 }
 
 #' show a hypothesis

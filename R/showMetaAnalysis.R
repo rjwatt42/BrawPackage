@@ -220,7 +220,11 @@ showMetaMultiple<-function(metaResult=braw.res$metaMultiple,showType=NULL,dimens
     showHTML(g)
     return(invisible(g))
   }
-  else return(g)  
+  if (braw.env$graphicsType=="ggplot" && braw.env$autoShow) {
+    print(g)
+    return(invisible(g))
+  }
+  return(g)  
 }
 
 drawMeta<-function(metaResult=doMetaMultiple(),whichMeta="Single",showType="metaK;null",g=NULL) {

@@ -212,5 +212,9 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
     showHTML(g1)
     return(invisible(g1))
   }
-  else return(g1)  
+  if (braw.env$graphicsType=="ggplot" && braw.env$autoShow) {
+    print(g1)
+    return(invisible(g1))
+  }
+  return(g1)  
 }

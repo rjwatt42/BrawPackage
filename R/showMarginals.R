@@ -27,7 +27,11 @@ showMarginals<-function(result=braw.res$result,style="piled") {
     showHTML(g)
     return(invisible(g))
   }
-  else return(g)  
+  if (braw.env$graphicsType=="ggplot" && braw.env$autoShow) {
+    print(g)
+    return(invisible(g))
+  }
+  return(g)  
 }
 
 

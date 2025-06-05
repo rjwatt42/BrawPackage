@@ -1,11 +1,6 @@
 ###########################################
 #
 
-source("StartUp.R")
-
-###########################################
-#
-
 hypothesis1<-makeHypothesis(effect=makeEffect(rIV=0.3))
 hypothesis2<-getHypothesis("Psych")
 design2<-getDesign("Psych")
