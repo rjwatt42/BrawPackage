@@ -141,6 +141,11 @@ removeNonSig<-function(zi,zpd,sigma,df1) {
 GammaSamplingPDF<-function(z,lambda,sigma,gamma_shape=1,bias=FALSE,df1=1) {
   if (length(sigma)==1) {sigma<-rep(sigma,length(z))}
   
+  if (all(sigma==0)) {
+    zd<-dgamma(abs(z),shape=gamma_shape,scale=lambda/gamma_shape)
+    zd<-zd/(sum(zd)*(z[2]-z[1]))
+    return(zd)
+  }
   zi<-seq(-braw.env$dist_range,braw.env$dist_range,braw.env$dist_zi)
   zpd<-dgamma(abs(zi),shape=gamma_shape,scale=lambda/gamma_shape)
   zpd<-zpd/(sum(zpd)*braw.env$dist_zi)
@@ -157,28 +162,37 @@ GammaSamplingPDF<-function(z,lambda,sigma,gamma_shape=1,bias=FALSE,df1=1) {
 }
 
 GenExpSamplingPDF<-function(z,lambda,sigma,genexp_shape=1,bias=FALSE,df1=1) {
-  
+  genExp<-function(z,lambda,genexp_shape) {exp(-1/genexp_shape*(abs(z)/lambda)^genexp_shape)}
+  if (is.null(braw.env$genExpGains)) {
+    lambdas<-seq(0.01,1,0.01)
+    genexp_shapes<-seq(0.02,4,0.02)
+    gains<-matrix(nrow=length(lambdas),ncol=length(genexp_shapes))
+    for (i in 1:length(lambdas))
+      for (j in 1:length(genexp_shapes)) {
+        zdi<-genExp(zi,lambdas[i],genexp_shapes[j])
+        gains[i,j]<-sum(zdi)*braw.env$dist_zi
+      }
+    setBrawEnv("genExpGains",list(lambdas=lambdas,genexp_shapes=genexp_shapes,gains=gains))
+  }
+
+  gain<-interp2(x=braw.env$genExpGains$genexp_shapes,y=braw.env$genExpGains$lambdas,braw.env$genExpGains$gains,genexp_shape,lambda)
   if (all(sigma==0)) {
-    zd<-1-(1-exp(-abs(z)/lambda))^genexp_shape
-    zd<-zd/(sum(zd)*(z[2]-z[1]))
+    zd<-genExp(z,lambda,genexp_shape)/gain
     return(zd)
   }
 
+  zi<-seq(-braw.env$dist_range,braw.env$dist_range,braw.env$dist_zi)
+  zdi<-genExp(zi,lambda,genexp_shape)/gain
   if (length(sigma)==1) {sigma<-rep(sigma,length(z))}
 
-  zi<-seq(-braw.env$dist_range,braw.env$dist_range,braw.env$dist_zi)
-  zpd<-1-(1-exp(-abs(zi)/lambda))^genexp_shape
-  zpd<-zpd/(sum(zpd)*braw.env$dist_zi)
-
-  d1<-convolveWith(zi,zpd,z,sigma)
+  d1<-convolveWith(zi,zd,z,sigma)
   
   if (bias) {
-    d2<-removeNonSig(zi,zpd,sigma,df1)
+    d2<-removeNonSig(zi,zd,sigma,df1)
   } else {
     d2<-1
   }
   return(list(pdf=d1,sig_pdf=d2))
-  
 }
 
 

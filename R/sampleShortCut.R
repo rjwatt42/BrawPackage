@@ -24,51 +24,9 @@ sampleShortCut<-function(hypothesis,design,evidence,nsims,appendData,oldanalysis
       effect$world$populationPDFk<-tanh(atanh(effect$rIV)+rnorm(1,0,atanh(effect$rSD)))
       effect$world$populationNullp<-0
     }
-    switch (paste0(effect$world$populationPDF,"_",effect$world$populationRZ),
-            "Single_r"={
-              pops<-rep(effect$world$populationPDFk,sample_increase)
-            },
-            "Single_z"={
-              pops<-rep(effect$world$populationPDFk,sample_increase)
-              pops<-tanh(pops)
-            },
-            "Double_r"={
-              pops<-rep(effect$world$populationPDFk,sample_increase)*sign(rnorm(sample_increase))
-            },
-            "Double_z"={
-              pops<-rep(effect$world$populationPDFk,sample_increase)*sign(rnorm(sample_increase))
-              pops<-tanh(pops)
-            },
-            "Exp_z"={
-              pops<-rexp(sample_increase,rate=1/effect$world$populationPDFk)
-              pops<-pops*sign(rnorm(length(pops)))
-              pops<-tanh(pops)
-            },
-            "Exp_r"={
-              pops<-rexp(1.5*sample_increase,rate=1/effect$world$populationPDFk)
-              pops<-pops[pops<1]
-              if (length(pops)>sample_increase) {
-                pops<-pops[1:(sample_increase)]
-              }
-              pops<-pops*sign(rnorm(length(pops)))
-            },
-            "Gauss_z"={
-              pops<-rnorm(sample_increase,sd=effect$world$populationPDFk)
-              pops<-tanh(pops)
-            },
-            "Gauss_r"={
-              pops<-rnorm(sample_increase,sd=effect$world$populationPDFk)
-              pops<-pops[abs(pops)<1]
-            },
-            "Uniform_r"={
-              pops<-runif(sample_increase,min=-1,max=1)
-            },
-            "Uniform_z"={
-              pops<-runif(sample_increase,min=-uniformZrange,max=uniformZrange)
-              pops<-tanh(pops)
-            }
-    )
-    popsOld<-pops
+    pops<-rRandomValue(world,sample_increase)
+    popsOld<-pops$old
+    pops<-pops$use
     if (effect$world$populationNullp>0) {
       change<-rand(length(pops),1)<=effect$world$populationNullp
       pops[change]<-0

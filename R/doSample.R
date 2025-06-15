@@ -44,40 +44,7 @@ getWorldEffect<-function(nsamples=1,effect=braw.def$hypothesis$effect) {
     if (effect$world$populationPDFsample) {
       rho<-sampleLK(nsamples,effect$world)
     } else {
-    if (!is.na(effect$world$populationRZ) && !isempty(effect$world$populationRZ)){
-      switch (effect$world$populationRZ,
-              "r"={
-                switch (effect$world$populationPDF,
-                        "Single"={rho<-effect$world$populationPDFk},
-                        "Double"={rho<-effect$world$populationPDFk*sign(runif(nsamples,-1,1))},
-                        "Uniform"={rho<-runif(nsamples,min=-1,max=1)},
-                        "Exp"={rho<-effect$world$populationPDFmu+rexp(nsamples,rate=1/effect$world$populationPDFk)*sign((runif(nsamples)*2-1))},
-                        "Gauss"={rho<-effect$world$populationPDFmu+rnorm(nsamples,mean=0,sd=effect$world$populationPDFk)*sign((runif(nsamples)*2-1))},
-                        ">"={rho<-runif(nsamples,min=effect$world$populationPDFk,max=1)*sign(runif(nsamples,min=-1,max=1))},
-                        "<"={rho<-runif(nsamples,min=-1,max=1)*effect$world$populationPDFk}
-                )
-              },
-              "z"={
-                switch (effect$world$populationPDF,
-                        "Single"={rho<-effect$world$populationPDFk},
-                        "Double"={rho<-effect$world$populationPDFk*sign(runif(nsamples,-1,1))},
-                        "Uniform"={rho<-runif(nsamples,min=-uniformZrange,max=uniformZrange)},
-                        "Exp"={rho<-effect$world$populationPDFmu+rexp(nsamples,rate=1/effect$world$populationPDFk)*sign((runif(nsamples)*2-1))},
-                        "Gauss"={rho<-effect$world$populationPDFmu+rnorm(nsamples,mean=0,sd=effect$world$populationPDFk)},
-                        ">"={rho<-runif(nsamples,min=effect$world$populationPDFk,max=10)*sign(runif(nsamples,min=-1,max=1))},
-                        "<"={rho<-runif(nsamples,min=-1,max=1)*effect$world$populationPDFk}
-                )
-                rho<-tanh(rho)
-                 }
-      )
-      rhoOld<-rho
-      if (effect$world$populationNullp>0) {
-        use<-runif(nsamples)<=effect$world$populationNullp
-        rho[use]<-0
-      }
-      rho[rho< -0.99]<- -0.99
-      rho[rho>0.99]<- 0.99
-    }
+      rho<-rRandomValue(effect$world,1)$use
     }
   } else    rho<-effect$rIV
   return(rho)

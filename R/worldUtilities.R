@@ -122,8 +122,10 @@ rSamp2Pop<-function(r_s,n,world=NULL) {
            # } else {
            #   mlEst<-max(z_s-overEst,0)
            # }
-           }
-         )
+           },
+         "Gamma"={mlEst<-z_s},
+         "GenExp"={mlEst<-z_s}
+  )
   tanh(mlEst)
 }
   
@@ -227,6 +229,41 @@ getNList<-function(design,world,HQ=FALSE) {
   }
 }
 
+rRandomValue<-function(world,ns) {
+  k<-world$populationPDFk
+  mu<-world$populationPDFmu
+  sh<-world$populationPDFs
+  rangeMax<-braw.env$r_range
+  if (world$populationRZ=="z") rangeMax<-atanh(rangeMax)
+  switch (world$populationPDF,
+          "Single"={pops<-rep(k,ns)},
+          "Double"={pops<-rep(k,ns)},
+          "Uniform"={pops<-runif(ns,min=0,max=rangeMax)},
+          "Exp"={pops<-rexp(ceil(5*ns),rate=1/k)},
+          "Gauss"={pops<-rnorm(ceil(5*ns),mean=mu,sd=k)},
+          "Gamma"={pops<-rgamma(ceil(5*ns),shape=sh,rate=sh/k)},
+          "GenExp"={
+            zi<-seq(-rangeMax,rangeMax,0.001)
+            zd<-cumsum(GenExpSamplingPDF(zi,k,0,sh))
+            zd<-(zd-min(zd))/(max(zd)-min(zd))
+            pops<-approx(zd,zi,runif(ns,0,1))$y
+            }
+  )
+  if (world$populationRZ=="z") pops<-tanh(pops)
+  if (world$populationPDF!="Single") pops<-pops*sign(rnorm(length(pops)))
+  pops<-pops[abs(pops)<1]
+  if (length(pops)>ns) {
+    pops<-pops[1:ns]
+  }
+  
+  popsOld<-pops
+  if (world$populationNullp>0) {
+    change<-rand(length(pops),1)<=world$populationNullp
+    pops[change]<-0
+  }
+  return(list(old=popsOld,use=pops))
+}
+
 rPopulationDist<-function(rvals,world) {
   if (world$populationPDFsample) {
     mn<-world$populationSamplemn
@@ -235,51 +272,19 @@ rPopulationDist<-function(rvals,world) {
   } else rdens1<-1
   k<-world$populationPDFk
   mu<-world$populationPDFmu
-  switch (paste0(world$populationPDF,"_",world$populationRZ),
-          "Single_r"={
-            rdens<-rvals*0
-            rdens[which.min(abs(k-rvals))]<-1
-          },
-          "Single_z"={
-            rdens<-rvals*0
-            rdens[which.min(abs(tanh(k)-rvals))]<-1
-          },
-          "Double_r"={
-            rdens<-rvals*0
-            rdens[which.min(abs(k-rvals))]<-1/2
-            rdens[which.min(abs(k+rvals))]<-1/2
-          },
-          "Double_z"={
-            rdens<-rvals*0
-            rdens[which.min(abs(tanh(k)-rvals))]<-1/2
-            rdens[which.min(abs(tanh(k)+rvals))]<-1/2
-          },
-          "Uniform_r"={
-            rdens<-rvals*0+0.5
-            # rdens[abs(rvals)<0.75]<-0.5
-          },
-          "Uniform_z"={
-            zvals<-atanh(rvals)
-            zdens<-zvals*0+0.5
-            rdens<-zdens2rdens(zdens,rvals)
-          },
-          "Exp_r"={
-            rdens<-exp(-abs(rvals)/k)/(2*k)
-          },
-          "Exp_z"={
-            zvals<-atanh(rvals)
-            zdens<-exp(-abs(zvals)/k)/(2*k)
-            rdens<-zdens2rdens(zdens,rvals)
-          },
-          "Gauss_r"={
-            rdens<-exp(-0.5*(abs(rvals-mu)/k)^2)/k/sqrt(2*pi)
-          },
-          "Gauss_z"={
-            zvals<-atanh(rvals)
-            zdens<-exp(-0.5*(abs(zvals-mu)/k)^2)/k/sqrt(2*pi)
-            rdens<-zdens2rdens(zdens,rvals)
-          }
+  sh<-world$populationPDFs
+  if (world$populationRZ=="z") rvals<-atanh(rvals)
+  rdens<-rvals*0
+  switch (world$populationPDF,
+          "Single"={rdens[which.min(abs(k-rvals))]<-1 },
+          "Double"={ rdens[c(which.min(abs(k-rvals)),which.min(abs(k+rvals)))]<-1/2},
+          "Uniform"={rdens<-rdens+0.5},
+          "Exp"={rdens<-dexp(abs(rvals),rate=1/k)},
+          "Gauss"={rdens<-dnorm(rvals,mean=mu,sd=k)},
+          "Gamma"={rdens<-dgamma(abs(rvals),shape=sh,rate=sh/k)},
+          "GenExp"={rdens<-GenExpSamplingPDF(rvals,k,sigma=0,sh)}
   )
+if (world$populationRZ=="z") rdens<-zdens2rdens(rdens,tanh(rvals))
 return(rdens*rdens1)
 }
 

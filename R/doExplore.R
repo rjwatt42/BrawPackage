@@ -372,7 +372,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
           "rIVIV2DV"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "sourceBias"={vals<-seq(0,1,length.out=npoints)},
           
-          "PDF"={vals<-c("Single","Double","Uniform","Gauss","Exp",">","<")},
+          "PDF"={vals<-c("Single","Double","Uniform","Gauss","Exp","Gamma",">","<")},
           "Lambda"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "no"={vals<-seq(10,250,length.out=npoints)},
           "pNull"={vals<-seq(minVal,maxVal,length.out=npoints)},
