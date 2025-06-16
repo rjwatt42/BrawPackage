@@ -214,7 +214,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
           
           braw.env$useSignificanceCols<-TRUE
 
-          braw.env$includeSingle<-TRUE  # in "All" meta-analysis
+          braw.env$includeSingle<-FALSE  # in "All" meta-analysis
           braw.env$includeGamma<-FALSE
           braw.env$includeGenExp<-FALSE
           

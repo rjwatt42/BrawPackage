@@ -229,13 +229,22 @@ showMetaMultiple<-function(metaResult=braw.res$metaMultiple,showType=NULL,dimens
            },
            {
              g<-nullPlot()
-             braw.env$plotArea<-c(0,0,0.39,1)
-             if (!all(is.na(metaResult$single$Smax)))
-               g<-drawMeta(metaResult=metaResult,whichMeta="Single",showType="metaK;null",g)
-             braw.env$plotArea<-c(0.41,0,0.27,1)
+             if (braw.env$includeSingle) {
+               braw.env$plotArea<-c(0,0,0.39,1)
+               if (!all(is.na(metaResult$single$Smax)))
+                 g<-drawMeta(metaResult=metaResult,whichMeta="Single",showType="metaK;null",g)
+               xoff<-0.41
+               xsize<-0.27
+               xgap<-0
+             } else {
+               xoff<-0
+               xsize<-0.42
+               xgap<-0.1
+             }
+             braw.env$plotArea<-c(xoff,0,xsize+xgap,1)
              if (!all(is.na(metaResult$gauss$Smax)))
                g<-drawMeta(metaResult=metaResult,whichMeta="Gauss",showType="metaK;null",g)
-             braw.env$plotArea<-c(0.7,0,0.27,1)
+             braw.env$plotArea<-c(xoff+xsize+xgap+0.02,0,xsize,1)
              if (!all(is.na(metaResult$exp$Smax)))
                g<-drawMeta(metaResult=metaResult,whichMeta="Exp",showType="metaK;null",g)
            }
