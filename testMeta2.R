@@ -100,9 +100,9 @@ setDefaults()
 setWorld(TRUE,"Exp","z",0.3,populationNullp=0.3)
 setDesign(getDesign("Psych"))
 
-ma<-makeMetaAnalysis(TRUE,10000,"world",modelNulls=TRUE,modelPDF="All")
+ma<-makeMetaAnalysis(TRUE,1000,"world",modelNulls=TRUE,modelPDF="All")
 
-d<-doMetaMultiple(10,NULL,ma)
+d<-doMetaMultiple(100,NULL,ma)
 reportMetaMultiple(d)
 showMetaMultiple(d)
 

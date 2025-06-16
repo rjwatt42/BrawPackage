@@ -123,6 +123,7 @@ reportMetaMultiple<-function(metaResult=braw.res$metaMultiple,reportStats="Media
            }
     )
   } else {
+    outputText<-c(outputText,"!H","!C","",braw.env$Llabel,"p[null]","log(lk)")
     n1<-sum(metaResult$best$dist=="Single")
     n2<-sum(metaResult$best$dist=="Gauss")
     n3<-sum(metaResult$best$dist=="Exp")
