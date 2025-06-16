@@ -162,7 +162,9 @@ GammaSamplingPDF<-function(z,lambda,sigma,gamma_shape=1,bias=FALSE,df1=1) {
 }
 
 GenExpSamplingPDF<-function(z,lambda,sigma,genexp_shape=1,bias=FALSE,df1=1) {
-  genExp<-function(z,lambda,genexp_shape) {exp(-1/genexp_shape*(abs(z)/lambda)^genexp_shape)}
+  genExp<-function(z,lambda,genexp_shape) 
+    {exp(-1/genexp_shape*(abs(z)/lambda)^genexp_shape)}
+  
   if (is.null(braw.env$genExpGains)) {
     lambdas<-seq(0.01,1,0.01)
     genexp_shapes<-seq(0.02,4,0.02)
