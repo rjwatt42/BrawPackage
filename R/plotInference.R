@@ -148,16 +148,16 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
             if (braw.env$nPlotScale=="log10") d1<-log10(d1)
           },
           "metaRiv"={
-            d1<-analysis$bestParam1
+            d1<-analysis$best$param1
           },
           "metaRsd"={
-            d1<-analysis$bestParam2
+            d1<-analysis$best$param2
           },
           "metaBias"={
-            d1<-analysis$bestParam3
+            d1<-analysis$best$param3
           },
           "metaS"={
-            d1<-analysis$bestS
+            d1<-analysis$best$S
           },
           "llknull"=d1<-(-0.5*(analysis$aic-analysis$aicNull)),
           "sLLR"=d1<-res2llr(analysis,"sLLR"),
@@ -212,16 +212,16 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
             if (braw.env$nPlotScale=="log10") d2<-log10(d2)
           },
           "metaRiv"={
-            d2<-analysis$bestParam1
+            d2<-analysis$best$param1
           },
           "metaRsd"={
-            d2<-analysis$bestParam2
+            d2<-analysis$best$param2
           },
           "metaBias"={
-            d2<-analysis$bestParam3
+            d2<-analysis$best$param3
           },
           "metaS"={
-            d2<-analysis$bestS
+            d2<-analysis$best$S
           },
           "llknull"=d2<-(-0.5*(analysis$aic-analysis$aicNull)),
           "sLLR"=d2<-res2llr(analysis,"sLLR"),

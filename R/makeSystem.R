@@ -312,9 +312,21 @@ makeEvidence<-function(shortHand=FALSE,sigOnly=FALSE,
 
 #' set default hypothesis
 #' @export
+setDefaults<-function() {
+  setBrawDef("hypothesis",braw.def$defaultHypothesis)
+  setBrawDef("design",braw.def$defaultDesign)
+  setBrawDef("evidence",braw.def$defaultEvidence)
+  setBrawDef("metaAnalysis",braw.def$defaultMetaAnalysis)
+  setBrawDef("explore",braw.def$defaultExplore)
+}
+
+#' set default hypothesis
+#' @export
 setHypothesis<-function(IV=braw.def$hypothesis$IV,IV2=braw.def$hypothesis$IV2,DV=braw.def$hypothesis$DV,
                         effect=braw.def$hypothesis$effect,layout=braw.def$hypothesis$layout) {
-  e<-makeHypothesis(IV=IV,IV2=IV2,DV=DV,effect=effect,layout=layout)
+  if (is.list(IV) && !is.null(IV$IV)) e<-IV
+  else
+    e<-makeHypothesis(IV=IV,IV2=IV2,DV=DV,effect=effect,layout=layout)
   setBrawDef("hypothesis",e)
 }
 
@@ -339,11 +351,13 @@ setWorld<-function(worldOn=braw.def$hypothesis$effect$world$worldOn,
                    populationPDFmu=braw.def$hypothesis$effect$world$populationPDFmu,populationNullp=braw.def$hypothesis$effect$world$populationNullp,
                    populationPDFsample=braw.def$hypothesis$effect$world$populationPDFsample,populationSamplemn=braw.def$hypothesis$effect$world$populationSamplemn,populationSamplesd=braw.def$hypothesis$effect$world$populationSamplesd,populationSamplebias=braw.def$hypothesis$effect$world$populationSamplebias,
                    sigOnly=braw.def$hypothesis$effect$world$sigOnly,worldAbs=braw.def$hypothesis$effect$world$worldAbs) {
-  e<-makeWorld(worldOn=worldOn,
-               populationPDF=populationPDF,populationRZ=populationRZ,
-               populationPDFk=populationPDFk,populationPDFs=populationPDFs,populationPDFmu=populationPDFmu,populationNullp=populationNullp,
-               populationPDFsample=populationPDFsample,populationSamplemn=populationSamplemn,populationSamplesd=populationSamplesd,populationSamplebias=populationSamplebias,
-               sigOnly=sigOnly,worldAbs=worldAbs)
+  if (is.list(worldOn)) e<-worldOn
+  else
+    e<-makeWorld(worldOn=worldOn,
+                 populationPDF=populationPDF,populationRZ=populationRZ,
+                 populationPDFk=populationPDFk,populationPDFs=populationPDFs,populationPDFmu=populationPDFmu,populationNullp=populationNullp,
+                 populationPDFsample=populationPDFsample,populationSamplemn=populationSamplemn,populationSamplesd=populationSamplesd,populationSamplebias=populationSamplebias,
+                 sigOnly=sigOnly,worldAbs=worldAbs)
   h<-braw.def$hypothesis
   h$effect$world<-e
   setBrawDef("hypothesis",h)
@@ -360,15 +374,17 @@ setDesign<-function(sN=braw.def$design$sN, sMethod=braw.def$design$sMethod, sMet
                     sDependence=braw.def$design$sDependence, sOutliers=braw.def$design$sOutliers,sNonResponse=braw.def$design$sNonResponse,
                     sCheating=braw.def$design$sCheating,sCheatingAttempts=braw.def$design$sCheatingAttempts,sCheatingLimit=braw.def$design$sCheatingLimit,sCheatingBudget=braw.def$design$sCheatingBudget,
                     Replication=braw.def$design$Replication) {
-  e<-makeDesign(sN=sN, sMethod=sMethod, sMethodSeverity=sMethodSeverity,
-                sNRand=sNRand,sNRandSD=sNRandSD,sNRandDist=sNRandDist,
-                sIV1Use=sIV1Use,sIV2Use=sIV2Use, 
-                sWithinCor=sWithinCor,
-                sBudgetOn=sBudgetOn,sNBudget=sNBudget,
-                sRangeOn=sRangeOn, sIVRange=sIVRange, sDVRange=sDVRange, 
-                sDependence=sDependence, sOutliers=sOutliers,sNonResponse=sNonResponse,
-                sCheating=sCheating,sCheatingAttempts=sCheatingAttempts,sCheatingLimit=sCheatingLimit,sCheatingBudget=sCheatingBudget,
-                Replication=Replication)
+  if (is.list(sN)) e<-sN
+  else
+    e<-makeDesign(sN=sN, sMethod=sMethod, sMethodSeverity=sMethodSeverity,
+                  sNRand=sNRand,sNRandSD=sNRandSD,sNRandDist=sNRandDist,
+                  sIV1Use=sIV1Use,sIV2Use=sIV2Use, 
+                  sWithinCor=sWithinCor,
+                  sBudgetOn=sBudgetOn,sNBudget=sNBudget,
+                  sRangeOn=sRangeOn, sIVRange=sIVRange, sDVRange=sDVRange, 
+                  sDependence=sDependence, sOutliers=sOutliers,sNonResponse=sNonResponse,
+                  sCheating=sCheating,sCheatingAttempts=sCheatingAttempts,sCheatingLimit=sCheatingLimit,sCheatingBudget=sCheatingBudget,
+                  Replication=Replication)
   setBrawDef("design",e)
 }
 

@@ -1047,8 +1047,12 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
     showSig<-FALSE
     doingMetaAnalysis<-TRUE
     showTheory<-FALSE
+    ydata<-analysis$best$S
     # top<-TRUE
-  } else doingMetaAnalysis<-FALSE
+  } else {
+    doingMetaAnalysis<-FALSE
+    ydata<-NULL
+  }
   
   hypothesis<-analysis$hypothesis
   effect<-hypothesis$effect
@@ -1070,7 +1074,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
          })
 
   xlabel<-NULL
-  yaxis<-plotAxis(showType,hypothesis,design)
+  yaxis<-plotAxis(showType,hypothesis,design,result=analysis)
   ylim<-yaxis$lim
   ylabel<-yaxis$label
   ylines<-yaxis$lines
@@ -1170,10 +1174,10 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
             "re"={sampleVals<-data$rs-data$rp},
             "p"={sampleVals<-data$ps},
             "po"={sampleVals<-data$po},
-            "metaRiv"={sampleVals<-cbind(analysis$bestParam1)},
-            "metaRsd"={sampleVals<-cbind(analysis$bestParam2)},
-            "metaBias"={sampleVals<-cbind(analysis$bestParam3)},
-            "metaS"={sampleVals<-cbind(analysis$bestS)},
+            "metaRiv"={sampleVals<-cbind(analysis$best$param1)},
+            "metaRsd"={sampleVals<-cbind(analysis$best$param2)},
+            "metaBias"={sampleVals<-cbind(analysis$best$param3)},
+            "metaS"={sampleVals<-cbind(analysis$best$S)},
             "llknull"={sampleVals<-exp(cbind(-0.5*(analysis$aic-analysis$aicNull)))},
             "sLLR"={sampleVals<-cbind(res2llr(analysis,"sLLR"))},
             "log(lrs)"={sampleVals<-cbind(res2llr(analysis,"sLLR"))},

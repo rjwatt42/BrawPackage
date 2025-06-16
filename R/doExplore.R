@@ -145,13 +145,13 @@ storeExploreResult<-function(result,res,ri,vi) {
       result$p$total[ri,vi,1:n]<-res$p$total
     }
   } else {
-    param1Max<-max(c(res$fixed$param1Max,res$random$param1Max,res$single$param1Max,res$gauss$param1Max,res$exp$param1Max),na.rm=TRUE)
-    param2Max<-max(c(res$fixed$param2Max,res$random$param2Max,res$single$param2Max,res$gauss$param2Max,res$exp$param2Max),na.rm=TRUE)
-    param3Max<-max(c(res$fixed$param3Max,res$random$param3Max,res$single$param3Max,res$gauss$param3Max,res$exp$param3Max),na.rm=TRUE)
+    param1<-max(c(res$fixed$param1,res$random$param1,res$single$param1,res$gauss$param1,res$exp$param1),na.rm=TRUE)
+    param2<-max(c(res$fixed$param2,res$random$param2,res$single$param2,res$gauss$param2,res$exp$param2),na.rm=TRUE)
+    param3<-max(c(res$fixed$param3,res$random$param3,res$single$param3,res$gauss$param3,res$exp$param3),na.rm=TRUE)
     S<-max(c(res$fixed$Smax,res$random$Smax,res$single$Smax,res$gauss$Smax,res$exp$Smax),na.rm=TRUE)
-    result$param1[ri,vi]<-param1Max
-    result$param2[ri,vi]<-param2Max
-    result$param3[ri,vi]<-param3Max
+    result$param1[ri,vi]<-param1
+    result$param2[ri,vi]<-param2
+    result$param3[ri,vi]<-param3
     result$S[ri,vi]<-S
   }
   return(result)
@@ -372,7 +372,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
           "rIVIV2DV"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "sourceBias"={vals<-seq(0,1,length.out=npoints)},
           
-          "PDF"={vals<-c("Single","Double","Uniform","Gauss","Exp","Gamma",">","<")},
+          "PDF"={vals<-c("Single","Double","Uniform","Gauss","Exp","Gamma","GenExp")},
           "Lambda"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "no"={vals<-seq(10,250,length.out=npoints)},
           "pNull"={vals<-seq(minVal,maxVal,length.out=npoints)},
@@ -703,7 +703,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
                 "pNull"={
                   effect$world$worldOn<-TRUE
                   effect$world$populationNullp<-vals[vi]
-                  # metaAnalysis$includeNulls<-TRUE
+                  # metaAnalysis$modelNulls<-TRUE
                 },
                 
                 "Heteroscedasticity"={effect$Heteroscedasticity<-vals[vi]},
@@ -795,13 +795,13 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
                 },
                 "MetaType"={
                   switch(vals[vi],
-                         "FF"={metaAnalysis$includeNulls<-FALSE
+                         "FF"={metaAnalysis$modelNulls<-FALSE
                          metaAnalysis$analyseBias<-FALSE},
-                         "FT"={metaAnalysis$includeNulls<-TRUE
+                         "FT"={metaAnalysis$modelNulls<-TRUE
                          metaAnalysis$analyseBias<-FALSE},
-                         "TF"={metaAnalysis$includeNulls<-FALSE
+                         "TF"={metaAnalysis$modelNulls<-FALSE
                          metaAnalysis$analyseBias<-TRUE},
-                         "TT"={metaAnalysis$includeNulls<-TRUE
+                         "TT"={metaAnalysis$modelNulls<-TRUE
                          metaAnalysis$analyseBias<-TRUE},
                   )
                   doingMetaAnalysis<-TRUE

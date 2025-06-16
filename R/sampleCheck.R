@@ -231,13 +231,13 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
                     rpIV=ResultHistory$rp)
       metaAnalysis<-makeMetaAnalysis(TRUE,analysisType="fixed",
                                      method="MLE",
-                                     includeNulls=FALSE,
+                                     modelNulls=FALSE,
                                      sourceBias=FALSE,
                                      analyseBias=1/length(studies$rIV))
       metaResult<-runMetaAnalysis(metaAnalysis,studies,hypothesis,metaResult=NULL)
       res$nval<-sum(ResultHistory$n)
       res$rIV<-sum(ResultHistory$r*ResultHistory$n)/res$nval
-      res$rIV<-metaResult$fixed$param1Max
+      res$rIV<-metaResult$fixed$param1
       res$df1<-ResultHistory$df1[1]
       res$pIV<-rn2p(res$rIV,res$nval)
     } else {

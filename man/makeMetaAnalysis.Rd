@@ -11,7 +11,7 @@ makeMetaAnalysis(
   analysisVar = "sd",
   method = "MLE",
   analysisPrior = "none",
-  includeNulls = FALSE,
+  modelNulls = FALSE,
   modelPDF = "All",
   sourceBias = FALSE,
   analyseBias = FALSE
@@ -27,7 +27,7 @@ set up for a meta-analysis
 makeMetaAnalysis<-function(On=TRUE,nstudies=100,
 analysisType="random",analysisVar="sd",
 method="MLE",analysisPrior="none",
-includeNulls=FALSE,modelPDF="All",
+modelNulls=FALSE,modelPDF="All",
 sourceBias=FALSE,
 analyseBias=FALSE)
 }

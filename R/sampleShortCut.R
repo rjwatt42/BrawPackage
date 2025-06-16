@@ -24,13 +24,9 @@ sampleShortCut<-function(hypothesis,design,evidence,nsims,appendData,oldanalysis
       effect$world$populationPDFk<-tanh(atanh(effect$rIV)+rnorm(1,0,atanh(effect$rSD)))
       effect$world$populationNullp<-0
     }
-    pops<-rRandomValue(world,sample_increase)
+    pops<-rRandomValue(effect$world,sample_increase)
     popsOld<-pops$old
     pops<-pops$use
-    if (effect$world$populationNullp>0) {
-      change<-rand(length(pops),1)<=effect$world$populationNullp
-      pops[change]<-0
-    }
     # make some sample sizes
     if (design$sN<1) {
       pops1<-pops

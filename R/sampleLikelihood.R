@@ -199,8 +199,8 @@ GenExpSamplingPDF<-function(z,lambda,sigma,genexp_shape=1,bias=FALSE,df1=1) {
 getLogLikelihood<-function(z,n,df1,distribution,location,spread=0,bias=FALSE,returnVals=FALSE) {
   if (is.null(spread)) spread<-0
   sigma<-1/sqrt(n-3)
-  if (length(sigma)==1) sigma<-sigma[1,1]
-  if (length(z)==1) z<-z[1,1]
+  # if (length(sigma)==1) sigma<-sigma[1,1]
+  # if (length(z)==1) z<-z[1,1]
   
   lambda2<-0
   zcrit<-atanh(p2r(braw.env$alphaSig,n,df1))
@@ -250,7 +250,7 @@ getLogLikelihood<-function(z,n,df1,distribution,location,spread=0,bias=FALSE,ret
     nullPDF<-list(pdf=0,sig_pdf=1)
     zcrit<-0
   } 
-  shape<-NA
+  shape<-0
   res<-matrix(-Inf,nrow=length(location),ncol=length(nulls))
   switch(distribution,
          "Uniform"={

@@ -253,8 +253,8 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=0,
   # }
   
   fontDimensions<-c(1)
-  if (!is.null(xticks) || !is.null(xlabel)) 
-    fontDimensions<-c(fontDimensions,braw.env$plotArea[3])
+  # if (!is.null(xticks) || !is.null(xlabel)) 
+  #   fontDimensions<-c(fontDimensions,braw.env$plotArea[3])
   if (!is.null(yticks) || !is.null(ylabel)) 
     fontDimensions<-c(fontDimensions,braw.env$plotArea[4])
   ez<-1

@@ -523,7 +523,7 @@ plotAxis<-function(showType,hypothesis,design=NULL,result=NULL) {
             ylim<-c(-0.01,0.5)
             ytick<-seq(0,0.5,0.1)
             ymins<-seq(0,0.5,0.05)
-            ylabel<-"sd(r)[m]"
+            ylabel<-"r[sd]"
             use_cols<-braw.env$plotColours$metaMultiple
           },
           "metaRvar"={
@@ -569,9 +569,9 @@ plotAxis<-function(showType,hypothesis,design=NULL,result=NULL) {
             ylabel<-"p(PDF)"
           },
           "metaS"={
-            ylim<-c(min(result$Ss),max(result$Ss))
+            ylim<-c(min(result$best$S),max(result$best$S))
             ylabel<-"llk"
-            ytick<-seq(ceil(min(result$Ss)),ceil(max(result$Ss)),1)
+            ytick<-seq(ceil(min(result$best$S)),ceil(max(result$best$S)),1)
             use_cols<-braw.env$plotColours$metaMultiple
           },
           "iv.mn"={

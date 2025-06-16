@@ -215,6 +215,8 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
           braw.env$useSignificanceCols<-TRUE
 
           braw.env$includeSingle<-TRUE  # in "All" meta-analysis
+          braw.env$includeGamma<-FALSE
+          braw.env$includeGenExp<-FALSE
           
           braw.env$alphaChar<-'\u03B1'
           
@@ -376,6 +378,13 @@ braw.def$design<-makeDesign()
 braw.def$evidence<-makeEvidence()
 braw.def$metaAnalysis<-makeMetaAnalysis()
 braw.def$explore<-makeExplore()
+
+braw.def$defaultHypothesis<-braw.def$hypothesis
+braw.def$defaultDesign<-braw.def$design
+braw.def$defaultEvidence<-braw.def$evidence
+braw.def$defaultMetaAnalysis<-braw.def$metaAnalysis
+braw.def$defaultExplore<-braw.def$explore
+
 # braw.def$possible<-makePossible(targetSample=0.3,sims=NULL,
 #                                 hypothesis=braw.def$hypothesis,design=braw.def$design)
 braw.def$possible<-NULL
