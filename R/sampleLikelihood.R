@@ -138,16 +138,16 @@ removeNonSig<-function(zi,zpd,sigma,df1) {
 }
 
 
-GammaSamplingPDF<-function(z,lambda,sigma,gamma_shape=1,bias=FALSE,df1=1) {
+GammaSamplingPDF<-function(z,lambda,sigma,shape=1,bias=FALSE,df1=1) {
   if (length(sigma)==1) {sigma<-rep(sigma,length(z))}
   
   if (all(sigma==0)) {
-    zd<-dgamma(abs(z),shape=gamma_shape,scale=lambda/gamma_shape)
+    zd<-dgamma(abs(z),shape=shape,scale=lambda/shape)
     zd<-zd/(sum(zd)*(z[2]-z[1]))
     return(zd)
   }
   zi<-seq(-braw.env$dist_range,braw.env$dist_range,braw.env$dist_zi)
-  zpd<-dgamma(abs(zi),shape=gamma_shape,scale=lambda/gamma_shape)
+  zpd<-dgamma(abs(zi),shape=shape,scale=lambda/shape)
   zpd<-zpd/(sum(zpd)*braw.env$dist_zi)
   
   d1<-convolveWith(zi,zpd,z,sigma)
@@ -161,13 +161,16 @@ GammaSamplingPDF<-function(z,lambda,sigma,gamma_shape=1,bias=FALSE,df1=1) {
   
 }
 
-GenExpSamplingPDF<-function(z,lambda,sigma,genexp_shape=1,bias=FALSE,df1=1) {
-  genExp<-function(z,lambda,genexp_shape) 
-    {exp(-1/genexp_shape*(abs(z)/lambda)^genexp_shape)}
+GenExpSamplingPDF<-function(z,lambda,sigma,shape=1,bias=FALSE,df1=1) {
+  genExp<-function(z,lambda,shape) {
+    if (lambda==0 || shape==0) as.numeric(z==0)+0.1
+    else exp(-1/shape*(abs(z)/lambda)^shape)
+    }
+  zi<-seq(-braw.env$dist_range,braw.env$dist_range,braw.env$dist_zi)
   
   if (is.null(braw.env$genExpGains)) {
-    lambdas<-seq(0.01,1,0.01)
-    genexp_shapes<-seq(0.02,4,0.02)
+    lambdas<-seq(0,3,0.01)
+    genexp_shapes<-seq(0,4,0.02)
     gains<-matrix(nrow=length(lambdas),ncol=length(genexp_shapes))
     for (i in 1:length(lambdas))
       for (j in 1:length(genexp_shapes)) {
@@ -177,18 +180,17 @@ GenExpSamplingPDF<-function(z,lambda,sigma,genexp_shape=1,bias=FALSE,df1=1) {
     setBrawEnv("genExpGains",list(lambdas=lambdas,genexp_shapes=genexp_shapes,gains=gains))
   }
 
-  gain<-interp2(x=braw.env$genExpGains$genexp_shapes,y=braw.env$genExpGains$lambdas,braw.env$genExpGains$gains,genexp_shape,lambda)
+  gain<-interp2(x=braw.env$genExpGains$genexp_shapes,y=braw.env$genExpGains$lambdas,braw.env$genExpGains$gains,shape,lambda)
   if (all(sigma==0)) {
-    zd<-genExp(z,lambda,genexp_shape)/gain
+    zd<-genExp(z,lambda,shape)/gain
     return(zd)
   }
 
-  zi<-seq(-braw.env$dist_range,braw.env$dist_range,braw.env$dist_zi)
-  zdi<-genExp(zi,lambda,genexp_shape)/gain
+  zdi<-genExp(zi,lambda,shape)/gain
   if (length(sigma)==1) {sigma<-rep(sigma,length(z))}
 
-  d1<-convolveWith(zi,zd,z,sigma)
-  
+  d1<-convolveWith(zi,zdi,z,sigma)
+
   if (bias) {
     d2<-removeNonSig(zi,zd,sigma,df1)
   } else {
@@ -198,7 +200,7 @@ GenExpSamplingPDF<-function(z,lambda,sigma,genexp_shape=1,bias=FALSE,df1=1) {
 }
 
 
-getLogLikelihood<-function(z,n,df1,distribution,location,spread=0,bias=FALSE,returnVals=FALSE) {
+getLogLikelihood<-function(z,n,df1,distribution,location,spread=0,shape=1,bias=FALSE,returnVals=FALSE) {
   if (is.null(spread)) spread<-0
   sigma<-1/sqrt(n-3)
   # if (length(sigma)==1) sigma<-sigma[1,1]
@@ -208,7 +210,6 @@ getLogLikelihood<-function(z,n,df1,distribution,location,spread=0,bias=FALSE,ret
   zcrit<-atanh(p2r(braw.env$alphaSig,n,df1))
 
   if (distribution=="fixed") {
-    shape<-NA
     res<-matrix(-Inf,nrow=length(location),ncol=length(spread))
     lksHold<-c()
     lambda<-location
@@ -228,11 +229,9 @@ getLogLikelihood<-function(z,n,df1,distribution,location,spread=0,bias=FALSE,ret
     res<-matrix(-Inf,nrow=length(location),ncol=length(spread))
     lksHold<-c()
     lambda<-location
-    shape<-spread
-    spread<-0
     for (i in 1:length(lambda)) {
-      for (j in 1:length(shape)) {
-        mainPDF<-SingleSamplingPDF(z,lambda[i],sigma,shape=shape[j],bias=bias,df1=df1)
+      for (j in 1:length(spread)) {
+        mainPDF<-SingleSamplingPDF(z,lambda[i],sigma,shape=spread[j],bias=bias,df1=df1)
         # now normalize for the non-sig
         likelihoods<-mainPDF$pdf/mainPDF$sig_pdf
         likelihoods[(likelihoods<1e-300)]<- 1e-300
@@ -252,7 +251,6 @@ getLogLikelihood<-function(z,n,df1,distribution,location,spread=0,bias=FALSE,ret
     nullPDF<-list(pdf=0,sig_pdf=1)
     zcrit<-0
   } 
-  shape<-0
   res<-matrix(-Inf,nrow=length(location),ncol=length(nulls))
   switch(distribution,
          "Uniform"={
@@ -269,11 +267,9 @@ getLogLikelihood<-function(z,n,df1,distribution,location,spread=0,bias=FALSE,ret
          },
          "Gamma"={
            PDF<-GammaSamplingPDF
-           shape<-metaAnal$shape
          },
          "GenExp"={
            PDF<-GenExpSamplingPDF
-           shape<-metaAnal$shape
          }
   )
   for (i in 1:length(location)) {

@@ -229,11 +229,12 @@ getNList<-function(design,world,HQ=FALSE) {
   }
 }
 
-rRandomValue<-function(world,ns) {
+rRandomValue<-function(world=braw.def$hypothesis$effect$world,ns) {
   k<-world$populationPDFk
   mu<-world$populationPDFmu
   sh<-world$populationPDFs
   rangeMax<-braw.env$r_range
+  rangeMax<-0.9999999
   if (world$populationRZ=="z") rangeMax<-atanh(rangeMax)
   switch (world$populationPDF,
           "Single"={pops<-rep(k,ns)},

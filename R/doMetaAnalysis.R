@@ -81,14 +81,14 @@ getTrimFill<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
              q<-trimfill(zs,1/sqrt(ns-3),ma.common=TRUE,common=TRUE,random=FALSE)
              nFill<-q$k-length(zs)
              bias<-nFill/(nFill+sum(!sigs))
-             Smax<-getLogLikelihood(zs,ns,df1,dist,q$TE.common,0,bias)
+             Smax<-getLogLikelihood(zs,ns,df1,dist,q$TE.common,spread=0,bias=bias)
              list(param1=q$TE.common,param2=0,param3=bias,Smax=Smax,Svals=q$seTE)
            },
            "random"={
              q<-trimfill(zs,1/sqrt(ns-3),ma.common=FALSE,common=FALSE,random=TRUE)
              nFill<-q$k-length(zs)
              bias<-nFill/(nFill+sum(!sigs))
-             Smax<-getLogLikelihood(zs,ns,df1,dist,q$TE.random,q$tau,bias)
+             Smax<-getLogLikelihood(zs,ns,df1,dist,q$TE.random,spread=q$tau,bias=bias)
              list(param1=q$TE.random,param2=q$tau,param3=bias,Smax=Smax,Svals=q$seTE)
            }
            )
@@ -110,6 +110,7 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
   np1points<-21
   np2points<-21
   np3points<-21
+  np4points<-21
   
   niterations<-10
   # reInc1<-(np1points-1)/2/3
@@ -117,7 +118,14 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
   reInc1<-2
   reInc2<-2
   reInc3<-2
+  reInc4<-2
   
+  
+  if (is.element(dist,c("Gamma","GenExp"))) {
+    param4Use<-seq(0.1,2.5,length.out=np4points)
+  } else {
+    param4Use<-0
+  }
   
   if (metaAnalysis$modelNulls) {
     param2Use<-seq(0,1,length.out=np2points)
@@ -144,11 +152,9 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
          }
   )
   
-  includeBias<-FALSE
   if (metaAnalysis$analyseBias) {
     if (is.element(dist,c("fixed","random"))) {
       param3Use<-seq(0,1,length.out=np2points)
-      includeBias<-TRUE
     } else param3Use<-1
   } else param3Use<-0
   
@@ -176,21 +182,33 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
          }
   )
   
-  llfun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,x[1],x[2],x[3])+approx(prior_z,priorDens,x[1])$y)}
+  # location refers to lambda for world metaA
+  # spread refers to nulls for world metaA
+  if (length(param4Use)==1) {
+  llfun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,location=x[1],spread=x[2],bias=x[3],shape=param4Use)+approx(prior_z,priorDens,x[1])$y)}
   if (length(param2Use)==1)
-    llfun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,x[1],param2Use,x[3])+approx(prior_z,priorDens,x[1])$y)}
+    llfun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,location=x[1],spread=param2Use,bias=x[3],shape=param4Use)+approx(prior_z,priorDens,x[1])$y)}
   if (length(param3Use)==1)
-    llfun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,x[1],x[2],param3Use)+approx(prior_z,priorDens,x[1])$y)}
+    llfun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,location=x[1],spread=x[2],bias=param3Use,shape=param4Use)+approx(prior_z,priorDens,x[1])$y)}
   if (length(param2Use)==1 && length(param3Use)==1)
-    llfun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,x[1],param2Use,param3Use)+approx(prior_z,priorDens,x[1])$y)}
-
-  S<-array(0,c(length(param1Use),length(param2Use),length(param3Use)))
+    llfun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,location=x[1],spread=param2Use,bias=param3Use,shape=param4Use)+approx(prior_z,priorDens,x[1])$y)}
+  } else {
+    llfun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,location=x[1],spread=x[2],bias=x[3],shape=x[4])+approx(prior_z,priorDens,x[1])$y)}
+    if (length(param2Use)==1)
+      llfun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,location=x[1],spread=param2Use,bias=x[3],shape=x[4])+approx(prior_z,priorDens,x[1])$y)}
+    if (length(param3Use)==1)
+      llfun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,location=x[1],spread=x[2],bias=param3Use,shape=x[4])+approx(prior_z,priorDens,x[1])$y)}
+    if (length(param2Use)==1 && length(param3Use)==1)
+      llfun<-function(x) { -(getLogLikelihood(zs,ns,df1,dist,location=x[1],spread=param2Use,bias=param3Use,shape=x[4])+approx(prior_z,priorDens,x[1])$y)}
+  }
+  S<-array(0,c(length(param1Use),length(param2Use),length(param3Use),length(param4Use)))
   for (re in 1:niterations) {
     # get an approx result
     for (p1 in 1:length(param1Use))
       for (p2 in 1:length(param2Use))
         for (p3 in 1:length(param3Use))
-          S[p1,p2,p3]<-llfun(c(param1Use[p1],param2Use[p2],param3Use[p3]))
+          for (p4 in 1:length(param4Use))
+            S[p1,p2,p3,p4]<-llfun(c(param1Use[p1],param2Use[p2],param3Use[p3],param4Use[p4]))
 
     Smax<- -min(S,na.rm=TRUE)
     use<-which(S==-Smax, arr.ind = TRUE)
@@ -203,10 +221,13 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
     param3<-param3Use[use[1,3]]
     lb3<-param3Use[max(1,use[1,3]-reInc3)]
     ub3<-param3Use[min(length(param3Use),use[1,3]+reInc3)]
+    param4<-param4Use[use[1,4]]
+    lb4<-param4Use[max(1,use[1,4]-reInc4)]
+    ub4<-param4Use[min(length(param4Use),use[1,4]+reInc4)]
     # after 2 iterations, can we do a search?
     if (re==2) {
       result<-tryCatch( {
-        fmincon(c(param1,param2,param3),llfun,ub=c(ub1,ub2,ub3),lb=c(lb1,lb2,lb3))
+        fmincon(c(param1,param2,param3,param4),llfun,ub=c(ub1,ub2,ub3,ub4),lb=c(lb1,lb2,lb3,lb4))
       }, 
       error = function(e){NULL}
       )
@@ -215,16 +236,18 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
     param1Use<-seq(lb1,ub1,length.out=np1points)
     if (length(param2Use)>1) param2Use<-seq(lb2,ub2,length.out=np2points)
     if (length(param3Use)>1) param3Use<-seq(lb3,ub3,length.out=np3points)
-    result<-list(par=c(param1,param2,param3),value=-Smax)
+    if (length(param4Use)>1) param4Use<-seq(lb4,ub4,length.out=np4points)
+    result<-list(par=c(param1,param2,param3,param4),value=-Smax)
   }
   param1<-result$par[1]
   param2<-result$par[2]
   param3<-result$par[3]
+  param4<-result$par[4]
   Smax<- -result$value
   
-  Svals<-llfun(c(param1,param2,param3))
+  Svals<-llfun(c(param1,param2,param3,param4))
   if (dist=="random" && metaAnalysis$analysisVar=="sd") param2<-sign(param2)*sqrt(abs(param2))
-  return(list(param1=param1,param2=param2,param3=param3,Smax=Smax,Svals=Svals))
+  return(list(param1=param1,param2=param2,param3=param3,param4=param4,Smax=Smax,Svals=Svals))
 }
 
 
@@ -296,6 +319,7 @@ runMetaAnalysis<-function(metaAnalysis,studies,hypothesis,metaResult){
   bestParam1<-bestR$param1
   bestParam2<-bestR$param2
   bestParam3<-bestR$param3
+  bestParam4<-bestR$param4
   bestS<-bestR$Smax
   bestVals<-bestR$Svals
   if (!is.null(metaResult)) {
@@ -303,6 +327,7 @@ runMetaAnalysis<-function(metaAnalysis,studies,hypothesis,metaResult){
     bestParam1<-c(metaResult$best$param1,bestParam1)
     bestParam2<-c(metaResult$best$param2,bestParam2)
     bestParam3<-c(metaResult$best$param3,bestParam3)
+    bestParam4<-c(metaResult$best$param4,bestParam4)
     bestS<-c(metaResult$best$S,bestS)
   }
   count<-length(bestS)
@@ -312,6 +337,7 @@ runMetaAnalysis<-function(metaAnalysis,studies,hypothesis,metaResult){
            fixed$param1<-c(metaResult$fixed$param1,tanh(fixed$param1))
            fixed$param2<-c(metaResult$fixed$param2,fixed$param2)
            fixed$param3<-c(metaResult$fixed$param3,fixed$param3)
+           fixed$param4<-c(metaResult$fixed$param4,fixed$param4)
            fixed$Smax<-c(metaResult$fixed$Smax,fixed$Smax)
            fixed$rpIV<-c(metaResult$fixed$rpIV,mean(studies$rpIV))
            fixed$rpSD<-c(metaResult$fixed$rpSD,0)
@@ -321,6 +347,7 @@ runMetaAnalysis<-function(metaAnalysis,studies,hypothesis,metaResult){
            random$param1<-c(metaResult$random$param1,tanh(random$param1))
            random$param2<-c(metaResult$random$param2,tanh(random$param2))
            random$param3<-c(metaResult$random$param3,tanh(random$param3))
+           random$param4<-c(metaResult$random$param4,tanh(random$param4))
            random$Smax<-c(metaResult$random$Smax,random$Smax)
            random$rpIV<-c(metaResult$random$rpIV,mean(studies$rpIV))
            random$rpSD<-c(metaResult$random$rpSD,std(studies$rpIV))
@@ -330,22 +357,27 @@ runMetaAnalysis<-function(metaAnalysis,studies,hypothesis,metaResult){
            single$param1<-c(metaResult$single$param1,single$param1)
            single$param2<-c(metaResult$single$param2,single$param2)
            single$param3<-c(metaResult$single$param3,single$param3)
+           single$param4<-c(metaResult$single$param4,single$param4)
            single$Smax<-c(metaResult$single$Smax,single$Smax)
            gauss$param1<-c(metaResult$gauss$param1,gauss$param1)
            gauss$param2<-c(metaResult$gauss$param2,gauss$param2)
            gauss$param3<-c(metaResult$gauss$param3,gauss$param3)
+           gauss$param4<-c(metaResult$gauss$param4,gauss$param4)
            gauss$Smax<-c(metaResult$gauss$Smax,gauss$Smax)
            exp$param1<-c(metaResult$exp$param1,exp$param1)
            exp$param2<-c(metaResult$exp$param2,exp$param2)
            exp$param3<-c(metaResult$exp$param3,exp$param3)
+           exp$param4<-c(metaResult$exp$param4,exp$param4)
            exp$Smax<-c(metaResult$exp$Smax,exp$Smax)
            gamma$param1<-c(metaResult$gamma$param1,gamma$param1)
            gamma$param2<-c(metaResult$gamma$param2,gamma$param2)
            gamma$param3<-c(metaResult$gamma$param3,gamma$param3)
+           gamma$param4<-c(metaResult$gamma$param4,gamma$param4)
            gamma$Smax<-c(metaResult$gamma$Smax,gamma$Smax)
            genexp$param1<-c(metaResult$genexp$param1,genexp$param1)
            genexp$param2<-c(metaResult$genexp$param2,genexp$param2)
            genexp$param3<-c(metaResult$genexp$param3,genexp$param3)
+           genexp$param4<-c(metaResult$genexp$param4,genexp$param4)
            genexp$Smax<-c(metaResult$genexp$Smax,genexp$Smax)
          })
   
@@ -361,6 +393,7 @@ runMetaAnalysis<-function(metaAnalysis,studies,hypothesis,metaResult){
                              param1=bestParam1,
                              param2=bestParam2,
                              param3=bestParam3,
+                             param4=bestParam4,
                              vals=bestVals),
                    count=count,
                    metaAnalysis=metaAnalysis,

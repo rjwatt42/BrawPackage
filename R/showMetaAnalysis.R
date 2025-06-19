@@ -34,7 +34,7 @@ worldLabel<-function(metaResult,whichMeta=NULL,modelPDF=NULL) {
   #   lb<-paste0(lb,"\u00B1",brawFormat(std(p1),digits=2))
   if (!is.null(p2)) {
     label2<-braw.env$Pchar
-    if (is.element(Dist,c("random","fixed"))) label2<-paste0("sd(",braw.env$RZ,")[m]")
+    if (is.element(Dist,c("random","fixed"))) label2<-paste0(braw.env$RZ,"[sd]")
     lb<-paste0(lb,"\n",label2,"=",brawFormat(mean(p2,na.rm=TRUE),digits=3))
     # if (length(p2)>1)
     #   lb<-paste0(lb,"\u00B1",brawFormat(std(p2),digits=2))
@@ -158,7 +158,8 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showType="n",showTheory=
   fill2<-braw.env$plotColours$infer_nsigC
   if (showSval) {
     b<-getLogLikelihood(atanh(metaResult$result$rIV),metaResult$result$nval,rep(1,length(metaResult$result$nval)),
-                        distribution=metaResult$best$dist,metaResult$best$param1,metaResult$best$param2,
+                        distribution=metaResult$best$dist,
+                        location=metaResult$best$param1,spread=metaResult$best$param2,
                         bias=metaResult$metaAnalysis$analyseBias,returnVals = TRUE)
     fill1<-hsv(0.9*round((b-min(b))/(max(b)-min(b))*4)/4)
     fill1<-hsv(0.9*round((b/max(b))^svalExponent*10)/10)
@@ -337,7 +338,7 @@ showMetaMultiple<-function(metaResult=braw.res$metaMultiple,showType=NULL,dimens
               y<-result$param2
               y1<-0
               ylim<-c(min(y),max(y))+c(-1,1)*(max(y)-min(y))*0.2
-              ylabel<-"sd(r)[m]"
+              ylabel<-"r[sd]"
               xlabel<-"r[m]"
               useBest<-1:length(x)
             },
