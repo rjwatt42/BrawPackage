@@ -129,8 +129,8 @@ plotSEMModel<-function(pathmodel) {
   }
 
   # now summary result
-  label<-paste0("AIC = ",brawFormat(pathmodel$eval$AIC),";  R^2 = ",brawFormat(pathmodel$eval$Rsquared),
-                ";  k = ",brawFormat(pathmodel$eval$k),";  n = ",brawFormat(pathmodel$eval$n_obs))
+  label<-paste0("AIC ",brawFormat(pathmodel$eval$AIC),";  R^2 ",brawFormat(pathmodel$eval$Rsquared),
+                ";  k ",brawFormat(pathmodel$eval$k),";  n ",brawFormat(pathmodel$eval$n_obs))
   g<-addG(g,dataLabel(data.frame(x=xlim[2]-diff(xlim)/30,y=ylim[1]+diff(ylim)/30),label,hjust=1,size=0.7))
   return(g)
 
