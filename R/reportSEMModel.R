@@ -1,3 +1,9 @@
+
+#' report a fitted SEM model 
+#' @return sample object 
+#' @examples
+#' reportSEMModel<-function(sem,showType)
+#' @export
 reportSEMModel<-function(sem,showType) {
   digits<-3
   

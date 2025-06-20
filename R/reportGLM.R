@@ -12,6 +12,12 @@ makeText<-function(r,p,p_or_r) {
   }
 }
 
+
+#' report a fitted GLM model 
+#' @return sample object 
+#' @examples
+#' reportGLM<-function(DV,IVs,result,p_or_r)
+#' @export
 reportGLM<-function(DV,IVs,result,p_or_r) {
   
   nc<-4
