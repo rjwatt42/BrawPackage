@@ -1,3 +1,9 @@
+
+#' plot a fitted GLM model 
+#' @return sample object 
+#' @examples
+#' plotGLM<-function(DV,IVs,result,whichR)
+#' @export
 plotGLM<-function(DV,IVs,result,whichR) {
   
   switch(whichR,

@@ -1,3 +1,9 @@
+
+#' plot a fitted SEM model 
+#' @return sample object 
+#' @examples
+#' plotSEMModel<-function(pathmodel)
+#' @export
 plotSEMModel<-function(pathmodel) {
   
   digits<-2
