@@ -1,3 +1,9 @@
+
+#' prepare an existing sample
+#' @return sample object 
+#' @examples
+#' prepareSample<-function(raw_data, doOrdinals=FALSE, maxOrdinal=9, header=c())
+#' @export
 prepareSample<-function(raw_data, doOrdinals=FALSE, maxOrdinal=9, header=c()){
   if (is.null(raw_data)) {return(NULL)}
   if (nrow(raw_data)==0) {return(NULL)}
@@ -179,6 +185,12 @@ prepareSample<-function(raw_data, doOrdinals=FALSE, maxOrdinal=9, header=c()){
   return(allData)
 }
 
+
+#' prepare an existing sample
+#' @return sample object 
+#' @examples
+#' readSample<-function(data,DV,IV,IV2=NULL)
+#' @export
 readSample<-function(data,DV,IV,IV2=NULL) {
 
   if (is.character(data)) data<-read.csv(data)
