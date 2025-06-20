@@ -1,3 +1,9 @@
+
+#' fit a SEM model to existing data
+#' @return sample object 
+#' @examples
+#' fit_sem_model<-function(pathmodel,model_data,fixedCoeffs=NULL)
+#' @export
 fit_sem_model<-function(pathmodel,model_data,fixedCoeffs=NULL) {
 # this follows the notation in 
   # Flora D.B. (2018) Statistical Methods for the Social and Behavioural Sciences

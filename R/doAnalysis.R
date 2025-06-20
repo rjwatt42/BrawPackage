@@ -401,6 +401,13 @@ convert2Interval<-function(var) {
   var$sd<-var$iqr*qnorm(0.75)
 }
 
+
+#' analyse a sample
+#' 
+#' @returns result object
+#' @examples
+#' generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",caseOrder="AsStated")
+#' @export
 generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",caseOrder="AsStated") {
   
   if (ncol(allData)<3) {
