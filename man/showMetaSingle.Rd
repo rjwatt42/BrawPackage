@@ -7,7 +7,8 @@
 showMetaSingle(
   metaResult = braw.res$metaSingle,
   showType = "n",
-  showTheory = FALSE
+  showTheory = FALSE,
+  autoYlim = TRUE
 )
 }
 \value{

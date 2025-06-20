@@ -10,6 +10,7 @@ makeWorld(
   populationPDF = "Uniform",
   populationRZ = "r",
   populationPDFk = 0,
+  populationPDFs = 2,
   populationPDFmu = 0,
   populationNullp = 0,
   populationPDFsample = FALSE,
@@ -21,7 +22,7 @@ makeWorld(
 )
 }
 \arguments{
-\item{populationPDF}{"Single","Double","Uniform","Gauss","Exp"}
+\item{populationPDF}{"Single","Double","Uniform","Gauss","Exp","Gamma","GenExp"}
 
 \item{populationRZ}{"r","z"}
 }

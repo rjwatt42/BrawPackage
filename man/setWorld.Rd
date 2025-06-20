@@ -9,6 +9,7 @@ setWorld(
   populationPDF = braw.def$hypothesis$effect$world$populationPDF,
   populationRZ = braw.def$hypothesis$effect$world$populationRZ,
   populationPDFk = braw.def$hypothesis$effect$world$populationPDFk,
+  populationPDFs = braw.def$hypothesis$effect$world$populationPDFs,
   populationPDFmu = braw.def$hypothesis$effect$world$populationPDFmu,
   populationNullp = braw.def$hypothesis$effect$world$populationNullp,
   populationPDFsample = braw.def$hypothesis$effect$world$populationPDFsample,

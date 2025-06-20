@@ -10,7 +10,7 @@ doMetaAnalysis(
   keepStudies = FALSE,
   shortHand = TRUE,
   hypothesis = braw.def$hypothesis,
-  design = NULL,
+  design = braw.def$design,
   evidence = braw.def$evidence
 )
 }
