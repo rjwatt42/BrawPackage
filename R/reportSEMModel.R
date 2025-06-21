@@ -1,4 +1,8 @@
 
+truncateName<-function(name,names) {
+  substr(name,1,3)
+}
+
 #' report a fitted SEM model 
 #' @return sample object 
 #' @examples
@@ -40,7 +44,7 @@ reportSEMModel<-function(sem,showType) {
 
   stagesString<-""
   for (stage in sem$stages) {
-      stagesString<-paste0(stagesString,paste0("{",paste(sapply(stage,substr,1,3),collapse=","),"}"))
+      stagesString<-paste0(stagesString,paste0("{",paste(sapply(stage,truncateName,unlist(sem$stages)),collapse=","),"}"))
   }
   stagesString<-paste0(stagesString,"@",sem$depth)
   
