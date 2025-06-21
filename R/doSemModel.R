@@ -624,7 +624,7 @@ sem_results<-function(pathmodel,sem) {
   CAIC=AIC-2*k+k*(log(n_data)+1);
   
   k_null<-2*length(sem$endogenous)
-  residsNull<-Yactual[!is.na(Yactual)]
+  residsNull<-Y[!is.na(Y)]
   residLLK<-sum(log(dnorm(residsNull,mean(residsNull),sd(residsNull))))
   AICnull<-2*k_null-2*residLLK
   AICnull<-residLLK
