@@ -544,8 +544,8 @@ generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",ca
   n_obs<-n
   n_data<-n
   residsNull<-analysisRawData$dv[!is.na(analysisRawData$dv)]
-  residLLK<-sum(log(dnorm(residsNull,mean(residsNull,),sd(residsNull))))
-  aicNull<-2*k-2*residLLK
+  residLLK<-sum(log(dnorm(residsNull,mean(residsNull),sd(residsNull))))
+  aicNull<-2*2-2*residLLK
 
   # if (length(r.direct)<3) {
   #   r.direct<-c(r.direct,0)
