@@ -50,7 +50,8 @@ reportSEMModel<-function(sem,showType) {
 
   stagesString<-""
   for (stage in sem$stages) {
-      stagesString<-paste0(stagesString,paste0("{",paste(sapply(stage,truncateName,unlist(sem$stages)),collapse=","),"}"))
+    if (nchar(stagesString)>0) stagesString<-paste0(stagesString,"~")
+    stagesString<-paste0(stagesString,paste0("{",paste(sapply(stage,truncateName,unlist(sem$stages)),collapse=","),"}"))
   }
   stagesString<-paste0(stagesString,"@",sem$depth)
   

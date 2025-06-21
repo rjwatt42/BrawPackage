@@ -50,7 +50,8 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
                   rep("",nc-9)
     )
     stagesString<-""
-    for (stage in list(DV$name,list(IVs$name))) {
+    for (stage in list(list(IVs$name),DV$name)) {
+      if (nchar(stagesString)>0) stagesString<-paste0(stagesString,"~")
       stagesString<-paste0(stagesString,paste0("{",paste(sapply(stage,truncateName),collapse=","),"}"))
     }
     
