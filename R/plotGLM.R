@@ -41,7 +41,8 @@ plotGLM<-function(DV,IVs,result,whichR) {
     if (y[length(use)]>3*2.5) y<-y-(3*2.5-y[length(use)])
     # y<-seq(1,-1,length.out=length(use))*yRange
     for (i in 1:length(use)) {
-
+      r1<-r[use[i]]
+      
       colLine<-"#000000"
       arrowWidth<-0.3
       if (r1<0) colArrow<-"#0088FF"
