@@ -33,17 +33,13 @@ plotGLM<-function(DV,IVs,result,whichR) {
   fill<-"#FFAAAA"
   g<-addG(g,dataLabel(data.frame(x=0,y=0),label=DV$name,hjust=0,vjust=0.5,fontface="bold",size=1,fill=fill))
   xStart<-4+nchar(DV$name)/2*(fontSize/14)
-  arrowLength<-4-1
-  yRange<-max(sum(r>0),sum(r<0))/2
-  
-  
+
     use<-order(r)
     y<-seq(0.65,100,2)
     y<-seq(ylim[1],ylim[2],length(use))
     if (length(use)<5) y<-y*0.6
     else               y<-y*0.9
-    if (y[length(use)]>3*2.5) y<-y-(3*2.5-y[length(use)])
-    # y<-seq(1,-1,length.out=length(use))*yRange
+    # if (y[length(use)]>3*2.5) y<-y-(3*2.5-y[length(use)])
     for (i in 1:length(use)) {
       r1<-r[use[i]]
       
