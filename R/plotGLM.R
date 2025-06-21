@@ -31,10 +31,10 @@ plotGLM<-function(DV,IVs,result,whichR) {
   # g<-addG(g,dataPolygon(data.frame(x=c(-1,-1,1,1)*14,y=c(-1,1,1,-1)*9),col=braw.env$plotColours$graphBack,fill=braw.env$plotColours$graphBack))
   
   fill<-"#FFAAAA"
-  xEnd<-0
-  yEnd<- -10
+  xEnd<- (4+nchar(DV$name)/2*(fontSize/14))
+  xStart<- -xEnd
+  yEnd<- 0
   g<-addG(g,dataLabel(data.frame(x=xEnd,y=yEnd),label=DV$name,hjust=0,vjust=0.5,fontface="bold",size=1,fill=fill))
-  xStart<- -(4+nchar(DV$name)/2*(fontSize/14))
   dy<-20/(length(r)+1)
   
   y<-dy*(length(r)-1)/2
@@ -68,7 +68,7 @@ plotGLM<-function(DV,IVs,result,whichR) {
       }
       
       arrowLength<-sqrt((y-yEnd)^2+(xStart-xEnd)^2)
-      direction<- atan2((y-yEnd),(xStart-xEnd))*180/pi
+      direction<- atan2((yEnd-y),(xEnd-xStart))*180/pi
       
       labelWidth<-arrowWidth*4
       arrowWidth<-arrowWidth*1.6
