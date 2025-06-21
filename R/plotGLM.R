@@ -72,7 +72,7 @@ plotGLM<-function(DV,IVs,result,whichR) {
       arrowWidth<-arrowWidth*1.6
       # colArrow<-desat(colArrow,gain=abs(r[use[i]])^0.5)
       g<-addG(g,dataLabel(data.frame(x=-xStart,y=y[i]),label=IVs$name[use[i]],hjust=1,vjust=0.5,
-                          col=colLine,fill=labelFill,size=1.25,label.size=labelWidth))
+                          col="#000000",fill=labelFill,size=1.25,label.size=labelWidth))
       g<-addG(g,drawArrow(start=c(-xStart,y[i]),arrowLength,direction=90+direction,ends="last",finAngle=60,
                           col=colLine,fill=colArrow,width=arrowWidth))
     }
