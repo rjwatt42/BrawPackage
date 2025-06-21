@@ -768,6 +768,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
     analysis$sem1<-NULL
   }
   
+  analysis$nval<-n
   analysis$llk<-anResult$llk
   analysis$aic<-anResult$aic
   analysis$aicNull<-anResult$aicNull
