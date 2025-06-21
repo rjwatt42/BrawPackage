@@ -27,8 +27,8 @@ plotGLM<-function(DV,IVs,result,whichR="Unique") {
   
   dy<-20/(length(r)+1)
   dx<-30/2
-  fontSize<-min(dy/8,dx/12)
-  
+  fontSize<-min(c(0.85,dy/8,dx/12))
+
   braw.env$plotArea<-c(0,0,1,1)
   g<-startPlot(xlim=xlim,ylim=ylim,box="none",g=NULL)
   # g<-addG(g,dataPolygon(data.frame(x=c(-1,-1,1,1)*14,y=c(-1,1,1,-1)*9),col=braw.env$plotColours$graphBack,fill=braw.env$plotColours$graphBack))

@@ -22,7 +22,7 @@ plotSEMModel<-function(pathmodel) {
 
   dy<-20/max(sapply(pathmodel$stages,length)+1)
   dx<-30/(length(pathmodel$stages))
-  fontSize<-min(dy/8,dx/12)
+  fontSize<-min(c(0.85,dy/8,dx/12))
 
   names<-c()
   xs<-c()
