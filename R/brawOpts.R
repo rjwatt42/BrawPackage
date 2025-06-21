@@ -38,7 +38,7 @@ newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
 }
 
 #' @export
-BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16,10),
+BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,10),
                    reportHTML=FALSE, graphicsType="ggplot",
                    newDev=FALSE,height=400,aspect=1.3,autoShow=FALSE,autoPrint=TRUE,timeLimit=Inf,fullGraphSize=1,
                    reducedOutput=FALSE) {
@@ -142,7 +142,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1.5,graphicsSize=c(16
           # braw.env$reportTheme<-braw.env$blankTheme()+theme(plot.margin=margin(0.15,0.8,0,0.25,"cm"))
           
           braw.env$graphicsSize<-graphicsSize
-          braw.env$labelSize<-height/150*fontScale
+          braw.env$labelSize<-height/100*fontScale
           braw.env$dotSize<-braw.env$labelSize*1.25
           braw.env$fontSize<-1
           
