@@ -355,6 +355,7 @@ multipleAnalysis<-function(nsims=1,hypothesis,design,evidence,newResult=c()){
       newResult$nval[j]<-res$nval
       newResult$noval[j]<-res$noval
       newResult$df1[j]<-res$df1
+      newResult$llk[j]<-res$llk
       newResult$aic[j]<-res$aic
       newResult$aicNull[j]<-res$aicNull
       if (!is.null(hypothesis$IV2)) {
@@ -767,6 +768,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
     analysis$sem1<-NULL
   }
   
+  analysis$llk<-anResult$llk
   analysis$aic<-anResult$aic
   analysis$aicNull<-anResult$aicNull
   analysis$rFull<-anResult$r.full
