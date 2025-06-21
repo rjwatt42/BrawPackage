@@ -94,8 +94,8 @@ plotSEMModel<-function(pathmodel) {
           aWid<-c(aWid,arrowWidth)
           
           rlabels<-c(rlabels,brawFormat(r1,digits=digits))
-          rx<-c(rx,xStart+(xEnd-xStart)*fontSize*0.3)
-          ry<-c(ry,yStart+(yEnd-yStart)*fontSize*0.3)
+          rx<-c(rx,xStart+(xEnd-xStart)/2)
+          ry<-c(ry,yStart+(yEnd-yStart)/2)
           rcol<-c(rcol,colArrow)
           rfg<-c(rfg,colLine)
           rdir<-c(rdir,direction)

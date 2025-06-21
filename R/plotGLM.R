@@ -80,7 +80,7 @@ plotGLM<-function(DV,IVs,result,whichR="Unique") {
       
       g<-addG(g,drawArrow(start=c(xStartA,y),arrowLength,direction=90+direction,ends="last",finAngle=60,
                           col=colLine,fill=colArrow,width=arrowWidth))
-      g<-addG(g,dataLabel(data.frame(x=xStartA/2,y=y/2),label=brawFormat(r1,digits=2),hjust=0.5,vjust=0.5,
+      g<-addG(g,dataLabel(data.frame(x=xStart+(xEnd-xStart)/2,y=y+(yEnd-y)/2),label=brawFormat(r1,digits=2),hjust=0.5,vjust=0.5,
                           colour="#000000",fill=darken(colArrow,1,0.2),size=fontSize*0.85))
       y<-y-dy
     }
