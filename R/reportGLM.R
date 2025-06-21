@@ -28,6 +28,7 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
          "p"={title<-paste0("\bp-values"," (","DV = ",DV$name,")")}
          )
   outputText<-c(paste0("\b",title),rep("",nc-1))
+  outputText<-c(rep("",nc))
   
   outputText<-c(outputText,"!H!C","\bDirect","\bUnique","\bTotal")
   for (i in 1:length(result$r.direct)) {
@@ -43,7 +44,7 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
     outputText<-c(outputText,rep("",nc))
     
     outputText<-c(outputText,
-                  "Model","AIC","R^2","r","llr","k","n","obs",
+                  "!HModel","AIC","R^2","r","llr","k","n","obs",
                   rep("",nc-8)
     )
     outputText<-c(outputText,
@@ -55,7 +56,7 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
                   brawFormat(k),
                   brawFormat(result$nval),
                   "-",
-                  rep("",nc-4)
+                  rep("",nc-8)
     )
   }
 
