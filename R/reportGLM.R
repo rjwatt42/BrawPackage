@@ -55,7 +55,8 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
     }
     
     outputText<-c(outputText,
-                  paste(DV$name,"=",paste(IVs$name,collapse="+")),
+                  stagesString,
+                  # paste(DV$name,"=",paste(IVs$name,collapse="+")),
                   brawFormat(result$aic,digits=1),
                   brawFormat(result$aicNull,digits=1),
                   brawFormat(result$r.full^2,digits=3),
