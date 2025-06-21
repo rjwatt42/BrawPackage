@@ -627,6 +627,8 @@ sem_results<-function(pathmodel,sem) {
   residsNull<-Yactual[!is.na(Yactual)]
   residLLK<-sum(log(dnorm(residsNull,mean(residsNull),sd(residsNull))))
   AICnull<-2*k_null-2*residLLK
+  AICnull<-(residsNull[1]-mean(residsNull))/sd(residsNull)
+  
   # 
   sem$stats<-list(model_chisqr=model_chisqr,
                  model_chi_df=model_chi_df,
