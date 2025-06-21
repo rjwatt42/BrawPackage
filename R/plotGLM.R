@@ -33,14 +33,17 @@ plotGLM<-function(DV,IVs,result,whichR) {
   fill<-"#FFAAAA"
   g<-addG(g,dataLabel(data.frame(x=0,y=0),label=DV$name,hjust=0,vjust=0.5,fontface="bold",size=1,fill=fill))
   xStart<-4+nchar(DV$name)/2*(fontSize/14)
-
+  dy<-20/(length(r)+1)
+  
+  y<-dy*(length(r)-1)/2
+  
     use<-order(r)
-    y<-seq(ylim[1],ylim[2],length.out=length(use))
-    if (length(use)==1) y<-0
-    else {
-    if (length(use)<5) y<-y*0.6
-    else               y<-y*0.9
-    }
+    # y<-seq(ylim[1],ylim[2],length.out=length(use))
+    # if (length(use)==1) y<-0
+    # else {
+    # if (length(use)<5) y<-y*0.6
+    # else               y<-y*0.9
+    # }
     for (i in 1:length(use)) {
       r1<-r[use[i]]
       
@@ -68,12 +71,13 @@ plotGLM<-function(DV,IVs,result,whichR) {
       arrowWidth<-arrowWidth*1.6
       # colArrow<-desat(colArrow,gain=abs(r[use[i]])^0.5)
       fill<-"#CCFF44"
-      g<-addG(g,dataLabel(data.frame(x=-xStart,y=y[i]),label=IVs$name[use[i]],hjust=1,vjust=0.5,
+      g<-addG(g,dataLabel(data.frame(x=-xStart,y=y),label=IVs$name[use[i]],hjust=1,vjust=0.5,
                           col="#000000",fill=fill,size=1,label.size=labelWidth))
-      g<-addG(g,drawArrow(start=c(-xStart,y[i]),arrowLength,direction=90+direction,ends="last",finAngle=60,
+      g<-addG(g,drawArrow(start=c(-xStart,y),arrowLength,direction=90+direction,ends="last",finAngle=60,
                           col=colLine,fill=colArrow,width=arrowWidth))
-      g<-addG(g,dataLabel(data.frame(x=-xStart/2,y=y[i]/2),label=brawFormat(r1,digits=2),hjust=0.5,vjust=0.5,
+      g<-addG(g,dataLabel(data.frame(x=-xStart/2,y=y/2),label=brawFormat(r1,digits=2),hjust=0.5,vjust=0.5,
                           colour="#000000",fill=darken(colArrow,1,0.2),size=0.66))
+      y<-y-dy
     }
 
     g<-addG(g,dataText(data.frame(x=xlim[1],y=ylim[1]),label=paste0("r[model]=",brawFormat(result$r.full,3)),vjust=0))
