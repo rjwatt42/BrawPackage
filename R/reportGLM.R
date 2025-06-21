@@ -43,7 +43,8 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
     outputText<-c(outputText,rep("",nc))
     
     outputText<-c(outputText,
-                  brawFormat("Model","AIC","R^2","r","llr","k","n","obs"),rep("",nc-8)
+                  "Model","AIC","R^2","r","llr","k","n","obs",
+                  rep("",nc-8)
     )
     outputText<-c(outputText,
                   paste(lm$DV$name,"=",paste(lm$IVs$name,collapse="+")),
