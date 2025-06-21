@@ -30,7 +30,7 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
   outputText<-c(paste0("\b",title),rep("",nc-1))
   outputText<-c(rep("",nc))
   
-  outputText<-c(outputText,"!H!C","\bDirect","\bUnique","\bTotal")
+  outputText<-c(outputText,"!H!C","\bDirect","\bUnique","\bTotal",rep("",nc-4))
   for (i in 1:length(result$r.direct)) {
     outputText<-c(outputText,
                   paste0(" ",IVs$name[i],"    "),
