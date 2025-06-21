@@ -21,7 +21,8 @@ makeText<-function(r,p,p_or_r) {
 reportGLM<-function(DV,IVs,result,p_or_r) {
   
   nc<-10
-  k<-length(IVs)+2 # no coefficients
+  nIVs<-length(result$r.direct)
+  k<-nIVs+2 # no coefficients
 
   switch(p_or_r,
          "r"={title<-paste0("\beffect sizes"," (","DV = ",DV$name,")")},
@@ -31,7 +32,7 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
   outputText<-c(outputText,rep("",nc))
   
   outputText<-c(outputText,"!H!C","\bDirect","\bUnique","\bTotal",rep("",nc-4))
-  for (i in 1:length(result$r.direct)) {
+  for (i in 1:nIVs) {
     outputText<-c(outputText,
                   paste0(" ",IVs$name[i],"    "),
                   makeText(result$r.direct[i],result$p.direct[i],p_or_r),
