@@ -35,11 +35,12 @@ plotGLM<-function(DV,IVs,result,whichR) {
   xStart<-4+nchar(DV$name)/2*(fontSize/14)
 
     use<-order(r)
-    y<-seq(0.65,100,2)
-    y<-seq(ylim[1],ylim[2],length(use))
+    y<-seq(ylim[1],ylim[2],length.out=length(use))
+    if (length(use)==1) y<-0
+    else {
     if (length(use)<5) y<-y*0.6
     else               y<-y*0.9
-    # if (y[length(use)]>3*2.5) y<-y-(3*2.5-y[length(use)])
+    }
     for (i in 1:length(use)) {
       r1<-r[use[i]]
       
