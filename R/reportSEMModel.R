@@ -91,7 +91,7 @@ reportSEMModel<-function(sem,showType) {
     use<-1:ne
   }
 
-  columns<-c("Model","AIC","AICnull","llr[+]","Rsqr","r","llr","k","n","obs")
+  columns<-c("Model","AIC","AICnull","Rsqr","r","llr","k","n","obs")
   nc1<-length(columns)
   tableText<-c(columns,rep("",nc-nc1))
   tableText[1]<-paste0("!H",tableText[1])
