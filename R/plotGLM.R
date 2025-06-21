@@ -47,6 +47,7 @@ plotGLM<-function(DV,IVs,result,whichR) {
       arrowWidth<-0.3
       if (r1<0) colArrow<-"#0088FF"
       else      colArrow="#FFEE00"
+      colLabel<-colArrow
       if (abs(r1)<0.1) {
         colArrow<-desat(colArrow,0.1)
         colLine<-desat(colLine,0.1)
@@ -71,9 +72,9 @@ plotGLM<-function(DV,IVs,result,whichR) {
       arrowWidth<-arrowWidth*1.6
       # colArrow<-desat(colArrow,gain=abs(r[use[i]])^0.5)
       g<-addG(g,dataLabel(data.frame(x=-xStart,y=y[i]),label=IVs$name[use[i]],hjust=1,vjust=0.5,
-                          col=colArrow,fill=labelFill,size=1.25,label.size=labelWidth))
+                          col=colLabel,fill=labelFill,size=1.25,label.size=labelWidth))
       g<-addG(g,drawArrow(start=c(-xStart,y[i]),arrowLength,direction=90+direction,ends="last",finAngle=60,
-                          col=colArrow,fill=colArrow,width=arrowWidth))
+                          col=colLine,fill=colArrow,width=arrowWidth))
     }
 
     g<-addG(g,dataText(data.frame(x=xlim[1],y=ylim[1]),label=paste0("r[model]=",brawFormat(result$r.full,3)),vjust=0))
