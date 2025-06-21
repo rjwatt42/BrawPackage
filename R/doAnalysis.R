@@ -540,8 +540,8 @@ generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",ca
   aic<-AIC(lmNormC)
   llk<-logLik(lmNormC)
 
-  k<-2
-  n_obs<-1
+  k<-no_ivs+2
+  n_obs<-n
   n_data<-n
   resid2<-sum((analysisRawData$dv-mean(analysisRawData$dv))^2)
   aicNull<-2*k+n_obs*(log(2*pi*resid2/n_data)+1)
