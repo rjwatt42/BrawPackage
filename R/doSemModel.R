@@ -626,7 +626,7 @@ sem_results<-function(pathmodel,sem) {
   k_null<-2*length(sem$endogenous)
   residsNull<-Yactual
   Resid2_null<-sum(log(dnorm(residsNull,mean(residsNull,na.rm=TRUE),sd(residsNull,na.rm=TRUE))))
-  AICnull<-2*k_null+n_obs*(log(2*pi*Resid2_null/n_data)+1)
+  AICnull<-2*k_null+n_obs*Resid2_null
   # 
   sem$stats<-list(model_chisqr=model_chisqr,
                  model_chi_df=model_chi_df,
