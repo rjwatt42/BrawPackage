@@ -20,13 +20,16 @@ makeText<-function(r,p,p_or_r) {
 #' @export
 reportGLM<-function(DV,IVs,result,p_or_r) {
   
-  nc<-4
+  nc<-9
+  k<-length(IVs)
 
-  outputText<-c(
-    paste0("\b",p_or_r," values"," (","DV = ",DV$name,")"),"","","",
-    " ","","","",
-    "!H!C","\bDirect","\bUnique","\bTotal"
-    )
+  switch(p_or_r,
+         "r"={title<-paste0("\beffect sizes"," (","DV = ",DV$name,")")},
+         "p"={title<-paste0("\bp-values"," (","DV = ",DV$name,")")}
+         )
+  outputText<-c(paste0("\b",title),rep("",nc-1))
+  
+  outputText<-c(outputText,"!H!C","\bDirect","\bUnique","\bTotal")
   for (i in 1:length(result$r.direct)) {
     outputText<-c(outputText,
                   paste0(" ",IVs$name[i],"    "),
@@ -37,10 +40,24 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
   }
   
   if (p_or_r=="r") {
+    outputText<-c(outputText,rep("",nc))
+    
     outputText<-c(outputText,
-                  "Full model    ",paste0("\b",brawFormat(result$r.full,digits=3))," ","",
-                  "!UAIC:",paste0("\b",brawFormat(AIC(result$lmNormC),digits=3)),"",""
+                  brawFormat("Model","AIC","R^2","r","llr","k","n","obs"),rep("",nc-8)
+    )
+    outputText<-c(outputText,
+                  paste(lm$DV$name,"=",paste(lm$IVs$name,collapse="+")),
+                  brawFormat(AIC(result$lmNormC),digits=3),
+                  brawFormat(Rsqr=result$r.full^2,digits=3),
+                  brawFormat(r=result$r.full,digits=3),
+                  "-",
+                  brawFormat(k),
+                  brawFormat(result$nval),
+                  "-",
+                  rep("",nc-4)
     )
   }
+
+  
   reportPlot(outputText,nc,length(outputText)/nc)        
 }
