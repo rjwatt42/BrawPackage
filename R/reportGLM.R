@@ -47,7 +47,7 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
                   rep("",nc-8)
     )
     outputText<-c(outputText,
-                  paste(lm$DV$name,"=",paste(lm$IVs$name,collapse="+")),
+                  paste(DV$name,"=",paste(IVs$name,collapse="+")),
                   brawFormat(AIC(result$lmNormC),digits=3),
                   brawFormat(Rsqr=result$r.full^2,digits=3),
                   brawFormat(r=result$r.full,digits=3),
