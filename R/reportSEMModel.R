@@ -1,6 +1,12 @@
 
 truncateName<-function(name,names) {
-  substr(name,1,3)
+  n=3
+  # while(1==2) {
+  #   subnames<-sapply(names,substr,1,n)
+  #   if (length(unique(subnames))==length(subnames)) break
+  #   n=n+1
+  # }
+  substr(name,1,n)
 }
 
 #' report a fitted SEM model 

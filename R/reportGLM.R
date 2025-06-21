@@ -49,6 +49,11 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
                   "!HModel","AIC","AICnull","R^2","r","llr","k","n","obs",
                   rep("",nc-9)
     )
+    stagesString<-""
+    for (stage in list(DV$name,list(IVs$name))) {
+      stagesString<-paste0(stagesString,paste0("{",paste(sapply(stage,truncateName),collapse=","),"}"))
+    }
+    
     outputText<-c(outputText,
                   paste(DV$name,"=",paste(IVs$name,collapse="+")),
                   brawFormat(result$aic,digits=1),
