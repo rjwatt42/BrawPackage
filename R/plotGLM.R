@@ -39,14 +39,8 @@ plotGLM<-function(DV,IVs,result,whichR) {
   
   y<-dy*(length(r)-1)/2
   
-    use<-order(r)
-    # y<-seq(ylim[1],ylim[2],length.out=length(use))
-    # if (length(use)==1) y<-0
-    # else {
-    # if (length(use)<5) y<-y*0.6
-    # else               y<-y*0.9
-    # }
-    
+    use<-rev(order(r))
+
     for (i in 1:length(use)) {
       r1<-r[use[i]]
       
