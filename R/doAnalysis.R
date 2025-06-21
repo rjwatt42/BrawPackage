@@ -439,6 +439,8 @@ generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",ca
   analysisRawData<-data.frame(allData)
   names(analysisRawData)<-c("participant","dv",paste0("iv",1:no_ivs))
   
+  n<-sum(apply(analysisRawData,1,function(x) all(!is.na(x))))
+  
   #MAKE NORM DATA STORAGE
   # centre variables on zero
   # this helps with the interaction term
