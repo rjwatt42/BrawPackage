@@ -42,7 +42,8 @@ plotGLM<-function(DV,IVs,result,whichR="Unique") {
   g<-addG(g,dataLabel(data.frame(x=xEnd,y=yEnd),label=DV$name,hjust=0.5,vjust=0.5,fontface="bold",size=fontSize,fill=fill))
   
   y<-dy*(length(r)-1)/2
-    use<-rev(order(r))
+    # use<-rev(order(r))
+    use<-1:length(r)
 
     for (i in 1:length(use)) {
       r1<-r[use[i]]
