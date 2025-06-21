@@ -48,6 +48,12 @@ plotGLM<-function(DV,IVs,result,whichR) {
       if (r1<0) colArrow<-"#0088FF"
       else      colArrow="#FFEE00"
       colLabel<-colArrow
+      if (p[use[i]]<braw.env$alphaSig) {
+        labelFill<-colArrow
+      } else {
+        labelFill<-braw.env$plotColours$graphBack
+      }
+      
       if (abs(r1)<0.1) {
         colArrow<-desat(colArrow,0.1)
         colLine<-desat(colLine,0.1)
@@ -59,12 +65,6 @@ plotGLM<-function(DV,IVs,result,whichR) {
         arrowWidth<-0.2
       }
       
-      if (p[use[i]]<braw.env$alphaSig) {
-        labelFill<-"white"
-      } else {
-        labelFill<-braw.env$plotColours$graphBack
-      }
-      
       arrowLength<-sqrt((y[i])^2+(-xStart)^2)
       direction<- atan2((-y[i]),(xStart))*180/pi
       
@@ -72,7 +72,7 @@ plotGLM<-function(DV,IVs,result,whichR) {
       arrowWidth<-arrowWidth*1.6
       # colArrow<-desat(colArrow,gain=abs(r[use[i]])^0.5)
       g<-addG(g,dataLabel(data.frame(x=-xStart,y=y[i]),label=IVs$name[use[i]],hjust=1,vjust=0.5,
-                          col=colLabel,fill=labelFill,size=1.25,label.size=labelWidth))
+                          col=colLine,fill=labelFill,size=1.25,label.size=labelWidth))
       g<-addG(g,drawArrow(start=c(-xStart,y[i]),arrowLength,direction=90+direction,ends="last",finAngle=60,
                           col=colLine,fill=colArrow,width=arrowWidth))
     }
