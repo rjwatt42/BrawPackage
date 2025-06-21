@@ -535,6 +535,7 @@ generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",ca
   }
   r.full<-matrix(model2fulleffect(lmNormC,anNormC),nrow=1)
   aic<-AIC(lmNormC)
+  llk<-logLik(lmNormC)
 
   k<-2
   n_obs<-n
@@ -557,6 +558,7 @@ generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",ca
               r.unique=r.unique,
               r.total=r.total,
               r.full=r.full,
+              llk-llk,
               aic=aic,
               aicNull=aicNull,
               

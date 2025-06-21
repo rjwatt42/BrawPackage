@@ -28,7 +28,7 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
          "p"={title<-paste0("\bp-values"," (","DV = ",DV$name,")")}
          )
   outputText<-c(paste0("\b",title),rep("",nc-1))
-  outputText<-c(rep("",nc))
+  outputText<-c(outputText,rep("",nc))
   
   outputText<-c(outputText,"!H!C","\bDirect","\bUnique","\bTotal",rep("",nc-4))
   for (i in 1:length(result$r.direct)) {
@@ -50,10 +50,10 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
     )
     outputText<-c(outputText,
                   paste(DV$name,"=",paste(IVs$name,collapse="+")),
-                  brawFormat(AIC(result$lmNormC),digits=3),
+                  brawFormat(result$aic,digits=3),
                   brawFormat(result$r.full^2,digits=3),
                   brawFormat(result$r.full,digits=3),
-                  "-",
+                  brawFormat(result$llk,digits=3),
                   brawFormat(k),
                   brawFormat(result$nval),
                   "-",
