@@ -559,7 +559,8 @@ generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",ca
               r.unique=r.unique,
               r.total=r.total,
               r.full=r.full,
-              llk-llk,
+              nval=n,
+              llk=llk,
               aic=aic,
               aicNull=aicNull,
               
