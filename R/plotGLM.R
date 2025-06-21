@@ -31,8 +31,10 @@ plotGLM<-function(DV,IVs,result,whichR) {
   # g<-addG(g,dataPolygon(data.frame(x=c(-1,-1,1,1)*14,y=c(-1,1,1,-1)*9),col=braw.env$plotColours$graphBack,fill=braw.env$plotColours$graphBack))
   
   fill<-"#FFAAAA"
-  g<-addG(g,dataLabel(data.frame(x=0,y=0),label=DV$name,hjust=0,vjust=0.5,fontface="bold",size=1,fill=fill))
-  xStart<-4+nchar(DV$name)/2*(fontSize/14)
+  xEnd<-0
+  yEnd<- -10
+  g<-addG(g,dataLabel(data.frame(x=xEnd,y=yEnd),label=DV$name,hjust=0,vjust=0.5,fontface="bold",size=1,fill=fill))
+  xStart<- -(4+nchar(DV$name)/2*(fontSize/14))
   dy<-20/(length(r)+1)
   
   y<-dy*(length(r)-1)/2
@@ -44,6 +46,7 @@ plotGLM<-function(DV,IVs,result,whichR) {
     # if (length(use)<5) y<-y*0.6
     # else               y<-y*0.9
     # }
+    
     for (i in 1:length(use)) {
       r1<-r[use[i]]
       
@@ -64,18 +67,18 @@ plotGLM<-function(DV,IVs,result,whichR) {
         arrowWidth<-0.2
       }
       
-      arrowLength<-sqrt((y[i])^2+(-xStart)^2)
-      direction<- atan2((-y[i]),(xStart))*180/pi
+      arrowLength<-sqrt((y-yEnd)^2+(xStart-xEnd)^2)
+      direction<- atan2((y-yEnd),(xStart-xEnd))*180/pi
       
       labelWidth<-arrowWidth*4
       arrowWidth<-arrowWidth*1.6
       # colArrow<-desat(colArrow,gain=abs(r[use[i]])^0.5)
       fill<-"#CCFF44"
-      g<-addG(g,dataLabel(data.frame(x=-xStart,y=y),label=IVs$name[use[i]],hjust=1,vjust=0.5,
+      g<-addG(g,dataLabel(data.frame(x=xStart,y=y),label=IVs$name[use[i]],hjust=1,vjust=0.5,
                           col="#000000",fill=fill,size=1,label.size=labelWidth))
-      g<-addG(g,drawArrow(start=c(-xStart,y),arrowLength,direction=90+direction,ends="last",finAngle=60,
+      g<-addG(g,drawArrow(start=c(xStart,y),arrowLength,direction=90-direction,ends="last",finAngle=60,
                           col=colLine,fill=colArrow,width=arrowWidth))
-      g<-addG(g,dataLabel(data.frame(x=-xStart/2,y=y/2),label=brawFormat(r1,digits=2),hjust=0.5,vjust=0.5,
+      g<-addG(g,dataLabel(data.frame(x=xStart/2,y=y/2),label=brawFormat(r1,digits=2),hjust=0.5,vjust=0.5,
                           colour="#000000",fill=darken(colArrow,1,0.2),size=0.66))
       y<-y-dy
     }
