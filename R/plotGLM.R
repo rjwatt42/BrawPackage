@@ -39,6 +39,9 @@ plotGLM<-function(DV,IVs,result,whichR) {
   
     use<-order(r)
     y<-seq(0.65,100,2)
+    y<-seq(ylim[1],ylim[2],length(use))
+    if (length(use)<5) y<-y*0.6
+    else               y<-y*0.9
     if (y[length(use)]>3*2.5) y<-y-(3*2.5-y[length(use)])
     # y<-seq(1,-1,length.out=length(use))*yRange
     for (i in 1:length(use)) {
