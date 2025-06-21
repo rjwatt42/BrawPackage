@@ -23,7 +23,7 @@ plotSEMModel<-function(pathmodel) {
   dy<-20/max(sapply(pathmodel$stages,length)+1)
   dx<-30/(length(pathmodel$stages))
   fontSize<-min(dy/8,dx/12)
-  
+
   names<-c()
   xs<-c()
   ys<-c()
@@ -130,9 +130,8 @@ plotSEMModel<-function(pathmodel) {
   }
 
   # now summary result
-  label<-paste0("AIC ",brawFormat(pathmodel$eval$AIC),";  R^2 ",brawFormat(pathmodel$eval$Rsquared),
-                ";  k ",brawFormat(pathmodel$eval$k),";  n ",brawFormat(pathmodel$eval$n_obs))
-  g<-addG(g,dataLabel(data.frame(x=xlim[2]-diff(xlim)/30,y=ylim[1]+diff(ylim)/30),label,hjust=1,size=0.7))
+  label<-paste0("r[model]=",brawFormat(sqrt(pathmodel$eval$Rsquared),3),"  AIC=",brawFormat(pathmodel$eval$AIC,1))
+  g<-addG(g,dataLabel(data.frame(x=xlim[2]-diff(xlim)/30,y=ylim[1]+diff(ylim)/30),label,hjust=1,size=fontSize*0.85))
   return(g)
 
 }

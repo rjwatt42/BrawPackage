@@ -4,7 +4,7 @@
 #' @examples
 #' plotGLM<-function(DV,IVs,result,whichR)
 #' @export
-plotGLM<-function(DV,IVs,result,whichR) {
+plotGLM<-function(DV,IVs,result,whichR="Unique") {
   
   switch(whichR,
          "Direct"={
@@ -21,24 +21,27 @@ plotGLM<-function(DV,IVs,result,whichR) {
          }
   )
   
-  fontSize<-braw.env$labelSize*1.25
-  if (length(r)>10) fontSize<-braw.env$labelSize
   
   xlim<-c(-1,1)*15
   ylim<-c(-1,1)*10
+  
+  dy<-20/(length(r)+1)
+  dx<-30/2
+  fontSize<-min(dy/8,dx/12)
+  
   braw.env$plotArea<-c(0,0,1,1)
   g<-startPlot(xlim=xlim,ylim=ylim,box="none",g=NULL)
   # g<-addG(g,dataPolygon(data.frame(x=c(-1,-1,1,1)*14,y=c(-1,1,1,-1)*9),col=braw.env$plotColours$graphBack,fill=braw.env$plotColours$graphBack))
   
+  xEnd<- dx*(2-1)/2
+  
   fill<-"#FFAAAA"
-  xEnd<- (4+nchar(DV$name)/2*(fontSize/14))
-  xStart<- -xEnd
+  # xEnd<- (4+nchar(DV$name)/2*(fontSize/14))
+  xStart<- xEnd-dx
   yEnd<- 0
-  g<-addG(g,dataLabel(data.frame(x=xEnd,y=yEnd),label=DV$name,hjust=0,vjust=0.5,fontface="bold",size=1,fill=fill))
-  dy<-20/(length(r)+1)
+  g<-addG(g,dataLabel(data.frame(x=xEnd,y=yEnd),label=DV$name,hjust=0.5,vjust=0.5,fontface="bold",size=fontSize,fill=fill))
   
   y<-dy*(length(r)-1)/2
-  
     use<-rev(order(r))
 
     for (i in 1:length(use)) {
@@ -61,24 +64,29 @@ plotGLM<-function(DV,IVs,result,whichR) {
         arrowWidth<-0.2
       }
       
-      arrowLength<-sqrt((y-yEnd)^2+(xStart-xEnd)^2)
-      direction<- atan2((yEnd-y),(xEnd-xStart))*180/pi
       
       labelWidth<-arrowWidth*4
       arrowWidth<-arrowWidth*1.6
       # colArrow<-desat(colArrow,gain=abs(r[use[i]])^0.5)
       fill<-"#CCFF44"
-      g<-addG(g,dataLabel(data.frame(x=xStart,y=y),label=IVs$name[use[i]],hjust=1,vjust=0.5,
-                          col="#000000",fill=fill,size=1,label.size=labelWidth))
-      g<-addG(g,drawArrow(start=c(xStart,y),arrowLength,direction=90+direction,ends="last",finAngle=60,
+      g<-addG(g,dataLabel(data.frame(x=xStart,y=y),label=IVs$name[use[i]],hjust=0.5,vjust=0.5,
+                          col="#000000",fill=fill,size=fontSize,label.size=labelWidth,fontface="bold",))
+
+      xStartA<-xStart+(nchar(IVs$name[use[i]])+1)*fontSize*0.35
+      xEndA<-xEnd-(nchar(DV$name)+1)*fontSize*0.35
+      arrowLength<-sqrt((y-yEnd)^2+(xStartA-xEndA)^2)
+      direction<- atan2((yEnd-y),(xEndA-xStartA))*180/pi
+      
+      g<-addG(g,drawArrow(start=c(xStartA,y),arrowLength,direction=90+direction,ends="last",finAngle=60,
                           col=colLine,fill=colArrow,width=arrowWidth))
-      g<-addG(g,dataLabel(data.frame(x=xStart/2,y=y/2),label=brawFormat(r1,digits=2),hjust=0.5,vjust=0.5,
-                          colour="#000000",fill=darken(colArrow,1,0.2),size=0.66))
+      g<-addG(g,dataLabel(data.frame(x=xStartA/2,y=y/2),label=brawFormat(r1,digits=2),hjust=0.5,vjust=0.5,
+                          colour="#000000",fill=darken(colArrow,1,0.2),size=fontSize*0.85))
       y<-y-dy
     }
 
-    g<-addG(g,dataText(data.frame(x=xlim[1],y=ylim[1]),label=paste0("r[model]=",brawFormat(result$r.full,3)),vjust=0))
-  
+    label<-paste0("r[model]=",brawFormat(result$r.full,3),"  AIC=",brawFormat(result$aic,1))
+    g<-addG(g,dataLabel(data.frame(x=xlim[2]-diff(xlim)/30,y=ylim[1]+diff(ylim)/30),label,hjust=1,size=fontSize*0.85))
+
   return(g)
 
 }
