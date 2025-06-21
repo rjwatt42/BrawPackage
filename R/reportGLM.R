@@ -49,7 +49,7 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
     outputText<-c(outputText,
                   paste(DV$name,"=",paste(IVs$name,collapse="+")),
                   brawFormat(AIC(result$lmNormC),digits=3),
-                  brawFormatresult$r.full^2,digits=3),
+                  brawFormat(result$r.full^2,digits=3),
                   brawFormat(result$r.full,digits=3),
                   "-",
                   brawFormat(k),
