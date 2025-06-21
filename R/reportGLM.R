@@ -36,7 +36,8 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
                   paste0(" ",IVs$name[i],"    "),
                   makeText(result$r.direct[i],result$p.direct[i],p_or_r),
                   makeText(result$r.unique[i],result$p.unique[i],p_or_r),
-                  makeText(result$r.total[i],result$p.total[i],p_or_r)
+                  makeText(result$r.total[i],result$p.total[i],p_or_r),
+                  rep("",nc-4)
     )
   }
   
