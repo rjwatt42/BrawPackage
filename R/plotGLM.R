@@ -73,7 +73,7 @@ plotGLM<-function(DV,IVs,result,whichR) {
       g<-addG(g,drawArrow(start=c(-xStart,y[i]),arrowLength,direction=90+direction,ends="last",finAngle=60,
                           col=colLine,fill=colArrow,width=arrowWidth))
       g<-addG(g,dataLabel(data.frame(x=-xStart/2,y=y[i]/2),label=brawFormat(r1,digits=2),hjust=0.5,vjust=0.5,
-                          col=colLine,fill=colArrow,size=0.75))
+                          colour=darken(colLine,1,0.2),fill=colArrow,size=0.6))
     }
 
     g<-addG(g,dataText(data.frame(x=xlim[1],y=ylim[1]),label=paste0("r[model]=",brawFormat(result$r.full,3)),vjust=0))
