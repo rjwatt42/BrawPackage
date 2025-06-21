@@ -20,8 +20,8 @@ makeText<-function(r,p,p_or_r) {
 #' @export
 reportGLM<-function(DV,IVs,result,p_or_r) {
   
-  nc<-9
-  k<-length(IVs)
+  nc<-10
+  k<-length(IVs)+2 # no coefficients
 
   switch(p_or_r,
          "r"={title<-paste0("\beffect sizes"," (","DV = ",DV$name,")")},
@@ -45,19 +45,20 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
     outputText<-c(outputText,rep("",nc))
     
     outputText<-c(outputText,
-                  "!HModel","AIC","R^2","r","llr","k","n","obs",
-                  rep("",nc-8)
+                  "!HModel","AIC","AICnull","R^2","r","llr","k","n","obs",
+                  rep("",nc-9)
     )
     outputText<-c(outputText,
                   paste(DV$name,"=",paste(IVs$name,collapse="+")),
-                  brawFormat(result$aic,digits=3),
+                  brawFormat(result$aic,digits=1),
+                  brawFormat(result$aicNull,digits=1),
                   brawFormat(result$r.full^2,digits=3),
                   brawFormat(result$r.full,digits=3),
                   brawFormat(result$llk,digits=3),
                   brawFormat(k),
                   brawFormat(result$nval),
-                  "-",
-                  rep("",nc-8)
+                  brawFormat(1),
+                  rep("",nc-9)
     )
   }
 

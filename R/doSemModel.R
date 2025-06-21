@@ -614,7 +614,7 @@ sem_results<-function(pathmodel,sem) {
     k<-2
     Resid2<-sum(error^2)
   } else {
-    k=sum(!is.na(CF_table))+2*sum(use1); 
+    k=sum(!is.na(CF_table))+2*sum(use1)
     Resid2=colSums(error^2)[use1]
   }
   AIC=2*k+n_obs*sum(log(2*pi*Resid2/n_data)+1);
