@@ -593,7 +593,7 @@ sem_results<-function(pathmodel,sem) {
   # 
   B=sem$Bresult; B[is.na(B)]=0;
   L=sem$Lresult; L[is.na(L)]=0;
-  Y=t(sem$data[,1:P]); Y[is.na(Y)]=0;
+  Y=t(sem$data[,1:P]); #Y[is.na(Y)]=0;
   if (P==1) Y<-matrix(Y,nrow=1)
   if (Q>0) {
     X=t(sem$data[,(P+1):ncol(sem$data)]); X[is.na(X)]=0;
@@ -627,8 +627,7 @@ sem_results<-function(pathmodel,sem) {
   residsNull<-Y[!is.na(Y)]
   residLLK<-sum(log(dnorm(residsNull,mean(residsNull),sd(residsNull))))
   AICnull<-2*k_null-2*residLLK
-  AICnull<-residLLK
-  
+
   # 
   sem$stats<-list(model_chisqr=model_chisqr,
                  model_chi_df=model_chi_df,
