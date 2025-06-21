@@ -30,14 +30,14 @@ plotGLM<-function(DV,IVs,result,whichR) {
   g<-startPlot(xlim=xlim,ylim=ylim,box="none",g=NULL)
   # g<-addG(g,dataPolygon(data.frame(x=c(-1,-1,1,1)*14,y=c(-1,1,1,-1)*9),col=braw.env$plotColours$graphBack,fill=braw.env$plotColours$graphBack))
   
-  g<-addG(g,dataLabel(data.frame(x=0,y=0),label=DV$name,hjust=0.5,vjust=0.5,fontface="bold",size=1.25))
+  g<-addG(g,dataLabel(data.frame(x=0,y=0),label=DV$name,hjust=0,vjust=0.5,fontface="bold",size=1.25))
   xStart<-4+nchar(DV$name)/2*(fontSize/14)
   arrowLength<-4-1
   yRange<-max(sum(r>0),sum(r<0))/2
   
   
     use<-order(r)
-    y<-seq(0.65,100,1.3)
+    y<-seq(0.65,100,2)
     if (y[length(use)]>3*2.5) y<-y-(3*2.5-y[length(use)])
     # y<-seq(1,-1,length.out=length(use))*yRange
     for (i in 1:length(use)) {
@@ -64,13 +64,15 @@ plotGLM<-function(DV,IVs,result,whichR) {
         labelFill<-braw.env$plotColours$graphBack
       }
       
+      arrowLength<-sqrt((y[i])^2+(-xStart)^2)
+      direction<- atan2((-y[i]),(xStart))*180/pi
+      
       labelWidth<-arrowWidth*4
       arrowWidth<-arrowWidth*1.6
       # colArrow<-desat(colArrow,gain=abs(r[use[i]])^0.5)
       g<-addG(g,dataLabel(data.frame(x=-xStart,y=y[i]),label=IVs$name[use[i]],hjust=1,vjust=0.5,
                           col=colArrow,fill=labelFill,size=1.25,label.size=labelWidth))
-      direction<-atan2(y[i]*0.9,arrowLength+0.25)
-      g<-addG(g,drawArrow(start=c(-xStart,y[i]),arrowLength,direction=90-direction*180/pi,ends="last",finAngle=60,
+      g<-addG(g,drawArrow(start=c(-xStart,y[i]),arrowLength,direction=90+direction,ends="last",finAngle=60,
                           col=colArrow,fill=colArrow,width=arrowWidth))
     }
 
