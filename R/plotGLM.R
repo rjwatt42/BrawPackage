@@ -76,7 +76,7 @@ plotGLM<-function(DV,IVs,result,whichR) {
       fill<-"#CCFF44"
       g<-addG(g,dataLabel(data.frame(x=xStart,y=y),label=IVs$name[use[i]],hjust=1,vjust=0.5,
                           col="#000000",fill=fill,size=1,label.size=labelWidth))
-      g<-addG(g,drawArrow(start=c(xStart,y),arrowLength,direction=90-direction,ends="last",finAngle=60,
+      g<-addG(g,drawArrow(start=c(xStart,y),arrowLength,direction=90+direction,ends="last",finAngle=60,
                           col=colLine,fill=colArrow,width=arrowWidth))
       g<-addG(g,dataLabel(data.frame(x=xStart/2,y=y/2),label=brawFormat(r1,digits=2),hjust=0.5,vjust=0.5,
                           colour="#000000",fill=darken(colArrow,1,0.2),size=0.66))
