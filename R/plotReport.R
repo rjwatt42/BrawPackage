@@ -35,6 +35,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
       col2Style<-""
       blankStyle<-blankLineStyle
       headerRow<-FALSE
+      headerCol<-FALSE
       headerRowUsed<-FALSE
       for (j in 1:nr) {
         bgcolor<-""
@@ -76,6 +77,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
           col1Style<-paste0(col1Style,"border-right:solid;border-right-color:",lineColour,";")
           col1Style<-paste0(col1Style,"border-left:solid;border-left-color:",lineColour,";")
           outputText[index+(1:nc)]<-sub("!C","",outputText[index+(1:nc)])
+          headerCol<-TRUE
         }
         if (any(grepl("!D",outputText[index+(1:nc)]))) {
           col2Use<-which(grepl("!D",outputText[index+(1:nc)]))
@@ -166,9 +168,11 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
             outputText[index]<-gsub("\\^([a-zA-Z0-9_+-]*)([a-zA-Z0-9_]*)","<sup>\\1</sup>",outputText[index])
 
             
+            if (index==nc && headerCol) extra<-paste0("border-right:solid;border-right-color:",lineColour,";")
+            else extra<-""
             if (nchar(outputText[index])>0)
-                 outputFront<-paste0(outputFront,"<td ",bgcolor," style=",startStyle,rowStyle,cellStyle,cellFilledStyle,">",outputText[index],"</td>")
-            else outputFront<-paste0(outputFront,"<td ",bgcolor," style=height:1px;",cellEmptyStyle,rowStyle,"></td>")
+                 outputFront<-paste0(outputFront,"<td ",bgcolor," style=",startStyle,rowStyle,cellStyle,cellFilledStyle,extra,">",outputText[index],"</td>")
+            else outputFront<-paste0(outputFront,"<td ",bgcolor," style=height:1px;",cellEmptyStyle,rowStyle,extra,"></td>")
         }
         outputFront<-paste0(outputFront,"</tr>")
         if (index+nc<=length(outputText))
