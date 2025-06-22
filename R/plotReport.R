@@ -172,6 +172,10 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
         if (index+nc<=length(outputText))
         if (all(sapply(outputText[index+(1:nc)],nchar)==0) || titleRow) {
           outputFront<-paste0(outputFront,'</table></div><div style=padding:0px;',placing,blankStyle,'>',tableStart)
+          col1Use<-0
+          col2Use<-0
+          col1Style<-""
+          col2Style<-""
           colStyle<-""
           colUse<-0
           blankStyle<-blankLineStyle
