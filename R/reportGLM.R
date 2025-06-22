@@ -67,7 +67,7 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
   }
 
   tableOutput<-braw.res$historyLM
-  newRow<-list(model=makeModelFormula(sem),AIC=result$aic,Rsqr=result$r.full^2,r=result$r.full)
+  newRow<-list(model=makeModelFormula(list(DV=DV,IVs=IVs)),AIC=result$aic,Rsqr=result$r.full^2,r=result$r.full)
   if (is.null(tableOutput)) tableOutput<-rbind(newRow)
   else           
     if (!identical(newRow,tableOutput[1,])) tableOutput<-rbind(newRow,tableOutput)
