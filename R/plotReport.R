@@ -164,7 +164,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
 
             
             if (nchar(outputText[index])>0)
-                 outputFront<-paste0(outputFront,"<td ",bgcolor," style=",cellStyle,cellFilledStyle,rowStyle,startStyle,">",outputText[index],"</td>")
+                 outputFront<-paste0(outputFront,"<td ",bgcolor," style=",startStyle,rowStyle,cellStyle,cellFilledStyle,">",outputText[index],"</td>")
             else outputFront<-paste0(outputFront,"<td ",bgcolor," style=height:1px;",cellEmptyStyle,rowStyle,"></td>")
         }
         outputFront<-paste0(outputFront,"</tr>")
