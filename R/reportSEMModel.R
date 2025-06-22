@@ -130,7 +130,7 @@ reportSEMModel<-function(sem,showType) {
   }
   
   outputText<-c(outputText,"!THistory",rep("",nc-1))
-  outputText<-c(outputText,"model","AIC","R^2","r",rep("",nc-4))
+  outputText<-c(outputText,"!H!Cmodel","AIC","R^2","r",rep("",nc-4))
   
   for (i in 1:length(use)) {
     f2<-f3<-""
