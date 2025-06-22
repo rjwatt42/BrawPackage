@@ -649,7 +649,7 @@ sem_results<-function(pathmodel,sem) {
                  AICc=AICc,
                  BIC=BIC,
                  CAIC=CAIC,
-                 AICnull=AICnull
+                 aicNull=AICnull
   )
   # 
   
