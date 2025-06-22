@@ -536,7 +536,7 @@ generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",ca
     r.unique<-matrix(model2uniqueeffect(anNormC)*sign(r.direct),nrow=1)
     r.total<-matrix(model2totaleffect(lmNormC),nrow=1)
   }
-  r.full<-matrix(model2fulleffect(lmNormC,anNormC),nrow=1)
+  r.full<-model2fulleffect(lmNormC,anNormC)
   aic<-AIC(lmNormC)
   llk<-logLik(lmNormC)
 
