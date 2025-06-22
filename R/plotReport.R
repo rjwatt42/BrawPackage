@@ -171,7 +171,6 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
             if (i==nc && headerCol) extra<-paste0("border-right:solid;border-right-color:",lineColour,";")
             else extra<-""
             if (i==1 && headerCol) extra<-paste0(extra,"border-top:none;border-left:none;")
-            if (headerCol) extra<-paste0(extra,"border-top:none;")
             if (nchar(outputText[index])>0)
                  outputFront<-paste0(outputFront,"<td ",bgcolor," style=",startStyle,rowStyle,cellStyle,cellFilledStyle,extra,">",outputText[index],"</td>")
             else outputFront<-paste0(outputFront,"<td ",bgcolor," style=height:1px;",cellEmptyStyle,rowStyle,extra,"></td>")
