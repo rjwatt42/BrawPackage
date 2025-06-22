@@ -118,7 +118,8 @@ reportSEMModel<-function(sem,showType) {
   tableOutput<-braw.res$historySEM
   newRow<-list(model=makeModelFormula(sem),AIC=sem$result$aic,Rsqr=sem$result$r.full^2,r=sem$result$r.full)
   if (is.null(tableOutput)) tableOutput<-rbind(newRow)
-  else                      tableOutput<-rbind(newRow,tableOutput)
+  else           
+    if (!identical(newRow,tableOutput[1,])) tableOutput<-rbind(newRow,tableOutput)
   setBrawRes("historySEM",tableOutput)
   
   ne<-nrow(tableOutput)
