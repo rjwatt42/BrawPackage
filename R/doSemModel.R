@@ -638,18 +638,19 @@ sem_results<-function(pathmodel,sem) {
                  model_srmr=model_srmr
   )
   sem$result<-list(Rsquared=Rsquared,
-                 k=k,
-                 n_data=n_data,
-                 n_obs=n_obs,
-                 llr=llr,
-                 resid2=Resid2,
-                 aic=AIC,
-                 k1=k1,
-                 AIC1=AIC1,
-                 AICc=AICc,
-                 BIC=BIC,
-                 CAIC=CAIC,
-                 aicNull=AICnull
+                   r.full=sqrt(Rsquared),
+                   k=k,
+                   n_data=n_data,
+                   n_obs=n_obs,
+                   llr=llr,
+                   resid2=Resid2,
+                   aic=AIC,
+                   k1=k1,
+                   AIC1=AIC1,
+                   AICc=AICc,
+                   BIC=BIC,
+                   CAIC=CAIC,
+                   aicNull=AICnull
   )
   # 
   
