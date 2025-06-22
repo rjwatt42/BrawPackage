@@ -405,6 +405,7 @@ setBrawOpts<-function(BW=NULL,graphC=NULL,fontScale=NULL,
   if(!is.null(BW)) setBrawEnv("BW",BW)
   if(!is.null(graphC)) setBrawEnv("graphC",graphC)
   if(!is.null(fontScale)) {
+    height<-braw.env$plotSize[2]
     setBrawEnv("labelSize",height/100*fontScale)
     setBrawEnv("dotSize",braw.env$labelSize*1.25)
   }
