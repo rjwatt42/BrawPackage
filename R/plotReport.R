@@ -3,7 +3,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
 
   doVerticalLines=FALSE
   doItalic=FALSE
-  centreTable=TRUE
+  centreTable=FALSE
   indentSize="30px"
   gapSize="30px"
   lineColour="#446688"
