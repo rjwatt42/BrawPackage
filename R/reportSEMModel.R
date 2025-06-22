@@ -100,7 +100,7 @@ reportSEMModel<-function(sem,showType) {
   columns<-c("Model","AIC","AICnull","Rsqr","r","llr","k","n","obs")
   nc1<-length(columns)
   tableText<-c("!TStatistics",rep("",nc-1),columns,rep("",nc-nc1))
-  tableText[1]<-paste0("!H",tableText[1])
+  tableText[1]<-paste0("!H",tableText[nc+1])
   tableText[which(columns=="Rsqr")]<-"R^2"
   digitsE<-c(0,1,1,1,1,3,3,3,1,0,0,0)
   prefix<-"!r"
