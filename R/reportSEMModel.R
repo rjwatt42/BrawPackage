@@ -4,6 +4,8 @@ makeModelFormula<-function(sem) {
   # paste(DV$name,"=",paste(IVs$name,collapse="+")),
   stagesString<-""
   
+  if (is.null(sem$stages)) 
+    sem$stages<-list(sem$IVs,sem$DV)
   for (stage in sem$stages) {
     if (nchar(stagesString)>0) stagesString<-paste0(stagesString,"~")
     stagesString<-paste0(stagesString,paste0("{",paste(sapply(stage,truncateName,unlist(sem$stages)),collapse=","),"}"))
