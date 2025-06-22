@@ -694,28 +694,28 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
         c(sem5$ES_table[DV$name,IV$name],sem5$ES_table[DV$name,IV2$name],sem5$ES_table[IV2$name,IV$name]),
         c(sem6$ES_table[DV$name,IV$name],sem6$ES_table[DV$name,IV2$name],sem6$ES_table[IV2$name,IV$name])
       ))
-      modelSEMs<-c(sem0$eval[[evidence$useAIC]],
-                   sem1$eval[[evidence$useAIC]],
-                   sem2$eval[[evidence$useAIC]],
-                   sem3$eval[[evidence$useAIC]],
-                   sem4$eval[[evidence$useAIC]],
-                   sem5$eval[[evidence$useAIC]],
-                   sem6$eval[[evidence$useAIC]]
+      modelSEMs<-c(sem0$result[[evidence$useAIC]],
+                   sem1$result[[evidence$useAIC]],
+                   sem2$result[[evidence$useAIC]],
+                   sem3$result[[evidence$useAIC]],
+                   sem4$result[[evidence$useAIC]],
+                   sem5$result[[evidence$useAIC]],
+                   sem6$result[[evidence$useAIC]]
       )
-      modelSEM1s<-c(sem0$eval[[paste0(evidence$useAIC,"1")]],
-                   sem1$eval[[paste0(evidence$useAIC,"1")]],
-                   sem2$eval[[paste0(evidence$useAIC,"1")]],
-                   sem3$eval[[paste0(evidence$useAIC,"1")]],
-                   sem4$eval[[paste0(evidence$useAIC,"1")]],
-                   sem5$eval[[paste0(evidence$useAIC,"1")]],
-                   sem6$eval[[paste0(evidence$useAIC,"1")]]
+      modelSEM1s<-c(sem0$result[[paste0(evidence$useAIC,"1")]],
+                   sem1$result[[paste0(evidence$useAIC,"1")]],
+                   sem2$result[[paste0(evidence$useAIC,"1")]],
+                   sem3$result[[paste0(evidence$useAIC,"1")]],
+                   sem4$result[[paste0(evidence$useAIC,"1")]],
+                   sem5$result[[paste0(evidence$useAIC,"1")]],
+                   sem6$result[[paste0(evidence$useAIC,"1")]]
       )
       analysis$semP<-c(sem0$P,sem1$P,sem2$P,sem3$P,sem4$P,sem5$P,sem6$P)
       analysis$semQ<-c(sem0$Q,sem1$Q,sem2$Q,sem3$Q,sem4$Q,sem5$Q,sem6$Q)
-      analysis$semK1<-c(sem0$eval$k1,sem1$eval$k1,sem2$eval$k1,sem3$eval$k1,sem4$eval$k1,sem5$eval$k1,sem6$eval$k1)
-      analysis$semK<-c(sem0$eval$k,sem1$eval$k,sem2$eval$k,sem3$eval$k,sem4$eval$k,sem5$eval$k,sem6$eval$k)
-      analysis$semLLR<-c(sem0$eval$llr,sem1$eval$llr,sem2$eval$llr,sem3$eval$llr,sem4$eval$llr,sem5$eval$llr,sem6$eval$llr)
-      analysis$semRESID2<-c(sem0$eval$resid2,sem1$eval$resid2,sem2$eval$resid2,sem3$eval$resid2,sem4$eval$resid2,sem5$eval$resid2,sem6$eval$resid2)
+      analysis$semK1<-c(sem0$result$k1,sem1$result$k1,sem2$result$k1,sem3$result$k1,sem4$result$k1,sem5$result$k1,sem6$result$k1)
+      analysis$semK<-c(sem0$result$k,sem1$result$k,sem2$result$k,sem3$result$k,sem4$result$k,sem5$result$k,sem6$result$k)
+      analysis$semLLR<-c(sem0$result$llr,sem1$result$llr,sem2$result$llr,sem3$result$llr,sem4$result$llr,sem5$result$llr,sem6$result$llr)
+      analysis$semRESID2<-c(sem0$result$resid2,sem1$result$resid2,sem2$result$resid2,sem3$result$resid2,sem4$result$resid2,sem5$result$resid2,sem6$result$resid2)
       analysis$semSRMR<-c(sem0$stats$model_srmr,sem1$stats$model_srmr,sem2$stats$model_srmr,
                            sem3$stats$model_srmr,sem4$stats$model_srmr,sem5$stats$model_srmr,sem6$stats$model_srmr)
       analysis$semRMSEA<-c(sem0$stats$rmsea,sem1$stats$rmsea,sem2$stats$rmsea,
@@ -731,16 +731,16 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
       pathmodel$path$stages<-list(IV$name,DV$name)
       sem1<-fit_sem_model(pathmodel,model_data)
       
-      modelSEMs<-c(sem0$eval[[evidence$useAIC]],
-                   sem1$eval[[evidence$useAIC]],
+      modelSEMs<-c(sem0$result[[evidence$useAIC]],
+                   sem1$result[[evidence$useAIC]],
                    NA,NA,NA,NA,NA
                    )
-      analysis$semP<-c(sem0$eval$P,sem1$eval$P,rep(NA,5))
-      analysis$semQ<-c(sem0$eval$Q,sem1$eval$Q,rep(NA,5))
+      analysis$semP<-c(sem0$result$P,sem1$result$P,rep(NA,5))
+      analysis$semQ<-c(sem0$result$Q,sem1$result$Q,rep(NA,5))
       analysis$semRs<-t(rbind(c(NA,NA,NA),c(sem1$ES_table[1,2],NA,NA)))
-      analysis$semK<-c(sem0$eval$k,sem1$eval$k,rep(NA,5))
-      analysis$semLLR<-c(sem0$eval$llr,sem1$eval$llr,rep(NA,5))
-      analysis$semRESID2<-c(sem0$eval$resid2,sem1$eval$resid2,rep(NA,5))
+      analysis$semK<-c(sem0$result$k,sem1$result$k,rep(NA,5))
+      analysis$semLLR<-c(sem0$result$llr,sem1$result$llr,rep(NA,5))
+      analysis$semRESID2<-c(sem0$result$resid2,sem1$result$resid2,rep(NA,5))
       analysis$semSRMR<-c(sem0$stats$model_srmr,sem1$stats$model_srmr,rep(NA,5))
       analysis$semRMSEA<-c(sem0$stats$rmsea,sem1$stats$rmsea,rep(NA,5))
       analysis$semCHI2<-c(sem0$stats$model_chisqr,sem1$stats$model_chisqr,rep(NA,5))

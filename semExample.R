@@ -27,18 +27,18 @@ model_data<-list(pid=1:100,
 
 pathmodel$path$stages<-stages1
 sem<-fit_sem_model(pathmodel,model_data)
-res[i,1]<-sem$eval$AIC
-res[i,2]<-sem$eval$AICnull
+res[i,1]<-sem$result$aic
+res[i,2]<-sem$result$aicNull
 
 pathmodel$path$stages<-stages2
 sem<-fit_sem_model(pathmodel,model_data)
-res[i,3]<-sem$eval$AIC
-res[i,4]<-sem$eval$AICnull
+res[i,3]<-sem$result$aic
+res[i,4]<-sem$result$aicNull
 
 pathmodel$path$stages<-stages3
 sem<-fit_sem_model(pathmodel,model_data)
-res[i,5]<-sem$eval$AIC
-res[i,6]<-sem$eval$AICnull
+res[i,5]<-sem$result$aic
+res[i,6]<-sem$result$aicNull
 }
 
 print(colMeans(res))

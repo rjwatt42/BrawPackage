@@ -637,7 +637,7 @@ sem_results<-function(pathmodel,sem) {
                  model_rmsea_p=model_rmsea_p,
                  model_srmr=model_srmr
   )
-  sem$eval<-list(Rsquared=Rsquared,
+  sem$result<-list(Rsquared=Rsquared,
                  k=k,
                  n_data=n_data,
                  n_obs=n_obs,

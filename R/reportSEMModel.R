@@ -84,17 +84,17 @@ reportSEMModel<-function(sem,showType) {
 
   tableOutput<-braw.env$tableSEM
   newRow<-list(Model=makeModelFormula(sem),
-               AIC=sem$eval$AIC,
-               AICc=sem$eval$AICc,
-               BIC=sem$eval$BIC,
-               AICnull=sem$eval$AICnull,
-               Rsqr=sem$eval$Rsquared,
-               r=sqrt(sem$eval$Rsquared),
-               resid2=sem$eval$resid2,
-               llr=sem$eval$llr,
-               k=sem$eval$k,
-               n=sem$eval$n_obs,
-               obs=sem$eval$n_data/sem$eval$n_obs
+               AIC=sem$result$aic,
+               AICc=sem$result$aicc,
+               BIC=sem$result$BIC,
+               AICnull=sem$result$aicNull,
+               Rsqr=sem$result$Rsquared,
+               r=sqrt(sem$result$Rsquared),
+               resid2=sem$result$resid2,
+               llr=sem$result$llr,
+               k=sem$result$k,
+               n=sem$result$n_obs,
+               obs=sem$result$n_data/sem$result$n_obs
   )
   if (is.null(tableOutput) || (!identical(newRow,tableOutput[1,]))) {
     tableOutput<-rbind(newRow,tableOutput)
