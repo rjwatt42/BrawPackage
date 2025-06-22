@@ -1,3 +1,35 @@
+makeModelFormula<-function(sem) {
+  # paste(DV$name,"=",paste(IVs$name,collapse="+")),
+  stagesString<-""
+  
+  for (stage in sem$stages) {
+    if (nchar(stagesString)>0) stagesString<-paste0(stagesString,"~")
+    stagesString<-paste0(stagesString,paste0("{",paste(sapply(stage,truncateName,unlist(sem$stages)),collapse=","),"}"))
+  }
+  if (!is.null(sem$depth)) {
+    stagesString<-paste0(stagesString,"@",sem$depth)
+    
+    addString<-""
+    nAdd<-length(sem$add)
+    if (nAdd>0) {
+      addString<-" + "
+      for (add in sem$add) {
+        addString<-paste0(addString,"(",paste(sapply(add,substr,1,3),collapse=":"),")")
+      }
+    }
+    
+    removeString<-""
+    nRemove<-length(sem$remove)
+    if (nRemove>0){
+      removeString<-" - "
+      for (remove in sem$remove){
+        removeString<-paste0(removeString,"(",paste(sapply(remove,substr,1,3),collapse=":"),")")
+      }
+    }
+    stagesString<-paste0(stagesString,addString,removeString)
+  }
+  return(stagesString)
+}
 
 truncateName<-function(name,names) {
   n=3
@@ -48,35 +80,8 @@ reportSEMModel<-function(sem,showType) {
   
   outputText<-c(outputText,rep("",nc))
 
-  stagesString<-""
-  for (stage in sem$stages) {
-    if (nchar(stagesString)>0) stagesString<-paste0(stagesString,"~")
-    stagesString<-paste0(stagesString,paste0("{",paste(sapply(stage,truncateName,unlist(sem$stages)),collapse=","),"}"))
-  }
-  stagesString<-paste0(stagesString,"@",sem$depth)
-  
-  addString<-""
-  nAdd<-length(sem$add)
-  if (nAdd>0) {
-    addString<-" + "
-    for (add in sem$add) {
-      addString<-paste0(addString,"(",paste(sapply(add,substr,1,3),collapse=":"),")")
-    }
-  }
-  
-  removeString<-""
-  nRemove<-length(sem$remove)
-  if (nRemove>0){
-    removeString<-" - "
-    for (remove in sem$remove){
-      removeString<-paste0(removeString,"(",paste(sapply(remove,substr,1,3),collapse=":"),")")
-    }
-  }
-  st<-paste0(stagesString,addString,removeString)
-  
-  
   tableOutput<-braw.env$tableSEM
-  newRow<-list(Model=st,
+  newRow<-list(Model=makeModelFormula(stages),
                AIC=sem$eval$AIC,
                AICc=sem$eval$AICc,
                BIC=sem$eval$BIC,

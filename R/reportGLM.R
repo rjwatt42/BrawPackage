@@ -49,15 +49,11 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
                   "!HModel","AIC","AICnull","R^2","r","llr","k","n","obs",
                   rep("",nc-9)
     )
-    stagesString<-""
-    for (stage in list(list(IVs$name),DV$name)) {
-      if (nchar(stagesString)>0) stagesString<-paste0(stagesString,"~")
-      stagesString<-paste0(stagesString,paste0("{",paste(sapply(stage,truncateName),collapse=","),"}"))
-    }
     
+    model<-makeModelFormula(list(stages=list(list(IVs$name),DV$name)))
+
     outputText<-c(outputText,
-                  stagesString,
-                  # paste(DV$name,"=",paste(IVs$name,collapse="+")),
+                  model,
                   brawFormat(result$aic,digits=1),
                   brawFormat(result$aicNull,digits=1),
                   brawFormat(result$r.full^2,digits=3),

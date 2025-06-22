@@ -112,7 +112,6 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,1
   LGplotTheme<-ggplot2::theme(plot.title=ggplot2::element_text(size=21,face="bold"),axis.title=ggplot2::element_text(size=24,face="bold"),
                      axis.text.x=ggplot2::element_text(size=18),axis.text.y=ggplot2::element_text(size=18))
   
-  
   alphaSig<-0.05
   
   #################################
@@ -393,6 +392,29 @@ braw.def<<-braw.def
 braw.env<<-braw.env          
 braw.res<<-braw.res
 
+}
+
+
+#' @export
+setBrawOpts<-function(BW=NULL,graphC=NULL,fontScale=NULL,
+                      graphicsType=NULL,fullGraphSize=NULL,
+                      reportHTML=NULL, reducedOutput=NULL, 
+                      autoShow=NULL,autoPrint=NULL
+) {
+  
+  if(!is.null(BW)) setBrawEnv("BW",BW)
+  if(!is.null(graphC)) setBrawEnv("graphC",graphC)
+  if(!is.null(fontScale)) {
+    setBrawEnv("labelSize",height/100*fontScale)
+    setBrawEnv("dotSize",braw.env$labelSize*1.25)
+  }
+  if(!is.null(graphicsType)) setBrawEnv("graphicsType",graphicsType)
+  if(!is.null(reportHTML)) setBrawEnv("reportHTML",reportHTML)
+  if(!is.null(reducedOutput)) setBrawEnv("reducedOutput",reducedOutput)
+  if(!is.null(autoShow)) setBrawEnv("autoShow",autoShow)
+  if(!is.null(autoPrint)) setBrawEnv("autoPrint",autoPrint)
+  if(!is.null(fullGraphSize)) setBrawEnv("fullGraphSize",fullGraphSize)
+  
 }
 
 #' @export
