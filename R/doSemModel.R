@@ -643,7 +643,7 @@ sem_results<-function(pathmodel,sem) {
                  n_obs=n_obs,
                  llr=llr,
                  resid2=Resid2,
-                 AIC=AIC,
+                 aic=AIC,
                  k1=k1,
                  AIC1=AIC1,
                  AICc=AICc,
