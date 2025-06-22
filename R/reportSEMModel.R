@@ -68,7 +68,7 @@ reportSEMModel<-function(sem,showType) {
   nc<-ncol(showData)+1
   if (nc<11) nc<-11
   
-  outputText<-c(paste0("\b!T",title),rep("",nc-1))
+  outputText<-c(paste0("!T",title),rep("",nc-1))
   outputText<-c(outputText,"!H!C ",colnames(showData),rep("",nc-1-ncol(showData)))
   for (i in 1:nrow(showData)) {
     if (any(!is.na(showData[i,]))) {
@@ -113,6 +113,36 @@ reportSEMModel<-function(sem,showType) {
     tableText<-c(tableText,rep("",nc-nc1))
   outputText<-c(outputText,tableText)
   outputText<-c(outputText,rep("",nc))
+  
+  
+  tableOutput<-braw.res$historySEM
+  newRow<-list(model=makeModelFormula(sem),AIC=sem$result$aic,Rsqr=sem$result$r.full^2,r=sem$result$r.full)
+  if (is.null(tableOutput)) tableOutput<-rbind(newRow)
+  else                      tableOutput<-rbind(newRow,tableOutput)
+  setBrawRes("historySEM",tableOutput)
+  
+  ne<-nrow(tableOutput)
+  if (ne>15) {
+    use1<-which.min(tableOutput[15:ne,1])
+    use<-c(1:14,use1)
+  } else {
+    use<-1:ne
+  }
+  
+  outputText<-c(outputText,"!THistory",rep("",nc-1))
+  outputText<-c(outputText,"model","AIC","R^2","r",rep("",nc-4))
+  
+  for (i in 1:length(use)) {
+    f2<-f3<-""
+    if (use[i]==which.min(tableOutput[,2])) f2<-"\r"
+    if (use[i]==which.max(tableOutput[,3])) f3<-"\r"
+    row<-c(tableOutput[[use[i],1]],
+           paste0(f2,brawFormat(tableOutput[[use[i],2]],1)),
+           paste0(f3,brawFormat(tableOutput[[use[i],3]],3)),
+           brawFormat(tableOutput[[use[i],4]],3)
+           )
+    outputText<-c(outputText,row,rep("",nc-4))
+  }
   
   nr<-length(outputText)/nc
   reportPlot(outputText,nc,nr)
