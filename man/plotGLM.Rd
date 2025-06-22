@@ -4,7 +4,7 @@
 \alias{plotGLM}
 \title{plot a fitted GLM model}
 \usage{
-plotGLM(DV, IVs, result, whichR)
+plotGLM(DV, IVs, result, whichR = "Unique")
 }
 \value{
 sample object
