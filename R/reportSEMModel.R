@@ -143,6 +143,7 @@ reportSEMModel<-function(sem,showType) {
            )
     outputText<-c(outputText,row,rep("",nc-4))
   }
+  outputText<-c(outputText,rep("",nc))
   
   nr<-length(outputText)/nc
   reportPlot(outputText,nc,nr)
