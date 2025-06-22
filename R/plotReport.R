@@ -57,7 +57,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
           headerRowUsed<-TRUE
           # bgcolor<-paste0(" bgcolor=",rowColour)
           
-          # rowStyle<-paste0(rowStyle,"font-weight:bold;")
+          rowStyle<-paste0(rowStyle,"font-weight:bold;")
           rowStyle<-paste0(rowStyle,"text-align:center;")
           if (!doubleHeaderTop)
           rowStyle<-paste0(rowStyle,"border-bottom:solid;border-bottom-color:",lineColour,";border-bottom-width:1px;")
@@ -70,6 +70,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
         
         if (any(grepl("!C",outputText[index+(1:nc)]))) {
           col1Use<-which(grepl("!C",outputText[index+(1:nc)]))
+          col1Style<-paste0(col1Style,"font-weight:bold;")
           col1Style<-paste0(col1Style,"min-width:",indentSize,";")
           col1Style<-paste0(col1Style,"text-align:right;padding-right:5px;")
           outputText[index+(1:nc)]<-sub("!C","",outputText[index+(1:nc)])
