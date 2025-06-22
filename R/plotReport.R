@@ -83,7 +83,9 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
           rowStyle<-paste0(rowStyle,"font-weight:bold;")
           blankStyle<-"padding-top:1px;"
           outputText[index+(1:nc)]<-sub("!T","",outputText[index+(1:nc)])
-        }
+          titleRow<-TRUE
+        } else titleRow<-FALSE
+        
         if (any(grepl("!B",outputText[index+(1:nc)]))) {
           rowStyle<-paste0(rowStyle,"font-weight:bold;")
           outputText[index+(1:nc)]<-sub("!B","",outputText[index+(1:nc)])
@@ -167,7 +169,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
         }
         outputFront<-paste0(outputFront,"</tr>")
         if (index+nc<=length(outputText))
-        if (all(sapply(outputText[index+(1:nc)],nchar)==0) || any(grepl("!T",outputText[index+(1:nc)]))) {
+        if (all(sapply(outputText[index+(1:nc)],nchar)==0) || titleRow) {
           outputFront<-paste0(outputFront,'</table></div><div style=padding:0px;',placing,blankStyle,'>',tableStart)
           colStyle<-""
           colUse<-0
