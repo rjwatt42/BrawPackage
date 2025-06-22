@@ -100,7 +100,7 @@ reportSEMModel<-function(sem,showType) {
   columns<-c("Model","AIC","AICnull","Rsqr","r","llr","k","n","obs")
   nc1<-length(columns)
   tableText<-c("!TStatistics",rep("",nc-1),columns,rep("",nc-nc1))
-  tableText[nc+1]<-paste0("!H",tableText[nc+1])
+  tableText[nc+1]<-paste0("!H!C!l",tableText[nc+1])
   tableText[which(tableText=="Rsqr")]<-"R^2"
   digitsE<-c(0,1,1,1,1,3,3,3,1,0,0,0)
   prefix<-"!r"
@@ -131,12 +131,12 @@ reportSEMModel<-function(sem,showType) {
   }
   
   outputText<-c(outputText,"!THistory",rep("",nc-1))
-  outputText<-c(outputText,"!H!Cmodel","AIC","R^2","r",rep("",nc-4))
+  outputText<-c(outputText,"!H!C!lModel","AIC","R^2","r",rep("",nc-4))
   
   for (i in 1:length(use)) {
     f2<-f3<-""
-    if (use[i]==which.min(tableOutput[,2])) f2<-"\r"
-    if (use[i]==which.max(tableOutput[,3])) f3<-"\r"
+    if (use[i]==which.min(tableOutput[,2])) f2<-"!r"
+    if (use[i]==which.max(tableOutput[,3])) f3<-"!r"
     row<-c(tableOutput[[use[i],1]],
            paste0(f2,brawFormat(tableOutput[[use[i],2]],1)),
            paste0(f3,brawFormat(tableOutput[[use[i],3]],3)),
