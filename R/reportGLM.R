@@ -45,6 +45,7 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
     outputText<-c(outputText,rep("",nc))
     
     outputText<-c(outputText,
+                  "!TStatistics",rep("",nc-1),
                   "!HModel","AIC","AICnull","R^2","r","llr","k","n","obs",
                   rep("",nc-9)
     )
