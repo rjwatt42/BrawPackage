@@ -167,7 +167,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
         }
         outputFront<-paste0(outputFront,"</tr>")
         if (index+nc<=length(outputText))
-        if (all(sapply(outputText[index+(1:nc)],nchar)==0)) {
+        if (all(sapply(outputText[index+(1:nc)],nchar)==0) || any(grepl("!T",outputText[index+(1:nc)]))) {
           outputFront<-paste0(outputFront,'</table></div><div style=padding:0px;',placing,blankStyle,'>',tableStart)
           colStyle<-""
           colUse<-0
