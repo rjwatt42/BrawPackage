@@ -82,8 +82,8 @@ reportSEMModel<-function(sem,showType) {
   
   outputText<-c(outputText,rep("",nc))
 
-  tableOutput<-braw.env$tableSEM
-  newRow<-list(Model=makeModelFormula(sem),
+  # tableOutput<-braw.env$tableSEM
+  tableOutput<-list(Model=makeModelFormula(sem),
                AIC=sem$result$aic,
                AICc=sem$result$aicc,
                BIC=sem$result$BIC,
@@ -96,18 +96,18 @@ reportSEMModel<-function(sem,showType) {
                n=sem$result$n_obs,
                obs=sem$result$n_data/sem$result$n_obs
   )
-  if (is.null(tableOutput) || (!identical(newRow,tableOutput[1,]))) {
-    tableOutput<-rbind(newRow,tableOutput)
-    setBrawEnv("tableSEM",tableOutput)
-  }
+  # if (is.null(tableOutput) || (!identical(newRow,tableOutput[1,]))) {
+  #   tableOutput<-rbind(newRow,tableOutput)
+  #   setBrawEnv("tableSEM",tableOutput)
+  # }
 
-  ne<-nrow(tableOutput)
-  if (ne>15) {
-    use1<-which.min(tableOutput[15:ne,1])
-    use<-c(1:14,use1[1])
-  } else {
-    use<-1:ne
-  }
+  # ne<-nrow(tableOutput)
+  # if (ne>15) {
+  #   use1<-which.min(tableOutput[15:ne,1])
+  #   use<-c(1:14,use1[1])
+  # } else {
+  #   use<-1:ne
+  # }
 
   columns<-c("Model","AIC","AICnull","Rsqr","r","llr","k","n","obs")
   nc1<-length(columns)
