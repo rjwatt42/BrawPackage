@@ -83,7 +83,7 @@ reportSEMModel<-function(sem,showType) {
   outputText<-c(outputText,rep("",nc))
 
   tableOutput<-braw.env$tableSEM
-  newRow<-list(Model=makeModelFormula(stages),
+  newRow<-list(Model=makeModelFormula(sem),
                AIC=sem$eval$AIC,
                AICc=sem$eval$AICc,
                BIC=sem$eval$BIC,
