@@ -25,12 +25,12 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
   k<-nIVs+2 # no coefficients
 
   switch(p_or_r,
-         "r"={title<-paste0("\beffect sizes"," (","DV = ",DV$name,")")},
-         "p"={title<-paste0("\bp-values"," (","DV = ",DV$name,")")}
+         "r"={title<-paste0("effect sizes"," (","DV = ",DV$name,")")},
+         "p"={title<-paste0("p-values"," (","DV = ",DV$name,")")}
          )
-  outputText<-c(paste0("\b!T",title),rep("",nc-1))
+  outputText<-c(paste0("!T",title),rep("",nc-1))
 
-  outputText<-c(outputText,"!H!C","\bDirect","\bUnique","\bTotal",rep("",nc-4))
+  outputText<-c(outputText,"!H!C ","Direct","Unique","Total",rep("",nc-4))
   for (i in 1:nIVs) {
     outputText<-c(outputText,
                   paste0(" ",IVs$name[i],"    "),
@@ -46,7 +46,7 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
     
     outputText<-c(outputText,
                   "!TStatistics",rep("",nc-1),
-                  "!HModel","AIC","AICnull","R^2","r","llr","k","n","obs",
+                  "!H!lModel","AIC","AICnull","R^2","r","llr","k","n","obs",
                   rep("",nc-9)
     )
     
@@ -66,6 +66,37 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
     )
   }
 
+  tableOutput<-braw.res$historyLM
+  newRow<-list(model=makeModelFormula(sem),AIC=result$aic,Rsqr=result$r.full^2,r=result$r.full)
+  if (is.null(tableOutput)) tableOutput<-rbind(newRow)
+  else           
+    if (!identical(newRow,tableOutput[1,])) tableOutput<-rbind(newRow,tableOutput)
+  setBrawRes("historyLM",tableOutput)
+  
+  ne<-nrow(tableOutput)
+  if (ne>15) {
+    use1<-which.min(tableOutput[15:ne,1])
+    use<-c(1:14,use1)
+  } else {
+    use<-1:ne
+  }
+  
+  outputText<-c(outputText,"!THistory",rep("",nc-1))
+  outputText<-c(outputText,"!H!lModel","AIC","R^2","r",rep("",nc-4))
+  
+  for (i in 1:length(use)) {
+    f2<-f3<-""
+    if (use[i]==which.min(tableOutput[,2])) f2<-"!r"
+    if (use[i]==which.max(tableOutput[,3])) f3<-"!r"
+    row<-c(paste0("!l",tableOutput[[use[i],1]]),
+           paste0(f2,brawFormat(tableOutput[[use[i],2]],1)),
+           paste0(f3,brawFormat(tableOutput[[use[i],3]],3)),
+           brawFormat(tableOutput[[use[i],4]],3)
+    )
+    outputText<-c(outputText,row,rep("",nc-4))
+  }
+  outputText<-c(outputText,rep("",nc))
+  
   
   reportPlot(outputText,nc,length(outputText)/nc)        
 }
