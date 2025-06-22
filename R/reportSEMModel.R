@@ -1,3 +1,5 @@
+
+#' @export
 makeModelFormula<-function(sem) {
   # paste(DV$name,"=",paste(IVs$name,collapse="+")),
   stagesString<-""
