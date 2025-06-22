@@ -186,6 +186,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
           colStyle<-""
           colUse<-0
           blankStyle<-blankLineStyle
+          headerCol<-FALSE
         }
       }
         outputBack<-paste0("</table></div>",outputBack)
