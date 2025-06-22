@@ -68,8 +68,7 @@ reportSEMModel<-function(sem,showType) {
   nc<-ncol(showData)+1
   if (nc<11) nc<-11
   
-  outputText<-c(paste0("\b",title),rep("",nc-1))
-  outputText<-c(outputText,rep("",nc))
+  outputText<-c(paste0("\b!T",title),rep("",nc-1))
   outputText<-c(outputText,"!H!C ",colnames(showData),rep("",nc-1-ncol(showData)))
   for (i in 1:nrow(showData)) {
     if (any(!is.na(showData[i,]))) {

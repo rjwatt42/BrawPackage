@@ -28,9 +28,8 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
          "r"={title<-paste0("\beffect sizes"," (","DV = ",DV$name,")")},
          "p"={title<-paste0("\bp-values"," (","DV = ",DV$name,")")}
          )
-  outputText<-c(paste0("\b",title),rep("",nc-1))
-  outputText<-c(outputText,rep("",nc))
-  
+  outputText<-c(paste0("\b!T",title),rep("",nc-1))
+
   outputText<-c(outputText,"!H!C","\bDirect","\bUnique","\bTotal",rep("",nc-4))
   for (i in 1:nIVs) {
     outputText<-c(outputText,
