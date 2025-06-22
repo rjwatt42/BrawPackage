@@ -81,6 +81,7 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
     use<-1:ne
   }
   
+  outputText<-c(outputText,rep("",nc))
   outputText<-c(outputText,"!THistory",rep("",nc-1))
   outputText<-c(outputText,"!H!lModel","AIC","R^2","r",rep("",nc-4))
   
