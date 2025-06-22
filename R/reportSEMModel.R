@@ -82,7 +82,6 @@ reportSEMModel<-function(sem,showType) {
   
   outputText<-c(outputText,rep("",nc))
 
-  # tableOutput<-braw.env$tableSEM
   tableOutput<-list(Model=makeModelFormula(sem),
                AIC=sem$result$aic,
                AICc=sem$result$aicc,
@@ -96,18 +95,6 @@ reportSEMModel<-function(sem,showType) {
                n=sem$result$n_obs,
                obs=sem$result$n_data/sem$result$n_obs
   )
-  # if (is.null(tableOutput) || (!identical(newRow,tableOutput[1,]))) {
-  #   tableOutput<-rbind(newRow,tableOutput)
-  #   setBrawEnv("tableSEM",tableOutput)
-  # }
-
-  # ne<-nrow(tableOutput)
-  # if (ne>15) {
-  #   use1<-which.min(tableOutput[15:ne,1])
-  #   use<-c(1:14,use1[1])
-  # } else {
-  #   use<-1:ne
-  # }
 
   columns<-c("Model","AIC","AICnull","Rsqr","r","llr","k","n","obs")
   nc1<-length(columns)
@@ -117,29 +104,14 @@ reportSEMModel<-function(sem,showType) {
   digitsE<-c(0,1,1,1,1,3,3,3,1,0,0,0)
   prefix<-"!r"
     for (column in columns) {
-      if (column=="llr[+]") {
-        val<-log(exp(-0.5*(unlist(tableOutput[1,2])-unlist(tableOutput[1,5]))))
-        val<-brawFormat(val,digits=3)
-      } else {
-        j<-which(column==colnames(tableOutput))
-        val<-unlist(tableOutput[1,j])
+        j<-which(column==names(tableOutput))
+        val<-unlist(tableOutput[j])
         if (is.numeric(val)) val<-brawFormat(val,digits=digitsE[j])
-        # if (is.element(column,c("AIC","AICc","BIC")) && i==which.min(tableOutput[,j])) val<-paste0(prefix,val)
-        # if (is.element(column,c("Rsqr")) && i==which.max(tableOutput[,j])) val<-paste0(prefix,val)
-      }
       tableText<-c(tableText,val)
     }
     tableText<-c(tableText,rep("",nc-nc1))
   outputText<-c(outputText,tableText)
   outputText<-c(outputText,rep("",nc))
-  
-  if (nrow(tableOutput)>1) {
-  p1<-exp(-0.5*(unlist(tableOutput[1,2])-unlist(tableOutput[2,2])))
-  outputText<-c(outputText,paste0('!lcurrent model is ',brawFormat(p1,2),' times as probable as previous'),rep("",nc-1))
-  p2<-exp(-0.5*(unlist(tableOutput[1,2])-min(unlist(tableOutput[,2]))))
-  if (p2==1) outputText<-c(outputText,paste0('!lcurrent model is the best'),rep("",nc-1))
-    else     outputText<-c(outputText,paste0('!lcurrent model is ',brawFormat(p2,2),' times as probable as best'),rep("",nc-1))
-  }
   
   nr<-length(outputText)/nc
   reportPlot(outputText,nc,nr)
