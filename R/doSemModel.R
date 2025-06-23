@@ -568,12 +568,10 @@ sem_results<-function(pathmodel,sem) {
   
   # chi2 exact fit
   model_chisqr=(n_obs-1)*sem$Fmin
-  # number of effects estimated + number of predictor variables
-  tt<-2*(sum(sem$Lresult[!is.na(sem$Lresult)]!=0)
-      +sum(sem$Bresult[!is.na(sem$Bresult)]!=0)
-  )
-  # plus number of equations (error term and intercept for each)
-  tt<-tt+2*P
+  # number of effects estimated + error terms (=no endogenous P)
+  tt<-sum(!is.na(CF_table)) + P
+  # plus variances & covariances of exogenous (error term for each)
+  tt<-tt + Q*(Q+1)/2
   model_chi_df=(P+Q)*(P+Q+1)/2-tt
   model_chi_p=1-pchisq(abs(model_chisqr), model_chi_df);
   # non-central chi2
