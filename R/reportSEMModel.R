@@ -119,7 +119,6 @@ reportSEMModel<-function(sem,showType="CF",evalType="AIC",showFit=FALSE) {
   if (showFit) {
     outputText<-c(outputText,"!TFit",rep("",nc-1))
     outputText<-c(outputText,"!HStatistic","value","df","p",rep("",nc-4))
-    outputText<-c(outputText,"!H ","Chi^2","df","RMSEA","SRMR",rep("",nc-4))
     outputText<-c(outputText,"Chi^2",
                   brawFormat(sem$stats$model_chisqr,3),
                   brawFormat(sem$stats$model_chi_df,0),
