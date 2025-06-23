@@ -590,7 +590,7 @@ sem_results<-function(pathmodel,sem) {
   scm<-scm/sqrt(a*b)
   dc<-scm-scd
   # dc=ds/(a*b);
-  model_srmr=sqrt(mean(dc^2));
+  model_srmr=sqrt(sum(dc^2)/(nrow(scm)*(nrow(scm)-1)/2));
   #
   # 
   B=sem$Bresult; B[is.na(B)]=0;
