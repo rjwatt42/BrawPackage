@@ -159,7 +159,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
           "metaS"={
             d1<-analysis$best$S
           },
-          "llknull"=d1<-(-0.5*(analysis$aic-analysis$aicNull)),
+          "llknull"=d1<-(-0.5*(analysis$AIC-analysis$AICnull)),
           "sLLR"=d1<-res2llr(analysis,"sLLR"),
           "log(lrs)"=d1<-res2llr(analysis,"sLLR"),
           "log(lrd)"=d1<-res2llr(analysis,"dLLR"),
@@ -223,7 +223,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
           "metaS"={
             d2<-analysis$best$S
           },
-          "llknull"=d2<-(-0.5*(analysis$aic-analysis$aicNull)),
+          "llknull"=d2<-(-0.5*(analysis$AIC-analysis$AICnull)),
           "sLLR"=d2<-res2llr(analysis,"sLLR"),
           "log(lrs)"=d2<-res2llr(analysis,"sLLR"),
           "log(lrd)"=d2<-res2llr(analysis,"dLLR"),

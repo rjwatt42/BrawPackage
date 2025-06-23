@@ -50,7 +50,7 @@ truncateName<-function(name,names) {
 #' @examples
 #' reportSEMModel<-function(sem,showType)
 #' @export
-reportSEMModel<-function(sem,showType) {
+reportSEMModel<-function(sem,showType="CF",evalType="AIC",showFit=FALSE) {
   digits<-3
   
   switch(showType,
@@ -84,10 +84,11 @@ reportSEMModel<-function(sem,showType) {
   outputText<-c(outputText,rep("",nc))
 
   tableOutput<-list(Model=makeModelFormula(sem),
-               AIC=sem$result$aic,
-               AICc=sem$result$aicc,
+               AIC=sem$result$AIC,
+               AICc=sem$result$AICc,
                BIC=sem$result$BIC,
-               AICnull=sem$result$aicNull,
+               AICnull=sem$result$AICnull,
+               BICnull=sem$result$BICnull,
                Rsqr=sem$result$Rsquared,
                r=sqrt(sem$result$Rsquared),
                resid2=sem$result$resid2,
@@ -96,13 +97,13 @@ reportSEMModel<-function(sem,showType) {
                n=sem$result$n_obs,
                obs=sem$result$n_data/sem$result$n_obs
   )
-
-  columns<-c("Model","AIC","AICnull","Rsqr","r","llr","k","n","obs")
+  digitsE<-c(0,1,1,1,1,1,3,3,3,1,0,0,0)
+  
+  columns<-c("Model",evalType,paste0(evalType,"null"),"Rsqr","r","llr","k","n","obs")
   nc1<-length(columns)
   tableText<-c("!TStatistics",rep("",nc-1),columns,rep("",nc-nc1))
   tableText[nc+1]<-paste0("!H!l",tableText[nc+1])
   tableText[which(tableText=="Rsqr")]<-"R^2"
-  digitsE<-c(0,1,1,1,1,3,3,3,1,0,0,0)
   prefix<-"!r"
     for (column in columns) {
         j<-which(column==names(tableOutput))
@@ -115,9 +116,20 @@ reportSEMModel<-function(sem,showType) {
   outputText<-c(outputText,tableText)
   outputText<-c(outputText,rep("",nc))
   
+  if (showFit) {
+    outputText<-c(outputText,"!TFit",rep("",nc-1))
+    outputText<-c(outputText,"!H ","Chi^2","RMSEA","SRMR",rep("",nc-4))
+    outputText<-c(outputText," ",
+                  brawFormat(sem$stats$model_chisqr,3),
+                  brawFormat(sem$stats$model_rmsea,3),
+                  brawFormat(sem$stats$model_srmr,3),
+                  rep("",nc-4))
+    
+    outputText<-c(outputText,rep("",nc))
+  }
   
   tableOutput<-braw.res$historySEM
-  newRow<-list(model=makeModelFormula(sem),AIC=sem$result$aic,Rsqr=sem$result$r.full^2,r=sem$result$r.full)
+  newRow<-list(model=makeModelFormula(sem),AIC=sem$result$AIC,BIC=sem$result$BIC,Rsqr=sem$result$r.full^2,r=sem$result$r.full)
   if (is.null(tableOutput)) tableOutput<-rbind(newRow)
   else           
     if (!identical(newRow,tableOutput[1,])) tableOutput<-rbind(newRow,tableOutput)
@@ -132,16 +144,17 @@ reportSEMModel<-function(sem,showType) {
   }
   
   outputText<-c(outputText,"!THistory",rep("",nc-1))
-  outputText<-c(outputText,"!H!lModel","AIC","R^2","r",rep("",nc-4))
+  outputText<-c(outputText,"!H!lModel",evalType,"R^2","r",rep("",nc-4))
   
+  if (evalType=="BIC") io<-3 else io<-2
   for (i in 1:length(use)) {
     f2<-f3<-""
-    if (use[i]==which.min(tableOutput[,2])) f2<-"!r"
-    if (use[i]==which.max(tableOutput[,3])) f3<-"!r"
+    if (use[i]==which.min(tableOutput[,io])) f2<-"!r"
+    if (use[i]==which.max(tableOutput[,4])) f3<-"!r"
     row<-c(paste0("!l",tableOutput[[use[i],1]]),
-           paste0(f2,brawFormat(tableOutput[[use[i],2]],1)),
-           paste0(f3,brawFormat(tableOutput[[use[i],3]],3)),
-           brawFormat(tableOutput[[use[i],4]],3)
+           paste0(f2,brawFormat(tableOutput[[use[i],io]],1)),
+           paste0(f3,brawFormat(tableOutput[[use[i],4]],3)),
+           brawFormat(tableOutput[[use[i],5]],3)
            )
     outputText<-c(outputText,row,rep("",nc-4))
   }

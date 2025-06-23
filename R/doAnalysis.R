@@ -356,8 +356,8 @@ multipleAnalysis<-function(nsims=1,hypothesis,design,evidence,newResult=c()){
       newResult$noval[j]<-res$noval
       newResult$df1[j]<-res$df1
       newResult$llk[j]<-res$llk
-      newResult$aic[j]<-res$aic
-      newResult$aicNull[j]<-res$aicNull
+      newResult$AIC[j]<-res$AIC
+      newResult$AICnull[j]<-res$AICnull
       if (!is.null(hypothesis$IV2)) {
         newResult$rIV2[j]<-res$rIV2
         newResult$pIV2[j]<-res$pIV2
@@ -537,7 +537,7 @@ generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",ca
     r.total<-matrix(model2totaleffect(lmNormC),nrow=1)
   }
   r.full<-model2fulleffect(lmNormC,anNormC)
-  aic<-AIC(lmNormC)
+  AIC<-AIC(lmNormC)
   llk<-logLik(lmNormC)
 
   k<-no_ivs+2
@@ -546,7 +546,7 @@ generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",ca
   use<-colSums(apply(analysisRawData,1,function(x)!is.na(x)))==ncol(analysisRawData)
   residsNull<-analysisRawData$dv[use]
   residLLK<-sum(log(dnorm(residsNull,mean(residsNull),sd(residsNull))))
-  aicNull<-2*2-2*residLLK
+  AICnull<-2*2-2*residLLK
 
   # if (length(r.direct)<3) {
   #   r.direct<-c(r.direct,0)
@@ -565,8 +565,8 @@ generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",ca
               r.full=r.full,
               nval=n,
               llk=llk,
-              aic=aic,
-              aicNull=aicNull,
+              AIC=AIC,
+              AICnull=AICnull,
               
               p.direct=p.direct,
               p.unique=p.unique,
@@ -718,8 +718,8 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
       analysis$semRESID2<-c(sem0$result$resid2,sem1$result$resid2,sem2$result$resid2,sem3$result$resid2,sem4$result$resid2,sem5$result$resid2,sem6$result$resid2)
       analysis$semSRMR<-c(sem0$stats$model_srmr,sem1$stats$model_srmr,sem2$stats$model_srmr,
                            sem3$stats$model_srmr,sem4$stats$model_srmr,sem5$stats$model_srmr,sem6$stats$model_srmr)
-      analysis$semRMSEA<-c(sem0$stats$rmsea,sem1$stats$rmsea,sem2$stats$rmsea,
-                           sem3$stats$rmsea,sem4$stats$rmsea,sem5$stats$rmsea,sem6$stats$rmsea)
+      analysis$semRMSEA<-c(sem0$stats$model_rmsea,sem1$stats$model_rmsea,sem2$stats$model_rmsea,
+                           sem3$stats$model_rmsea,sem4$stats$model_rmsea,sem5$stats$model_rmsea,sem6$stats$model_rmsea)
       analysis$semCHI2<-c(sem0$stats$model_chisqr,sem1$stats$model_chisqr,sem2$stats$model_chisqr,
                           sem3$stats$model_chisqr,sem4$stats$model_chisqr,sem5$stats$model_chisqr,sem6$stats$model_chisqr)
       analysis$semDF<-c(sem0$stats$model_chi_df,sem1$stats$model_chi_df,sem2$stats$model_chi_df,
@@ -742,7 +742,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
       analysis$semLLR<-c(sem0$result$llr,sem1$result$llr,rep(NA,5))
       analysis$semRESID2<-c(sem0$result$resid2,sem1$result$resid2,rep(NA,5))
       analysis$semSRMR<-c(sem0$stats$model_srmr,sem1$stats$model_srmr,rep(NA,5))
-      analysis$semRMSEA<-c(sem0$stats$rmsea,sem1$stats$rmsea,rep(NA,5))
+      analysis$semRMSEA<-c(sem0$stats$model_rmsea,sem1$stats$model_rmsea,rep(NA,5))
       analysis$semCHI2<-c(sem0$stats$model_chisqr,sem1$stats$model_chisqr,rep(NA,5))
       analysis$semDF<-c(sem0$stats$model_chi_df,sem1$stats$model_chi_df,rep(NA,5))
     }
@@ -775,8 +775,8 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
   
   analysis$nval<-n
   analysis$llk<-anResult$llk
-  analysis$aic<-anResult$aic
-  analysis$aicNull<-anResult$aicNull
+  analysis$AIC<-anResult$AIC
+  analysis$AICnull<-anResult$AICnull
   analysis$rFull<-anResult$r.full
   analysis$pFull<-r2p(anResult$r.full,n,ncol(anResult$r.direct))
   analysis$rFullse<-r2se(analysis$rFull,n)

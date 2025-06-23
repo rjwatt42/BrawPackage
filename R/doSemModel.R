@@ -223,8 +223,8 @@ get_ml_fitfcn<-function(LB,S,phi,psy,Ldesign,Bdesign,data,debug=FALSE) {
   else psy=matrix(diag(var(error,na.rm=TRUE)))
   
   Stheta<-get_Stheta(Ldesign,Bdesign,phi,psy)
-  ml<-log(det(Stheta))+sum(diag(S%*%inv(Stheta)))-log(det(S))- (P+Q)
-  return(ml)
+  fMin<-log(det(Stheta))+sum(diag(S%*%inv(Stheta)))-log(det(S))- (P+Q)
+  return(fMin)
 }
 
 get_Stheta<-function(L,B=NULL,phi=NULL,psy=NULL) {
@@ -568,13 +568,13 @@ sem_results<-function(pathmodel,sem) {
   
   # chi2 exact fit
   model_chisqr=(n_obs-1)*sem$Fmin;
-  model_chi_df=(P+Q)*(P+Q+1)/2-(2*Q+sum(sem$Lresult[!is.na(sem$Lresult)]!=0)
+  model_chi_df=(P+Q)*(P+Q+1)/2-(sum(sem$Lresult[!is.na(sem$Lresult)]!=0)
                                 +sum(sem$Bresult[!is.na(sem$Bresult)]!=0)
-  )
+                                )
   model_chi_p=1-pchisq(abs(model_chisqr), model_chi_df);
   # non-central chi2
   model_chi_noncentrality=max(model_chisqr-model_chi_df,0)/(n_obs-1);
-  rmsea=sqrt(model_chi_noncentrality/model_chi_df);
+  model_rmsea=sqrt(model_chi_noncentrality/model_chi_df);
   model_rmsea_p=1-pchisq(model_chisqr, model_chi_df, model_chi_noncentrality);
   # 
   # ds=sem$cov_model-sem$covariance;
@@ -627,13 +627,14 @@ sem_results<-function(pathmodel,sem) {
   residsNull<-Y[!is.na(Y)]
   residLLK<-sum(log(dnorm(residsNull,mean(residsNull),sd(residsNull))))
   AICnull<-2*k_null-2*residLLK
-
+  BICnull=AICnull-2*k_null+k_null*log(n_data);
+  
   # 
   sem$stats<-list(model_chisqr=model_chisqr,
                  model_chi_df=model_chi_df,
                  model_chi_p=model_chi_p,
                  model_chi_noncentrality=model_chi_noncentrality,
-                 rmsea=rmsea,
+                 model_rmsea=model_rmsea,
                  model_rmsea_p=model_rmsea_p,
                  model_srmr=model_srmr
   )
@@ -644,13 +645,14 @@ sem_results<-function(pathmodel,sem) {
                    n_obs=n_obs,
                    llr=llr,
                    resid2=Resid2,
-                   aic=AIC,
+                   AIC=AIC,
+                   AICnull=AICnull,
                    k1=k1,
                    AIC1=AIC1,
                    AICc=AICc,
-                   BIC=BIC,
                    CAIC=CAIC,
-                   aicNull=AICnull
+                   BIC=BIC,
+                   BICnull=BICnull
   )
   # 
   

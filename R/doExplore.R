@@ -83,7 +83,7 @@ resetExploreResult<-function(nsims,n_vals,oldResult=NULL) {
   }
   
   result<-list(rval=b,pval=b,rpval=b,raval=b,roval=b,poval=b,nval=b,df1=b,
-               aic=b,aicNull=b,sem=b,
+               AIC=b,AICnull=b,sem=b,
                iv.mn=b,iv.sd=b,iv.sk=b,iv.kt=b,
                dv.mn=b,dv.sd=b,dv.sk=b,dv.kt=b,
                er.mn=b,er.sd=b,er.sk=b,er.kt=b,
@@ -107,9 +107,9 @@ storeExploreResult<-function(result,res,ri,vi) {
     result$nval[ri,vi]<-res$nval
     result$df1[ri,vi]<-res$df1
     
-    if (!is.null(res$aic)) {
-      result$aic[ri,vi]<-res$aic
-      result$aicNull[ri,vi]<-res$aicNull
+    if (!is.null(res$AIC)) {
+      result$AIC[ri,vi]<-res$AIC
+      result$AICnull[ri,vi]<-res$AICnull
     }
     if (!is.null(res$sem))
       result$sem[ri,vi]<-res$sem[1,8]
@@ -169,8 +169,8 @@ mergeExploreResult<-function(res1,res2) {
   result$poval<-rbind(res1$poval,res2$poval)
   result$nval<-rbind(res1$nval,res2$nval)
   result$df1<-rbind(res1$df1,res2$df1)
-  result$aic<-rbind(res1$aic,res2$aic)
-  result$aicNull<-rbind(res1$aicNull,res2$aicNull)
+  result$AIC<-rbind(res1$AIC,res2$AIC)
+  result$AICnull<-rbind(res1$AICnull,res2$AICnull)
   if (!is.null(res1$sem))
     result$sem<-rbind(res1$sem,res2$sem)
   else 

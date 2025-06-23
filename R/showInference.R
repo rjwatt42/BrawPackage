@@ -9,8 +9,8 @@ useData<-function(analysis,use) {
   analysis$df1<-analysis$df1[use]
   analysis$rFull<-analysis$rFull[use]
   analysis$pFull<-analysis$pFull[use]
-  analysis$aic<-analysis$aic[use]
-  analysis$aicNull<-analysis$aicNull[use]
+  analysis$AIC<-analysis$AIC[use]
+  analysis$AICnull<-analysis$AICnull[use]
   analysis$sem<-analysis$sem[use]
   return(analysis)
 }

@@ -130,7 +130,7 @@ plotSEMModel<-function(pathmodel) {
   }
 
   # now summary result
-  label<-paste0("r[model]=",brawFormat(sqrt(pathmodel$result$Rsquared),3),"  AIC=",brawFormat(pathmodel$result$aic,1))
+  label<-paste0("r[model]=",brawFormat(sqrt(pathmodel$result$Rsquared),3),"  AIC=",brawFormat(pathmodel$result$AIC,1))
   g<-addG(g,dataLabel(data.frame(x=xlim[2]-diff(xlim)/30,y=ylim[1]+diff(ylim)/30),label,hjust=1,size=fontSize*0.85))
   return(g)
 

@@ -534,10 +534,10 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                 showVals<-result$likes
               },
               "llknull"={
-                showVals<-log10(exp(-0.5*(result$aic-result$aicNull)))
+                showVals<-log10(exp(-0.5*(result$AIC-result$AICnull)))
               },
               "AIC"={
-                showVals<-result$aic-result$aicNull
+                showVals<-result$AIC-result$AICnull
               },
               "SEM"={
                 rarrow<-'\u2192'

@@ -54,8 +54,8 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
 
     outputText<-c(outputText,
                   model,
-                  brawFormat(result$aic,digits=1),
-                  brawFormat(result$aicNull,digits=1),
+                  brawFormat(result$AIC,digits=1),
+                  brawFormat(result$AICnull,digits=1),
                   brawFormat(result$r.full^2,digits=3),
                   brawFormat(result$r.full,digits=3),
                   brawFormat(result$llk,digits=3),
@@ -67,7 +67,7 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
   }
 
   tableOutput<-braw.res$historyLM
-  newRow<-list(model=makeModelFormula(list(DV=DV,IVs=IVs)),AIC=result$aic,Rsqr=result$r.full^2,r=result$r.full)
+  newRow<-list(model=makeModelFormula(list(DV=DV,IVs=IVs)),AIC=result$AIC,Rsqr=result$r.full^2,r=result$r.full)
   if (is.null(tableOutput)) tableOutput<-rbind(newRow)
   else           
     if (!identical(newRow,tableOutput[1,])) tableOutput<-rbind(newRow,tableOutput)

@@ -214,7 +214,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                   yiqr<-sqrt(ps*(1-ps)/nrow(pVals))*max(nVals)/colMeans(nVals)
                 },
                 "AIC"={
-                  showVals<-exploreResult$result$aic-exploreResult$result$aicNull
+                  showVals<-exploreResult$result$AIC-exploreResult$result$AICnull
                   y_label<-"diff(AIC)"
                 },
                 "NHST"={

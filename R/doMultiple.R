@@ -14,8 +14,8 @@ mergeMultiple<-function(r1,r2) {
     noval=rbind(r1$noval,r2$noval),
     df1=rbind(r1$df1,r2$df1),
     sem=rbind(r1$sem,r2$sem),
-    aic=rbind(r1$aic,r2$aic),
-    aicNull=rbind(r1$aicNull,r2$aicNull),
+    AIC=rbind(r1$AIC,r2$AIC),
+    AICnull=rbind(r1$AICnull,r2$AICnull),
     iv.mn=rbind(r1$iv.mn,r2$iv.mn),
     iv.sd=rbind(r1$iv.sd,r2$iv.sd),
     iv.sk=rbind(r1$iv.sk,r2$iv.sk),
@@ -62,7 +62,7 @@ resetMultiple<-function(nsims=0,evidence,multipleResult=NULL){
   newResult<-list(
     rIV=b,pIV=b,rpIV=b,roIV=b,poIV=b,nval=b,noval=b,df1=b,
     rFull=b,pFull=b,
-    aic=b,aicNull=b,sem=matrix(NA,nsims,8),
+    AIC=b,AICnull=b,sem=matrix(NA,nsims,8),
     iv.mn=b,iv.sd=b,iv.sk=b,iv.kt=b,
     dv.mn=b,dv.sd=b,dv.sk=b,dv.kt=b,
     er.mn=b,er.sd=b,er.sk=b,er.kt=b

@@ -78,8 +78,8 @@ sampleShortCut<-function(hypothesis,design,evidence,nsims,appendData,oldanalysis
                    er.sd=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$er.sd),
                    er.sk=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$er.sk),
                    er.kt=rbind(matrix(rep(0,nsims),ncol=1),oldanalysis$er.kt),
-                   aic=rbind(matrix(rep(NA,nsims),ncol=1),oldanalysis$aic),
-                   aicNull=rbind(matrix(rep(NA,nsims),ncol=1),oldanalysis$aicNull)
+                   AIC=rbind(matrix(rep(NA,nsims),ncol=1),oldanalysis$AIC),
+                   AICnull=rbind(matrix(rep(NA,nsims),ncol=1),oldanalysis$AICnull)
     )
     
   } else {
@@ -100,7 +100,7 @@ sampleShortCut<-function(hypothesis,design,evidence,nsims,appendData,oldanalysis
                  er.sd=matrix(rep(0,nsims),ncol=1),
                  er.sk=matrix(rep(0,nsims),ncol=1),
                  er.kt=matrix(rep(0,nsims),ncol=1),
-                 aic=NA,aicNull=NA
+                 AIC=NA,AICnull=NA
   )
   }
   analysis$participant<-1:length(analysis$rIV)

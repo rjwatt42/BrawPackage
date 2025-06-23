@@ -120,7 +120,7 @@ reportDescription<-function(analysis=braw.res$result){
   }
   # if (!braw.env$reducedOutput) {
     outputText<-c(outputText,"R^2",paste(brawFormat(analysis$rFull^2,digits=braw.env$report_precision),sep=""),rep("",nc-2))
-    outputText<-c(outputText,"AIC",paste(brawFormat(analysis$aic,digits=braw.env$report_precision),sep=""),rep("",nc-2))
+    outputText<-c(outputText,"AIC",paste(brawFormat(analysis$AIC,digits=braw.env$report_precision),sep=""),rep("",nc-2))
   # }  
   
   outputText<-c(outputText,rep("",nc))
