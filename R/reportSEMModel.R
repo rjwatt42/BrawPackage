@@ -120,17 +120,17 @@ reportSEMModel<-function(sem,showType="CF",evalType="AIC",showFit=FALSE) {
     outputText<-c(outputText,"!TFit",rep("",nc-1))
     outputText<-c(outputText,"!HStatistic","value","df","p",rep("",nc-4))
     outputText<-c(outputText,"Chi^2",
-                  brawFormat(sem$stats$model_chisqr,3),
-                  brawFormat(sem$stats$model_chi_df,0),
-                  brawFormat(sem$stats$model_chi_p,3),
+                  brawFormat(sem$stats$chisqr,3),
+                  brawFormat(sem$stats$chi_df,0),
+                  brawFormat(sem$stats$chi_p,3),
                   rep("",nc-4))
     outputText<-c(outputText,"RMSEA",
-                  brawFormat(sem$stats$model_rmsea,3),
+                  brawFormat(sem$stats$rmsea,3),
                   " ",
-                  brawFormat(sem$stats$model_rmsea_p,3),
+                  brawFormat(sem$stats$rmsea_p,3),
                   rep("",nc-4))
     outputText<-c(outputText,"SRMR",
-                  brawFormat(sem$stats$model_srmr,3),
+                  brawFormat(sem$stats$srmr,3),
                   " ",
                   " ",
                   rep("",nc-4))

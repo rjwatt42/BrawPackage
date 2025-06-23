@@ -716,14 +716,14 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
       analysis$semK<-c(sem0$result$k,sem1$result$k,sem2$result$k,sem3$result$k,sem4$result$k,sem5$result$k,sem6$result$k)
       analysis$semLLR<-c(sem0$result$llr,sem1$result$llr,sem2$result$llr,sem3$result$llr,sem4$result$llr,sem5$result$llr,sem6$result$llr)
       analysis$semRESID2<-c(sem0$result$resid2,sem1$result$resid2,sem2$result$resid2,sem3$result$resid2,sem4$result$resid2,sem5$result$resid2,sem6$result$resid2)
-      analysis$semSRMR<-c(sem0$stats$model_srmr,sem1$stats$model_srmr,sem2$stats$model_srmr,
-                           sem3$stats$model_srmr,sem4$stats$model_srmr,sem5$stats$model_srmr,sem6$stats$model_srmr)
-      analysis$semRMSEA<-c(sem0$stats$model_rmsea,sem1$stats$model_rmsea,sem2$stats$model_rmsea,
-                           sem3$stats$model_rmsea,sem4$stats$model_rmsea,sem5$stats$model_rmsea,sem6$stats$model_rmsea)
-      analysis$semCHI2<-c(sem0$stats$model_chisqr,sem1$stats$model_chisqr,sem2$stats$model_chisqr,
-                          sem3$stats$model_chisqr,sem4$stats$model_chisqr,sem5$stats$model_chisqr,sem6$stats$model_chisqr)
-      analysis$semDF<-c(sem0$stats$model_chi_df,sem1$stats$model_chi_df,sem2$stats$model_chi_df,
-                          sem3$stats$model_chi_df,sem4$stats$model_chi_df,sem5$stats$model_chi_df,sem6$stats$model_chi_df)
+      analysis$semSRMR<-c(sem0$stats$srmr,sem1$stats$srmr,sem2$stats$srmr,
+                           sem3$stats$srmr,sem4$stats$srmr,sem5$stats$srmr,sem6$stats$srmr)
+      analysis$semRMSEA<-c(sem0$stats$rmsea,sem1$stats$rmsea,sem2$stats$rmsea,
+                           sem3$stats$rmsea,sem4$stats$rmsea,sem5$stats$rmsea,sem6$stats$rmsea)
+      analysis$semCHI2<-c(sem0$stats$chisqr,sem1$stats$chisqr,sem2$stats$chisqr,
+                          sem3$stats$chisqr,sem4$stats$chisqr,sem5$stats$chisqr,sem6$stats$chisqr)
+      analysis$semDF<-c(sem0$stats$chi_df,sem1$stats$chi_df,sem2$stats$chi_df,
+                          sem3$stats$chi_df,sem4$stats$chi_df,sem5$stats$chi_df,sem6$stats$chi_df)
     } else {
       pathmodel$path$stages<-list(DV$name)
       sem0<-fit_sem_model(pathmodel,model_data)
@@ -741,10 +741,10 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
       analysis$semK<-c(sem0$result$k,sem1$result$k,rep(NA,5))
       analysis$semLLR<-c(sem0$result$llr,sem1$result$llr,rep(NA,5))
       analysis$semRESID2<-c(sem0$result$resid2,sem1$result$resid2,rep(NA,5))
-      analysis$semSRMR<-c(sem0$stats$model_srmr,sem1$stats$model_srmr,rep(NA,5))
-      analysis$semRMSEA<-c(sem0$stats$model_rmsea,sem1$stats$model_rmsea,rep(NA,5))
-      analysis$semCHI2<-c(sem0$stats$model_chisqr,sem1$stats$model_chisqr,rep(NA,5))
-      analysis$semDF<-c(sem0$stats$model_chi_df,sem1$stats$model_chi_df,rep(NA,5))
+      analysis$semSRMR<-c(sem0$stats$srmr,sem1$stats$srmr,rep(NA,5))
+      analysis$semRMSEA<-c(sem0$stats$rmsea,sem1$stats$rmsea,rep(NA,5))
+      analysis$semCHI2<-c(sem0$stats$chisqr,sem1$stats$chisqr,rep(NA,5))
+      analysis$semDF<-c(sem0$stats$chi_df,sem1$stats$chi_df,rep(NA,5))
     }
     rarrow<-'\u2192'
     barrow<-'\u2190\u2192'

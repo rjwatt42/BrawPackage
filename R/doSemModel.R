@@ -632,13 +632,13 @@ sem_results<-function(pathmodel,sem) {
   BICnull=AICnull-2*k_null+k_null*log(n_data);
   
   # 
-  sem$stats<-list(model_chisqr=model_chisqr,
-                 model_chi_df=model_chi_df,
-                 model_chi_p=model_chi_p,
-                 model_chi_noncentrality=model_chi_noncentrality,
-                 model_rmsea=model_rmsea,
-                 model_rmsea_p=model_rmsea_p,
-                 model_srmr=model_srmr
+  sem$stats<-list(chisqr=model_chisqr,
+                 chi_df=model_chi_df,
+                 chi_p=model_chi_p,
+                 chi_noncentrality=model_chi_noncentrality,
+                 rmsea=model_rmsea,
+                 rmsea_p=model_rmsea_p,
+                 srmr=model_srmr
   )
   sem$result<-list(Rsquared=Rsquared,
                    r.full=sqrt(Rsquared),
