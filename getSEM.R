@@ -34,7 +34,9 @@ makeSEMPath<-function(data=NULL,stages=NULL,
 #' readDataSEM<-function(filename)
 #' @export
 readDataSEM<-function(filename) {
-  d<-read.csv(filename)
+  if (grepl(".csv",filename)) d<-read.csv(filename)
+  if (grepl(".dat",filename)) d<-read.table(filename,header=TRUE)
+  
   dataFull<-prepareSample(d)
   liveData<-dataFull$data[,2:ncol(dataFull$data)]
   if (ncol(dataFull$data)==2) liveData<-matrix(liveData,ncol=ncol(dataFull$data)-1)

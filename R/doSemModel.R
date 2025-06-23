@@ -223,8 +223,8 @@ get_ml_fitfcn<-function(LB,S,phi,psy,Ldesign,Bdesign,data,debug=FALSE) {
   else psy=matrix(diag(var(error,na.rm=TRUE)))
   
   Stheta<-get_Stheta(Ldesign,Bdesign,phi,psy)
-  fMin<-log(det(Stheta))+sum(diag(S%*%inv(Stheta)))-log(det(S))- (P+Q)
-  return(fMin)
+  Fml<-log(det(Stheta))+sum(diag(S%*%inv(Stheta)))-log(det(S))- (P+Q)
+  return(Fml)
 }
 
 get_Stheta<-function(L,B=NULL,phi=NULL,psy=NULL) {
