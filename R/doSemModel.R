@@ -227,7 +227,7 @@ get_ml_fitfcn<-function(LB,S,phi,psy,Ldesign,Bdesign,data,debug=FALSE) {
   return(Fml)
 }
 
-get_Stheta<-function(L,B=NULL,phi=NULL,psy=NULL) {
+get_Stheta<-function(L,B=NULL,phi=NULL,psy=NULL,debug=FALSE) {
   
   nan_action<-"complete.obs" # "complete.obs"
   
@@ -239,7 +239,7 @@ get_Stheta<-function(L,B=NULL,phi=NULL,psy=NULL) {
     P=sem$P;
     Q=sem$Q;
     if (length(sem$exogenous)>1) phi<-cov(data[,sem$exogenous],use=nan_action)
-    else phi<-matrix(1)
+    else phi<-matrix(var(data[,sem$exogenous],na.rm=TRUE))
 
     if (P>1) Y<-t(data[,1:P])
     else Y<-matrix(data[,1],nrow=1)
@@ -251,6 +251,7 @@ get_Stheta<-function(L,B=NULL,phi=NULL,psy=NULL) {
     if (ncol(error)>1) psy<-diag(diag(var(error,na.rm=TRUE)))
     else psy<-matrix(var(error,na.rm=TRUE))
   }
+  if (debug) {print(phi);print(psy)}
   P<-nrow(psy)
   Q<-nrow(phi)
 
@@ -523,8 +524,7 @@ path2sem<-function(pathmodel,model_data) {
 }
 
 sem_results<-function(pathmodel,sem) {
-  output_field='sem_result';
-  
+
   P=sem$P;
   Q=sem$Q;
   n_obs=sem$n_obs;
@@ -541,7 +541,7 @@ sem_results<-function(pathmodel,sem) {
   colnames(sem$covariance)<-sem$varnames#[use_cf]
   if (Q>0) sem$cov_model=get_Stheta(sem)
   else sem$cov_model<-0
-  
+
   # model coefficients
   CF_table=cbind(sem$Bresult,sem$Lresult);
   # use_cf=!apply(is.na(CF_table),2,all)
@@ -590,7 +590,7 @@ sem_results<-function(pathmodel,sem) {
   scm<-scm/sqrt(a*b)
   dc<-scm-scd
   # dc=ds/(a*b);
-  model_srmr=sqrt(sum(dc^2)/(nrow(scm)*(nrow(scm)-1)/2));
+  model_srmr=sqrt(sum(dc^2)/2/(nrow(dc)*(nrow(dc)+1)/2));
   #
   # 
   B=sem$Bresult; B[is.na(B)]=0;
