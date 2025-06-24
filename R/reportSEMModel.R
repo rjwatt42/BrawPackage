@@ -83,57 +83,54 @@ reportSEMModel<-function(sem,showType="CF",evalType="AIC",showFit=TRUE) {
   
   outputText<-c(outputText,rep("",nc))
 
-  tableOutput<-list(Model=makeModelFormula(sem),
-               AIC=sem$result$AIC,
-               AICc=sem$result$AICc,
-               BIC=sem$result$BIC,
-               AICnull=sem$result$AICnull,
-               BICnull=sem$result$BICnull,
-               Rsqr=sem$result$Rsquared,
-               r=sqrt(sem$result$Rsquared),
-               # resid2=sem$result$resid2,
-               llk=sem$result$llk,
-               k=sem$result$k,
-               n=sem$result$n_obs,
-               obs=sem$result$n_data/sem$result$n_obs
-  )
-  digitsE<-c(0,1,1,1,1,1,3,3,3,1,0,0,0)
-  
-  columns<-c("Model",evalType,"Rsqr","r","llk","k","n","obs")
-  nc1<-length(columns)
-  tableText<-c("!TStatistics",rep("",nc-1),columns,rep("",nc-nc1))
-  tableText[nc+1]<-paste0("!H!l",tableText[nc+1])
-  tableText[which(tableText=="Rsqr")]<-"R^2"
-  prefix<-"!r"
-    for (column in columns) {
-        j<-which(column==names(tableOutput))
-        val<-unlist(tableOutput[j])
-        if (is.numeric(val)) val<-brawFormat(val,digits=digitsE[j])
-        if (column=="Model") val<-paste0("!l",val)
-      tableText<-c(tableText,val)
-    }
-    tableText<-c(tableText,rep("",nc-nc1))
+  tableText<-c("!TStatistics",rep("",nc-1),
+               "!H!lModel","AIC","BIC","R^2","r","llk","k","n",rep("",nc-8))
+  tableText<-c(tableText,
+               makeModelFormula(sem),brawFormat(sem$result$AIC,1),brawFormat(sem$result$BIC,1),
+               brawFormat(sem$result$Rsquared,3),brawFormat(sqrt(sem$result$Rsquared),3),brawFormat(sem$result$llk,3),
+               brawFormat(sem$result$k),brawFormat(sem$result$n_obs),rep("",nc-8))
+  tableText<-c(tableText,
+               "Null model",brawFormat(sem$result$AICnull,1),brawFormat(sem$result$BICnull,1),
+               brawFormat(0,3),brawFormat(0,3),brawFormat(sem$result$llkNull,3),
+               brawFormat(sem$result$kNull),brawFormat(sem$result$n_obs),rep("",nc-8))
   outputText<-c(outputText,tableText)
   outputText<-c(outputText,rep("",nc))
   
   if (showFit) {
     outputText<-c(outputText,"!TFit",rep("",nc-1))
-    outputText<-c(outputText,"!HStatistic","value","df","p",rep("",nc-4))
-    outputText<-c(outputText,"Chi^2",
+    outputText<-c(outputText,"!H","Statistic","value","df","p",rep("",nc-5))
+    outputText<-c(outputText,"User model",
+                  "Chi^2",
                   brawFormat(sem$stats$chisqr,3),
                   brawFormat(sem$stats$chi_df,0),
                   brawFormat(sem$stats$chi_p,3),
-                  rep("",nc-4))
-    outputText<-c(outputText,"RMSEA",
+                  rep("",nc-5))
+    outputText<-c(outputText," ","RMSEA",
                   brawFormat(sem$stats$rmsea,3),
                   " ",
                   brawFormat(sem$stats$rmsea_p,3),
-                  rep("",nc-4))
-    outputText<-c(outputText,"SRMR",
+                  rep("",nc-5))
+    outputText<-c(outputText," ","SRMR",
                   brawFormat(sem$stats$srmr,3),
                   " ",
                   " ",
-                  rep("",nc-4))
+                  rep("",nc-5))
+    outputText<-c(outputText,"Null model",
+                  "Chi^2",
+                  brawFormat(sem$statsNull$chisqr,3),
+                  brawFormat(sem$statsNull$chi_df,0),
+                  brawFormat(sem$statsNull$chi_p,3),
+                  rep("",nc-5))
+    outputText<-c(outputText," ","RMSEA",
+                  brawFormat(sem$statsNull$rmsea,3),
+                  " ",
+                  brawFormat(sem$statsNull$rmsea_p,3),
+                  rep("",nc-5))
+    outputText<-c(outputText," ","SRMR",
+                  brawFormat(sem$statsNull$srmr,3),
+                  " ",
+                  " ",
+                  rep("",nc-5))
     
     outputText<-c(outputText,rep("",nc))
   }

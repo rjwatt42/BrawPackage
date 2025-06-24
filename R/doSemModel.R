@@ -39,33 +39,21 @@ fit_sem_model<-function(pathmodel,model_data,fixedCoeffs=NULL) {
   semResult <- lavaan::sem(path, data=model_data$data)
   nullpath<-""
   for (i in 1:length(colnames(edges))) {
-    nullpath<-paste0(nullpath,colnames(edges)[i],"~",colnames(edges)[i],"\n")
+    nullpath<-paste0(nullpath,colnames(edges)[i],"~~",colnames(edges)[i],"\n")
   }
-  # semResultNull<-lavaan::sem(nullpath, data=model_data$data)
+  semResultNull<-lavaan::sem(nullpath, data=model_data$data)
   
   coefs<-lavInspect(semResult,"coef")$beta
   
-  # B<-coefs[,sem$endogenous]
-  # B[is.na(B)]<-0
-  # L<-coefs[,sem$exogenous]
-  # L[is.na(L)]<-0
-  # Y<-t(sem$data[,1:sem$P])
-  # Y[is.na(Y)]<-0
-  # X<-t(sem$data[,(sem$P+1):ncol(sem$data)])
-  # X[is.na(X)]<-0
-  # Ypredicted<-B%*%Y+L%*%X
-  # Yactual<-rbind(Y,X)
-  # Yactual<-Yactual-matrix(rep(rowMeans(Yactual),ncol(Yactual)),ncol=ncol(Yactual))
-  # Ypredicted<-Ypredicted-matrix(rep(rowMeans(Ypredicted),ncol(Ypredicted)),ncol=ncol(Ypredicted))
-  # error<-t(Yactual-Ypredicted)
-  # Rsquared<-1-(sd(error,na.rm=TRUE)/sd(Yactual,na.rm=TRUE))^2
   Rsquared<-mean(lavInspect(semResult,"rsquare"))
 
   fit<-lavaan::fitMeasures(semResult)
+  fitNull<-lavaan::fitMeasures(semResultNull)
+  
+  sem$mdl<-semResult
   sem$Fmin<-fit["fmin"]
   sem$loglike<-fit["logl"]
   sem$coefficients<-coefs
-  sem$mdl<-semResult
   sem$n_obs<-lavInspect(semResult,"nobs")
   sem$covariance<-lavInspect(semResult,"cov.ov")
   sem$cov_model<-lavInspect(semResult,"cov.all")
@@ -81,18 +69,27 @@ fit_sem_model<-function(pathmodel,model_data,fixedCoeffs=NULL) {
                   rmsea_p=fit["rmsea.pvalue"],
                   srmr=fit["srmr"]
   )
+  sem$statsNull<-list(chisqr=fitNull["chisq"],
+                  chi_df=fitNull["df"],
+                  chi_p=fitNull["pvalue"],
+                  rmsea=fitNull["rmsea"],
+                  rmsea_p=fitNull["rmsea.pvalue"],
+                  srmr=fitNull["srmr"]
+  )
   sem$result<-list(fmin=fit["fmin"],
                    Rsquared=Rsquared,
                    r.full=sqrt(Rsquared),
                    k=fit["npar"],
+                   kNull=fitNull["npar"],
                    n_data=lavInspect(semResult,"nobs"),
                    n_obs=lavInspect(semResult,"npar"),
                    llk=fit["logl"],
+                   llkNull=fitNull["logl"],
                    # resid2=sum(error^2,na.rm=TRUE),
                    AIC=fit["aic"],
-                   AICnull=NA,
+                   AICnull=fitNull["aic"],
                    BIC=fit["bic"],
-                   BICnull=NA
+                   BICnull=fitNull["bic"]
   )
   
   sem$Rtotal<-NA

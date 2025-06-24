@@ -20,6 +20,20 @@ lavaan::summary(semResult, fit.measures=T)
 lavaan::fitMeasures(semResult,"srmr")
 semResult@ParTable
 
+############################
+
+ch9data <- read.table("lennox.dat", header=T)
+
+ch9mod="cesd ~~ cesd
+pass ~~ pass
+density ~~ density
+homophily ~~ homophily"
+
+semResult <- lavaan::sem(ch9mod, data=ch9data)
+lavaan::summary(semResult, fit.measures=T)
+lavaan::fitMeasures(semResult,"srmr")
+semResult@ParTable
+
 
 # semPaths(ch9modML,layout="circle",#what="est",
 #          rotation=3,residuals=FALSE,
