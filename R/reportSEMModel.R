@@ -50,7 +50,7 @@ truncateName<-function(name,names) {
 #' @examples
 #' reportSEMModel<-function(sem,showType)
 #' @export
-reportSEMModel<-function(sem,showType="CF",evalType="AIC",showFit=FALSE) {
+reportSEMModel<-function(sem,showType="CF",evalType="AIC",showFit=TRUE) {
   digits<-3
   
   switch(showType,
@@ -92,14 +92,14 @@ reportSEMModel<-function(sem,showType="CF",evalType="AIC",showFit=FALSE) {
                Rsqr=sem$result$Rsquared,
                r=sqrt(sem$result$Rsquared),
                # resid2=sem$result$resid2,
-               llr=sem$result$llr,
+               llk=sem$result$llk,
                k=sem$result$k,
                n=sem$result$n_obs,
                obs=sem$result$n_data/sem$result$n_obs
   )
   digitsE<-c(0,1,1,1,1,1,3,3,3,1,0,0,0)
   
-  columns<-c("Model",evalType,paste0(evalType,"null"),"Rsqr","r","llr","k","n","obs")
+  columns<-c("Model",evalType,"Rsqr","r","llk","k","n","obs")
   nc1<-length(columns)
   tableText<-c("!TStatistics",rep("",nc-1),columns,rep("",nc-nc1))
   tableText[nc+1]<-paste0("!H!l",tableText[nc+1])
@@ -139,7 +139,7 @@ reportSEMModel<-function(sem,showType="CF",evalType="AIC",showFit=FALSE) {
   }
   
   tableOutput<-braw.res$historySEM
-  newRow<-list(model=makeModelFormula(sem),AIC=sem$result$AIC,BIC=sem$result$BIC,Rsqr=sem$result$r.full^2,r=sem$result$r.full)
+  newRow<-list(model=makeModelFormula(sem),AIC=sem$result$AIC,BIC=sem$result$BIC,Rsqr=sem$result$r.full^2,r=sem$result$r.full,llk=sem$result$llk)
   if (is.null(tableOutput)) tableOutput<-rbind(newRow)
   else           
     if (!identical(newRow,tableOutput[1,])) tableOutput<-rbind(newRow,tableOutput)
@@ -154,7 +154,7 @@ reportSEMModel<-function(sem,showType="CF",evalType="AIC",showFit=FALSE) {
   }
   
   outputText<-c(outputText,"!THistory",rep("",nc-1))
-  outputText<-c(outputText,"!H!lModel",evalType,"R^2","r",rep("",nc-4))
+  outputText<-c(outputText,"!H!lModel",evalType,"R^2","r","llk",rep("",nc-5))
   
   if (evalType=="BIC") io<-3 else io<-2
   for (i in 1:length(use)) {
@@ -164,9 +164,10 @@ reportSEMModel<-function(sem,showType="CF",evalType="AIC",showFit=FALSE) {
     row<-c(paste0("!l",tableOutput[[use[i],1]]),
            paste0(f2,brawFormat(tableOutput[[use[i],io]],1)),
            paste0(f3,brawFormat(tableOutput[[use[i],4]],3)),
-           brawFormat(tableOutput[[use[i],5]],3)
-           )
-    outputText<-c(outputText,row,rep("",nc-4))
+           brawFormat(tableOutput[[use[i],5]],3),
+           brawFormat(tableOutput[[use[i],6]],3)
+    )
+    outputText<-c(outputText,row,rep("",nc-5))
   }
   outputText<-c(outputText,rep("",nc))
   

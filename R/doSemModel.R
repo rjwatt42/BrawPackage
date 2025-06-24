@@ -87,7 +87,7 @@ fit_sem_model<-function(pathmodel,model_data,fixedCoeffs=NULL) {
                    k=fit["npar"],
                    n_data=lavInspect(semResult,"nobs"),
                    n_obs=lavInspect(semResult,"npar"),
-                   llr=fit["logl"],
+                   llk=fit["logl"],
                    # resid2=sum(error^2,na.rm=TRUE),
                    AIC=fit["aic"],
                    AICnull=NA,
