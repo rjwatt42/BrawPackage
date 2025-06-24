@@ -91,7 +91,7 @@ reportSEMModel<-function(sem,showType="CF",evalType="AIC",showFit=FALSE) {
                BICnull=sem$result$BICnull,
                Rsqr=sem$result$Rsquared,
                r=sqrt(sem$result$Rsquared),
-               resid2=sem$result$resid2,
+               # resid2=sem$result$resid2,
                llr=sem$result$llr,
                k=sem$result$k,
                n=sem$result$n_obs,

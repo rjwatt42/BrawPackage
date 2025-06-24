@@ -715,7 +715,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
       analysis$semK1<-c(sem0$result$k1,sem1$result$k1,sem2$result$k1,sem3$result$k1,sem4$result$k1,sem5$result$k1,sem6$result$k1)
       analysis$semK<-c(sem0$result$k,sem1$result$k,sem2$result$k,sem3$result$k,sem4$result$k,sem5$result$k,sem6$result$k)
       analysis$semLLR<-c(sem0$result$llr,sem1$result$llr,sem2$result$llr,sem3$result$llr,sem4$result$llr,sem5$result$llr,sem6$result$llr)
-      analysis$semRESID2<-c(sem0$result$resid2,sem1$result$resid2,sem2$result$resid2,sem3$result$resid2,sem4$result$resid2,sem5$result$resid2,sem6$result$resid2)
+      # analysis$semRESID2<-c(sem0$result$resid2,sem1$result$resid2,sem2$result$resid2,sem3$result$resid2,sem4$result$resid2,sem5$result$resid2,sem6$result$resid2)
       analysis$semSRMR<-c(sem0$stats$srmr,sem1$stats$srmr,sem2$stats$srmr,
                            sem3$stats$srmr,sem4$stats$srmr,sem5$stats$srmr,sem6$stats$srmr)
       analysis$semRMSEA<-c(sem0$stats$rmsea,sem1$stats$rmsea,sem2$stats$rmsea,
@@ -740,7 +740,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
       analysis$semRs<-t(rbind(c(NA,NA,NA),c(sem1$ES_table[1,2],NA,NA)))
       analysis$semK<-c(sem0$result$k,sem1$result$k,rep(NA,5))
       analysis$semLLR<-c(sem0$result$llr,sem1$result$llr,rep(NA,5))
-      analysis$semRESID2<-c(sem0$result$resid2,sem1$result$resid2,rep(NA,5))
+      # analysis$semRESID2<-c(sem0$result$resid2,sem1$result$resid2,rep(NA,5))
       analysis$semSRMR<-c(sem0$stats$srmr,sem1$stats$srmr,rep(NA,5))
       analysis$semRMSEA<-c(sem0$stats$rmsea,sem1$stats$rmsea,rep(NA,5))
       analysis$semCHI2<-c(sem0$stats$chisqr,sem1$stats$chisqr,rep(NA,5))
