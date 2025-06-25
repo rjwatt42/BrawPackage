@@ -11,7 +11,7 @@ drawVar<-function(pts,ticks,var,plotArea=c(0,0,1,1),g){
   pts<-data.frame(x=pts$r,y=pts$dens)
   g<-startPlot(xlim=c(min(pts$x),max(pts$x)),ylim=c(0,1.1),
                xticks=makeTicks(ticks$breaks,ticks$labels),xlabel=makeLabel(var$name),
-               box="x",fontScale=2.5,g=g)
+               box="x",fontScale=1,g=g)
   # g<-addG(g,xAxisTicks(ticks$breaks,ticks$labels),xAxisLabel(var$name))
   g<-addG(g,
     dataPolygon(pts,fill=braw.env$plotColours$variableC,colour=braw.env$plotColours$variableC,linewidth=0.25)
@@ -130,10 +130,10 @@ drawInterval<-function(var,plotArea=c(0,0,1,1),g){
 #' @examples
 #' variable<-showVariable(variable=makeVariable())
 #' @export
-showVariable<-function(variable=makeVariable(),sample=NULL,plotArea=NULL,g=NULL){
+showVariable<-function(variable=makeVariable("test"),sample=NULL,plotArea=NULL,g=NULL){
   if (is.null(g)) 
     g<-nullPlot()
-  if (!is.null(plotArea)) braw.env$plotArea<-plotArea
+  if (!is.null(plotArea)) braw.env$plotArea<<-plotArea
   
   switch(variable$type,
          "Interval"={g<-drawInterval(variable,plotArea,g)},
