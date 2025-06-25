@@ -66,6 +66,7 @@ buildGraph<-function(g1=NULL) {
   return(g)
 }
 
+#' @export
 showHistory<-function(back=-1) {
   back<-min(back,0)
   use<-max(1,length(braw.env$history)+back)
@@ -91,6 +92,7 @@ svgY<-function(y) {return((1-y)*(svgBoxY()-20)+10)}
 # svgX<-function(x) {return(x*(svgBoxX()))}
 # svgY<-function(y) {return((1-y)*(svgBoxY()))}
 
+#' @export
 joinHTML<-function(p1,p2) {
   paste0('<div style="display: inline-block; float left;"> ',
          p1,
