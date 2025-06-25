@@ -72,6 +72,10 @@ reportSystem<-function(hypothesis=braw.def$hypothesis,design=braw.def$design){
     
 }
 
+#' @return ggplot2 object - and printed
+#' @examples
+#' reportSample(sample=doSample())
+#' @export
 reportDesign<-function(design=braw.def$design) {
 
   nc=6
