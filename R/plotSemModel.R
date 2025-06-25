@@ -124,7 +124,7 @@ plotSEMModel<-function(pathmodel) {
   for (ni in 1:length(names)) {
     fill="white"
     if (is.element(names[ni],colnames(pathmodel$Bdesign)) && all(pathmodel$Bdesign[,names[ni]]==0)) fill<-"#FFAAAA"
-    if (!is.element(names[ni],rownames(pathmodel$Bdesign))) fill<-"#CCFF44"
+    if (!is.element(names[ni],rownames(pathmodel$Bdesign)) || all(pathmodel$Ldesign[names[ni],]==0)) fill<-"#CCFF44"
     g<-addG(g,dataLabel(data.frame(x=xs[ni],y=ys[ni]),label=names[ni],
                         size=fontSize,hjust=0.5,vjust=0.5,fontface="bold",fill=fill))
   }

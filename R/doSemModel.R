@@ -309,6 +309,11 @@ path2sem<-function(pathmodel,model_data) {
       } else {
         Ldesign[iDest,iSource]<-0
       }
+      # if (all(Bdesign[iDest,]==0) && all(Ldesign[iDest,]==0)) {
+      #   keep<-setdiff(1:nrow(Bdesign),iDest)
+      #   Bdesign<-Bdesign[keep,]
+      #   Ldesign<-Ldesign[keep,]
+      # }
     }
   }
   
