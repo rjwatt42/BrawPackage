@@ -12,3 +12,6 @@ changes plotting environment
 \description{
 set up for a meta-analysis
 }
+\examples{
+svgBix(height=200)
+}

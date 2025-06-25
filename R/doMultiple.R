@@ -1,6 +1,12 @@
 ##################################################################################    
 # EXPECTED    
 
+#' merge multiple samples 
+#' 
+#' @returns multipleResult object
+#' @examples
+#' multipleResult<-mergeMultiple(mres1,mres2)
+#' @export
 mergeMultiple<-function(r1,r2) {
   newResult<-list(
     rIV=rbind(r1$rIV,r2$rIV),
