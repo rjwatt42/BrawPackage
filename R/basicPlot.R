@@ -72,6 +72,10 @@ showHistory<-function(back=-1) {
   buildGraph(braw.env$history[[use]])
 }
 
+#' set up for a meta-analysis
+#' 
+#' @return cgnges plotting environment 
+#' @examples
 #' @export
 svgBox<-function(height=NULL,aspect=1.3,fontScale=1.5) {
   if (is.null(height) && is.null(aspect)) return(braw.env$plotSize)
