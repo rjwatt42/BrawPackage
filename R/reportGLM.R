@@ -47,7 +47,7 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
     outputText<-c(outputText,
                   "!TStatistics",rep("",nc-1),
                   "!H!lModel","AIC","BIC","R^2","r","llr","k","n",
-                  rep("",nc-9)
+                  rep("",nc-8)
     )
     
     model<-makeModelFormula(list(stages=list(list(IVs$name),DV$name)))
@@ -60,8 +60,8 @@ reportGLM<-function(DV,IVs,result,p_or_r) {
                   brawFormat(result$r.full,digits=3),
                   brawFormat(result$llk,digits=3),
                   brawFormat(k),
-                  brawFormat(result$nval)
-                  rep("",nc-9)
+                  brawFormat(result$nval),
+                  rep("",nc-8)
     )
   }
 
