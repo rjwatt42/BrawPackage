@@ -50,7 +50,7 @@ truncateName<-function(name,names) {
 #' @examples
 #' reportSEMModel<-function(sem,showType)
 #' @export
-reportSEMModel<-function(sem,showType="CF",evalType="AIC",showFit=TRUE) {
+reportSEMModel<-function(sem,showType="CF",showFit=TRUE) {
   digits<-3
   
   switch(showType,
@@ -151,20 +151,21 @@ reportSEMModel<-function(sem,showType="CF",evalType="AIC",showFit=TRUE) {
   }
   
   outputText<-c(outputText,"!THistory",rep("",nc-1))
-  outputText<-c(outputText,"!H!lModel",evalType,"R^2","r","llk",rep("",nc-5))
+  outputText<-c(outputText,"!H!lModel","AIC","BIC","R^2","r","llk",rep("",nc-6))
   
-  if (evalType=="BIC") io<-3 else io<-2
   for (i in 1:length(use)) {
     f2<-f3<-""
-    if (use[i]==which.min(tableOutput[,io])) f2<-"!r"
+    if (use[i]==which.min(tableOutput[,2])) f2<-"!r"
+    if (use[i]==which.min(tableOutput[,3])) f2<-"!r"
     if (use[i]==which.max(tableOutput[,4])) f3<-"!r"
     row<-c(paste0("!l",tableOutput[[use[i],1]]),
-           paste0(f2,brawFormat(tableOutput[[use[i],io]],1)),
+           paste0(f2,brawFormat(tableOutput[[use[i],2]],1)),
+           paste0(f2,brawFormat(tableOutput[[use[i],3]],1)),
            paste0(f3,brawFormat(tableOutput[[use[i],4]],3)),
            brawFormat(tableOutput[[use[i],5]],3),
            brawFormat(tableOutput[[use[i],6]],3)
     )
-    outputText<-c(outputText,row,rep("",nc-5))
+    outputText<-c(outputText,row,rep("",nc-6))
   }
   outputText<-c(outputText,rep("",nc))
   
