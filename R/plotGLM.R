@@ -4,7 +4,10 @@
 #' @examples
 #' plotGLM<-function(DV,IVs,result,whichR)
 #' @export
-plotGLM<-function(DV,IVs,result,whichR="Unique") {
+plotGLM<-function(lm,whichR="Unique") {
+  DV<-lm$DV
+  IVs<-lm$IVs
+  result<-lm$result
   
   switch(whichR,
          "Direct"={

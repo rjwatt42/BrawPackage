@@ -1,4 +1,22 @@
 
+#' make SEM model object
+#' @return sem object 
+#' @examples
+#' makeSEM<-function(filename)
+#' @export
+makeLM<-function(data,DV=NULL,IV=NULL) {
+  if (is.character(data)) data<-readDataSEM(data)
+  nvar<-ncol(data$data)
+  if (is.null(DV)) {
+    dataNames<-data$varnames
+    DV<-dataNames[1]
+    IV<-dataNames[2:nvar]
+  }
+
+  data<-data$data[c(DV,IV)]
+  lm<-list(data=data,DV=DV,IV=IV)  
+}
+
 #' make path for a SEM model
 #' @return path object 
 #' @examples
@@ -36,13 +54,13 @@ makeSEMPath<-function(data=NULL,stages=NULL,
 readDataSEM<-function(filename) {
   if (grepl(".csv",filename)) d<-read.csv(filename)
   if (grepl(".dat",filename)) d<-read.table(filename,header=TRUE)
+  if (!is.character(filename)) d<-filename
   
   dataFull<-prepareSample(d)
   liveData<-dataFull$data[,2:ncol(dataFull$data)]
   if (ncol(dataFull$data)==2) liveData<-matrix(liveData,ncol=ncol(dataFull$data)-1)
   
-  data<-list(pid=1:length(dataFull$data[[1]]),
-             data=liveData,
+  data<-list(data=liveData,
              varnames=dataFull$variables$name,
              varcat=(dataFull$variables$type=="Categorical")
   )

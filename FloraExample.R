@@ -1,4 +1,13 @@
+###############################
 
+lm1<-makeLM("lennox.dat")
+result<-generalAnalysis(lm1$data,InteractionOn=FALSE)
+lm1<-list(result=result,DV=list(name=lm1$DV),IVs=list(name=lm1$IV))
+
+g1<-reportGLM(lm1)
+print(g1)
+
+##############################
 
 sem1<-makeSEM("lennox.dat",makeSEMPath(stages=list(c("size","density","homophily"),c("pass"),c("cesd"))))
 semResult<-fit_sem_model(sem1$path,sem1$data)

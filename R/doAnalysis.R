@@ -538,6 +538,7 @@ generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",ca
   }
   r.full<-model2fulleffect(lmNormC,anNormC)
   AIC<-AIC(lmNormC)
+  BIC<-BIC(lmNormC)
   llk<-logLik(lmNormC)
 
   k<-no_ivs+2
@@ -566,6 +567,7 @@ generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",ca
               nval=n,
               llk=llk,
               AIC=AIC,
+              BIC=BIC,
               AICnull=AICnull,
               
               p.direct=p.direct,
