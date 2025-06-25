@@ -4,7 +4,7 @@
 \alias{reportGLM}
 \title{report a fitted GLM model}
 \usage{
-reportGLM(DV, IVs, result, p_or_r)
+reportGLM(lm, p_or_r = "r")
 }
 \value{
 sample object
@@ -13,5 +13,5 @@ sample object
 report a fitted GLM model
 }
 \examples{
-reportGLM<-function(DV,IVs,result,p_or_r)
+reportGLM<-function(lm,p_or_r)
 }

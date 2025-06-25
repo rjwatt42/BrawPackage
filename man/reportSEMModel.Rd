@@ -4,7 +4,7 @@
 \alias{reportSEMModel}
 \title{report a fitted SEM model}
 \usage{
-reportSEMModel(sem, showType)
+reportSEMModel(sem, showType = "CF", showFit = TRUE)
 }
 \value{
 sample object
