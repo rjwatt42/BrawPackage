@@ -5,7 +5,7 @@
 \title{show a variable object}
 \usage{
 showVariable(
-  variable = makeVariable(),
+  variable = makeVariable("test"),
   sample = NULL,
   plotArea = NULL,
   g = NULL

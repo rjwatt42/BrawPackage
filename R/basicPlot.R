@@ -208,7 +208,12 @@ plotLimits<-function(xlim,ylim,orientation="horz",gaps=c(1,1,0,0),fontScale=1) {
   )
 }
 
-# this is the start of any figure - which may then contain several graphs
+#' this is the start of any figure - which may then contain several graphs
+#' 
+#' @returns a plot object
+#' @examples
+#' g<-nullPlot()
+#' @export
 nullPlot<-function() {
   addGraphElement(NULL)
   drawNullPlot()
