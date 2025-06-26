@@ -758,8 +758,8 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
       } else {
         c1<-braw.env$plotColours$infer_sigNonNull
         c2<-braw.env$plotColours$infer_nsigNull
-        c3<-braw.env$plotColours$infer_sigNull
-        c4<-braw.env$plotColours$infer_nsigNonNull
+        c3<-braw.env$plotColours$infer_sigNonNull
+        c4<-braw.env$plotColours$infer_nsigNull
       }
       if (all(is.na(pts$notNull))) pts$notNull<-rep(TRUE,length(pts$sig))
 
