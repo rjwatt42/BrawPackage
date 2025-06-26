@@ -351,6 +351,7 @@ setWorld<-function(worldOn=braw.def$hypothesis$effect$world$worldOn,
                    populationPDFmu=braw.def$hypothesis$effect$world$populationPDFmu,populationNullp=braw.def$hypothesis$effect$world$populationNullp,
                    populationPDFsample=braw.def$hypothesis$effect$world$populationPDFsample,populationSamplemn=braw.def$hypothesis$effect$world$populationSamplemn,populationSamplesd=braw.def$hypothesis$effect$world$populationSamplesd,populationSamplebias=braw.def$hypothesis$effect$world$populationSamplebias,
                    sigOnly=braw.def$hypothesis$effect$world$sigOnly,worldAbs=braw.def$hypothesis$effect$world$worldAbs) {
+  if (is.character(worldOn)) e<-getWorld(worldOn)
   if (is.list(worldOn)) e<-worldOn
   else
     e<-makeWorld(worldOn=worldOn,

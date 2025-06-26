@@ -758,8 +758,8 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
       } else {
         c1<-braw.env$plotColours$infer_sigNonNull
         c2<-braw.env$plotColours$infer_nsigNull
-        c3<-braw.env$plotColours$infer_sigNonNull
-        c4<-braw.env$plotColours$infer_nsigNull
+        c3<-braw.env$plotColours$infer_sigNull
+        c4<-braw.env$plotColours$infer_nsigNonNull
       }
       if (all(is.na(pts$notNull))) pts$notNull<-rep(TRUE,length(pts$sig))
 
@@ -907,6 +907,8 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
       ystart<-0
       for (j in 1:length(cols)) {
         if (dens[i,j]>0) {
+          if (histStyle=="width" && j>1) ystart<-ystart+dens[i,j-1] 
+          else ystart<-0  
           if (histStyle=="width") {
             alpha<-simAlpha
             alpha<-1
@@ -931,12 +933,6 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
                                     x=(c(w,0,0,w)+ystart)*width[2]+xoff)
                    g<-addG(g,dataPolygon(data=data,
                                          colour=colour, fill = cols[j],alpha=alpha))
-                     dataL<-data.frame(y=c(hists$x[i],hists$x[i],hists$x[i+1]),x=(c(-w0,-w,-w)-ystart)*width[1])
-                     if (i==length(hists$h1) || (i<length(hists$h1) && dens[i+1,j]==0))
-                       dataL<-data.frame(y=c(hists$x[i],hists$x[i],hists$x[i+1],hists$x[i+1]),x=(c(-w0,-w,-w,0)-ystart)*width[1])
-                     g<-addG(g,dataLine(dataL,colour="black"))
-                     dataL$x<- (-(dataL$x/width[1]+ystart)+ystart)*width[2]
-                     g<-addG(g,dataLine(dataL,colour="black"))
                  },
                  "horz"={
                    data<-data.frame(x=c(hists$x[i],hists$x[i],hists$x[i+1],hists$x[i+1]),
@@ -944,9 +940,21 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
                    g<-addG(g,dataPolygon(data=data,
                                          colour=colour, fill = cols[j],alpha=alpha))
                  })
-        if (histStyle=="width") ystart<-ystart+dens[i,j]
         }
       }
+    }
+    if (orientation=="vert") {
+      dens1<-rowSums(dens)
+      x<-c(hists$x[1],hists$x[1])
+      y<-c(0,dens1[1])
+      for (i in 1:(nrow(dens)-1)) {
+        x<-c(x,hists$x[i],hists$x[i+1],hists$x[i+1])
+        y<-c(y,dens1[i],dens1[i],dens1[i+1])
+      }
+       x<-c(x,hists$x[nrow(dens)],hists$x[nrow(dens)+1],hists$x[nrow(dens)+1]) 
+       y<-c(y,dens1[nrow(dens)],dens1[nrow(dens)],0)
+       g<-addG(g,dataLine(data.frame(y=x*width[2]+xoff,x=y),colour="black"))
+       g<-addG(g,dataLine(data.frame(y=x*width[1]+xoff,x=-y),colour="black"))
     }
     # g<-addG(g,
     #   dataPolygon(data=data.frame(y=hist1$x,x=hist1$y1+xoff),colour=NA, fill = c2,alpha=simAlpha),
