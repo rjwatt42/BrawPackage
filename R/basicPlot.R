@@ -723,7 +723,7 @@ drawPoint<-function(data,shape=21,colour="#000000",fill="white",alpha=1,size=3) 
                g<-paste0(g,
                          '<circle cx="',format(x[i]),'" cy="',format(y[i]),'" r="',sz,'"',
                          ' fill="',fill,'"',
-                         ' stroke="',colour,'" stroke-width="1"',
+                         ' stroke="',colour,'" stroke-width="0.1"',
                          ' />'
                )
              }
@@ -738,7 +738,7 @@ drawPoint<-function(data,shape=21,colour="#000000",fill="white",alpha=1,size=3) 
                          ' width="',sz,'"',' height="',sz,'"',
                          ' rx="0" ry="0"',
                          ' fill="',fill,'"',
-                         ' stroke="',colour,'" stroke-width="1"',
+                         ' stroke="',colour,'" stroke-width="0.1"',
                          tr,
                          ' />'
                )
