@@ -4,7 +4,7 @@
 #' @examples
 #' fit_sem_model<-function(pathmodel,model_data,fixedCoeffs=NULL)
 #' @export
-fit_sem_model<-function(pathmodel,model_data,fixedCoeffs=NULL) {
+fit_sem_model<-function(pathmodel,model_data,fixedCoeffs=NULL,doinglavaan=TRUE) {
 # this follows the notation in 
   # Flora D.B. (2018) Statistical Methods for the Social and Behavioural Sciences
 #  
@@ -17,14 +17,27 @@ fit_sem_model<-function(pathmodel,model_data,fixedCoeffs=NULL) {
 #
 #  Stheta is obtained from a given set of possible model coefficients
   
+  if (doinglavaan) {
+    pathmodel$path$stages<-sapply(pathmodel$path$stages,function(x) gsub("[^0-9a-zA-Z_.]","",x))
+    pathmodel$path$only_ivs<-sapply(pathmodel$path$only_ivs,function(x) gsub("[^0-9a-zA-Z_.]","",x))
+    pathmodel$path$only_dvs<-sapply(pathmodel$path$only_dvs,function(x) gsub("[^0-9a-zA-Z_.]","",x))
+    pathmodel$path$add<-sapply(pathmodel$path$add,function(x) gsub("[^0-9a-zA-Z_.]","",x))
+    pathmodel$path$remove<-sapply(pathmodel$path$remove,function(x) gsub("[^0-9a-zA-Z_.]","",x))
+    
+    colnames(model_data$data)<-gsub("[^0-9a-zA-Z_.]","",colnames(model_data$data))
+    model_data$variables$name<-gsub("[^0-9a-zA-Z_.]","",model_data$variables$name)
+    model_data$varnames<-gsub("[^0-9a-zA-Z_.]","",model_data$varnames)
+  }
+  
   stages<-pathmodel$path$stages
   stages<-stages[!sapply(stages,isempty)]
+
   n_stages<-length(stages)
   if (n_stages==0) return(NULL)
   m_stages<-max(sapply(stages,length))
 
   pathLocalModel<-matrix(0,n_stages,m_stages)
-  sem<-path2sem(pathmodel,model_data)
+  sem<-path2sem(pathmodel,model_data,doinglavaan)
 
   edges<-cbind(sem$Ldesign,sem$Bdesign)
   path<-""
@@ -36,12 +49,12 @@ fit_sem_model<-function(pathmodel,model_data,fixedCoeffs=NULL) {
     }
   }
   
-  semResult <- lavaan::sem(path, data=model_data$data)
+  semResult <- lavaan::sem(path, data=sem$data)
   nullpath<-""
   for (i in 1:length(colnames(edges))) {
     nullpath<-paste0(nullpath,colnames(edges)[i],"~~",colnames(edges)[i],"\n")
   }
-  semResultNull<-lavaan::sem(nullpath, data=model_data$data)
+  semResultNull<-lavaan::sem(nullpath, data=sem$data)
   
   coefs<-lavInspect(semResult,"coef")$beta
   
@@ -97,7 +110,7 @@ fit_sem_model<-function(pathmodel,model_data,fixedCoeffs=NULL) {
   return(sem)
 }
 
-path2sem<-function(pathmodel,model_data) {
+path2sem<-function(pathmodel,model_data,doinglavaan=TRUE) {
 
   # firstly get all the details local
   stages<-pathmodel$path$stages
@@ -130,38 +143,40 @@ path2sem<-function(pathmodel,model_data) {
       new_data<-cbind(new_data,nv)
       new_names<-c(new_names,full_varnames[iv])
     } else {
-      if (is.factor(full_data[,iv]))
-        cases<-levels(full_data[,iv])
-      else cases<-unique(full_data[,iv])
-      cases<-cases[!is.na(cases)]
-      nv<-zeros(nrow(full_data),length(cases)-1)
-      nv[is.na(full_data[,iv]),]<-NA
-      for (ic in 2:length(cases)) {
-        nv[,ic-1]<-unlist(full_data[,iv])==cases[ic]
-      }
-      nn<-paste0(full_varnames[iv],'=',cases[2:length(cases)])
-      # colnames(nv)<-nn
-      new_data<-cbind(new_data,nv)
-      new_names<-cbind(new_names,nn)
-      for (is in 1:length(stages)){
-        s<-stages[[is]]
-        change<-which(full_varnames[iv]==s)
-        if (!isempty(change)) {
-          new_s<-c()
-          if (change>1) new_s<-s[1:(change-1)]
-          new_s<-c(new_s,nn)
-          if (change<length(s)) new_s<-c(new_s,s[(change+1):length(s)])
-          stages[[is]]<-new_s
-        }
-      }
-      s<-only_ivs
-      change<-which(full_varnames[iv]==s)
-      if (!isempty(change))
-        only_ivs<-cbind(only_ivs[1:(change-1)],nn,only_ivs[(change+1):length(s)])
-      s<-only_dvs
-      change<-which(full_varnames[iv]==s)
-      if (!isempty(change))
-        only_dvs<-cbind(only_dvs[1:(change-1)],nn,only_dvs[(change+1):length(s)])
+      # make dummy variables
+          if (is.factor(full_data[,iv]))
+            cases<-levels(full_data[,iv])
+          else cases<-unique(full_data[,iv])
+          cases<-cases[!is.na(cases)]
+          nv<-zeros(nrow(full_data),length(cases)-1)
+          nv[is.na(full_data[,iv]),]<-NA
+          for (ic in 2:length(cases)) {
+            nv[,ic-1]<-unlist(full_data[,iv])==cases[ic]
+          }
+          # nn<-paste0(full_varnames[iv],'=',cases[2:length(cases)])
+          nn<-paste0(full_varnames[iv],cases[2:length(cases)])
+          colnames(nv)<-nn
+          new_data<-cbind(new_data,nv)
+          new_names<-cbind(new_names,nn)
+          for (is in 1:length(stages)){
+            s<-stages[[is]]
+            change<-which(full_varnames[iv]==s)
+            if (!isempty(change)) {
+              new_s<-c()
+              if (change>1) new_s<-s[1:(change-1)]
+              new_s<-c(new_s,nn)
+              if (change<length(s)) new_s<-c(new_s,s[(change+1):length(s)])
+              stages[[is]]<-new_s
+            }
+          }
+          s<-only_ivs
+          change<-which(full_varnames[iv]==s)
+          if (!isempty(change))
+            only_ivs<-cbind(only_ivs[1:(change-1)],nn,only_ivs[(change+1):length(s)])
+          s<-only_dvs
+          change<-which(full_varnames[iv]==s)
+          if (!isempty(change))
+            only_dvs<-cbind(only_dvs[1:(change-1)],nn,only_dvs[(change+1):length(s)])
     }
   }
   full_varnames<-new_names

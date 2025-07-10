@@ -191,13 +191,17 @@ prepareSample<-function(raw_data, doOrdinals=FALSE, maxOrdinal=9, header=c()){
 #' @examples
 #' readSample<-function(data,DV,IV,IV2=NULL)
 #' @export
-readSample<-function(data,DV,IV,IV2=NULL) {
+readSample<-function(data,DV=NULL,IV=NULL,IV2=NULL) {
 
-  if (is.character(data)) data<-read.csv(data)
-  if (length(IV)>1) IV2<-IV[2]
+  if (is.character(data)) {
+    if (grepl(".xlsx",data)) data<-read_xlsx(data)
+    else data<-read.csv(data)
+  } 
   
   data1<-prepareSample(data)
+  if (is.null(DV)) return(data1)
   
+  if (length(IV)>1) IV2<-IV[2]
   dvUse<-as.list(data1$variables[which(data1$variables$name==DV),])
   ivUse<-as.list(data1$variables[which(data1$variables$name==IV[1]),])
   if (!is.null(IV2)) iv2Use<-as.list(data1$variables[which(data1$variables$name==IV2),])

@@ -1,9 +1,10 @@
+#####################
 
 data1<-readSample("class data 2018.xlsx")
 data1$data<-data1$data[rowSums(is.na(data1$data))==0,]
 
 pathmodel<-list(path=list(
-                          stages=list(c("Age","Sex"),c("HAMD total")),
+                          stages=list(c("HAMD total","Age","Sex"),c("PHQ-9 total")),
                           depth="d1",
                           only_ivs=list(),
                           only_dvs=list(),
@@ -21,15 +22,14 @@ pathmodel<-list(path=list(
 # pathmodel$path$depth<-"2"
 # pathmodel$path$stages<-list("Sex","PHQ-9 total")
 
-model_data<-list(pid=data1$data$participant,
+model_data<-list(pid=data1$data$Participant,
                  data=data1$data[2:ncol(data1$data)],
                  varnames=data1$variables$name,
                  varcat=data1$variables$type=="Categorical"
                  )
-sem<-path2sem(pathmodel,model_data)
 sem<-fit_sem_model(pathmodel,model_data)
 
-print(plotPathModel(sem))
+print(plotSEMModel(sem))
 
-
+########################
 

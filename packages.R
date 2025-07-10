@@ -3,10 +3,10 @@
 # source("https://github.com/rjwatt42/BrawStats/raw/main/packages.R")
 # suppressPackageStartupMessages
 
-list.of.packages<-c("ggplot2","ggtext","grDevices","grid",
+list.of.packages<-c("ggplot2","ggtext",
                     "mnormt","lme4",
                     "readxl","writexl","stringr","clipr",
-                    "car","pracma","abind","meta"
+                    "car","pracma","abind","meta","lavaan"
 )
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)>0) install.packages(new.packages,repos="http://cran.fhcrc.org")
