@@ -33,6 +33,9 @@ showSystem<-function(whichShow="all",hypothesis=braw.def$hypothesis,design=braw.
          "hypothesis"={
            g<-showHypothesis(hypothesis=hypothesis,evidence=evidence)
          },
+         "world"={
+           g<-showFullWorld(hypothesis=hypothesis)
+         },
          "design"={
            g<-showDesign(hypothesis=hypothesis,design=design)
          },
