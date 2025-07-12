@@ -83,7 +83,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     }
     outputText<-c(outputText,rep("",nc))
     
-    if (multipleResult$nullcount>0) {
+    if (nullresult$count>0) {
       result$rp[result$rp==0]<-0.00000000001
       result$rIV<-rbind(result$rIV,nullresult$rIV)
       result$rp<-rbind(result$rp,nullresult$rp)
@@ -160,7 +160,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
       }
       outputText1<-c(outputText1," ")
       outputText1<-rep(outputText1,effectTypes)
-      outputText1<-c("!H ","!jSources:",outputText1,rep("",nc-length(outputText1)-2))
+      outputText1<-c("!H "," ",outputText1,rep("",nc-length(outputText1)-2))
       }
     outputText<-c(outputText,outputText1)
     

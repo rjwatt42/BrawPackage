@@ -22,7 +22,7 @@
 #' @import pracma
 #' @import abind
 #' @import meta
-
+#' @import lavaan
 
 #' @export
 newBrawDev<-function(fontScale=1,height=1000,aspect=1) {

@@ -12,9 +12,9 @@ new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"
 if(length(new.packages)>0) install.packages(new.packages,repos="http://cran.fhcrc.org")
 
 library(ggplot2)
-library(ggtext)
-library(grDevices)
-library(grid)
+library(ggtext)      # richtext for ggplot2 (not used)
+library(grDevices)   # dev.off etc
+library(grid)        # unit()
 
 library(mnormt)      # pmnorm for logistic
 library(lme4)        # lmer (mixed models)

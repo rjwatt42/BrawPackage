@@ -74,8 +74,8 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
           col1Style<-paste0(col1Style,"font-weight:bold;")
           col1Style<-paste0(col1Style,"min-width:",indentSize,";")
           col1Style<-paste0(col1Style,"text-align:right;padding-right:5px;")
-          col1Style<-paste0(col1Style,"border-right:solid;border-right-color:",lineColour,";border-right-width:1px;")
-          col1Style<-paste0(col1Style,"border-left:solid;border-left-color:",lineColour,";border-left-width:1px;")
+          # col1Style<-paste0(col1Style,"border-right:solid;border-right-color:",lineColour,";border-right-width:1px;")
+          # col1Style<-paste0(col1Style,"border-left:solid;border-left-color:",lineColour,";border-left-width:1px;")
           outputText[index+(1:nc)]<-sub("!C","",outputText[index+(1:nc)])
           headerCol<-TRUE
         }
