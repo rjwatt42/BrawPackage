@@ -30,20 +30,23 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
     }
     outputText<-c(outputText,rep("",nc))
     
-    if (is.null(IV2)){
+    for (i in 1:1) {
       pval<-analysis$pIV
-      if (pval>=10^(-braw.env$report_precision-1)) {
-        pvalText<-paste("p = ",brawFormat(pval,digits=braw.env$report_precision+1),sep="")
-      } else {
-        pvalText<-paste0("p < ",10^(-braw.env$report_precision-1))
-      }
-      
-      t_name<-analysis$test_name
       df<-analysis$df
+      nval<-analysis$nval
+      rval<-analysis$rIV
+      
+      if (is.null(IV2)){
+        if (pval>=10^(-braw.env$report_precision-1)) {
+          pvalText<-paste("p = ",brawFormat(pval,digits=braw.env$report_precision+1),sep="")
+        } else {
+          pvalText<-paste0("p < ",10^(-braw.env$report_precision-1))
+        }
+        
+      t_name<-analysis$test_name
       if (!is.character(df)) df<-paste0("(",brawFormat(df),")")
       tval<-analysis$test_val
       
-      n<-analysis$nval
       f1<-" "
       f2<-" "
       if (braw.env$STMethod=="sLLR") {
@@ -60,8 +63,8 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
         f2<-paste("d=",brawFormat(analysis$dIV,digits=braw.env$report_precision),sep="")
       }
 
-      rvalText<-paste0(brawFormat(analysis$rIV,digits=braw.env$report_precision),
-                       "\u00B1",brawFormat(r2se(analysis$rIV,analysis$nval),digits=braw.env$report_precision))
+      rvalText<-paste0(brawFormat(rval,digits=braw.env$report_precision),
+                       "\u00B1",brawFormat(r2se(rval,nval),digits=braw.env$report_precision))
 
       if (IV$type=="Categorical" && IV$ncats==2 && DV$type=="Interval") {
         use1<-analysis$iv==IV$cases[1]
@@ -84,7 +87,7 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
                       f2,rvalText,rep("",nc-6))
       }
     }
-    
+    }
     if (!is.null(IV2)) {
       nc1<-length(colnames(anova))+1
       outputText<-c(outputText,"!H!C ","r",paste0(sub("Pr\\(","p\\(",sub("^","",colnames(anova)))),rep("",nc-1-nc1))
