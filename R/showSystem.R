@@ -156,12 +156,12 @@ showHypothesis<-function(hypothesis=braw.def$hypothesis,evidence=braw.def$eviden
 #' showFullWorld(world=makeWorld())
 #' @export
 showFullWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),fontScale=1,autoShow=FALSE,g=NULL) {
-  g<-showWorld(hypothesis=hypothesis,plotArea=c(0.05,0.5,0.4,0.4),fontScale=1,g=g)
+  g<-showWorld(hypothesis=hypothesis,joinNulls=FALSE,plotArea=c(0.05,0.35,0.45,0.55),fontScale=1,g=g)
   s<-hypothesis$effect$world$populationNullp
   
-  braw.env$plotArea<-c(0,0.15,0.6,0.4)
+  braw.env$plotArea<-c(0.1,0.1,0.45,0.3)
   g<-startPlot(xlim=c(-1,1),ylim=c(0,1),back="transparent",box="none",g=g)
-  g<-addG(g,drawArrow(c(0,0.9),0.75,45,"last",col="#000000",
+  g<-addG(g,drawArrow(c(0,0.9),1,45,"last",col="#000000",
                       fill=braw.env$plotColours$populationC,alpha=1, 
                       width=0.1*(1-s),position="end",finAngle=45),
             dataText(data.frame(x=0,y=0.5),brawFormat(1-s,digits=3),size=0.75))
@@ -171,11 +171,11 @@ showFullWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),fontS
   
   hypothesis1<-hypothesis
   hypothesis1$effect$world<-makeWorld(TRUE,"Single","r",0)
-  g<-showWorld(hypothesis=hypothesis1,plotArea=c(0.55,0.5,0.4,0.4),fontScale=1,g=g)
+  g<-showWorld(hypothesis=hypothesis1,plotArea=c(0.55,0.35,0.45,0.55),fontScale=1,g=g)
   
-  braw.env$plotArea<-c(0.4,0.15,0.6,0.4)
+  braw.env$plotArea<-c(0.45,0.1,0.45,0.3)
   g<-startPlot(xlim=c(-1,1),ylim=c(0,1),back="transparent",box="none",g=g)
-  g<-addG(g,drawArrow(c(0,0.9),0.75,-45,"last",col="#000000",
+  g<-addG(g,drawArrow(c(0,0.9),1,-45,"last",col="#000000",
                       fill=braw.env$plotColours$populationC,alpha=1, 
                       width=0.1*s,position="end",finAngle=45),
           dataText(data.frame(x=0,y=0.5),brawFormat(s,digits=3),hjust=1,size=0.75)
@@ -194,7 +194,8 @@ showFullWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),fontS
 #' @examples
 #' showWorld(world=makeWorld())
 #' @export
-showWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),fontScale=1,autoShow=FALSE,g=NULL) {
+showWorld<-function(hypothesis=braw.def$hypothesis,joinNulls=TRUE,
+                    plotArea=c(0,0,1,1),fontScale=1,autoShow=FALSE,g=NULL) {
 # world diagram
 
   world<-hypothesis$effect$world
@@ -233,8 +234,21 @@ showWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),fontScale
          }
   )
   if (is.element(world$populationPDF,c("Single","Double"))) {
-    rdens<-rdens/sum(rdens)*(1-world$populationNullp)
-    rdens[rx==0]<-rdens[rx==0]+world$populationNullp
+    width<-0.02
+    rx<-world$populationPDFk+c(-1,-1,1,1)*width
+    rdens<-c(0,1,1,0)*(1-world$populationNullp)
+    if (world$populationPDF=="Double") {
+      rx<-c(-rx,rx)
+      rdens<-c(rdens,rdens)/2
+    }
+    if (joinNulls)
+    if (world$populationNullp>0) {
+      rdens<-rdens/sum(rdens)
+      rx<-c(rx,c(-1,-1,1,1)*width)
+      rdens<-c(rdens,c(0,1,1,0)*world$populationNullp)
+    }
+    
+    # rdens[rx==0]<-rdens[rx==0]+world$populationNullp
   } 
   if (!is.element(world$populationPDF,c("sample","biasedsample"))) {
     rdens<-rdens*(1-world$populationNullp)
