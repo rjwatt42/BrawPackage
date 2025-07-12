@@ -122,10 +122,11 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     
     # column labels
     if (is.element(showType,c("NHST","Hits","Misses","Inference"))) {
+      outputText<-c(outputText,"!TSources",rep("",nc-1))
       if (braw.env$STMethod=="NHST")
-        outputText1<-c("!H ","!H!CSources:","sig","ns",rep("",nc-4))
+        outputText1<-c("!H ","!H!C","sig","ns",rep("",nc-4))
       else
-        outputText1<-c("!H ","!H!CSources:","sig","ns","err",rep("",nc-5))
+        outputText1<-c("!H ","!H!C","sig","ns","err",rep("",nc-5))
     }
     else 
       if (is.element(showType,c("SEM"))) {
@@ -219,7 +220,8 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
             e2p=paste0("!j",brawFormat(sum(!resSig)/(sum(!nullSig)+sum(!resSig))*100,digits=1),"%")
 
             outputText<-c(outputText,rep("",nc))
-            outputText<-c(outputText,"!H ","!H!C!jInferences:","false","correct",rep("",nc-4))
+            outputText<-c(outputText,"!TInferences",rep("",nc-1))
+            outputText<-c(outputText,"!H ","!H!C","false","correct",rep("",nc-4))
             
             outputText<-c(outputText," ","!jAll:",e1b,e2b,rep("",nc-4))
             outputText<-c(outputText," ",paste0("!jHits ",e1c,":"),e1n,e1p,rep("",nc-4))
