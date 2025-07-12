@@ -54,6 +54,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
              "Power"=     {pars<-c("ws","wp")},
              "2D"=        {pars<-c("rs","p")},
              "CILimits"=  {pars<-c("ci1","ci2")},
+             "rse"=       {pars<-c("e2p","e1p")}
              "NHST"=      {pars<-c("e2p","e1p")},
              "Inference"= {pars<-c("e1a","e2a")},
              "Source"=    {pars<-c("e1a","e2a")},
