@@ -167,9 +167,8 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
             outputText[index]<-gsub("\\[([a-zA-Z0-9_+-]*)\\]","<sub>\\1</sub>",outputText[index])
             outputText[index]<-gsub("\\^([a-zA-Z0-9_+-]*)([a-zA-Z0-9_]*)","<sup>\\1</sup>",outputText[index])
 
-            
+            extra<-""
             # if (i==nc && headerCol) extra<-paste0("border-right:solid;border-right-color:",lineColour,";")
-            else extra<-""
             # if (i==1 && headerCol) extra<-paste0(extra,"border-left:solid;")
             if (nchar(outputText[index])>0)
                  outputFront<-paste0(outputFront,"<td ",bgcolor," style=",startStyle,rowStyle,cellStyle,cellFilledStyle,extra,">",outputText[index],"</td>")
