@@ -287,16 +287,21 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE,sequence=FALSE){
     shape<-braw.env$plotShapes$meta
   }
   pts1=pts[use,]
+  if (sequence) dotSize<-dotSize*0.5
   if (length(d1)>100) {b1<-c1;b2<-c2} else {b1<-b2<-"#000000"}
   g<-addG(g,dataPoint(data=pts1,shape=shape, colour = b2, fill = c2, alpha=gain^0.8, size = dotSize))
-  pts1$x<-pts1$x+diff(xaxis$lim)*0.02
+  pts1$x<-pts1$x+diff(xaxis$lim)*0.025
   if (sequence)
     g<-addG(g,dataText(data=pts1,labels[use],vjust=0.5,size=0.75))
   pts2=pts[!use,]
   g<-addG(g,dataPoint(data=pts2,shape=shape, colour = b1, fill = c1, alpha=gain^0.8, size = dotSize))
-  pts2$x<-pts2$x+diff(xaxis$lim)*0.02
+  pts2$x<-pts2$x+diff(xaxis$lim)*0.025
   if (sequence)
     g<-addG(g,dataText(data=pts2,labels[!use],vjust=0.5,size=0.75))
   
+  if (sequence) {
+    use<-length(pts$x)
+    g<-addG(g,dataPoint(data=pts[use,],shape=shape, colour = b2, fill = c2, alpha=gain^0.8, size = dotSize*2))
+  }
   return(g)
 }

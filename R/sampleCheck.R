@@ -238,8 +238,14 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
       res$nval<-sum(ResultHistory$nval)
       res$rIV<-sum(ResultHistory$rIV*ResultHistory$nval)/res$nval
       res$rIV<-metaResult$fixed$param1
+      res$rpIV<-ResultHistory$prIV[1]
       res$df1<-ResultHistory$df1[1]
       res$pIV<-rn2p(res$rIV,res$nval)
+      ResultHistory$nval<-c(ResultHistory$nval,res$nval)
+      ResultHistory$df1<-c(ResultHistory$df1,res$df1)
+      ResultHistory$rIV<-c(ResultHistory$rIV,res$rIV)
+      ResultHistory$rpIV<-c(ResultHistory$rpIV,res$rpIV)
+      ResultHistory$pIV<-c(ResultHistory$pIV,res$pIV)
     } else {
     switch(Replication$Keep,
            "Median"={
