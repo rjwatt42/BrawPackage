@@ -252,7 +252,7 @@ makeLabel<-function(label=NULL) {
 }
 startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=0,
                     xticks=NULL,xlabel=NULL,xmax=FALSE,yticks=NULL,ylabel=NULL,ymax=FALSE,
-                    backC=braw.env$plotColours$graphBack,orientation="horz",fontScale=1,
+                    backC=braw.env$plotColours$graphBack,orientation="horz",fontScale=1,unitGap=0.75,
                     g=NULL) {
   sz<-braw.env$fullGraphSize
   # if (all(braw.env$plotArea==c(0,0,1,1))) {
@@ -275,7 +275,7 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=0,
   fontScale<-fontScale*fontShrink
   
   minGap<-0.1
-  unitGap<-0.75*braw.env$fontSize
+  unitGap<-unitGap*braw.env$fontSize
   labelGapx<-labelGapy<-unitGap*1.7
   if (containsSubscript(xlabel$label) || containsSuperscript(xlabel$label)) labelGapx<-labelGapx*1.6
   if (containsSubscript(ylabel$label) || containsSuperscript(ylabel$label)) labelGapy<-labelGapy*1.6
