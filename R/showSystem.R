@@ -145,13 +145,53 @@ showHypothesis<-function(hypothesis=braw.def$hypothesis,evidence=braw.def$eviden
   else return(g)  
 }
 
+
+#' show a world object
+#' 
+#' @return ggplot2 object - and printed
+#' @examples
+#' showFullWorld(world=makeWorld())
+#' @export
+showFullWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),fontScale=1,autoShow=FALSE,g=NULL) {
+  g<-showWorld(hypothesis=hypothesis,plotArea=c(0.05,0.5,0.4,0.4),fontScale=1,g=g)
+  s<-hypothesis$effect$world$populationNullp
+  
+  braw.env$plotArea<-c(0,0.15,0.6,0.4)
+  g<-startPlot(xlim=c(-1,1),ylim=c(0,1),back="transparent",box="none",g=g)
+  g<-addG(g,drawArrow(c(0,0.9),0.75,45,"last",col="#000000",
+                      fill=braw.env$plotColours$populationC,alpha=1, 
+                      width=0.1*(1-s),position="end",finAngle=45),
+            dataText(data.frame(x=0,y=0.5),brawFormat(1-s,digits=3),size=0.75))
+    
+  # g<-showEffect(1-hypothesis$effect$world$populationNullp,showValue=TRUE,
+  #               plotArea=c(0.0,0.15,0.6,0.4),2,g)
+  
+  hypothesis1<-hypothesis
+  hypothesis1$effect$world<-makeWorld(TRUE,"Single","r",0)
+  g<-showWorld(hypothesis=hypothesis1,plotArea=c(0.55,0.5,0.4,0.4),fontScale=1,g=g)
+  
+  braw.env$plotArea<-c(0.4,0.15,0.6,0.4)
+  g<-startPlot(xlim=c(-1,1),ylim=c(0,1),back="transparent",box="none",g=g)
+  g<-addG(g,drawArrow(c(0,0.9),0.75,-45,"last",col="#000000",
+                      fill=braw.env$plotColours$populationC,alpha=1, 
+                      width=0.1*s,position="end",finAngle=45),
+          dataText(data.frame(x=0,y=0.5),brawFormat(s,digits=3),hjust=1,size=0.75)
+  )
+  
+  # g<-showEffect(hypothesis$effect$world$populationNullp,showValue=TRUE,
+  #               plotArea=c(0.4,0.15,0.6,0.4),3,g)
+  
+  
+  return(g)
+  }
+
 #' show a world object
 #' 
 #' @return ggplot2 object - and printed
 #' @examples
 #' showWorld(world=makeWorld())
 #' @export
-showWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),autoShow=FALSE,g=NULL) {
+showWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),fontScale=1,autoShow=FALSE,g=NULL) {
 # world diagram
 
   world<-hypothesis$effect$world
@@ -173,7 +213,7 @@ showWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),autoShow=
          "z"={ xticks<-makeTicks(seq(-2,2,1));xlabel<-makeLabel(braw.env$zpLabel)}
   )
   g<-startPlot(xlim=c(-1,1)*range,ylim=c(0,1.05),
-               xticks=xticks,xlabel=xlabel,
+               xticks=xticks,xlabel=xlabel,fontScale = fontScale,
                box="x",g=g)
   # if (world$worldAbs) {
   #   rx<-seq(0,1,length.out=braw.env$worldNPoints)*range
