@@ -730,7 +730,7 @@ simulations_hist<-function(pts,valType,ylim,histGain,histGainrange){
 
 simulations_plot<-function(g,pts,showType=NULL,simWorld,
                         i=1,scale=1,width=1,col="white",alpha=1,useSignificanceCols=braw.env$useSignificanceCols,
-                        histStyle="width",orientation="vert",ylim,histGain=NA,histGainrange=NA,npointsMax=200){
+                        histStyle="width",orientation="vert",ylim,histGain=NA,histGainrange=NA,npointsMax=braw.env$npointsMax){
   se_size<-0.25
   
   c1=col
@@ -1291,7 +1291,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       }
       
       g<-simulations_plot(g,pts,showType,analysis$hypothesis$effect$world$worldOn,i,orientation=orientation,
-                       ylim=ylim,histGain=histGain,histGainrange=histGainrange,npointsMax=200)
+                       ylim=ylim,histGain=histGain,histGainrange=histGainrange)
 
       ns<-c()
       s<-c()

@@ -41,6 +41,7 @@ newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
 BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,10),
                    reportHTML=FALSE, graphicsType="ggplot",
                    newDev=FALSE,height=400,aspect=1.3,autoShow=FALSE,autoPrint=TRUE,timeLimit=Inf,fullGraphSize=1,
+                   npointsMax=250,
                    reducedOutput=FALSE) {
   if (graphC=="white") graphC<-"#FFFFFF"
   if (graphC=="normal") graphC<-"#BFECFF"
@@ -190,6 +191,8 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,1
           braw.env$truncate_p<-FALSE
           braw.env$min_nw<-10
           braw.env$max_nw<-10000
+          
+          braw.env$npointsMax<-npointsMax
           
           braw.env$dist_zi<-0.05
           braw.env$dist_range<-4
