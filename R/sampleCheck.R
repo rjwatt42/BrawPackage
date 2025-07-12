@@ -145,7 +145,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
 
   Replication<-design$Replication
   resOriginal<-res
-  ResultHistory<-list(n=res$nval,df1=res$df1,r=res$rIV,rp=res$rpIV,p=res$pIV)
+  ResultHistory<-list(nval=res$nval,df1=res$df1,rIV=res$rIV,rpIV=res$rpIV,pIV=res$pIV)
   
   if (Replication$On) {
     # are we asked to start with a significant first result?
@@ -158,7 +158,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
       #   res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
       # }
       resOriginal<-res
-      ResultHistory<-list(n=res$nval,df1=res$df1,r=res$rIV,rp=res$rpIV,p=res$pIV)
+      ResultHistory<-list(nval=res$nval,df1=res$df1,rIV=res$rIV,rpIV=res$rpIV,pIV=res$pIV)
     }
     
     braw.env$alphaSig<-Replication$RepAlpha
@@ -203,11 +203,11 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
         # res$rIV<-0
       }
       # save this result
-      ResultHistory$n<-c(ResultHistory$n,res$nval)
+      ResultHistory$nval<-c(ResultHistory$nval,res$nval)
       ResultHistory$df1<-c(ResultHistory$df1,res$df1)
-      ResultHistory$r<-c(ResultHistory$r,res$rIV)
-      ResultHistory$rp<-c(ResultHistory$rp,res$rpIV)
-      ResultHistory$p<-c(ResultHistory$p,res$pIV)
+      ResultHistory$rIV<-c(ResultHistory$rIV,res$rIV)
+      ResultHistory$rpIV<-c(ResultHistory$rpIV,res$rpIV)
+      ResultHistory$pIV<-c(ResultHistory$pIV,res$pIV)
       
       if (Replication$BudgetType=="Fixed") {
         budgetUse<-budgetUse+res$nval
@@ -227,50 +227,50 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
     
     
     if (Replication$Keep=="MetaAnalysis") {
-      studies<-list(rIV=ResultHistory$r,nval=ResultHistory$n,df1=ResultHistory$df1,
-                    rpIV=ResultHistory$rp)
+      studies<-list(rIV=ResultHistory$rIV,nval=ResultHistory$nval,df1=ResultHistory$df1,
+                    rpIV=ResultHistory$rpIV)
       metaAnalysis<-makeMetaAnalysis(TRUE,analysisType="fixed",
                                      method="MLE",
                                      modelNulls=FALSE,
                                      sourceBias=FALSE,
                                      analyseBias=1/length(studies$rIV))
       metaResult<-runMetaAnalysis(metaAnalysis,studies,hypothesis,metaResult=NULL)
-      res$nval<-sum(ResultHistory$n)
-      res$rIV<-sum(ResultHistory$r*ResultHistory$n)/res$nval
+      res$nval<-sum(ResultHistory$nval)
+      res$rIV<-sum(ResultHistory$rIV*ResultHistory$nval)/res$nval
       res$rIV<-metaResult$fixed$param1
       res$df1<-ResultHistory$df1[1]
       res$pIV<-rn2p(res$rIV,res$nval)
     } else {
     switch(Replication$Keep,
            "Median"={
-             use<-which(ResultHistory$p==sort(ResultHistory$p)[ceil(length(ResultHistory$p)/2)])
+             use<-which(ResultHistory$pIV==sort(ResultHistory$pIV)[ceil(length(ResultHistory$pIV)/2)])
              use<-use[1]
            },
            "LargeN"={
-             use<-which.max(ResultHistory$n)
+             use<-which.max(ResultHistory$nval)
            },
            "SmallP"={
-             use<-which.min(ResultHistory$p[2:length(ResultHistory$p)])
+             use<-which.min(ResultHistory$pIV[2:length(ResultHistory$pIV)])
            },
            "Last"={
-             use<-length(ResultHistory$p)
+             use<-length(ResultHistory$pIV)
            },
            "FirstSuccess"={
-             use<-length(ResultHistory$p)
+             use<-length(ResultHistory$pIV)
            },
            "Cautious"={
-             sigs<-isSignificant(braw.env$STMethod,ResultHistory$p,ResultHistory$r,ResultHistory$n,ResultHistory$df1,evidence)
-             if (!any(!sigs)) use<-length(ResultHistory$p)
+             sigs<-isSignificant(braw.env$STMethod,ResultHistory$pIV,ResultHistory$rIV,ResultHistory$nval,ResultHistory$df1,evidence)
+             if (!any(!sigs)) use<-length(ResultHistory$pIV)
              else            {
                use<-which(!sigs)
                use<-use[1]
              }
            }
     )
-    res$rIV<-ResultHistory$r[use]
-    res$nval<-ResultHistory$n[use]
+    res$rIV<-ResultHistory$rIV[use]
+    res$nval<-ResultHistory$nval[use]
     res$df1<-ResultHistory$df1[use]
-    res$pIV<-ResultHistory$p[use]
+    res$pIV<-ResultHistory$pIV[use]
     }
   }
   

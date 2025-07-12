@@ -29,7 +29,8 @@ trimanalysis<-function(analysis) {
 }
 
 plotInference<-function(analysis,otheranalysis=NULL,disp="rs",orientation="vert",
-                        whichEffect="Main 1",effectType="all",showTheory=braw.env$showTheory,showLegend=FALSE,g=NULL){
+                        whichEffect="Main 1",effectType="all",showTheory=braw.env$showTheory,showLegend=FALSE,sequence=FALSE,
+                        g=NULL){
   if (length(disp)==2) {
     return(plot2Inference(analysis,disp[1],disp[2]))
   } 
@@ -104,7 +105,7 @@ plotInference<-function(analysis,otheranalysis=NULL,disp="rs",orientation="vert"
 }
 
 
-plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
+plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE,sequence=FALSE){
     
   r<-analysis$hypothesis$rIV
   if (!is.null(analysis$hypothesis$IV2)){
@@ -247,6 +248,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
     )
   
   pts<-data.frame(x=d1,y=d2)
+  labels<-1:length(d1)
   braw.env$plotArea<-c(0,0,1,1)
   g<-startPlot(xaxis$lim,yaxis$lim,
                xticks=makeTicks(logScale=xaxis$logScale),xlabel=makeLabel(xaxis$label),
@@ -287,8 +289,14 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
   pts1=pts[use,]
   if (length(d1)>100) {b1<-c1;b2<-c2} else {b1<-b2<-"#000000"}
   g<-addG(g,dataPoint(data=pts1,shape=shape, colour = b2, fill = c2, alpha=gain^0.8, size = dotSize))
+  pts1$x<-pts1$x+diff(xaxis$lim)*0.02
+  if (sequence)
+    g<-addG(g,dataText(data=pts1,labels[use],vjust=0.5))
   pts2=pts[!use,]
   g<-addG(g,dataPoint(data=pts2,shape=shape, colour = b1, fill = c1, alpha=gain^0.8, size = dotSize))
+  pts2$x<-pts2$x+diff(xaxis$lim)*0.02
+  if (sequence)
+    g<-addG(g,dataText(data=pts2,labels[!use],vjust=0.5))
   
   return(g)
 }

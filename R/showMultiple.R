@@ -30,6 +30,11 @@ showMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     }
     
   fullResult<-multipleResult$result
+  sequence<-FALSE
+  if (is.null(fullResult)) {
+    fullResult<-multipleResult$ResultHistory
+    sequence<-TRUE
+  }
   if (is.element(showType[1],c("NHST","Hits","Misses","Source","Inference","p(sig)","SEM")) &&
       !multipleResult$hypothesis$effect$world$worldOn && 
       !all(is.na(multipleResult$nullresult$rIV))) {
@@ -45,7 +50,7 @@ showMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
   )
   
   g<-showInference(fullResult,showType=showType,dimension=dimension,orientation=orientation,
-                   whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showLegend=showLegend
+                   whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showLegend=showLegend,sequence=sequence
   ) 
   # if (is.null(multipleResult$hypothesis$IV2) || !is.element(whichEffect,c("All","Mains")))
     # g<-addG(g,plotTitle(paste0("Multiple: ",brawFormat(multipleResult$count)),"right",size=0.85))

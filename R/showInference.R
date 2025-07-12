@@ -60,7 +60,7 @@ getNulls<-function(analysisOld,useSig=FALSE,useNSig=FALSE) {
 #'               showTheory=TRUE)
 #' @export
 showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D",orientation="vert",
-                        whichEffect="All",effectType="all",showTheory=braw.env$showTheory,showLegend=FALSE
+                        whichEffect="All",effectType="all",showTheory=braw.env$showTheory,showLegend=FALSE,sequence=FALSE
 ) {
   if (is.null(analysis)) analysis<-doSingle(autoShow=FALSE)
   
@@ -147,7 +147,7 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
   } 
   
   if (length(showType)==2 && dimension=="2D") {
-    g1<-plot2Inference(analysis,showType[1],showType[2])
+    g1<-plot2Inference(analysis,showType[1],showType[2],sequence=sequence)
   } else {
     area.x<-0
     area.y<-1
