@@ -33,6 +33,8 @@ showMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
   sequence<-FALSE
   if (is.null(fullResult)) {
     fullResult<-multipleResult$ResultHistory
+    showType<-"rs;p"
+    dimension<-"2D"
     sequence<-TRUE
   }
   if (is.element(showType[1],c("NHST","Hits","Misses","Source","Inference","p(sig)","SEM")) &&
