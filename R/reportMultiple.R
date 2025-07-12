@@ -1,3 +1,10 @@
+reportNumber<-function(k,k1,reportCounts) {
+  if (reportCounts) {
+    brawFormat(k)
+  } else {
+    paste0(brawFormat(k/k1*100,digits=1),"%")
+  }
+}
 
 #' show the estimated population characteristics from multiple simulated sample
 #' 
@@ -8,7 +15,7 @@
 #' @return ggplot2 object - and printed
 #' @export
 reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
-                         whichEffect="All",effectType="all",reportStats="Medians"){
+                         whichEffect="All",effectType="all",reportStats="Medians",reportCounts=FALSE){
   
   if (is.null(multipleResult)) multipleResult=doMultiple(autoShow=FALSE)
   if (!multipleResult$hypothesis$effect$world$worldOn && is.element(showType[1],c("NHST","Inference","Source","Hits","Misses"))) {
@@ -85,11 +92,11 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     
     if (nullresult$count>0) {
       result$rp[result$rp==0]<-0.00000000001
-      result$rIV<-rbind(result$rIV,nullresult$rIV)
-      result$rp<-rbind(result$rp,nullresult$rp)
-      result$pIV<-rbind(result$pIV,nullresult$pIV)
-      result$nval<-rbind(result$nval,nullresult$nval)
-      result$df1<-rbind(result$df1,nullresult$df1)
+      result$rIV<-c(result$rIV,nullresult$rIV)
+      result$rpIV<-c(result$rpIV,nullresult$rpIV)
+      result$pIV<-c(result$pIV,nullresult$pIV)
+      result$nval<-c(result$nval,nullresult$nval)
+      result$df1<-c(result$df1,nullresult$df1)
     }
     
     effectTypes<-1
@@ -168,76 +175,69 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     for (whichEffect in whichEffects)  {
       
       if (is.element(showType,c("NHST","Hits","Misses","Inference","Source"))){
-        nullSig<-isSignificant(braw.env$STMethod,nullresult$pIV,nullresult$rIV,nullresult$nval,nullresult$df1,nullresult$evidence)
-        resSig<-isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,result$evidence)
-        if (braw.env$STMethod=="dLLR") {
-          nullSigW<-nullSig>0
-          nullSigN<-nullSig==0
-          nullSigC<-nullSig<0
-          resSigW<-resSig<0
-          resSigN<-resSig==0
-          resSigC<-resSig>0
-        }
-        
-        if (braw.env$STMethod=="NHST") {
-          e1=paste0(brawFormat(mean(nullSig)*100,digits=1),"%")
-          e2=paste0(brawFormat(mean(!resSig)*100,digits=1),"%")
-        } else {
-          e1=paste0(brawFormat(sum(nullSigW)/length(nullSig)*100,digits=1),"%")
-          e2=paste0(brawFormat(sum(resSigW)/length(resSig)*100,digits=1),"%")
-        }
-        
+        nulls<-result$rpIV==0
+        sigs<-isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,result$evidence)
+        nr<-length(result$pIV)
+        nsig<-sum(sigs!=0)
+        nnull<-sum(nulls)
+
         if (effect$world$worldOn) {
-          nr<-(length(nullresult$pIV)+length(result$pIV))
+          # nr<-(length(nullresult$pIV)+length(result$pIV))
           if (braw.env$STMethod=="NHST") {
-            e1e<-paste0("!j",brawFormat(sum(nullSig)/(sum(nullSig)+sum(resSig))*100,digits=1),"%")
-            e2e<-paste0("!j",brawFormat(sum(!resSig)/(sum(!nullSig)+sum(!resSig))*100,digits=1),"%")
-            e1a<-paste0("!j",brawFormat((sum(nullSig)+sum(resSig))/nr*100,digits=1),"%")
-            e2a<-paste0("!j",brawFormat((sum(!nullSig)+sum(!resSig))/nr*100,digits=1),"%")
+            e1a<-paste0("!j",reportNumber((sum(sigs)),nr,reportCounts))
+            e2a<-paste0("!j",reportNumber((sum(!sigs)),nr,reportCounts))
             outputText<-c(outputText," ","!jAll:",e1a,e2a,rep("",nc-4))
             
-            e1=paste0("!j",brawFormat(mean(nullSig)*100,digits=1),"%")
-            e2=paste0("!j",brawFormat(mean(!resSig)*100,digits=1),"%")
-            e3=paste0("!j",brawFormat(mean(!nullSig)*100,digits=1),"%")
-            e4=paste0("!j",brawFormat(mean(resSig)*100,digits=1),"%")
-            nn<-paste0("(",brawFormat(length(nullresult$pIV)/nr*100,digits=1),"%)")
-            nnn<-paste0("(",brawFormat(length(result$pIV)/nr*100,digits=1),"%)")
+            e1=paste0("!j",reportNumber(sum(nulls&sigs),nnull,reportCounts))
+            e2=paste0("!j",reportNumber(sum(!nulls&sigs),nr-nnull,reportCounts))
+            e3=paste0("!j",reportNumber(sum(nulls&!sigs),nnull,reportCounts))
+            e4=paste0("!j",reportNumber(sum(!nulls&!sigs),nr-nnull,reportCounts))
+            e1c<-reportNumber(sum(nulls),nr,reportCounts)
+            e2c<-reportNumber(sum(!nulls),nr,reportCounts)
             if (result$evidence$minRp!=0) {
-              outputText<-c(outputText," ",paste0("!j",braw.env$inactiveTitle," ",nn,":"),e1,e3,rep("",nc-4))
-            outputText<-c(outputText," ",paste0("!j",braw.env$activeTitle," ",nnn,":"),e4,e2,rep("",nc-4))
+              outputText<-c(outputText," ",paste0("!j",braw.env$activeTitle," (",e2c,"):"),e4,e2,rep("",nc-4))
+              outputText<-c(outputText," ",paste0("!j",braw.env$inactiveTitle," (",e1c,"):"),e1,e3,rep("",nc-4))
             } else {
-              outputText<-c(outputText," ",paste0("!j",braw.env$nullTitle," ",nn,":"),e1,e3,rep("",nc-4))
-              outputText<-c(outputText," ",paste0("!j",braw.env$nonnullTitle," ",nnn,":"),e4,e2,rep("",nc-4))
+              outputText<-c(outputText," ",paste0("!j",braw.env$nonnullTitle," (",e2c,"):"),e4,e2,rep("",nc-4))
+              outputText<-c(outputText," ",paste0("!j",braw.env$nullTitle," (",e1c,"):"),e1,e3,rep("",nc-4))
             }
-            e1b=paste0("!j",brawFormat((sum(nullSig)+sum(!resSig))/nr*100,digits=1),"%")
-            e2b=paste0("!j",brawFormat((sum(!nullSig)+sum(resSig))/nr*100,digits=1),"%")
-            e1c=paste0("(",brawFormat((sum(nullSig)+sum(resSig))/nr*100,digits=1),"%)")
-            e2c=paste0("(",brawFormat((sum(!nullSig)+sum(!resSig))/nr*100,digits=1),"%)")
-            
-            e1n=paste0("!j",brawFormat(sum(nullSig)/(sum(nullSig)+sum(resSig))*100,digits=1),"%")
-            e1p=paste0("!j",brawFormat(sum(resSig)/(sum(nullSig)+sum(resSig))*100,digits=1),"%")
-            e2n=paste0("!j",brawFormat(sum(!nullSig)/(sum(!nullSig)+sum(!resSig))*100,digits=1),"%")
-            e2p=paste0("!j",brawFormat(sum(!resSig)/(sum(!nullSig)+sum(!resSig))*100,digits=1),"%")
 
             outputText<-c(outputText,rep("",nc))
             outputText<-c(outputText,"!TInferences",rep("",nc-1))
             outputText<-c(outputText,"!H ","!H!C","false","correct",rep("",nc-4))
             
+            e1b=paste0("!j",reportNumber((sum(nulls&sigs)+sum(!nulls&!sigs)),nr,reportCounts))
+            e2b=paste0("!j",reportNumber((sum(nulls&!sigs)+sum(!nulls&sigs)),nr,reportCounts))
             outputText<-c(outputText," ","!jAll:",e1b,e2b,rep("",nc-4))
-            outputText<-c(outputText," ",paste0("!jHits ",e1c,":"),e1n,e1p,rep("",nc-4))
-            outputText<-c(outputText," ",paste0("!jMisses ",e2c,":"),e2p,e2n,rep("",nc-4))
+            
+            e1c=reportNumber(sum(sigs),nr,reportCounts)
+            e1n=paste0("!j",reportNumber(sum(nulls&sigs),nsig,reportCounts))
+            e1p=paste0("!j",reportNumber(sum(!nulls&sigs),nsig,reportCounts))
+            outputText<-c(outputText," ",paste0("!jHits (",e1c,"):"),e1n,e1p,rep("",nc-4))
+            
+            e2c=reportNumber(sum(!sigs),nr,reportCounts)
+            e2n=paste0("!j",reportNumber(sum(nulls&!sigs),nr-nsig,reportCounts))
+            e2p=paste0("!j",reportNumber(sum(!nulls&!sigs),nr-nsig,reportCounts))
+            outputText<-c(outputText," ",paste0("!jMisses (",e2c,"):"),e2n,e2p,rep("",nc-4))
           } else {
-            e1a<-paste0("!j",brawFormat((sum(nullSigC)+sum(resSigC))/nr*100,digits=1),"%")
-            e2a<-paste0("!j",brawFormat((sum(nullSigW)+sum(resSigW))/nr*100,digits=1),"%")
-            e3a<-paste0("!j",brawFormat((sum(nullSigN)+sum(resSigN))/nr*100,digits=1),"%")
+            nullSigW<-nulls&(sigs>0)
+            nullSigN<-nulls&(sigs==0)
+            nullSigC<-nulls&(sigs<0)
+            resSigW<-!nulls&(sigs<0)
+            resSigN<-!nulls&(sigs==0)
+            resSigC<-!nulls&(sigs>0)
+            
+            e1a<-paste0("!j",reportNumber((sum(nullSigC)+sum(resSigC)),nr,reportCounts))
+            e2a<-paste0("!j",reportNumber((sum(nullSigW)+sum(resSigW)),nr,reportCounts))
+            e3a<-paste0("!j",reportNumber((sum(nullSigN)+sum(resSigN)),nr,reportCounts))
             outputText<-c(outputText,"","!jAll",e1a,e3a,e2a,rep("",nc-5))
             
-            e1=paste0("!j",brawFormat(sum(nullSigC)/length(nullSig)*100,digits=1),"%")
-            e2=paste0("!j",brawFormat(sum(resSigC)/length(resSig)*100,digits=1),"%")
-            e3=paste0("!j",brawFormat(sum(nullSigN)/length(nullSig)*100,digits=1),"%")
-            e4=paste0("!j",brawFormat(sum(resSigN)/length(resSig)*100,digits=1),"%")
-            e5=paste0("!j",brawFormat(sum(nullSigW)/length(nullSig)*100,digits=1),"%")
-            e6=paste0("!j",brawFormat(sum(resSigW)/length(resSig)*100,digits=1),"%")
+            e1=paste0("!j",reportNumber(sum(nullSigC),nnull,reportCounts))
+            e2=paste0("!j",reportNumber(sum(resSigC),nr-nnull,reportCounts))
+            e3=paste0("!j",reportNumber(sum(nullSigN),nnull,reportCounts))
+            e4=paste0("!j",reportNumber(sum(resSigN),nr-nnull,reportCounts))
+            e5=paste0("!j",reportNumber(sum(nullSigW),nnull,reportCounts))
+            e6=paste0("!j",reportNumber(sum(resSigW),nr-nnull,reportCounts))
             if (result$evidence$minRp!=0) {
               outputText<-c(outputText,"",paste0("!j",braw.env$inactiveTitle),e1,e3,e5,rep("",nc-5))
             outputText<-c(outputText,"",paste0("!j",braw.env$activeTitle),e2,e4,e6,rep("",nc-5))
@@ -245,19 +245,19 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
               outputText<-c(outputText,"",paste0("!j",braw.env$nullTitle),e1,e3,e5,rep("",nc-5))
               outputText<-c(outputText,"",paste0("!j",braw.env$nonnullTitle),e2,e4,e6,rep("",nc-5))
             }
-            e1b=paste0("!j",brawFormat((sum(nullSigW)+sum(resSigW))/nr*100,digits=1),"%")
-            e2b=paste0("!j",brawFormat((sum(nullSigC)+sum(resSigC))/nr*100,digits=1),"%")
-            e3b=paste0(brawFormat((sum(nullSigN)+sum(resSigN))/nr*100,digits=1),"%")
-            e1c=paste0("(",brawFormat((sum(nullSigW)+sum(resSigW)+sum(nullSigC)+sum(resSigC))/nr*100,digits=1),"%)")
-            e2c=paste0("(",brawFormat((sum(nullSigW)+sum(resSigC))/nr*100,digits=1),"%)")
-            e3c=paste0("(",brawFormat((sum(nullSigC)+sum(resSigW))/nr*100,digits=1),"%)")
+            e1b=paste0("!j",reportNumber((sum(nullSigW)+sum(resSigW)),nr,reportCounts))
+            e2b=paste0("!j",reportNumber((sum(nullSigC)+sum(resSigC)),nr,reportCounts))
+            e3b=paste0(reportNumber((sum(nullSigN)+sum(resSigN)),nr,reportCounts))
+            e1c=paste0("(",reportNumber((sum(nullSigW)+sum(resSigW)+sum(nullSigC)+sum(resSigC)),nr,reportCounts),")")
+            e2c=paste0("(",reportNumber((sum(nullSigW)+sum(resSigC)),nr,reportCounts),")")
+            e3c=paste0("(",reportNumber((sum(nullSigC)+sum(resSigW)),nr,reportCounts),")")
 
-            e1n=paste0("!j",brawFormat((sum(nullSigW)+sum(resSigW))/(sum(nullSigW)+sum(resSigW)+sum(nullSigC)+sum(resSigC))*100,digits=1),"%")
-            e1p=paste0("!j",brawFormat((sum(nullSigC)+sum(resSigC))/(sum(nullSigW)+sum(resSigW)+sum(nullSigC)+sum(resSigC))*100,digits=1),"%")
-            e2n=paste0("!j",brawFormat((sum(nullSigW))/(sum(nullSigW)+sum(resSigC))*100,digits=1),"%")
-            e2p=paste0("!j",brawFormat((sum(resSigC))/(sum(nullSigW)+sum(resSigC))*100,digits=1),"%")
-            e3n=paste0("!j",brawFormat((sum(resSigW))/(sum(nullSigC)+sum(resSigW))*100,digits=1),"%")
-            e3p=paste0("!j",brawFormat((sum(nullSigC))/(sum(nullSigC)+sum(resSigW))*100,digits=1),"%")
+            e1n=paste0("!j",reportNumber((sum(nullSigW)+sum(resSigW)),(sum(nullSigW)+sum(resSigW)+sum(nullSigC)+sum(resSigC)),reportCounts))
+            e1p=paste0("!j",reportNumber((sum(nullSigC)+sum(resSigC)),(sum(nullSigW)+sum(resSigW)+sum(nullSigC)+sum(resSigC)),reportCounts))
+            e2n=paste0("!j",reportNumber((sum(nullSigW)),(sum(nullSigW)+sum(resSigC)),reportCounts))
+            e2p=paste0("!j",reportNumber((sum(resSigC)),(sum(nullSigW)+sum(resSigC)),reportCounts))
+            e3n=paste0("!j",reportNumber((sum(resSigW)),(sum(nullSigC)+sum(resSigW)),reportCounts))
+            e3p=paste0("!j",reportNumber((sum(nullSigC)),(sum(nullSigC)+sum(resSigW)),reportCounts))
             
             outputText<-c(outputText,rep("",nc))
             outputText<-c(outputText,"!H ","!H!C!jInferences:","correct","missing","false",rep("",nc-5))
@@ -269,6 +269,15 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
           }
           
         } else {
+          if (braw.env$STMethod=="NHST") {
+            e1=reportNumber(sum(nulls&sigs),nnull,reportCounts)
+            e2=reportNumber(sum(!nulls&sigs),nr-nnull,reportCounts)
+          } else {
+            nullSigW<-nulls&(sigs>0)
+            resSigW<-!nulls&(sigs<0)
+            e1=reportNumber(sum(nullSigW),nnull,reportCounts)
+            e2=reportNumber(sum(resSigW),nr-nnull,reportCounts)
+          }
           outputText<-c(outputText," "," ",e1,e2,rep("",nc-4))
         }
         
@@ -287,32 +296,32 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
           if (!all(nulls) && !all(!nulls)) {
             for (ig in nbar:1) {
               nextLine<-c("",colnames(data)[ig],
-                          paste0(brawFormat(100*sum(outcomes[!nulls]==ig)/sum(!nulls | nulls),digits=1),"%"),
-                          paste0("(",brawFormat(100*sum(outcomes[!nulls]==ig)/sum(!nulls),digits=1),"%",")"),
+                          paste0(reportNumber(sum(outcomes[!nulls]==ig),sum(!nulls | nulls),reportCounts)),
+                          paste0("(",reportNumber(sum(outcomes[!nulls]==ig),sum(!nulls),reportCounts),")"),
                           brawFormat(mean(abs(data[!nulls,ig]),na.rm=TRUE),digits=digits),
                           brawFormat(sd(abs(data[!nulls,ig]),na.rm=TRUE),digits=digits),
                           rep("",nc-6))
               if (ig==nbar) nextLine[1]<-paste0("!jNon-Nulls(",
-                                                brawFormat(100*sum(!nulls)/sum(!nulls | nulls),digits=1),"%)",
+                                                reportNumber(sum(!nulls),sum(!nulls | nulls),reportCounts),
                                                 ": ",nextLine[1])
               outputText<-c(outputText,nextLine)
             }
             for (ig in nbar:1) {
               nextLine<-c("",colnames(data)[ig],
-                          paste0(brawFormat(100*sum(outcomes[nulls]==ig)/sum(!nulls | nulls),digits=1),"%"),
-                          paste0("(",brawFormat(100*sum(outcomes[nulls]==ig)/sum(nulls),digits=1),"%",")"),
+                          paste0(reportNumber(sum(outcomes[nulls]==ig),sum(!nulls | nulls),reportCounts)),
+                          paste0("(",reportNumber(sum(outcomes[nulls]==ig),sum(nulls),reportCounts),")"),
                           brawFormat(mean(abs(data[nulls,ig]),na.rm=TRUE),digits=digits),
                           brawFormat(sd(abs(data[nulls,ig]),na.rm=TRUE),digits=digits),
                           rep("",nc-6))
               if (ig==nbar) nextLine[1]<-paste0("!jNulls(",
-                                                brawFormat(100*sum(nulls)/sum(!nulls | nulls),digits=1),"%)",
+                                                reportNumber(sum(nulls),sum(!nulls | nulls),reportCounts),")",
                                                 ": ",nextLine[1])
               outputText<-c(outputText,nextLine)
             }
           } else {
             for (ig in nbar:1) {
               nextLine<-c("",
-                          colnames(data)[ig],paste0(brawFormat(100*mean(outcomes==ig),digits=1),"%"),
+                          colnames(data)[ig],paste0(reportNumber(sum(outcomes==ig),length(outcomes),reportCounts)),
                           "",
                           brawFormat(mean(data[,ig],na.rm=TRUE),digits=1),
                           brawFormat(sd(data[,ig],na.rm=TRUE),digits=1),
@@ -427,14 +436,14 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
         # if (any(pars=="p")) {
         if (is.null(IV2)) {
           outputText<-c(outputText,rep("",nc),
-                        paste0("\bp(sig) = ",brawFormat(sum(p<braw.env$alphaSig,na.rm=TRUE)/sum(!is.na(p))*100,digits=1),"%"),rep(" ",nc-1))
+                        paste0("\bp(sig) = ",reportNumber(sum(p<braw.env$alphaSig,na.rm=TRUE),sum(!is.na(p)),reportCounts)),rep(" ",nc-1))
         }
         # }
         if (any(pars=="wp")) {
           if (is.null(IV2)) {
             outputText<-c(outputText,
                           paste0("\bp(w[p]>0.8) = ",
-                                 brawFormat(sum(rn2w(result$rpIV,result$nval)>0.8,na.rm=TRUE)/sum(!is.na(result$rpIV))*100,digits=1),"%"),rep(" ",nc-1))
+                                 reportNumber(sum(rn2w(result$rpIV,result$nval)>0.8,na.rm=TRUE),sum(!is.na(result$rpIV)),reportCounts)),rep(" ",nc-1))
           }
         }
           }
