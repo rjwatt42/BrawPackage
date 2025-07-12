@@ -808,14 +808,14 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
     }
     
     xr<-makeFiddle(pts$y1,2/40/braw.env$plotArea[4],orientation)
-    dotSize<-min(4,braw.env$dotSize*scale/max(abs(xr))*2.5)
     switch(orientation,
            "horz"={
-             hgain<-0.8
+             hgain<-0.9
              },
            "vert"={
-             hgain<-0.4
+             hgain<-0.45
            })
+    dotSize<-min(4,braw.env$dotSize*scale/max(abs(xr))/hgain*2)
     if (max(abs(xr))>0) xr<-xr*hgain/max(abs(xr))
     
     pts$x<-pts$x+xr*sum(width)*0.3/0.35
