@@ -45,7 +45,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
       if (whichEffect=="rIVIV2DV") {whichEffects<-"Interaction"}
     }
     
-    
+    if (showType=="rse") showType<-"NHST"
     if (length(showType)==1) {
       switch(showType,
              "Single"=    {pars<-c("rs")},
@@ -54,7 +54,6 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
              "Power"=     {pars<-c("ws","wp")},
              "2D"=        {pars<-c("rs","p")},
              "CILimits"=  {pars<-c("ci1","ci2")},
-             "rse"=       {pars<-c("e2p","e1p")},
              "NHST"=      {pars<-c("e2p","e1p")},
              "Inference"= {pars<-c("e1a","e2a")},
              "Source"=    {pars<-c("e1a","e2a")},
