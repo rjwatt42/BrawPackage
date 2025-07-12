@@ -276,7 +276,8 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=0,
   
   minGap<-0.1
   unitGap<-unitGap*braw.env$fontSize
-  labelGapx<-labelGapy<-unitGap*1.7
+  if (braw.env$graphicsType!="HTML") unitGap<-unitGap*1.7
+  labelGapx<-labelGapy<-unitGap
   if (containsSubscript(xlabel$label) || containsSuperscript(xlabel$label)) labelGapx<-labelGapx*1.6
   if (containsSubscript(ylabel$label) || containsSuperscript(ylabel$label)) labelGapy<-labelGapy*1.6
   

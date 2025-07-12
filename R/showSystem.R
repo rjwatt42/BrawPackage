@@ -216,7 +216,7 @@ showWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),fontScale
          "z"={ xticks<-makeTicks(seq(-2,2,1));xlabel<-makeLabel(braw.env$zpLabel)}
   )
   g<-startPlot(xlim=c(-1,1)*range,ylim=c(0,1.05),
-               xticks=xticks,xlabel=xlabel,fontScale = fontScale,unitGap=0.56,
+               xticks=xticks,xlabel=xlabel,fontScale = fontScale,unitGap=0.45,
                box="x",g=g)
   # if (world$worldAbs) {
   #   rx<-seq(0,1,length.out=braw.env$worldNPoints)*range
