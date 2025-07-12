@@ -610,6 +610,7 @@ drawText<-function(data,label, hjust=0, vjust=0, colour="#000000",fill="white",s
            
            for (i in 1:length(x)) {
              thisLabel<-label[i]
+             thisLabel<-gsub("'","",thisLabel)
              thisLabel<-gsub('\\[([^ ]*?)\\]',
                              paste0('</tspan><tspan baseline-shift="sub" font-size="',
                                     reSizeFont(size)*0.8,'">\\1</tspan><tspan>'),
