@@ -166,12 +166,15 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
     
     if (!braw.env$reducedOutput) {
     outputText<-c(outputText,rep("",nc))
-    outputText<-c(outputText,"!HPower(w)", "Post Hoc","Actual","n80",rep("",nc-4))   
+    outputText<-c(outputText,"!Hr[p]", "w[p]", "n80[p]", "w[s]", "n80[s]",rep("",nc-5))   
       if (is.na(effect$rIV)) {effect$rIV<-0}
-      outputText<-c(outputText," ",brawFormat(rn2w(analysis$rIV,analysis$nval),digits=3),
-                    brawFormat(rn2w(effect$rIV,analysis$nval),digits=3),
-                    paste0("!j",brawFormat(ceil(rw2n(analysis$rIV,0.8,2)))),
-                    rep("",nc-4))
+      outputText<-c(outputText,
+                    brawFormat(analysis$rpIV,digits=3),
+                    brawFormat(rn2w(analysis$rpIV,analysis$nval),digits=3),
+                    brawFormat(ceil(rw2n(analysis$rpIV,0.8,2))),
+                    brawFormat(rn2w(analysis$rIV,analysis$nval),digits=3),
+                    brawFormat(ceil(rw2n(analysis$rIV,0.8,2))),
+                    rep("",nc-5))
     }
     
     if (evidence$doSEM) {
