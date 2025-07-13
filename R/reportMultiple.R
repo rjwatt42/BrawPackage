@@ -85,7 +85,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     # header
     if (is.element(showType[1],c("NHST","Hits","Misses","Inference","SEM")) && sum(!is.na(nullresult$rIV))>0) {
       n1<-paste0(reportNumber(sum(!is.na(result$rIV)),length(result$rIV),reportCounts=TRUE),"(",reportNumber(sum(!is.na(result$rIV)),length(result$rIV),reportCounts=FALSE),")")
-      n2<-paste0(reportNumber(sum(!is.na(nullresult$rIV)),length(nullresult$rIV),reportCounts=TRUE),"(",reportNumber(sum(!is.na(nullresult$rIV)(),length(nullresult$rIV),reportCounts=FALSE),")")
+      n2<-paste0(reportNumber(sum(!is.na(nullresult$rIV)),length(nullresult$rIV),reportCounts=TRUE),"(",reportNumber(sum(!is.na(nullresult$rIV)),length(nullresult$rIV),reportCounts=FALSE),")")
       outputText<-c("!TMultiple  ",paste("nsims = ",n1,"+",n2,sep=""),rep("",nc-2))
     } else {
       outputText<-c("!TMultiple  ",paste("nsims = ",format(sum(!is.na(result$rIV))+sum(!is.na(nullresult$rIV))),sep=""),rep("",nc-2))
