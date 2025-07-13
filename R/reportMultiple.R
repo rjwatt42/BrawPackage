@@ -88,6 +88,16 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     } else {
       outputText<-c("!TMultiple  ",paste("nsims = ",format(sum(!is.na(result$rIV))+sum(!is.na(nullresult$rIV))),sep=""),rep("",nc-2))
     }
+    if (multipleResult$design$Replication$On) {
+      replTable<-c("!TReplication",rep("",nc-1))
+      replTable<-c(replTable,"!H","Original","Power","Decision",rep(",nc-4"))
+      replTable<-c(replTable," ",
+                   switch(multipleResult$design$Replication$forceSigOriginal+1,"any","sig only"),
+                   switch(multipleResult$design$Replication$PowerOn+1,"-",brawFormat(multipleResult$design$Replication$Power)),
+                   multipleResult$design$Replication$Keep,
+                   rep(",nc-4"))
+      outputText<-c(outputText,replTable)
+    }
     outputText<-c(outputText,rep("",nc))
     
     if (nullresult$count>0) {
