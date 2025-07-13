@@ -401,7 +401,7 @@ braw.res<<-braw.res
 #' @export
 setBrawOpts<-function(BW=NULL,graphC=NULL,fontScale=NULL,
                       graphicsType=NULL,fullGraphSize=NULL,
-                      reportHTML=NULL, reducedOutput=NULL, 
+                      reportHTML=NULL, fullOutput=NULL, 
                       npointsMax=NULL,
                       autoShow=NULL,autoPrint=NULL
 ) {
@@ -415,7 +415,7 @@ setBrawOpts<-function(BW=NULL,graphC=NULL,fontScale=NULL,
   }
   if(!is.null(graphicsType)) setBrawEnv("graphicsType",graphicsType)
   if(!is.null(reportHTML)) setBrawEnv("reportHTML",reportHTML)
-  if(!is.null(reducedOutput)) setBrawEnv("reducedOutput",reducedOutput)
+  if(!is.null(fullOutput)) setBrawEnv("fullOutput",fullOutput)
   if(!is.null(autoShow)) setBrawEnv("autoShow",autoShow)
   if(!is.null(autoPrint)) setBrawEnv("autoPrint",autoPrint)
   if(!is.null(fullGraphSize)) setBrawEnv("fullGraphSize",fullGraphSize)
