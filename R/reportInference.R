@@ -166,7 +166,7 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
     
     if (braw.env$fullOutput>0) {
     outputText<-c(outputText,rep("",nc))
-    outputText<-c(outputText,"!H","r", "n", "w", "n80",rep("",nc-4))   
+    outputText<-c(outputText,"!H","r", "n", "w", "n80",rep("",nc-5))   
       if (is.na(effect$rIV)) {effect$rIV<-0}
       outputText<-c(outputText,
                     "population",
@@ -174,7 +174,7 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
                     paste0("!j",brawFormat(analysis$nval)),
                     paste0("!j",brawFormat(rn2w(analysis$rpIV,analysis$nval),digits=3)),
                     paste0("!j",brawFormat(ceil(rw2n(analysis$rpIV,0.8,2)))),
-                    rep("",nc-4))
+                    rep("",nc-5))
       if (analysis$design$Replication$On) {
         outputText<-c(outputText,
                       "original",
@@ -182,13 +182,13 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
                       paste0("!j",brawFormat(analysis$noval)),
                       paste0("!j",brawFormat(rn2w(analysis$roIV,analysis$noval),digits=3)),
                       paste0("!j",brawFormat(ceil(rw2n(analysis$roIV,0.8,2)))),
-                      rep("",nc-4),
+                      rep("",nc-5),
                       "final",
                       paste0("!j",brawFormat(analysis$rIV,digits=3)),
                       paste0("!j",brawFormat(analysis$nval)),
                       paste0("!j",brawFormat(rn2w(analysis$rIV,analysis$nval),digits=3)),
                       paste0("!j",brawFormat(ceil(rw2n(analysis$rIV,0.8,2)))),
-                      rep("",nc-4))
+                      rep("",nc-5))
       } else {
         outputText<-c(outputText,
                       "sample",
@@ -196,7 +196,7 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
                       paste0("!j",brawFormat(analysis$nval)),
                       paste0("!j",brawFormat(rn2w(analysis$rIV,analysis$nval),digits=3)),
                       paste0("!j",brawFormat(ceil(rw2n(analysis$rIV,0.8,2)))),
-                      rep("",nc-4))
+                      rep("",nc-5))
       }
     }
     
