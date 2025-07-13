@@ -693,7 +693,8 @@ drawPath<-function(data,arrow=NULL,colour="#000000",linetype="solid",linewidth=0
            if (!is.null(arrow)) {
              for (i in 2:length(x)) {
              direction<-atan2(diff(y[(i-1):i]),diff(x[(i-1):i]))
-             finLength<-12
+             lineLength<-sqrt(diff(y[(i-1):i])^2+diff(x[(i-1):i])^2)
+             finLength<-min(12,lineLength/4)
              finAngle<-20/(180/pi)
              ax1<-x[i]-cos(direction+finAngle)*finLength
              ay1<-y[i]-sin(direction+finAngle)*finLength
