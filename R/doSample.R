@@ -208,8 +208,8 @@ makeSampleVar<-function(design,effect,n,MV,MV2){
       rho2<-effect$rIV2
       rho12<-effect$rIVIV2
       rhoInter<-effect$rIVIV2DV
-      ivr2_resid<-makeSampleVals(n,0,sqrt(1-rho12^2),IV2)
-      ivr21<-ivr*rho12+ivr2_resid
+      ivr2_resid<-makeSampleVals(n,0,sqrt(1-rho12^2),MV2)
+      ivr21<-ivr1*rho12+ivr2_resid
     } else {
       rho2<-0
       rho12<-0
@@ -222,7 +222,7 @@ makeSampleVar<-function(design,effect,n,MV,MV2){
       if (design$sIVRangeOn)
         condition<-condition & (ivr1>design$sIVRange[1] & ivr1<design$sIVRange[2])
       if (!is.null(MV2) && design$sIV2RangeOn) 
-        condition<-condition & (ivr2>design$sIV2Range[1] & ivr2<design$sIV2Range[2])
+        condition<-condition & (ivr21>design$sIV2Range[1] & ivr21<design$sIV2Range[2])
       ivr<-c(ivr, ivr1[condition])
       if (!is.null(MV2))
         ivr2<-c(ivr2,ivr21[condition])
