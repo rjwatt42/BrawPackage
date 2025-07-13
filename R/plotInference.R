@@ -302,8 +302,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE,sequence=FALSE){
   if (sequence) {
     use<-length(pts$x)
     g<-addG(g,dataPoint(data=pts[use,],shape=shape, colour = b2, fill = c2, alpha=gain^0.8, size = dotSize*2))
-    # g<-addG(g,dataPath(data=pts,arrow=TRUE,linewidth=1,colour="#FFFFFF"))
-    g<-addG(g,drawArrow(pts[1,],pts[2,]))
+    g<-addG(g,dataPath(data=pts,arrow=TRUE,linewidth=0.5,colour="#FFFFFF"))
   }
   return(g)
 }

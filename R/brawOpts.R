@@ -42,7 +42,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,1
                    reportHTML=FALSE, graphicsType="ggplot",
                    newDev=FALSE,height=400,aspect=1.3,autoShow=FALSE,autoPrint=TRUE,timeLimit=Inf,fullGraphSize=1,
                    npointsMax=250,
-                   fullOutput=FALSE) {
+                   reducedOutput=0) {
   if (graphC=="white") graphC<-"#FFFFFF"
   if (graphC=="normal") graphC<-"#BFECFF"
   braw.env <- new.env(parent = emptyenv())
@@ -225,7 +225,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,1
           braw.env$showTheoryHQ<-TRUE
           braw.env$showTheory<-TRUE
           
-          braw.env$fullOutput<-fullOutput
+          braw.env$reducedOutput<-reducedOutput
 
           ##################################
           # default variables
@@ -401,7 +401,7 @@ braw.res<<-braw.res
 #' @export
 setBrawOpts<-function(BW=NULL,graphC=NULL,fontScale=NULL,
                       graphicsType=NULL,fullGraphSize=NULL,
-                      reportHTML=NULL, fullOutput=NULL, 
+                      reportHTML=NULL, reducedOutput=NULL, 
                       npointsMax=NULL,
                       autoShow=NULL,autoPrint=NULL
 ) {
@@ -415,7 +415,7 @@ setBrawOpts<-function(BW=NULL,graphC=NULL,fontScale=NULL,
   }
   if(!is.null(graphicsType)) setBrawEnv("graphicsType",graphicsType)
   if(!is.null(reportHTML)) setBrawEnv("reportHTML",reportHTML)
-  if(!is.null(fullOutput)) setBrawEnv("fullOutput",fullOutput)
+  if(!is.null(reducedOutput)) setBrawEnv("reducedOutput",reducedOutput)
   if(!is.null(autoShow)) setBrawEnv("autoShow",autoShow)
   if(!is.null(autoPrint)) setBrawEnv("autoPrint",autoPrint)
   if(!is.null(fullGraphSize)) setBrawEnv("fullGraphSize",fullGraphSize)

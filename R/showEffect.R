@@ -7,8 +7,12 @@ drawArrow<-function(start,len,direction=0,ends="last",col="#000000",fill="white"
     )
   }
   if (length(len)==2) {
-    direction<-atan2(len[2]-start[2],len[1]-start[1])*(180/pi)
-    len<-sqrt((len[2]-start[2])^2+(len[1]-start[1])^2)
+    ygain<-diff(braw.env$plotLimits$ylim)
+    xgain<-diff(braw.env$plotLimits$xlim)
+    len<-len/c(ygain,xgain)
+    st<-start/c(ygain,xgain)
+    direction<- -atan2(len[2]-st[2],len[1]-st[1])*(180/pi)
+    len<-sqrt((len[2]-st[2])^2+(len[1]-st[1])^2)
   }
   finAngle<-finAngle/(180/pi)
   d=width*sin(finAngle)

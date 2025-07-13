@@ -77,7 +77,7 @@ showHistory<-function(back=-1) {
 #' 
 #' @return changes plotting environment 
 #' @examples 
-#' svgBix(height=200)
+#' svgB0x(height=200)
 #' @export
 svgBox<-function(height=NULL,aspect=1.3,fontScale=1.5) {
   if (is.null(height) && is.null(aspect)) return(braw.env$plotSize)
@@ -664,7 +664,7 @@ axisPath<-function(data,arrow=NULL,colour="#000000",linetype="solid",linewidth=0
 drawPath<-function(data,arrow=NULL,colour="#000000",linetype="solid",linewidth=0.25,alpha=1) {
   switch(braw.env$graphicsType,
          "ggplot"={
-           if (!is.null(arrow)) arrow<-grid::arrow()
+           if (!is.null(arrow)) arrow<-grid::arrow(angle=20,length=unit(0.4,"cm"))
            g<-geom_path(data=data,aes(x=x,y=y),arrow=arrow,color=colour,alpha=alpha,
                         linetype=linetype,linewidth=linewidth)
          },
@@ -674,21 +674,43 @@ drawPath<-function(data,arrow=NULL,colour="#000000",linetype="solid",linewidth=0
            if (linetype=="dashed") ls<-' stroke-dasharray="4,1"'
            linestyle<-paste0(' fill="none" stroke="',colour,'"',
                              ls,
-                             ' stroke-width="',linewidth,'"',
+                             ' stroke-width="',linewidth*2.5,'"',
                              ' stroke-opacity="',alpha,'"')
            x<-svgX(data$x)
            y<-svgY(data$y)
            points<-' points="'
-           for (i in 1:length(x)) 
+           for (i in 1:length(x))  {
              points<-paste0(points,' ',format(x[i]),',',format(y[i]))
+           }
            points<-paste0(points,'"')
-           
            g<-paste0(
              '<polyline',
              points,
              linestyle,
              ' />'
            )
+           
+           if (!is.null(arrow)) {
+             for (i in 2:length(x)) {
+             direction<-atan2(diff(y[(i-1):i]),diff(x[(i-1):i]))
+             finLength<-12
+             finAngle<-20/(180/pi)
+             ax1<-x[i]-cos(direction+finAngle)*finLength
+             ay1<-y[i]-sin(direction+finAngle)*finLength
+             ax2<-x[i]-cos(direction-finAngle)*finLength
+             ay2<-y[i]-sin(direction-finAngle)*finLength
+             g1<-paste0(
+               '<polyline',
+               paste0(' points=" ',format(ax1),',',format(ay1),
+                               ' ',format(x[i]),',',format(y[i]),
+                               ' ',format(ax2),',',format(ay2),
+                      '"'),
+               linestyle,
+               ' />'
+             )
+             g<-paste0(g,g1)
+             }
+           }
          },
          "base"={
            
