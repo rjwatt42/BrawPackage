@@ -84,8 +84,9 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     
     # header
     if (is.element(showType[1],c("NHST","Hits","Misses","Inference","SEM")) && sum(!is.na(nullresult$rIV))>0) {
-      n1<-paste0(reportNumber(sum(!is.na(result$rIV)),length(result$rIV),reportCounts=TRUE),"(",reportNumber(sum(!is.na(result$rIV)),length(result$rIV),reportCounts=FALSE),")")
-      n2<-paste0(reportNumber(sum(!is.na(nullresult$rIV)),length(nullresult$rIV),reportCounts=TRUE),"(",reportNumber(sum(!is.na(nullresult$rIV)),length(nullresult$rIV),reportCounts=FALSE),")")
+      n0<-sum(!is.na(result$rIV))+sum(!is.na(nullresult$rIV))
+      n1<-paste0(reportNumber(sum(!is.na(result$rIV)),nr,reportCounts=TRUE),"(",reportNumber(sum(!is.na(result$rIV)),nr,reportCounts=FALSE),")")
+      n2<-paste0(reportNumber(sum(!is.na(nullresult$rIV)),nr,reportCounts=TRUE),"(",reportNumber(sum(!is.na(nullresult$rIV)),nr,reportCounts=FALSE),")")
       outputText<-c("!TMultiple  ",paste("nsims = ",n1,"+",n2,sep=""),rep("",nc-2))
     } else {
       outputText<-c("!TMultiple  ",paste("nsims = ",format(sum(!is.na(result$rIV))+sum(!is.na(nullresult$rIV))),sep=""),rep("",nc-2))
@@ -195,13 +196,13 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
           if (result$evidence$minRp!=0) {
             # h1<-paste0(braw.env$activeTitle," (",e2c,"):")
             # h2<-paste0(braw.env$inactiveTitle," (",e1c,"):")
-            h1<-paste0(braw.env$activeTitle,":")
-            h2<-paste0(braw.env$inactiveTitle,":")
+            h1<-paste0(braw.env$activeTitle)
+            h2<-paste0(braw.env$inactiveTitle)
           } else {
             # h1<-paste0(braw.env$nonnullTitle," (",e2c,"):") #,e4,e2,rep("",nc-4))
             # h2<-paste0(braw.env$nullTitle," (",e1c,"):") #,e1,e3,rep("",nc-4))
-            h1<-paste0(braw.env$nonnullTitle,":")
-            h2<-paste0(braw.env$nullTitle,":")
+            h1<-paste0(braw.env$nonnullTitle)
+            h2<-paste0(braw.env$nullTitle)
           }
           outputText1<-c("!H ","!H!C","All",h1,h2,rep("",nc-5))
           outputText<-c(outputText,outputText1)
@@ -228,8 +229,8 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
             #               paste0("Hits (",e1c,"):"),
             #               paste0("Misses (",e2c,"):"),rep("",nc-5))
             outputText<-c(outputText,"!H ","!H!C","All",
-                          paste0("Hits:"),
-                          paste0("Misses:"),rep("",nc-5))
+                          paste0("Hits"),
+                          paste0("Misses"),rep("",nc-5))
             
             e1b=paste0("!j",reportNumber((sum(nulls&sigs)+sum(!nulls&!sigs)),nr,reportCounts))
             e2b=paste0("!j",reportNumber((sum(nulls&!sigs)+sum(!nulls&sigs)),nr,reportCounts))
