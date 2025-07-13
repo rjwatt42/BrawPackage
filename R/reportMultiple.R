@@ -201,7 +201,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
             # h1<-paste0(braw.env$nonnullTitle," (",e2c,"):") #,e4,e2,rep("",nc-4))
             # h2<-paste0(braw.env$nullTitle," (",e1c,"):") #,e1,e3,rep("",nc-4))
             h1<-paste0(braw.env$nonnullTitle,":")
-            h2<-braw.env$nullTitle,":")
+            h2<-paste0(braw.env$nullTitle,":")
           }
           outputText1<-c("!H ","!H!C","All",h1,h2,rep("",nc-5))
           outputText<-c(outputText,outputText1)
