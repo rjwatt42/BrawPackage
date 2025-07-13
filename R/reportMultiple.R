@@ -174,8 +174,8 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
       outputText1<-c(outputText1," ")
       outputText1<-rep(outputText1,effectTypes)
       outputText1<-c("!H "," ",outputText1,rep("",nc-length(outputText1)-2))
+      outputText<-c(outputText,outputText1)
       }
-    outputText<-c(outputText,outputText1)
     
     for (whichEffect in whichEffects)  {
       
@@ -198,6 +198,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
             h2<-paste0(braw.env$nullTitle," (",e1c,"):") #,e1,e3,rep("",nc-4))
           }
           outputText1<-c("!H ","!H!C","All",h1,h2,rep("",nc-5))
+          outputText<-c(outputText,outputText1)
             # outputText1<-c("!H ","!H!C","sig","ns","err",rep("",nc-5))
           
           if (braw.env$STMethod=="NHST") {
@@ -205,11 +206,13 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
             e1=paste0("!j",reportNumber(sum(nulls&sigs),nnull,reportCounts))
             e2=paste0("!j",reportNumber(sum(!nulls&sigs),nr-nnull,reportCounts))
             outputText1<-c("","!jsig:",e1a,e2,e1,rep("",nc-5))
+            outputText<-c(outputText,outputText1)
             
             e2a<-paste0("!j",reportNumber((sum(!sigs)),nr,reportCounts))
             e3=paste0("!j",reportNumber(sum(nulls&!sigs),nnull,reportCounts))
             e4=paste0("!j",reportNumber(sum(!nulls&!sigs),nr-nnull,reportCounts))
             outputText1<-c("","!jns:",e2a,e4,e3,rep("",nc-5))
+            outputText<-c(outputText,outputText1)
             
             outputText<-c(outputText,rep("",nc))
             outputText<-c(outputText,"!TInferences",rep("",nc-1))
