@@ -87,9 +87,9 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
       nr<-sum(!is.na(result$rIV))+sum(!is.na(nullresult$rIV))
       n1<-paste0(reportNumber(sum(!is.na(result$rIV)),nr,reportCounts=TRUE),"(",reportNumber(sum(!is.na(result$rIV)),nr,reportCounts=FALSE),")")
       n2<-paste0(reportNumber(sum(!is.na(nullresult$rIV)),nr,reportCounts=TRUE),"(",reportNumber(sum(!is.na(nullresult$rIV)),nr,reportCounts=FALSE),")")
-      outputText<-c("!TMultiple  ",paste("nsims = ",n1,"+",n2,sep=""),rep("",nc-2))
+      outputText<-c("!bMultiple  ",paste("nsims = ",n1,"+",n2,sep=""),rep("",nc-2))
     } else {
-      outputText<-c("!TMultiple  ",paste("nsims = ",format(sum(!is.na(result$rIV))+sum(!is.na(nullresult$rIV))),sep=""),rep("",nc-2))
+      outputText<-c("!bMultiple  ",paste("nsims = ",format(sum(!is.na(result$rIV))+sum(!is.na(nullresult$rIV))),sep=""),rep("",nc-2))
     }
     if (multipleResult$design$Replication$On) {
       replTable<-c("!TReplication",rep("",nc-1))
