@@ -1,9 +1,14 @@
-drawArrow<-function(start,len,direction,ends,col="#000000",fill="white",alpha=1, width=0.1,position="start",finAngle=45) {
+drawArrow<-function(start,len,direction=0,ends="last",col="#000000",fill="white",alpha=1, 
+                    width=0.1,position="start",finAngle=45) {
   if (position=="centre") {
     start<-c(
       start[1]-len/2*sin((direction-90)/(180/pi)),
       start[2]-len/2*cos((direction-90)/(180/pi))
     )
+  }
+  if (length(len)==2) {
+    direction<-atan2(len[2]-start[2],len[1]-start[1])*(180/pi)
+    len<-sqrt((len[2]-start[2])^2+(len[1]-start[1])^2))
   }
   finAngle<-finAngle/(180/pi)
   d=width*sin(finAngle)
