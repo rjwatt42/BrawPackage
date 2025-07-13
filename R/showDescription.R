@@ -4,7 +4,7 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,maxoff=1){
   if (braw.env$allScatter && !braw.env$newSampleDisplay) showRawData<-TRUE
   else showRawData<-FALSE
   
-  alphaPoints<-0.35
+  alphaPoints<-1
   shrinkDots=0.5
   if (colindex==1)
           {  col<- braw.env$plotColours$descriptionC
@@ -318,8 +318,8 @@ plotParDescription<-function(analysis,g) {
   analysis$hypothesis$IV$vals<-analysis$iv
   analysis$hypothesis$DV$vals<-analysis$dv
   
-  g<-plotPoints(g,analysis$hypothesis$IV,analysis$hypothesis$DV,analysis,1)
   g<-plotPrediction(analysis$hypothesis$IV,analysis$hypothesis$IV2,analysis$hypothesis$DV,analysis,analysis$design,offset=1,g=g)
+  g<-plotPoints(g,analysis$hypothesis$IV,analysis$hypothesis$DV,analysis,1)
   g
 }
 
@@ -369,7 +369,7 @@ showDescription<-function(analysis=braw.res$result,plotArea=c(0,0,1,1),g=NULL) {
                          title="",shape=c(21,22)))
   } else{
     g<-nullPlot()
-    if (analysis$evidence$rInteractionOn) {
+    if (analysis$evidence$AnalysisTerms==3) {
       if (analysis$evidence$rInteractionOnly) 
         braw.env$plotArea<-c(0,0,1,1)*plotArea[c(3,4,3,4)]+c(plotArea[c(1,2)],0,0)
       else
@@ -384,7 +384,7 @@ showDescription<-function(analysis=braw.res$result,plotArea=c(0,0,1,1),g=NULL) {
       yoff<-0
     } else yoff<-0.25
     
-    if (!analysis$evidence$rInteractionOn || !analysis$evidence$rInteractionOnly) {
+    if (analysis$evidence$AnalysisTerms==2 || !analysis$evidence$rInteractionOnly) {
       analysis1<-analysis
       analysis1$hypothesis$IV2<-NULL
       analysis2<-analysis
@@ -396,7 +396,7 @@ showDescription<-function(analysis=braw.res$result,plotArea=c(0,0,1,1),g=NULL) {
       analysis2$hypothesis$IV2<-NULL
       
       braw.env$plotArea<-c(0,yoff,0.45,0.5)*plotArea[c(3,4,3,4)]+c(plotArea[c(1,2)],0,0)
-      g<-getAxisPrediction(analysis1$hypothesis,g=g) 
+      g<-getAxisPrediction(analysis1$hypothesis,g=g)
       switch (analysis$hypothesis$DV$type,
               "Interval"=g<-plotParDescription(analysis1,g=g),
               "Ordinal"=g<-plotParDescription(analysis1,g=g),

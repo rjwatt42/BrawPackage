@@ -85,26 +85,27 @@ plotParParPrediction<-function(g,IV,DV,rho,n,offset=1,range=NULL){
     pts1<-data.frame(x=xv,y=c(yv_lower,rev(yv_upper)))
     pts1a<-data.frame(x=xd,y=yv_lower)
     pts1b<-data.frame(x=xd,y=yv_upper)
+    gain<-0.5
     if (ni==1) {
     g<-addG(g,dataPolygon(data=pts1,fill = col, colour=NA, alpha=0.5))
-    g<-addG(g,dataLine(data=pts1a,colour=col,linewidth=1))
-    g<-addG(g,dataLine(data=pts1b,colour=col,linewidth=1))
+    g<-addG(g,dataLine(data=pts1a,colour=col,linewidth=1*gain))
+    g<-addG(g,dataLine(data=pts1b,colour=col,linewidth=1*gain))
     } 
     if (ni>1 && ni<4) {
-      g<-addG(g,dataLine(data=pts1a,colour='black',linewidth=0.5,linetype='dotted'))
-      g<-addG(g,dataLine(data=pts1b,colour='black',linewidth=0.5,linetype='dotted'))
+      g<-addG(g,dataLine(data=pts1a,colour='black',linewidth=0.5*gain,linetype='dotted'))
+      g<-addG(g,dataLine(data=pts1b,colour='black',linewidth=0.5*gain,linetype='dotted'))
     }
     if (ni==4) {
-      g<-addG(g,dataLine(data=pts1a,colour='white',linewidth=0.5,linetype='dotted'))
-      g<-addG(g,dataLine(data=pts1b,colour='white',linewidth=0.5,linetype='dotted'))
+      g<-addG(g,dataLine(data=pts1a,colour='white',linewidth=0.5*gain,linetype='dotted'))
+      g<-addG(g,dataLine(data=pts1b,colour='white',linewidth=0.5*gain,linetype='dotted'))
     }
     }
   }
   pts2<-data.frame(x=xd,y=yd)
   if (offset==1) {
-    g<-addG(g,dataLine(data=pts2,colour=col,linewidth=2))
+    g<-addG(g,dataLine(data=pts2,colour=col,linewidth=2*gain))
   } else {
-    g<-addG(g,dataLine(data=pts2,colour=col,linewidth=2))
+    g<-addG(g,dataLine(data=pts2,colour=col,linewidth=2*gain))
   }
   g
   

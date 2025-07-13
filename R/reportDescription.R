@@ -150,12 +150,14 @@ reportDescription<-function(analysis=braw.res$result){
                           paste0("!j",brawFormat(analysis$r$unique[1],digits=braw.env$report_precision)),
                           paste0("!j",brawFormat(analysis$r$total[1],digits=braw.env$report_precision)),
                           rep("",nc-4))
-            outputText<-c(outputText,IV2$name,
+            if (evidence$AnalysisTerms>=2) {
+              outputText<-c(outputText,IV2$name,
                           paste0("!j",brawFormat(analysis$r$direct[2],digits=braw.env$report_precision)),
                           paste0("!j",brawFormat(analysis$r$unique[2],digits=braw.env$report_precision)),
                           paste0("!j",brawFormat(analysis$r$total[2],digits=braw.env$report_precision)),
                           rep("",nc-4))
-            if (evidence$rInteractionOn) {
+            }
+            if (evidence$AnalysisTerms==3) {
               outputText<-c(outputText,paste0(IV$name,braw.env$interaction_string,IV2$name),
                             paste0("!j",brawFormat(analysis$r$direct[3],digits=braw.env$report_precision)),
                             paste0("!j",brawFormat(analysis$r$unique[3],digits=braw.env$report_precision)),

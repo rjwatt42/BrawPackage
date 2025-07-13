@@ -7,7 +7,7 @@
 makeEvidence(
   shortHand = FALSE,
   sigOnly = FALSE,
-  rInteractionOn = FALSE,
+  AnalysisTerms = FALSE,
   rInteractionOnly = TRUE,
   ssqType = "Type3",
   caseOrder = "AsStated",
@@ -34,7 +34,7 @@ make an evidence definition
 }
 \examples{
 makeEvidence(shortHand=FALSE,sigOnly=FALSE,
-             rInteractionOn=TRUE,rInteractionOnly=TRUE,ssqType="Type3",
+             AnalysisTerms=TRUE,rInteractionOnly=TRUE,ssqType="Type3",
              caseOrder="Alphabetic",
              llr=list(e1=c(),e2=0),
              useAIC="AIC",

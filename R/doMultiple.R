@@ -59,8 +59,7 @@ resetMultiple<-function(nsims=0,evidence,multipleResult=NULL){
   
   if (nsims>0) {
     b<-matrix(NA,nsims,1)
-    if (evidence$rInteractionOn) bm<-matrix(NA,nsims,3)
-    else  bm<-matrix(NA,nsims,2)
+      bm<-matrix(NA,nsims,evidence$AnalysisTerms)
   } else {
     b<-NA
     bm<-NA

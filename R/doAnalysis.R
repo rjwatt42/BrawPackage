@@ -409,7 +409,7 @@ convert2Interval<-function(var) {
 #' @examples
 #' generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",caseOrder="AsStated")
 #' @export
-generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",caseOrder="AsStated") {
+generalAnalysis<-function(allData,AnalysisTerms,withins=FALSE,ssqType="Type3",caseOrder="AsStated") {
   
   if (ncol(allData)<3) {
     return(NULL)
@@ -452,10 +452,10 @@ generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",ca
   
   # CREATE FORMULA
   formula<-"dv~iv1"
-  if (no_ivs>1)
+  if (no_ivs>1 && AnalysisTerms>1)
     for (i in 2:no_ivs) {
       formula<-paste(formula,"+iv",i,sep="")
-      if (InteractionOn==1) formula<-paste(formula,"+iv1:iv",i,sep="")
+      if (AnalysisTerms>2) formula<-paste(formula,"+iv1:iv",i,sep="")
     }
   if (any(withins)){
     doingWithin<-TRUE
@@ -592,6 +592,8 @@ generalAnalysis<-function(allData,InteractionOn,withins=FALSE,ssqType="Type3",ca
 #' @export
 doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,autoShow=FALSE){
 
+  if (evidence$AnalysisTerms<2) sample$hypothesis$IV2<-NULL
+  
   design<-sample$design
   hypothesis<-sample$hypothesis
   IV<-hypothesis$IV
@@ -614,7 +616,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
 
   withins<-c(design$sIV1Use=="Within" && IV$type=="Categorical",design$sIV2Use=="Within" && IV2$type=="Categorical")
 
-  anResult<-generalAnalysis(allData,evidence$rInteractionOn,withins,evidence$ssqType,evidence$caseOrder)
+  anResult<-generalAnalysis(allData,evidence$AnalysisTerms,withins,evidence$ssqType,evidence$caseOrder)
   
 # MOVE RESULTS OUT TO BRAWSTATS  
   r_use<-anResult$r.direct
@@ -627,7 +629,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
   if (analysis$rIV<0 && analysis$rIVCI[1]<0 && analysis$rIVCI[2]>0) analysis$pIVCI[2]<-1
   analysis$rpIV<-sample$effectRho
 
-  if (no_ivs==2) {
+  if (length(r_use)>1) {
     analysis$rIV2<-r_use[2]
     analysis$pIV2<-p_use[2]
     analysis$rIV2CI<-r2ci(analysis$rIV2,n)
@@ -636,7 +638,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
     if (analysis$rIV2<0 && analysis$rIV2CI[1]<0 && analysis$rIV2CI[2]>0) analysis$pIV2CI[2]<-1
     
     #  interaction term
-    if (evidence$rInteractionOn==1) {
+    if (evidence$AnalysisTerms==3) {
       analysis$rIVIV2DV<-r_use[3]
       analysis$pIVIV2DV<-p_use[3]
       analysis$rIVIV2CI<-r2ci(analysis$rIVIV2DV,n)
@@ -650,6 +652,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
       analysis$pIVIV2CI<-NA
     }
   }
+  else hypothesis$IV2<-NULL
   analysis$rIVIV2<-0
   
   if (evidence$doSEM) {

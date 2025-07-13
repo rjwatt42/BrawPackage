@@ -44,7 +44,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     if (is.null(IV2) || showType=="SEM")    whichEffects<-"Main 1"
     else {
       whichEffects<-whichEffect
-      if (whichEffect=="All" && !evidence$rInteractionOn) whichEffect<-"Mains"
+      if (whichEffect=="All" && evidence$AnalysisTerms==2) whichEffect<-"Mains"
       if (whichEffect=="All")   {whichEffects<-c("Main 1","Main 2","Interaction")}
       if (whichEffect=="Mains") {whichEffects<-c("Main 1","Main 2")}
       if (whichEffect=="rIV") {whichEffects<-"Main 1"}

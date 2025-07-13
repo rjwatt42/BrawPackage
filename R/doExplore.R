@@ -773,7 +773,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
                   evidence$Welch<-!vals[vi]
                 },
                 "Transform"={evidence$Transform<-vals[vi]},
-                "InteractionOn"={evidence$rInteractionOn<-vals[vi]},
+                "InteractionOn"={evidence$AnalysisTerms<-vals[vi]},
                 
                 "Keep"={
                   design$Replication$Keep<-vals[vi]

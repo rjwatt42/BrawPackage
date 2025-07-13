@@ -274,7 +274,7 @@ makeDesign<-function(sN=42, sMethod=makeSampling("Random"),sMethodSeverity=0.1,
 #' @param Transform   "None","Log","Exp"
 #' @examples
 #' makeEvidence(shortHand=FALSE,sigOnly=FALSE,
-#'              rInteractionOn=TRUE,rInteractionOnly=TRUE,ssqType="Type3",
+#'              AnalysisTerms=TRUE,rInteractionOnly=TRUE,ssqType="Type3",
 #'              caseOrder="Alphabetic",
 #'              llr=list(e1=c(),e2=0),
 #'              useAIC="AIC",
@@ -285,7 +285,7 @@ makeDesign<-function(sN=42, sMethod=makeSampling("Random"),sMethodSeverity=0.1,
 #'              )
 #' @export
 makeEvidence<-function(shortHand=FALSE,sigOnly=FALSE,
-                       rInteractionOn=FALSE,rInteractionOnly=TRUE,ssqType="Type3",
+                       AnalysisTerms=2,rInteractionOnly=TRUE,ssqType="Type3",
                        caseOrder="AsStated",
                        llr=list(e1=c(),e2=0),
                        useAIC="AIC",
@@ -297,7 +297,7 @@ makeEvidence<-function(shortHand=FALSE,sigOnly=FALSE,
                        metaAnalysis=makeMetaAnalysis()
                        ){
   
-  evidence<-list(rInteractionOn=rInteractionOn,rInteractionOnly=rInteractionOnly,ssqType=ssqType,
+  evidence<-list(AnalysisTerms=AnalysisTerms,rInteractionOnly=rInteractionOnly,ssqType=ssqType,
                  caseOrder=caseOrder,shortHand=shortHand,sigOnly=sigOnly,
                  llr=llr,useAIC=useAIC,doSEM=doSEM,
                  Welch=Welch,Transform=Transform,McFaddens=McFaddens,
@@ -395,7 +395,7 @@ setDesign<-function(sN=braw.def$design$sN, sMethod=braw.def$design$sMethod, sMet
 #' set default evidence
 #' @export
 setEvidence<-function(shortHand=braw.def$evidence$shortHand,sigOnly=braw.def$evidence$sigOnly,
-                      rInteractionOn=braw.def$evidence$rInteractionOn,rInteractionOnly=braw.def$evidence$rInteractionOnly,ssqType=braw.def$evidence$ssqType,
+                      AnalysisTerms=braw.def$evidence$AnalysisTerms,rInteractionOnly=braw.def$evidence$rInteractionOnly,ssqType=braw.def$evidence$ssqType,
                       caseOrder=braw.def$evidence$caseOrder,
                       llr=braw.def$evidence$llr,useAIC=braw.def$evidence$useAIC,doSEM=braw.def$evidence$doSEM,
                       Welch=braw.def$evidence$Welch,Transform=braw.def$evidence$Transform,McFaddens=braw.def$evidence$McFaddens,
@@ -403,7 +403,7 @@ setEvidence<-function(shortHand=braw.def$evidence$shortHand,sigOnly=braw.def$evi
                       prior=braw.def$evidence$prior,
                       metaAnalysis=braw.def$evidence$metaAnalysis) {
   e<-makeEvidence(shortHand=shortHand,sigOnly=sigOnly,
-                  rInteractionOn=rInteractionOn,rInteractionOnly=rInteractionOnly,ssqType=ssqType,
+                  AnalysisTerms=AnalysisTerms,rInteractionOnly=rInteractionOnly,ssqType=ssqType,
                   caseOrder=caseOrder,
                   llr=llr,useAIC=useAIC,doSEM=doSEM,
                   Welch=Welch,Transform=Transform,McFaddens=McFaddens,
