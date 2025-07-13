@@ -42,7 +42,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,1
                    reportHTML=FALSE, graphicsType="ggplot",
                    newDev=FALSE,height=400,aspect=1.3,autoShow=FALSE,autoPrint=TRUE,timeLimit=Inf,fullGraphSize=1,
                    npointsMax=250,
-                   reducedOutput=0) {
+                   fullOutput=0) {
   if (graphC=="white") graphC<-"#FFFFFF"
   if (graphC=="normal") graphC<-"#BFECFF"
   braw.env <- new.env(parent = emptyenv())
@@ -225,7 +225,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,1
           braw.env$showTheoryHQ<-TRUE
           braw.env$showTheory<-TRUE
           
-          braw.env$reducedOutput<-reducedOutput
+          braw.env$fullOutput<-fullOutput
 
           ##################################
           # default variables

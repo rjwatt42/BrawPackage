@@ -396,7 +396,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
           "Alpha"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "minRp"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Transform"={vals<-c("None","Log","Exp")},
-          "InteractionOn"={vals<-c(FALSE,TRUE)},
+          "InteractionOn"={vals<-c(2,3)},
           "EqualVar"={vals<-c(FALSE,TRUE)},
           
           "Keep"={vals<-c("cautious", "last", "largeN", "smallP", "median")},
