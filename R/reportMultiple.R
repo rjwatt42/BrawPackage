@@ -90,12 +90,12 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     }
     if (multipleResult$design$Replication$On) {
       replTable<-c("!TReplication",rep("",nc-1))
-      replTable<-c(replTable,"!H","Original","Power","Decision",rep(",nc-4"))
+      replTable<-c(replTable,"!H","Original","Power","Decision",rep("",nc-4))
       replTable<-c(replTable," ",
                    switch(multipleResult$design$Replication$forceSigOriginal+1,"any","sig only"),
                    switch(multipleResult$design$Replication$PowerOn+1,"-",brawFormat(multipleResult$design$Replication$Power)),
                    multipleResult$design$Replication$Keep,
-                   rep(",nc-4"))
+                   rep("",nc-4))
       outputText<-c(outputText,replTable)
     }
     outputText<-c(outputText,rep("",nc))
@@ -139,11 +139,6 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     
     # column labels
     if (is.element(showType,c("NHST","Hits","Misses","Inference"))) {
-      outputText<-c(outputText,"!TSources",rep("",nc-1))
-      if (braw.env$STMethod=="NHST")
-        outputText1<-c("!H ","!H!C","sig","ns",rep("",nc-4))
-      else
-        outputText1<-c("!H ","!H!C","sig","ns","err",rep("",nc-5))
     }
     else 
       if (is.element(showType,c("SEM"))) {
@@ -192,43 +187,46 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
         nnull<-sum(nulls)
 
         if (effect$world$worldOn) {
-          # nr<-(length(nullresult$pIV)+length(result$pIV))
+          outputText<-c(outputText,"!TSources",rep("",nc-1))
+          e1c<-reportNumber(sum(nulls),nr,reportCounts)
+          e2c<-reportNumber(sum(!nulls),nr,reportCounts)
+          if (result$evidence$minRp!=0) {
+            h1<-paste0(braw.env$activeTitle," (",e2c,"):")
+            h2<-paste0(braw.env$inactiveTitle," (",e1c,"):")
+          } else {
+            h1<-paste0(braw.env$nonnullTitle," (",e2c,"):") #,e4,e2,rep("",nc-4))
+            h2<-paste0(braw.env$nullTitle," (",e1c,"):") #,e1,e3,rep("",nc-4))
+          }
+          outputText1<-c("!H ","!H!C","All",h1,h2,rep("",nc-5))
+            # outputText1<-c("!H ","!H!C","sig","ns","err",rep("",nc-5))
+          
           if (braw.env$STMethod=="NHST") {
             e1a<-paste0("!j",reportNumber((sum(sigs)),nr,reportCounts))
-            e2a<-paste0("!j",reportNumber((sum(!sigs)),nr,reportCounts))
-            outputText<-c(outputText," ","!jAll:",e1a,e2a,rep("",nc-4))
-            
             e1=paste0("!j",reportNumber(sum(nulls&sigs),nnull,reportCounts))
             e2=paste0("!j",reportNumber(sum(!nulls&sigs),nr-nnull,reportCounts))
+            outputText1<-c("","!jsig:",e1a,e2,e1,rep("",nc-5))
+            
+            e2a<-paste0("!j",reportNumber((sum(!sigs)),nr,reportCounts))
             e3=paste0("!j",reportNumber(sum(nulls&!sigs),nnull,reportCounts))
             e4=paste0("!j",reportNumber(sum(!nulls&!sigs),nr-nnull,reportCounts))
-            e1c<-reportNumber(sum(nulls),nr,reportCounts)
-            e2c<-reportNumber(sum(!nulls),nr,reportCounts)
-            if (result$evidence$minRp!=0) {
-              outputText<-c(outputText," ",paste0("!j",braw.env$activeTitle," (",e2c,"):"),e4,e2,rep("",nc-4))
-              outputText<-c(outputText," ",paste0("!j",braw.env$inactiveTitle," (",e1c,"):"),e1,e3,rep("",nc-4))
-            } else {
-              outputText<-c(outputText," ",paste0("!j",braw.env$nonnullTitle," (",e2c,"):"),e4,e2,rep("",nc-4))
-              outputText<-c(outputText," ",paste0("!j",braw.env$nullTitle," (",e1c,"):"),e1,e3,rep("",nc-4))
-            }
-
+            outputText1<-c("","!jns:",e2a,e4,e3,rep("",nc-5))
+            
             outputText<-c(outputText,rep("",nc))
             outputText<-c(outputText,"!TInferences",rep("",nc-1))
-            outputText<-c(outputText,"!H ","!H!C","false","correct",rep("",nc-4))
-            
+            e1c=reportNumber(sum(sigs),nr,reportCounts)
+            e2c=reportNumber(sum(!sigs),nr,reportCounts)
+            outputText<-c(outputText,"!H ","!H!C","All",
+                          paste0("Hits (",e1c,"):"),
+                          paste0("Misses (",e2c,"):"),rep("",nc-5))
+
             e1b=paste0("!j",reportNumber((sum(nulls&sigs)+sum(!nulls&!sigs)),nr,reportCounts))
             e2b=paste0("!j",reportNumber((sum(nulls&!sigs)+sum(!nulls&sigs)),nr,reportCounts))
-            outputText<-c(outputText," ","!jAll:",e1b,e2b,rep("",nc-4))
-            
-            e1c=reportNumber(sum(sigs),nr,reportCounts)
             e1n=paste0("!j",reportNumber(sum(nulls&sigs),nsig,reportCounts))
             e1p=paste0("!j",reportNumber(sum(!nulls&sigs),nsig,reportCounts))
-            outputText<-c(outputText," ",paste0("!jHits (",e1c,"):"),e1n,e1p,rep("",nc-4))
-            
-            e2c=reportNumber(sum(!sigs),nr,reportCounts)
             e2n=paste0("!j",reportNumber(sum(nulls&!sigs),nr-nsig,reportCounts))
             e2p=paste0("!j",reportNumber(sum(!nulls&!sigs),nr-nsig,reportCounts))
-            outputText<-c(outputText," ",paste0("!jMisses (",e2c,"):"),e2n,e2p,rep("",nc-4))
+            outputText<-c(outputText," ","!jfalse:",e1b,e1n,e2n,rep("",nc-5))
+            outputText<-c(outputText," ","!jcorrect:",e2b,e1p,e2p,rep("",nc-5))
           } else {
             nullSigW<-nulls&(sigs>0)
             nullSigN<-nulls&(sigs==0)
