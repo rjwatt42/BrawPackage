@@ -754,7 +754,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
                   design$sIVRange<-c(vals[vi],4)
                 },
                 "DVRange"={
-                  design$sRangeOn<-TRUE
+                  design$sIVRangeOn<-TRUE
                   design$sDVRange<-vals[vi]*c(-1,1)
                 },
                 "Cheating"={

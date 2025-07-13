@@ -99,8 +99,9 @@ makeSampleVals<-function(n,mn,sdv,MV,distr="normal"){
   )
 }
 
-makeSampleVar<-function(design,n,MV){
+makeSampleVar<-function(design,effect,n,MV,MV2){
   ivr=c()
+  ivr2=c()
   dvr_s<-c()
   dvr_m<-c()
   while (length(ivr)<n) {
@@ -202,23 +203,40 @@ makeSampleVar<-function(design,n,MV){
             }
     )
 
+    # make iv2 (if needed)
+    if (!is.null(MV2)){
+      rho2<-effect$rIV2
+      rho12<-effect$rIVIV2
+      rhoInter<-effect$rIVIV2DV
+      ivr2_resid<-makeSampleVals(n,0,sqrt(1-rho12^2),IV2)
+      ivr21<-ivr*rho12+ivr2_resid
+    } else {
+      rho2<-0
+      rho12<-0
+      rhoInter<-0
+      ivr21<-rep(0,n)
+    }
+    
     if (design$sIVRangeOn || design$sIV2RangeOn) {
       condition<-rep(TRUE,length(ivr1))
       if (design$sIVRangeOn)
         condition<-condition & (ivr1>design$sIVRange[1] & ivr1<design$sIVRange[2])
-      if (!is.null(IV2) && design$sIV2RangeOn) 
+      if (!is.null(MV2) && design$sIV2RangeOn) 
         condition<-condition & (ivr2>design$sIV2Range[1] & ivr2<design$sIV2Range[2])
       ivr<-c(ivr, ivr1[condition])
+      if (!is.null(MV2))
+        ivr2<-c(ivr2,ivr21[condition])
       dvr_m<-c(dvr_m, dvr1_m[condition])
       dvr_s<-c(dvr_s, dvr1_s[condition])
     } else
     { 
       ivr<-c(ivr,ivr1)
+      ivr2<-c(ivr2,ivr21)
       dvr_m<-c(dvr_m,dvr1_m)
       dvr_s<-c(dvr_s,dvr1_s)
     }
   }
-  data<-list(ivr=ivr[1:n],dvr_m=dvr_m[1:n],dvr_s=dvr_s[1:n])
+  data<-list(ivr=ivr[1:n],ivr2=ivr2[1:n],dvr_m=dvr_m[1:n],dvr_s=dvr_s[1:n])
 }
 
 #' make a simulated sample
@@ -403,27 +421,23 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
       
       # make id
       id<-factor(1:n)
-      
-      # make iv
-      data<-makeSampleVar(design,n,IV)
-      ivr<-data$ivr
-      dvr_m<-data$dvr_m
-      dvr_s<-data$dvr_s
-      
-      # make iv2 (if needed)
+      # effect sizes for IV2 (if needed)
       if (!is.null(IV2)){
         rho2<-effect$rIV2
         rho12<-effect$rIVIV2
         rhoInter<-effect$rIVIV2DV
-        ivr2_resid<-makeSampleVals(n,0,sqrt(1-rho12^2),IV2)
-        iv2r<-ivr*rho12+ivr2_resid
       } else {
         rho2<-0
         rho12<-0
         rhoInter<-0
-        iv2r<-0
       }
-
+      
+      # make iv
+      data<-makeSampleVar(design,effect,n,IV,IV2)
+      ivr<-data$ivr
+      iv2r<-data$ivr2
+      dvr_m<-data$dvr_m
+      dvr_s<-data$dvr_s
       
       # make the interaction term
       switch(IV$type,
@@ -564,7 +578,7 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
       }
       
       # trim DV values
-      if (design$sRangeOn) {
+      if (design$sIVRangeOn) {
         keep<-dvr<=design$sDVRange[2] & dvr>=design$sDVRange[1]
         dvr<-dvr[keep]
         ivr<-ivr[keep]
