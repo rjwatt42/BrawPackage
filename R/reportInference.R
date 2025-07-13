@@ -139,7 +139,7 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
       outputText<-c(outputText,rep("",nc))
     }
     
-    if (!braw.env$reducedOutput) {
+    if (braw.env$fullOutput>1) {
     AIC<-analysis$AIC
     llkNull<-exp(-0.5*(analysis$AIC-analysis$AICnull))
     k<-nrow(anova)-2+2
@@ -164,7 +164,7 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
     }
     
     
-    if (!braw.env$reducedOutput) {
+    if (braw.env$fullOutput>0) {
     outputText<-c(outputText,rep("",nc))
     outputText<-c(outputText,"!Hr[p]", "w[p]", "n80[p]", "w[s]", "n80[s]",rep("",nc-5))   
       if (is.na(effect$rIV)) {effect$rIV<-0}
