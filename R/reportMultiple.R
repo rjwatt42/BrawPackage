@@ -103,7 +103,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     }
     outputText<-c(outputText,rep("",nc))
     
-    if (nullresult$count>0) {
+    if (any(!is.na(nullresult$rpIV))) {
       result$rp[result$rp==0]<-0.00000000001
       result$rIV<-c(result$rIV,nullresult$rIV)
       result$rpIV<-c(result$rpIV,nullresult$rpIV)
