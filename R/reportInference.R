@@ -170,14 +170,14 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
       if (is.na(effect$rIV)) {effect$rIV<-0}
       outputText<-c(outputText,
                     "population",
-                    brawFormat(analysis$rpIV,digits=3),
-                    brawFormat(rn2w(analysis$rpIV,analysis$nval),digits=3),
-                    brawFormat(ceil(rw2n(analysis$rpIV,0.8,2))),
+                    paste0("!j",brawFormat(analysis$rpIV,digits=3)),
+                    paste0("!j",brawFormat(rn2w(analysis$rpIV,analysis$nval),digits=3)),
+                    paste0("!j",brawFormat(ceil(rw2n(analysis$rpIV,0.8,2)))),
                     rep("",nc-4),
                     "sample",
-                    brawFormat(analysis$rIV,digits=3),
-                    brawFormat(rn2w(analysis$rIV,analysis$nval),digits=3),
-                    brawFormat(ceil(rw2n(analysis$rIV,0.8,2))),
+                    paste0("!j",brawFormat(analysis$rIV,digits=3)),
+                    paste0("!j",brawFormat(rn2w(analysis$rIV,analysis$nval),digits=3)),
+                    paste0("!j",brawFormat(ceil(rw2n(analysis$rIV,0.8,2)))),
                     rep("",nc-4))
     }
     
