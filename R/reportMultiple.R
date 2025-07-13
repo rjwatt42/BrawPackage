@@ -193,13 +193,13 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
           e1c<-reportNumber(sum(nulls),nr,reportCounts)
           e2c<-reportNumber(sum(!nulls),nr,reportCounts)
           if (result$evidence$minRp!=0) {
-            h1<-paste0(braw.env$activeTitle," (",e2c,"):")
-            h2<-paste0(braw.env$inactiveTitle," (",e1c,"):")
+            # h1<-paste0(braw.env$activeTitle," (",e2c,"):")
+            # h2<-paste0(braw.env$inactiveTitle," (",e1c,"):")
             h1<-paste0(braw.env$activeTitle,":")
-            h2<-braw.env$inactiveTitle,":")
+            h2<-paste0(braw.env$inactiveTitle,":")
           } else {
-            h1<-paste0(braw.env$nonnullTitle," (",e2c,"):") #,e4,e2,rep("",nc-4))
-            h2<-paste0(braw.env$nullTitle," (",e1c,"):") #,e1,e3,rep("",nc-4))
+            # h1<-paste0(braw.env$nonnullTitle," (",e2c,"):") #,e4,e2,rep("",nc-4))
+            # h2<-paste0(braw.env$nullTitle," (",e1c,"):") #,e1,e3,rep("",nc-4))
             h1<-paste0(braw.env$nonnullTitle,":")
             h2<-braw.env$nullTitle,":")
           }
