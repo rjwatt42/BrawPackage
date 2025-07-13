@@ -664,6 +664,7 @@ axisPath<-function(data,arrow=NULL,colour="#000000",linetype="solid",linewidth=0
 drawPath<-function(data,arrow=NULL,colour="#000000",linetype="solid",linewidth=0.25,alpha=1) {
   switch(braw.env$graphicsType,
          "ggplot"={
+           if (!is.null(arrow)) arrow<-grid::arrow()
            g<-geom_path(data=data,aes(x=x,y=y),arrow=arrow,color=colour,alpha=alpha,
                         linetype=linetype,linewidth=linewidth)
          },
