@@ -742,15 +742,15 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
                 "Outliers"={design$sOutliers<-vals[vi]},
                 "NonResponse"={design$sNonResponse<-vals[vi]},
                 "IVRange"={
-                  design$sRangeOn<-TRUE
+                  design$sIVRangeOn<-TRUE
                   design$sIVRange<-vals[vi]*c(-1,1)
                 },
                 "IVRangeC"={
-                  design$sRangeOn<-TRUE
+                  design$sIVRangeOn<-TRUE
                   design$sIVRange<-vals[vi]*c(-1,1)
                 },
                 "IVRangeE"={
-                  design$sRangeOn<-TRUE
+                  design$sIVRangeOn<-TRUE
                   design$sIVRange<-c(vals[vi],4)
                 },
                 "DVRange"={
