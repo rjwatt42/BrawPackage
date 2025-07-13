@@ -166,15 +166,19 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
     
     if (braw.env$fullOutput>0) {
     outputText<-c(outputText,rep("",nc))
-    outputText<-c(outputText,"!Hr[p]", "w[p]", "n80[p]", "w[s]", "n80[s]",rep("",nc-5))   
+    outputText<-c(outputText,"!H","r", "w", "n80",rep("",nc-4))   
       if (is.na(effect$rIV)) {effect$rIV<-0}
       outputText<-c(outputText,
+                    "population",
                     brawFormat(analysis$rpIV,digits=3),
                     brawFormat(rn2w(analysis$rpIV,analysis$nval),digits=3),
                     brawFormat(ceil(rw2n(analysis$rpIV,0.8,2))),
+                    rep("",nc-4),
+                    "sample",
+                    brawFormat(analysis$rIV,digits=3),
                     brawFormat(rn2w(analysis$rIV,analysis$nval),digits=3),
                     brawFormat(ceil(rw2n(analysis$rIV,0.8,2))),
-                    rep("",nc-5))
+                    rep("",nc-4))
     }
     
     if (evidence$doSEM) {
