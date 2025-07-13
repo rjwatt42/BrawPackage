@@ -8,7 +8,7 @@ drawArrow<-function(start,len,direction=0,ends="last",col="#000000",fill="white"
   }
   if (length(len)==2) {
     direction<-atan2(len[2]-start[2],len[1]-start[1])*(180/pi)
-    len<-sqrt((len[2]-start[2])^2+(len[1]-start[1])^2))
+    len<-sqrt((len[2]-start[2])^2+(len[1]-start[1])^2)
   }
   finAngle<-finAngle/(180/pi)
   d=width*sin(finAngle)
