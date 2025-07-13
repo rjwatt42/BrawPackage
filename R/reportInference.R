@@ -173,12 +173,27 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
                     paste0("!j",brawFormat(analysis$rpIV,digits=3)),
                     paste0("!j",brawFormat(rn2w(analysis$rpIV,analysis$nval),digits=3)),
                     paste0("!j",brawFormat(ceil(rw2n(analysis$rpIV,0.8,2)))),
-                    rep("",nc-4),
-                    "sample",
-                    paste0("!j",brawFormat(analysis$rIV,digits=3)),
-                    paste0("!j",brawFormat(rn2w(analysis$rIV,analysis$nval),digits=3)),
-                    paste0("!j",brawFormat(ceil(rw2n(analysis$rIV,0.8,2)))),
                     rep("",nc-4))
+      if (analysis$design$Replication$On) {
+        outputText<-c(outputText,
+                      "original",
+                      paste0("!j",brawFormat(analysis$roIV,digits=3)),
+                      paste0("!j",brawFormat(rn2w(analysis$roIV,analysis$noval),digits=3)),
+                      paste0("!j",brawFormat(ceil(rw2n(analysis$roIV,0.8,2)))),
+                      rep("",nc-4),
+                      "final",
+                      paste0("!j",brawFormat(analysis$rIV,digits=3)),
+                      paste0("!j",brawFormat(rn2w(analysis$rIV,analysis$nval),digits=3)),
+                      paste0("!j",brawFormat(ceil(rw2n(analysis$rIV,0.8,2)))),
+                      rep("",nc-4))
+      } else {
+        outputText<-c(outputText,
+                      "sample",
+                      paste0("!j",brawFormat(analysis$rIV,digits=3)),
+                      paste0("!j",brawFormat(rn2w(analysis$rIV,analysis$nval),digits=3)),
+                      paste0("!j",brawFormat(ceil(rw2n(analysis$rIV,0.8,2)))),
+                      rep("",nc-4))
+      }
     }
     
     if (evidence$doSEM) {
