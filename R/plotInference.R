@@ -300,8 +300,9 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE,sequence=FALSE){
     g<-addG(g,dataText(data=pts2,labels[!use],vjust=0.5,size=0.75))
   
   if (sequence) {
-    use<-length(pts$x)
-    g<-addG(g,dataPoint(data=pts[use,],shape=shape, colour = b2, fill = c2, alpha=gain^0.8, size = dotSize*2))
+    last<-length(pts$x)
+    if (!use[last]) colour<-c(b1,c1) else colour<-c(b2,c2)
+    g<-addG(g,dataPoint(data=pts[last,],shape=shape, colour = colour[1], fill = colour[2], alpha=gain^0.8, size = dotSize*2))
     g<-addG(g,dataPath(data=pts,arrow=TRUE,linewidth=0.5,colour="#FFFFFF"))
   }
   return(g)
