@@ -309,7 +309,7 @@ plotParInterDescription<-function(analysis,g=NULL){
           g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,offset=2,range=range1,g=g)
           g<-plotPrediction(analysis2$hypothesis$IV,NULL,analysis2$hypothesis$DV,analysis2,analysis$design,offset=3,range=range2,g=g)
         }
-   g<-addG(g,dataLegend(data.frame(names=names,colours=col),title=analysis1$hypothesis$IV2$name))     
+   g<-addG(g,dataLegend(data.frame(names=names,colours=col),title=analysis$hypothesis$IV2$name))     
   g
 }
 
