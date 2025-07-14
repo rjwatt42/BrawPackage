@@ -294,7 +294,6 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     }
   } else {
     if (explore$exploreType=="minRp") exploreTypeShow<-"min(r[p])"
-    if (exploreTypeShow=="nSplits") exploreTypeShow<-"no repeats"
   }
     
   for (whichEffect in whichEffects) {
