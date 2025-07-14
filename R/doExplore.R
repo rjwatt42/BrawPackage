@@ -23,10 +23,13 @@ makeExplore<-function(exploreType="n",exploreNPoints=13,
                 exploreNPoints=exploreNPoints,
                 minVal=minVal,maxVal=maxVal,xlog=xlog
   )
-  range<-getExploreRange(explore)
-  if (is.na(explore$minVal)) explore$minVal<-range$minVal
-  if (is.na(explore$maxVal)) explore$maxVal<-range$maxVal
-  if (is.na(explore$xlog)) explore$xlog<-range$logScale
+  if (is.na(explore$minVal)) {
+    range<-getExploreRange(explore)
+    explore$minVal<-range$minVal
+    explore$maxVal<-range$maxVal
+    explore$exploreNPoints<-range$np
+    explore$xlog<-range$logScale
+  }
   
   return(explore)
 }
@@ -42,6 +45,7 @@ getExploreRange<-function(explore) {
   
   switch(exploreType,
          "n"=range<-list(minVal=10,maxVal=250,logScale=FALSE,np=13),
+         "nSplits"=range<-list(minVal=1,maxVal=10,logScale=FALSE,np=10),
          "rIV"=range<-list(minVal=0,maxVal=0.75,logScale=FALSE,np=13),
          "rSD"=range<-list(minVal=0,maxVal=0.4,logScale=FALSE,np=13),
          "rs"=range<-list(minVal=-0.75,maxVal=0.75,logScale=FALSE,np=13),
@@ -72,6 +76,83 @@ getExploreRange<-function(explore) {
   return(range)
 }
 
+summariseResult<-function(result) {
+  if (!is.null(result$rIV)) {
+    sigs<-isSignificant(method=braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1)
+    result$nSig<-sum(sigs)
+    result$rIV<-mean(result$rIV)
+    result$pIV<-mean(result$pIV)
+    result$rpIV<-mean(result$rpIV)
+    result$roIV<-mean(result$roIV)
+    result$poIV<-mean(result$poIV)
+    result$nval<-mean(result$nval)
+    result$df1<-mean(result$df1)
+    
+    if (!is.null(result$AIC)) {
+      result$AIC<-mean(result$AIC)
+      result$AICnull<-mean(result$AICnull)
+    }
+    if (!is.null(result$sem))
+      result$sem<-result$sem[1,8]
+    
+    if (!is.null(result$iv)) {
+      result$iv.mn<-mean(result$iv.mn)
+      result$iv.sd<-mean(result$iv.sd)
+      result$iv.sk<-mean(result$iv.sk)
+      result$iv.kt<-mean(result$iv.kt)
+      result$dv.mn<-mean(result$dv.mn)
+      result$dv.sd<-mean(result$dv.sd)
+      result$dv.sk<-mean(result$dv.sk)
+      result$dv.kt<-mean(result$dv.kt)
+      result$er.mn<-mean(result$er.mn)
+      result$er.sd<-mean(result$er.sd)
+      result$er.sk<-mean(result$er.sk)
+      result$er.kt<-mean(result$er.kt)
+    }
+    
+    if (!is.null(result$rIV2)){
+      result$rIV2<-mean(result$rIV2)
+      result$pIV2<-mean(result$pIV2)
+      result$rIVIV2DV<-mean(result$rIVIV2DV)
+      result$pIVIV2DV<-mean(result$pIVIV2DV)
+      
+      n<-length(result$r$direct)
+      result$r$direct<-result$r$direct
+      result$r$unique<-result$r$unique
+      result$r$total<-result$r$total
+      
+      result$p$direct<-result$p$direct
+      result$p$unique<-result$p$unique
+      result$p$total<-result$p$total
+    }
+  } else {
+    param1<-max(c(result$fixed$param1,result$random$param1,result$single$param1,result$gauss$param1,result$exp$param1),na.rm=TRUE)
+    param2<-max(c(result$fixed$param2,result$random$param2,result$single$param2,result$gauss$param2,result$exp$param2),na.rm=TRUE)
+    param3<-max(c(result$fixed$param3,result$random$param3,result$single$param3,result$gauss$param3,result$exp$param3),na.rm=TRUE)
+    S<-max(c(result$fixed$Smax,result$random$Smax,result$single$Smax,result$gauss$Smax,result$exp$Smax),na.rm=TRUE)
+    sigs<-isSignificant(braw.env$STMethod,result$result$pIV,result$result$rIV,result$result$nval,result$result$df1,result$result$evidence)
+    nSig<-sum(sigs)
+    result$param1<-param1
+    result$param2<-param2
+    result$param3<-param3
+    result$S<-S
+    result$nSig<-nSig
+  }
+  return(result)
+  
+  result<-list(rval=mean(res),pval=b,rpval=b,raval=b,roval=b,poval=b,nval=b,df1=b,
+               AIC=b,AICnull=b,sem=b,
+               iv.mn=b,iv.sd=b,iv.sk=b,iv.kt=b,
+               dv.mn=b,dv.sd=b,dv.sk=b,dv.kt=b,
+               er.mn=b,er.sd=b,er.sk=b,er.kt=b,
+               rIV2=b,rIVIV2DV=b,pIV2=b,pIVIV2DV=b,
+               r=list(direct=bm,unique=bm,total=bm),
+               p=list(direct=bm,unique=bm,total=bm),
+               param1=b,param2=b,param3=b,S=b,nSig=b
+  )
+  return(result)
+}
+
 resetExploreResult<-function(nsims,n_vals,oldResult=NULL) {
   
   if (nsims>0) {
@@ -90,7 +171,7 @@ resetExploreResult<-function(nsims,n_vals,oldResult=NULL) {
                rIV2=b,rIVIV2DV=b,pIV2=b,pIVIV2DV=b,
                r=list(direct=bm,unique=bm,total=bm),
                p=list(direct=bm,unique=bm,total=bm),
-               param1=b,param2=b,param3=b,S=b
+               param1=b,param2=b,param3=b,S=b,nSig=b
   )
   if (!is.null(oldResult)) {
     result<-mergeExploreResult(oldResult,result)
@@ -106,6 +187,7 @@ storeExploreResult<-function(result,res,ri,vi) {
     result$poval[ri,vi]<-res$poIV
     result$nval[ri,vi]<-res$nval
     result$df1[ri,vi]<-res$df1
+    result$nSig[ri,vi]<-res$nSig
     
     if (!is.null(res$AIC)) {
       result$AIC[ri,vi]<-res$AIC
@@ -149,10 +231,13 @@ storeExploreResult<-function(result,res,ri,vi) {
     param2<-max(c(res$fixed$param2,res$random$param2,res$single$param2,res$gauss$param2,res$exp$param2),na.rm=TRUE)
     param3<-max(c(res$fixed$param3,res$random$param3,res$single$param3,res$gauss$param3,res$exp$param3),na.rm=TRUE)
     S<-max(c(res$fixed$Smax,res$random$Smax,res$single$Smax,res$gauss$Smax,res$exp$Smax),na.rm=TRUE)
+    sigs<-isSignificant(braw.env$STMethod,res$result$pIV,res$result$rIV,res$result$nval,res$result$df1,res$result$evidence)
+    nSig<-sum(sigs)
     result$param1[ri,vi]<-param1
     result$param2[ri,vi]<-param2
     result$param3[ri,vi]<-param3
     result$S[ri,vi]<-S
+    result$nSig[ri,vi]<-nSig
   }
   return(result)
 }
@@ -208,6 +293,7 @@ mergeExploreResult<-function(res1,res2) {
   result$param2<-rbind(res1$param2,res2$param2)
   result$param3<-rbind(res1$param3,res2$param3)
   result$S<-rbind(res1$S,res2$S)
+  result$nSig<-rbind(res1$nSig,res2$nSig)
   
   return(result)
 }
@@ -310,6 +396,8 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
   DV<-hypothesis$DV
   effect<-hypothesis$effect
   
+  design$sNReps<-1
+  
   if (hypothesis$effect$world$worldOn && hypothesis$effect$world$populationNullp>0) 
     doingNull<-FALSE
   
@@ -377,6 +465,8 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
           "no"={vals<-seq(10,250,length.out=npoints)},
           "pNull"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "n"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "nSplits"={design$sNBudget<-design$sN
+                     vals<-seq(1,floor(design$sNBudget/5),length.out=npoints)},
           "Method"={vals<-c("Random","Stratified","Cluster","Snowball","Convenience")},
           "ClusterRad"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Usage"={vals<-c("Between","Within")},
@@ -708,6 +798,9 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
                 
                 "Heteroscedasticity"={effect$Heteroscedasticity<-vals[vi]},
                 "n"={design$sN<-round(vals[vi])},
+                "nSplits"={design$sN<-round(design$sNBudget/vals[vi])
+                      design$sNReps<-vals[vi]
+                      },
                 "Method"={design$sMethod<-makeSampling(vals[vi])},
                 "ClusterRad"={design$sMethod$Cluster_rad<-vals[vi]},
                 "Usage"={ switch(vals[vi],
@@ -819,7 +912,10 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
           result<-storeExploreResult(result,res,ri,vi)
         } else {
           if (doingNonNull) {
-            res<-multipleAnalysis(1,hypothesis,design,evidence)
+            res<-multipleAnalysis(design$sNReps,hypothesis,design,evidence)
+            if (explore$exploreType=="nSplits") {
+              res<-summariseResult(res)
+            }
             result<-storeExploreResult(result,res,ri,vi)
           }
           

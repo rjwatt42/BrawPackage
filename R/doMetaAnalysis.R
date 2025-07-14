@@ -265,6 +265,7 @@ runMetaAnalysis<-function(metaAnalysis,studies,hypothesis,metaResult){
   gamma<-list(param1=NA,param2=NA,param3=NA,Smax=NA)
   genexp<-list(param1=NA,param2=NA,param3=NA,Smax=NA)
   switch(metaAnalysis$analysisType,
+         "none"={},
          "fixed"={
            # a fixed analysis finds a single effect size
            metaAnalysis$modelNulls<-FALSE
@@ -307,15 +308,18 @@ runMetaAnalysis<-function(metaAnalysis,studies,hypothesis,metaResult){
   
   use<-which.max(c(fixed$Smax,random$Smax,single$Smax,gauss$Smax,exp$Smax,gamma$Smax,genexp$Smax))
   bestDist<-c("fixed","random","Single","Gauss","Exp","Gamma","GenExp")[use]
-  switch(use,
-         {bestR<-fixed},
-         {bestR<-random},
-         {bestR<-single},
-         {bestR<-gauss},
-         {bestR<-exp},
-         {bestR<-gamma},
-         {bestR<-genexp}
-  )
+  if (metaAnalysis$analysisType=="none")
+    bestR<-fixed
+    else
+      switch(use,
+             {bestR<-fixed},
+             {bestR<-random},
+             {bestR<-single},
+             {bestR<-gauss},
+             {bestR<-exp},
+             {bestR<-gamma},
+             {bestR<-genexp}
+      )
   bestParam1<-bestR$param1
   bestParam2<-bestR$param2
   bestParam3<-bestR$param3

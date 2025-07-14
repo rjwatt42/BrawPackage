@@ -76,7 +76,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   
 # sort out what we are showing
   
-  if (is.element(showType[1],c("NHST","Inference","Source","Hits","Misses","p(sig)"))) showHist<-FALSE
+  if (is.element(showType[1],c("NHST","Inference","Source","Hits","Misses","p(sig)","n(sig)"))) showHist<-FALSE
   
   showType<-strsplit(showType,";")[[1]]
   if (length(showType)==1) {
@@ -89,8 +89,12 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
            {}
     )
   }
-  if (exploreResult$doingMetaAnalysis) 
+  if (exploreResult$doingMetaAnalysis) {
     switch(exploreResult$metaAnalysis$analysisType,
+           "none"={
+             showType<-"n(sig)"
+             showHist<-FALSE
+           },
            "fixed"={
              showType<-c("metaRiv")
              if (exploreResult$metaAnalysis$analyseBias) showType<-c(showType,"metaBias")
@@ -101,7 +105,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                },
            {showType<-c("Lambda")}
            )
-    
+  }
   
   if (length(showType)>1 && showType[2]==" ") showType<-showType[1]
   
@@ -290,9 +294,9 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     }
   } else {
     if (explore$exploreType=="minRp") exploreTypeShow<-"min(r[p])"
+    if (exploreTypeShow=="nSplits") exploreTypeShow<-"no repeats"
   }
     
-  
   for (whichEffect in whichEffects) {
     yi<-which(whichEffect == whichEffects)
     if (length(showType)==1 && !is.null(hypothesis$IV2) && showType[1]!="SEM")  {
@@ -490,6 +494,8 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       nVals<-result$nval
       df1Vals<-result$df1
       
+      showMax<-NULL
+      showMin<-NULL
       switch (showType[si],
               "rs"={
                 showVals<-rVals
@@ -579,6 +585,12 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                 ns<-result$nval
                 df1<-result$df1
                 showVals<-r2llr(rVals,ns,df1,"dLLR",evidence$llr,evidence$prior)
+              },
+              "n(sig)"={
+                showVals<-NULL
+                showMeans<-colMeans(result$nSig)
+                showMax<-apply(result$nSig,2,max)
+                showMin<-apply(result$nSig,2,min)
               },
               "metaBias"={
                 showVals<-result$param3
@@ -778,10 +790,12 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       }
       if (!is.element(showType[si],c("NHST","SEM"))) {
         # draw the basic line and point data
-        if (is.element(showType[si],c("p(sig)","p(w80)","Hits","Misses","Inference","Source"))) {
+        if (is.element(showType[si],c("n(sig)","p(sig)","p(w80)","Hits","Misses","Inference","Source"))) {
           y50<-showMeans
-          y75<-NULL
-          y25<-NULL
+          y75<-showMax
+          y25<-showMin
+          y62<-NULL
+          y38<-NULL
         } else {
           y75<-apply( showVals , 2 , quantile , probs = 0.50+quants , na.rm = TRUE ,names=FALSE)
           y62<-apply( showVals , 2 , quantile , probs = 0.50+quants/2 , na.rm = TRUE ,names=FALSE)
@@ -909,6 +923,8 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
             g<-addG(g,dataLine(data.frame(x=vals,y=y25),colour="#000000",alpha=0.9))
             g<-addG(g,dataLine(data.frame(x=vals,y=y75),colour="#000000",alpha=0.9))
             pts1f<-data.frame(x=vals,ymin=y25,ymax=y75)
+            g<-addG(g,dataPoint(data=data.frame(x=vals,y=y25),fill=col,size=2))
+            g<-addG(g,dataPoint(data=data.frame(x=vals,y=y75),fill=col,size=2))
             # g<-addG(g,dataErrorBar(pts1f,colour=col))
           }
         } # end of line and point

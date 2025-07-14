@@ -512,6 +512,13 @@ plotAxis<-function(showType,hypothesis,design=NULL,result=NULL) {
             ylabel<-"False Miss"
             use_cols<-braw.env$plotColours$fmr
           },
+          "n(sig)"={
+            ylim<-c(0,10)
+            ytick<-1:10
+            ymins<-1:10
+            ylabel<-"n(sig)"
+            use_cols<-"#FFFFFF"
+          },
           "metaRiv"={
             ylim<-c(-1.01,1.01)
             ytick<-seq(-1,1,0.2)
