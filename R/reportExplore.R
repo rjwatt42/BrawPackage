@@ -198,20 +198,10 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                   y75<-ps+sqrt(ps*(1-ps)/nrow(pVals))
                 },
                 "n(sig)"={
-                  if (explore$exploreType=="Alpha") {
-                    braw.env$alphaSig<-exploreResult$vals
-                  }
-                  ps<-isSignificant(braw.env$STMethod,pVals,rVals,nVals,df1Vals,exploreResult$evidence,braw.env$alphaSig)
-                  if (ncol(ps)>1) {
-                    ps<-colMeans(ps)
-                  }
-                  y25<-ps-sqrt(ps*(1-ps)/nrow(pVals))
-                  y50<-ps
-                  y75<-ps+sqrt(ps*(1-ps)/nrow(pVals))
-                  y25<-y25*max(nVals)/colMeans(nVals)
-                  y50<-y50*max(nVals)/colMeans(nVals)
-                  y75<-y75*max(nVals)/colMeans(nVals)
-                  yiqr<-sqrt(ps*(1-ps)/nrow(pVals))*max(nVals)/colMeans(nVals)
+                  y50<-colMeans(exploreResult$result$nSig)
+                  y51<-colMeans(exploreResult$result$nFP)
+                  y75<-apply(exploreResult$result$nSig,1,max)
+                  y25<-apply(exploreResult$result$nSig,1,min)
                 },
                 "AIC"={
                   showVals<-exploreResult$result$AIC-exploreResult$result$AICnull
@@ -573,22 +563,31 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
         }
         
         
-        if (is.element(showType,c("p(sig)","Hits","Misses")) ){
+        if (is.element(showType,c("p(sig)","n(sig)","Hits","Misses")) ){
           if (returnDataFrame) {
             d<-data.frame(vals=vals,psig=y50)
             names(d)[1]<-explore$exploreType
             return(d)
           }
           
-          outputText<-c(outputText,"","-se ")
+          if (showType=="n(sig)") outputText<-c(outputText,"","!jmin")
+          else outputText<-c(outputText,"","-se ")
           for (i in 1:length(useVals)) {
             outputText<-c(outputText,paste0("!j",brawFormat(y25[useVals[i]],digits=precision)))
           }
-          outputText<-c(outputText," ",paste0("",y_label))
+          if (showType=="n(sig)") {
+            outputText<-c(outputText," ",paste0("","n(False Discoveries)"))
+            for (i in 1:length(useVals)) {
+              outputText<-c(outputText,paste0("!j",brawFormat(y51[useVals[i]],digits=precision)))
+            }
+          }
+          if (showType=="n(sig)") outputText<-c(outputText," ",paste0("","n(Significant Results)"))
+            else outputText<-c(outputText," ",paste0("",y_label))
           for (i in 1:length(useVals)) {
             outputText<-c(outputText,paste0("!j",brawFormat(y50[useVals[i]],digits=precision)))
           }
-          outputText<-c(outputText,"!U","+se ")
+          if (showType=="n(sig)") outputText<-c(outputText,"!U","!jmax")
+          else           outputText<-c(outputText,"!U","+se ")
           for (i in 1:length(useVals)) {
             outputText<-c(outputText,paste0("!j",brawFormat(y75[useVals[i]],digits=precision)))
           }

@@ -76,7 +76,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   
 # sort out what we are showing
   
-  if (is.element(showType[1],c("NHST","Inference","Source","Hits","Misses","p(sig)","n(sig)"))) showHist<-FALSE
+  if (is.element(showType[1],c("NHST","Inference","Source","Hits","Misses","p(sig)","n(sig)","n(fd)"))) showHist<-FALSE
   
   showType<-strsplit(showType,";")[[1]]
   if (length(showType)==1) {
@@ -588,8 +588,18 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
               "n(sig)"={
                 showVals<-NULL
                 showMeans<-colMeans(result$nSig)
+                if (any(result$nFP)>0) {
+                showMeans2<-colMeans(result$nFP)
+                showMeans<-rbind(showMeans,showMeans2)
+                }
                 showMax<-apply(result$nSig,2,max)
                 showMin<-apply(result$nSig,2,min)
+              },
+              "n(fd)"={
+                showVals<-NULL
+                showMeans<-colMeans(result$nFP)
+                showMax<-apply(result$nFP,2,max)
+                showMin<-apply(result$nFP,2,min)
               },
               "metaBias"={
                 showVals<-result$param3
@@ -789,12 +799,21 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       }
       if (!is.element(showType[si],c("NHST","SEM"))) {
         # draw the basic line and point data
-        if (is.element(showType[si],c("n(sig)","p(sig)","p(w80)","Hits","Misses","Inference","Source"))) {
+        if (is.element(showType[si],c("n(sig)","n(fd)","p(sig)","p(w80)","Hits","Misses","Inference","Source"))) {
+          if (showType[si]=="n(sig)") {
+            y50<-showMeans[1,]
+            y38<-showMeans[2,]
+            if (all(y38==0)) y38<-NULL
+            y75<-showMax
+            y25<-showMin
+            y62<-NULL
+          } else {
           y50<-showMeans
-          y75<-showMax
-          y25<-showMin
+          y75<-NULL
+          y25<-NULL
           y62<-NULL
           y38<-NULL
+          }
         } else {
           y75<-apply( showVals , 2 , quantile , probs = 0.50+quants , na.rm = TRUE ,names=FALSE)
           y62<-apply( showVals , 2 , quantile , probs = 0.50+quants/2 , na.rm = TRUE ,names=FALSE)
@@ -924,6 +943,11 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
             pts1f<-data.frame(x=vals,ymin=y25,ymax=y75)
             g<-addG(g,dataPoint(data=data.frame(x=vals,y=y25),fill=col,size=2))
             g<-addG(g,dataPoint(data=data.frame(x=vals,y=y75),fill=col,size=2))
+            if (!is.null(y38)) {
+              g<-addG(g,dataLine(data=data.frame(x=vals,y=y38),colour="#000000"))
+              g<-addG(g,dataPoint(data=data.frame(x=vals,y=y38),fill=braw.env$plotColours$infer_sigNull,size=4))
+              g<-addG(g,dataLegend(data.frame(names=c("total","false discovery"),colours=c(col,braw.env$plotColours$infer_sigNull))))
+            }
             # g<-addG(g,dataErrorBar(pts1f,colour=col))
           }
         } # end of line and point

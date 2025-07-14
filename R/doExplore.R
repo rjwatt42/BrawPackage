@@ -80,6 +80,7 @@ summariseResult<-function(result) {
   if (!is.null(result$rIV)) {
     sigs<-isSignificant(method=braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1)
     result$nSig<-sum(sigs)
+    result$nFP<-sum(sigs & result$rpIV==0)
     result$rIV<-mean(result$rIV)
     result$pIV<-mean(result$pIV)
     result$rpIV<-mean(result$rpIV)
@@ -141,6 +142,7 @@ summariseResult<-function(result) {
   return(result)
   
   result<-list(rval=mean(res),pval=b,rpval=b,raval=b,roval=b,poval=b,nval=b,df1=b,
+               nSig=b,nFP=b,
                AIC=b,AICnull=b,sem=b,
                iv.mn=b,iv.sd=b,iv.sk=b,iv.kt=b,
                dv.mn=b,dv.sd=b,dv.sk=b,dv.kt=b,
@@ -148,7 +150,7 @@ summariseResult<-function(result) {
                rIV2=b,rIVIV2DV=b,pIV2=b,pIVIV2DV=b,
                r=list(direct=bm,unique=bm,total=bm),
                p=list(direct=bm,unique=bm,total=bm),
-               param1=b,param2=b,param3=b,S=b,nSig=b
+               param1=b,param2=b,param3=b,S=b
   )
   return(result)
 }
@@ -164,6 +166,7 @@ resetExploreResult<-function(nsims,n_vals,oldResult=NULL) {
   }
   
   result<-list(rval=b,pval=b,rpval=b,raval=b,roval=b,poval=b,nval=b,df1=b,
+               nSig=b,nFP=b,
                AIC=b,AICnull=b,sem=b,
                iv.mn=b,iv.sd=b,iv.sk=b,iv.kt=b,
                dv.mn=b,dv.sd=b,dv.sk=b,dv.kt=b,
@@ -171,7 +174,7 @@ resetExploreResult<-function(nsims,n_vals,oldResult=NULL) {
                rIV2=b,rIVIV2DV=b,pIV2=b,pIVIV2DV=b,
                r=list(direct=bm,unique=bm,total=bm),
                p=list(direct=bm,unique=bm,total=bm),
-               param1=b,param2=b,param3=b,S=b,nSig=b
+               param1=b,param2=b,param3=b,S=b
   )
   if (!is.null(oldResult)) {
     result<-mergeExploreResult(oldResult,result)
@@ -188,6 +191,7 @@ storeExploreResult<-function(result,res,ri,vi) {
     result$nval[ri,vi]<-res$nval
     result$df1[ri,vi]<-res$df1
     result$nSig[ri,vi]<-res$nSig
+    result$nFP[ri,vi]<-res$nFP
     
     if (!is.null(res$AIC)) {
       result$AIC[ri,vi]<-res$AIC
@@ -294,6 +298,7 @@ mergeExploreResult<-function(res1,res2) {
   result$param3<-rbind(res1$param3,res2$param3)
   result$S<-rbind(res1$S,res2$S)
   result$nSig<-rbind(res1$nSig,res2$nSig)
+  result$nFP<-rbind(res1$nFP,res2$nFP)
   
   return(result)
 }

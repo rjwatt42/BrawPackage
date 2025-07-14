@@ -517,6 +517,13 @@ plotAxis<-function(showType,hypothesis,design=NULL,result=NULL) {
             ytick<-1:10
             ymins<-1:10
             ylabel<-"n(sig)"
+            use_cols<-braw.env$plotColours$infer_sigNonNull
+          },
+          "n(fd)"={
+            ylim<-c(0,10)
+            ytick<-1:10
+            ymins<-1:10
+            ylabel<-"n(false discoveries)"
             use_cols<-"#FFFFFF"
           },
           "metaRiv"={
