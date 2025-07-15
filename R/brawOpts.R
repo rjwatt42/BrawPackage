@@ -226,6 +226,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,1
           braw.env$showTheory<-TRUE
           
           braw.env$fullOutput<-fullOutput
+          braw.env$reportCounts<-FALSE
 
           ##################################
           # default variables
