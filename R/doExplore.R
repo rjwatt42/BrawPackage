@@ -16,7 +16,7 @@
 #'                              minVal=10,maxVal=250,xlog=FALSE)
 #' @export
 makeExplore<-function(exploreType="n",exploreNPoints=13,
-                      vals=NULL,minVal=NA,maxVal=NA,xlog=NA
+                      vals=NULL,minVal=NA,maxVal=NA,xlog=FALSE
 ) {
   if (exploreType=="alpha") exploreType<-"Alpha"
   explore<-list(exploreType=exploreType,
