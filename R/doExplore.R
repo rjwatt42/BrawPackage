@@ -16,14 +16,16 @@
 #'                              minVal=10,maxVal=250,xlog=FALSE)
 #' @export
 makeExplore<-function(exploreType="n",exploreNPoints=13,
-                      minVal=NA,maxVal=NA,xlog=NA
+                      vals<-NULL,minVal=NA,maxVal=NA,xlog=NA
 ) {
   if (exploreType=="alpha") exploreType<-"Alpha"
   explore<-list(exploreType=exploreType,
                 exploreNPoints=exploreNPoints,
                 minVal=minVal,maxVal=maxVal,xlog=xlog
   )
-  if (is.na(explore$minVal)) {
+  if (!is.null(vals)) explore$minVal<-vals
+  
+  if (any(is.na(explore$minVal))) {
     range<-getExploreRange(explore)
     explore$minVal<-range$minVal
     explore$maxVal<-range$maxVal
@@ -418,11 +420,12 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
   minVal<-explore$minVal
   maxVal<-explore$maxVal
   xlog<-explore$xlog
-  if (xlog) {
+  if (length(minVal)>1) vals<-minVal
+  else {
+    if (xlog) {
     minVal<-log10(minVal)
     maxVal<-log10(maxVal)
   }
-  
   switch (explore$exploreType,
           "IVType"={vals<-c("Interval","Ord7","Ord4","Cat2","Cat3")},
           "DVType"={vals<-c("Interval","Ord7","Ord4","Cat2")},
@@ -502,6 +505,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
           "MetaType"={vals<-c("FF","FT","TF","TT")}
   )
   if (xlog) vals<-10^vals
+  }
   if (is.element(explore$exploreType,c("IVlevels","DVlevels","n","NoStudies"))) vals<-round(vals)
   
   exploreResult$vals<-vals
