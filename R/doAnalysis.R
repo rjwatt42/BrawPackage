@@ -359,11 +359,21 @@ multipleAnalysis<-function(nsims=1,hypothesis,design,evidence,newResult=c()){
       newResult$AIC[j]<-res$AIC
       newResult$AICnull[j]<-res$AICnull
       if (!is.null(hypothesis$IV2)) {
-        newResult$rIV2[j]<-res$rIV2
-        newResult$pIV2[j]<-res$pIV2
-        newResult$rIVIV2DV[j]<-res$rIVIV2DV
-        newResult$pIVIV2DV[j]<-res$pIVIV2DV
-        
+        if (evidence$AnalysisTerms>1) {
+          newResult$rIV2[j]<-res$rIV2
+          newResult$pIV2[j]<-res$pIV2
+        } else {
+          newResult$rIV2[j]<-NA
+          newResult$pIV2[j]<-NA
+        }
+        if (evidence$AnalysisTerms>2) {
+          newResult$rIV2[j]<-res$rIVIV2DV
+          newResult$pIV2[j]<-res$pIVIV2DV
+        } else {
+          newResult$rIV2[j]<-NA
+          newResult$pIV2[j]<-NA
+        }
+
         newResult$r$direct[j,]<-res$r$direct
         newResult$r$unique[j,]<-res$r$unique
         newResult$r$total[j,]<-res$r$total
