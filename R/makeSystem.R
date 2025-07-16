@@ -109,6 +109,9 @@ makeEffect<-function(rIV=0,rIV2=0,rIVIV2=0,rIVIV2DV=0,rSD=0,Heteroscedasticity=0
 #' @export
 makeHypothesis<-function(IV=makeVariable("IV"),IV2=NULL,DV=makeVariable("DV"),
                          effect=makeEffect(),layout="normal") {
+  if (is.character(IV)) IV<-getVariable(IV)
+  if (is.character(IV2)) IV2<-getVariable(IV2)
+  if (is.character(DV)) DV<-getVariable(DV)
   hypothesis<-list(IV=IV,IV2=IV2,DV=DV,effect=effect,layout=layout)
   # assign("hypothesis",hypothesis,braw.def)
   # braw.def$hypothesis<<-hypothesis
