@@ -219,10 +219,18 @@ makeSampleVar<-function(design,effect,n,MV,MV2){
     
     if (design$sIVRangeOn || design$sIV2RangeOn) {
       condition<-rep(TRUE,length(ivr1))
-      if (design$sIVRangeOn)
-        condition<-condition & (ivr1>design$sIVRange[1] & ivr1<design$sIVRange[2])
-      if (!is.null(MV2) && design$sIV2RangeOn) 
-        condition<-condition & (ivr21>design$sIV2Range[1] & ivr21<design$sIV2Range[2])
+      if (design$sIVRangeOn) {
+        if (design$sIVRange[1]==design$sIVRange[2])
+          ivr1<-ivr*0+design$sIVRange[1]
+        else
+          condition<-condition & (ivr1>design$sIVRange[1] & ivr1<design$sIVRange[2])
+      }
+      if (!is.null(MV2) && design$sIV2RangeOn) {
+        if (design$sIV2Range[1]==design$sIV2Range[2])
+          ivr22<-ivr2*0+design$sIV2Range[1]
+        else
+          condition<-condition & (ivr1>design$sIV2Range[1] & ivr1<design$sIV2Range[2])
+      }
       ivr<-c(ivr, ivr1[condition])
       if (!is.null(MV2))
         ivr2<-c(ivr2,ivr21[condition])
