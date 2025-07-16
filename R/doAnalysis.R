@@ -374,12 +374,13 @@ multipleAnalysis<-function(nsims=1,hypothesis,design,evidence,newResult=c()){
           newResult$pIV2[j]<-NA
         }
 
-        newResult$r$direct[j,]<-c(res$r$direct,rep(NA,3-length(res$r$direct)))
-        newResult$r$unique[j,]<-c(res$r$unique,rep(NA,3-length(res$r$unique)))
-        newResult$r$total[j,]<-c(res$r$total,rep(NA,3-length(res$r$total)))
-        newResult$p$direct[j,]<-c(res$p$direct,rep(NA,3-length(res$p$direct)))
-        newResult$p$unique[j,]<-c(res$p$unique,rep(NA,3-length(res$p$unique)))
-        newResult$p$total[j,]<-c(respr$total,rep(NA,3-length(res$p$total)))
+        nrep<-length(newResult$r$direct[j,])-length(res$r$direct)
+        newResult$r$direct[j,]<-c(res$r$direct,rep(NA,3-nrep))
+        newResult$r$unique[j,]<-c(res$r$unique,rep(NA,3-nrep))
+        newResult$r$total[j,]<-c(res$r$total,rep(NA,3-nrep))
+        newResult$p$direct[j,]<-c(res$p$direct,rep(NA,3-nrep))
+        newResult$p$unique[j,]<-c(res$p$unique,rep(NA,3-nrep))
+        newResult$p$total[j,]<-c(respr$total,rep(NA,3-nrep))
       }
       if (!is.null(res$sem)){
       newResult$sem[j,]<-res$sem
