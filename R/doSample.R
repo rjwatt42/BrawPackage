@@ -227,7 +227,7 @@ makeSampleVar<-function(design,effect,n,MV,MV2){
       }
       if (!is.null(MV2) && design$sIV2RangeOn) {
         if (design$sIV2Range[1]==design$sIV2Range[2])
-          ivr21<-ivr2*0+design$sIV2Range[1]
+          ivr21<-ivr21*0+design$sIV2Range[1]
         else
           condition<-condition & (ivr2>design$sIV2Range[1] & ivr2<design$sIV2Range[2])
       }
