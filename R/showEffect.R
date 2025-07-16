@@ -56,7 +56,7 @@ drawArrow<-function(start,len,direction=0,ends="last",col="#000000",fill="white"
 
 
 #' export
-showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
+showEffect<-function(r,t=1,cols=c(TRUE,TRUE,TRUE),showValue=TRUE,plotArea=NULL,g=NULL){
 
   if (!is.null(plotArea)) braw.env$plotArea<-plotArea
   if (length(r)==2) {rSD<-r[2]; r<-r[1]} else {rSD<-NULL; rUN<-NULL}
@@ -83,6 +83,7 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
           hjust<- 1
           ends="last"
           fill=braw.env$plotColours$maineffectES
+          if (!cols[1]) fill<-"#AAAAAA"
           size=0.7
           },
           # 3
@@ -93,6 +94,7 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
           hjust<- 0
           ends="last"
           fill=braw.env$plotColours$maineffectES
+          if (!cols[2]) fill<-"#AAAAAA"
           size=0.7
           },
           # 4
@@ -113,6 +115,7 @@ showEffect<-function(r,t=1,showValue=TRUE,plotArea=NULL,g=NULL){
           hjust<-0.5
           ends="join"
           fill=braw.env$plotColours$interactionES
+          if (!cols[3]) fill<-"#AAAAAA"
           size=0.7
           },
           # 6

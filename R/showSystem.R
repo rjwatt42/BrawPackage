@@ -101,6 +101,10 @@ showHypothesis<-function(hypothesis=braw.def$hypothesis,evidence=braw.def$eviden
              r1<-c(r1,0,r1*sqrt(1-r12^2))
              r2<-c(r2,0,r2*sqrt(1-r12^2))
            } 
+           if (evidence$AnalysisTerms==3) cols<-c(TRUE,TRUE,TRUE)
+           if (evidence$AnalysisTerms==2) cols<-c(TRUE,TRUE,FALSE)
+           if (evidence$AnalysisTerms==1) cols<-c(TRUE,FALSE,FALSE)
+           
            switch(hypothesis$layout,
                   "simple"={
                     g<-showVariable(IV,plotArea=c(xoff-xgain*0.3,yoff+0.65*ygain,xgain,0.35*ygain),g=g)
@@ -113,11 +117,10 @@ showHypothesis<-function(hypothesis=braw.def$hypothesis,evidence=braw.def$eviden
                     g<-showVariable(IV,plotArea=c(xoff-xgain*0.3,yoff+0.65*ygain,xgain,0.35*ygain),g=g)
                     g<-showVariable(IV2,plotArea=c(xoff+xgain*1.3,yoff+0.65*ygain,xgain,0.35*ygain),g=g)
                     g<-showVariable(DV,plotArea=c(xoff+xgain/2,yoff,xgain,0.35*ygain),g=g)
-                    g<-showEffect(r1,2,showValue=showValue,plotArea=c(xoff-xgain*0.3,yoff+0.35*ygain,xgain,0.3*ygain),g)
-                    g<-showEffect(r2,3,showValue=showValue,plotArea=c(xoff+xgain*1.3,yoff+0.35*ygain,xgain,0.3*ygain),g)
-                    g<-showEffect(r12,4,showValue=showValue,plotArea=c(xoff+xgain/2,yoff+0.7*ygain,xgain,0.22*ygain),g)
-                    if (evidence$AnalysisTerms==3)
-                      g<-showEffect(effect$rIVIV2DV,5,showValue=showValue,plotArea=c(xoff+xgain/2,yoff+0.35*ygain,xgain,0.3*ygain),g)
+                    g<-showEffect(r1,2,cols,showValue=showValue,plotArea=c(xoff-xgain*0.3,yoff+0.35*ygain,xgain,0.3*ygain),g)
+                    g<-showEffect(r2,3,cols,showValue=showValue,plotArea=c(xoff+xgain*1.3,yoff+0.35*ygain,xgain,0.3*ygain),g)
+                    g<-showEffect(r12,4,cols,showValue=showValue,plotArea=c(xoff+xgain/2,yoff+0.7*ygain,xgain,0.22*ygain),g)
+                    g<-showEffect(effect$rIVIV2DV,5,cols,showValue=showValue,plotArea=c(xoff+xgain/2,yoff+0.35*ygain,xgain,0.3*ygain),g)
                   },
                   "path"={
                     g<-showVariable(IV,plotArea=c(xoff,yoff+0.65*ygain,xgain*0.9,0.35*ygain),g=g)
