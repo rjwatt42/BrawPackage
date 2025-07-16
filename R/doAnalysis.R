@@ -380,7 +380,7 @@ multipleAnalysis<-function(nsims=1,hypothesis,design,evidence,newResult=c()){
         newResult$r$total[j,]<-c(res$r$total,rep(NA,nrep))
         newResult$p$direct[j,]<-c(res$p$direct,rep(NA,nrep))
         newResult$p$unique[j,]<-c(res$p$unique,rep(NA,nrep))
-        newResult$p$total[j,]<-c(respr$total,rep(NA,nrep))
+        newResult$p$total[j,]<-c(res$p$total,rep(NA,nrep))
       }
       if (!is.null(res$sem)){
       newResult$sem[j,]<-res$sem
