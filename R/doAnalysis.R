@@ -375,12 +375,12 @@ multipleAnalysis<-function(nsims=1,hypothesis,design,evidence,newResult=c()){
         }
 
         nrep<-length(newResult$r$direct[j,])-length(res$r$direct)
-        newResult$r$direct[j,]<-c(res$r$direct,rep(NA,3-nrep))
-        newResult$r$unique[j,]<-c(res$r$unique,rep(NA,3-nrep))
-        newResult$r$total[j,]<-c(res$r$total,rep(NA,3-nrep))
-        newResult$p$direct[j,]<-c(res$p$direct,rep(NA,3-nrep))
-        newResult$p$unique[j,]<-c(res$p$unique,rep(NA,3-nrep))
-        newResult$p$total[j,]<-c(respr$total,rep(NA,3-nrep))
+        newResult$r$direct[j,]<-c(res$r$direct,rep(NA,nrep))
+        newResult$r$unique[j,]<-c(res$r$unique,rep(NA,nrep))
+        newResult$r$total[j,]<-c(res$r$total,rep(NA,nrep))
+        newResult$p$direct[j,]<-c(res$p$direct,rep(NA,nrep))
+        newResult$p$unique[j,]<-c(res$p$unique,rep(NA,nrep))
+        newResult$p$total[j,]<-c(respr$total,rep(NA,nrep))
       }
       if (!is.null(res$sem)){
       newResult$sem[j,]<-res$sem
