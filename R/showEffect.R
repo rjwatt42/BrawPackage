@@ -181,7 +181,7 @@ showEffect<-function(r,moderator=NULL,type=1,useCols=c(TRUE,TRUE,TRUE),showValue
   )
   col<-"#000000"
   alpha<-1
-  if ((is.element(type,c(4,6,7,8)) && !is.null(r) && r==0) || (!is.null(moderator) && moderator==FALSE)) {
+  if ((is.element(type,c(3,4,5,6,7,8)) && !is.null(r) && r==0) || (!is.null(moderator) && moderator==FALSE)) {
     fill<-darken(desat(fill,0.5),off=0.8)
     # alpha<-0.2
     col<-darken(col,off=0.8)
