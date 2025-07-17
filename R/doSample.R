@@ -475,6 +475,9 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
       if (!is.null(IV2)) iv12r<-ivDiscrete*iv2Discrete
       else               iv12r<-ivr*0
 
+      if (!is.null(effect$rM1) && !effect$rM1) rho<-0
+      if (!is.null(effect$rM2) && !effect$rM2) rho2<-0
+      
       # make residuals
       variance_explained=rho^2+rho2^2+rhoInter^2+2*rho*rho2*rho12
       residual<-makeSampleVals(n,0,sqrt(1-variance_explained),DV,effect$ResidDistr)

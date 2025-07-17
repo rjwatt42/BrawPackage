@@ -56,7 +56,7 @@ drawArrow<-function(start,len,direction=0,ends="last",col="#000000",fill="white"
 
 
 #' export
-showEffect<-function(r,t=1,cols=c(TRUE,TRUE,TRUE),showValue=TRUE,plotArea=NULL,g=NULL){
+showEffect<-function(r,moderator=NULL,type=1,useCols=c(TRUE,TRUE,TRUE),showValue=TRUE,plotArea=NULL,g=NULL){
 
   if (!is.null(plotArea)) braw.env$plotArea<-plotArea
   if (length(r)==2) {rSD<-r[2]; r<-r[1]} else {rSD<-NULL; rUN<-NULL}
@@ -64,7 +64,7 @@ showEffect<-function(r,t=1,cols=c(TRUE,TRUE,TRUE),showValue=TRUE,plotArea=NULL,g
   
   g<-startPlot(xlim=c(-1,1),ylim=c(0,1),back="transparent",box="none",g=g)
   
-  switch (t,
+  switch (type,
           # 1
           {start=c(0,0.92)
           direction=0
@@ -83,7 +83,7 @@ showEffect<-function(r,t=1,cols=c(TRUE,TRUE,TRUE),showValue=TRUE,plotArea=NULL,g
           hjust<- 1
           ends="last"
           fill=braw.env$plotColours$maineffectES
-          if (!cols[1]) fill<-"#AAAAAA"
+          if (!useCols[1]) fill<-"#AAAAAA"
           size=0.7
           },
           # 3
@@ -94,7 +94,7 @@ showEffect<-function(r,t=1,cols=c(TRUE,TRUE,TRUE),showValue=TRUE,plotArea=NULL,g
           hjust<- 0
           ends="last"
           fill=braw.env$plotColours$maineffectES
-          if (!cols[2]) fill<-"#AAAAAA"
+          if (!useCols[2]) fill<-"#AAAAAA"
           size=0.7
           },
           # 4
@@ -115,7 +115,7 @@ showEffect<-function(r,t=1,cols=c(TRUE,TRUE,TRUE),showValue=TRUE,plotArea=NULL,g
           hjust<-0.5
           ends="join"
           fill=braw.env$plotColours$interactionES
-          if (!cols[3]) fill<-"#AAAAAA"
+          if (!useCols[3]) fill<-"#AAAAAA"
           size=0.7
           },
           # 6
@@ -181,16 +181,21 @@ showEffect<-function(r,t=1,cols=c(TRUE,TRUE,TRUE),showValue=TRUE,plotArea=NULL,g
   )
   col<-"#000000"
   alpha<-1
-  if (is.element(t,c(4,6,7,8)) && !is.null(r) && r==0) {
+  if ((is.element(type,c(4,6,7,8)) && !is.null(r) && r==0) || (!is.null(moderator) && moderator==FALSE)) {
     fill<-darken(desat(fill,0.5),off=0.8)
     # alpha<-0.2
     col<-darken(col,off=0.8)
   }
   g<-addG(g,drawArrow(start,len,direction,ends,col=col,fill=fill,alpha=alpha))
   
+  if(!is.null(moderator)) {
+    if (moderator) col<-fill else col<-"#FF4400"
+    centre<-start+len*0.5*c(sin(direction/57.296),-cos(direction/57.296))
+    g<-addG(g,dataPoint(data=data.frame(x=centre[1],y=centre[2]),fill=col,shape=21,size=8))
+  }
   
   if (showValue && braw.env$simData && !is.null(r)) {
-    if (t==1){
+    if (type==1){
       lbl=paste("r[p]=",brawFormat(r,digits=2),sep="")
       if (!is.null(rSD) && rSD!=0) lbl<-paste0(lbl,"\u00B1",brawFormat(rSD,digits=1))
     }else{ 
@@ -198,12 +203,17 @@ showEffect<-function(r,t=1,cols=c(TRUE,TRUE,TRUE),showValue=TRUE,plotArea=NULL,g
       else {
         lbl<-brawFormat(r,digits=2)
         if (!is.null(rUN)) {
-          # if (t==2) lbl<-paste0("(",brawFormat(rUN,digits=2),") ",lbl)
-          # if (t==3) lbl<-paste0(lbl," (",brawFormat(rUN,digits=2),")")
+          # if (type==2) lbl<-paste0("(",brawFormat(rUN,digits=2),") ",lbl)
+          # if (type==3) lbl<-paste0(lbl," (",brawFormat(rUN,digits=2),")")
         }
       }
     }
-    g<-addG(g,dataText(data=labelpts, label = lbl, size=size*1, hjust=hjust, colour=col, fontface="bold"))
+    if (direction<0) {off<-c(0.15,0); hjust<-0}
+    if (direction>=0) {off<-c(-0.15,0); hjust<-1}
+    if (direction<=-90) {off<-c(0,0.15); hjust<-0.5}
+    labelpts<-start+len*0.5*c(sin(direction/57.296),-cos(direction/57.296))+off
+    g<-addG(g,dataText(data=data.frame(x=labelpts[1],y=labelpts[2]), label = lbl, size=size*1, 
+                       hjust=hjust, vjust=0.5, colour=col, fontface="bold"))
   }
   
   return(g)  

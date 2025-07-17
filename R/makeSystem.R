@@ -80,8 +80,10 @@ makeWorld<-function(worldOn=TRUE,populationPDF="Uniform",populationRZ="r",
 #'            ResidDistr="normal",world=makeWorld()
 #' )
 #' @export
-makeEffect<-function(rIV=0,rIV2=0,rIVIV2=0,rIVIV2DV=0,rSD=0,Heteroscedasticity=0,
-                     ResidDistr="normal",world=makeWorld(FALSE)){
+makeEffect<-function(rIV=0,rIV2=0,rIVIV2=0,rIVIV2DV=0,rSD=0,
+                     rM1=NULL,rM2=NULL,
+                     Heteroscedasticity=0,ResidDistr="normal",
+                     world=makeWorld(FALSE)){
 
   # check effect sizes before going any further
   fullES<-rIV^2+rIV2^2+2*rIV*rIV2*rIVIV2+rIVIV2DV^2
@@ -93,6 +95,7 @@ makeEffect<-function(rIV=0,rIV2=0,rIVIV2=0,rIVIV2DV=0,rSD=0,Heteroscedasticity=0
     fullES<-rIV^2+rIV2^2+2*rIV*rIV2*rIVIV2+rIVIV2DV^2
   }
   effect<-list(rIV=rIV,rIV2=rIV2,rIVIV2=rIVIV2,rIVIV2DV=rIVIV2DV,rSD=rSD,
+               rM1=rM1,rM2=rM2,
                Heteroscedasticity=Heteroscedasticity,ResidDistr=ResidDistr,
                world=world
   )
@@ -339,9 +342,11 @@ setHypothesis<-function(IV=braw.def$hypothesis$IV,IV2=braw.def$hypothesis$IV2,DV
 #' set default effect
 #' @export
 setEffect<-function(rIV=braw.def$hypothesis$effect$rIV,rIV2=braw.def$hypothesis$effect$rIV2,rIVIV2=braw.def$hypothesis$effect$rIVIV2,rIVIV2DV=braw.def$hypothesis$effect$rIVIV2DV,rSD=braw.def$hypothesis$effect$rSD,
+                    rM1=braw.def$hypothesis$effect$rM1,rM2=braw.def$hypothesis$effect$rM2,
                     Heteroscedasticity=braw.def$hypothesis$effect$Heteroscedasticity,ResidDistr=braw.def$hypothesis$effect$ResidDistr,
                     world=braw.def$hypothesis$effect$world) {
   e<-makeEffect(rIV=rIV,rIV2=rIV2,rIVIV2=rIVIV2,rIVIV2DV=rIVIV2DV,rSD=rSD,
+                rM1=rM1,rM2=rM2,
                 Heteroscedasticity=Heteroscedasticity,ResidDistr=ResidDistr,
                 world=world)
   h<-braw.def$hypothesis
