@@ -230,7 +230,7 @@ drawNullPlot<-function() {
            g<-paste0(
              '<svg width=',format(svgBoxX()),' height=',format(svgBoxY()),
              ' padding:0;',
-             ' style="','background-color: ',col,';','display: block; margin: auto;','" ',
+             ' style="','background-color: ',col,';','margin: auto;','" ',
              ' xmlns="http://www.w3.org/2000/svg">'
            )
          },
