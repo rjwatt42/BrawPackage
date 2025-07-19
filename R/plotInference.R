@@ -249,6 +249,11 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE,sequence=FALSE){
   
   pts<-data.frame(x=d1,y=d2)
   labels<-1:length(d1)
+  if (design$Replication$On) {
+    labels<-c("Original",rep("Replication",length(d1)-1))
+    if (design$Replication$Keep=="MetaAnalysis")
+      labels[length(d1)]<-"Combined"
+  }
   braw.env$plotArea<-c(0,0,1,1)
   g<-startPlot(xaxis$lim,yaxis$lim,
                xticks=makeTicks(logScale=xaxis$logScale),xlabel=makeLabel(xaxis$label),

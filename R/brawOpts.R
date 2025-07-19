@@ -361,6 +361,8 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,1
           
           braw.env$nonnullTitle<-"Non Null"
           braw.env$nullTitle<-"Null"
+          braw.env$nonnullTitle<-"H[+]"
+          braw.env$nullTitle<-"H[0]"
           
           braw.env$timeLimit<-timeLimit # seconds
           
