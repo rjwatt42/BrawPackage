@@ -176,7 +176,18 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
                       paste0("!j",brawFormat(analysis$poIV,digits=3)),
                       paste0("!j",brawFormat(analysis$rpIV,digits=3)),
                       paste0("!j",brawFormat(rn2w(analysis$rpIV,analysis$noval),digits=3)),
-                      rep("",nc-6),
+                      rep("",nc-6)
+        )
+        if (analysis$design$Replication$Keep=="MetaAnalysis")
+          outputText<-c(outputText,
+                        "replication",
+                        paste0("!j",brawFormat(analysis$ResultHistory$rIV[2],digits=3)),
+                        paste0("!j",brawFormat(analysis$ResultHistory$nval[2])),
+                        paste0("!j",brawFormat(analysis$ResultHistory$pIV[2],digits=3)),
+                        paste0("!j",brawFormat(analysis$rpIV,digits=3)),
+                        paste0("!j",brawFormat(rn2w(analysis$rpIV,analysis$ResultHistory$nval[2]),digits=3)),
+                        rep("",nc-6))
+        outputText<-c(outputText,
                       "final",
                       paste0("!j",brawFormat(analysis$rIV,digits=3)),
                       paste0("!j",brawFormat(analysis$nval)),
