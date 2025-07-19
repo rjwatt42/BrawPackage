@@ -309,7 +309,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE,sequence=FALSE){
     if (!use[last]) colour<-c(b1,c1) else colour<-c(b2,c2)
     g<-addG(g,dataPoint(data=pts[last,],shape=shape, colour = colour[1], fill = colour[2], alpha=gain^0.8, size = dotSize*2))
     if (analysis$design$Replication$On && analysis$design$Replication$Keep=="MetaAnalysis") pts<-pts[1:(last-1),]
-    g<-addG(g,dataPath(data=pts,arrow=TRUE,linewidth=0.5,colour="#FFFFFF"))
+    g<-addG(g,dataPath(data=pts,arrow=TRUE,linewidth=0.75,colour=braw.env$plotColours$descriptionC))
   }
   return(g)
 }
