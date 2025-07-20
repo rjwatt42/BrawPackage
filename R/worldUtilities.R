@@ -214,19 +214,19 @@ getNDist<-function(design,world=NULL,logScale=FALSE,sigOnly=FALSE,HQ=FALSE) {
 }
 
 getNList<-function(design,world,HQ=FALSE) {
-  if (design$Replication$On) {
-    if (HQ) npt<-201 else npt=21
-    nmax<-5
-    nvals<-braw.env$minN+seq(0,nmax*design$sN,length.out=npt)
-    design$Replication$On<-FALSE
-    ndens<-fullRSamplingDist(nvals,world=world,design=design,"nw",logScale=FALSE,sigOnly=design$Replication$forceSigOriginal)
-    return(list(nvals=nvals,ndens=ndens,ndensSig=ndens))
-  } else {
+  # if (design$Replication$On) {
+  #   if (HQ) npt<-201 else npt=21
+  #   nmax<-5
+  #   nvals<-braw.env$minN+seq(0,nmax*design$sN,length.out=npt)
+  #   design$Replication$On<-FALSE
+  #   ndens<-fullRSamplingDist(nvals,world=world,design=design,"nw",logScale=FALSE,sigOnly=FALSE)
+  #   return(list(nvals=nvals,ndens=ndens,ndensSig=ndens))
+  # } else {
     if (!design$sNRand) {
       return(list(nvals=design$sN,ndens=1,ndensSig=1))
     }
     return(getNDist(design,world=NULL,logScale=FALSE,sigOnly=FALSE,HQ=HQ))
-  }
+  # }
 }
 
 rRandomValue<-function(world=braw.def$hypothesis$effect$world,ns) {

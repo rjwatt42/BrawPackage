@@ -203,6 +203,7 @@ makeSampling<-function(type="Random") {
 #' @export
 makeReplication<-function(On=TRUE,Repeats=1,Keep="Cautious",RepAlpha=0.05,
                           PowerOn=TRUE,Power=0.8,Tails=2,PowerPrior="None",
+                          replicateAll=FALSE,
                           forceSigOriginal=FALSE,forceSign=TRUE,
                           maxN=2000,
                           BudgetType="Unlimited",Budget=1000,
@@ -211,6 +212,7 @@ makeReplication<-function(On=TRUE,Repeats=1,Keep="Cautious",RepAlpha=0.05,
   
   replication<-list(On=On,Repeats=Repeats,Keep=Keep,RepAlpha=RepAlpha,
                     PowerOn=PowerOn,Power=Power,Tails=Tails,PowerPrior=PowerPrior,
+                    replicateAll=replicateAll,
                     forceSigOriginal=forceSigOriginal,forceSign=forceSign,
                     maxN=maxN,
                     BudgetType=BudgetType,Budget=Budget
