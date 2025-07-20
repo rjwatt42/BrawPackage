@@ -892,6 +892,13 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
       }
   } else { # more than 250 points
     hists<-simulations_hist(pts,showType,ylim,histGain,histGainrange)
+    gh<-max(hists$h1+hists$h2+hists$h3+hists$h4)
+    if (gh>0.8) {
+      hists$h1<-hists$h1/gh*0.8
+      hists$h2<-hists$h2/gh*0.8
+      hists$h3<-hists$h3/gh*0.8
+      hists$h4<-hists$h4/gh*0.8
+    }
     xoff<-pts$x[1]
     if (orientation=="vert") {
       simAlpha<-0.85
