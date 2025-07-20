@@ -219,7 +219,7 @@ getNList<-function(design,world,HQ=FALSE) {
     nmax<-5
     nvals<-braw.env$minN+seq(0,nmax*design$sN,length.out=npt)
     design$Replication$On<-FALSE
-    ndens<-fullRSamplingDist(nvals,world=world,design=design,"nw",logScale=FALSE,sigOnly=FALSE)
+    ndens<-fullRSamplingDist(nvals,world=world,design=design,"nw",logScale=FALSE,sigOnly=design$Replication$forceSigOriginal)
     return(list(nvals=nvals,ndens=ndens,ndensSig=ndens))
   } else {
     if (!design$sNRand) {

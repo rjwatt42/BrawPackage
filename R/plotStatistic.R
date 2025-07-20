@@ -182,7 +182,7 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
                         if (design$Replication$Keep=="MetaAnalysis") psig<-sum(w2)
                         else psig<-sum(w1*w2)
                         if (design$Replication$forceSigOriginal)
-                        theoryDens_sig[ri1]<-theoryDens_sig[ri1]*psig
+                          theoryDens_sig[ri1]<-theoryDens_sig[ri1]*psig
                         else 
                           theoryDens_sig[ri1]<-theoryDens_all[ri1]*psig
                       }
@@ -684,19 +684,19 @@ simulations_hist<-function(pts,valType,ylim,histGain,histGainrange){
   nonnulls<-pts$notNull[use]
   if (all(is.na(nonnulls))) nonnulls<-rep(TRUE,length(vals))
   
-  vals1<-vals[nonnulls & sigs==0]
+  vals1<-vals[nonnulls & sigs==1]
   dens1<-hist(vals1,breaks=bins,plot=FALSE,warn.unused = FALSE,right=TRUE)
   dens1<-dens1$counts
   
-  vals2<-vals[nonnulls & sigs==1]
+  vals2<-vals[nonnulls & sigs==0]
   dens2<-hist(vals2,breaks=bins,plot=FALSE,warn.unused = FALSE,right=TRUE)
   dens2<-dens2$counts
   
-  vals3<-vals[!nonnulls & sigs==1]
+  vals3<-vals[!nonnulls & sigs==0]
   dens3<-hist(vals3,breaks=bins,plot=FALSE,warn.unused = FALSE,right=TRUE)
   dens3<-dens3$counts
   
-  vals4<-vals[!nonnulls & sigs==0]
+  vals4<-vals[!nonnulls & sigs==1]
   dens4<-hist(vals4,breaks=bins,plot=FALSE,warn.unused = FALSE,right=TRUE)
   dens4<-dens4$counts
   dens0<-dens1+dens2+dens3+dens4
@@ -747,23 +747,23 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
     if (useSignificanceCols){
       if (is.numeric(pts$sig)) {
         c1<-braw.env$plotColours$infer_sigNonNull
-        c2<-braw.env$plotColours$infer_nsigNull
-        c3<-braw.env$plotColours$infer_sigNull
-        c4<-braw.env$plotColours$infer_nsigNonNull
+        c2<-braw.env$plotColours$infer_nsigNonNull
+        c3<-braw.env$plotColours$infer_nsigNull
+        c4<-braw.env$plotColours$infer_sigNull
         c5<-braw.env$plotColours$infer_isigNonNull
         c6<-braw.env$plotColours$infer_isigNull
         doingDLLR<-TRUE
       }
       if (simWorld && is.element(showType,c("rse","sig","ns","nonnulls","nulls"))) {
         c1<-braw.env$plotColours$infer_sigNonNull
-        c2<-braw.env$plotColours$infer_nsigNull
-        c3<-braw.env$plotColours$infer_sigNull
-        c4<-braw.env$plotColours$infer_nsigNonNull
+        c2<-braw.env$plotColours$infer_nsigNonNull
+        c3<-braw.env$plotColours$infer_nsigNull
+        c4<-braw.env$plotColours$infer_sigNull
       } else {
         c1<-braw.env$plotColours$infer_sigNonNull
         c2<-braw.env$plotColours$infer_nsigNull
-        c3<-braw.env$plotColours$infer_sigNonNull
-        c4<-braw.env$plotColours$infer_nsigNull
+        c3<-braw.env$plotColours$infer_nsigNull
+        c4<-braw.env$plotColours$infer_sigNonNull
       }
       if (all(is.na(pts$notNull))) pts$notNull<-rep(TRUE,length(pts$sig))
 
@@ -811,6 +811,8 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
         }
     }
     
+    use<-c(which(pts$sig & pts$notNull),which(!pts$sig & pts$notNull),which(!pts$sig & !pts$notNull),which(pts$sig & !pts$notNull))
+    pts<-pts[use,]
     xr<-makeFiddle(pts$y1,2/40/braw.env$plotArea[4],orientation)
     switch(orientation,
            "horz"={
@@ -855,11 +857,11 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
       g<-addG(g,dataPoint(data=sigNonNullData,shape=shape, 
                           colour = "black", alpha=alpha, fill = c1, size = dotSize))
       g<-addG(g,dataPoint(data=nsNonNullData,shape=shape, 
-                          colour = "black", alpha=alpha, fill = c4, size = dotSize))
-      g<-addG(g,dataPoint(data=sigNullData,shape=shape, 
-                          colour = "black", alpha=alpha, fill = c3, size = dotSize))
-      g<-addG(g,dataPoint(data=nsNullData,shape=shape, 
                           colour = "black", alpha=alpha, fill = c2, size = dotSize))
+      g<-addG(g,dataPoint(data=nsNullData,shape=shape, 
+                          colour = "black", alpha=alpha, fill = c3, size = dotSize))
+      g<-addG(g,dataPoint(data=sigNullData,shape=shape, 
+                          colour = "black", alpha=alpha, fill = c4, size = dotSize))
       if (doingDLLR) {
         pts_isigNonNull=pts[pts$sig==-1 & pts$notNull,]
         pts_isigNull=pts[pts$sig==-1 & !pts$notNull,]
@@ -900,20 +902,20 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
 
     if (length(width)==1) width=c(width,width)
     
-    dens<-cbind(hists$h2,hists$h3,hists$h1,hists$h4)
-    cols<-c(c1,c3,c4,c2)
+    dens<-cbind(hists$h1,hists$h2,hists$h3,hists$h4)
+    cols<-c(c1,c2,c3,c4)
     if (doingDLLR) {
       dens<-cbind(hists$h2,hists$h5,hists$h1,hists$h3,hists$h4,hists$h6)
       cols<-c(c1,c5,c4,c3,c2,c6)
     }
     
-    for (i in 1:length(hists$h1)) {
+    for (i in 1:nrow(dens)) {
       ystart<-0
-      for (j in 1:length(cols)) {
-        if (dens[i,j]>0) {
+      for (j in 1:ncol(dens)) {
           if (histStyle=="width" && j>1) ystart<-ystart+dens[i,j-1] 
           else ystart<-0  
-          if (histStyle=="width") {
+          if (dens[i,j]>0) {
+            if (histStyle=="width") {
             alpha<-simAlpha
             alpha<-1
             colour<-cols[j]
@@ -982,7 +984,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                  g=NULL){
 
   baseColour<-braw.env$plotColours$infer_nsigC
-  theoryFirst<-FALSE
+  theoryFirst<-TRUE
   npct<-0
   showSig<-TRUE
   labelSig<-TRUE
@@ -1234,7 +1236,8 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       sampleVals[sampleVals<(-10)]<--10
     }  
     if (nrow(sampleVals)<100000) theoryFirst<-TRUE
-  }    
+    else theoryFirst<-FALSE
+  } 
   sigOnly<-evidence$sigOnly
   
   if (doingMetaAnalysis) { theoryAlpha<-0.5} else {theoryAlpha<-0.8}
