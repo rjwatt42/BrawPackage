@@ -158,13 +158,14 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
                     nd<-nd[use]
                     ns<-ns[use]
                     # we do each population separately
-                    if (!design$Replication$On) {
+                    # if (!design$Replication$On) {
                       for (ri in 1:npt) {
                         w<-rn2w(theoryVals[ri],ns)
                         psig<-sum(nd*w)
                         theoryDens_sig[ri]<-theoryDens_all[ri]*psig
                       }
-                    } else {
+                    # } 
+                  if (design$Replication$On) {
                       # for each of the possible sample rs
                       for (ri1 in 1:npt) {
                         w1<-rn2w(theoryVals[ri1],ns)*nd
@@ -180,7 +181,10 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
                         }
                         if (design$Replication$Keep=="MetaAnalysis") psig<-sum(w2)
                         else psig<-sum(w1*w2)
-                        theoryDens_sig[ri1]<-theoryDens_all[ri1]*psig
+                        if (design$Replication$forceSigOriginal)
+                        theoryDens_sig[ri1]<-theoryDens_sig[ri1]*psig
+                        else 
+                          theoryDens_sig[ri1]<-theoryDens_all[ri1]*psig
                       }
                     }
                   },
