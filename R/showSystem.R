@@ -341,7 +341,7 @@ showDesign<-function(design=braw.def$design,hypothesis=braw.def$hypothesis,plotA
       hypothesis$effect$world$populationRZ<-"r"
       hypothesis$effect$world$populationNullp<-0
     }
-    nRepDens<-fullRSamplingDist(nbin,hypothesis$effect$world,design,"nw",logScale=(braw.env$nPlotScale=="log10"),sigOnly=FALSE)
+    nRepDens<-fullRSamplingDist(nbin,hypothesis$effect$world,design,"nw",logScale=(braw.env$nPlotScale=="log10"),sigOnlyOutput=FALSE)
     y<-c(0,nRepDens,0)/max(nRepDens)*0.4
     x<-nbin[c(1,1:length(nbin),length(nbin))]
     pts=data.frame(x=log10(x),y=y)
@@ -497,7 +497,7 @@ showWorldSampling<-function(hypothesis=braw.def$hypothesis,design=braw.def$desig
   design1<-design
   design$Replication$On<-FALSE
   
-  dens<-fullRSamplingDist(vals,world,design,sigOnly=sigOnly) 
+  dens<-fullRSamplingDist(vals,world,design,sigOnlyOutput=sigOnly) 
   switch(braw.env$RZ,
          "r"={},
          "z"={
@@ -510,7 +510,7 @@ showWorldSampling<-function(hypothesis=braw.def$hypothesis,design=braw.def$desig
   )
   dens<-dens/sum(dens)
   if (design1$Replication$On) {
-    dens1<-fullRSamplingDist(vals,world,design1,sigOnly=sigOnly) 
+    dens1<-fullRSamplingDist(vals,world,design1,sigOnlyOutput=sigOnly) 
     dens1<-dens1/sum(dens1)
   } else dens1<-NA
   gain<-max(max(dens),max(dens1),na.rm=TRUE)

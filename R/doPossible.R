@@ -97,7 +97,7 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
   
   # enumerate the source populations
   sD<-fullRSamplingDist(rs,source,design,separate=TRUE,
-                        sigOnly=possible$sigOnly,sigOnlyCompensate=possible$sigOnlyCompensate,
+                        sigOnlyOutput=possible$sigOnly,sigOnlyCompensate=possible$sigOnlyCompensate,
                         HQ=possible$HQ)
   sourceRVals<-sD$vals
   sourceSampDens_r_total<-sD$dens

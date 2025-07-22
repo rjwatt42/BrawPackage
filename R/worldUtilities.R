@@ -219,7 +219,7 @@ getNList<-function(design,world,HQ=FALSE) {
   #   nmax<-5
   #   nvals<-braw.env$minN+seq(0,nmax*design$sN,length.out=npt)
   #   design$Replication$On<-FALSE
-  #   ndens<-fullRSamplingDist(nvals,world=world,design=design,"nw",logScale=FALSE,sigOnly=FALSE)
+  #   ndens<-fullRSamplingDist(nvals,world=world,design=design,"nw",logScale=FALSE,sigOnlyOutput=FALSE)
   #   return(list(nvals=nvals,ndens=ndens,ndensSig=ndens))
   # } else {
     if (!design$sNRand) {
@@ -322,7 +322,7 @@ fullPSig<-function(world,design,HQ=FALSE,alpha=braw.env$alphaSig) {
   return(pSig)
 }
 
-fullRSamplingDist<-function(vals,world,design,doStat="rs",logScale=FALSE,sigOnly=FALSE,sigOnlyCompensate=FALSE,HQ=FALSE,separate=FALSE,quantiles=NULL) {
+fullRSamplingDist<-function(vals,world,design,doStat="rs",logScale=FALSE,sigOnlyInput=FALSE,sigOnlyOutput=FALSE,sigOnlyCompensate=FALSE,HQ=FALSE,separate=FALSE,quantiles=NULL) {
   # sampling distribution from specified populations (pRho)
   if (is.null(vals)) 
     vals<-seq(-1,1,length=braw.env$worldNPoints)*braw.env$r_range
@@ -332,6 +332,7 @@ fullRSamplingDist<-function(vals,world,design,doStat="rs",logScale=FALSE,sigOnly
   rvals<-pR$pRho
   rdens<-pR$pRhogain
   if (length(rvals)>1) rdens<-rdens*diff(rvals[1:2])
+  if (sigOnlyInput) rdens<-rdens*rn2w(rvals,design$sN)
   if (!world$worldOn) world$populationNullp<-0
   if (!is.element(world$populationPDF,c("sample"))) {
   rvals<-c(rvals,0)
@@ -417,9 +418,9 @@ fullRSamplingDist<-function(vals,world,design,doStat="rs",logScale=FALSE,sigOnly
         if (logScale) addition<-addition*vals
         addition<-addition*ndens[ni]
         d1<-d1+addition
-        if (sigOnly>0) {
+        if (sigOnlyOutput>0) {
           critR<-tanh(qnorm(1-braw.env$alphaSig/2,0,1/sqrt(nvals[ni]-3)))
-          addition[abs(rp)<critR]<-addition[abs(rp)<critR]*(1-sigOnly)
+          addition[abs(rp)<critR]<-addition[abs(rp)<critR]*(1-sigOnlyOutput)
           if (sigOnlyCompensate) addition<-addition/sum(addition)
         }
         d<-d+addition

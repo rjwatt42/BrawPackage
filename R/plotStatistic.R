@@ -70,8 +70,8 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
     oldEffect<-effectTheory
     if (showType=="e1p") effectTheory$world$populationNullp<-1
     if (showType=="e2p") effectTheory$world$populationNullp<-0
-    theoryDens_all<-fullRSamplingDist(yvUse,effectTheory$world,design,"p",logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
-    theoryDens_sig<-fullRSamplingDist(yvUse,effectTheory$world,design,"p",logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
+    theoryDens_all<-fullRSamplingDist(yvUse,effectTheory$world,design,"p",logScale=logScale,sigOnlyOutput=FALSE,HQ=braw.env$showTheoryHQ)
+    theoryDens_sig<-fullRSamplingDist(yvUse,effectTheory$world,design,"p",logScale=logScale,sigOnlyOutput=TRUE,HQ=braw.env$showTheoryHQ)
     effectTheory<-oldEffect
   }
   
@@ -92,60 +92,63 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
                rvals<-seq(-1,1,length.out=npt)*0.99
              switch(showType,
                     "sig"={
-                      theoryDens_all<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
+                      theoryDens_all<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnlyOutput=TRUE,HQ=braw.env$showTheoryHQ)
                       theoryDens_sig<-theoryDens_all
                     },
                     "ns"={
-                      theoryDens_all<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
-                      theoryDens_sig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
+                      theoryDens_all<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnlyOutput=FALSE,HQ=braw.env$showTheoryHQ)
+                      theoryDens_sig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnlyOutput=TRUE,HQ=braw.env$showTheoryHQ)
                       theoryDens_all<-theoryDens_all-theoryDens_sig
                       theoryDens_sig<-theoryDens_sig*0
                     },
                     "nonnulls"={
                       ew<-effectTheory$world
                       ew$populationNullp<-0
-                      theoryDens_all<-fullRSamplingDist(rvals,ew,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
-                      theoryDens_sig<-fullRSamplingDist(rvals,ew,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
+                      theoryDens_all<-fullRSamplingDist(rvals,ew,design,rOff,logScale=logScale,sigOnlyOutput=FALSE,HQ=braw.env$showTheoryHQ)
+                      theoryDens_sig<-fullRSamplingDist(rvals,ew,design,rOff,logScale=logScale,sigOnlyOutput=TRUE,HQ=braw.env$showTheoryHQ)
                     },
                     "nulls"={
                       ew<-effectTheory$world
                       ew$populationNullp<-1
-                      theoryDens_all<-fullRSamplingDist(rvals,ew,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
-                      theoryDens_sig<-fullRSamplingDist(rvals,ew,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
+                      theoryDens_all<-fullRSamplingDist(rvals,ew,design,rOff,logScale=logScale,sigOnlyOutput=FALSE,HQ=braw.env$showTheoryHQ)
+                      theoryDens_sig<-fullRSamplingDist(rvals,ew,design,rOff,logScale=logScale,sigOnlyOutput=TRUE,HQ=braw.env$showTheoryHQ)
                     },
                     {
-                      # if (design$Replication$On) {
-                      #   # original sample - 
-                      #   design$Replication$On<-FALSE
-                      #   theoryDens_all<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
-                      #   theoryDens_sig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
-                      #   # the ns results that don't get replicated
-                      #   theoryDens_all<-theoryDens_all-theoryDens_sig 
-                      #   if (design$Replication$forceSigOriginal) theoryDens_all<-theoryDens_all*0
-                      #   # the sig ones
-                      #   theoryDens_all_2Rep<-theoryDens_sig
-                      #   # now look at replication samples
-                      #   effectTheory$world$populationNullp<-rn2w(0,design$sN)/(rn2w(0,design$sN)+rn2w(0.3,design$sN))
-                      #   theoryFullAll<-theoryFullSig<-0
-                      #   for (i in 1:length(rvals)) {
-                      #     if (theoryDens_all_2Rep[i]>0) {
-                      #     n2<-rw2n(rvals[i],design$Replication$Power)
-                      #     theoryPartAll<-fullRSamplingDist(rvals,world=effectTheory$world,
-                      #                                      design=makeDesign(sN=n2),rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
-                      #     theoryPartSig<-fullRSamplingDist(rvals,world=effectTheory$world,
-                      #                                      design=makeDesign(sN=n2),rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
-                      #     theoryFullAll<-theoryFullAll+theoryPartAll*theoryDens_all_2Rep[i]
-                      #     theoryFullSig<-theoryFullSig+theoryPartSig*theoryDens_all_2Rep[i]
-                      #     }
-                      #   }
-                      #   theoryFullAll<-theoryFullAll/sum(theoryFullAll)*sum(theoryDens_all_2Rep)
-                      #   theoryFullSig<-theoryFullSig/sum(theoryFullAll)*sum(theoryDens_all_2Rep)
-                      #   theoryDens_all<-theoryDens_all+theoryFullAll
-                      #   theoryDens_sig<-theoryFullSig
-                      # } else {
-                        theoryDens_all<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
-                        theoryDens_sig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
-                      # }
+                      if (design$Replication$On) {
+                        # original sample -
+                        design$Replication$On<-FALSE
+                        theoryDens_all<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnlyOutput=FALSE,HQ=braw.env$showTheoryHQ)
+                        theoryDens_sig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnlyOutput=TRUE,HQ=braw.env$showTheoryHQ)
+                        # the ns results that don't get replicated
+                        theoryDens_all<-theoryDens_all-theoryDens_sig
+                        if (design$Replication$forceSigOriginal) theoryDens_all<-theoryDens_all*0
+                        # the sig ones
+                        theoryDens_all_2Rep<-theoryDens_sig
+                        # now look at replication samples
+                        theoryFullAll<-theoryFullSig<-0
+                        for (i in 1:length(rvals)) {
+                          if (theoryDens_all_2Rep[i]>0) {
+                            # new sample size
+                            n2<-rw2n(rvals[i],design$Replication$Power)
+                            # sampling distribution for the new sample
+                            theoryPartAll<-fullRSamplingDist(rvals,world=effectTheory$world,
+                                                             design=makeDesign(sN=n2),rOff,logScale=logScale,
+                                                             sigOnlyInput=design$Replication$forceSigOriginal,sigOnlyOutput=FALSE,HQ=braw.env$showTheoryHQ)
+                            theoryPartSig<-fullRSamplingDist(rvals,world=effectTheory$world,
+                                                             design=makeDesign(sN=n2),rOff,logScale=logScale,
+                                                             sigOnlyInput=design$Replication$forceSigOriginal,sigOnlyOutput=TRUE,HQ=braw.env$showTheoryHQ)
+                            theoryFullAll<-theoryFullAll+theoryPartAll*theoryDens_all_2Rep[i]
+                            theoryFullSig<-theoryFullSig+theoryPartSig*theoryDens_all_2Rep[i]
+                          }
+                        }
+                        theoryFullAll<-theoryFullAll/sum(theoryFullAll)*sum(theoryDens_all_2Rep)
+                        theoryFullSig<-theoryFullSig/sum(theoryFullAll)*sum(theoryDens_all_2Rep)
+                        theoryDens_all<-theoryDens_all+theoryFullAll
+                        theoryDens_sig<-theoryFullSig
+                      } else {
+                        theoryDens_all<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnlyOutput=FALSE,HQ=braw.env$showTheoryHQ)
+                        theoryDens_sig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnlyOutput=TRUE,HQ=braw.env$showTheoryHQ)
+                      }
                     }
              )
              theoryVals<-rvals
@@ -158,8 +161,8 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
              zvals<-seq(-1,1,length.out=npt*2)*braw.env$z_range*2
              rvals<-tanh(zvals)
              # rvals<-seq(-1,1,length.out=npt)*0.99
-             theoryDens_all<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=FALSE,HQ=braw.env$showTheoryHQ)
-             theoryDens_sig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnly=TRUE,HQ=braw.env$showTheoryHQ)
+             theoryDens_all<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnlyOutput=FALSE,HQ=braw.env$showTheoryHQ)
+             theoryDens_sig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnlyOutput=TRUE,HQ=braw.env$showTheoryHQ)
              theoryDens_all<-rdens2zdens(theoryDens_all,rvals)
              theoryDens_sig<-rdens2zdens(theoryDens_sig,rvals)
              theoryVals<-atanh(rvals)
@@ -237,23 +240,23 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
          "ws"={
            dw<-0.01
            theoryVals<-seq(braw.env$alphaSig*(1+dw),1/(1+dw),length.out=npt)
-           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"ws",logScale=logScale,sigOnly=evidence$sigOnly)
+           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"ws",logScale=logScale,sigOnlyOutput=evidence$sigOnly)
          },
          "log(lrs)"={
            theoryVals<-seq(0,braw.env$lrRange,length.out=npt)
-           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"log(lrs)",logScale=logScale,sigOnly=evidence$sigOnly)
+           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"log(lrs)",logScale=logScale,sigOnlyOutput=evidence$sigOnly)
          },
          "log(lrd)"={
            theoryVals<-seq(-braw.env$lrRange,braw.env$lrRange,length.out=npt)
-           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"log(lrd)",logScale=logScale,sigOnly=evidence$sigOnly)
+           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"log(lrd)",logScale=logScale,sigOnlyOutput=evidence$sigOnly)
          },
          "e1d"={
            theoryVals<-seq(-braw.env$lrRange,braw.env$lrRange,length.out=npt)
-           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"log(lrd)",logScale=logScale,sigOnly=evidence$sigOnly)
+           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"log(lrd)",logScale=logScale,sigOnlyOutput=evidence$sigOnly)
          },
          "e2d"={
            theoryVals<-seq(-braw.env$lrRange,braw.env$lrRange,length.out=npt)
-           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"log(lrd)",logScale=logScale,sigOnly=evidence$sigOnly)
+           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"log(lrd)",logScale=logScale,sigOnlyOutput=evidence$sigOnly)
          },
          "nw"={
            if (logScale) {
@@ -263,13 +266,13 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
              theoryVals<-5+seq(0,braw.env$max_nw,length.out=npt)
              yvUse<-theoryVals
            }
-           theoryDens_all<-fullRSamplingDist(yvUse,effectTheory$world,design,"nw",logScale=logScale,sigOnly=evidence$sigOnly)
+           theoryDens_all<-fullRSamplingDist(yvUse,effectTheory$world,design,"nw",logScale=logScale,sigOnlyOutput=evidence$sigOnly)
            theoryDens_all<-abs(theoryDens_all)
          },
          "wp"={
            dw<-0.01
            theoryVals<-seq(braw.env$alphaSig*(1+dw),1/(1+dw),length.out=npt)
-           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"wp",logScale=logScale,sigOnly=evidence$sigOnly)
+           theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"wp",logScale=logScale,sigOnlyOutput=evidence$sigOnly)
          },
          "iv.mn"={
            var<-hypothesis$IV
