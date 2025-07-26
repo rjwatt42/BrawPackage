@@ -18,7 +18,7 @@
 showMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
                        dimension="1D",orientation="vert",
                        whichEffect="All",effectType="all",
-                       showTheory=braw.env$showTheory,showLegend=TRUE
+                       showTheory=braw.env$showTheory,showData=TRUE,showLegend=TRUE
 ) {
   if (is.null(multipleResult)) multipleResult=doMultiple(autoShow=FALSE)
   if (is.numeric(multipleResult)) multipleResult=doMultiple(multipleResult,autoShow=FALSE)
@@ -52,7 +52,7 @@ showMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
   )
   
   g<-showInference(fullResult,showType=showType,dimension=dimension,orientation=orientation,
-                   whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showLegend=showLegend,sequence=sequence
+                   whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showLegend=showLegend,sequence=sequence
   ) 
   # if (is.null(multipleResult$hypothesis$IV2) || !is.element(whichEffect,c("All","Mains")))
     # g<-addG(g,plotTitle(paste0("Multiple: ",brawFormat(multipleResult$count)),"right",size=0.85))

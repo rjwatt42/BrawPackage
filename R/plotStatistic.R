@@ -115,35 +115,44 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
                     },
                     {
                       if (design$Replication$On) {
-                        # original sample -
                         design$Replication$On<-FALSE
+                        # original populations
+                          pR<-getRList(effectTheory$world,addNulls=TRUE,HQ=braw.env$showTheoryHQ)
+                          rSourceVals<-pR$pRho
+                          rSourcePopdens<-pR$pRhogain
+                          rSourcePopdens<-rSourcePopdens/sum(rSourcePopdens)
+                          # we are only replicating significant results
+                          rSourcePopdens<-rSourcePopdens*rn2w(rSourceVals,design$sN)
+                        # original samples -
                         theoryDens_all<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnlyOutput=FALSE,HQ=braw.env$showTheoryHQ)
                         theoryDens_sig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnlyOutput=TRUE,HQ=braw.env$showTheoryHQ)
-                        # the ns results that don't get replicated
-                        theoryDens_all<-theoryDens_all-theoryDens_sig
-                        if (design$Replication$forceSigOriginal) theoryDens_all<-theoryDens_all*0
-                        # the sig ones
-                        theoryDens_all_2Rep<-theoryDens_sig
-                        # now look at replication samples
+                        # carry forward the ns results that don't get replicated
+                        theoryDens_ns<-theoryDens_all-theoryDens_sig
+                        # if we are forcing significant original, then there are none to carry forward
+                        if (design$Replication$forceSigOriginal) theoryDens_ns<-theoryDens_ns*0
+                        # # these are the ones we will replicate: the sig ones
                         theoryFullAll<-theoryFullSig<-0
-                        for (i in 1:length(rvals)) {
-                          if (theoryDens_all_2Rep[i]>0) {
-                            # new sample size
-                            n2<-rw2n(rvals[i],design$Replication$Power)
-                            # sampling distribution for the new sample
-                            theoryPartAll<-fullRSamplingDist(rvals,world=effectTheory$world,
-                                                             design=makeDesign(sN=n2),rOff,logScale=logScale,
-                                                             sigOnlyInput=design$Replication$forceSigOriginal,sigOnlyOutput=FALSE,HQ=braw.env$showTheoryHQ)
-                            theoryPartSig<-fullRSamplingDist(rvals,world=effectTheory$world,
-                                                             design=makeDesign(sN=n2),rOff,logScale=logScale,
-                                                             sigOnlyInput=design$Replication$forceSigOriginal,sigOnlyOutput=TRUE,HQ=braw.env$showTheoryHQ)
-                            theoryFullAll<-theoryFullAll+theoryPartAll*theoryDens_all_2Rep[i]
-                            theoryFullSig<-theoryFullSig+theoryPartSig*theoryDens_all_2Rep[i]
+                        # for each possible population effect size
+                        for (i in 1:length(rSourceVals)) {
+                          # make original sample & get replication sample size
+                          samp1Dens<-fullRSamplingDist(rvals,makeWorld(TRUE,"Single","r",rSourceVals[i],populationNullp = 0),
+                                                       design=design,rOff,logScale=logScale,
+                                                       sigOnlyOutput=TRUE,HQ=braw.env$showTheoryHQ)
+                          n2<-replicationNewN(rvals,design$sN,hypothesis,design)
+                          # now get sampling distribution for this population and all sample sizes
+                          theoryPartAll<-theoryPartSig<-0
+                          nUse<-unique(n2)
+                          for (i2 in 1:length(nUse)) {
+                            rdens<-samp1Dens[n2==nUse[i2]]
+                            rS<-rSamplingDistr(rvals,rSourceVals[i],nUse[i2])
+                            rCrit<-wn2r(0.5,nUse[i2])
+                            theoryPartAll<-theoryPartAll+rS*sum(rdens)
+                            theoryPartSig<-theoryPartSig+rS*(abs(rvals)>rCrit)*sum(rdens)
                           }
+                          theoryFullAll<-theoryFullAll+theoryPartAll/sum(theoryPartAll)*rSourcePopdens[i]
+                          theoryFullSig<-theoryFullSig+theoryPartSig/sum(theoryPartAll)*rSourcePopdens[i]
                         }
-                        theoryFullAll<-theoryFullAll/sum(theoryFullAll)*sum(theoryDens_all_2Rep)
-                        theoryFullSig<-theoryFullSig/sum(theoryFullAll)*sum(theoryDens_all_2Rep)
-                        theoryDens_all<-theoryDens_all+theoryFullAll
+                        theoryDens_all<-theoryFullAll+theoryDens_ns
                         theoryDens_sig<-theoryFullSig
                       } else {
                         theoryDens_all<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnlyOutput=FALSE,HQ=braw.env$showTheoryHQ)
@@ -182,14 +191,11 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
                     theoryVals<-seq(-1,1,length.out=npt)*0.99
                     theoryDens_all<-rPopulationDist(theoryVals,effectTheory$world)
                     theoryDens_sig<-theoryDens_all
-                    ndist<-getNDist(design,hypothesis$effect$world)
-                    ns<-ndist$nvals
-                    # nd<-nDistrDens(ns,design)
-                    nd<-ndist$ndens
-                    nd<-nd/sum(nd)
-                    use<-which(nd>max(nd)/50)
-                    nd<-nd[use]
-                    ns<-ns[use]
+                      ndist<-getNList(design,hypothesis$effect$world)
+                      ns<-ndist$nvals
+                      # nd<-nDistrDens(ns,design)
+                      nd<-ndist$ndens
+                      nd<-nd/sum(nd)
                     # we do each population separately
                     # if (!design$Replication$On) {
                       for (ri in 1:npt) {
@@ -1020,7 +1026,7 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
 
 r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                  orientation="vert",whichEffect="Main 1",effectType="all",
-                 showTheory=TRUE,showLegend=FALSE,
+                 showTheory=TRUE,showData=TRUE,showLegend=FALSE,
                  g=NULL){
 
   baseColour<-braw.env$plotColours$infer_nsigC
@@ -1275,7 +1281,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       sampleVals<-log10(sampleVals)
       sampleVals[sampleVals<(-10)]<--10
     }  
-    if (nrow(sampleVals)<100000) theoryFirst<-TRUE
+    if (nrow(sampleVals)<100) theoryFirst<-TRUE
     else theoryFirst<-FALSE
   } 
   sigOnly<-evidence$sigOnly
@@ -1305,6 +1311,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
     }
     
     # then the samples
+    if (showData) {
     rvals<-c()
     if (!all(is.na(analysis$rIV)) || doingMetaAnalysis) {
       shvals<-sampleVals[,iUse[i]]
@@ -1631,6 +1638,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       )
       if (length(labels)>0) g<-addG(g,dataLegend(data.frame(names=labels,colours=colours),title=title,shape=22))
     }
+    }
     
     if (!is.null(hypothesis$IV2)) {
       if(effectType=="all"){
@@ -1646,28 +1654,28 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   g
 }
 
-l_plot<-function(analysis,ptype=NULL,otheranalysis=NULL,orientation="vert",showTheory=TRUE,showLegend=FALSE,g=NULL){
-  g<-r_plot(analysis,ptype,orientation=orientation,showTheory=showTheory)
+l_plot<-function(analysis,ptype=NULL,otheranalysis=NULL,orientation="vert",showTheory=TRUE,showData=TRUE,showLegend=FALSE,g=NULL){
+  g<-r_plot(analysis,ptype,orientation=orientation,showTheory=showTheory,showData=showData)
   g
 }
 
 p_plot<-function(analysis,ptype="p",otheranalysis=NULL,PlotScale=braw.env$pPlotScale,orientation="vert",
-                 whichEffect="Main 1",effectType="all",showTheory=TRUE,showLegend=FALSE,g=NULL){
+                 whichEffect="Main 1",effectType="all",showTheory=TRUE,showData=TRUE,showLegend=FALSE,g=NULL){
   g<-r_plot(analysis,ptype,PlotScale=="log10",otheranalysis,orientation=orientation,
-            whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,g=g)
+            whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,g=g)
   g
 }
 
-w_plot<-function(analysis,wtype,orientation="vert",showTheory=TRUE,showLegend=FALSE,g=NULL){
-  g<-r_plot(analysis,wtype,braw.env$wPlotScale=="log10",orientation=orientation,showTheory=showTheory,g=g)
+w_plot<-function(analysis,wtype,orientation="vert",showTheory=TRUE,showData=TRUE,showLegend=FALSE,g=NULL){
+  g<-r_plot(analysis,wtype,braw.env$wPlotScale=="log10",orientation=orientation,showTheory=showTheory,showData=showData,g=g)
   g
 }
 
-n_plot<-function(analysis,ntype,orientation="vert",showTheory=TRUE,showLegend=FALSE,g=NULL){
-  r_plot(analysis,ntype,braw.env$nPlotScale=="log10",orientation=orientation,showTheory=showTheory,g=g)
+n_plot<-function(analysis,ntype,orientation="vert",showTheory=TRUE,showData=TRUE,showLegend=FALSE,g=NULL){
+  r_plot(analysis,ntype,braw.env$nPlotScale=="log10",orientation=orientation,showTheory=showTheory,showData=showData,g=g)
 }
 
-e2_plot<-function(analysis,disp,otheranalysis=NULL,orientation="vert",showTheory=TRUE,showLegend=FALSE,g=NULL){
+e2_plot<-function(analysis,disp,otheranalysis=NULL,orientation="vert",showTheory=TRUE,showData=TRUE,showLegend=FALSE,g=NULL){
   if (!analysis$hypothesis$effect$world$worldOn) {
     lambda<-brawFormat(analysis$hypothesis$effect$rIV,digits=3)
     switch (braw.env$RZ,
@@ -1699,33 +1707,33 @@ e2_plot<-function(analysis,disp,otheranalysis=NULL,orientation="vert",showTheory
             analysis$hypothesis$effect$world$populationNullp<-0
             switch(disp,
                    "e2r"={
-                     g<-r_plot(analysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
+                     g<-r_plot(analysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,g=g)
                    },
                    "e2+"={
-                     g<-r_plot(analysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
+                     g<-r_plot(analysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,g=g)
                    },
                    "e2-"={
-                     g<-r_plot(analysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
+                     g<-r_plot(analysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,g=g)
                    },
                    "e2p"={
-                     g<-p_plot(analysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
+                     g<-p_plot(analysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,g=g)
                    }
             )
             g<-addG(g,plotTitle(lab))
           },
           "sLLR"={
-            g<-p_plot(analysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
+            g<-p_plot(analysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,g=g)
             g<-addG(g,plotTitle(lab))
           },
           "dLLR"={
-            g<-p_plot(analysis,"e2d",otheranalysis=otheranalysis,PlotScale="linear",orientation=orientation,showTheory=showTheory,g=g)
+            g<-p_plot(analysis,"e2d",otheranalysis=otheranalysis,PlotScale="linear",orientation=orientation,showTheory=showTheory,showData=showData,g=g)
             g<-addG(g,plotTitle(lab))
           }
   )
   return(g)
 }
 
-e1_plot<-function(nullanalysis,disp,otheranalysis=NULL,orientation="vert",showTheory=TRUE,showLegend=FALSE,g=NULL){
+e1_plot<-function(nullanalysis,disp,otheranalysis=NULL,orientation="vert",showTheory=TRUE,showData=TRUE,showLegend=FALSE,g=NULL){
   switch (braw.env$RZ,
           "r"={
             lab<-"Null: r[p]= 0"
@@ -1741,33 +1749,33 @@ e1_plot<-function(nullanalysis,disp,otheranalysis=NULL,orientation="vert",showTh
             # g<-r_plot(nullanalysis,"rs_e1",otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
             switch(disp,
                    "e1r"={
-                     g<-r_plot(nullanalysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
+                     g<-r_plot(nullanalysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,g=g)
                    },
                    "e1+"={
-                     g<-r_plot(nullanalysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
+                     g<-r_plot(nullanalysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,g=g)
                    },
                    "e1-"={
-                     g<-r_plot(nullanalysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
+                     g<-r_plot(nullanalysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,g=g)
                    },
                    "e1a"={
-                     g<-p_plot(nullanalysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
+                     g<-p_plot(nullanalysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,g=g)
                    }
             )
             g<-addG(g,plotTitle(lab))
           },
           "sLLR"={
-            g<-p_plot(nullanalysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)+
+            g<-p_plot(nullanalysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,g=g)+
               g<-addG(g,plotTitle(lab))
           },
           "dLLR"={
-            g<-p_plot(nullanalysis,"e1d",otheranalysis=otheranalysis,PlotScale="linear",orientation=orientation,showTheory=showTheory,g=g)
+            g<-p_plot(nullanalysis,"e1d",otheranalysis=otheranalysis,PlotScale="linear",orientation=orientation,showTheory=showTheory,showData=showData,g=g)
             g<-addG(g,plotTitle(lab))
           }
   )
   return(g)
 }
 
-ps_plot<-function(analysis,disp,showTheory=TRUE,showLegend=FALSE,g=NULL){
+ps_plot<-function(analysis,disp,showTheory=TRUE,showLegend=FALSE,showData=TRUE,g=NULL){
   
   if (is.null(analysis$hypothesis$IV2)) {
     sigs<-isSignificant(braw.env$STMethod,analysis$pIV,analysis$rIV,analysis$nval,analysis$df1,analysis$evidence)
@@ -1858,7 +1866,7 @@ ps_plot<-function(analysis,disp,showTheory=TRUE,showLegend=FALSE,g=NULL){
   return(g)
 }
 
-aic_plot<-function(analysis,disp,showTheory=TRUE,showLegend=FALSE,g=NULL) {
+aic_plot<-function(analysis,disp,showTheory=TRUE,showData=TRUE,showLegend=FALSE,g=NULL) {
   # plotting a single result:
   
   hypothesis<-analysis$hypothesis
@@ -1934,7 +1942,7 @@ aic_plot<-function(analysis,disp,showTheory=TRUE,showLegend=FALSE,g=NULL) {
   return(g)
 }
 
-sem_plot<-function(analysis,disp,showTheory=TRUE,showLegend=FALSE,g=NULL){
+sem_plot<-function(analysis,disp,showTheory=TRUE,showData=TRUE,showLegend=FALSE,g=NULL){
   
   hypothesis<-analysis$hypothesis
   effect<-hypothesis$effect
@@ -1988,6 +1996,6 @@ sem_plot<-function(analysis,disp,showTheory=TRUE,showLegend=FALSE,g=NULL){
   return(g)
 }
 
-var_plot<-function(analysis,disp,otheranalysis=NULL,orientation="vert",showTheory=TRUE,showLegend=FALSE,g=NULL){
-  g<-r_plot(analysis,showType=disp,showTheory=showTheory,showLegend=FALSE,g=g)
+var_plot<-function(analysis,disp,otheranalysis=NULL,orientation="vert",showTheory=TRUE,showData=TRUE,showLegend=FALSE,g=NULL){
+  g<-r_plot(analysis,showType=disp,showTheory=showTheory,showData=showData,showLegend=FALSE,g=g)
 }

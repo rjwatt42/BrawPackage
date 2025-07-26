@@ -40,7 +40,7 @@ newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
 #' @export
 BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,10),
                    reportHTML=FALSE, graphicsType="ggplot",
-                   newDev=FALSE,height=400,aspect=1.3,autoShow=FALSE,autoPrint=TRUE,timeLimit=Inf,fullGraphSize=1,
+                   newDev=FALSE,height=400,aspect=1.3,autoShow=FALSE,autoPrint=FALSE,timeLimit=Inf,fullGraphSize=1,
                    npointsMax=250,
                    fullOutput=0) {
   if (graphC=="white") graphC<-"#FFFFFF"

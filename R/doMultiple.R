@@ -1,6 +1,62 @@
 ##################################################################################    
 # EXPECTED    
 
+
+#' ex6ract multiple samples 
+#' 
+#' @returns multipleResult object
+#' @examples
+#' newResult<-extractMultiple(mres1,n)
+#' @export
+extractMultiple<-function(r1,n=NULL) {
+  if (is.null(n)) return(r1)
+  newResult<-list(
+    rIV=cbind(r1$rIV[n,]),
+    pIV=cbind(r1$pIV[n,]),
+    rpIV=cbind(r1$rpIV[n,]),
+    roIV=cbind(r1$roIV[n,]),
+    poIV=cbind(r1$poIV[n,]),
+    rFull=cbind(r1$rFull[n,]),
+    pFull=cbind(r1$pFull[n,]),
+    nval=cbind(r1$nval[n,]),
+    noval=cbind(r1$noval[n,]),
+    df1=cbind(r1$df1[n,]),
+    sem=cbind(r1$sem[n,]),
+    AIC=cbind(r1$AIC[n,]),
+    AICnull=cbind(r1$AICnull[n,]),
+    iv.mn=cbind(r1$iv.mn[n,]),
+    iv.sd=cbind(r1$iv.sd[n,]),
+    iv.sk=cbind(r1$iv.sk[n,]),
+    iv.kt=cbind(r1$iv.kt[n,]),
+    dv.mn=cbind(r1$dv.mn[n,]),
+    dv.sd=cbind(r1$dv.sd[n,]),
+    dv.sk=cbind(r1$dv.sk[n,]),
+    dv.kt=cbind(r1$dv.kt[n,]),
+    er.mn=cbind(r1$er.mn[n,]),
+    er.sd=cbind(r1$er.sd[n,]),
+    er.sk=cbind(r1$er.sk[n,]),
+    er.kt=cbind(r1$er.kt[n,])
+  )
+  colnames(newResult$sem)<-colnames(r1$sem)
+  if (!is.null(r1$rIV2)) {
+    newResult<-c(newResult,list(
+      rIV2=cbind(r1$rIV2[n,]),
+      pIV2=cbind(r1$pIV2[n,]),
+      rIVIV2DV=cbind(r1$rIVIV2DV[n,]),
+      pIVIV2DV=cbind(r1$pIVIV2DV[n,]),
+      r=list(direct=rbind(r1$r$direct[n,]),
+             unique=rbind(r1$r$unique[n,]),
+             total=rbind(r1$r$total[n,])
+      ),
+      p=list(direct=rbind(r1$p$direct[n,]),
+             unique=rbind(r1$p$unique[n,]),
+             total=rbind(r1$p$total[n,])
+      )
+    )
+    )
+  }
+  return(newResult)
+}
 #' merge multiple samples 
 #' 
 #' @returns multipleResult object
@@ -25,18 +81,18 @@ mergeMultiple<-function(r1,r2) {
     iv.mn=rbind(r1$iv.mn,r2$iv.mn),
     iv.sd=rbind(r1$iv.sd,r2$iv.sd),
     iv.sk=rbind(r1$iv.sk,r2$iv.sk),
-    iv.kt=rbind(r1$iv.kt,r2$iv.ky),
+    iv.kt=rbind(r1$iv.kt,r2$iv.kt),
     dv.mn=rbind(r1$dv.mn,r2$dv.mn),
     dv.sd=rbind(r1$dv.sd,r2$dv.sd),
     dv.sk=rbind(r1$dv.sk,r2$dv.sk),
-    dv.kt=rbind(r1$dv.kt,r2$dv.ky),
+    dv.kt=rbind(r1$dv.kt,r2$dv.kt),
     er.mn=rbind(r1$er.mn,r2$er.mn),
     er.sd=rbind(r1$er.sd,r2$er.sd),
     er.sk=rbind(r1$er.sk,r2$er.sk),
-    er.kt=rbind(r1$er.kt,r2$er.ky)
+    er.kt=rbind(r1$er.kt,r2$er.kt)
   )
   colnames(newResult$sem)<-colnames(r2$sem)
-  if (!is.null(r1$rIV2)) {
+  if (!is.null(r1$rIV2) && !all(is.na(r1$rIV2))) {
     newResult<-c(newResult,list(
       rIV2=rbind(r1$rIV2,r2$rIV2),
       pIV2=rbind(r1$pIV2,r2$pIV2),
@@ -52,7 +108,9 @@ mergeMultiple<-function(r1,r2) {
       )
     )
     )
-  }
+  }  
+  
+  return(newResult)
 }
 # function to clear 
 resetMultiple<-function(nsims=0,evidence,multipleResult=NULL){
@@ -61,8 +119,8 @@ resetMultiple<-function(nsims=0,evidence,multipleResult=NULL){
     b<-matrix(NA,nsims,1)
       bm<-matrix(NA,nsims,evidence$AnalysisTerms)
   } else {
-    b<-NA
-    bm<-NA
+    b<-matrix(NA,1,1)
+    bm<-matrix(NA,1,evidence$AnalysisTerms)
   }
   newResult<-list(
     rIV=b,pIV=b,rpIV=b,roIV=b,poIV=b,nval=b,noval=b,df1=b,

@@ -129,7 +129,7 @@ rSamp2Pop<-function(r_s,n,world=NULL) {
   tanh(mlEst)
 }
   
-getRList<-function(world,HQ=FALSE) {
+getRList<-function(world,addNulls=FALSE,HQ=FALSE) {
   if (HQ) npops=50*6+1
   else    npops=20*6+1 # 2*3*4*5+1
 
@@ -167,13 +167,14 @@ getRList<-function(world,HQ=FALSE) {
           }
   )
   
-  # if (world$populationNullp>0) {
-  #   pRho<-c(pRho,0)
-  #   pRhogain<-c(pRhogain/sum(pRhogain)*(1-world$populationNullp),world$populationNullp)
-  # } else {
-  #   pRho<-c(pRho,0)
-  #   pRhogain<-c(pRhogain/sum(pRhogain),0)
-  # }
+  if (addNulls)
+  if (world$populationNullp>0) {
+    pRho<-c(0,pRho)
+    pRhogain<-c(world$populationNullp,pRhogain/sum(pRhogain)*(1-world$populationNullp))
+  } else {
+    pRho<-c(pRho,0)
+    pRhogain<-c(pRhogain/sum(pRhogain),0)
+  }
   
   list(pRho=pRho,pRhogain=pRhogain)  
 }
@@ -197,7 +198,7 @@ getNDist<-function(design,world=NULL,logScale=FALSE,sigOnly=FALSE,HQ=FALSE) {
   }
   if (sigOnly>0) {
     nsig<-ng 
-    pR<-getRList(world,HQ)
+    pR<-getRList(world,HQ=HQ)
     pR$pRhogain<-pR$pRhogain/sum(pR$pRhogain)
     for (ni in 1:length(nvals)) {
       psig<-sum(rn2w(pR$pRho,nvals[ni])*pR$pRhogain)
@@ -292,7 +293,7 @@ return(rdens*rdens1)
 fullPSig<-function(world,design,HQ=FALSE,alpha=braw.env$alphaSig) {
 
   # distribution of population effect sizes
-  pR<-getRList(world)
+  pR<-getRList(world,HQ=HQ)
   rvals<-pR$pRho
   rdens<-pR$pRhogain
   if (length(rvals)>1) rdens<-rdens*diff(rvals[1:2])
@@ -322,23 +323,23 @@ fullPSig<-function(world,design,HQ=FALSE,alpha=braw.env$alphaSig) {
   return(pSig)
 }
 
-fullRSamplingDist<-function(vals,world,design,doStat="rs",logScale=FALSE,sigOnlyInput=FALSE,sigOnlyOutput=FALSE,sigOnlyCompensate=FALSE,HQ=FALSE,separate=FALSE,quantiles=NULL) {
+fullRSamplingDist<-function(vals,world,design,doStat="rs",logScale=FALSE,sigOnlyOutput=FALSE,sigOnlyCompensate=FALSE,HQ=FALSE,separate=FALSE,quantiles=NULL) {
   # sampling distribution from specified populations (pRho)
   if (is.null(vals)) 
     vals<-seq(-1,1,length=braw.env$worldNPoints)*braw.env$r_range
 
   # distribution of population effect sizes
-  pR<-getRList(world,HQ)
+  if (!is.null(world$worldOn)) pR<-getRList(world,HQ=HQ)
+  else pR<-world
   rvals<-pR$pRho
-  rdens<-pR$pRhogain
-  if (length(rvals)>1) rdens<-rdens*diff(rvals[1:2])
-  if (sigOnlyInput) rdens<-rdens*rn2w(rvals,design$sN)
+  rPopdens<-pR$pRhogain
+  if (length(rvals)>1) rPopdens<-rPopdens*diff(rvals[1:2])
   if (!world$worldOn) world$populationNullp<-0
   if (!is.element(world$populationPDF,c("sample"))) {
   rvals<-c(rvals,0)
-  rdens<-c(rdens/sum(rdens)*(1-world$populationNullp),world$populationNullp)
+  rPopdens<-c(rPopdens/sum(rPopdens)*(1-world$populationNullp),world$populationNullp)
   }
-  
+
   # distribution of sample sizes
   ndist<-getNList(design,world,HQ=HQ)
   nvals<-ndist$nvals
@@ -425,7 +426,7 @@ fullRSamplingDist<-function(vals,world,design,doStat="rs",logScale=FALSE,sigOnly
         }
         d<-d+addition
       }
-      d<-d/sum(d1,na.rm=TRUE)*rdens[ei]
+      d<-d/sum(d1,na.rm=TRUE)*rPopdens[ei]
       sourceSampDens_r<-rbind(sourceSampDens_r,d)
   }
 
