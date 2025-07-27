@@ -69,6 +69,15 @@ getWorld<-function(name,result=braw.res$result) {
                        populationNullp=0.74,
                        populationPDFsample=FALSE)
          },
+         "Psych50"={
+           world<-list(worldOn=TRUE,
+                       populationPDF="Exp",
+                       populationRZ="z",
+                       populationPDFk=0.3,
+                       populationPDFmu=0,
+                       populationNullp=0.5,
+                       populationPDFsample=FALSE)
+         },
          "PsychF"={
            world<-list(worldOn=TRUE,
                        populationPDF="Exp",
@@ -103,6 +112,9 @@ getHypothesis<-function(name,hypothesis=braw.def$hypothesis) {
          },
          "Psych"={
            hypothesis$effect$world<-getWorld("Psych")
+         },
+         "Psych50"={
+           hypothesis$effect$world<-getWorld("Psych50")
          },
          "PsychF"={
            hypothesis$effect$world<-getWorld("PsychF")
