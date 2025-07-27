@@ -32,7 +32,6 @@ makeExplore<-function(exploreType="n",exploreNPoints=13,
     explore$exploreNPoints<-range$np
     explore$xlog<-range$logScale
   }
-  
   return(explore)
 }
 
@@ -197,8 +196,8 @@ storeExploreResult<-function(result,res,ri,vi) {
     result$poval[ri,vi]<-res$poIV
     result$nval[ri,vi]<-res$nval
     result$df1[ri,vi]<-res$df1
-    result$nSig[ri,vi]<-result$nSig[ri,vi]+sig
-    result$nFP[ri,vi]<-result$nFP[ri,vi]+sig&(res$rpIV==0)
+    result$nSig[ri,vi]<-sum(sig)
+    result$nFP[ri,vi]<-sum(sig&(res$rpIV==0))
     
     if (!is.null(res$AIC)) {
       result$AIC[ri,vi]<-res$AIC

@@ -803,10 +803,10 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
           if (showType[si]=="n(sig)") {
             y50<-showMeans[1,]
             y38<-showMeans[2,]
-            if (all(y38==0)) y38<-NULL
+            if (all(y38==0)) y38<-y50+NA
             y75<-showMax
             y25<-showMin
-            y62<-NULL
+            y62<-y50+NA
           } else {
           y50<-showMeans
           y75<-NULL
@@ -885,16 +885,21 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
           y50[y50<ylim[1]]<-ylim[1]
           if (!is.null(y75)) {
             y75[y75>ylim[2]]<-ylim[2]
-            y62[y62>ylim[2]]<-ylim[2]
-            y38[y38>ylim[2]]<-ylim[2]
-            y25[y25>ylim[2]]<-ylim[2]
-            
             y75[y75<ylim[1]]<-ylim[1]
+          }
+          if (!is.null(y62)) {
+            y62[y62>ylim[2]]<-ylim[2]
             y62[y62<ylim[1]]<-ylim[1]
+          }
+          if (!is.null(y38)) {
+            y38[y38>ylim[2]]<-ylim[2]
             y38[y38<ylim[1]]<-ylim[1]
+          }
+          if (!is.null(y25)) {
+            y25[y25>ylim[2]]<-ylim[2]
             y25[y25<ylim[1]]<-ylim[1]
           }
-          
+
         if (doLine) {
           if (!is.null(y75)) {
             pts1f<-data.frame(x=c(vals,rev(vals)),y=c(y25,rev(y75)))
