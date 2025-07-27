@@ -921,9 +921,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
         } else {
           if (doingNonNull) {
             res<-multipleAnalysis(design$sNReps,hypothesis,design,evidence)
-            # if (explore$exploreType=="nSplits") {
-              res<-summariseResult(res)
-            # }
+            res<-summariseResult(res)
             result<-storeExploreResult(result,res,ri,vi)
           }
           
@@ -931,6 +929,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
             nullhypothesis<-hypothesis
             nullhypothesis$effect$rIV<-0
             res_null<-multipleAnalysis(1,nullhypothesis,design,evidence)
+            res_null<-summariseResult(res_null)
             nullresult<-storeExploreResult(nullresult,res_null,ri,vi)
           }
         }
