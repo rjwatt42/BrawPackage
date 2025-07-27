@@ -921,9 +921,9 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
         } else {
           if (doingNonNull) {
             res<-multipleAnalysis(design$sNReps,hypothesis,design,evidence)
-            if (explore$exploreType=="nSplits") {
+            # if (explore$exploreType=="nSplits") {
               res<-summariseResult(res)
-            }
+            # }
             result<-storeExploreResult(result,res,ri,vi)
           }
           

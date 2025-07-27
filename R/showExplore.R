@@ -927,7 +927,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
               if (i==1) left=(vals[i+1]-vals[i])*0.35 else left=(vals[i]-vals[i-1])*0.35
               if (i==length(vals)) right=(vals[i]-vals[i-1])*0.35 else right=(vals[i+1]-vals[i])*0.35
               g<-simulations_plot(g,
-                               data.frame(x=vals[i],y1=showVals[,i],sig=sigVals[,i]),
+                               data.frame(x=vals[i],y1=showVals[,i],sig=sigVals[,i],notNull=sigVals[,i]*0),
                                showType=showType[si],ylim=ylim,
                                scale=3/(length(vals)+1),
                                width=c(left,right),
@@ -948,7 +948,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
             # pts1f<-data.frame(x=vals,ymin=y25,ymax=y75)
             # g<-addG(g,dataPoint(data=data.frame(x=vals,y=y25),fill=col,size=2))
             # g<-addG(g,dataPoint(data=data.frame(x=vals,y=y75),fill=col,size=2))
-            if (!is.null(y38)) {
+            if (!is.null(y38) && is.element(showType,c("n(sig)"))) {
               g<-addG(g,dataLine(data=data.frame(x=vals,y=y38),colour="#000000"))
               g<-addG(g,dataPoint(data=data.frame(x=vals,y=y38),fill=braw.env$plotColours$infer_sigNull,size=4))
               g<-addG(g,dataLegend(data.frame(names=c("total","false discovery"),colours=c(col,braw.env$plotColours$infer_sigNull))))

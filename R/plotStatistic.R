@@ -850,7 +850,10 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
         }
     }
     
-    use<-c(which(pts$sig & pts$notNull),which(!pts$sig & pts$notNull),which(!pts$sig & !pts$notNull),which(pts$sig & !pts$notNull))
+    # if (is.null(pts$notNull)) 
+    #   use<-c(which(pts$sig),which(!pts$sig),which(!pts$sig),which(pts$sig))
+    # else
+      use<-c(which(pts$sig & pts$notNull),which(!pts$sig & pts$notNull),which(!pts$sig & !pts$notNull),which(pts$sig & !pts$notNull))
     pts<-pts[use,]
     xr<-makeFiddle(pts$y1,2/40/braw.env$plotArea[4],orientation)
     switch(orientation,
