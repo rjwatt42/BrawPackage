@@ -588,7 +588,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
               "n(sig)"={
                 showVals<-NULL
                 showMeans<-colMeans(result$nSig)
-                if (any(result$nFP)>0) {
+                if (any(!is.na(result$nFP))) {
                 showMeans2<-colMeans(result$nFP)
                 showMeans<-rbind(showMeans,showMeans2)
                 }
@@ -945,9 +945,9 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
           if (!is.null(y75)) {
             g<-addG(g,dataLine(data.frame(x=vals,y=y25),colour="#000000",alpha=0.9))
             g<-addG(g,dataLine(data.frame(x=vals,y=y75),colour="#000000",alpha=0.9))
-            pts1f<-data.frame(x=vals,ymin=y25,ymax=y75)
-            g<-addG(g,dataPoint(data=data.frame(x=vals,y=y25),fill=col,size=2))
-            g<-addG(g,dataPoint(data=data.frame(x=vals,y=y75),fill=col,size=2))
+            # pts1f<-data.frame(x=vals,ymin=y25,ymax=y75)
+            # g<-addG(g,dataPoint(data=data.frame(x=vals,y=y25),fill=col,size=2))
+            # g<-addG(g,dataPoint(data=data.frame(x=vals,y=y75),fill=col,size=2))
             if (!is.null(y38)) {
               g<-addG(g,dataLine(data=data.frame(x=vals,y=y38),colour="#000000"))
               g<-addG(g,dataPoint(data=data.frame(x=vals,y=y38),fill=braw.env$plotColours$infer_sigNull,size=4))

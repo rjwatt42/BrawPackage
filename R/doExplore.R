@@ -79,7 +79,7 @@ getExploreRange<-function(explore) {
 
 summariseResult<-function(result) {
   if (!is.null(result$rIV)) {
-    sigs<-isSignificant(method=braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1)
+    sigs<-isSignificant(method=braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,result$result$evidence)
     result$nSig<-sum(sigs)
     result$nFP<-sum(sigs & result$rpIV==0)
     result$rIV<-mean(result$rIV)
@@ -89,10 +89,7 @@ summariseResult<-function(result) {
     result$poIV<-mean(result$poIV)
     result$nval<-mean(result$nval)
     result$df1<-mean(result$df1)
-    sigs<-isSignificant(braw.env$STMethod,result$result$pIV,result$result$rIV,result$result$nval,result$result$df1,result$result$evidence)
-    nSig<-sum(sigs)
-    result$nSig<-nSig
-    
+
     if (!is.null(result$AIC)) {
       result$AIC<-mean(result$AIC)
       result$AICnull<-mean(result$AICnull)
@@ -187,8 +184,6 @@ resetExploreResult<-function(nsims,n_vals,oldResult=NULL) {
 }
 storeExploreResult<-function(result,res,ri,vi) {
   if (!is.null(res$rIV)) {
-    sig<-isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,res$evidence)
-    
     result$rval[ri,vi]<-res$rIV
     result$pval[ri,vi]<-res$pIV
     result$rpval[ri,vi]<-res$rpIV
@@ -196,8 +191,8 @@ storeExploreResult<-function(result,res,ri,vi) {
     result$poval[ri,vi]<-res$poIV
     result$nval[ri,vi]<-res$nval
     result$df1[ri,vi]<-res$df1
-    result$nSig[ri,vi]<-sum(sig)
-    result$nFP[ri,vi]<-sum(sig&(res$rpIV==0))
+    result$nSig[ri,vi]<-res$nSig
+    result$nFP[ri,vi]<-res$nFP
     
     if (!is.null(res$AIC)) {
       result$AIC[ri,vi]<-res$AIC
