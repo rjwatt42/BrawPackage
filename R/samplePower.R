@@ -33,6 +33,11 @@ zn2w<-function(z,n,t=2,alpha=NA){
 
 rn2w<-function(r,n,t=2,alpha=NA){
   if (is.na(alpha)) alpha<-braw.env$alphaSig
+  if (!is.numeric(r)) {
+    rL<-getRList(w)
+    wL<-rn2w(rL$pRho,50)
+    return(sum(wL*rL$pRhogain)/sum(rL$pRhogain))
+  }
   if (any(abs(r)>1)) {
     print(paste0("rn2w exception: ",format(max(abs(r)),digits=3)))
     r[r>1]<-1

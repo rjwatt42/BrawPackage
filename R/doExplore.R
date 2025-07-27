@@ -90,6 +90,9 @@ summariseResult<-function(result) {
     result$poIV<-mean(result$poIV)
     result$nval<-mean(result$nval)
     result$df1<-mean(result$df1)
+    sigs<-isSignificant(braw.env$STMethod,result$result$pIV,result$result$rIV,result$result$nval,result$result$df1,result$result$evidence)
+    nSig<-sum(sigs)
+    result$nSig<-nSig
     
     if (!is.null(result$AIC)) {
       result$AIC<-mean(result$AIC)
@@ -133,12 +136,12 @@ summariseResult<-function(result) {
     param2<-max(c(result$fixed$param2,result$random$param2,result$single$param2,result$gauss$param2,result$exp$param2),na.rm=TRUE)
     param3<-max(c(result$fixed$param3,result$random$param3,result$single$param3,result$gauss$param3,result$exp$param3),na.rm=TRUE)
     S<-max(c(result$fixed$Smax,result$random$Smax,result$single$Smax,result$gauss$Smax,result$exp$Smax),na.rm=TRUE)
-    sigs<-isSignificant(braw.env$STMethod,result$result$pIV,result$result$rIV,result$result$nval,result$result$df1,result$result$evidence)
-    nSig<-sum(sigs)
     result$param1<-param1
     result$param2<-param2
     result$param3<-param3
     result$S<-S
+    sigs<-isSignificant(braw.env$STMethod,result$result$pIV,result$result$rIV,result$result$nval,result$result$df1,result$result$evidence)
+    nSig<-sum(sigs)
     result$nSig<-nSig
   }
   return(result)
@@ -185,6 +188,8 @@ resetExploreResult<-function(nsims,n_vals,oldResult=NULL) {
 }
 storeExploreResult<-function(result,res,ri,vi) {
   if (!is.null(res$rIV)) {
+    sig<-isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,res$evidence)
+    
     result$rval[ri,vi]<-res$rIV
     result$pval[ri,vi]<-res$pIV
     result$rpval[ri,vi]<-res$rpIV
@@ -192,8 +197,8 @@ storeExploreResult<-function(result,res,ri,vi) {
     result$poval[ri,vi]<-res$poIV
     result$nval[ri,vi]<-res$nval
     result$df1[ri,vi]<-res$df1
-    result$nSig[ri,vi]<-res$nSig
-    result$nFP[ri,vi]<-res$nFP
+    result$nSig[ri,vi]<-result$nSig[ri,vi]+sig
+    result$nFP[ri,vi]<-result$nFP[ri,vi]+sig&(res$rpIV==0)
     
     if (!is.null(res$AIC)) {
       result$AIC[ri,vi]<-res$AIC
