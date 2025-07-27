@@ -232,7 +232,7 @@ makeSampleVar<-function(design,effect,n,MV,MV2){
           condition<-condition & (ivr21>design$sIV2Range[1] & ivr21<design$sIV2Range[2])
       }
       ivr<-c(ivr, ivr1[condition])
-      if (!is.null(MV2))
+      # if (!is.null(MV2))
         ivr2<-c(ivr2,ivr21[condition])
       dvr_m<-c(dvr_m, dvr1_m[condition])
       dvr_s<-c(dvr_s, dvr1_s[condition])
