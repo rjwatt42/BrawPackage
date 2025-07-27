@@ -210,9 +210,8 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                 "NHST"={
                   ng<-2
                   showLabels<-c("sig","ns")
-                  if (explore$exploreType=="minRp") {
-                    evidence$minRp<-exploreResult$vals
-                  }
+                  if (explore$exploreType=="minRp") evidence$minRp<-exploreResult$vals
+                  else evidence$minRp<-rep(evidence$minRp,length(exploreResult$vals))
                   
                   nulls<-abs(exploreResult$result$rpval)<=matrix(evidence$minRp,nrow(exploreResult$result$rpval),ncol(exploreResult$result$rpval),byrow=TRUE)
                   sigs<-nulls*0
@@ -223,23 +222,25 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                     sigs[,i]<-isSignificant(braw.env$STMethod,pVals[,i],rVals[,i],nVals[,i],df1Vals[,i],exploreResult$evidence)
                   }
                   
-                  semProps<-c()
-                  semPropsNull<-c()
+                  propsNonNull<-c()
+                  propsNull<-c()
                   if (all(nulls) || all(!nulls)) {
-                    for (ig in ng:1) semProps<-rbind(semProps,colMeans((sigs==(ig-1))))
+                    for (ig in ng:1) propsNonNull<-rbind(propsNonNull,colMeans((sigs==(ig-1))))
                   } else {
-                    for (ig in ng:1) semPropsNull<-rbind(semPropsNull,colSums((sigs==(ig-1))*nulls)/colSums(nulls | !nulls))
-                    for (ig in ng:1) semProps<-rbind(semProps,colSums((sigs==(ig-1))*(!nulls))/colSums(nulls | !nulls))
+                    for (ig in ng:1) propsNull<-rbind(propsNull,colSums((sigs==(ig-1))*nulls)/colSums(nulls | !nulls))
+                    for (ig in ng:1) propsNonNull<-rbind(propsNonNull,colSums((sigs==(ig-1))*(!nulls))/colSums(nulls | !nulls))
                   }
                 },
                 "Hits"={
+                  if (explore$exploreType=="minRp") evidence$minRp<-exploreResult$vals
+                  else evidence$minRp<-rep(evidence$minRp,length(exploreResult$vals))
                   if (effect$world$worldOn) {
                     for (i in 1:length(exploreResult$vals)){
                       if (explore$exploreType=="Alpha") {
                         braw.env$alphaSig<-exploreResult$vals[i]
                       }
                       sigs<-isSignificant(braw.env$STMethod,pVals[,i],rVals[,i],nVals[,i],df1Vals[,i],exploreResult$evidence)
-                      nulls<-abs(exploreResult$result$rpval[,i])<=evidence$minRp
+                      nulls<-abs(exploreResult$result$rpval[,i])<=evidence$minRp[i]
                       p<-sum(sigs & nulls,na.rm=TRUE)/sum(sigs)
                       y50[i]<-1-p
                       y75[i]<-1-p+sqrt(p*(1-p)/length(pVals[,i]))
@@ -267,13 +268,15 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                   y_label<-"True Hits"
                 },
                 "Misses"={
+                  if (explore$exploreType=="minRp") evidence$minRp<-exploreResult$vals
+                  else evidence$minRp<-rep(evidence$minRp,length(exploreResult$vals))
                   if (effect$world$worldOn) {
                     for (i in 1:length(exploreResult$vals)){
                       if (explore$exploreType=="Alpha") {
                         braw.env$alphaSig<-exploreResult$vals[i]
                       }
                       sigs<-isSignificant(braw.env$STMethod,pVals[,i],rVals[,i],nVals[,i],df1Vals[,i],exploreResult$evidence)
-                      nulls<-abs(exploreResult$result$rpval[,i])<=evidence$minRp
+                      nulls<-abs(exploreResult$result$rpval[,i])<=evidence$minRp[i]
                       p<-sum(!sigs & nulls,na.rm=TRUE)/sum(!sigs)
                       y50[i]<-1-p
                       y75[i]<-1-p+sqrt(p*(1-p)/length(pVals[,i]))
@@ -301,13 +304,12 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                   y_label<-"False Misses"
                 },
                 "Inference"={
+                  if (explore$exploreType=="minRp") evidence$minRp<-exploreResult$vals
+                  else evidence$minRp<-rep(evidence$minRp,length(exploreResult$vals))
                   if (effect$world$worldOn) {
                     for (i in 1:length(exploreResult$vals)){
                       if (explore$exploreType=="Alpha") {
                         braw.env$alphaSig<-exploreResult$vals[i]
-                      }
-                      if (explore$exploreType=="minRp") {
-                        evidence$minRp<-exploreResult$vals
                       }
                       sigs<-isSignificant(braw.env$STMethod,pVals[,i],rVals[,i],nVals[,i],df1Vals[,i],exploreResult$evidence)
                       nulls<-abs(exploreResult$result$rpval[,i])<=evidence$minRp[i]
@@ -352,6 +354,8 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                   y_label<-"Misses"
                 },
                 "Source"={
+                  if (explore$exploreType=="minRp") evidence$minRp<-exploreResult$vals
+                  else evidence$minRp<-rep(evidence$minRp,length(exploreResult$vals))
                   if (effect$world$worldOn) {
                     for (i in 1:length(exploreResult$vals)){
                       if (explore$exploreType=="Alpha") {
@@ -418,13 +422,13 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                   showLabels<-showLabels[ng:1]
                   
                   nulls<-abs(exploreResult$result$rpval)<=evidence$minRp
-                  semProps<-c()
-                  semPropsNull<-c()
+                  propsNonNull<-c()
+                  propsNull<-c()
                   if (all(nulls) || all(!nulls)) {
-                    for (ig in ng:1) semProps<-rbind(semProps,colMeans(exploreResult$result$sem==ig))
+                    for (ig in ng:1) propsNonNull<-rbind(propsNonNull,colMeans(exploreResult$result$sem==ig))
                   } else {
-                    for (ig in ng:1) semPropsNull<-rbind(semPropsNull,colSums((exploreResult$result$sem==ig)*nulls)/colSums(nulls | !nulls))
-                    for (ig in ng:1) semProps<-rbind(semProps,colSums((exploreResult$result$sem==ig)*(!nulls))/colSums(nulls | !nulls))
+                    for (ig in ng:1) propsNull<-rbind(propsNull,colSums((exploreResult$result$sem==ig)*nulls)/colSums(nulls | !nulls))
+                    for (ig in ng:1) propsNonNull<-rbind(propsNonNull,colSums((exploreResult$result$sem==ig)*(!nulls))/colSums(nulls | !nulls))
                   }
                 },
                 "log(lrs)"={
@@ -596,101 +600,115 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
         if (is.element(showType,c("Inference","Source")) ){
           switch(showType,
                  "Inference"={
-                   y1_label<-"\bCorrect Hits"
-                   y2_label<-"\bCorrect Misses"
+                   y1_label<-"\bSig"
+                   y2_label<-"\bNS"
+                   yp_label<-"!jcorrect"
+                   yn_label<-"!jerror"
                  },
                  "Source"={
                    if (exploreResult$evidence$minRp!=0) {
-                     y1_label<-paste0("\bSig ",braw.env$activeTitle)
-                     y2_label<-paste0("\bSig ",braw.env$inactiveTitle)
+                     y1_label<-paste0("\b",braw.env$activeTitle)
+                     y2_label<-paste0("\b",braw.env$inactiveTitle)
                    } else {
-                     y1_label<-paste0("\bSig ",braw.env$nonnullTitle)
-                     y2_label<-paste0("\bSig ",braw.env$nullTitle)
+                     y1_label<-paste0("\b",braw.env$nonnullTitle)
+                     y2_label<-paste0("\b",braw.env$nullTitle)
                    }
+                   yp_label<-"!jsig"
+                   yn_label<-"!jns"
                  }
           )
           
-          if (reportQuants){
-            outputText<-c(outputText,"","-se ")
-            for (i in 1:length(useVals)) {
-              outputText<-c(outputText,paste0("!j",brawFormat(y25[useVals[i]],digits=precision)))
-            }
-          }
-          outputText<-c(outputText,paste0("",y1_label)," ")
+          # if (reportQuants){
+          #   outputText<-c(outputText,"","-se ")
+          #   for (i in 1:length(useVals)) {
+          #     outputText<-c(outputText,paste0("!j",brawFormat(y25[useVals[i]],digits=precision)))
+          #   }
+          # }
+          outputText<-c(outputText,y1_label,rep("",nc-1))
+          outputText<-c(outputText," ",yp_label)
           for (i in 1:length(useVals)) {
             outputText<-c(outputText,paste0("!j",brawFormat(y50[useVals[i]],digits=precision)))
           }
-          if (!reportQuants) {
+          outputText<-c(outputText," ",yn_label)
+          for (i in 1:length(useVals)) {
+            outputText<-c(outputText,paste0("!j",brawFormat(1-y50[useVals[i]],digits=precision)))
+          }
+          if (reportQuants) {
             outputText<-c(outputText,"!U","\u00B1se")
             for (i in 1:length(useVals)) {
               outputText<-c(outputText,paste0("!j",brawFormat(yiqr[useVals[i]],digits=precision)))
             }
           } else {
-            outputText<-c(outputText,"!U","+se ")
-            for (i in 1:length(useVals)) {
-              outputText<-c(outputText,paste0("!j",brawFormat(y75[useVals[i]],digits=precision)))
-            }
+            # outputText<-c(outputText,"!U","+se ")
+            # for (i in 1:length(useVals)) {
+            #   outputText<-c(outputText,paste0("!j",brawFormat(y75[useVals[i]],digits=precision)))
+            # }
           }
           
           if (reportQuants){
-            outputText<-c(outputText,"","-se ")
-            for (i in 1:length(useVals)) {
-              outputText<-c(outputText,paste0("!j",brawFormat(y25e[useVals[i]],digits=precision)))
-            }
+            # outputText<-c(outputText,"","-se ")
+            # for (i in 1:length(useVals)) {
+            #   outputText<-c(outputText,paste0("!j",brawFormat(y25e[useVals[i]],digits=precision)))
+            # }
           }
-          outputText<-c(outputText,paste0("",y2_label)," ")
+          outputText<-c(outputText,y2_label,rep("",nc-1))
+          outputText<-c(outputText," ",yp_label)
           for (i in 1:length(useVals)) {
             outputText<-c(outputText,paste0("!j",brawFormat(y50e[useVals[i]],digits=precision)))
           }
-          if (!reportQuants) {
+          outputText<-c(outputText," ",yn_label)
+          for (i in 1:length(useVals)) {
+            outputText<-c(outputText,paste0("!j",brawFormat(1-y50e[useVals[i]],digits=precision)))
+          }
+          if (reportQuants) {
             outputText<-c(outputText,"!U","\u00B1se")
             for (i in 1:length(useVals)) {
               outputText<-c(outputText,paste0("!j",brawFormat(yiqre[useVals[i]],digits=precision)))
             }
           } else {
-            outputText<-c(outputText,"!U","+se ")
-            for (i in 1:length(useVals)) {
-              outputText<-c(outputText,paste0("!j",brawFormat(y75e[useVals[i]],digits=precision)))
-            }
+            # outputText<-c(outputText,"!U","+se ")
+            # for (i in 1:length(useVals)) {
+            #   outputText<-c(outputText,paste0("!j",brawFormat(y75e[useVals[i]],digits=precision)))
+            # }
           }
         }
         if (is.element(showType[1],c("NHST","SEM"))) {
-          if (is.null(semPropsNull)) {
+          if (is.null(propsNull)) {
             if (returnDataFrame) {
               d<-data.frame(vals=vals)
-              for (ig in 1:nrow(semProps)) {
-                d<-cbind(d,semProps[ig,])
+              for (ig in 1:nrow(propsNonNull)) {
+                d<-cbind(d,propsNonNull[ig,])
                 }
               names(d)<-c(explore$exploreType,showLabels)
               return(d)
             }
             
-            for (ig in 1:nrow(semProps)) {
+            for (ig in 1:nrow(propsNonNull)) {
               outputText<-c(outputText,paste0("!j",showLabels[ig])," ")
-              for (i in useVals)  outputText<-c(outputText,paste0(brawFormat(100*semProps[ig,i],digits=1),"%"))
+              for (i in useVals)  outputText<-c(outputText,paste0(brawFormat(100*propsNonNull[ig,i],digits=1),"%"))
             }
           } else {
             if (returnDataFrame) {
               d<-data.frame(vals=vals)
-              for (ig in 1:nrow(semProps)) {
-                d<-cbind(d,semProps[ig,])
+              for (ig in 1:nrow(propsNonNull)) {
+                d<-cbind(d,propsNonNull[ig,])
               }
-              for (ig in 1:nrow(semProps)) {
-                d<-cbind(d,semPropsNull[ig,])
+              for (ig in 1:nrow(propsNonNull)) {
+                d<-cbind(d,propsNull[ig,])
               }
               names(d)<-c(explore$exploreType,paste0("NonNulls",showLabels),paste0("Nulls",showLabels))
               return(d)
             }
             
-            outputText<-c(outputText,"Non-Nulls",rep("",nc-1))
-            for (ig in 1:nrow(semProps)) {
+            outputText<-c(outputText,braw.env$nonnullTitle,rep("",nc-1))
+            for (ig in 1:nrow(propsNonNull)) {
               outputText<-c(outputText,paste0("!j",showLabels[ig])," ")
-              for (i in useVals)  outputText<-c(outputText,paste0(brawFormat(100*semProps[ig,i],digits=1),"%"))
+              for (i in useVals)  outputText<-c(outputText,paste0(brawFormat(100*propsNonNull[ig,i],digits=1),"%"))
             }
-            outputText<-c(outputText,"Nulls",rep("",nc-1))
-            for (ig in 1:nrow(semPropsNull)) {
+            outputText<-c(outputText,braw.env$nullTitle,rep("",nc-1))
+            for (ig in 1:nrow(propsNull)) {
               outputText<-c(outputText,paste0("!j",showLabels[ig])," ")
-              for (i in useVals)  outputText<-c(outputText,paste0(brawFormat(100*semPropsNull[ig,i],digits=1),"%"))
+              for (i in useVals)  outputText<-c(outputText,paste0(brawFormat(100*propsNull[ig,i],digits=1),"%"))
             }
           }
         }
