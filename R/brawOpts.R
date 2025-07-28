@@ -39,7 +39,7 @@ newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
 
 #' @export
 BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,10),
-                   reportHTML=FALSE, graphicsType="ggplot",
+                   reportHTML=FALSE, graphicsType="ggplot", reportFontSize=0.85, 
                    newDev=FALSE,height=400,aspect=1.3,autoShow=FALSE,autoPrint=FALSE,timeLimit=Inf,fullGraphSize=1,
                    npointsMax=250,
                    fullOutput=0) {
@@ -58,6 +58,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,1
   
   braw.env$plotSize<-c(aspect,1)*height
   braw.env$fullGraphSize<-fullGraphSize
+  braw.env$reportFontSize<-reportFontSize
   
   # genuine globals (for now)
   braw.env$plotDescriptionCols<-c()
@@ -402,7 +403,7 @@ braw.res<<-braw.res
 
 
 #' @export
-setBrawOpts<-function(BW=NULL,graphC=NULL,fontScale=NULL,
+setBrawOpts<-function(BW=NULL,graphC=NULL,fontScale=NULL,reportFontSize=NULL,
                       graphicsType=NULL,fullGraphSize=NULL,
                       reportHTML=NULL, fullOutput=NULL, 
                       npointsMax=NULL,
@@ -418,6 +419,7 @@ setBrawOpts<-function(BW=NULL,graphC=NULL,fontScale=NULL,
   }
   if(!is.null(graphicsType)) setBrawEnv("graphicsType",graphicsType)
   if(!is.null(reportHTML)) setBrawEnv("reportHTML",reportHTML)
+  if(!is.null(reportFontSize)) setBrawEnv("reportFontSize",reportFontSize)
   if(!is.null(fullOutput)) setBrawEnv("fullOutput",fullOutput)
   if(!is.null(autoShow)) setBrawEnv("autoShow",autoShow)
   if(!is.null(autoPrint)) setBrawEnv("autoPrint",autoPrint)

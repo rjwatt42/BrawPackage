@@ -1,5 +1,5 @@
 
-reportPlot<-function(outputText,nc,nr,fontSize=0.85/2,maxRows=14,renderAsHTML=braw.env$reportHTML){
+reportPlot<-function(outputText,nc,nr,fontSize=braw.env$reportFontSize,maxRows=14,renderAsHTML=braw.env$reportHTML){
 
   doVerticalLines=FALSE
   doItalic=FALSE
