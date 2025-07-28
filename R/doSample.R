@@ -121,7 +121,7 @@ makeSampleVar<-function(design,effect,n,MV,MV2){
                 dens<-dnorm(r)
                 dens<-round(dens/sum(dens)*n)
                 ivr1<-rep(r,dens)
-                ivr<-ivr[sample(length(ivr1),length(ivr1))]
+                ivr<-ivr1[sample(length(ivr1),length(ivr1))]
               }
               dvr1_m<-rep(0,n)
               dvr1_s<-rep(1,n)

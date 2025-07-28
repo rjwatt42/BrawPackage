@@ -298,17 +298,20 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=0,
   }
   
   if (!is.null(xticks) && !is.null(xticks$labels))
-    maxtick<-max(strNChar(xticks$labels))
-  else maxtick<-0
+    maxtickx<-max(strNChar(xticks$labels))
+  else maxtickx<-0
   if (!is.null(yticks) && !is.null(yticks$labels))
-    maxtick<-max(c(maxtick,strNChar(yticks$labels)))
+    maxticky<-max(strNChar(yticks$labels))
+  else 
+    maxticky<-0
+  maxtick<-max(maxtickx,maxticky)
   
   tickSize<-5/max(7,maxtick)
-  tickGap<-unitGap*maxtick/5
+  tickGapy<-unitGap*maxticky/5
 
   bottomGap<-labelGapx+3*unitGap
   if (top>0) topGap<-top*unitGap*3.125 else topGap<-minGap
-  leftGap<-labelGapy+4*tickGap
+  leftGap<-labelGapy+3*tickGapy
   rightGap<-minGap
   
   if (!is.null(xticks)) {
