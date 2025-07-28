@@ -848,7 +848,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                    ylabel=makeLabel(label=ylabel),
                    top=TRUE,g=g)
       if (nchar(useLabel)>0)    g<-addG(g,plotTitle(useLabel,size=1.5))
-      else g<-addG(g,plotTitle(paste0("n[sims]=",exploreResult$count),size=0.5,position = "right"))
+      else g<-addG(g,plotTitle(paste0("nsims=",exploreResult$count),size=0.5,position = "right"))
       }
       
       # theory plots
