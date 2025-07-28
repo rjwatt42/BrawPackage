@@ -162,7 +162,7 @@ showFullWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),fontS
   g<-showWorld(hypothesis=hypothesis,joinNulls=FALSE,plotArea=c(0.05,0.35,0.45,0.55),fontScale=1,g=g)
   s<-hypothesis$effect$world$populationNullp
   
-  wd<-0.4
+  wd<-0.25
   if ((1-s)>0) {
   braw.env$plotArea<-c(0.1,0.1,0.45,0.3)
   g<-startPlot(xlim=c(-1,1),ylim=c(0,1),back="transparent",box="none",g=g)
