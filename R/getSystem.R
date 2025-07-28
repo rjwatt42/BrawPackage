@@ -51,6 +51,24 @@ getWorld<-function(name,result=braw.res$result) {
                        populationNullp=0.5,
                        populationPDFsample=FALSE)
          },
+         "Plain"={
+           world<-list(worldOn=TRUE,
+                       populationPDF="Single",
+                       populationRZ="r",
+                       populationPDFk=0.3,
+                       populationPDFmu=0,
+                       populationNullp=0,
+                       populationPDFsample=FALSE)
+         },
+         "Binary"={
+           world<-list(worldOn=TRUE,
+                       populationPDF="Single",
+                       populationRZ="r",
+                       populationPDFk=0.3,
+                       populationPDFmu=0,
+                       populationNullp=0.5,
+                       populationPDFsample=FALSE)
+         },
          "Double"={
            world<-list(worldOn=TRUE,
                        populationPDF="Double",
