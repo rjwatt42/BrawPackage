@@ -45,7 +45,7 @@ getExploreRange<-function(explore) {
   if (is.element(exploreType,c("IVkurtosis","DVkurtosis"))) exploreType<-"kurt"
   
   switch(exploreType,
-         "n"=range<-list(minVal=10,maxVal=250,logScale=FALSE,np=13),
+         "n"=range<-list(minVal=10,maxVal=1000,logScale=TRUE,np=13),
          "nSplits"=range<-list(minVal=1,maxVal=10,logScale=FALSE,np=10),
          "rIV"=range<-list(minVal=0,maxVal=0.75,logScale=FALSE,np=13),
          "rSD"=range<-list(minVal=0,maxVal=0.4,logScale=FALSE,np=13),
@@ -496,7 +496,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
           "InteractionOn"={vals<-c(2,3)},
           "EqualVar"={vals<-c(FALSE,TRUE)},
           
-          "Keep"={vals<-c("cautious", "last", "largeN", "smallP", "median")},
+          "Keep"={vals<-c("cautious", "MetaAnalysis", "largeN")},
           "Power"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Repeats" ={ vals<-minVal:maxVal },
           
