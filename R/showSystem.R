@@ -162,12 +162,13 @@ showFullWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),fontS
   g<-showWorld(hypothesis=hypothesis,joinNulls=FALSE,plotArea=c(0.05,0.35,0.45,0.55),fontScale=1,g=g)
   s<-hypothesis$effect$world$populationNullp
   
+  wd<-0.4
   if ((1-s)>0) {
   braw.env$plotArea<-c(0.1,0.1,0.45,0.3)
   g<-startPlot(xlim=c(-1,1),ylim=c(0,1),back="transparent",box="none",g=g)
   g<-addG(g,drawArrow(c(0,0.9),1,45,"last",col="#000000",
                       fill=braw.env$plotColours$populationC,alpha=1, 
-                      width=0.1*(1-s),position="end",finAngle=45),
+                      width=wd*(1-s),position="end",finAngle=45),
             dataText(data.frame(x=0,y=0.5),brawFormat(1-s,digits=3),size=0.75))
   }
   
@@ -183,7 +184,7 @@ showFullWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),fontS
   g<-startPlot(xlim=c(-1,1),ylim=c(0,1),back="transparent",box="none",g=g)
   g<-addG(g,drawArrow(c(0,0.9),1,-45,"last",col="#000000",
                       fill=braw.env$plotColours$populationC,alpha=1, 
-                      width=0.1*s,position="end",finAngle=45),
+                      width=wd*s,position="end",finAngle=45),
           dataText(data.frame(x=0,y=0.5),brawFormat(s,digits=3),hjust=1,size=0.75)
   )
   }
