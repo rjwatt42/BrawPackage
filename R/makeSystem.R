@@ -165,7 +165,7 @@ makeSampling<-function(type="Random") {
                           Cluster_n=10,
                           Cluster_rad=0.3,
                           Contact_n=0,
-                          Contact_rad=0
+                          Contact_rad=1
             )
           },
           "Snowball"={

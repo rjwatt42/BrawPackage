@@ -128,65 +128,53 @@ makeSampleVar<-function(design,effect,n,MV,MV2){
             },
             {
               method<-design$sMethod
+              
+              sMethodSeverity<-design$sMethodSeverity
+              Cluster_n<-ceiling(method$Cluster_n*sMethodSeverity+1)
+              Contact_n<-ceiling(method$Contact_n*sMethodSeverity)
+              nClusts<-ceiling(n/Cluster_n/(1+Contact_n))
+              
+              Cluster_rad<-1-(1-method$Cluster_rad)*(sMethodSeverity)
+              Contact_rad<-1-(1-method$Contact_rad)*(sMethodSeverity)
+              nsims<-1000
+              
+              # note that all points come from rnorm(mean=0,sd=1)
+              # ie the whole population
               ivr1<-c()
               dvr1_m<-c()
               dvr1_s<-c()
-              
-              if (design$sMethodSeverity<1) 
-                sMethodSeverity<-n*design$sMethodSeverity
-              else               sMethodSeverity<-design$sMethodSeverity
-              nClusts<-n-sMethodSeverity
-              switch(method$type,
-                     "Cluster"={
-                       Cluster_n<-n/nClusts-1
-                       Contact_n<-0
-                     },
-                     "Snowball"={
-                       Cluster_n<-0
-                       Contact_n<-n/nClusts-1
-                     },
-                     "Convenience"={
-                       Cluster_n<-sqrt(n/nClusts-1)
-                       Contact_n<-sqrt(n/nClusts-1)
-                     })
-              
-              if (Cluster_n>floor(Cluster_n) && runif(1)<=(Cluster_n-floor(Cluster_n)))
-                Cluster_n<-ceiling(Cluster_n)
-              else
-                Cluster_n<-floor(Cluster_n)
-              if (Contact_n>floor(Contact_n) && runif(1)<=(Contact_n-floor(Contact_n)))
-                Contact_n<-ceiling(Contact_n)
-              else
-                Contact_n<-floor(Contact_n)
-              
-              if (nClusts==n) method$Cluster_rad<-1
-              Main_rad<-sqrt(1-method$Cluster_rad^2)*method$Main_rad
               for (i in 1:nClusts) {
                 # location of cluster
-                  x_cluster_centre<-rnorm(1)
-                  y_cluster_centre<-rnorm(1)
-
-                for (j in 1:(Cluster_n+1)) {
+                x_cluster_centre<-rnorm(1)
+                y_cluster_centre<-rnorm(1)
+                
+                if (sMethodSeverity==0) {
+                  ivr1<-c(ivr1,x_cluster_centre)
+                  dvr1_m<-c(dvr1_m,y_cluster_centre)
+                } else {
+                for (j in 1:Cluster_n) {
                   # location of contact group
                   use<-FALSE
-                  while (!any(use)) {
-                    x_contact<-rnorm(100)
-                    y_contact<-rnorm(100)
-                    use<-sqrt((x_contact-x_cluster_centre)^2+(y_contact-y_cluster_centre)^2)<rnorm(100)*method$Cluster_rad
+                  while (sum(use)<1) {
+                    x_contact<-rnorm(nsims)
+                    y_contact<-rnorm(nsims)
+                    d<-sqrt((x_contact-x_cluster_centre)^2+(y_contact-y_cluster_centre)^2)
+                    use<-d<Cluster_rad*rnorm(nsims)
                   }
                   x_contact<-x_contact[which(use)[1]]
                   y_contact<-y_contact[which(use)[1]]
                   ivr1<-c(ivr1,x_contact)
                   dvr1_m<-c(dvr1_m,y_contact)
-                  
+
                   # track any contacts
                   if (Contact_n>0)
                   for (k in 1:Contact_n) {
                     use<-FALSE
-                    while (!any(use)) {
-                      x_contact1<-rnorm(100)
-                      y_contact1<-rnorm(100)
-                      use<-sqrt((x_contact1-x_contact)^2+(y_contact1-y_contact)^2)<rnorm(100)*method$Contact_rad
+                    while (sum(use)<1) {
+                      x_contact1<-rnorm(nsims)
+                      y_contact1<-rnorm(nsims)
+                      d<-sqrt((x_contact1-x_contact)^2+(y_contact1-y_contact)^2)
+                      use<-d<Contact_rad*rnorm(nsims)
                     }
                     x_contact<-x_contact1[which(use)[1]]
                     y_contact<-y_contact1[which(use)[1]]
@@ -194,11 +182,13 @@ makeSampleVar<-function(design,effect,n,MV,MV2){
                     dvr1_m<-c(dvr1_m,y_contact)
                   }
                 }
+                }
               }
               
               use<-sample(length(ivr1),length(ivr1))
               ivr1<-ivr1[use]
               dvr1_m<-dvr1_m[use]
+              dvr1_m<-dvr1_m/std(dvr1_m)
               dvr1_s<-rep(0,n)
             }
     )
@@ -481,7 +471,7 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
       # make residuals
       variance_explained=rho^2+rho2^2+rhoInter^2+2*rho*rho2*rho12
       residual<-makeSampleVals(n,0,sqrt(1-variance_explained),DV,effect$ResidDistr)
-      # residual<-residual*dvr_s+dvr_m
+      residual<-residual*dvr_s+dvr_m
 
       # non-independence  
       if (design$sDependence>0) {
