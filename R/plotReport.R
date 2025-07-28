@@ -1,5 +1,5 @@
 
-reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw.env$reportHTML){
+reportPlot<-function(outputText,nc,nr,fontSize=0.85/2,maxRows=14,renderAsHTML=braw.env$reportHTML){
 
   doVerticalLines=FALSE
   doItalic=FALSE
@@ -24,7 +24,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=0.85,maxRows=14,renderAsHTML=braw
     
     preText<-""
     # outputFront<-paste0('<div style="padding:',fontSize,'px;margin-left:',fontSize*2,'px;',mainStyle,'">')
-    outputFront<-paste0('<div style="width:150px;padding:',fontSize,'px;',placing,mainStyle,'">')
+    outputFront<-paste0('<div style="padding:',fontSize,'px;',placing,mainStyle,'">')
     outputBack<-'</div>'
     if (!is.null(outputText)) {
       outputFront<-paste0(outputFront,'<div style="padding:0px',placing,'">',tableStart)
