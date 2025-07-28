@@ -496,7 +496,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
           "InteractionOn"={vals<-c(2,3)},
           "EqualVar"={vals<-c(FALSE,TRUE)},
           
-          "Keep"={vals<-c("cautious", "MetaAnalysis", "largeN")},
+          "Keep"={vals<-c("Cautious", "MetaAnalysis", "LargeN")},
           "Power"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Repeats" ={ vals<-minVal:maxVal },
           
