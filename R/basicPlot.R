@@ -84,7 +84,7 @@ svgBox<-function(height=NULL,aspect=1.3,fontScale=braw.env$fontScale) {
   if (is.null(height)) height<-braw.env$plotSize[2]
   setBrawEnv("plotSize",c(aspect,1)*height)
   setBrawEnv("labelSize",height/100*fontScale)
-  setBrawEnv("dotSize",height/100*dotSize)
+  setBrawEnv("dotSize",height/100*fontScale)
 }
 svgBoxX<-function() {return(braw.env$plotSize[1])}
 svgBoxY<-function() {return(braw.env$plotSize[2])}
