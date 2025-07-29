@@ -772,7 +772,7 @@ drawPoint<-function(data,shape=21,colour="#000000",fill="white",alpha=1,size=3) 
                )
              }
            } else {
-             sz<-size*5.25
+             sz<-size*4
              if (shape==22) tr="" 
              else           tr=paste0(' transform=rotate(45,',format(x[i]),',',format(y[i]),')')
              g<-""
