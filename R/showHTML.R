@@ -13,4 +13,5 @@ showHTML<-function(data) {
     
     assign("graphHTML",FALSE,braw.env)
   }
+  return(NULL)
 }
