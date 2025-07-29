@@ -608,7 +608,7 @@ drawText<-function(data,label, hjust=0, vjust=0, colour="#000000",fill="white",s
            
            if (fontface=="plain") fontface="normal"
            
-           size<-size*1.25
+           size<-size*1.2
            
            x<-svgX(data$x)
            y<-svgY(data$y)
