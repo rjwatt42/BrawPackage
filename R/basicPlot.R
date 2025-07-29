@@ -79,12 +79,12 @@ showHistory<-function(back=-1) {
 #' @examples 
 #' svgB0x(height=200)
 #' @export
-svgBox<-function(height=NULL,aspect=1.3,fontScale=braw.env$labelSize) {
+svgBox<-function(height=NULL,aspect=1.3,fontScale=1.5) {
   if (is.null(height) && is.null(aspect)) return(braw.env$plotSize)
   if (is.null(height)) height<-braw.env$plotSize[2]
   setBrawEnv("plotSize",c(aspect,1)*height)
   setBrawEnv("labelSize",height/100*fontScale)
-  setBrawEnv("dotSize",height/100*fontScale)
+  setBrawEnv("dotSize",height/100*fontScale*1.25)
 }
 svgBoxX<-function() {return(braw.env$plotSize[1])}
 svgBoxY<-function() {return(braw.env$plotSize[2])}
