@@ -341,7 +341,7 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=0,
   
   if (!(is.character(backC) && backC=="transparent")) {
     back<-data.frame(x=xlim[c(1,2,2,1)],y=ylim[c(1,1,2,2)])
-    g<-addG(g,axisPath(data=data.frame(x=c(0,1,1,0,0),y=c(0,0,1,1,0)),colour="red"))
+    # g<-addG(g,axisPath(data=data.frame(x=c(0,1,1,0,0),y=c(0,0,1,1,0)),colour="red"))
     g<-addG(g,dataPolygon(data=back, fill=backC, colour=backC))
   }
   
