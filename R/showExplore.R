@@ -656,7 +656,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                   sigs0<-colMeans(abs(sigs & nulls))
                   showSE2<-sqrt(sigs0*(1-sigs0)/sum(nulls))
                 } else showMeans2<-0
-                showMeans<-showMeans+showMeans2
+                showMeans<-rbind(showMeans+showMeans2,showMeans2)
                 showSE<-NULL
               },
               "tDR"={
@@ -800,7 +800,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       if (!is.element(showType[si],c("NHST","SEM"))) {
         # draw the basic line and point data
         if (is.element(showType[si],c("n(sig)","n(fd)","p(sig)","p(w80)","Hits","Misses","Inference","Source"))) {
-          if (showType[si]=="n(sig)") {
+          if (nrow(showMeans)>1) {
             y50<-showMeans[1,]
             y38<-showMeans[2,]
             if (all(y38==0)) y38<-y50+NA
@@ -828,7 +828,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
         if (showHist) {
           use_y<-c(showVals,theoryVals,theoryLower,theoryVals1,theoryVals0,theoryVals2)
         } else {
-          use_y<-c(y25,y50,y75,theoryVals,theoryLower,theoryVals1,theoryVals0,theoryVals2)
+          use_y<-c(y25,y38,y50,y75,theoryVals,theoryLower,theoryVals1,theoryVals0,theoryVals2)
         }
         use_y[is.infinite(use_y)]<-NA
         ylim<-c(
@@ -916,6 +916,11 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
           pts0f<-data.frame(x=vals,y=y50[i,])
           g<-addG(g,dataLine(data=pts0f,linewidth=0.75))
           g<-addG(g,dataPoint(data=pts0f,fill=ycols[i],size=4))
+          }
+          if (!is.null(y38)) {
+            g<-addG(g,dataLine(data.frame(x=vals,y=y38,linewidth=0.75)))
+            g<-addG(g,dataPoint(data.frame(x=vals,y=y38),fill=braw.env$plotColours$infer_sigNull,size=4))
+            g<-addG(g,dataLegend(data.frame(names=c("total","false discovery"),colours=c(ycols[1],braw.env$plotColours$infer_sigNull))))
           }
         } else { # not doLine
           if (nrow(rVals)>0)
