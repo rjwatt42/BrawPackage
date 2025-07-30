@@ -30,7 +30,7 @@ trimanalysis<-function(analysis) {
 
 plotInference<-function(analysis,otheranalysis=NULL,disp="rs",orientation="vert",
                         whichEffect="Main 1",effectType="all",
-                        showTheory=braw.env$showTheory,showData=TRUE,showLegend=FALSE,sequence=FALSE,
+                        showTheory=braw.env$showTheory,showData=TRUE,showLegend=FALSE,
                         g=NULL){
   if (length(disp)==2) {
     return(plot2Inference(analysis,disp[1],disp[2]))
@@ -106,33 +106,42 @@ plotInference<-function(analysis,otheranalysis=NULL,disp="rs",orientation="vert"
 }
 
 
-plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE,sequence=FALSE){
+plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
     
   r<-analysis$hypothesis$rIV
   if (!is.null(analysis$hypothesis$IV2)){
     r<-c(r,analysis$hypothesis$rIV2,analysis$hypothesis$rIVIV2DV)
   }
-  
-  pvals<-analysis$pIV
-  rvals<-analysis$rIV
-  nvals<-analysis$nval
-  df1vals<-analysis$df1
 
+  if (analysis$design$Replication$On) {
+    pvals<-analysis$ResultHistory$pIV
+    rvals<-analysis$ResultHistory$rIV
+    nvals<-analysis$ResultHistory$nval
+    df1vals<-analysis$ResultHistory$df1
+    sequence<-TRUE
+  } else {
+    pvals<-analysis$pIV
+    rvals<-analysis$rIV
+    nvals<-analysis$nval
+    df1vals<-analysis$df1
+    sequence<-FALSE
+  }
+  
   xaxis<-plotAxis(disp1,analysis$hypothesis,analysis$design,result=analysis)
   yaxis<-plotAxis(disp2,analysis$hypothesis,analysis$design,result=analysis)
   switch (disp1,
           "rs"={
-            d1<-analysis$rIV
+            d1<-rvals
           },
           "p"={
-            d1<-analysis$pIV
+            d1<-pvals
             if (braw.env$pPlotScale=="log10") d1<-log10(d1)
             },
           "rp"={
             d1<-analysis$rpIV
           },
           "re"={
-            d1<-analysis$rIV-analysis$rpIV
+            d1<-rvals-analysis$rpIV
           },
           "ro"={
             d1<-analysis$roIV
@@ -142,7 +151,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE,sequence=FALSE){
             if (braw.env$pPlotScale=="log10") d1<-log10(d1)
           },
           "n"={
-            d1<-analysis$nval
+            d1<-nvals
             if (braw.env$nPlotScale=="log10") d1<-log10(d1)
           },
           "no"={
@@ -186,17 +195,17 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE,sequence=FALSE){
 
   switch (disp2,
           "rs"={
-            d2<-analysis$rIV
+            d2<-rvals
           },
           "p"={
-            d2<-analysis$pIV
+            d2<-pvals
             if (braw.env$pPlotScale=="log10") d2<-log10(d2)
           },
           "rp"={
             d2<-analysis$rpIV
           },
           "re"={
-            d2<-analysis$rIV-analysis$rpIV
+            d2<-rvals-analysis$rpIV
           },
           "ro"={
             d2<-analysis$roIV
@@ -206,7 +215,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE,sequence=FALSE){
             if (braw.env$pPlotScale=="log10") d2<-log10(d2)
           },
           "n"={
-            d2<-analysis$nval
+            d2<-nvals
             if (braw.env$nPlotScale=="log10") d2<-log10(d2)
           },
           "no"={
