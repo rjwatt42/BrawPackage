@@ -147,7 +147,7 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
   } 
   
   if (length(showType)==2 && dimension=="2D") {
-    g1<-plot2Inference(analysis,showType[1],showType[2],sequence=sequence)
+    g1<-plot2Inference(analysis,showType[1],showType[2])
   } else {
     area.x<-0
     area.y<-1

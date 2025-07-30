@@ -118,7 +118,9 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
     rvals<-analysis$ResultHistory$rIV
     nvals<-analysis$ResultHistory$nval
     df1vals<-analysis$ResultHistory$df1
-    sequence<-TRUE
+    if (!is.element(analysis$design$Replication$Keep,c("SmallP")))
+      sequence<-TRUE
+    else sequence<-FALSE
   } else {
     pvals<-analysis$pIV
     rvals<-analysis$rIV
@@ -301,8 +303,11 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
     use<-rep(FALSE,length(d1))
     shape<-braw.env$plotShapes$meta
   }
-  if (sequence) dotSize<-dotSize*0.5
+  if (nrow(pts)>1) dotSize<-dotSize*0.65
   if (length(d1)>100) {b1<-c1;b2<-c2} else {b1<-b2<-"#000000"}
+  last<-length(pts$x)
+  if (!use[last]) colour<-c(b1,c1) else colour<-c(b2,c2)
+  g<-addG(g,dataPoint(data=pts[last,],shape=shape, colour = colour[1], fill = colour[2], alpha=gain^0.8, size = dotSize*2))
   if (any(use)) {
     pts1=pts[use,]
     g<-addG(g,dataPoint(data=pts1,shape=shape, colour = b2, fill = c2, alpha=gain^0.8, size = dotSize))
@@ -318,11 +323,8 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
     g<-addG(g,dataLabel(data=pts2,labels[!use],vjust=0.5,size=0.75))
   }
   
-  if (sequence) {
-    last<-length(pts$x)
-    if (!use[last]) colour<-c(b1,c1) else colour<-c(b2,c2)
-    g<-addG(g,dataPoint(data=pts[last,],shape=shape, colour = colour[1], fill = colour[2], alpha=gain^0.8, size = dotSize*2))
-    if (analysis$design$Replication$On && analysis$design$Replication$Keep=="MetaAnalysis") pts<-pts[1:(last-1),]
+    if (sequence) {
+      if (analysis$design$Replication$On && analysis$design$Replication$Keep=="MetaAnalysis") pts<-pts[1:(last-1),]
     g<-addG(g,dataPath(data=pts,arrow=TRUE,linewidth=0.75,colour=braw.env$plotColours$descriptionC))
   }
   return(g)

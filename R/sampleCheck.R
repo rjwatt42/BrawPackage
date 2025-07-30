@@ -256,7 +256,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
              use<-which.max(ResultHistory$nval)
            },
            "SmallP"={
-             use<-which.min(ResultHistory$pIV[2:length(ResultHistory$pIV)])
+             use<-which.min(ResultHistory$pIV)
            },
            "Last"={
              use<-length(ResultHistory$pIV)
@@ -273,10 +273,15 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
              }
            }
     )
+      nr<-length(ResultHistory$rIV)
     res$rIV<-ResultHistory$rIV[use]
     res$nval<-ResultHistory$nval[use]
     res$df1<-ResultHistory$df1[use]
     res$pIV<-ResultHistory$pIV[use]
+    ResultHistory$rIV<-ResultHistory$rIV[c(setdiff(1:nr,use),use)]
+    ResultHistory$pIV<-ResultHistory$pIV[c(setdiff(1:nr,use),use)]
+    ResultHistory$nval<-ResultHistory$nval[c(setdiff(1:nr,use),use)]
+    ResultHistory$df1<-ResultHistory$df1[c(setdiff(1:nr,use),use)]
     }
   }
   
