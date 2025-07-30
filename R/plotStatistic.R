@@ -29,7 +29,7 @@ theoryPlot<-function(g,theory,orientation,baseColour,theoryAlpha,xoff) {
                theory_sig<-data.frame(y=c(theoryVals[use],rev(theoryVals[use])),x=c(theoryDens_sig[use],-rev(theoryDens_sig[use]))+xoff)
              })
       g<-addG(g,dataPolygon(data=theory_sig,colour=NA,fill=braw.env$plotColours$infer_sigC,alpha=theoryAlpha))
-      g<-addG(g,dataPath(data=theory_sig,colour="white",linewidth=0.1))
+      g<-addG(g,dataPath(data=theory_sig,colour="red",linewidth=0.1))
     }
   }
   
