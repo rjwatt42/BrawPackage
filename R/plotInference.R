@@ -36,7 +36,13 @@ plotInference<-function(analysis,otheranalysis=NULL,disp="rs",orientation="vert"
     return(plot2Inference(analysis,disp[1],disp[2]))
   } 
   analysis<-trimanalysis(analysis)
-
+  if (analysis$design$Replication$On) {
+    analysis$rIV<-analysis$ResultHistory$rIV
+    analysis$pIV<-analysis$ResultHistory$pIV
+    analysis$nval<-analysis$ResultHistory$nval
+    analysis$df1<-analysis$ResultHistory$df1
+    analysis$rpIV<-analysis$ResultHistory$rpIV
+  }
   switch (disp,
           "rs"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
           "rp"={g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
@@ -308,6 +314,8 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
   last<-length(pts$x)
   if (!use[last]) colour<-c(b1,c1) else colour<-c(b2,c2)
   g<-addG(g,dataPoint(data=pts[last,],shape=shape, colour = colour[1], fill = colour[2], alpha=gain^0.8, size = dotSize*2))
+  use<-use[1:(last-1)]
+  pts<-pts[1:(last-1),]
   if (any(use)) {
     pts1=pts[use,]
     g<-addG(g,dataPoint(data=pts1,shape=shape, colour = b2, fill = c2, alpha=gain^0.8, size = dotSize))
