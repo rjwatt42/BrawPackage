@@ -29,7 +29,7 @@ theoryPlot<-function(g,theory,orientation,baseColour,theoryAlpha,xoff) {
                theory_sig<-data.frame(y=c(theoryVals[use],rev(theoryVals[use])),x=c(theoryDens_sig[use],-rev(theoryDens_sig[use]))+xoff)
              })
       g<-addG(g,dataPolygon(data=theory_sig,colour=NA,fill=braw.env$plotColours$infer_sigC,alpha=theoryAlpha))
-      g<-addG(g,dataPath(data=theory_sig,colour="red",linewidth=0.1))
+      g<-addG(g,dataPath(data=theory_sig,colour="white",linewidth=0.1))
     }
   }
   
@@ -837,8 +837,7 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
   }
   if (length(pts$y1)<=npointsMax) {
 
-    if (is.element(showType,c("rs","rse","sig","ns","nonnulls","nulls","rss","p")) && length(pts$y1)==1) {
-        if (is.element(showType,c("rs","rse","sig","ns","nonnulls","nulls","rss"))){
+    if (is.element(showType,c("rs","rse","sig","ns","nonnulls","nulls","rss")) && length(pts$y1)==1) {
           n<-pts$n
           r<-pts$y1
           rCI<-r2ci(r,n)
@@ -846,8 +845,7 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
           x<-pts$x
           if (length(x)<length(rCI)) x<-rep(x,length(rCI))
           pts1se<-data.frame(y=rCI[1,],x=x)
-          g<-addG(g,dataLine(data=pts1se,colour="white",linewidth=se_size))
-        }
+          # g<-addG(g,dataLine(data=pts1se,colour="white",linewidth=se_size))
     }
     
     # if (is.null(pts$notNull)) 
