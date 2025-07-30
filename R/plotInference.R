@@ -320,26 +320,25 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
     g<-addG(g,dataLabel(data=pts1[last,],labels[last],vjust=0.5,size=0.75))
 if (last>1) {
     use<-use[1:(last-1)]
-    pts<-pts[1:(last-1),]
+    pts1<-pts[1:(last-1),]
     labels<-labels[1:(last-1)]
     if (any(use)) {
-      pts1=pts[use,]
-      g<-addG(g,dataPoint(data=pts1,shape=shape, colour = b2, fill = c2, alpha=gain^0.8, size = dotSize))
+      g<-addG(g,dataPoint(data=pts1[use,],shape=shape, colour = b2, fill = c2, alpha=gain^0.8, size = dotSize))
       pts1$x<-pts1$x+diff(xaxis$lim)*0.025
       if (sequence)
-        g<-addG(g,dataLabel(data=pts1,labels[use],vjust=0.5,size=0.75))
+        g<-addG(g,dataLabel(data=pts1[use,],labels[use],vjust=0.5,size=0.75))
+      pts1$x<-pts1$x-diff(xaxis$lim)*0.025
     }
     if (any(!use)) {
-      pts2=pts[!use,]
-      g<-addG(g,dataPoint(data=pts2,shape=shape, colour = b1, fill = c1, alpha=gain^0.8, size = dotSize))
-      pts2$x<-pts2$x+diff(xaxis$lim)*0.025
+      g<-addG(g,dataPoint(data=pts1[!use,],shape=shape, colour = b1, fill = c1, alpha=gain^0.8, size = dotSize))
+      pts1$x<-pts1$x+diff(xaxis$lim)*0.025
       if (sequence)
-        g<-addG(g,dataLabel(data=pts2,labels[!use],vjust=0.5,size=0.75))
+        g<-addG(g,dataLabel(data=pts1[!use,],labels[!use],vjust=0.5,size=0.75))
     }
   }
   if (sequence) {
       if (analysis$design$Replication$On && analysis$design$Replication$Keep=="MetaAnalysis") pts<-pts[1:(last-1),]
-    g<-addG(g,dataPath(data=pts,arrow=TRUE,linewidth=0.75,colour=braw.env$plotColours$descriptionC))
+    g<-addG(g,dataPath(data=pts,arrow=TRUE,linewidth=0.75,colour=braw.env$plotColours$sampleC))
   }
   return(g)
 }
