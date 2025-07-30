@@ -10,11 +10,14 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
   
   if (design$sCheating=="None") return(result)
   if (CheatingAttempts==0) return(result)
-  if (isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence)) return(result)
+  if (isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence)) 
+    return(result)
 
   # fix the hypothesis
   hypothesis$effect$world$worldOn<-FALSE
   hypothesis$effect$rIV<-result$rpIV
+  
+  ResultHistory<-list(rIV=result$rIV,pIV=result$pIV,rpIV=result$rpIV,nval=result$nval,df1=result$df1)
   
   if (is.element(design$sCheating,c("Retry"))) {
     ntrials<-0
@@ -25,6 +28,11 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
     while (!isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence) && ntrials<limit) {
       sample<-doSample(hypothesis,design)
       result<-doAnalysis(sample,evidence)
+      ResultHistory$rIV=c(ResultHistory$rIV,result$rIV)
+      ResultHistory$pIV=c(ResultHistory$pIV,result$pIV)
+      ResultHistory$rpIV=c(ResultHistory$rpIV,result$rpIV)
+      ResultHistory$nval=c(ResultHistory$nval,result$nval)
+      ResultHistory$df1=c(ResultHistory$df1,result$df1)
       switch(design$sCheatingLimit,
              "Fixed"={ntrials<-ntrials+1},
              "Budget"={ntrials<-ntrials+result$nval}
@@ -42,7 +50,7 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
     
     sample2<-doSample(makeHypothesis(IV,IV2,DV,effect2),design2)
   }
-
+  
   if (is.element(design$sCheating,c("Prune","Replace"))) {
     ntrials<-0
     while (!isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence) 
@@ -76,8 +84,15 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
              }
       )
       result<-doAnalysis(sample,evidence)
+      ResultHistory$rIV=c(ResultHistory$rIV,result$rIV)
+      ResultHistory$pIV=c(ResultHistory$pIV,result$pIV)
+      ResultHistory$rpIV=c(ResultHistory$rpIV,result$rpIV)
+      ResultHistory$nval=c(ResultHistory$nval,result$nval)
+      ResultHistory$df1=c(ResultHistory$df1,result$df1)
+
       ntrials<-ntrials+1
     }
+    result$ResultHistory<-ResultHistory
     return(result)
   }
   
@@ -93,8 +108,14 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
       design$sN<-design$sN+(1:changeAmount)
       
       result<-doAnalysis(sample,evidence)
+      ResultHistory$rIV=c(ResultHistory$rIV,result$rIV)
+      ResultHistory$pIV=c(ResultHistory$pIV,result$pIV)
+      ResultHistory$rpIV=c(ResultHistory$rpIV,result$rpIV)
+      ResultHistory$nval=c(ResultHistory$nval,result$nval)
+      ResultHistory$df1=c(ResultHistory$df1,result$df1)
       ntrials<-ntrials+changeAmount
     }
+    result$ResultHistory<-ResultHistory
     return(result)
   }
   
@@ -116,6 +137,11 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
       }
       
       result<-doAnalysis(sample,evidence)
+      ResultHistory$rIV=c(ResultHistory$rIV,result$rIV)
+      ResultHistory$pIV=c(ResultHistory$pIV,result$pIV)
+      ResultHistory$rpIV=c(ResultHistory$rpIV,result$rpIV)
+      ResultHistory$nval=c(ResultHistory$nval,result$nval)
+      ResultHistory$df1=c(ResultHistory$df1,result$df1)
       ntrials<-ntrials+1
     }
     return(result)
@@ -145,7 +171,8 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
 
   Replication<-design$Replication
   resOriginal<-res
-  ResultHistory<-list(nval=res$nval,df1=res$df1,rIV=res$rIV,rpIV=res$rpIV,pIV=res$pIV)
+  ResultHistory<-res$ResultHistory
+  # ResultHistory<-list(nval=res$nval,df1=res$df1,rIV=res$rIV,rpIV=res$rpIV,pIV=res$pIV)
   
   if (Replication$On) {
     # are we asked to start with a significant first result?

@@ -63,6 +63,13 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
                         whichEffect="All",effectType="all",showTheory=braw.env$showTheory,showData=TRUE,showLegend=FALSE,sequence=FALSE
 ) {
   if (is.null(analysis)) analysis<-doSingle(autoShow=FALSE)
+  if (length(analysis$ResultHistory$rIV)>1) {
+    analysis$rIV<-analysis$ResultHistory$rIV
+    analysis$pIV<-analysis$ResultHistory$pIV
+    analysis$nval<-analysis$ResultHistory$nval
+    analysis$df1<-analysis$ResultHistory$df1
+    analysis$rpIV<-analysis$ResultHistory$rpIV
+  }
   
   if (showType[1]=="2D") {
     showType<-"Basic"

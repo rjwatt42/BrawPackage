@@ -36,13 +36,6 @@ plotInference<-function(analysis,otheranalysis=NULL,disp="rs",orientation="vert"
     return(plot2Inference(analysis,disp[1],disp[2]))
   } 
   analysis<-trimanalysis(analysis)
-  if (analysis$design$Replication$On) {
-    analysis$rIV<-analysis$ResultHistory$rIV
-    analysis$pIV<-analysis$ResultHistory$pIV
-    analysis$nval<-analysis$ResultHistory$nval
-    analysis$df1<-analysis$ResultHistory$df1
-    analysis$rpIV<-analysis$ResultHistory$rpIV
-  }
   switch (disp,
           "rs"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
           "rp"={g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
@@ -336,7 +329,7 @@ if (last>1) {
         g<-addG(g,dataLabel(data=pts1[!use,],labels[!use],vjust=0.5,size=0.75))
     }
   }
-  if (sequence) {
+  if (sequence || analysis$design$sCheating!="None") {
       if (analysis$design$Replication$On && analysis$design$Replication$Keep=="MetaAnalysis") pts<-pts[1:(last-1),]
     g<-addG(g,dataPath(data=pts,arrow=TRUE,linewidth=0.75,colour=braw.env$plotColours$sampleC))
   }
