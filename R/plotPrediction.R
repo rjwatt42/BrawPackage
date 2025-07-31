@@ -406,7 +406,7 @@ plotPrediction<-function(IV=braw.def$hypothesis$IV,IV2=braw.def$hypothesis$IV2,D
     }
     
     rho<-effect$rIV
-    if (is.na(rho)) {rho<-0}
+    if (is.null(rho) || is.na(rho)) {rho<-0}
     
     switch (hypothesisType,
             "Interval Interval"={
