@@ -211,6 +211,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
     
     if (Replication$Repeats>0)
     for (i in 1:Replication$Repeats) {
+      if (!(Replication$replicateAll && i==1))
       if (Replication$Keep=="Cautious" && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
         break
       }

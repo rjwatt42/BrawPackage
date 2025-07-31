@@ -262,8 +262,9 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
   labels<-1:length(d1)
   if (analysis$design$Replication$On) {
     labels<-c("Original",rep("Replication",length(d1)-1))
-    if (analysis$design$Replication$Keep=="MetaAnalysis")
-      labels[length(d1)]<-"Combined"
+    labels<-c("0",rep("",length(d1)-2),"final")
+    # if (analysis$design$Replication$Keep=="MetaAnalysis")
+    #   labels[length(d1)]<-"Combined"
   }
   braw.env$plotArea<-c(0,0,1,1)
   g<-startPlot(xaxis$lim,yaxis$lim,
@@ -309,9 +310,9 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
   pts1<-pts
   g<-addG(g,dataPoint(data=pts1[last,],shape=shape, colour = colour[1], fill = colour[2], alpha=gain^0.8, size = dotSize*2))
   pts1$x<-pts1$x+diff(xaxis$lim)*0.025
-  if (sequence)
+  if (sequence && nchar(labels[last])>0)
     g<-addG(g,dataLabel(data=pts1[last,],labels[last],vjust=0.5,size=0.75))
-if (last>1) {
+  if (last>1) {
     use<-use[1:(last-1)]
     pts1<-pts[1:(last-1),]
     labels<-labels[1:(last-1)]
@@ -329,8 +330,9 @@ if (last>1) {
         g<-addG(g,dataLabel(data=pts1[!use,],labels[!use],vjust=0.5,size=0.75))
     }
   }
-  if (sequence || analysis$design$sCheating!="None") {
-      if (analysis$design$Replication$On && analysis$design$Replication$Keep=="MetaAnalysis") pts<-pts[1:(last-1),]
+  if (analysis$design$Replication$On || analysis$design$sCheating!="None") {
+      if (analysis$design$Replication$On && analysis$design$Replication$Keep=="MetaAnalysis") 
+        pts<-pts[1:(last-1),]
     g<-addG(g,dataPath(data=pts,arrow=TRUE,linewidth=0.75,colour=braw.env$plotColours$sampleC))
   }
   return(g)
