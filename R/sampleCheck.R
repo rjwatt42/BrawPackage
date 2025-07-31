@@ -172,7 +172,8 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
   Replication<-design$Replication
   resOriginal<-res
   ResultHistory<-res$ResultHistory
-  # ResultHistory<-list(nval=res$nval,df1=res$df1,rIV=res$rIV,rpIV=res$rpIV,pIV=res$pIV)
+  if (is.null(ResultHistory))
+    ResultHistory<-list(nval=res$nval,df1=res$df1,rIV=res$rIV,rpIV=res$rpIV,pIV=res$pIV)
   
   if (Replication$On) {
     # are we asked to start with a significant first result?
