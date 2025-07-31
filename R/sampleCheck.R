@@ -176,16 +176,19 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
   
   if (Replication$On) {
     # are we asked to start with a significant first result?
-    while (Replication$forceSigOriginal && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
-      res<-getSample(hypothesis,design,evidence)
-      # if (!evidence$shortHand) {
-      #   sample<-doSample(hypothesis,design,autoShow=FALSE)
-      #   res<-doAnalysis(sample,evidence,autoShow=FALSE)
-      # } else {
-      #   res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
-      # }
-      resOriginal<-res
-      ResultHistory<-list(nval=res$nval,df1=res$df1,rIV=res$rIV,rpIV=res$rpIV,pIV=res$pIV)
+    if (Replication$forceSigOriginal) {
+      while (!isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
+        res<-getSample(hypothesis,design,evidence)
+        # if (!evidence$shortHand) {
+        #   sample<-doSample(hypothesis,design,autoShow=FALSE)
+        #   res<-doAnalysis(sample,evidence,autoShow=FALSE)
+        # } else {
+        #   res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
+        # }
+        resOriginal<-res
+        ResultHistory<-list(nval=res$nval,df1=res$df1,rIV=res$rIV,rpIV=res$rpIV,pIV=res$pIV)
+      }
+      res<-doAnalysis(res,evidence)
     }
     
     braw.env$alphaSig<-Replication$RepAlpha
