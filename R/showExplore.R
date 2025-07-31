@@ -77,6 +77,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
 # sort out what we are showing
   
   if (is.element(showType[1],c("NHST","Inference","Source","Hits","Misses","p(sig)","n(sig)","n(fd)"))) showHist<-FALSE
+  if (exploreResult$count>50) showHist<-FALSE
   
   showType<-strsplit(showType,";")[[1]]
   if (length(showType)==1) {
@@ -798,21 +799,21 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                )
       }
       if (!is.element(showType[si],c("NHST","SEM"))) {
+        y50a<-NULL
+        y75<-NULL
+        y25<-NULL
+        y62<-NULL
+        y38<-NULL
         # draw the basic line and point data
         if (is.element(showType[si],c("n(sig)","n(fd)","p(sig)","p(w80)","Hits","Misses","Inference","Source"))) {
           if (nrow(showMeans)>1) {
             y50<-showMeans[1,]
-            y38<-showMeans[2,]
-            if (all(y38==0)) y38<-y50+NA
+            y50a<-showMeans[2,]
+            if (all(y50a==0)) y50a<-y50+NA
             y75<-showMax
             y25<-showMin
-            y62<-y50+NA
           } else {
           y50<-showMeans
-          y75<-NULL
-          y25<-NULL
-          y62<-NULL
-          y38<-NULL
           }
         } else {
           y75<-apply( showVals , 2 , quantile , probs = 0.50+quants , na.rm = TRUE ,names=FALSE)
@@ -828,7 +829,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
         if (showHist) {
           use_y<-c(showVals,theoryVals,theoryLower,theoryVals1,theoryVals0,theoryVals2)
         } else {
-          use_y<-c(y25,y38,y50,y75,theoryVals,theoryLower,theoryVals1,theoryVals0,theoryVals2)
+          use_y<-c(y25,y50a,y50,y75,theoryVals,theoryLower,theoryVals1,theoryVals0,theoryVals2)
         }
         use_y[is.infinite(use_y)]<-NA
         ylim<-c(
@@ -883,6 +884,10 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
         if (!isempty(y50)) {
           y50[y50>ylim[2]]<-ylim[2]
           y50[y50<ylim[1]]<-ylim[1]
+          if (!is.null(y50a)) {
+            y50a[y50a>ylim[2]]<-ylim[2]
+            y50a[y50a<ylim[1]]<-ylim[1]
+          }
           if (!is.null(y75)) {
             y75[y75>ylim[2]]<-ylim[2]
             y75[y75<ylim[1]]<-ylim[1]
@@ -917,9 +922,9 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
           g<-addG(g,dataLine(data=pts0f,linewidth=0.75))
           g<-addG(g,dataPoint(data=pts0f,fill=ycols[i],size=4))
           }
-          if (!is.null(y38)) {
-            g<-addG(g,dataLine(data.frame(x=vals,y=y38,linewidth=0.75)))
-            g<-addG(g,dataPoint(data.frame(x=vals,y=y38),fill=braw.env$plotColours$infer_sigNull,size=4))
+          if (!is.null(y50a)) {
+            g<-addG(g,dataLine(data.frame(x=vals,y=y50a,linewidth=0.75)))
+            g<-addG(g,dataPoint(data.frame(x=vals,y=y50a),fill=braw.env$plotColours$infer_sigNull,size=4))
             g<-addG(g,dataLegend(data.frame(names=c("total","false discovery"),colours=c(ycols[1],braw.env$plotColours$infer_sigNull))))
           }
         } else { # not doLine
@@ -950,15 +955,11 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
           if (!is.null(y75)) {
             g<-addG(g,dataLine(data.frame(x=vals,y=y25),colour="#000000",alpha=0.9))
             g<-addG(g,dataLine(data.frame(x=vals,y=y75),colour="#000000",alpha=0.9))
-            # pts1f<-data.frame(x=vals,ymin=y25,ymax=y75)
-            # g<-addG(g,dataPoint(data=data.frame(x=vals,y=y25),fill=col,size=2))
-            # g<-addG(g,dataPoint(data=data.frame(x=vals,y=y75),fill=col,size=2))
-            if (!is.null(y38) && is.element(showType[si],c("n(sig)","n(fd)","p(sig)","p(w80)","Hits","Misses","Inference","Source"))) {
-              g<-addG(g,dataLine(data=data.frame(x=vals,y=y38),colour="#000000"))
-              g<-addG(g,dataPoint(data=data.frame(x=vals,y=y38),fill=braw.env$plotColours$infer_sigNull,size=4))
-              g<-addG(g,dataLegend(data.frame(names=c("total","false discovery"),colours=c(col,braw.env$plotColours$infer_sigNull))))
-            }
-            # g<-addG(g,dataErrorBar(pts1f,colour=col))
+          }
+          if (!is.null(y50a) && is.element(showType[si],c("n(sig)","n(fd)","p(sig)","p(w80)","Hits","Misses","Inference","Source"))) {
+            g<-addG(g,dataLine(data=data.frame(x=vals,y=y50a),colour="#000000"))
+            g<-addG(g,dataPoint(data=data.frame(x=vals,y=y50a),fill=braw.env$plotColours$infer_sigNull,size=4))
+            g<-addG(g,dataLegend(data.frame(names=c("total","false discovery"),colours=c(col,braw.env$plotColours$infer_sigNull))))
           }
         } # end of line and point
         }

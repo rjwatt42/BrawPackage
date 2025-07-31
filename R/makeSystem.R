@@ -365,13 +365,15 @@ setWorld<-function(worldOn=braw.def$hypothesis$effect$world$worldOn,
                    populationPDFsample=braw.def$hypothesis$effect$world$populationPDFsample,populationSamplemn=braw.def$hypothesis$effect$world$populationSamplemn,populationSamplesd=braw.def$hypothesis$effect$world$populationSamplesd,populationSamplebias=braw.def$hypothesis$effect$world$populationSamplebias,
                    sigOnly=braw.def$hypothesis$effect$world$sigOnly,worldAbs=braw.def$hypothesis$effect$world$worldAbs) {
   if (is.character(worldOn)) e<-getWorld(worldOn)
-  if (is.list(worldOn)) e<-worldOn
-  else
-    e<-makeWorld(worldOn=worldOn,
-                 populationPDF=populationPDF,populationRZ=populationRZ,
-                 populationPDFk=populationPDFk,populationPDFs=populationPDFs,populationPDFmu=populationPDFmu,populationNullp=populationNullp,
-                 populationPDFsample=populationPDFsample,populationSamplemn=populationSamplemn,populationSamplesd=populationSamplesd,populationSamplebias=populationSamplebias,
-                 sigOnly=sigOnly,worldAbs=worldAbs)
+  else {
+    if (is.list(worldOn)) e<-worldOn
+    else
+      e<-makeWorld(worldOn=worldOn,
+                   populationPDF=populationPDF,populationRZ=populationRZ,
+                   populationPDFk=populationPDFk,populationPDFs=populationPDFs,populationPDFmu=populationPDFmu,populationNullp=populationNullp,
+                   populationPDFsample=populationPDFsample,populationSamplemn=populationSamplemn,populationSamplesd=populationSamplesd,populationSamplebias=populationSamplebias,
+                   sigOnly=sigOnly,worldAbs=worldAbs)
+  }
   h<-braw.def$hypothesis
   h$effect$world<-e
   setBrawDef("hypothesis",h)
