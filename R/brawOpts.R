@@ -448,3 +448,6 @@ setBrawDef<-function(which,value) {
     assign("hypothesis",makeHypothesis(),braw.def)
   }
 }
+
+setHTML<-function() setBrawEnv("graphicsType","HTML")
+setggplot<-function() setBrawEnv("graphicsType","ggplot")

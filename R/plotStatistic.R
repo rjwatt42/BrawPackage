@@ -773,7 +773,8 @@ simulations_hist<-function(pts,valType,ylim,histGain,histGainrange){
 
 simulations_plot<-function(g,pts,showType=NULL,simWorld,
                         i=1,scale=1,width=1,col="white",alpha=1,useSignificanceCols=braw.env$useSignificanceCols,
-                        histStyle="width",orientation="vert",ylim,histGain=NA,histGainrange=NA,npointsMax=braw.env$npointsMax){
+                        histStyle="width",orientation="vert",ylim,histGain=NA,histGainrange=NA,
+                        npointsMax=braw.env$npointsMax,sequence=FALSE){
   se_size<-0.25
   
   c1=col
@@ -865,6 +866,8 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
     if (max(abs(xr))>0) xr<-xr*hgain/max(abs(xr))
     
     pts$x<-pts$x+xr*sum(width)*0.3/0.35
+    if (sequence)     pts$x<-0+((1:nrow(pts))-1)/nrow(pts)/10
+    
     gain<-50/max(50,length(xr))
     colgain<-1-min(1,sqrt(max(0,(length(xr)-50))/200))
     
@@ -930,6 +933,8 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
         pts_wsig=pts[pts$y3,]
         g<-addG(g,dataPoint(data=data.frame(x=pts_wsig$x,y=pts_wsig$y1),shape=braw.env$plotShapes$study, colour = co1, alpha=alpha, fill = c3, size = dotSize))
       }
+    if (sequence)
+    g<-addG(g,dataPath(makeData(pts$y1,pts$x,orientation),arrow=TRUE,linewidth=0.25,colour="white"))
   } else { # more than 250 points
     hists<-simulations_hist(pts,showType,ylim,histGain,histGainrange)
     gh<-max(hists$h1+hists$h2+hists$h3+hists$h4)
@@ -1302,13 +1307,10 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       if (theoryFirst)
       g<-theoryPlot(g,theory,orientation,baseColour,theoryAlpha,xoff[i])
       
-      histGain<-abs(sum(theoryDens_all*c(0,diff(theoryVals))))
       histGainrange<-sort(c(theoryVals[1],theoryVals[length(theoryVals)]))
-      if (is.element(showType,c("wp","ws"))) {
-        histGainrange<-c(0.06,0.99)
-        use<-theoryVals>=histGainrange[1] & theoryVals<=histGainrange[2]
-        histGain<-abs(sum(theoryDens_all[use]*c(0,diff(theoryVals[use]))))
-      }
+      if (is.element(showType,c("wp","ws")))   histGainrange<-c(0.06,0.99)
+      use<-theoryVals>=histGainrange[1] & theoryVals<=histGainrange[2]
+      histGain<-abs(sum(theoryDens_all[use]*c(0,diff(theoryVals[use]))))
     }
     
     # then the samples
@@ -1345,8 +1347,12 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
           pts<-data.frame(x=shvals*0+xoff[i],y1=shvals,sig=resSig,notNull=resNotNull,n=nvals)
       }
       
+      if (analysis$design$Replication$On || analysis$design$sCheating!="None") 
+           sequence<-TRUE
+      else sequence<-FALSE
       g<-simulations_plot(g,pts,showType,analysis$hypothesis$effect$world$worldOn,i,orientation=orientation,
-                       ylim=ylim,histGain=histGain,histGainrange=histGainrange)
+                       ylim=ylim,histGain=histGain,histGainrange=histGainrange,
+                       sequence=sequence)
 
       ns<-c()
       s<-c()
