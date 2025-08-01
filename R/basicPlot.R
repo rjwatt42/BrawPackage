@@ -317,7 +317,7 @@ startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=0,
 
   bottomGap<-labelGapx+3*unitGap
   if (top>0) topGap<-top*unitGap*3.125 else topGap<-minGap
-  leftGap<-labelGapy+maxticky*unitGap
+  leftGap<-labelGapy+(maxticky+1)*unitGap
   rightGap<-minGap
   
   if (!is.null(xticks)) {

@@ -456,34 +456,34 @@ plotAxis<-function(showType,hypothesis,design=NULL,result=NULL) {
           },
           "Hits"={
             ylim<-c(0,1)
-            ytick<-seq(0,1,0.2)
+            yticks<-seq(0,1,0.2)
             ymins<-seq(0,1,0.1)
             ylabel<-"True Hits"
             use_cols<-braw.env$plotColours$fdr
           },
           "NHST"={
             ylim<-c(0,1)
-            ytick<-seq(0,1,0.2)
+            yticks<-seq(0,1,0.2)
             ymins<-seq(0,1,0.1)
             ylabel<-"Outcomes"
           },
           "Inference"={
             ylim<-c(0,1)
-            ytick<-seq(0,1,0.2)
+            yticks<-seq(0,1,0.2)
             ymins<-seq(0,1,0.1)
             use_cols<-c(braw.env$plotColours$fdr,braw.env$plotColours$fmr)
             ylabel<-"p(correct)"
           },
           "Source"={
             ylim<-c(0,1)
-            ytick<-seq(0,1,0.2)
+            yticks<-seq(0,1,0.2)
             ymins<-seq(0,1,0.1)
             use_cols<-c(braw.env$plotColours$fdr,braw.env$plotColours$fmr)
             ylabel<-"p(sig)"
           },
           "p(sig)"={
             ylim<-c(0,1)
-            ytick<-seq(0,1,0.2)
+            yticks<-seq(0,1,0.2)
             ymins<-seq(0,1,0.1)
             ylabel<-"p(sig)"
             lines<-c(0.05,0.8)
@@ -495,7 +495,7 @@ plotAxis<-function(showType,hypothesis,design=NULL,result=NULL) {
           },
           "p(w80)"={
             ylim<-c(0,1)
-            ytick<-seq(0,1,0.2)
+            yticks<-seq(0,1,0.2)
             ymins<-seq(0,1,0.1)
             ylabel<-"p(w>0.8)"
             lines<-c()
@@ -507,42 +507,42 @@ plotAxis<-function(showType,hypothesis,design=NULL,result=NULL) {
           },
           "Misses"={
             ylim<-c(0,1)
-            ytick<-seq(0,1,0.2)
+            yticks<-seq(0,1,0.2)
             ymins<-seq(0,1,0.1)
             ylabel<-"False Miss"
             use_cols<-braw.env$plotColours$fmr
           },
           "n(sig)"={
             ylim<-c(0,10)
-            ytick<-1:10
-            ymins<-1:10
+            yticks<-0:10
+            ymins<-0:10
             ylabel<-"n(sig)"
             use_cols<-braw.env$plotColours$infer_sigNonNull
           },
           "n(fd)"={
             ylim<-c(0,10)
-            ytick<-1:10
+            yticks<-1:10
             ymins<-1:10
             ylabel<-"n(false discoveries)"
             use_cols<-"#FFFFFF"
           },
           "metaRiv"={
             ylim<-c(-1.01,1.01)
-            ytick<-seq(-1,1,0.2)
+            yticks<-seq(-1,1,0.2)
             ymins<-seq(-1,1,0.1)
             ylabel<-"r[m]"
             use_cols<-braw.env$plotColours$metaMultiple
           },
           "metaRsd"={
             ylim<-c(-0.01,0.5)
-            ytick<-seq(0,0.5,0.1)
+            yticks<-seq(0,0.5,0.1)
             ymins<-seq(0,0.5,0.05)
             ylabel<-"r[sd]"
             use_cols<-braw.env$plotColours$metaMultiple
           },
           "metaRvar"={
             ylim<-c(-0.05,0.2)
-            ytick<-seq(-0.05,0.2,0.05)
+            yticks<-seq(-0.05,0.2,0.05)
             ymins<-seq(-0.05,0.2,0.01)
             ylabel<-"var(r)[m]"
             lines<-0
@@ -550,42 +550,42 @@ plotAxis<-function(showType,hypothesis,design=NULL,result=NULL) {
           },
           "metaBias"={
             ylim<-c(-0.05,1.05)
-            ytick<-seq(0,0.1,1)
+            yticks<-seq(0,0.1,1)
             ymins<-seq(0,0.1,1)
             ylabel<-"bias[m]"
             use_cols<-braw.env$plotColours$metaMultiple
           },
           "metaK"={
             ylim<-c(-0.01,1.01)
-            ytick<-seq(0,1,0.2)
+            yticks<-seq(0,1,0.2)
             ymins<-seq(0,1,0.1)
             ylabel<-braw.env$Llabel
             use_cols<-braw.env$plotColours$metaMultiple
           },
           "Lambda"={
             ylim<-c(-0.01,1.01)
-            ytick<-seq(0,1,0.2)
+            yticks<-seq(0,1,0.2)
             ymins<-seq(0,1,0.1)
             ylabel<-braw.env$Llabel
             use_cols<-braw.env$plotColours$metaMultiple
           },
           "pNull"={
             ylim<-c(-0.01,1.01)
-            ytick<-seq(0,1,0.2)
+            yticks<-seq(0,1,0.2)
             ymins<-seq(0,1,0.1)
             ylabel<-braw.env$Plabel
             use_cols<-braw.env$plotColours$metaMultiple
           },
           "PDF"={
             ylim<-c(0,1)
-            ytick<-seq(0,1,0.2)
+            yticks<-seq(0,1,0.2)
             ymins<-seq(0,1,0.1)
             ylabel<-"p(PDF)"
           },
           "metaS"={
             ylim<-c(min(result$best$S),max(result$best$S))
             ylabel<-"llk"
-            ytick<-seq(ceil(min(result$best$S)),ceil(max(result$best$S)),1)
+            yticks<-seq(ceil(min(result$best$S)),ceil(max(result$best$S)),1)
             use_cols<-braw.env$plotColours$metaMultiple
           },
           "iv.mn"={
