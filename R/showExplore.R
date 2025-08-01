@@ -1015,7 +1015,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                   bwidth<-0.4*(ptsShow$x[2]-ptsShow$x[1])
                   for (i in 1:npts) {
                     g<-addG(g,drawNHSTBar(i,npts,ptsShow,bwidth,colShow))
-                    if (use==4) g<-addG(g,drawNHSTLine(i,npts,ptsShow,bwidth*1.1,linewidth=1))
+                    if (is.element(use,showSplit)) g<-addG(g,drawNHSTLine(i,npts,ptsShow,bwidth*1.1,linewidth=1))
                   }
               }
             }
