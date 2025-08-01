@@ -20,14 +20,17 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
   ResultHistory<-list(rIV=result$rIV,pIV=result$pIV,rpIV=result$rpIV,nval=result$nval,df1=result$df1,sequence=TRUE)
   
   if (is.element(design$sCheating,c("Retry"))) {
+    hypothesis$effect$world$worldOn<-TRUE
     ntrials<-0
+    minP<-1
     switch(design$sCheatingLimit,
            "Fixed"={limit<-CheatingAttempts},
            "Budget"={limit<-design$sCheatingBudget}
            )
-    while (!isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence) && ntrials<limit) {
+    while (ntrials<limit) {
       sample<-doSample(hypothesis,design)
       result<-doAnalysis(sample,evidence)
+      if (result$pIV<minP) res<-result
       ResultHistory$rIV=c(ResultHistory$rIV,result$rIV)
       ResultHistory$pIV=c(ResultHistory$pIV,result$pIV)
       ResultHistory$rpIV=c(ResultHistory$rpIV,result$rpIV)
@@ -38,7 +41,9 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
              "Budget"={ntrials<-ntrials+result$nval}
       )
     }
-    return(result)
+    ResultHistory$sequence<-FALSE
+    res$ResultHistory<-ResultHistory
+    return(res)
   }
   
   if (is.element(design$sCheating,c("Grow","Replace"))) {
