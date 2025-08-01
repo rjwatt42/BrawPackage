@@ -7,6 +7,15 @@ drawNHSTBar<-function(i,npts,pts1,bwidth,col1) {
   pts<-data.frame(x=x1,y=y1)
   dataPolygon(data=pts,fill=col1)
 }
+drawNHSTLine<-function(i,npts,pts1,bwidth,col1) {
+  barx<-c(-1,1)*bwidth
+  bary<-c(npts*2-i+1,npts*2-i+1)
+  
+  y1<-pts1$y[bary]
+  x1<-pts1$x[i]+barx
+  pts<-data.frame(x=x1,y=y1)
+  dataLine(data=pts,fill=col1)
+}
 drawNHSTLabel<-function(lb1,lb1xy,xoff,col1,vjust=NULL) {
   if (sum(col2rgb(col1))>128*3) col<-"#000000" else col<-"white"
   lb1xy$x<-lb1xy$x+xoff
@@ -1000,15 +1009,16 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
             } else {
               if (doLine) {
                 g<-addG(g,dataPolygon(data=ptsShow,fill=colShow,colour="#000000",linewidth=0.1))
+                if (is.element(use,showSplit)) g<-addG(g,dataLine(data.frame(x=vals,y=ybottom),linewidth=1))
               } else {
                   npts<-length(vals)
                   bwidth<-0.4*(ptsShow$x[2]-ptsShow$x[1])
                   for (i in 1:npts) {
                     g<-addG(g,drawNHSTBar(i,npts,ptsShow,bwidth,colShow))
+                    if (use==2) g<-addG(g,drawNHSTLine(i,npts,ptsShow,bwidth,colShow))
                   }
               }
             }
-            if (is.element(use,showSplit)) g<-addG(g,dataLine(data.frame(x=vals,y=ybottom),linewidth=1))
           }
         }
           
