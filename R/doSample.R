@@ -127,7 +127,6 @@ makeSampleVar<-function(design,effect,n,MV,MV2){
               dvr1_s<-rep(1,n)
             },
             "Limited"={
-              # purely random sample from whole range
               ivr1<-c()
               while (length(ivr1)<n) {
                 ivr2<-makeSampleVals(n*10,0,1,MV)
