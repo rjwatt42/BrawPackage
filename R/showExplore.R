@@ -67,7 +67,7 @@ trimExploreResult<-function(result,nullresult) {
 #'                        quantileShow=0.5,autoYlim=TRUE,showHist=TRUE)
 #' @export
 showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension="1D",showTheory=FALSE,
-                      effectType="unique",whichEffect="All",quantileShow=0.5,autoYlim=TRUE,showHist=TRUE){
+                      effectType="unique",whichEffect="All",quantileShow=0.5,autoYlim=TRUE,showHist=TRUE,fixNulls=TRUE){
 
 # do we need more simulations  
   if (is.null(exploreResult)) exploreResult=doExplore()
@@ -744,12 +744,19 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                   d<-r2llr(rVals,nVals,df1Vals,braw.env$STMethod,world=effect$world)
                 }
                 np<-sum(!is.na(pVals[,1]))
-                sigNonNulls<- colSums( sigs & d>0 & !nulls,na.rm=TRUE)/np 
-                nsigNonNulls<-colSums(!sigs &       !nulls,na.rm=TRUE)/np
-                isigNonNulls<-colSums( sigs & d<0 & !nulls,na.rm=TRUE)/np 
-                isigNulls<-   colSums( sigs & d<0 & nulls,na.rm=TRUE)/np 
-                sigNulls<-    colSums( sigs & d>0 & nulls,na.rm=TRUE)/np 
-                nsigNulls<-   colSums(!sigs &       nulls,na.rm=TRUE)/np 
+                if (fixNulls) {
+                  adjustNulls<-effect$world$populationNullp/(colSums(nulls)/np)
+                  adjustNonNulls<-(1-effect$world$populationNullp)/(colSums(!nulls)/np)
+                } else {
+                  adjustNulls<-1
+                  adjustNonNulls<-1
+                }
+                sigNonNulls<- colSums( sigs & d>0 & !nulls,na.rm=TRUE)/np*adjustNonNulls
+                nsigNonNulls<-colSums(!sigs &       !nulls,na.rm=TRUE)/np*adjustNonNulls
+                isigNonNulls<-colSums( sigs & d<0 & !nulls,na.rm=TRUE)/np*adjustNonNulls
+                isigNulls<-   colSums( sigs & d<0 & nulls,na.rm=TRUE)/np*adjustNulls
+                sigNulls<-    colSums( sigs & d>0 & nulls,na.rm=TRUE)/np*adjustNulls
+                nsigNulls<-   colSums(!sigs &       nulls,na.rm=TRUE)/np*adjustNulls
                 showVals<-rbind()
                 showVals<-rbind(isigNonNulls,nsigNonNulls,sigNonNulls,sigNulls,nsigNulls,isigNulls)
                 rownames(showVals)<-c("isigNonNulls","nsigNonNulls","sigNonNulls","sigNulls","nsigNulls","isigNulls")
