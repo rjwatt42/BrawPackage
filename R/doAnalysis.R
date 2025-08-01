@@ -327,11 +327,11 @@ multipleAnalysis<-function(nsims=1,hypothesis,design,evidence,newResult=c()){
   rho<-hypothesis$effect$rIV
   rho2<-hypothesis$effect$rIV2
   
-  if (length(rho)<nsims) {rho<-rep(rho,nsims)}
+  while (length(rho)<nsims) {rho<-rep(rho,nsims)}
   if (!is.null(hypothesis$IV2)) {
     if (length(rho2)<nsims) {rho2<-rep(rho2,nsims)}
   }
-  
+
   offset<-sum(!is.na(newResult$rIV))
   for (i in 1:nsims){
     hypothesis$effect$rIV<-rho[i]
