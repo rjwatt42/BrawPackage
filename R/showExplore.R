@@ -9,7 +9,7 @@ drawNHSTBar<-function(i,npts,pts1,bwidth,col1) {
 }
 drawNHSTLine<-function(i,npts,pts1,bwidth,linewidth=1) {
   barx<-c(-1,1)*bwidth
-  bary<-c(npts*2-i+1,npts*2-i+1)
+  bary<-c(i,i)
   
   y1<-pts1$y[bary]
   x1<-pts1$x[i]+barx
@@ -1015,7 +1015,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                   bwidth<-0.4*(ptsShow$x[2]-ptsShow$x[1])
                   for (i in 1:npts) {
                     g<-addG(g,drawNHSTBar(i,npts,ptsShow,bwidth,colShow))
-                    if (is.element(use,showSplit)) g<-addG(g,drawNHSTLine(i,npts,ptsShow,bwidth*1.1,linewidth=1))
+                    if (is.element(use,showSplit)) g<-addG(g,drawNHSTLine(i,npts,ptsShow,bwidth*1.25,linewidth=1))
                   }
               }
             }
