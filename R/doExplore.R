@@ -45,8 +45,8 @@ getExploreRange<-function(explore) {
   if (is.element(exploreType,c("IVkurtosis","DVkurtosis"))) exploreType<-"kurt"
   
   switch(exploreType,
-         "n"=range<-list(minVal=10,maxVal=2500,logScale=TRUE,np=13),
-         "nSplits"=range<-list(minVal=1,maxVal=10,logScale=FALSE,np=10),
+         "n"=range<-list(minVal=10,maxVal=250,logScale=TRUE,np=13),
+         "NoSplits"=range<-list(minVal=1,maxVal=32,logScale=TRUE,np=6),
          "rIV"=range<-list(minVal=0,maxVal=0.75,logScale=FALSE,np=13),
          "rSD"=range<-list(minVal=0,maxVal=0.4,logScale=FALSE,np=13),
          "rs"=range<-list(minVal=-0.75,maxVal=0.75,logScale=FALSE,np=13),
@@ -472,8 +472,8 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
           "no"={vals<-seq(10,250,length.out=npoints)},
           "pNull"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "n"={vals<-seq(minVal,maxVal,length.out=npoints)},
-          "nSplits"={design$sNBudget<-design$sN
-                     vals<-seq(1,floor(design$sNBudget/5),length.out=npoints)},
+          "NoSplits"={design$sNBudget<-design$sN
+                     vals<-2^seq(log2(minVal),log2(maxVal),length.out=npoints)},
           "Method"={vals<-c("Random","Cluster","Snowball","Convenience")},
           "ClusterRad"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Usage"={vals<-c("Between","Within")},
@@ -806,7 +806,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
                 
                 "Heteroscedasticity"={effect$Heteroscedasticity<-vals[vi]},
                 "n"={design$sN<-round(vals[vi])},
-                "nSplits"={design$sN<-round(design$sNBudget/vals[vi])
+                "NoSplits"={design$sN<-round(design$sNBudget/vals[vi])
                       design$sNReps<-vals[vi]
                       },
                 "Method"={design$sMethod<-makeSampling(vals[vi])},
