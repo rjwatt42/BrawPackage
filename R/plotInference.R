@@ -112,21 +112,21 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
     r<-c(r,analysis$hypothesis$rIV2,analysis$hypothesis$rIVIV2DV)
   }
 
-  if (analysis$design$Replication$On) {
-    pvals<-analysis$ResultHistory$pIV
-    rvals<-analysis$ResultHistory$rIV
-    nvals<-analysis$ResultHistory$nval
-    df1vals<-analysis$ResultHistory$df1
-    if (!is.element(analysis$design$Replication$Keep,c("SmallP")))
-      sequence<-TRUE
-    else sequence<-FALSE
-  } else {
+  sequence<-analysis$sequence
+  # if (analysis$design$Replication$On) {
+  #   pvals<-analysis$ResultHistory$pIV
+  #   rvals<-analysis$ResultHistory$rIV
+  #   nvals<-analysis$ResultHistory$nval
+  #   df1vals<-analysis$ResultHistory$df1
+  #   if (!is.element(analysis$design$Replication$Keep,c("SmallP")))
+  #     sequence<-TRUE
+  #   else sequence<-FALSE
+  # } else {
     pvals<-analysis$pIV
     rvals<-analysis$rIV
     nvals<-analysis$nval
     df1vals<-analysis$df1
-    sequence<-FALSE
-  }
+  # }
   
   xaxis<-plotAxis(disp1,analysis$hypothesis,analysis$design,result=analysis)
   yaxis<-plotAxis(disp2,analysis$hypothesis,analysis$design,result=analysis)

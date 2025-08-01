@@ -1347,9 +1347,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
           pts<-data.frame(x=shvals*0+xoff[i],y1=shvals,sig=resSig,notNull=resNotNull,n=nvals)
       }
       
-      if (analysis$design$Replication$On || analysis$design$sCheating!="None") 
-           sequence<-TRUE
-      else sequence<-FALSE
+      sequence<-analysis$sequence
       g<-simulations_plot(g,pts,showType,analysis$hypothesis$effect$world$worldOn,i,orientation=orientation,
                        ylim=ylim,histGain=histGain,histGainrange=histGainrange,
                        sequence=sequence)

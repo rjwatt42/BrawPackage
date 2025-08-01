@@ -17,7 +17,7 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
   hypothesis$effect$world$worldOn<-FALSE
   hypothesis$effect$rIV<-result$rpIV
   
-  ResultHistory<-list(rIV=result$rIV,pIV=result$pIV,rpIV=result$rpIV,nval=result$nval,df1=result$df1)
+  ResultHistory<-list(rIV=result$rIV,pIV=result$pIV,rpIV=result$rpIV,nval=result$nval,df1=result$df1,sequence=TRUE)
   
   if (is.element(design$sCheating,c("Retry"))) {
     ntrials<-0
@@ -173,7 +173,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
   resOriginal<-res
   ResultHistory<-res$ResultHistory
   if (is.null(ResultHistory))
-    ResultHistory<-list(nval=res$nval,df1=res$df1,rIV=res$rIV,rpIV=res$rpIV,pIV=res$pIV)
+    ResultHistory<-list(nval=res$nval,df1=res$df1,rIV=res$rIV,rpIV=res$rpIV,pIV=res$pIV,sequence=TRUE)
   
   if (Replication$On) {
     # are we asked to start with a significant first result?
@@ -187,7 +187,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
         #   res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
         # }
         resOriginal<-res
-        ResultHistory<-list(nval=res$nval,df1=res$df1,rIV=res$rIV,rpIV=res$rpIV,pIV=res$pIV)
+        ResultHistory<-list(nval=res$nval,df1=res$df1,rIV=res$rIV,rpIV=res$rpIV,pIV=res$pIV,sequence<-TRUE)
       }
       res<-doAnalysis(res,evidence)
     }
