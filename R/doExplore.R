@@ -473,7 +473,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
           "pNull"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "n"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "NoSplits"={design$sNBudget<-design$sN
-                     vals<-2^seq(log2(minVal),log2(maxVal),length.out=npoints)},
+                     vals<-seq(minVal,maxVal,length.out=npoints)},
           "Method"={vals<-c("Random","Limited","Cluster","Snowball","Convenience")},
           "ClusterRad"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Usage"={vals<-c("Between","Within")},
