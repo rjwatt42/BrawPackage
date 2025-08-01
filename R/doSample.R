@@ -126,6 +126,17 @@ makeSampleVar<-function(design,effect,n,MV,MV2){
               dvr1_m<-rep(0,n)
               dvr1_s<-rep(1,n)
             },
+            "Limited"={
+              # purely random sample from whole range
+              ivr1<-c()
+              while (length(ivr1)<n) {
+                ivr2<-makeSampleVals(n*10,0,1,MV)
+                use<-abs(ivr2)<3*(1-design$sMethodSeverity*design$sMethod$sLimitedRange)
+                ivr1<-c(ivr1,ivr2[use])
+              }
+              dvr1_m<-rep(0,n)
+              dvr1_s<-rep(1,n)
+            },
             {
               method<-design$sMethod
               
