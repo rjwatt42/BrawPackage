@@ -33,6 +33,16 @@ getWorld<-function(name,result=braw.res$result) {
                        populationPDFsample=FALSE
            )
          },
+         "NullH"={
+           world<-list(worldOn=TRUE,
+                       populationPDF="Single",
+                       populationRZ="z",
+                       populationPDFk=0,
+                       populationPDFmu=0,
+                       populationNullp=0,
+                       populationPDFsample=FALSE
+           )
+         },
          "Uniform"={
            world<-list(worldOn=TRUE,
                        populationPDF="Uniform",
