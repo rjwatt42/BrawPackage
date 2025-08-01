@@ -1167,7 +1167,6 @@ runSimulation<-function(hypothesis,design,evidence,sigOnly=FALSE,onlyAnalysis=FA
       if (runif(1)>sigOnly) break
     }
   }
-  res$ResultHistory<-list(nval=res$nval,df1=res$df1,rIV=res$rIV,rpIV=res$rpIV,pIV=res$pIV,sequence=FALSE)
   
   # Replication?
   res<-replicateSample(hypothesis,design,evidence,sample,res)
@@ -1182,6 +1181,7 @@ getSample<-function(hypothesis,design,evidence) {
   } else {
     res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
   }
+  res$ResultHistory<-list(nval=res$nval,df1=res$df1,rIV=res$rIV,rpIV=res$rpIV,pIV=res$pIV,sequence=FALSE)
   # Cheating ?
   res<-cheatSample(hypothesis,design,evidence,sample,res)
   res

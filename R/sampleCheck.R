@@ -187,7 +187,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
         #   res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
         # }
         resOriginal<-res
-        ResultHistory<-list(nval=res$nval,df1=res$df1,rIV=res$rIV,rpIV=res$rpIV,pIV=res$pIV,sequence<-TRUE)
+        ResultHistory<-list(nval=res$nval,df1=res$df1,rIV=res$rIV,rpIV=res$rpIV,pIV=res$pIV,sequence=TRUE)
       }
       res<-doAnalysis(res,evidence)
     }
