@@ -155,7 +155,7 @@ makeHypothesis<-function(IV=makeVariable("IV"),IV2=NULL,DV=makeVariable("DV"),
 makeSampling<-function(type="Random") {
   switch (type,
           "Random"={method=list(type="Random")},
-          "Limited"={method=list(type="Limited",sLimitedRange=4)},
+          "Limited"={method=list(type="Limited",sLimitedRange=4.5)},
           "Stratified"={
             method=list(type="Stratified",
                         sStrata_rRange=2,sStrata_n=5
