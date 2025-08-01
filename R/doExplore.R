@@ -12,10 +12,10 @@
 #' @seealso showExplore() 
 #' @seealso reportExplore()
 #' @examples
-#' explore<-makeExplore(exploreType="n",exploreNPoints=13,
+#' explore<-makeExplore(exploreType="n",exploreNPoints=11,
 #'                              minVal=10,maxVal=250,xlog=FALSE)
 #' @export
-makeExplore<-function(exploreType="n",exploreNPoints=13,
+makeExplore<-function(exploreType="n",exploreNPoints=11,
                       vals=NULL,minVal=NA,maxVal=NA,xlog=FALSE
 ) {
   if (exploreType=="alpha") exploreType<-"Alpha"
@@ -45,7 +45,7 @@ getExploreRange<-function(explore) {
   if (is.element(exploreType,c("IVkurtosis","DVkurtosis"))) exploreType<-"kurt"
   
   switch(exploreType,
-         "n"=range<-list(minVal=10,maxVal=1000,logScale=TRUE,np=13),
+         "n"=range<-list(minVal=10,maxVal=2500,logScale=TRUE,np=13),
          "nSplits"=range<-list(minVal=1,maxVal=10,logScale=FALSE,np=10),
          "rIV"=range<-list(minVal=0,maxVal=0.75,logScale=FALSE,np=13),
          "rSD"=range<-list(minVal=0,maxVal=0.4,logScale=FALSE,np=13),
