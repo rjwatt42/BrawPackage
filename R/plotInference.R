@@ -262,7 +262,10 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
   labels<-1:length(d1)
   if (analysis$design$Replication$On) {
     labels<-c("Original",rep("Replication",length(d1)-1))
-    labels<-c("0",rep("",length(d1)-2),"final")
+    if (length(d1)>2)
+      labels<-c("0",rep("",length(d1)-2),"final")
+    else 
+      labels<-c("0","final")
     # if (analysis$design$Replication$Keep=="MetaAnalysis")
     #   labels[length(d1)]<-"Combined"
   }
