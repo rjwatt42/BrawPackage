@@ -10,8 +10,6 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
   
   if (design$sCheating=="None") return(result)
   if (CheatingAttempts==0) return(result)
-  if (isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence)) 
-    return(result)
 
   # fix the hypothesis
   hypothesis$effect$world$worldOn<-FALSE
@@ -45,6 +43,9 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
     res$ResultHistory<-ResultHistory
     return(res)
   }
+  
+  if (isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence)) 
+    return(result)
   
   if (is.element(design$sCheating,c("Grow","Replace"))) {
     design2<-design
