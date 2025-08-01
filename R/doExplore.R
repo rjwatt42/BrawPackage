@@ -474,7 +474,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
           "n"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "nSplits"={design$sNBudget<-design$sN
                      vals<-seq(1,floor(design$sNBudget/5),length.out=npoints)},
-          "Method"={vals<-c("Random","Stratified","Cluster","Snowball","Convenience")},
+          "Method"={vals<-c("Random","Cluster","Snowball","Convenience")},
           "ClusterRad"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Usage"={vals<-c("Between","Within")},
           "WithinCorr"={vals<-seq(minVal,maxVal,length.out=npoints)},
@@ -488,7 +488,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
           "IVRangeC"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "IVRangeE"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "DVRange"={vals<-seq(minVal,maxVal,length.out=npoints)},
-          "Cheating"={vals<-c("None","Grow","Prune","Replace","Retry")},
+          "Cheating"={vals<-c("None","Grow","Prune","Replace")},
           "CheatingAmount"={vals<-seq(minVal*design$sN,maxVal*design$sN,length.out=npoints)},
           "Alpha"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "minRp"={vals<-seq(minVal,maxVal,length.out=npoints)},
