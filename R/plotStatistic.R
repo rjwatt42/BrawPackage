@@ -1643,7 +1643,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                 colours<-c(braw.env$plotColours$infer_sigC,braw.env$plotColours$infer_sigC,braw.env$plotColours$infer_nsigC)
               }
       )
-      if (length(labels)>0) g<-addG(g,dataLegend(data.frame(names=labels,colours=colours),title=title,shape=22))
+      if (!sequence && length(labels)>0) g<-addG(g,dataLegend(data.frame(names=labels,colours=colours),title=title,shape=22))
     }
     }
     
@@ -1850,8 +1850,9 @@ ps_plot<-function(analysis,disp,showTheory=TRUE,showLegend=FALSE,showData=TRUE,g
         y<-y-mean(nulls & sigs>0)
         cols<-c(cols,col4,col3)
         nms<-c(nms,lb4,lb3)
-      }        
-      g<-addG(g,dataLegend(data.frame(colours=cols,names=nms),title="",shape=22))
+      }       
+      if (!sequence)
+        g<-addG(g,dataLegend(data.frame(colours=cols,names=nms),title="",shape=22))
 
     }
   } else {
