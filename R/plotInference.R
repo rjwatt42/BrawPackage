@@ -313,7 +313,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
   last<-length(pts$x)
   if (!use[last]) colour<-c(b1,c1) else colour<-c(b2,c2)
   pts1<-pts
-  g<-addG(g,dataPoint(data=pts1[last,],shape=shape, colour = colour[1], fill = colour[2], alpha=gain^0.8, size = dotSize*1.2))
+  g<-addG(g,dataPoint(data=pts1[last,],shape=shape, colour = colour[1], fill = colour[2], alpha=alpha, size = dotSize*1.2))
   pts1$x<-pts1$x+diff(xaxis$lim)*0.025
   if (sequence && nchar(labels[last])>0)
     g<-addG(g,dataLabel(data=pts1[last,],labels[last],vjust=0.5,size=0.75))
@@ -322,7 +322,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
     pts1<-pts[1:(last-1),]
     labels<-labels[1:(last-1)]
     if (any(use)) {
-      g<-addG(g,dataPoint(data=pts1[use,],shape=shape, colour = c2, fill = c2, alpha=gain^0.8, size = dotSize))
+      g<-addG(g,dataPoint(data=pts1[use,],shape=shape, colour = c2, fill = c2, alpha=alpha, size = dotSize))
       pts1$x<-pts1$x+diff(xaxis$lim)*0.025
       if (sequence)
         g<-addG(g,dataLabel(data=pts1[use,],labels[use],vjust=0.5,size=0.75))
