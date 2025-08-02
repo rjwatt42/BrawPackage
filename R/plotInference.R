@@ -288,12 +288,11 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
    if (braw.env$pPlotScale=="log10")  ps<-log10(ps)
    g<-addG(g,horzLine(ps,linetype="dotted",colour=braw.env$plotColours$infer_sigC,linewidth=1))
  }
-  gain<-10/max(10,sqrt(length(d1)))
-  dotSize<-braw.env$dotSize*gain
+  dotSize<-braw.env$dotSize
 
   if (!metaPlot && braw.env$useSignificanceCols){
-    c1=darken(braw.env$plotColours$infer_sigC,gain=1/gain^0.8)
-    c2=darken(braw.env$plotColours$infer_nsigC,gain=1)
+    c1=braw.env$plotColours$infer_sigC
+    c2=braw.env$plotColours$infer_nsigC
   } else {
     c1=braw.env$plotColours$descriptionC
     c2=braw.env$plotColours$descriptionC
@@ -308,7 +307,7 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
   }
   np<-nrow(pts)
   if (np>1) dotSize<-dotSize*0.65
-  alpha<-min(1,50/np) 
+  alpha<-max(0.5,min(1,50/np))
   if (np>50) {b1<-c1;b2<-c2} else {b1<-b2<-"#000000"}
   last<-length(pts$x)
   if (!use[last]) colour<-c(b1,c1) else colour<-c(b2,c2)
@@ -322,14 +321,14 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
     pts1<-pts[1:(last-1),]
     labels<-labels[1:(last-1)]
     if (any(use)) {
-      g<-addG(g,dataPoint(data=pts1[use,],shape=shape, colour = c2, fill = c2, alpha=alpha, size = dotSize))
+      g<-addG(g,dataPoint(data=pts1[use,],shape=shape, colour = b2, fill = c2, alpha=alpha, size = dotSize))
       pts1$x<-pts1$x+diff(xaxis$lim)*0.025
       if (sequence)
         g<-addG(g,dataLabel(data=pts1[use,],labels[use],vjust=0.5,size=0.75))
       pts1$x<-pts1$x-diff(xaxis$lim)*0.025
     }
     if (any(!use)) {
-      g<-addG(g,dataPoint(data=pts1[!use,],shape=shape, colour = c1, fill = c1, alpha=gain^0.8, size = dotSize))
+      g<-addG(g,dataPoint(data=pts1[!use,],shape=shape, colour = b1, fill = c1, alpha=alpha, size = dotSize))
       pts1$x<-pts1$x+diff(xaxis$lim)*0.025
       if (sequence)
         g<-addG(g,dataLabel(data=pts1[!use,],labels[!use],vjust=0.5,size=0.75))
