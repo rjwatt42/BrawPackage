@@ -306,8 +306,10 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
     use<-rep(FALSE,length(d1))
     shape<-braw.env$plotShapes$meta
   }
-  if (nrow(pts)>1) dotSize<-dotSize*0.65
-  if (length(d1)>100) {b1<-c1;b2<-c2} else {b1<-b2<-"#000000"}
+  np<-nrow(pts)
+  if (np>1) dotSize<-dotSize*0.65
+  alpha<-min(1,50/np) 
+  if (np>50) {b1<-c1;b2<-c2} else {b1<-b2<-"#000000"}
   last<-length(pts$x)
   if (!use[last]) colour<-c(b1,c1) else colour<-c(b2,c2)
   pts1<-pts
