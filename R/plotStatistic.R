@@ -852,8 +852,10 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
     # if (is.null(pts$notNull)) 
     #   use<-c(which(pts$sig),which(!pts$sig),which(!pts$sig),which(pts$sig))
     # else
+    if (!sequence) {
       use<-c(which(pts$sig & pts$notNull),which(!pts$sig & pts$notNull),which(!pts$sig & !pts$notNull),which(pts$sig & !pts$notNull))
     pts<-pts[use,]
+    }
     xr<-makeFiddle(pts$y1,2/40/braw.env$plotArea[4],orientation)
     switch(orientation,
            "horz"={
@@ -934,7 +936,7 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
         g<-addG(g,dataPoint(data=data.frame(x=pts_wsig$x,y=pts_wsig$y1),shape=braw.env$plotShapes$study, colour = co1, alpha=alpha, fill = c3, size = dotSize))
       }
     if (sequence)
-    g<-addG(g,dataPath(makeData(pts$y1,pts$x,orientation),arrow=TRUE,linewidth=0.25,colour="white"))
+    g<-addG(g,dataPath(makeData(pts$y1,pts$x,orientation),arrow=TRUE,linewidth=0.75,colour="white"))
   } else { # more than 250 points
     hists<-simulations_hist(pts,showType,ylim,histGain,histGainrange)
     gh<-max(hists$h1+hists$h2+hists$h3+hists$h4)
