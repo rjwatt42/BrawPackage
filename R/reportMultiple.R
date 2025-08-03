@@ -19,7 +19,6 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
                          whichEffect="All",effectType="all",reportStats="Medians",compact=FALSE){
   
   if (is.null(multipleResult)) multipleResult=doMultiple(autoShow=FALSE)
-  print(length(multipleResult$result$rIV))
   if (!multipleResult$hypothesis$effect$world$worldOn && is.element(showType[1],c("NHST","Inference","Source","Hits","Misses"))) {
     if (multipleResult$nullcount<multipleResult$count) {
       multipleResult<-doMultiple(0,multipleResult,doingNull=TRUE)
