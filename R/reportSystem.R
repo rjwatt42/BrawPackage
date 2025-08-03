@@ -116,7 +116,7 @@ reportDesign<-function(design=braw.def$design) {
 
   nc=6
   
-  outputText<-rep("",nc)
+  outputText<-c()
   
   if (design$sMethod$type=="Random") col<-'' else col<-'!r'
   if (design$sCheating=="None") col1<-'' else col1<-'!r'
