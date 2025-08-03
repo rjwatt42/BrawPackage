@@ -5,9 +5,9 @@
 \title{make a hypothesis object}
 \usage{
 makeHypothesis(
-  IV = braw.def$IV,
-  IV2 = braw.def$IV2,
-  DV = braw.def$DV,
+  IV = makeVariable("IV"),
+  IV2 = NULL,
+  DV = makeVariable("DV"),
   effect = makeEffect(),
   layout = "normal"
 )

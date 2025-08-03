@@ -13,7 +13,8 @@ showExplore(
   whichEffect = "All",
   quantileShow = 0.5,
   autoYlim = TRUE,
-  showHist = TRUE
+  showHist = TRUE,
+  fixNulls = TRUE
 )
 }
 \arguments{

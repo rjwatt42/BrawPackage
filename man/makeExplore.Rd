@@ -6,10 +6,11 @@
 \usage{
 makeExplore(
   exploreType = "n",
-  exploreNPoints = 13,
+  exploreNPoints = 11,
+  vals = NULL,
   minVal = NA,
   maxVal = NA,
-  xlog = NA
+  xlog = FALSE
 )
 }
 \arguments{
@@ -28,7 +29,7 @@ explore object
 make multiple samples whilst varying a parameter
 }
 \examples{
-explore<-makeExplore(exploreType="n",exploreNPoints=13,
+explore<-makeExplore(exploreType="n",exploreNPoints=11,
                              minVal=10,maxVal=250,xlog=FALSE)
 }
 \seealso{

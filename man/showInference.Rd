@@ -12,7 +12,9 @@ showInference(
   whichEffect = "All",
   effectType = "all",
   showTheory = braw.env$showTheory,
-  showLegend = FALSE
+  showData = TRUE,
+  showLegend = FALSE,
+  sequence = FALSE
 )
 }
 \arguments{

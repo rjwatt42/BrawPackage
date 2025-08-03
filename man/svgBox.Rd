@@ -13,5 +13,5 @@ changes plotting environment
 set up for a meta-analysis
 }
 \examples{
-svgBix(height=200)
+svgB0x(height=200)
 }

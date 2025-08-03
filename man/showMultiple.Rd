@@ -12,6 +12,7 @@ showMultiple(
   whichEffect = "All",
   effectType = "all",
   showTheory = braw.env$showTheory,
+  showData = TRUE,
   showLegend = TRUE
 )
 }

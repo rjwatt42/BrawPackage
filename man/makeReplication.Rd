@@ -13,6 +13,7 @@ makeReplication(
   Power = 0.8,
   Tails = 2,
   PowerPrior = "None",
+  replicateAll = FALSE,
   forceSigOriginal = FALSE,
   forceSign = TRUE,
   maxN = 2000,

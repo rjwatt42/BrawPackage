@@ -7,7 +7,7 @@
 makeSampling(type = "Random")
 }
 \arguments{
-\item{type}{"Random","Stratified","Cluster","Snowball","Convenience"}
+\item{type}{"Random","Limited,"Stratified","Cluster","Snowball","Convenience"}
 }
 \value{
 an effect object

@@ -4,7 +4,7 @@
 \alias{fit_sem_model}
 \title{fit a SEM model to existing data}
 \usage{
-fit_sem_model(pathmodel, model_data, fixedCoeffs = NULL)
+fit_sem_model(pathmodel, model_data, fixedCoeffs = NULL, doinglavaan = TRUE)
 }
 \value{
 sample object

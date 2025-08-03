@@ -10,6 +10,8 @@ setEffect(
   rIVIV2 = braw.def$hypothesis$effect$rIVIV2,
   rIVIV2DV = braw.def$hypothesis$effect$rIVIV2DV,
   rSD = braw.def$hypothesis$effect$rSD,
+  rM1 = braw.def$hypothesis$effect$rM1,
+  rM2 = braw.def$hypothesis$effect$rM2,
   Heteroscedasticity = braw.def$hypothesis$effect$Heteroscedasticity,
   ResidDistr = braw.def$hypothesis$effect$ResidDistr,
   world = braw.def$hypothesis$effect$world

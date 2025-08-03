@@ -10,6 +10,8 @@ makeEffect(
   rIVIV2 = 0,
   rIVIV2DV = 0,
   rSD = 0,
+  rM1 = NULL,
+  rM2 = NULL,
   Heteroscedasticity = 0,
   ResidDistr = "normal",
   world = makeWorld(FALSE)

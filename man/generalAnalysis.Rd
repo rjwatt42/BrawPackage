@@ -6,7 +6,7 @@
 \usage{
 generalAnalysis(
   allData,
-  InteractionOn,
+  AnalysisTerms,
   withins = FALSE,
   ssqType = "Type3",
   caseOrder = "AsStated"

@@ -4,7 +4,7 @@
 \alias{readSample}
 \title{prepare an existing sample}
 \usage{
-readSample(data, DV, IV, IV2 = NULL)
+readSample(data, DV = NULL, IV = NULL, IV2 = NULL)
 }
 \value{
 sample object

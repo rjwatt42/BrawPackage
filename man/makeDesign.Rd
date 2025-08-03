@@ -16,16 +16,19 @@ makeDesign(
   sWithinCor = 0.5,
   sBudgetOn = FALSE,
   sNBudget = 1000,
-  sRangeOn = FALSE,
+  sIVRangeOn = FALSE,
   sIVRange = c(-1, 1) * 4,
+  sIV2RangeOn = FALSE,
+  sIV2Range = c(-1, 1) * 4,
   sDVRange = c(-1, 1) * 4,
   sDependence = 0,
   sOutliers = 0,
   sNonResponse = 0,
   sCheating = "None",
-  sCheatingAttempts = 5,
+  sCheatingAttempts = 10,
   sCheatingLimit = "Fixed",
   sCheatingBudget = 1000,
+  sCheatingFixedPop = TRUE,
   Replication = makeReplication(FALSE)
 )
 }

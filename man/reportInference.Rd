@@ -7,7 +7,8 @@
 reportInference(
   analysis = braw.res$result,
   analysisType = "Anova",
-  showPowerN = TRUE
+  showPowerN = TRUE,
+  compact = FALSE
 )
 }
 \arguments{

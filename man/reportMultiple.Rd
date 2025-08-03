@@ -9,7 +9,8 @@ reportMultiple(
   showType = "Basic",
   whichEffect = "All",
   effectType = "all",
-  reportStats = "Medians"
+  reportStats = "Medians",
+  compact = FALSE
 )
 }
 \arguments{

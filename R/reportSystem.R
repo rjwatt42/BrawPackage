@@ -1,23 +1,23 @@
-#' report a simulated sample
+#' report the system
 #' 
 #' @return ggplot2 object - and printed
 #' @examples
-#' reportSample(sample=doSample())
+#' reportSystem(hypothesis,design)
 #' @export
 reportSystem<-function(hypothesis=braw.def$hypothesis,design=braw.def$design){
-
+  
   IV<-hypothesis$IV
   IV2<-hypothesis$IV2
   DV<-hypothesis$DV
-
+  
   if (is.null(IV2)) no_ivs<-1 else no_ivs<-2
-
+  
   nc=7
-
+  
   outputText<-c("!THypothesis:",rep(" ",nc-1))
   outputText<-c(outputText,
                 "!H!CVariables",rep(" ",nc-1)
-                )
+  )
   switch (DV$type,
           "Interval"={ DVtype<-paste0("Interval(",DV$mu,",",DV$sd,")") },
           "Ordinal"={ DVtype<-paste0("Ordinal(",DV$median,",",DV$iqr,")") },
@@ -35,16 +35,16 @@ reportSystem<-function(hypothesis=braw.def$hypothesis,design=braw.def$design){
                 "!jIV",paste0('"',IV$name,'"'),IVtype,rep(" ",nc-3)
   )
   if (no_ivs>1) {
-  switch (IV2$type,
-          "Interval"={ IV2type<-paste0("Interval(",IV2$mu,",",IV2$sd,")") },
-          "Ordinal"={ IV2type<-paste0("Ordinal(",IV2$median,",",IV2$iqr,")") },
-          "Categorical"={ IV2type<-paste0("Categorical(",IV2$ncats,")") }
-  )
-  outputText<-c(outputText,
-                "!jIV2",paste0('"',IV2$name,'"'),IV2type,rep(" ",nc-3)
-  )
+    switch (IV2$type,
+            "Interval"={ IV2type<-paste0("Interval(",IV2$mu,",",IV2$sd,")") },
+            "Ordinal"={ IV2type<-paste0("Ordinal(",IV2$median,",",IV2$iqr,")") },
+            "Categorical"={ IV2type<-paste0("Categorical(",IV2$ncats,")") }
+    )
+    outputText<-c(outputText,
+                  "!jIV2",paste0('"',IV2$name,'"'),IV2type,rep(" ",nc-3)
+    )
   }
-
+  
   outputText<-c(outputText,
                 "!H!CEffects",rep(" ",nc-1)
   )
@@ -69,7 +69,42 @@ reportSystem<-function(hypothesis=braw.def$hypothesis,design=braw.def$design){
   
   nr=length(outputText)/nc
   reportPlot(outputText,nc,nr)
-    
+  
+}
+
+#' report the system
+#' 
+#' @return ggplot2 object - and printed
+#' @examples
+#' reportWorld(hypothesis,design)
+#' @export
+reportWorld<-function(hypothesis=braw.def$hypothesis){
+  
+  world<-hypothesis$effect$world
+  nc<-5
+  outputText<-c()
+  outputText<-c(outputText,
+                "!TWorld:",rep("",nc-1),
+                "!H ","Amount","Formula",rep("",nc-3)
+  )
+  
+  outputText<-c(outputText,
+                paste0("NonNulls","(",braw.env$nonnullTitle,")"),
+                reportNumber(1-world$populationNullp,1,TRUE),
+                paste0("r[p]","~",world$populationPDF,"(",world$populationRZ,"=",world$populationPDFk,")"),
+                rep("",nc-3)
+                )
+  outputText<-c(outputText,
+                paste0("Nulls","(",braw.env$nullTitle,")"),
+                reportNumber(world$populationNullp,1,TRUE),
+                paste0("r[p]","=",0),
+                rep("",nc-3)
+  )
+  outputText<-c(outputText,rep("",nc))
+  
+  nr=length(outputText)/nc
+  reportPlot(outputText,nc,nr)
+  
 }
 
 #' report a design

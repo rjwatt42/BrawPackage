@@ -4,7 +4,15 @@
 \alias{showEffect}
 \title{export}
 \usage{
-showEffect(r, t = 1, showValue = TRUE, plotArea = NULL, g = NULL)
+showEffect(
+  r,
+  moderator = NULL,
+  type = 1,
+  useCols = c(TRUE, TRUE, TRUE),
+  showValue = TRUE,
+  plotArea = NULL,
+  g = NULL
+)
 }
 \description{
 export
