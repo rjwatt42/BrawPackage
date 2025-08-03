@@ -41,10 +41,10 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
       rval<-analysis$rIV
       
       if (is.null(IV2)){
-        if (pval>=10^(-braw.env$report_precision-1)) {
-          pvalText<-paste("p = ",brawFormat(pval,digits=braw.env$report_precision+1),sep="")
+        if (pval>=10^(-braw.env$report_precision)) {
+          pvalText<-paste0(brawFormat(pval,digits=braw.env$report_precision))
         } else {
-          pvalText<-paste0("p < ",10^(-braw.env$report_precision-1))
+          pvalText<-paste0("< ",10^(-braw.env$report_precision))
         }
         
       t_name<-analysis$test_name
