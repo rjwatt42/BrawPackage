@@ -110,7 +110,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=braw.env$reportFontSize,maxRows=1
           headerRowUsed<-FALSE
         }
           
-        if (!all(sapply(outputText[index+(1:nc)],nchar)==0))
+        if (!all(sapply(outputText[index+(1:nc)],nchar)==0)) {
         for (i in 1:nc) {
           if (i>1) startStyle<-""
           cellStyle<-''
@@ -176,8 +176,8 @@ reportPlot<-function(outputText,nc,nr,fontSize=braw.env$reportFontSize,maxRows=1
             else outputFront<-paste0(outputFront,"<td ",bgcolor," style=height:1px;",cellEmptyStyle,rowStyle,extra,"></td>")
         }
         outputFront<-paste0(outputFront,"</tr>")
-        if (index+nc<=length(outputText))
-        if (all(sapply(outputText[index+(1:nc)],nchar)==0) || titleRow) {
+        } else {
+          index<-index+nc
           outputFront<-paste0(outputFront,'</table>',tableStart)
           col1Use<-0
           col2Use<-0
@@ -188,6 +188,18 @@ reportPlot<-function(outputText,nc,nr,fontSize=braw.env$reportFontSize,maxRows=1
           blankStyle<-blankLineStyle
           headerCol<-FALSE
         }
+        # if (index+nc<=length(outputText))
+        # if (all(sapply(outputText[index+(1:nc)],nchar)==0) || titleRow) {
+        #   outputFront<-paste0(outputFront,'</table>',tableStart)
+        #   col1Use<-0
+        #   col2Use<-0
+        #   col1Style<-""
+        #   col2Style<-""
+        #   colStyle<-""
+        #   colUse<-0
+        #   blankStyle<-blankLineStyle
+        #   headerCol<-FALSE
+        # }
       }
         outputBack<-paste0("</table></div>",outputBack)
     }
