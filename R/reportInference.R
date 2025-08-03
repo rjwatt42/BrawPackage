@@ -248,7 +248,7 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
     outputText<-t(cbind(t1,t3))
     nc<-nc*2
   } else
-    outputText<-c(outputText,table1,table2,table3,table4)
+    outputText<-c(outputText,table1,table2,rep("",nc),table3,table4)
   
     nr=length(outputText)/nc
 
