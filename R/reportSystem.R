@@ -122,7 +122,7 @@ reportDesign<-function(design=braw.def$design,plain=FALSE) {
   if (design$sCheating=="None") col1<-'' else col1<-'!r'
   outputText<-c(outputText,
                 "!TDesign:",rep("",nc-1),
-                "!HSample n","Usage","Method","Cheating",rep("",nc-4),
+                "!Hn","Usage","Method","Cheating",rep("",nc-4),
                 paste0("!c",design$sN),paste0("!c",design$sIV1Use),
                 paste0(col,design$sMethod$type),paste0(col1,design$sCheating),
                 rep("",nc-4)
