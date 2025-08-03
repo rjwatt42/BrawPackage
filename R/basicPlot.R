@@ -231,7 +231,7 @@ drawNullPlot<-function() {
            g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
          },
          "HTML"={
-           if (braw.env$plotColours$graphC=="#FFFFFF") col<-"rgba(0,0,0,0)"
+           if (braw.env$plotColours$graphC=="#FFFFFF") col<-"rgba(0,0,0,1)"
            else col<-braw.env$plotColours$graphC
            g<-paste0(
              '<svg width=',format(svgBoxX()),' height=',format(svgBoxY()),
