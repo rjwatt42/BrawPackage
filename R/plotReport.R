@@ -177,7 +177,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=braw.env$reportFontSize,maxRows=1
         outputFront<-paste0(outputFront,"</tr>")
         if (index+nc<=length(outputText))
         if (all(sapply(outputText[index+(1:nc)],nchar)==0) || titleRow) {
-          outputFront<-paste0(outputFront,'</table></div><div style=padding:0px;',placing,blankStyle,'>',tableStart)
+          outputFront<-paste0(outputFront,'</table>',tableStart)
           col1Use<-0
           col2Use<-0
           col1Style<-""
