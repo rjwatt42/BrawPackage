@@ -110,6 +110,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=braw.env$reportFontSize,maxRows=1
           headerRowUsed<-FALSE
         }
           
+        if (!all(sapply(outputText[index+(1:nc)],nchar)==0)
         for (i in 1:nc) {
           if (i>1) startStyle<-""
           cellStyle<-''
