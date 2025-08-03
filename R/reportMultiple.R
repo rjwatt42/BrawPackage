@@ -1,4 +1,5 @@
 reportNumber<-function(k,k1,reportCounts=braw.env$reportCounts) {
+  if (is.null(k)) return("-")
   if (reportCounts) {
     brawFormat(k)
   } else {
@@ -15,7 +16,7 @@ reportNumber<-function(k,k1,reportCounts=braw.env$reportCounts) {
 #' @return ggplot2 object - and printed
 #' @export
 reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
-                         whichEffect="All",effectType="all",reportStats="Medians"){
+                         whichEffect="All",effectType="all",reportStats="Medians",compact=FALSE){
   
   if (is.null(multipleResult)) multipleResult=doMultiple(autoShow=FALSE)
   if (!multipleResult$hypothesis$effect$world$worldOn && is.element(showType[1],c("NHST","Inference","Source","Hits","Misses"))) {
@@ -87,13 +88,15 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     nc<-nc+1
     
     # header
+    outputText<-c()
+    if (!compact) {
     if (is.element(showType[1],c("NHST","Hits","Misses","Inference","SEM")) && sum(!is.na(nullresult$rIV))>0) {
       nr<-sum(!is.na(result$rIV))+sum(!is.na(nullresult$rIV))
       n1<-paste0(reportNumber(sum(!is.na(result$rIV)),nr,reportCounts=TRUE),"(",reportNumber(sum(!is.na(result$rIV)),nr,reportCounts=FALSE),")")
       n2<-paste0(reportNumber(sum(!is.na(nullresult$rIV)),nr,reportCounts=TRUE),"(",reportNumber(sum(!is.na(nullresult$rIV)),nr,reportCounts=FALSE),")")
-      outputText<-c("!bMultiple  ",paste("nsims = ",n1,"+",n2,sep=""),rep("",nc-2))
+      outputText<-c(outputText,"!bMultiple  ",paste("nsims = ",n1,"+",n2,sep=""),rep("",nc-2))
     } else {
-      outputText<-c("!bMultiple  ",paste("nsims = ",format(sum(!is.na(result$rIV))+sum(!is.na(nullresult$rIV))),sep=""),rep("",nc-2))
+      outputText<-c(outputText,"!bMultiple  ",paste("nsims = ",format(sum(!is.na(result$rIV))+sum(!is.na(nullresult$rIV))),sep=""),rep("",nc-2))
     }
     if (multipleResult$design$Replication$On) {
       replTable<-c("!TReplication",rep("",nc-1))
@@ -106,6 +109,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
       outputText<-c(outputText,replTable)
     }
     outputText<-c(outputText,rep("",nc))
+    } 
     
     if (any(!is.na(nullresult$rpIV))) {
       result$rp[result$rp==0]<-0.00000000001
