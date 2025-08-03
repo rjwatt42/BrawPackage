@@ -11,14 +11,15 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
   if (design$sCheating=="None") return(result)
   if (CheatingAttempts==0) return(result)
 
-  # fix the hypothesis
+  # fix the hypothesis 
+  if (!(is.element(design$sCheating,c("Retry")) || design$sCheatingFixedPop)) {
   hypothesis$effect$world$worldOn<-FALSE
   hypothesis$effect$rIV<-result$rpIV
+  }
   
   ResultHistory<-list(rIV=result$rIV,pIV=result$pIV,rpIV=result$rpIV,nval=result$nval,df1=result$df1,sequence=TRUE)
   
   if (is.element(design$sCheating,c("Retry"))) {
-    hypothesis$effect$world$worldOn<-TRUE
     ntrials<-0
     minP<-1
     switch(design$sCheatingLimit,

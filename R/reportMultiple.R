@@ -242,8 +242,8 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
             e1p=paste0("!j",reportNumber(sum(!nulls&sigs),nsig,braw.env$reportCounts))
             e2n=paste0("!j",reportNumber(sum(nulls&!sigs),nr-nsig,braw.env$reportCounts))
             e2p=paste0("!j",reportNumber(sum(!nulls&!sigs),nr-nsig,braw.env$reportCounts))
-            outputText<-c(outputText," ","!jfalse:",e1b,e1n,e2n,rep("",nc-5))
-            outputText<-c(outputText," ","!jcorrect:",e2b,e1p,e2p,rep("",nc-5))
+            outputText<-c(outputText," ","!jfalse:",e1b,e1n,e2p,rep("",nc-5))
+            outputText<-c(outputText," ","!jcorrect:",e2b,e1p,e2n,rep("",nc-5))
           } else {
             nullSigW<-nulls&(sigs>0)
             nullSigN<-nulls&(sigs==0)

@@ -251,7 +251,7 @@ makeDesign<-function(sN=42, sMethod=makeSampling("Random"),sMethodSeverity=0.1,
                      sIVRangeOn=FALSE, sIVRange=c(-1,1)*4, 
                      sIV2RangeOn=FALSE, sIV2Range=c(-1,1)*4, sDVRange=c(-1,1)*4, 
                      sDependence=0, sOutliers=0, sNonResponse=0,
-                     sCheating="None",sCheatingAttempts=10,sCheatingLimit="Fixed",sCheatingBudget=1000,
+                     sCheating="None",sCheatingAttempts=10,sCheatingLimit="Fixed",sCheatingBudget=1000,sCheatingFixedPop=TRUE,
                      Replication=makeReplication(FALSE)
 ) {
   
@@ -266,7 +266,7 @@ makeDesign<-function(sN=42, sMethod=makeSampling("Random"),sMethodSeverity=0.1,
                sIVRangeOn=sIVRangeOn, sIVRange=sIVRange, 
                sIV2RangeOn=sIV2RangeOn, sIV2Range=sIV2Range, sDVRange=sDVRange, 
                sDependence=sDependence, sOutliers=sOutliers,sNonResponse=sNonResponse,
-               sCheating=sCheating,sCheatingAttempts=sCheatingAttempts,sCheatingLimit=sCheatingLimit,sCheatingBudget=sCheatingBudget,
+               sCheating=sCheating,sCheatingAttempts=sCheatingAttempts,sCheatingLimit=sCheatingLimit,sCheatingBudget=sCheatingBudget,sCheatingFixedPop=sCheatingFixedPop,
                Replication=Replication
                )
   # assign("design",design,braw.def)
