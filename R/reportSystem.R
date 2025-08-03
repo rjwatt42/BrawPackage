@@ -183,6 +183,10 @@ reportDesign<-function(design=braw.def$design,plain=FALSE) {
 #' reportWorldDesign()
 #' @export
 reportWorldDesign<-function() {
+  fontsize<-0.85
+  fontSize<-fontSize*13
+  mainStyle<-paste0("font-size:",format(fontSize) ,"px;font-weight:normal;text-align: left;")
+  placing<-''
   outputFront<-paste0('<div style="padding:',fontSize,'px;',placing,mainStyle,'">')
   outputBack<-'</div>'
   paste0(
