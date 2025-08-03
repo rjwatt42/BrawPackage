@@ -100,8 +100,7 @@ reportWorld<-function(hypothesis=braw.def$hypothesis){
                 paste0("r[p]","=",0),
                 rep("",nc-3)
   )
-  outputText<-c(outputText,rep("",nc))
-  
+
   nr=length(outputText)/nc
   reportPlot(outputText,nc,nr)
   
