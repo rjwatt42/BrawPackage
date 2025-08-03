@@ -102,7 +102,7 @@ reportWorld<-function(hypothesis=braw.def$hypothesis,plain=FALSE){
   )
 
   nr=length(outputText)/nc
-  reportPlot(outputText,nc,nr,plain)
+  reportPlot(outputText,nc,nr,plain=plain)
   
 }
 
@@ -169,7 +169,7 @@ reportDesign<-function(design=braw.def$design,plain=FALSE) {
   }
    
   nr=length(outputText)/nc
-  reportPlot(outputText,nc,nr,plain)
+  reportPlot(outputText,nc,nr,plain=plain)
   
   
 }
@@ -191,8 +191,8 @@ reportWorldDesign<-function() {
   outputBack<-'</div>'
   paste0(
     outputFront,
-    reportWorld(),
-    reportDesign(),
+    reportWorld(plain=TRUE),
+    reportDesign(plain=TRUE),
     outputBack
   )
 }
