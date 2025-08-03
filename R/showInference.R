@@ -15,22 +15,22 @@ useData<-function(analysis,use) {
   return(analysis)
 }
 
-getNulls<-function(analysisOld,useSig=FALSE,useNSig=FALSE) {
-  nonnulls<-which(abs(analysisOld$rpIV)>analysisOld$evidence$minRp)
-  nulls<-which(abs(analysisOld$rpIV)<=analysisOld$evidence$minRp)
+getNulls<-function(analysisOld,evidence,useSig=FALSE,useNSig=FALSE) {
+  nonnulls<-which(abs(analysisOld$rpIV)>evidence$minRp)
+  nulls<-which(abs(analysisOld$rpIV)<=evidence$minRp)
   if (useSig) {
     sigs<-isSignificant(braw.env$STMethod,
-                        analysisOld$pIV,analysisOld$rIV,analysisOld$nval,analysisOld$df1,analysisOld$evidence)
+                        analysisOld$pIV,analysisOld$rIV,analysisOld$nval,analysisOld$df1,evidence)
     
-    nonnulls<-which(abs(analysisOld$rpIV)>analysisOld$evidence$minRp & sigs)
-    nulls<-which(abs(analysisOld$rpIV)<=analysisOld$evidence$minRp & sigs)
+    nonnulls<-which(abs(analysisOld$rpIV)>evidence$minRp & sigs)
+    nulls<-which(abs(analysisOld$rpIV)<=evidence$minRp & sigs)
   }
   if (useNSig) {
     sigs<-isSignificant(braw.env$STMethod,
-                        analysisOld$pIV,analysisOld$rIV,analysisOld$nval,analysisOld$df1,analysisOld$evidence)
+                        analysisOld$pIV,analysisOld$rIV,analysisOld$nval,analysisOld$df1,evidence)
     
-    nonnulls<-which(abs(analysisOld$rpIV)>analysisOld$evidence$minRp & !sigs)
-    nulls<-which(abs(analysisOld$rpIV)<=analysisOld$evidence$minRp & !sigs)
+    nonnulls<-which(abs(analysisOld$rpIV)>evidence$minRp & !sigs)
+    nulls<-which(abs(analysisOld$rpIV)<=evidence$minRp & !sigs)
   }
   
     nullanalysis<-useData(analysisOld,nulls)
@@ -125,7 +125,7 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
            },
            "Hits"=       {
              showType<-c("e2+","e1+");dimension<-"1D"
-             r<-getNulls(analysis,useSig=TRUE)
+             r<-getNulls(analysis,analysis$evidence,useSig=TRUE)
              analysis1<-r$analysis
              analysis2<-r$nullanalysis
              other1<-analysis2
@@ -133,7 +133,7 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
            },
            "Misses"=       {
              showType<-c("e2-","e1-");dimension<-"1D"
-             r<-getNulls(analysis,useNSig=TRUE)
+             r<-getNulls(analysis,analysis$evidence,useNSig=TRUE)
              analysis1<-r$analysis
              analysis2<-r$nullanalysis
              other1<-analysis2

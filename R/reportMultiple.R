@@ -23,6 +23,10 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
       multipleResult<-doMultiple(0,multipleResult,doingNull=TRUE)
     }
   }
+  if (is.null(multipleResult$result)) {
+    multipleResult$result<-multipleResult$ResultHistory
+    multipleResult$count<-length(multipleResult$result$rIV)
+  }
   
     reportMeans<-(reportStats=="Means")
     reportQuants<-FALSE
@@ -36,7 +40,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     nullresult<-multipleResult$nullresult
     
     if (effect$world$worldOn) {
-      r<-getNulls(result)
+      r<-getNulls(result,evidence)
       result<-r$analysis
       nullresult<-r$nullanalysis
     }
@@ -184,7 +188,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
       
       if (is.element(showType,c("NHST","Hits","Misses","Inference","Source"))){
         nulls<-result$rpIV==0
-        sigs<-isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,result$evidence)
+        sigs<-isSignificant(braw.env$STMethod,result$pIV,result$rIV,result$nval,result$df1,evidence)
         nr<-length(result$pIV)
         nsig<-sum(sigs!=0)
         nnull<-sum(nulls)
@@ -193,7 +197,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
           outputText<-c(outputText,"!TSources",rep("",nc-1))
           e1c<-reportNumber(sum(nulls),nr,braw.env$reportCounts)
           e2c<-reportNumber(sum(!nulls),nr,braw.env$reportCounts)
-          if (result$evidence$minRp!=0) {
+          if (evidence$minRp!=0) {
             # h1<-paste0(braw.env$activeTitle," (",e2c,"):")
             # h2<-paste0(braw.env$inactiveTitle," (",e1c,"):")
             h1<-paste0(braw.env$activeTitle)
@@ -259,7 +263,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
             e4=paste0("!j",reportNumber(sum(resSigN),nr-nnull,braw.env$reportCounts))
             e5=paste0("!j",reportNumber(sum(nullSigW),nnull,braw.env$reportCounts))
             e6=paste0("!j",reportNumber(sum(resSigW),nr-nnull,braw.env$reportCounts))
-            if (result$evidence$minRp!=0) {
+            if (evidence$minRp!=0) {
               outputText<-c(outputText,"",paste0("!j",braw.env$inactiveTitle),e1,e3,e5,rep("",nc-5))
             outputText<-c(outputText,"",paste0("!j",braw.env$activeTitle),e2,e4,e6,rep("",nc-5))
             } else {
@@ -308,7 +312,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
           sigs<-isSignificant(braw.env$STMethod,
                               result$pIV,result$rIV,
                               result$nval,result$df1,
-                              result$evidence)
+                              evidence)
           outcomes<-multipleResult$result$sem[,8]
           data<-multipleResult$result$sem[,1:7]
           digits=1
