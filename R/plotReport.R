@@ -27,7 +27,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=braw.env$reportFontSize,maxRows=1
     outputFront<-paste0('<div style="padding:',fontSize,'px;',placing,mainStyle,'">')
     outputBack<-'</div>'
     if (!is.null(outputText)) {
-      outputFront<-paste0(outputFront,'<div style="padding:0px',placing,'">',tableStart)
+      outputFront<-paste0(outputFront,tableStart)
       index<-0
       col1Use<-0
       col2Use<-0
