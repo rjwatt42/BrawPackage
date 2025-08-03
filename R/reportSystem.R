@@ -78,7 +78,7 @@ reportSystem<-function(hypothesis=braw.def$hypothesis,design=braw.def$design){
 #' @examples
 #' reportWorld(hypothesis,design)
 #' @export
-reportWorld<-function(hypothesis=braw.def$hypothesis){
+reportWorld<-function(hypothesis=braw.def$hypothesis,plain=FALSE){
   
   world<-hypothesis$effect$world
   nc<-5
@@ -102,7 +102,7 @@ reportWorld<-function(hypothesis=braw.def$hypothesis){
   )
 
   nr=length(outputText)/nc
-  reportPlot(outputText,nc,nr)
+  reportPlot(outputText,nc,nr,plain)
   
 }
 
@@ -112,7 +112,7 @@ reportWorld<-function(hypothesis=braw.def$hypothesis){
 #' @examples
 #' reportDesign(design=braw.def$design)
 #' @export
-reportDesign<-function(design=braw.def$design) {
+reportDesign<-function(design=braw.def$design,plain=FALSE) {
 
   nc=6
   
@@ -168,10 +168,27 @@ reportDesign<-function(design=braw.def$design) {
     }
   }
    
-  outputText<-c(outputText,rep("",nc))
-  
   nr=length(outputText)/nc
-  reportPlot(outputText,nc,nr)
+  reportPlot(outputText,nc,nr,plain)
   
   
+}
+
+
+
+#' report the system
+#' 
+#' @return ggplot2 object - and printed
+#' @examples
+#' reportWorldDesign()
+#' @export
+reportWorldDesign<-function() {
+  outputFront<-paste0('<div style="padding:',fontSize,'px;',placing,mainStyle,'">')
+  outputBack<-'</div>'
+  paste0(
+    outputFront,
+    reportWorld(),
+    reportDesign(),
+    outputBack
+  )
 }

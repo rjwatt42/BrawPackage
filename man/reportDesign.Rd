@@ -4,7 +4,7 @@
 \alias{reportDesign}
 \title{report a design}
 \usage{
-reportDesign(design = braw.def$design)
+reportDesign(design = braw.def$design, plain = FALSE)
 }
 \value{
 ggplot2 object - and printed

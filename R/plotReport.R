@@ -1,5 +1,5 @@
 
-reportPlot<-function(outputText,nc,nr,fontSize=braw.env$reportFontSize,maxRows=14,renderAsHTML=braw.env$reportHTML){
+reportPlot<-function(outputText,nc,nr,fontSize=braw.env$reportFontSize,maxRows=14,renderAsHTML=braw.env$reportHTML,plain=FALSE){
 
   doVerticalLines=FALSE
   doItalic=FALSE
@@ -24,8 +24,13 @@ reportPlot<-function(outputText,nc,nr,fontSize=braw.env$reportFontSize,maxRows=1
     
     preText<-""
     # outputFront<-paste0('<div style="padding:',fontSize,'px;margin-left:',fontSize*2,'px;',mainStyle,'">')
-    outputFront<-paste0('<div style="padding:',fontSize,'px;',placing,mainStyle,'">')
-    outputBack<-'</div>'
+    if (!plain) {
+      outputFront<-paste0('<div style="padding:',fontSize,'px;',placing,mainStyle,'">')
+      outputBack<-'</div>'
+    } else {
+      outputFront<-''
+      outputBack<-''
+    }
     if (!is.null(outputText)) {
       outputFront<-paste0(outputFront,tableStart)
       index<-0
