@@ -1,5 +1,5 @@
 reportNumber<-function(k,k1,reportCounts=braw.env$reportCounts) {
-  if (is.null(k) !!is.na(k)) return("-")
+  if (is.null(k) || is.na(k)) return("-")
   if (reportCounts) {
     brawFormat(k)
   } else {
