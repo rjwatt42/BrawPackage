@@ -91,7 +91,7 @@ reportWorld<-function(hypothesis=braw.def$hypothesis,plain=FALSE){
   outputText<-c(outputText,
                 paste0("NonNulls","(",braw.env$nonnullTitle,")"),
                 reportNumber(1-world$populationNullp,1,TRUE),
-                paste0("r[p]","~",world$populationPDF,"(",world$populationRZ,"=",world$populationPDFk,")"),
+                paste0("r[p]","~",tolower(world$populationPDF),"(",world$populationRZ,"=",world$populationPDFk,")"),
                 rep("",nc-3)
                 )
   outputText<-c(outputText,
