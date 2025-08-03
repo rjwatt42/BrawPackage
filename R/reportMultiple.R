@@ -1,5 +1,5 @@
 reportNumber<-function(k,k1,reportCounts=braw.env$reportCounts) {
-  if (is.null(k) || is.na(k)) return("-")
+  if (is.null(k) || is.na(k) || k1==0) return("-")
   if (reportCounts) {
     brawFormat(k)
   } else {
@@ -19,6 +19,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
                          whichEffect="All",effectType="all",reportStats="Medians",compact=FALSE){
   
   if (is.null(multipleResult)) multipleResult=doMultiple(autoShow=FALSE)
+  print(length(multipleResult$result$rIV))
   if (!multipleResult$hypothesis$effect$world$worldOn && is.element(showType[1],c("NHST","Inference","Source","Hits","Misses"))) {
     if (multipleResult$nullcount<multipleResult$count) {
       multipleResult<-doMultiple(0,multipleResult,doingNull=TRUE)
