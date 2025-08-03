@@ -241,13 +241,13 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
         }
     }
     
-  if (compact && braw.env$fullOutput==1) {
-    t1<-matrix(table1,ncol=nc,byrow = TRUE)
-    t3<-matrix(table3,ncol=nc,byrow = TRUE)
-    while (nrow(t1)<nrow(t3)) t1<-rbind(t1,rep("",nc))
-    outputText<-t(cbind(t1,t3))
-    nc<-nc*2
-  } else
+  # if (compact && braw.env$fullOutput==1) {
+  #   t1<-matrix(table1,ncol=nc,byrow = TRUE)
+  #   t3<-matrix(table3,ncol=nc,byrow = TRUE)
+  #   while (nrow(t1)<nrow(t3)) t1<-rbind(t1,rep("",nc))
+  #   outputText<-t(cbind(t1,t3))
+  #   nc<-nc*2
+  # } else
     outputText<-c(outputText,table1,table2,rep("",nc),table3,table4)
   
     nr=length(outputText)/nc
