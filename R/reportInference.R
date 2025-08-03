@@ -80,12 +80,12 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
                     mean(use1,na.rm=TRUE)*sd(analysis$dv[use1],na.rm=TRUE)^2
                   )
                 )
-        table1<-c(table1,"!Htest-statistic","(df) ","value","p",f1,"r[s]","Cohen's d",rep("",nc-7))
+        table1<-c(table1,"!Htest","(df) ","value","p",f1,"r[s]","Cohen's d",rep("",nc-7))
         table1<-c(table1,paste0("!j",t_name),df,
                                  brawFormat(tval,digits=braw.env$report_precision),pvalText,
                       f2,rvalText,brawFormat(dval,digits=braw.env$report_precision),rep("",nc-7))
       } else {
-        table1<-c(table1,"!Htest-statistic","(df) ","value","p",f1,"r[s]",rep("",nc-6))
+        table1<-c(table1,"!Htest","(df) ","value","p",f1,"r[s]",rep("",nc-6))
         table1<-c(table1,paste0("!j",t_name),df,
                                  brawFormat(tval,digits=braw.env$report_precision),pvalText,
                       f2,rvalText,rep("",nc-6))
