@@ -40,7 +40,6 @@ reportPlot<-function(outputText,nc,nr,fontSize=braw.env$reportFontSize,maxRows=1
       for (j in 1:nr) {
         bgcolor<-""
         startStyle<-""
-        outputFront<-paste0(outputFront,"<tr>")
         rowStyle<-paste0("font-size:",format(fontSize),"px;")
         if (grepl("!H",outputText[index+1]) && grepl("!C",outputText[index+1]))
           startStyle<-"font-weight:bold;text-align:right;"
@@ -111,7 +110,8 @@ reportPlot<-function(outputText,nc,nr,fontSize=braw.env$reportFontSize,maxRows=1
         }
           
         if (!all(sapply(outputText[index+(1:nc)],nchar)==0)) {
-        for (i in 1:nc) {
+          outputFront<-paste0(outputFront,"<tr>")
+          for (i in 1:nc) {
           if (i>1) startStyle<-""
           cellStyle<-''
           
@@ -201,7 +201,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=braw.env$reportFontSize,maxRows=1
         #   headerCol<-FALSE
         # }
       }
-        outputBack<-paste0("</table></div>",outputBack)
+        outputBack<-paste0("</table>",outputBack)
     }
 
     return(paste0(preText,outputFront,outputBack))
