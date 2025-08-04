@@ -169,51 +169,54 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
     
     
   table3<-c()
-    if (braw.env$fullOutput>0) {
-      table3<-c("!TPower",rep("",nc-1))
-      nrep<-length(analysis$ResultHistory$rIV)
-      if (design$Replication$On)
-        table3<-c(table3,"!H","r[s]","n","p", "r[p]", "w[p]", "p(e)",rep("",nc-7))
-      else table3<-c(table3,"!H","r[s]","n","p", "r[p]", "w[p]", rep("",nc-6))
-      if (nrep>1) {
-        labels<-c("original",rep(" ",nrep-2),"final")
-        for (i in 1:nrep) {
-          if (design$Replication$On) {
-            sig<-analysis$ResultHistory$pIV[i]<0.05
-            if (sig) 
-              p_error<-effect$world$populationNullp*
-                analysis$ResultHistory$pIV[i]
-            else
-              p_error<-(1-effect$world$populationNullp)*
-                (1-rn2w(analysis$ResultHistory$rpIV[i],analysis$ResultHistory$nval[i]))
-            p_error<-brawFormat(p_error,digits=3)
-            if (sig) p_error<-paste0("e[I]=",p_error)
-            else     p_error<-paste0("e[II]=",p_error)
-          } else
-            p_error<-NULL
-          
-          table3<-c(table3,
-                    labels[i],
-                    paste0("!j",brawFormat(analysis$ResultHistory$rIV[i],digits=3)),
-                    paste0("!j",brawFormat(analysis$ResultHistory$nval[i])),
-                    paste0("!j",brawFormat(analysis$ResultHistory$pIV[i],digits=3)),
-                    paste0("!j",brawFormat(analysis$ResultHistory$rpIV[i],digits=3)),
-                    paste0("!j",brawFormat(rn2w(analysis$ResultHistory$rpIV[i],analysis$ResultHistory$nval[i]),digits=3))
-          )
-          if (!is.null(p_error)) table3<-c(table3,paste0("!j",p_error),rep("",nc-7))
-          else table3<-c(table3,rep("",nc-6))
-        }
-      } else {
-        table3<-c(table3,"!Hn", "r[p]", "w[p]","w[s]",rep("",nc-4))   
+  if (braw.env$fullOutput>0) {
+    table3<-c("!TPower",rep("",nc-1))
+    nrep<-length(analysis$ResultHistory$rIV)
+    if (design$Replication$On && 1==2)
+      table3<-c(table3,"!H","r[s]","n","p", "r[p]", "w[p]", "p(e)",rep("",nc-7))
+    else table3<-c(table3,"!H","r[s]","n","p", "r[p]", "w[p]", "w[s]", rep("",nc-7))
+    if (nrep>1) labels<-c("original",rep(" ",nrep-2),"final")
+    else        labels<-""
+    for (i in 1:nrep) {
+      if (1==2) {
+        if (design$Replication$On) {
+          sig<-analysis$ResultHistory$pIV[i]<0.05
+          if (sig) 
+            p_error<-effect$world$populationNullp*
+              analysis$ResultHistory$pIV[i]
+          else
+            p_error<-(1-effect$world$populationNullp)*
+              (1-rn2w(analysis$ResultHistory$rpIV[i],analysis$ResultHistory$nval[i]))
+          p_error<-brawFormat(p_error,digits=3)
+          if (sig) p_error<-paste0("e[I]=",p_error)
+          else     p_error<-paste0("e[II]=",p_error)
+        } else
+          p_error<-NULL
+        
         table3<-c(table3,
-                      paste0("!j",brawFormat(analysis$nval)),
+                  labels[i],
+                  paste0("!j",brawFormat(analysis$ResultHistory$rIV[i],digits=3)),
+                  paste0("!j",brawFormat(analysis$ResultHistory$nval[i])),
+                  paste0("!j",brawFormat(analysis$ResultHistory$pIV[i],digits=3)),
+                  paste0("!j",brawFormat(analysis$ResultHistory$rpIV[i],digits=3)),
+                  paste0("!j",brawFormat(rn2w(analysis$ResultHistory$rpIV[i],analysis$ResultHistory$nval[i]),digits=3))
+        )
+        if (!is.null(p_error)) table3<-c(table3,paste0("!j",p_error),rep("",nc-7))
+        else table3<-c(table3,rep("",nc-6))
+      } else {
+        table3<-c(table3,
+                  labels[i],
+                  paste0("!j",brawFormat(analysis$ResultHistory$rIV[i],digits=3)),
+                  paste0("!j",brawFormat(analysis$ResultHistory$nval[i])),
+                  paste0("!j",brawFormat(analysis$ResultHistory$pIV[i],digits=3)),
                   paste0("!j",brawFormat(analysis$rpIV,digits=3)),
                   paste0("!j",brawFormat(rn2w(analysis$rpIV,analysis$nval),digits=3)),
                   paste0("!j",brawFormat(rn2w(analysis$rIV,analysis$nval),digits=3)),
-                  rep("",nc-4))
+                  rep("",nc-7))
       }
     }
-    
+  }
+  
   table4<-c()
     if (evidence$doSEM) {
       table4<-c(table4,rep("",nc))
