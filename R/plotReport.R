@@ -44,6 +44,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=braw.env$reportFontSize,maxRows=1
       headerRowUsed<-FALSE
       for (j in 1:nr) {
         bgcolor<-""
+        colspan<-""
         startStyle<-""
         rowStyle<-paste0("font-size:",format(fontSize),"px;")
         if (grepl("!H",outputText[index+1]) && grepl("!C",outputText[index+1]))
@@ -92,6 +93,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=braw.env$reportFontSize,maxRows=1
           rowStyle<-paste0(rowStyle,"font-weight:bold;")
           blankStyle<-"padding-top:1px;"
           outputText[index+(1:nc)]<-sub("!T","",outputText[index+(1:nc)])
+          colspan<-paste0('colspan="',nc,'"')
           titleRow<-TRUE
         } else titleRow<-FALSE
         
@@ -117,8 +119,8 @@ reportPlot<-function(outputText,nc,nr,fontSize=braw.env$reportFontSize,maxRows=1
         if (!all(sapply(outputText[index+(1:nc)],nchar)==0)) {
           outputFront<-paste0(outputFront,"<tr>")
           for (i in 1:nc) {
-          if (i>1) startStyle<-""
-          cellStyle<-''
+            if (i>1) startStyle<-""
+            cellStyle<-''
           
             index<-index+1
             cellStyle<-paste0(cellStyle,cellPadding)
@@ -177,8 +179,12 @@ reportPlot<-function(outputText,nc,nr,fontSize=braw.env$reportFontSize,maxRows=1
             # if (i==nc && headerCol) extra<-paste0("border-right:solid;border-right-color:",lineColour,";")
             # if (i==1 && headerCol) extra<-paste0(extra,"border-left:solid;")
             if (nchar(outputText[index])>0)
-                 outputFront<-paste0(outputFront,"<td ",bgcolor," style=",startStyle,rowStyle,cellStyle,cellFilledStyle,extra,">",outputText[index],"</td>")
-            else outputFront<-paste0(outputFront,"<td ",bgcolor," style=height:1px;",cellEmptyStyle,rowStyle,extra,"></td>")
+                 outputFront<-paste0(outputFront,"<td ",colspan,bgcolor," style=",startStyle,rowStyle,cellStyle,cellFilledStyle,extra,">",outputText[index],"</td>")
+            else outputFront<-paste0(outputFront,"<td ",colspan,bgcolor," style=height:1px;",cellEmptyStyle,rowStyle,extra,"></td>")
+            if (nchar(colspan)>0) {
+              index<-index+nc-1
+              break;
+            }
         }
         outputFront<-paste0(outputFront,"</tr>")
         } else {

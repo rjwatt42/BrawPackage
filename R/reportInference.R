@@ -24,15 +24,12 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
   
   an_name<-analysis$an_name
   outputText<-c()
-  if (!compact) {
     outputText<-c(outputText,rep(" ",nc))
     outputText[1]<-paste0("!T",an_name)
     if (!is.null(IV2)) {
       outputText[2]<-paste("(",analysisType,"/",braw.env$modelType,")",sep="")
     }
-    outputText<-c(outputText,rep("",nc))
-  }
-  
+
   table1<-c()
     for (i in 1:1) {
       pval<-analysis$pIV
@@ -171,44 +168,31 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
     
   table3<-c()
     if (braw.env$fullOutput>0) {
-    table3<-c(table3,"!H","r[s]","n","p", "r[p]", "w[p]",rep("",nc-6))   
-      if (is.na(effect$rIV)) {effect$rIV<-0}
-      if (analysis$design$Replication$On) {
-        table3<-c(table3,
-                      "original",
-                      paste0("!j",brawFormat(analysis$roIV,digits=3)),
-                      paste0("!j",brawFormat(analysis$noval)),
-                      paste0("!j",brawFormat(analysis$poIV,digits=3)),
-                      paste0("!j",brawFormat(analysis$rpIV,digits=3)),
-                      paste0("!j",brawFormat(rn2w(analysis$rpIV,analysis$noval),digits=3)),
-                      rep("",nc-6)
-        )
-        if (analysis$design$Replication$Keep=="MetaAnalysis")
+      table3<-c("!TPower",rep("",nc-1))
+      nrep<-length(analysis$ResultHistory$rIV)
+      if (nrep>1) {
+        table3<-c(table3,"!H","r[s]","n","p", "r[p]", "w[p]", "w[s]",rep("",nc-7))
+        labels<-c("original",rep(" ",nrep),"final")
+        for (i in 1:nrep) {
           table3<-c(table3,
-                        "replication",
-                        paste0("!j",brawFormat(analysis$ResultHistory$rIV[2],digits=3)),
-                        paste0("!j",brawFormat(analysis$ResultHistory$nval[2])),
-                        paste0("!j",brawFormat(analysis$ResultHistory$pIV[2],digits=3)),
-                        paste0("!j",brawFormat(analysis$rpIV,digits=3)),
-                        paste0("!j",brawFormat(rn2w(analysis$rpIV,analysis$ResultHistory$nval[2]),digits=3)),
-                        rep("",nc-6))
-        table3<-c(table3,
-                      "final",
-                      paste0("!j",brawFormat(analysis$rIV,digits=3)),
-                      paste0("!j",brawFormat(analysis$nval)),
-                      paste0("!j",brawFormat(analysis$pIV,digits=3)),
-                      paste0("!j",brawFormat(analysis$rpIV,digits=3)),
-                      paste0("!j",brawFormat(rn2w(analysis$rpIV,analysis$nval),digits=3)),
-                      rep("",nc-6))
+                    labels[i],
+                    paste0("!j",brawFormat(analysis$ResultHistory$rIV[i],digits=3)),
+                    paste0("!j",brawFormat(analysis$ResultHistory$nval[i])),
+                    paste0("!j",brawFormat(analysis$ResultHistory$pIV[i],digits=3)),
+                    paste0("!j",brawFormat(analysis$ResultHistory$rpIV[i],digits=3)),
+                    paste0("!j",brawFormat(rn2w(analysis$ResultHistory$rpIV[i],analysis$ResultHistory$nval[i]),digits=3)),
+                    paste0("!j",brawFormat(rn2w(analysis$ResultHistory$rIV[i],analysis$ResultHistory$nval[i]),digits=3)),
+                    rep("",nc-7)
+          )
+        }
       } else {
+        table3<-c(table3,"!Hn", "r[p]", "w[p]","w[s]",rep("",nc-4))   
         table3<-c(table3,
-                      "sample",
-                      paste0("!j",brawFormat(analysis$rIV,digits=3)),
                       paste0("!j",brawFormat(analysis$nval)),
-                      paste0("!j",brawFormat(analysis$pIV,digits=3)),
-                      paste0("!j",brawFormat(analysis$rpIV,digits=3)),
-                      paste0("!j",brawFormat(rn2w(analysis$rpIV,analysis$nval),digits=3)),
-                      rep("",nc-6))
+                  paste0("!j",brawFormat(analysis$rpIV,digits=3)),
+                  paste0("!j",brawFormat(rn2w(analysis$rpIV,analysis$nval),digits=3)),
+                  paste0("!j",brawFormat(rn2w(analysis$rIV,analysis$nval),digits=3)),
+                  rep("",nc-4))
       }
     }
     
