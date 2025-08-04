@@ -174,13 +174,13 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
         table3<-c(table3,"!H","r[s]","n","p", "r[p]", "w[p]", "p(e)",rep("",nc-7))
         labels<-c("original",rep(" ",nrep-2),"final")
         for (i in 1:nrep) {
-          if (analysis$effect$world$worldOn) {
+          if (effect$world$worldOn) {
           if (analysis$ResultHistory$pIV[i]<0.05)
-            p_error<-analysis$effect$world$populationNullp*
+            p_error<-effect$world$populationNullp*
                      0.05*
                      (1-0.05)
           else
-            p_error<-analysis$effect$world$populationNullp*
+            p_error<-(1-effect$world$populationNullp)*
               rn2w(analysis$ResultHistory$rpIV[1],analysis$ResultHistory$nval[1])*
               (1-rn2w(analysis$ResultHistory$rpIV[i],analysis$ResultHistory$nval[i]))
           } else p_error<-'-'
