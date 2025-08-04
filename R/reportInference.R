@@ -172,7 +172,7 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
       nrep<-length(analysis$ResultHistory$rIV)
       if (nrep>1) {
         table3<-c(table3,"!H","r[s]","n","p", "r[p]", "w[p]", "w[s]",rep("",nc-7))
-        labels<-c("original",rep(" ",nrep),"final")
+        labels<-c("original",rep(" ",nrep-2),"final")
         for (i in 1:nrep) {
           table3<-c(table3,
                     labels[i],

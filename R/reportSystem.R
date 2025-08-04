@@ -88,16 +88,18 @@ reportWorld<-function(hypothesis=braw.def$hypothesis,plain=FALSE){
                 "!H ","Amount","Formula",rep("",nc-3)
   )
   
+  if (world$populationPDF=="Uniform") pdf<-paste0(world$populationPDF,"(",world$populationRZ,")")
+  else pdf<-paste0(world$populationPDF,"(",world$populationRZ,"=",world$populationPDFk,")")
   outputText<-c(outputText,
-                paste0("NonNulls","(",braw.env$nonnullTitle,")"),
-                reportNumber(1-world$populationNullp,1,FALSE),
-                paste0("r[p]","~",tolower(world$populationPDF),"(",world$populationRZ,"=",world$populationPDFk,")"),
+                paste0(braw.env$nonnullTitle),
+                paste0("!j",reportNumber(1-world$populationNullp,1,FALSE)),
+                paste0("r[p]"," ~ ",tolower(pdf)),
                 rep("",nc-3)
                 )
   outputText<-c(outputText,
-                paste0("Nulls","(",braw.env$nullTitle,")"),
-                reportNumber(world$populationNullp,1,FALSE),
-                paste0("r[p]","=",0),
+                paste0(braw.env$nullTitle),
+                paste0("!j",reportNumber(world$populationNullp,1,FALSE)),
+                paste0("r[p]"," = ",0),
                 rep("",nc-3)
   )
 
@@ -120,52 +122,60 @@ reportDesign<-function(design=braw.def$design,plain=FALSE) {
   
   if (design$sMethod$type=="Random") col<-'' else col<-'!r'
   if (design$sCheating=="None") col1<-'' else col1<-'!r'
+  if (design$sCheating=="None") cheat<-'-' else cheat<-tolower(design$sCheating)
+  if (design$Replication$On) repl<-tolower(design$Replication$Keep) else repl<-'-'
   outputText<-c(outputText,
                 "!TDesign:",rep("",nc-1),
-                "!Hn","Usage","Method","Cheating",rep("",nc-4),
-                paste0("!c",design$sN),paste0("!c",design$sIV1Use),
-                paste0(col,design$sMethod$type),paste0(col1,design$sCheating),
-                rep("",nc-4)
+                "!Hn","Method","Usage","Replication","Cheating",rep("",nc-5),
+                paste0("!c",design$sN),
+                paste0("!c",col,tolower(design$sMethod$type)),
+                paste0("!c",tolower(design$sIV1Use)),
+                paste0("!c",repl),
+                paste0("!c",col1,cheat),
+                rep("",nc-5)
   )
   if (is.element(design$sMethod$type,c("Convenience","Cluster","Snowball")) ){
     if (design$sMethodSeverity<1) 
       sMethodSeverity<-design$sN*design$sMethodSeverity
     else               sMethodSeverity<-design$sMethodSeverity
-    n<-design$sN
-    nClusts<-n-sMethodSeverity
     outputText<-c(outputText,rep("",2),
-                  paste0("seeds=",brawFormat(nClusts,digits=1)),
+                  brawFormat(design$sMethodSeverity,digits=2),
                   rep("",nc-3))
-    switch(design$sMethod$type,
-           "Cluster"={
-             Cluster_n<-n/nClusts-1
-             Contact_n<-0
-           },
-           "Snowball"={
-             Contact_n<-n/nClusts-1
-             Cluster_n<-0
-           },
-           "Convenience"={
-             Cluster_n<-sqrt(n/nClusts-1)
-             Contact_n<-sqrt(n/nClusts-1)
-           })
-    
-    if (Cluster_n>0) {
-      outputText<-c(outputText,rep("",2),
-                    paste0("clust_r=",brawFormat(design$sMethod$Cluster_rad,digits=1)),
-                    rep("",nc-3))
-      outputText<-c(outputText,rep("",2),
-                    paste0("clust_n=",brawFormat(Cluster_n,digits=1)),
-                    rep("",nc-3))
-    }
-    if (Contact_n>0) {
-      outputText<-c(outputText,rep("",2),
-                    paste0("chain_r=",brawFormat(design$sMethod$Contact_rad,digits=1)),
-                    rep("",nc-3))
-      outputText<-c(outputText,rep("",2),
-                    paste0("chain_n=",brawFormat(Contact_n,digits=1)),
-                    rep("",nc-3))
-    }
+    # n<-design$sN
+    # nClusts<-n-sMethodSeverity
+    # outputText<-c(outputText,rep("",2),
+    #               paste0("seeds=",brawFormat(nClusts,digits=1)),
+    #               rep("",nc-3))
+    # switch(design$sMethod$type,
+    #        "Cluster"={
+    #          Cluster_n<-n/nClusts-1
+    #          Contact_n<-0
+    #        },
+    #        "Snowball"={
+    #          Contact_n<-n/nClusts-1
+    #          Cluster_n<-0
+    #        },
+    #        "Convenience"={
+    #          Cluster_n<-sqrt(n/nClusts-1)
+    #          Contact_n<-sqrt(n/nClusts-1)
+    #        })
+    # 
+    # if (Cluster_n>0) {
+    #   outputText<-c(outputText,rep("",2),
+    #                 paste0("clust_r=",brawFormat(design$sMethod$Cluster_rad,digits=1)),
+    #                 rep("",nc-3))
+    #   outputText<-c(outputText,rep("",2),
+    #                 paste0("clust_n=",brawFormat(Cluster_n,digits=1)),
+    #                 rep("",nc-3))
+    # }
+    # if (Contact_n>0) {
+    #   outputText<-c(outputText,rep("",2),
+    #                 paste0("chain_r=",brawFormat(design$sMethod$Contact_rad,digits=1)),
+    #                 rep("",nc-3))
+    #   outputText<-c(outputText,rep("",2),
+    #                 paste0("chain_n=",brawFormat(Contact_n,digits=1)),
+    #                 rep("",nc-3))
+    # }
   }
    
   nr=length(outputText)/nc
