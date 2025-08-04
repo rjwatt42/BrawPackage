@@ -935,8 +935,13 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
         pts_wsig=pts[pts$y3,]
         g<-addG(g,dataPoint(data=data.frame(x=pts_wsig$x,y=pts_wsig$y1),shape=braw.env$plotShapes$study, colour = co1, alpha=alpha, fill = c3, size = dotSize))
       }
-    if (sequence)
-    g<-addG(g,dataPath(makeData(pts$y1,pts$x,orientation),arrow=TRUE,linewidth=0.75,colour="white"))
+    if (sequence) {
+      if (design$Replication$On && design$Replication$Keep=="MetaAnalysis") {
+        use<-1:(length(pts$y1)-1)
+        g<-addG(g,dataPath(makeData(pts$y1[use,],pts$x[use,],orientation),arrow=TRUE,linewidth=0.75,colour="white"))
+      }      else
+        g<-addG(g,dataPath(makeData(pts$y1,pts$x,orientation),arrow=TRUE,linewidth=0.75,colour="white"))
+    }
   } else { # more than 250 points
     hists<-simulations_hist(pts,showType,ylim,histGain,histGainrange)
     gh<-max(hists$h1+hists$h2+hists$h3+hists$h4)
