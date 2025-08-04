@@ -173,7 +173,7 @@ reportWorldDesign<-function() {
   mainStyle<-paste0("font-size:",format(fontSize) ,"px;font-weight:normal;text-align: left;")
   placing<-''
   outputFront<-paste0('<div style="padding:',fontSize,'px;padding-bottom:100px;',placing,mainStyle,'">')
-  outputFront<-paste0('<div style="padding:100px;">')
+  outputFront<-paste0('<div style="padding:10px;margin-bottom:100px;">')
   outputBack<-'</div>'
   paste0(
     outputFront,
