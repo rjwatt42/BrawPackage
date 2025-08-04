@@ -168,7 +168,7 @@ reportDesign<-function(design=braw.def$design,plain=FALSE) {
 #' reportWorldDesign()
 #' @export
 reportWorldDesign<-function() {
-  outputFront<-paste0('<div style="padding:10px;margin-bottom:20px;">')
+  outputFront<-paste0('<div style="display:inline-block;padding:10px;margin-bottom:20px;">')
   outputBack<-'</div>'
   paste0(
     outputFront,
