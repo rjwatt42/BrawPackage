@@ -139,7 +139,7 @@ reportDesign<-function(design=braw.def$design,plain=FALSE) {
       sMethodSeverity<-design$sN*design$sMethodSeverity
     else               sMethodSeverity<-design$sMethodSeverity
     outputText<-c(outputText,rep("",1),
-                  brawFormat(design$sMethodSeverity,digits=2),
+                  paste0("severity=",brawFormat(design$sMethodSeverity,digits=2)),
                   rep("",nc-2))
   }
   if (design$sCheating!="None") {
