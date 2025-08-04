@@ -171,13 +171,13 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
     if (braw.env$fullOutput>0) {
       table3<-c("!TPower",rep("",nc-1))
       nrep<-length(analysis$ResultHistory$rIV)
-      if (effect$world$worldOn && design$Replication$On)
+      if (design$Replication$On)
         table3<-c(table3,"!H","r[s]","n","p", "r[p]", "w[p]", "p(e)",rep("",nc-7))
       else table3<-c(table3,"!H","r[s]","n","p", "r[p]", "w[p]", rep("",nc-6))
       if (nrep>1) {
         labels<-c("original",rep(" ",nrep-2),"final")
         for (i in 1:nrep) {
-          if (effect$world$worldOn && design$Replication$On) {
+          if (design$Replication$On) {
             if (analysis$ResultHistory$pIV[i]<0.05)
             p_error<-effect$world$populationNullp*
                      0.05*

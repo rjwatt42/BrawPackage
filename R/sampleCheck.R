@@ -176,6 +176,8 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
   oldAlpha<-braw.env$alphaSig
   on.exit(setBrawEnv("alphaSig",oldAlpha),add=TRUE)
 
+  oldHypothesis<-hypothesis
+  
   Replication<-design$Replication
   resOriginal<-res
   ResultHistory<-res$ResultHistory
