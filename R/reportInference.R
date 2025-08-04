@@ -66,7 +66,8 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
 
       rvalText<-paste0(brawFormat(rval,digits=braw.env$report_precision),
                        "\u00B1",brawFormat(r2se(rval,nval),digits=braw.env$report_precision))
-
+      rvalText<-brawFormat(rval,digits=braw.env$report_precision)
+      
       if (IV$type=="Categorical" && IV$ncats==2 && DV$type=="Interval") {
         use1<-analysis$iv==IV$cases[1]
         use2<-analysis$iv==IV$cases[2]
@@ -170,12 +171,14 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
     if (braw.env$fullOutput>0) {
       table3<-c("!TPower",rep("",nc-1))
       nrep<-length(analysis$ResultHistory$rIV)
-      if (nrep>1) {
+      if (effect$world$worldOn && design$Replication$On)
         table3<-c(table3,"!H","r[s]","n","p", "r[p]", "w[p]", "p(e)",rep("",nc-7))
+      else table3<-c(table3,"!H","r[s]","n","p", "r[p]", "w[p]", rep("",nc-6))
+      if (nrep>1) {
         labels<-c("original",rep(" ",nrep-2),"final")
         for (i in 1:nrep) {
-          if (effect$world$worldOn) {
-          if (analysis$ResultHistory$pIV[i]<0.05)
+          if (effect$world$worldOn && design$Replication$On) {
+            if (analysis$ResultHistory$pIV[i]<0.05)
             p_error<-effect$world$populationNullp*
                      0.05*
                      (1-0.05)
@@ -184,7 +187,8 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
               rn2w(analysis$ResultHistory$rpIV[1],analysis$ResultHistory$nval[1])*
               (1-rn2w(analysis$ResultHistory$rpIV[i],analysis$ResultHistory$nval[i]))
           p_error<-brawFormat(p_error,digits=3)
-          } else p_error<-'-'
+          } else
+            p_error<-NULL
           
           table3<-c(table3,
                     labels[i],
@@ -192,10 +196,10 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
                     paste0("!j",brawFormat(analysis$ResultHistory$nval[i])),
                     paste0("!j",brawFormat(analysis$ResultHistory$pIV[i],digits=3)),
                     paste0("!j",brawFormat(analysis$ResultHistory$rpIV[i],digits=3)),
-                    paste0("!j",brawFormat(rn2w(analysis$ResultHistory$rpIV[i],analysis$ResultHistory$nval[i]),digits=3)),
-                    paste0("!j",p_error),
-                    rep("",nc-7)
+                    paste0("!j",brawFormat(rn2w(analysis$ResultHistory$rpIV[i],analysis$ResultHistory$nval[i]),digits=3))
           )
+          if (!is.null(p_error)) table3<-c(table3,paste0("!j",p_error),rep("",nc-7))
+          else table3<-c(table3,rep("",nc-6))
         }
       } else {
         table3<-c(table3,"!Hn", "r[p]", "w[p]","w[s]",rep("",nc-4))   
