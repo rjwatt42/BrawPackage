@@ -12,6 +12,7 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
   IV2<-analysis$hypothesis$IV2
   DV<-analysis$hypothesis$DV
   effect<-analysis$hypothesis$effect
+  design<-analysis$design
   evidence<-analysis$evidence
   
   switch (analysisType,
