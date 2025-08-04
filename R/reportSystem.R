@@ -145,11 +145,11 @@ reportDesign<-function(design=braw.def$design,plain=FALSE) {
   if (design$sCheating!="None") {
     if (design$sCheating=="Retry")    
       outputText<-c(outputText,rep("",4),
-                    paste0("!j",brawFormat(design$sCheatingAttempts,digits=2)),
+                    paste0("!j","Attempts","=",brawFormat(design$sCheatingAttempts,digits=2)),
                     rep("",nc-5))
     else
       outputText<-c(outputText,rep("",4),
-                    paste0("!j",brawFormat(design$sCheatingBudget,digits=2)),
+                    paste0("!j",tolower(design$sCheatingLimit),"=",brawFormat(design$sCheatingBudget,digits=2)),
                     rep("",nc-5))
   }
   
