@@ -183,6 +183,7 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
             p_error<-(1-effect$world$populationNullp)*
               rn2w(analysis$ResultHistory$rpIV[1],analysis$ResultHistory$nval[1])*
               (1-rn2w(analysis$ResultHistory$rpIV[i],analysis$ResultHistory$nval[i]))
+          p_error<-brawFormat(p_error,digits=3)
           } else p_error<-'-'
           
           table3<-c(table3,
@@ -192,7 +193,7 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
                     paste0("!j",brawFormat(analysis$ResultHistory$pIV[i],digits=3)),
                     paste0("!j",brawFormat(analysis$ResultHistory$rpIV[i],digits=3)),
                     paste0("!j",brawFormat(rn2w(analysis$ResultHistory$rpIV[i],analysis$ResultHistory$nval[i]),digits=3)),
-                    paste0("!j",brawFormat(p_error,digits=3)),
+                    paste0("!j",p_error),
                     rep("",nc-7)
           )
         }
