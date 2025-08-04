@@ -665,8 +665,8 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                   showMeans2<-getStat(abs(sigs & nulls),nVals)
                   sigs0<-colMeans(abs(sigs & nulls))
                   showSE2<-sqrt(sigs0*(1-sigs0)/sum(nulls))
-                } else showMeans2<-0
-                showMeans<-rbind(showMeans+showMeans2,showMeans2)
+                  showMeans<-rbind(showMeans+showMeans2,showMeans2)
+                } 
                 showSE<-NULL
               },
               "tDR"={
