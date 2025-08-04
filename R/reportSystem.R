@@ -138,46 +138,21 @@ reportDesign<-function(design=braw.def$design,plain=FALSE) {
     if (design$sMethodSeverity<1) 
       sMethodSeverity<-design$sN*design$sMethodSeverity
     else               sMethodSeverity<-design$sMethodSeverity
-    outputText<-c(outputText,rep("",2),
+    outputText<-c(outputText,rep("",1),
                   brawFormat(design$sMethodSeverity,digits=2),
-                  rep("",nc-3))
-    # n<-design$sN
-    # nClusts<-n-sMethodSeverity
-    # outputText<-c(outputText,rep("",2),
-    #               paste0("seeds=",brawFormat(nClusts,digits=1)),
-    #               rep("",nc-3))
-    # switch(design$sMethod$type,
-    #        "Cluster"={
-    #          Cluster_n<-n/nClusts-1
-    #          Contact_n<-0
-    #        },
-    #        "Snowball"={
-    #          Contact_n<-n/nClusts-1
-    #          Cluster_n<-0
-    #        },
-    #        "Convenience"={
-    #          Cluster_n<-sqrt(n/nClusts-1)
-    #          Contact_n<-sqrt(n/nClusts-1)
-    #        })
-    # 
-    # if (Cluster_n>0) {
-    #   outputText<-c(outputText,rep("",2),
-    #                 paste0("clust_r=",brawFormat(design$sMethod$Cluster_rad,digits=1)),
-    #                 rep("",nc-3))
-    #   outputText<-c(outputText,rep("",2),
-    #                 paste0("clust_n=",brawFormat(Cluster_n,digits=1)),
-    #                 rep("",nc-3))
-    # }
-    # if (Contact_n>0) {
-    #   outputText<-c(outputText,rep("",2),
-    #                 paste0("chain_r=",brawFormat(design$sMethod$Contact_rad,digits=1)),
-    #                 rep("",nc-3))
-    #   outputText<-c(outputText,rep("",2),
-    #                 paste0("chain_n=",brawFormat(Contact_n,digits=1)),
-    #                 rep("",nc-3))
-    # }
+                  rep("",nc-2))
   }
-   
+  if (design$sCheating!="None") {
+    if (design$sCheating=="Retry")    
+      outputText<-c(outputText,rep("",4),
+                    brawFormat(design$sCheatingAttempts,digits=2),
+                    rep("",nc-5))
+    else
+      outputText<-c(outputText,rep("",4),
+                    brawFormat(design$sCheatingBudget,digits=2),
+                    rep("",nc-5))
+  }
+  
   nr=length(outputText)/nc
   reportPlot(outputText,nc,nr,plain=plain)
   
