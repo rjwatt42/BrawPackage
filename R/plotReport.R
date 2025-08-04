@@ -63,7 +63,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=braw.env$reportFontSize,maxRows=1
           headerRowUsed<-TRUE
           # bgcolor<-paste0(" bgcolor=",rowColour)
           
-          rowStyle<-paste0(rowStyle,"font-weight:bold;height:",fontSize*2,"px;")
+          rowStyle<-paste0(rowStyle,"font-weight:bold;height:",fontSize*1.5+6,"px;")
           rowStyle<-paste0(rowStyle,"text-align:center;")
           if (!doubleHeaderTop)
           rowStyle<-paste0(rowStyle,"border-bottom:solid;border-bottom-color:",lineColour,";border-bottom-width:1px;")
