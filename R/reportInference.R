@@ -211,7 +211,7 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
                   paste0("!j",brawFormat(analysis$ResultHistory$pIV[i],digits=3)),
                   paste0("!j",brawFormat(analysis$rpIV,digits=3)),
                   paste0("!j",brawFormat(rn2w(analysis$rpIV,analysis$nval),digits=3)),
-                  paste0("!j",brawFormat(rn2w(analysis$rIV,analysis$nval),digits=3)),
+                  paste0("!j",brawFormat(rn2w(analysis$roIV,analysis$noval),digits=3)),
                   rep("",nc-7))
       }
     }
