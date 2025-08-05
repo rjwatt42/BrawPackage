@@ -1193,6 +1193,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
     if (effectType=="unique") iUse<-2
     if (effectType=="total") iUse<-3
   }
+  ydlim<-ylim
   switch(orientation,
          "horz"={
            xlim<-ylim
@@ -1319,7 +1320,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
     histGainrange<-c(NA,NA)
     
     if (showTheory) {
-      theory<-makeTheoryMultiple(hypothesis,design,evidence,showType,whichEffect,logScale,ylim,labelNSig,labelSig,orientation)
+      theory<-makeTheoryMultiple(hypothesis,design,evidence,showType,whichEffect,logScale,ydlim,labelNSig,labelSig,orientation)
       theoryVals<-theory$theoryVals
       theoryDens_all<-theory$theoryDens_all
       theoryDens_sig<-theory$theoryDens_sig
