@@ -945,9 +945,9 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
     if (sequence) {
       if (design$Replication$On && design$Replication$Keep=="MetaAnalysis") {
         if (metaPts$sig && metaPts$notNull) c3<-braw.env$plotColours$infer_sigNonNull
-        if (!metaPts$sig && metaPts$notNull) c3<-braw.env$plotColours$infer_nsNonNull
+        if (!metaPts$sig && metaPts$notNull) c3<-braw.env$plotColours$infer_nsigNonNull
         if (metaPts$sig && !metaPts$notNull) c3<-braw.env$plotColours$infer_sigNull
-        if (!metaPts$sig && !metaPts$notNull) c3<-braw.env$plotColours$infer_nsNull
+        if (!metaPts$sig && !metaPts$notNull) c3<-braw.env$plotColours$infer_nsigNull
         g<-addG(g,dataPoint(makeData(x=metaPts$y1,y=metaPts$x,orientation),
                             shape=braw.env$plotShapes$meta,
                             fill = c3, 
