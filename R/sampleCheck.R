@@ -324,6 +324,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
     ResultHistory$nval<-ResultHistory$nval[c(setdiff(1:nr,use),use)]
     ResultHistory$df1<-ResultHistory$df1[c(setdiff(1:nr,use),use)]
     }
+    ResultHistory$sequence<-TRUE
   }
   
   res$ResultHistory<-ResultHistory
