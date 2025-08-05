@@ -773,10 +773,10 @@ drawPoint<-function(data,shape=21,colour="#000000",fill="white",alpha=1,size=3) 
              }
            } else {
              sz<-size*4
-             if (shape==22) tr="" 
-             else           tr=paste0(' transform=rotate(45,',format(x[i]),',',format(y[i]),')')
              g<-""
              for (i in 1:length(x)) {
+               if (shape==22) tr="" 
+               else           tr=paste0(' transform=rotate(45,',format(x[i]),',',format(y[i]),')')
                g<-paste0(g,
                          '<rect x="',format(x[i]-sz/2),'" y="',format(y[i]-sz/2),'"',
                          ' width="',sz,'"',' height="',sz,'"',
