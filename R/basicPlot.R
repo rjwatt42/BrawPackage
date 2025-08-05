@@ -570,6 +570,7 @@ drawText<-function(data,label, hjust=0, vjust=0, colour="#000000",fill="white",s
   switch(braw.env$graphicsType,
          "ggplot"={
            parser<-FALSE
+           if (fontface=="normal") fontface="plain"
            if (any(is.mathLabel(label))) {
              label<-mathPrepText(label,fontface=="bold")
              parser=TRUE
