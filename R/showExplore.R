@@ -954,7 +954,10 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
               if (i==length(vals)) right=(vals[i]-vals[i-1])*0.35 else right=(vals[i+1]-vals[i])*0.35
               g<-simulations_plot(g,
                                data.frame(x=vals[i],y1=showVals[,i],sig=sigVals[,i],notNull=sigVals[,i]*0),
-                               showType=showType[si],ylim=ylim,
+                               showType=showType[si],
+                               simWorld=exploreResult$hypothesis$effect$world,
+                               design=exploreResult$design,
+                               ylim=ylim,
                                scale=3/(length(vals)+1),
                                width=c(left,right),
                                col=col,useSignificanceCols=FALSE,

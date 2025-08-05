@@ -771,7 +771,7 @@ simulations_hist<-function(pts,valType,ylim,histGain,histGainrange){
   # data.frame(y1=c(-y1,rev(y1)), y2=c(-y2,rev(y2)), x=c(x,rev(x)))
 }
 
-simulations_plot<-function(g,pts,showType=NULL,simWorld,
+simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
                         i=1,scale=1,width=1,col="white",alpha=1,useSignificanceCols=braw.env$useSignificanceCols,
                         histStyle="width",orientation="vert",ylim,histGain=NA,histGainrange=NA,
                         npointsMax=braw.env$npointsMax,sequence=FALSE){
@@ -868,7 +868,14 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
     if (max(abs(xr))>0) xr<-xr*hgain/max(abs(xr))
     
     pts$x<-pts$x+xr*sum(width)*0.3/0.35
-    if (sequence)     pts$x<-0+((1:nrow(pts))-1)/nrow(pts)/10
+    if (sequence)  {
+      pts$x<-0+((1:nrow(pts))-1)/nrow(pts)/5
+      if (design$Replication$On && design$Replication$Keep=="MetaAnalysis") {
+        np<-length(pts$x)
+        metaPts<-pts[np,]
+        pts<-pts[1:(np-1),]
+      }
+    }   
     
     gain<-50/max(50,length(xr))
     colgain<-1-min(1,sqrt(max(0,(length(xr)-50))/200))
@@ -936,11 +943,17 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,
         g<-addG(g,dataPoint(data=data.frame(x=pts_wsig$x,y=pts_wsig$y1),shape=braw.env$plotShapes$study, colour = co1, alpha=alpha, fill = c3, size = dotSize))
       }
     if (sequence) {
-      # if (design$Replication$On && design$Replication$Keep=="MetaAnalysis") {
-      #   use<-1:(length(pts$y1)-1)
-      #   g<-addG(g,dataPath(makeData(pts$y1[use,],pts$x[use,],orientation),arrow=TRUE,linewidth=0.75,colour="white"))
-      # }      else
-        g<-addG(g,dataPath(makeData(pts$y1,pts$x,orientation),arrow=TRUE,linewidth=0.75,colour="white"))
+      if (design$Replication$On && design$Replication$Keep=="MetaAnalysis") {
+        if (metaPts$sig && metaPts$notNull) c3<-braw.env$plotColours$infer_sigNonNull
+        if (!metaPts$sig && metaPts$notNull) c3<-braw.env$plotColours$infer_nsNonNull
+        if (metaPts$sig && !metaPts$notNull) c3<-braw.env$plotColours$infer_sigNull
+        if (!metaPts$sig && !metaPts$notNull) c3<-braw.env$plotColours$infer_nsNull
+        g<-addG(g,dataPoint(makeData(x=metaPts$y1,y=metaPts$x,orientation),
+                            shape=braw.env$plotShapes$meta,
+                            fill = c3, 
+                            size=dotSize*1.25))
+      }
+      g<-addG(g,dataPath(makeData(pts$y1,pts$x,orientation),arrow=TRUE,linewidth=0.75,colour="white"))
     }
   } else { # more than 250 points
     hists<-simulations_hist(pts,showType,ylim,histGain,histGainrange)
@@ -1355,7 +1368,8 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       }
       
       sequence<-analysis$sequence
-      g<-simulations_plot(g,pts,showType,analysis$hypothesis$effect$world$worldOn,i,orientation=orientation,
+      g<-simulations_plot(g,pts,showType,analysis$hypothesis$effect$world$worldOn,analysis$design,
+                          i,orientation=orientation,
                        ylim=ylim,histGain=histGain,histGainrange=histGainrange,
                        sequence=sequence)
 
