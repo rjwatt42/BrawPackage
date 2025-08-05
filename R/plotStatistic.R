@@ -951,7 +951,7 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
         g<-addG(g,dataPoint(makeData(x=metaPts$y1,y=metaPts$x,orientation),
                             shape=braw.env$plotShapes$meta,
                             fill = c3, 
-                            size=dotSize*1.25))
+                            size=dotSize))
       }
       g<-addG(g,dataPath(makeData(pts$y1,pts$x,orientation),arrow=TRUE,linewidth=0.75,colour="white"))
     }
