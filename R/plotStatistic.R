@@ -1230,18 +1230,18 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                yticks=yticks,ylabel=ylabel,ymax=ymax,
                box=box,top=top,orientation=orient,g=g)
   
+  nr<-sum(!is.na(analysis$rIV))
   if (is.element(showType[1],c("NHST","Hits","Misses","Inference","SEM")) && sum(!is.na(analysis$nullresult$rIV))>0) {
-    nr<-sum(!is.na(analysis$rIV))
     n1<-brawFormat(sum(analysis$rpIV!=0))
     n2<-brawFormat(sum(!is.na(analysis$rpIV==0)))
     title<-paste("nsims = ",n1,"+",n2,sep="")
   } else {
-    title<-paste("nsims = ",format(sum(!is.na(analysis$rIV))),sep="")
+    n1<-brawFormat(nr)
+    title<-paste("nsims = ",n1,sep="")
   }
   
-  g<-addG(g,plotTitle(title,size=0.65,fontface="normal"))
-  # g<-addG(g,yAxisTicks(logScale=yaxis$logScale),yAxisLabel(ylabel))
-    # g<-addG(g,xAxisTicks(breaks=c(0,2,4),c("direct","unique","total")))
+  if (nr>1)   g<-addG(g,plotTitle(title,size=0.65,fontface="normal"))
+  
   lineCol<-"#000000"
   if (is.element(showType,c("p","e1p","e2p","e1d","e2d"))) lineCol<-"green"
   switch(orientation,
