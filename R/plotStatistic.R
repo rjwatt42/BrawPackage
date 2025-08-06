@@ -527,7 +527,8 @@ makeFiddle<-function(y,yd,orientation="horz"){
     yz<-c(yz,y[i])
     yzR<-c(yzR,this_y)
   }
-  if (orientation=="horz") xz<-xz/2
+  
+  if (orientation=="horz") xz<-xz/2+max(xz)/50
   return(xz)
 }
 
