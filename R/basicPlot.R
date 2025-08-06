@@ -101,9 +101,9 @@ svgY<-function(y) {
 
 #' @export
 joinHTML<-function(p1,p2) {
-  paste0('<div style="display: inline-block; float left;"> ',
+  paste0('<div style="display: inline-block; float left;vertical-align: text-top;"> ',
          p1,
-         '</div><div style="display: inline-block;">',
+         '</div><div style="display: inline-block;vertical-align: text-top;">',
          p2,
          '</div>')
 }
