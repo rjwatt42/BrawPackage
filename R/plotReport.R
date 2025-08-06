@@ -25,7 +25,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=braw.env$reportFontSize,maxRows=1
     preText<-""
     # outputFront<-paste0('<div style="padding:',fontSize,'px;margin-left:',fontSize*2,'px;',mainStyle,'">')
     if (!plain) {
-      outputFront<-paste0('<div style="padding:',fontSize,'px;',placing,mainStyle,'">')
+      outputFront<-paste0('<div style="padding:',0,'px;',placing,mainStyle,'">')
       outputBack<-'</div>'
     } else {
       outputFront<-''
