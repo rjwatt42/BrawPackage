@@ -171,9 +171,9 @@ reportWorldDesign<-function() {
   outputFront<-paste0('<div style="display:inline-block;padding:10px;margin-bottom:20px;">')
   outputBack<-'</div>'
   paste0(
-    outputFront,
+    # outputFront,
     reportWorld(plain=TRUE),
     reportDesign(plain=TRUE),
-    outputBack
+    # outputBack
   )
 }
