@@ -528,7 +528,7 @@ makeFiddle<-function(y,yd,orientation="horz"){
     yzR<-c(yzR,this_y)
   }
   
-  if (orientation=="horz") xz<-xz/2+max(xz)/50
+  if (orientation=="horz") xz<-xz/2
   return(xz)
 }
 
@@ -861,12 +861,15 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
     switch(orientation,
            "horz"={
              hgain<-0.9
+             hoff<-0.025
              },
            "vert"={
              hgain<-0.45
+             hoff<-0
            })
     dotSize<-min(4,braw.env$dotSize*scale/max(abs(xr))/hgain*2)
     if (max(abs(xr))>0) xr<-xr*hgain/max(abs(xr))
+    xr<-xr+hoff
     
     pts$x<-pts$x+xr*sum(width)*0.3/0.35
     if (sequence)  {
