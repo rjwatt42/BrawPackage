@@ -173,7 +173,7 @@ reportWorldDesign<-function() {
   paste0(
     # outputFront,
     reportWorld(plain=TRUE),
-    reportDesign(plain=TRUE),
+    reportDesign(plain=TRUE)
     # outputBack
   )
 }
