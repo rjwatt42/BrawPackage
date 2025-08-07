@@ -449,5 +449,8 @@ setBrawDef<-function(which,value) {
   }
 }
 
-setHTML<-function() setBrawEnv("graphicsType","HTML")
+setHTML<-function() {
+  setBrawEnv("graphicsType","HTML")
+  setBrawEnv("reportHTML",TRUE)
+}
 setggplot<-function() setBrawEnv("graphicsType","ggplot")
