@@ -1323,7 +1323,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       sampleVals<-log10(sampleVals)
       sampleVals[sampleVals<(-10)]<--10
     }  
-    if (nrow(sampleVals)<100) theoryFirst<-TRUE
+    if (nrow(sampleVals)<1000) theoryFirst<-TRUE
     else theoryFirst<-FALSE
   } 
   sigOnly<-evidence$sigOnly
