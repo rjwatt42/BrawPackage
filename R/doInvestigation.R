@@ -3,7 +3,7 @@
 doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
                           sN=42,sMethod="Convenience",sBudget=320,sSplits=16,sCheating="grow",
                           sReplicationPower=0.9,sReplicationSigOriginal=TRUE,
-                          group="a",
+                          group=ifelse(runif(1)>0.5,"a","b"),
                           nreps=200) {
   
   setHTML()
@@ -116,10 +116,8 @@ doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
       multiple<-braw.res$multiple
       multiple$hypothesis$IV2<-NULL
       multiple$result$hypothesis$IV2<-NULL
-      switch(group,
-             "a"={multiple$result$hypothesis$effect$rIV<-0.3},
-             "b"={multiple$result$hypothesis$effect$rIV<-0}
-      )
+      multiple$hypothesis$effect$world<-makeWorld(TRUE,"Single","r",0.3,populationNullp=0.5)
+      multiple$result$hypothesis$effect$world<-makeWorld(TRUE,"Single","r",0.3,populationNullp=0.5)
       setBrawRes("multiple",multiple)
     } 
   
