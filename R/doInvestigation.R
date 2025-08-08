@@ -115,13 +115,14 @@ doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
     outputNow<-"Multiple"
   }
     
-  if (rootInv=="Inv5") 
+  if (rootInv=="Inv5") {
     if (single) {
       result<-braw.res$result
       result$hypothesis$IV2<-NULL
       result$hypothesis$effect$world<-makeWorld(TRUE,"Single","r",0.3,populationNullp=0.5)
       setBrawRes("result",result)
     } else {
+      oldMultiple<-braw.res$multiple
       multiple<-braw.res$multiple
       multiple$hypothesis$IV2<-NULL
       multiple$result$hypothesis$IV2<-NULL
@@ -129,6 +130,7 @@ doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
       multiple$result$hypothesis$effect$world<-makeWorld(TRUE,"Single","r",0.3,populationNullp=0.5)
       setBrawRes("multiple",multiple)
     } 
+  }
   
   # display the results
   svgBox(height=350,aspect=1.5,fontScale=1.2)
@@ -196,6 +198,7 @@ doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
       tabLinkLabel=paste0('\U24D8',linkLabel),
       open=open
     )
+  if (rootInv=="Inv5" && !single) braw.res$multiple<-oldMultiple
   
   return(investgResults)
 }
