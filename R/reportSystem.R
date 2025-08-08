@@ -143,10 +143,10 @@ reportDesign<-function(design=braw.def$design,plain=FALSE) {
                   rep("",nc-2))
   } else {
     if (design$sIVRangeOn) outputText<-c(outputText,rep("",1),
-                                         "IV limited",
+                                         "!rIV limited",
                                          rep("",nc-2))
     if (design$sIV2RangeOn) outputText<-c(outputText,rep("",1),
-                                         "IV2 limited",
+                                         "!rIV2 limited",
                                          rep("",nc-2))
   }
   if (design$sCheating!="None") {
