@@ -1886,7 +1886,7 @@ ps_plot<-function(analysis,disp,showTheory=TRUE,showLegend=FALSE,showData=TRUE,g
         cols<-c(cols,col4,col3)
         nms<-c(nms,lb4,lb3)
       }       
-      if (!sequence)
+      if (!analysis$sequence)
         g<-addG(g,dataLegend(data.frame(colours=cols,names=nms),title="",shape=22))
 
     }
