@@ -80,7 +80,7 @@ doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
                     hypothesis<-makeHypothesis(IV2=makeVariable("IV2","Interval"),
                                                effect=makeEffect(rIV=0.3,rIV2=0,rIVIV2DV=-0.3,world=makeWorld(FALSE)))
                     if (group=="a") range<-rangeA else range<-rangeB
-                    design<-makeDesign(sN=1000,sIV2RangeOn=TRUE,sIV2Range=range)
+                    design<-makeDesign(sN=1000,sIV2RangeOn=TRUE,sIV2Range=c(1,1),sRangeP=0.5)
                     
                   },
                   "B"={
@@ -89,7 +89,7 @@ doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
                     rangeA<-range<-c(0,0)
                     rangeB<-range<-c(-4,4)
                     if (group=="a") range<-rangeA else range<-rangeB
-                    design<-makeDesign(sN=1000,sIV2RangeOn=TRUE,sIV2Range=range)
+                    design<-makeDesign(sN=1000,sIV2RangeOn=TRUE,sIV2Range=range<-c(0,0),sRangeP=0.5)
                     
                   }
            )

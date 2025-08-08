@@ -217,7 +217,7 @@ makeSampleVar<-function(design,effect,n,MV,MV2){
       ivr21<-rep(0,n)
     }
     
-    if (design$sIVRangeOn || design$sIV2RangeOn) {
+    if ((design$sIVRangeOn || design$sIV2RangeOn) && design$sRangeP>runif(1)) {
       condition<-rep(TRUE,length(ivr1))
       if (design$sIVRangeOn) {
         if (design$sIVRange[1]==design$sIVRange[2])

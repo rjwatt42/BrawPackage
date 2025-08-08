@@ -234,7 +234,7 @@ makeReplication<-function(On=TRUE,Repeats=1,Keep="Cautious",RepAlpha=0.05,
 #'            sBudgetOn=FALSE,sNBudget=1000,
 #'            sIV1Use="Between",sIV2Use="Between",  sWithinCor=0.5,
 #'            
-#'            sRangeOn=FALSE, sIVRange=c(-3,3), sDVRange=c(-3,3), 
+#'            sRangeOn=FALSE, sIVRange=c(-3,3), sDVRange=c(-3,3), sRangeP=1,
 #'            sDependence=0, sOutliers=0, sNonResponse=0,
 #'            
 #'            sCheating="None", sCheatingAttempts=5,
@@ -250,6 +250,7 @@ makeDesign<-function(sN=42, sMethod=makeSampling("Random"),sMethodSeverity=0.1,
                      sBudgetOn=FALSE,sNBudget=1000,
                      sIVRangeOn=FALSE, sIVRange=c(-1,1)*4, 
                      sIV2RangeOn=FALSE, sIV2Range=c(-1,1)*4, sDVRange=c(-1,1)*4, 
+                     sRangeP=1,
                      sDependence=0, sOutliers=0, sNonResponse=0,
                      sCheating="None",sCheatingAttempts=10,sCheatingLimit="Fixed",sCheatingBudget=1000,sCheatingFixedPop=TRUE,
                      Replication=makeReplication(FALSE)
@@ -265,6 +266,7 @@ makeDesign<-function(sN=42, sMethod=makeSampling("Random"),sMethodSeverity=0.1,
                sBudgetOn=sBudgetOn,sNBudget=sNBudget,
                sIVRangeOn=sIVRangeOn, sIVRange=sIVRange, 
                sIV2RangeOn=sIV2RangeOn, sIV2Range=sIV2Range, sDVRange=sDVRange, 
+               sRangeP=sRangeP,
                sDependence=sDependence, sOutliers=sOutliers,sNonResponse=sNonResponse,
                sCheating=sCheating,sCheatingAttempts=sCheatingAttempts,sCheatingLimit=sCheatingLimit,sCheatingBudget=sCheatingBudget,sCheatingFixedPop=sCheatingFixedPop,
                Replication=Replication
@@ -389,6 +391,7 @@ setDesign<-function(sN=braw.def$design$sN, sMethod=braw.def$design$sMethod, sMet
                     sBudgetOn=braw.def$design$sBudgetOn,sNBudget=braw.def$design$sNBudget,
                     sIVRangeOn=braw.def$design$sIVRangeOn, sIVRange=braw.def$design$sIVRange, 
                     sIV2RangeOn=braw.def$design$sIV2RangeOn, sIV2Range=braw.def$design$sIV2Range, sDVRange=braw.def$design$sDVRange, 
+                    sRangeP=braw.def$design$sRangeP,
                     sDependence=braw.def$design$sDependence, sOutliers=braw.def$design$sOutliers,sNonResponse=braw.def$design$sNonResponse,
                     sCheating=braw.def$design$sCheating,sCheatingAttempts=braw.def$design$sCheatingAttempts,sCheatingLimit=braw.def$design$sCheatingLimit,sCheatingBudget=braw.def$design$sCheatingBudget,
                     Replication=braw.def$design$Replication) {
@@ -400,6 +403,7 @@ setDesign<-function(sN=braw.def$design$sN, sMethod=braw.def$design$sMethod, sMet
                   sWithinCor=sWithinCor,
                   sBudgetOn=sBudgetOn,sNBudget=sNBudget,
                   sIVRangeOn=sIVRangeOn, sIVRange=sIVRange, sIV2RangeOn=sIV2RangeOn, sIV2Range=sIV2Range, sDVRange=sDVRange, 
+                  sRangeP=sRangeP,
                   sDependence=sDependence, sOutliers=sOutliers,sNonResponse=sNonResponse,
                   sCheating=sCheating,sCheatingAttempts=sCheatingAttempts,sCheatingLimit=sCheatingLimit,sCheatingBudget=sCheatingBudget,
                   Replication=Replication)
