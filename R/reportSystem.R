@@ -141,6 +141,13 @@ reportDesign<-function(design=braw.def$design,plain=FALSE) {
     outputText<-c(outputText,rep("",1),
                   paste0("severity=",brawFormat(design$sMethodSeverity,digits=2)),
                   rep("",nc-2))
+  } else {
+    if (design$sIVRangeOn) outputText<-c(outputText,rep("",1),
+                                         "IV limited",
+                                         rep("",nc-2))
+    if (design$sIV2RangeOn) outputText<-c(outputText,rep("",1),
+                                         "IV2 limited",
+                                         rep("",nc-2))
   }
   if (design$sCheating!="None") {
     if (design$sCheating=="Retry")    
