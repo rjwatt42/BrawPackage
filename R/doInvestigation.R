@@ -75,10 +75,10 @@ doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
          "Inv5"={
            switch(partInv,
                   "A"={
-                    rangeA<-range<-c(1,1)
-                    rangeB<-range<-c(-1,-1)
+                    rangeA<-range<-c(-4,4)
+                    rangeB<-range<-c(1,1)
                     hypothesis<-makeHypothesis(IV2=makeVariable("IV2","Interval"),
-                                               effect=makeEffect(rIV=0.3/2,rIV2=0,rIVIV2DV=0.3/2,world=makeWorld(FALSE)))
+                                               effect=makeEffect(rIV=0.3,rIV2=0,rIVIV2DV=-0.3,world=makeWorld(FALSE)))
                     if (group=="a") range<-rangeA else range<-rangeB
                     design<-makeDesign(sN=1000,sIV2RangeOn=TRUE,sIV2Range=range)
                     
