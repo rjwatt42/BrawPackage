@@ -75,20 +75,14 @@ doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
          "Inv5"={
            switch(partInv,
                   "A"={
-                    rangeA<-range<-c(-4,4)
-                    rangeB<-range<-c(1,1)
                     hypothesis<-makeHypothesis(IV2=makeVariable("IV2","Interval"),
                                                effect=makeEffect(rIV=0.3,rIV2=0,rIVIV2DV=-0.3,world=makeWorld(FALSE)))
-                    if (group=="a") range<-rangeA else range<-rangeB
                     design<-makeDesign(sN=1000,sIV2RangeOn=TRUE,sIV2Range=c(1,1),sRangeP=0.5)
                     
                   },
                   "B"={
                     hypothesis<-makeHypothesis(IV2=makeVariable("IV2","Interval"),
                                                effect=makeEffect(rIV=0.3,rIV2=-sqrt(0.3),rIVIV2=sqrt(0.3),world=makeWorld(FALSE)))
-                    rangeA<-range<-c(0,0)
-                    rangeB<-range<-c(-4,4)
-                    if (group=="a") range<-rangeA else range<-rangeB
                     design<-makeDesign(sN=1000,sIV2RangeOn=TRUE,sIV2Range=range<-c(0,0),sRangeP=0.5)
                     
                   }
@@ -109,14 +103,15 @@ doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
     if (doingInvestg=="Inv2B")   setBrawRes("multiple",braw.res$result)
   } else {
     if (doingInvestg=="Inv3Bm") nreps<-nreps/4
-    if (rootInv=="Inv5") {
-      setDesign(sIV2Range=rangeA)
-      m1<-doMultiple(nreps/2)
-      setDesign(sIV2Range=rangeB)
-      m2<-doMultiple(nreps/2)
-      m1$result<-mergeMultiple(m1$result,m2$result)
-      setBrawRes("multiple",m1)
-    } else doMultiple(nreps)
+    # if (rootInv=="Inv5") {
+    #   setDesign(sIV2Range=rangeA)
+    #   m1<-doMultiple(nreps/2)
+    #   setDesign(sIV2Range=rangeB)
+    #   m2<-doMultiple(nreps/2)
+    #   m1$result<-mergeMultiple(m1$result,m2$result)
+    #   setBrawRes("multiple",m1)
+    # } else 
+      doMultiple(nreps)
     outputNow<-"Multiple"
   }
     
