@@ -5,7 +5,7 @@ doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
                           sReplicationPower=0.9,sReplicationSigOriginal=TRUE,
                           group=ifelse(runif(1)>0.5,"a","b"),
                           nreps=200) {
-  
+
   setHTML()
   rootInv<-substr(doingInvestg,1,4)
   partInv<-substr(doingInvestg,5,5)
@@ -75,14 +75,20 @@ doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
          "Inv5"={
            switch(partInv,
                   "A"={
-                    hypothesis<-makeHypothesis(IV2=makeVariable("IV2","Interval"),effect=makeEffect(rIV=0.3/2,rIV2=0,rIVIV2DV=0.3/2))
-                    if (group=="a") range<-c(1,1) else range<-c(-1,-1)
+                    rangeA<-range<-c(1,1)
+                    rangeB<-range<-c(-1,-1)
+                    hypothesis<-makeHypothesis(IV2=makeVariable("IV2","Interval"),
+                                               effect=makeEffect(rIV=0.3/2,rIV2=0,rIVIV2DV=0.3/2,world=makeWorld(FALSE)))
+                    if (group=="a") range<-rangeA else range<-rangeB
                     design<-makeDesign(sN=1000,sIV2RangeOn=TRUE,sIV2Range=range)
                     
                   },
                   "B"={
-                    hypothesis<-makeHypothesis(IV2=makeVariable("IV2","Interval"),effect=makeEffect(rIV=0.3,rIV2=-sqrt(0.3),rIVIV2=sqrt(0.3)))
-                    if (group=="a") range<-c(0,0) else range<-c(-4,4)
+                    hypothesis<-makeHypothesis(IV2=makeVariable("IV2","Interval"),
+                                               effect=makeEffect(rIV=0.3,rIV2=-sqrt(0.3),rIVIV2=sqrt(0.3),world=makeWorld(FALSE)))
+                    rangeA<-range<-c(0,0)
+                    rangeB<-range<-c(-4,4)
+                    if (group=="a") range<-rangeA else range<-rangeB
                     design<-makeDesign(sN=1000,sIV2RangeOn=TRUE,sIV2Range=range)
                     
                   }
@@ -103,7 +109,14 @@ doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
     if (doingInvestg=="Inv2B")   setBrawRes("multiple",braw.res$result)
   } else {
     if (doingInvestg=="Inv3Bm") nreps<-nreps/4
-    doMultiple(nreps)
+    if (rootInv=="Inv5") {
+      setDesign(sIV2Range=rangeA)
+      m1<-doMultiple(nreps/2)
+      setDesign(sIV2Range=rangeB)
+      m2<-doMultiple(nreps/2)
+      m1$result<-mergeMultiple(m1$result,m2$result)
+      setBrawRes("multiple",m1)
+    } else doMultiple(nreps)
     outputNow<-"Multiple"
   }
     
@@ -111,6 +124,7 @@ doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
     if (single) {
       result<-braw.res$result
       result$hypothesis$IV2<-NULL
+      result$hypothesis$effect$world<-makeWorld(TRUE,"Single","r",0.3,populationNullp=0.5)
       setBrawRes("result",result)
     } else {
       multiple<-braw.res$multiple
@@ -142,11 +156,14 @@ doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
     if (is.element(doingInvestg,c("Inv2B","Inv3B","Inv4A","Inv4B")))
       open<-2                   
     else open<-1
-    } else {
-      investgS<-showMultiple(showType="rse",dimension=1,orientation="horz")
-      if (rootInv=="Inv5") 
-        investgR<-reportMultiple(showType="rse",compact=TRUE)
-      else    investgR<-reportMultiple(showType="NHST",compact=TRUE)
+  } else {
+    if (rootInv=="Inv5") {
+        investgS<-showMultiple(showType="rs",dimension=1,orientation="horz")
+        investgR<-reportMultiple(showType="rs",compact=TRUE)
+      } else {
+        investgS<-showMultiple(showType="rse",dimension=1,orientation="horz")
+        investgR<-reportMultiple(showType="NHST",compact=TRUE)
+      }
       open<-2
     }
   setBrawRes("investgD",investgD)
