@@ -62,3 +62,6 @@ vignettes/*.pdf
 # docs sources
 
 inst/doc
+.Rdata
+.DS_Store
+.quarto
