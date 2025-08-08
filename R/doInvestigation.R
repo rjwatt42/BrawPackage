@@ -117,6 +117,7 @@ doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
     
   if (rootInv=="Inv5") {
     if (single) {
+      oldSingle<-braw.res$result
       result<-braw.res$result
       result$hypothesis$IV2<-NULL
       result$hypothesis$effect$world<-makeWorld(TRUE,"Single","r",0.3,populationNullp=0.5)
@@ -198,7 +199,11 @@ doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
       tabLinkLabel=paste0('\U24D8',linkLabel),
       open=open
     )
-  if (rootInv=="Inv5" && !single) braw.res$multiple<-oldMultiple
+  
+  if (rootInv=="Inv5") {
+    if (single) braw.res$result<-oldSingle
+      else braw.res$multiple<-oldMultiple
+  }
   
   return(investgResults)
 }
