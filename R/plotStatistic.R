@@ -495,6 +495,44 @@ makeFiddle<-function(y,yd,orientation="horz"){
   
   xG<-(braw.env$plotArea[3]-braw.env$plotLimits$gap[3]-braw.env$plotLimits$gap[1])/diff(braw.env$plotLimits$xsc)
   rX<-function(x) x*xG
+  rr<-round(20*min(1,sqrt(100/length(y))))
+  rj<-1
+  
+  y_vals<-seq(min(y),max(y),length.out=501)
+  dy<-diff(y_vals[c(1,1+rr*2)])
+  y_filledp<-y_vals*0
+  y_filledn<-y_vals*0
+  x_pos<-y*0
+  if (orientation=="horz") 
+    for (i in 1:length(y)) {
+      use<-which.min(abs(y[i]-y_vals))
+      dx<-sqrt(rX(dy)^2-rX(y[i]-y_vals[use])^2)
+      dxr<-dx*runif(1)*rj
+      fill<-use+(-rr:rr)
+      fill<-fill[fill>=1 & fill<=length(y_vals)]
+      x_pos[i]<-y_filledp[use]+dxr
+      y_filledp[fill]<-x_pos[i]+dx
+    }
+  else
+    for (i in 1:length(y)) {
+      use<-which.min(abs(y[i]-y_vals))
+      dx<-sqrt(rX(dy)^2-rX(y[i]-y_vals[use])^2)
+      dxr<-dx*runif(1)*rj
+      fill<-use+(-rr:rr)
+      fill<-fill[fill>=1 & fill<=length(y_vals)]
+      dxr<-dx*runif(1)*rj
+      if (y_filledp[use]<y_filledn[use] || (y_filledp[use]==0 && y_filledn[use]==0 && runif(1)>0.5)) {
+        x_pos[i]<-y_filledp[use]+dxr
+        y_filledp[fill]<-x_pos[i]+dx
+        if (x_pos[i]==0) y_filledn[fill]<-x_pos[i]+dx
+      } else {
+        x_pos[i]<- -(y_filledn[use]+dxr)
+        y_filledn[fill]<- -x_pos[i]+dx
+        if (x_pos[i]==0) y_filledp[fill]<- -x_pos[i]+dx
+      }
+    }
+  return(x_pos/max(abs(x_pos)))
+  
   
   possible_xs<-seq(0,500,by=0.01)
   
@@ -867,9 +905,9 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
              hgain<-0.45
              hoff<-0
            })
-    dotSize<-min(4,braw.env$dotSize*scale/max(abs(xr))/hgain*2)
-    if (max(abs(xr))>0) xr<-xr*hgain/max(abs(xr))
-    xr<-xr+hoff
+    dotSize<-min(4,braw.env$dotSize*sqrt(min(1,100/length(pts$y1))))
+    # if (max(abs(xr))>0) xr<-xr*hgain/max(abs(xr))
+    xr<-xr*hgain+hoff
     
     pts$x<-pts$x+xr*sum(width)*0.3/0.35
     if (sequence)  {
