@@ -488,17 +488,20 @@ collectData<-function(analysis,whichEffect) {
 }
 
 makeFiddle<-function(y,yd,orientation="horz"){
-  d<-0.05
-  d2<-d^2
+  
+  y_vals<-seq(min(y),max(y),length.out=501)
+  
   yG<-(braw.env$plotArea[4]-braw.env$plotLimits$gap[4]-braw.env$plotLimits$gap[2])/diff(braw.env$plotLimits$ysc)
   rY<-function(y) y*yG
   
   xG<-(braw.env$plotArea[3]-braw.env$plotLimits$gap[3]-braw.env$plotLimits$gap[1])/diff(braw.env$plotLimits$xsc)
   rX<-function(x) x*xG
-  rr<-round(20*min(1,sqrt(100/length(y))))
+  
+  dotSize<-min(4,braw.env$dotSize*sqrt(min(1,100/length(y))))
+  dotSize<-dotSize/4
+  rr<-round(dotSize/4*yG/25/diff(y_vals[c(1,2)]))
   rj<-1
   
-  y_vals<-seq(min(y),max(y),length.out=501)
   dy<-diff(y_vals[c(1,1+rr*2)])
   y_filledp<-y_vals*0
   y_filledn<-y_vals*0
@@ -533,6 +536,8 @@ makeFiddle<-function(y,yd,orientation="horz"){
     }
   return(x_pos/max(abs(x_pos)))
   
+  d<-0.05
+  d2<-d^2
   
   possible_xs<-seq(0,500,by=0.01)
   
