@@ -661,7 +661,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                   showMeans<-0
                   showSE<-NULL
                 }
-                if (any(nulls)) {
+                if (any(hypothesis$effect$world$worldOn)) {
                   showMeans2<-getStat(abs(sigs & nulls),nVals)
                   sigs0<-colMeans(abs(sigs & nulls))
                   showSE2<-sqrt(sigs0*(1-sigs0)/sum(nulls))
@@ -1061,8 +1061,8 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
           if (sum(n>n80$minimum)<2) label<-paste("Unsafe result")
         }
         if (braw.env$nPlotScale=="log10") 
-             lpts<-data.frame(x=log10(min(n)),y=ylim[2]-diff(ylim)*5,label=label)
-        else lpts<-data.frame(x=min(n),y=ylim[2]-diff(ylim)*5,label=label)
+             lpts<-data.frame(x=log10(min(n)),y=ylim[2]-diff(ylim)/5,label=label)
+        else lpts<-data.frame(x=min(n),y=ylim[2]-diff(ylim)/5,label=label)
         g<-addG(g,dataLabel(data=lpts,label = label))
       }
       
@@ -1094,7 +1094,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
           if (sum(r<n80$minimum)<2) label<-paste("Unsafe result")
           if (sum(r>n80$minimum)<2) label<-paste("Unsafe result")
         }
-        lpts<-data.frame(x=0,y=0.8)
+        lpts<-data.frame(x=0,y=ylim[2]-diff(ylim)/5)
         g<-addG(g,dataLabel(data=lpts,label = label))
       }
     }
