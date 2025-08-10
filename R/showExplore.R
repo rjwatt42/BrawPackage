@@ -1063,7 +1063,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
         if (braw.env$nPlotScale=="log10") 
              lpts<-data.frame(x=log10(min(n)),y=ylim[2],label=label)
         else lpts<-data.frame(x=min(n),y=ylim[2],label=label)
-        g<-addG(g,dataLabel(data=lpts,label = label),vjust=1)
+        g<-addG(g,dataLabel(data=lpts,label = label),vjust=0)
       }
       
       # find r80
