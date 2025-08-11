@@ -489,7 +489,7 @@ collectData<-function(analysis,whichEffect) {
 
 makeFiddle<-function(y,yd,orientation="horz"){
   
-  if (length(y)==1) y_vals<- c(-0.1,0.1)+y
+  if (length(y)==1) y_vals<- c(-0.1,0,0.1)+y
   else y_vals<-seq(min(y),max(y),length.out=501)
   
   yG<-(braw.env$plotArea[4]-braw.env$plotLimits$gap[4]-braw.env$plotLimits$gap[2])/diff(braw.env$plotLimits$ysc)
@@ -535,7 +535,8 @@ makeFiddle<-function(y,yd,orientation="horz"){
         if (x_pos[i]==0) y_filledp[fill]<- -x_pos[i]+dx
       }
     }
-  return(x_pos/max(abs(x_pos)))
+  if (length(y)>10) x_pos<-x_pos/max(abs(x_pos))
+  return(x_pos)
   
   d<-0.05
   d2<-d^2
