@@ -155,7 +155,7 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
                         theoryDens_all<-theoryFullAll+theoryDens_ns
                         theoryDens_sig<-theoryFullSig
                       } else {
-                        theoryDens_all<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnlyOutput=FALSE,HQ=braw.env$showTheoryHQ)
+                        theoryDens_all<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnlyOutput=evidence$sigOnly,HQ=braw.env$showTheoryHQ)
                         theoryDens_sig<-fullRSamplingDist(rvals,effectTheory$world,design,rOff,logScale=logScale,sigOnlyOutput=TRUE,HQ=braw.env$showTheoryHQ)
                       }
                     }
