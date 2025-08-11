@@ -177,9 +177,21 @@ reportDesign<-function(design=braw.def$design,plain=FALSE) {
 reportWorldDesign<-function() {
   outputFront<-paste0('<div style="display:inline-block;padding:10px;margin-bottom:20px;">')
   outputBack<-'</div>'
+  if (is.null(braw.def$hypothesis$IV2)) rw<-reportWorld(plain=TRUE)
+  else {
+    graphicsType<-braw.env$graphicsType
+    setHTML()
+    svgBox(height=150,aspect=1.5,fontScale=1.2)
+    rw<-paste0(
+      '<div style="display:inline-block;float:left;">',
+      showHypothesis(),
+      '</div>'
+    )
+    setBrawEnv("graphicsType",graphicsType)
+  }
   paste0(
     outputFront,
-    reportWorld(plain=TRUE),
+    rw,
     reportDesign(plain=TRUE),
     outputBack
   )

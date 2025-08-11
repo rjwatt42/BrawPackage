@@ -180,7 +180,7 @@ doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
                 '<tr><td>', braw.res$investgD, '</td></tr>',
                 '<tr><td>', braw.res$investgR, '</td></tr>',
                 '<tr style="height:10px;"></tr>',
-                '<tr><td>', moreHTML(reportWorldDesign(),"see Plan","p1"), '</td></tr>',
+                '<tr><td>', moreHTML(reportWorldDesign(),title="see Plan",ID="p1"), '</td></tr>',
                 '</table>',
                 '</div>'
   )
@@ -189,7 +189,7 @@ doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
                 '<tr><td>', braw.res$investgS, '</td></tr>',
                 '<tr><td>', braw.res$investgR, '</td></tr>',
                 '<tr style="height:10px;"></tr>',
-                '<tr><td>', moreHTML(reportWorldDesign(),"see Plan","p2"), '</td></tr>',
+                '<tr><td>', moreHTML(reportWorldDesign(),title="see Plan",ID="p2"), '</td></tr>',
                 '</table>',
                 '</div>'
   )
