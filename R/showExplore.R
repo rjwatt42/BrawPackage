@@ -668,6 +668,10 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                   showMeans<-rbind(showMeans+showMeans2,showMeans2)
                 } else showMeans<-rbind(showMeans)
                 showSE<-NULL
+                showVals<-rbind(1-showMeans[1,],showMeans[1,]-showMeans[2,],showMeans[2,])
+                showCols<-c(NA,col0,col5)
+                showLabels<-c(NA,lb0,lb5)
+                showSplit<-0
               },
               "tDR"={
                 showVals<-NULL
@@ -840,7 +844,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
         }
       }
       
-      if (showType[si] != "NHST")
+      if (!is.element(showType[si],c("NHST","p(sig)")))
       if (autoYlim) {
         if (showHist) {
           use_y<-c(showVals,theoryVals,theoryLower,theoryVals1,theoryVals0,theoryVals2)
@@ -895,7 +899,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       }
       
       # plot results
-      if (!is.element(showType[si],c("NHST","SEM"))) {
+      if (!is.element(showType[si],c("NHST","SEM","p(sig)"))) {
         # draw the basic line and point data
         if (!isempty(y50)) {
           y50[y50>ylim[2]]<-ylim[2]
@@ -1000,9 +1004,10 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
         # if (doLine) xoff<-0
         # else        xoff<-bwidth
         
-        for (use in 1:nrow(showVals)) {
-          colShow<-showCols[use]
-          valsD<-showVals[use,]
+        for (row in 1:nrow(showVals)) {
+          colShow<-showCols[row]
+          valsD<-showVals[row,]
+          valsD[is.na(valsD)]<-0
           if (any(valsD!=0)) {
             ybottom<-ytop-valsD
             ybottom[ybottom<0]<-0
@@ -1019,19 +1024,18 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
             } else {
               if (doLine) {
                 g<-addG(g,dataPolygon(data=ptsShow,fill=colShow,colour="#000000",linewidth=0.1))
-                if (is.element(use,showSplit)) g<-addG(g,dataLine(data.frame(x=vals,y=ybottom),linewidth=1))
+                if (is.element(row,showSplit)) g<-addG(g,dataLine(data.frame(x=vals,y=ybottom),linewidth=1))
               } else {
                   npts<-length(vals)
                   bwidth<-0.4*(ptsShow$x[2]-ptsShow$x[1])
                   for (i in 1:npts) {
                     g<-addG(g,drawNHSTBar(i,npts,ptsShow,bwidth,colShow))
-                    if (is.element(use,showSplit)) g<-addG(g,drawNHSTLine(i,npts,ptsShow,bwidth*1.25,linewidth=1))
+                    if (is.element(row,showSplit)) g<-addG(g,drawNHSTLine(i,npts,ptsShow,bwidth*1.25,linewidth=1))
                   }
               }
             }
           }
         }
-          
         g<-addG(g,dataLegend(data.frame(colours=showCols[!is.na(showCols)],names=showLabels[!is.na(showCols)]),title="",shape=22))
       }
 
