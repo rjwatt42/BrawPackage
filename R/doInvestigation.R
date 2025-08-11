@@ -29,6 +29,20 @@ doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
          "Inv2"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world)))
            if (world!="Plain") hypothesis$effect$world$populationNullp<-pNull
+           design<-makeDesign(sN=sN)
+           switch(partInv,
+                  "A"=design$sMethod<-makeSampling(sMethod),
+                  "B"={
+                    design$sCheating<-sCheating
+                    design$sCheatingLimit<-"Budget"
+                    design$sCheatingBudget<-sN*0.5
+                  }
+           )
+           
+         },
+         "Inv3"={
+           hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world)))
+           if (world!="Plain") hypothesis$effect$world$populationNullp<-pNull
            
            switch(partInv,
                   "A"=design<-makeDesign(sN=sN),
@@ -38,20 +52,6 @@ doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
                                        sCheating="Retry",
                                        sCheatingLimit="Budget",sCheatingBudget=sBudget-n,
                                        sCheatingFixedPop=FALSE)
-                  }
-           )
-           
-         },
-         "Inv3"={
-           hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world)))
-           if (world!="Plain") hypothesis$effect$world$populationNullp<-pNull
-           design<-makeDesign(sN=sN)
-           switch(partInv,
-                  "A"=design$sMethod<-makeSampling(sMethod),
-                  "B"={
-                    design$sCheating<-sCheating
-                    design$sCheatingLimit<-"Budget"
-                    design$sCheatingBudget<-sN*0.5
                   }
            )
            
@@ -107,9 +107,9 @@ doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
   if (single) {
     doSingle()
     outputNow<-"Description"
-    if (doingInvestg=="Inv2B")   setBrawRes("multiple",braw.res$result)
+    if (doingInvestg=="Inv3B")   setBrawRes("multiple",braw.res$result)
   } else {
-    if (doingInvestg=="Inv3Bm") nreps<-nreps/4
+    if (doingInvestg=="Inv2Bm") nreps<-nreps/4
     # if (rootInv=="Inv5") {
     #   setDesign(sIV2Range=rangeA)
     #   m1<-doMultiple(nreps/2)
@@ -155,7 +155,7 @@ doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
   if (single) {
     investgD<-showDescription()
     investgS<-showInference(showType="rse",orientation="horz",dimension=1)
-    if (is.element(doingInvestg,c("Inv2B")))
+    if (is.element(doingInvestg,c("Inv3B")))
       investgR<-reportMultiple(showType="NHST",compact=TRUE)
     else     investgR<-reportInference(compact=TRUE)
     if (is.element(doingInvestg,c("Inv2B","Inv3B","Inv4A","Inv4B")))
