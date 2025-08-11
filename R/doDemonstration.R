@@ -99,14 +99,14 @@ doDemonstration<-function(doingDemo,world="Binary",pNull=0.5,
   if (single) {
     doSingle()
     outputNow<-"Description"
-    if (doingInvestg=="Inv2B")   setBrawRes("multiple",braw.res$result)
+    if (doingInvestg=="Step2B")   setBrawRes("multiple",braw.res$result)
   } else {
-    if (doingInvestg=="Inv3Bm") nreps<-nreps/4
+    if (doingInvestg=="Step3Bm") nreps<-nreps/4
     doMultiple(nreps)
     outputNow<-"Multiple"
   }
     
-  if (rootInv=="Inv5") 
+  if (rootInv=="Step5") 
     if (single) {
       result<-braw.res$result
       result$hypothesis$IV2<-NULL
@@ -126,9 +126,9 @@ doDemonstration<-function(doingDemo,world="Binary",pNull=0.5,
   svgBox(height=350,aspect=1.5,fontScale=1.2)
   setBrawEnv("graphicsType","HTML")
   
-  if (rootInv=="Inv0") setBrawEnv("fullOutput",0)
+  if (rootInv=="Step0") setBrawEnv("fullOutput",0)
   else setBrawEnv("fullOutput",1)
-  if (doingInvestg=="Inv2B") setBrawEnv("reportCounts",TRUE)
+  if (doingInvestg=="Step2B") setBrawEnv("reportCounts",TRUE)
   else setBrawEnv("reportCounts",FALSE)
   
   investgD<-braw.res$investgD
@@ -137,15 +137,15 @@ doDemonstration<-function(doingDemo,world="Binary",pNull=0.5,
   if (single) {
     investgD<-showDescription()
     investgS<-showInference(showType="rse",orientation="horz",dimension=1)
-    if (is.element(doingInvestg,c("Inv2B")))
+    if (is.element(doingInvestg,c("Step2B")))
       investgR<-reportMultiple(showType="NHST",compact=TRUE)
     else     investgR<-reportInference(compact=TRUE)
-    if (is.element(doingInvestg,c("Inv2B","Inv3B","Inv4A","Inv4B")))
+    if (is.element(doingInvestg,c("Step2B","Step3B","Step4A","Step4B")))
       open<-2                   
     else open<-1
     } else {
       investgS<-showMultiple(showType="rse",dimension=1,orientation="horz")
-      if (rootInv=="Inv5") 
+      if (rootInv=="Step5") 
         investgR<-reportMultiple(showType="rse",compact=TRUE)
       else    investgR<-reportMultiple(showType="NHST",compact=TRUE)
       open<-2
@@ -175,7 +175,7 @@ doDemonstration<-function(doingDemo,world="Binary",pNull=0.5,
   linkLabel<-paste0(substr(doingInvestg,1,6))
   investgResults<-
     generate_tab(
-      title="Investigation:",
+      title="MetaScience:",
       plainTabs=FALSE,
       titleWidth=100,
       width=550,

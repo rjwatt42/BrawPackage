@@ -1,3 +1,7 @@
+rootMS<-function(doing) substr(doing,1,5)
+stepMS<-function(doing) substr(doing,5,5)
+partMS<-function(doing) substr(doing,6,6)
+singleMS<-function(doing) substr(doing,7,7)==0
 
 #' @export
 doMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
@@ -7,17 +11,19 @@ doMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
                           nreps=200) {
 
   setHTML()
-  rootInv<-substr(doingInvestg,1,4)
-  partInv<-substr(doingInvestg,5,5)
-  single<-nchar(substr(doingInvestg,6,6))==0
+  rootInv<-rootMS(doingInvestg)
+  stepInv<-stepMS(doingInvestg)
+  partInv<-partMS(doingInvestg)
+  steppartInv<-paste0(stepInv,partInv)
+  single<-singleMS(doingInvestg)
   
-  switch(rootInv,
-         "Inv0"={
+  switch(stepInv,
+         "0"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld("Plain")))
            design<-makeDesign(sN=42)
            
          },
-         "Inv1"={
+         "1"={
            switch(partInv,
                   "I"=hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld("Plain"))),
                   "A"=hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld("Binary"))),
@@ -26,7 +32,7 @@ doMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
            design<-makeDesign(sN=42)
            
          },
-         "Inv2"={
+         "2"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world)))
            if (world!="Plain") hypothesis$effect$world$populationNullp<-pNull
            design<-makeDesign(sN=sN)
@@ -40,7 +46,7 @@ doMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
            )
            
          },
-         "Inv3"={
+         "3"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world)))
            if (world!="Plain") hypothesis$effect$world$populationNullp<-pNull
            
@@ -56,7 +62,7 @@ doMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
            )
            
          },
-         "Inv4"={
+         "4"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world)))
            if (world!="Plain") hypothesis$effect$world$populationNullp<-pNull
            design<-makeDesign(sN=sN)
@@ -73,7 +79,7 @@ doMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
            setBrawDef("evidence",evidence)
            
          },
-         "Inv5"={
+         "5"={
            switch(differenceSource,
                   "Interaction"={
                     hypothesis<-makeHypothesis(IV2=makeVariable("IV2","Interval"),
@@ -108,22 +114,14 @@ doMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
   if (single) {
     doSingle()
     outputNow<-"Description"
-    if (doingInvestg=="Inv3B")   setBrawRes("multiple",braw.res$result)
+    if (steppartInv=="3B")   setBrawRes("multiple",braw.res$result)
   } else {
-    if (doingInvestg=="Inv2Bm") nreps<-nreps/4
-    # if (rootInv=="Inv5") {
-    #   setDesign(sIV2Range=rangeA)
-    #   m1<-doMultiple(nreps/2)
-    #   setDesign(sIV2Range=rangeB)
-    #   m2<-doMultiple(nreps/2)
-    #   m1$result<-mergeMultiple(m1$result,m2$result)
-    #   setBrawRes("multiple",m1)
-    # } else 
+    if (steppartInv=="2B" && single) nreps<-nreps/4
       doMultiple(nreps)
     outputNow<-"Multiple"
   }
     
-  if (rootInv=="Inv5") {
+  if (stepInv=="5") {
     if (single) {
       oldSingle<-braw.res$result
       result<-braw.res$result
@@ -145,9 +143,9 @@ doMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
   svgBox(height=350,aspect=1.5,fontScale=1.2)
   setBrawEnv("graphicsType","HTML")
   
-  if (rootInv=="Inv0") setBrawEnv("fullOutput",0)
+  if (steppartInv=="0") setBrawEnv("fullOutput",0)
   else setBrawEnv("fullOutput",1)
-  if (doingInvestg=="Inv2B") setBrawEnv("reportCounts",TRUE)
+  if (steppartInv=="2B") setBrawEnv("reportCounts",TRUE)
   else setBrawEnv("reportCounts",FALSE)
   
   investgD<-braw.res$investgD
@@ -156,14 +154,14 @@ doMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
   if (single) {
     investgD<-showDescription()
     investgS<-showInference(showType="rse",orientation="horz",dimension=1)
-    if (is.element(doingInvestg,c("Inv3B")))
+    if (is.element(steppartInv,c("3B")))
       investgR<-reportMultiple(showType="NHST",compact=TRUE)
     else     investgR<-reportInference(compact=TRUE)
-    if (is.element(doingInvestg,c("Inv2B","Inv3B","Inv4A","Inv4B")))
+    if (is.element(steppartInv,c("2B","3B","4A","4B")))
       open<-2                   
     else open<-1
   } else {
-    if (rootInv=="Inv5") {
+    if (stepInv=="5") {
         investgS<-showMultiple(showType="rs",dimension=1,orientation="horz")
         investgR<-reportMultiple(showType="rs",compact=TRUE)
       } else {
@@ -194,21 +192,21 @@ doMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
                 '</table>',
                 '</div>'
   )
-  linkLabel<-paste0(substr(doingInvestg,1,6))
+  linkLabel<-paste0(rootInv,partInv)
   investgResults<-
     generate_tab(
-      title="Investigation:",
+      title="MetaScience:",
       plainTabs=FALSE,
       titleWidth=100,
       width=550,
       tabs=c("Data","Schematic"),
       tabContents=c(show1,show2),
-      tabLink=paste0('https://doingpsychstats.wordpress.com/investigation-',substr(doingInvestg,4,4),'#',substr(doingInvestg,1,5)),
+      tabLink=paste0('https://doingpsychstats.wordpress.com/metascience-',stepInv,'#','Part',stepInv,partInv),
       tabLinkLabel=paste0('&#x24D8 ',linkLabel),
       open=open
     )
   
-  if (rootInv=="Inv5") {
+  if (rootInv=="5") {
     if (single) braw.res$result<-oldSingle
       else braw.res$multiple<-oldMultiple
   }
