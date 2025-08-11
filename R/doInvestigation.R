@@ -90,7 +90,7 @@ doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
                     design$sRangeV<-0
                   },
                   "B"={
-                    design$sRangeP<-0.5
+                    design$sRangeP<-1
                     design$sRangeV<-1
                   }
            )
@@ -203,7 +203,7 @@ doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
       tabs=c("Data","Schematic"),
       tabContents=c(show1,show2),
       tabLink=paste0('https://doingpsychstats.wordpress.com/investigation-',substr(doingInvestg,4,4),'#',substr(doingInvestg,1,5)),
-      tabLinkLabel=paste0('\U24D8',linkLabel),
+      tabLinkLabel=paste0('&#x24D8 ',linkLabel),
       open=open
     )
   
