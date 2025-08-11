@@ -62,14 +62,15 @@ doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
            design<-makeDesign(sN=sN)
            switch(partInv,
                   "A"= {
-                    design$Replication<-makeReplication(TRUE,Keep="Cautious",
-                                                        forceSigOriginal=sReplicationSigOriginal,Power=sReplicationPower)
+                    design$Replication<-makeReplication(FALSE)
                   },
                   "B"={
-                    design$Replication<-makeReplication(TRUE,Keep="MetaAnalysis",
-                                                        forceSigOriginal=sReplicationSigOriginal,Power=sReplicationPower)
+                    design$Replication<-makeReplication(TRUE,
+                                                        forceSigOriginal=TRUE,Power=sReplicationPower)
                   }
            )
+           evidence<-makeEvidence(sigOnly=TRUE)
+           setBrawDef("evidence",evidence)
            
          },
          "Inv5"={
