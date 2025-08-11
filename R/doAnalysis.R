@@ -1175,12 +1175,16 @@ runSimulation<-function(hypothesis,design,evidence,sigOnly=FALSE,onlyAnalysis=FA
 }
 
 getSample<-function(hypothesis,design,evidence) {
-  if (!evidence$shortHand) {
-    sample<-doSample(hypothesis,design,autoShow=FALSE)
-    res<-doAnalysis(sample,evidence,autoShow=FALSE)
-  } else {
-    res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
+  while (1==1) {
+    if (!evidence$shortHand) {
+      sample<-doSample(hypothesis,design,autoShow=FALSE)
+      res<-doAnalysis(sample,evidence,autoShow=FALSE)
+    } else {
+      res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
+    }
+    if (!evidence$sigOnly || isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) break
   }
+  
   res$ResultHistory<-list(nval=res$nval,df1=res$df1,rIV=res$rIV,rpIV=res$rpIV,pIV=res$pIV,sequence=FALSE)
   # Cheating ?
   res<-cheatSample(hypothesis,design,evidence,sample,res)

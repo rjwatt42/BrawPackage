@@ -2,6 +2,8 @@ theoryPlot<-function(g,theory,orientation,baseColour,theoryAlpha,xoff) {
   theoryVals<-theory$theoryVals
   theoryDens_all<-theory$theoryDens_all
   theoryDens_sig<-theory$theoryDens_sig
+  showAll<-all(theoryDens_all==theoryDens_sig)
+  if (showAll) theoryDens_all<-theoryDens_all*0
   
   switch(orientation,
          "horz"={
@@ -13,7 +15,7 @@ theoryPlot<-function(g,theory,orientation,baseColour,theoryAlpha,xoff) {
          })
   if (is.null(theoryDens_sig)) baseColour<-"white"
   g<-addG(g,dataPolygon(data=theory_all,colour=NA,fill=baseColour,alpha=theoryAlpha))
-  
+
   if (!is.null(theoryDens_sig)) {
     i2<-0
     while (i2<length(theoryDens_sig)) {
@@ -29,11 +31,15 @@ theoryPlot<-function(g,theory,orientation,baseColour,theoryAlpha,xoff) {
                theory_sig<-data.frame(y=c(theoryVals[use],rev(theoryVals[use])),x=c(theoryDens_sig[use],-rev(theoryDens_sig[use]))+xoff)
              })
       g<-addG(g,dataPolygon(data=theory_sig,colour=NA,fill=braw.env$plotColours$infer_sigC,alpha=theoryAlpha))
-      g<-addG(g,dataPath(data=theory_sig,colour="white",linewidth=0.1))
+      if (showAll) 
+        g<-addG(g,dataPath(data=theory_sig,colour="black",linewidth=0.1))
+      else
+        g<-addG(g,dataPath(data=theory_sig,colour="white",linewidth=0.1))
     }
   }
   
-  g<-addG(g,dataPath(data=theory_all,colour="#000000",linewidth=0.2))
+  if (!showAll) 
+    g<-addG(g,dataPath(data=theory_sig,colour="#000000",linewidth=0.2))
   
   return(g)
 }
