@@ -541,7 +541,7 @@ makeFiddle<-function(y,yd,orientation="horz"){
         if (x_pos[i]==0) y_filledp[fill]<- -x_pos[i]+dx
       }
     }
-  if (length(y)>10) x_pos<-x_pos/max(abs(x_pos))
+  if (length(y)>=10) x_pos<-x_pos/max(abs(x_pos))
   return(x_pos)
   
   d<-0.05
