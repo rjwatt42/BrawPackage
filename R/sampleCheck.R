@@ -177,6 +177,8 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
   on.exit(setBrawEnv("alphaSig",oldAlpha),add=TRUE)
 
   oldHypothesis<-hypothesis
+  oldEvidence<-evidence
+  braw.def$evidence$sigOnly<-FALSE
   
   Replication<-design$Replication
   resOriginal<-res
@@ -332,5 +334,8 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
   res$noval<-resOriginal$nval
   res$df1o<-resOriginal$df1
   res$poIV<-resOriginal$pIV
+  
+  setBrawDef("evidence",oldEvidence)
+  setBrawDef("hypothesis",oldHypothesis)
   return(res)
 }
