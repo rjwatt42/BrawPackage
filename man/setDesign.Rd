@@ -21,6 +21,8 @@ setDesign(
   sIV2RangeOn = braw.def$design$sIV2RangeOn,
   sIV2Range = braw.def$design$sIV2Range,
   sDVRange = braw.def$design$sDVRange,
+  sRangeP = braw.def$design$sRangeP,
+  sRangeV = braw.def$design$sRangeV,
   sDependence = braw.def$design$sDependence,
   sOutliers = braw.def$design$sOutliers,
   sNonResponse = braw.def$design$sNonResponse,
