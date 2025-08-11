@@ -178,7 +178,8 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
 
   oldHypothesis<-hypothesis
   oldEvidence<-evidence
-  braw.def$evidence$sigOnly<-FALSE
+  evidence$sigOnly<-FALSE
+  setBrawDef('evidence',evidence)
   
   Replication<-design$Replication
   resOriginal<-res
