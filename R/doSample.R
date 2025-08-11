@@ -218,6 +218,11 @@ makeSampleVar<-function(design,effect,n,MV,MV2){
     }
     
     if ((design$sIVRangeOn || design$sIV2RangeOn) && design$sRangeP>runif(1)) {
+      if (design$sRangeV>0) {
+        design$sIVRange<-design$sIVRange-mean(design$sIVRange)+rnorm(1,0,design$sRangeV)
+        design$sIV2Range<-design$sIV2Range-mean(design$sIV2Range)+rnorm(1,0,design$sRangeV)
+      }
+
       condition<-rep(TRUE,length(ivr1))
       if (design$sIVRangeOn) {
         if (design$sIVRange[1]==design$sIVRange[2])

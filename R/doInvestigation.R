@@ -3,7 +3,7 @@
 doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
                           sN=42,sMethod="Convenience",sBudget=320,sSplits=16,sCheating="grow",
                           sReplicationPower=0.9,sReplicationSigOriginal=TRUE,
-                          group=ifelse(runif(1)>0.5,"a","b"),
+                          differenceSource="Interaction",
                           nreps=200) {
 
   setHTML()
@@ -73,18 +73,25 @@ doInvestigation<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
            
          },
          "Inv5"={
-           switch(partInv,
-                  "A"={
+           switch(differenceSource,
+                  "Interaction"={
                     hypothesis<-makeHypothesis(IV2=makeVariable("IV2","Interval"),
                                                effect=makeEffect(rIV=0.3,rIV2=0,rIVIV2DV=-0.3,world=makeWorld(FALSE)))
                     design<-makeDesign(sN=1000,sIV2RangeOn=TRUE,sIV2Range=c(1,1),sRangeP=0.5)
-                    
                   },
-                  "B"={
+                  "Covariation"={
                     hypothesis<-makeHypothesis(IV2=makeVariable("IV2","Interval"),
                                                effect=makeEffect(rIV=0.3,rIV2=-sqrt(0.3),rIVIV2=sqrt(0.3),world=makeWorld(FALSE)))
                     design<-makeDesign(sN=1000,sIV2RangeOn=TRUE,sIV2Range=range<-c(0,0),sRangeP=0.5)
-                    
+                  })
+           switch(partInv,
+                  "A"={
+                    design$sRangeP<-0.5
+                    design$sRangeV<-0
+                  },
+                  "B"={
+                    design$sRangeP<-0.5
+                    design$sRangeV<-1
                   }
            )
            evidence<-makeEvidence(AnalysisTerms=1)
