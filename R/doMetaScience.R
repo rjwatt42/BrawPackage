@@ -109,7 +109,7 @@ prepareMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
 }
 
 #' @export
-doMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
+doMetaScience<-function(doingInvestg,world=NULL,rp=0.3,pNull=0.5,
                         sN=42,sMethod="Convenience",sBudget=320,sSplits=16,sCheating="Grow",
                         sReplicationPower=0.9,sReplicationSigOriginal=TRUE,
                         differenceSource="Interaction",
@@ -124,6 +124,7 @@ doMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
   steppartInv<-paste0(stepInv,partInv)
   single<-singleMS(doingInvestg)
   
+  if (!is.null(world))
   prepareMetaScience(doingInvestg,world=world,rp=rp,pNull=pNull,
                    sN=sN,sMethod=sMethod,sBudget=sBudget,sSplits=sSplits,sCheating=sCheating,
                    sReplicationPower=sReplicationPower,sReplicationSigOriginal=sReplicationSigOriginal,
