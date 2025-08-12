@@ -1,7 +1,7 @@
 rootMS<-function(doing) substr(doing,1,5)
 stepMS<-function(doing) substr(doing,5,5)
 partMS<-function(doing) substr(doing,6,6)
-singleMS<-function(doing) substr(doing,7,7)==0
+singleMS<-function(doing) substr(doing,7,7)!='m'
 
 #' @export
 doMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
@@ -9,7 +9,8 @@ doMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
                           sReplicationPower=0.9,sReplicationSigOriginal=TRUE,
                           differenceSource="Interaction",
                           nreps=200) {
-
+  if (nchar(doingInvestg)<7) doingInvestg<-paste0(doingInvestg,'s')
+  
   setHTML()
   rootInv<-rootMS(doingInvestg)
   stepInv<-stepMS(doingInvestg)
@@ -21,7 +22,7 @@ doMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
          "0"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld("Plain")))
            design<-makeDesign(sN=42)
-           
+           evidence<-makeEvidence()
          },
          "1"={
            switch(partInv,
@@ -30,7 +31,7 @@ doMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
                   "B"=hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld("Psych50")))
            )
            design<-makeDesign(sN=42)
-           
+           evidence<-makeEvidence()
          },
          "2"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world)))
@@ -44,7 +45,7 @@ doMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
                     design$sCheatingBudget<-sN*0.5
                   }
            )
-           
+           evidence<-makeEvidence()
          },
          "3"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world)))
@@ -60,7 +61,7 @@ doMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
                                        sCheatingFixedPop=FALSE)
                   }
            )
-           
+           evidence<-makeEvidence()
          },
          "4"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world)))
@@ -76,8 +77,6 @@ doMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
                   }
            )
            evidence<-makeEvidence(sigOnly=TRUE)
-           setBrawDef("evidence",evidence)
-           
          },
          "5"={
            switch(differenceSource,
@@ -102,14 +101,13 @@ doMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
                   }
            )
            evidence<-makeEvidence(AnalysisTerms=1)
-           setBrawDef("evidence",evidence)
-           
          }
   )
   hypothesis$effect$world$populationPDFk<-rp
   setBrawDef("hypothesis",hypothesis)
   setBrawDef("design",design)
-
+  setBrawDef("evidence",evidence)
+  
   
   if (single) {
     doSingle()
@@ -206,7 +204,7 @@ doMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
       open=open
     )
   
-  if (rootInv=="5") {
+  if (stepInv=="5") {
     if (single) braw.res$result<-oldSingle
       else braw.res$multiple<-oldMultiple
   }
