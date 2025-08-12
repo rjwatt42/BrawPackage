@@ -541,7 +541,8 @@ makeFiddle<-function(y,yd,orientation="horz"){
         if (x_pos[i]==0) y_filledp[fill]<- -x_pos[i]+dx
       }
     }
-  if (length(y)>=10) x_pos<-x_pos/max(abs(x_pos))
+  # if (length(y)>=10) x_pos<-x_pos/max(abs(x_pos))
+  if (length(y)>=10) x_pos<-x_pos/(sum(y_filledp)*diff(y_vals[1:2]))
   return(x_pos)
   
   d<-0.05
@@ -826,7 +827,6 @@ simulations_hist<-function(pts,valType,ylim,histGain,histGainrange){
 simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
                         i=1,scale=1,width=1,col="white",alpha=1,useSignificanceCols=braw.env$useSignificanceCols,
                         histStyle="width",orientation="vert",ylim,histGain=NA,histGainrange=NA,
-                        polygonArea=0.5,
                         npointsMax=braw.env$npointsMax,sequence=FALSE){
   se_size<-0.25
   
@@ -911,13 +911,13 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
     }
     xr<-makeFiddle(pts$y1,2/40/braw.env$plotArea[4],orientation)
     
-    pa<-chull(pts$y1,xr)
-    p1<-abs(polyarea(pts$y1[pa],xr[pa]))
-
+    # pa<-chull(pts$y1,xr)
+    # p1<-abs(polyarea(pts$y1[pa],xr[pa]))
+    # 
     switch(orientation,
            "horz"={
              if (sequence) hgain<-0.8
-             else hgain<-abs(polygonArea/p1)
+             else hgain<-abs(histGain)*0.8
              hoff<-0.025
              },
            "vert"={
@@ -1400,8 +1400,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       theoryVals<-theory$theoryVals
       theoryDens_all<-theory$theoryDens_all
       theoryDens_sig<-theory$theoryDens_sig
-      p<-abs(polyarea(theoryVals,theoryDens_all))
-      
+
       if (theoryFirst)
       g<-theoryPlot(g,theory,orientation,baseColour,theoryAlpha,xoff[i])
 
@@ -1448,7 +1447,6 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       g<-simulations_plot(g,pts,showType,analysis$hypothesis$effect$world$worldOn,analysis$design,
                           i,orientation=orientation,
                        ylim=ylim,histGain=histGain,histGainrange=histGainrange,
-                       polygonArea=p,
                        sequence=sequence)
 
       ns<-c()
