@@ -3,6 +3,8 @@
 #                                  initialize = function() {
 #                                  },
 # 
+
+#' @export
 generate_tab = function(title="Tab",tabs=c("1","2","3"),tabContents=c("a","b","c"),
                         titleTab="",titleWidth=135,
                         tabLink=NULL,tabLinkLabel='here',
@@ -200,6 +202,7 @@ generate_tab = function(title="Tab",tabs=c("1","2","3"),tabContents=c("a","b","c
   return(html_content)
 }
 
+#' @export
 moreHTML<-function(content,title="more",ID="p") {
   control<-paste0(
     '<script>',
@@ -236,6 +239,3 @@ moreHTML<-function(content,title="more",ID="p") {
   )
 }
 
-#                              )
-# )
-# 
