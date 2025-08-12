@@ -1206,6 +1206,8 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   design<-analysis$design
   evidence<-analysis$evidence
   
+  sequence<-analysis$sequence
+  
   r<-effect$rIV
   if (!is.null(hypothesis$IV2)){
     r<-c(r,effect$rIV2,effect$rIVIV2DV)
@@ -1295,7 +1297,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
     title<-paste("nsims = ",n1,sep="")
   }
   
-  if (nr>1)   g<-addG(g,plotTitle(title,size=0.65,fontface="normal"))
+  if (nr>1 && !sequence)   g<-addG(g,plotTitle(title,size=0.65,fontface="normal"))
   
   lineCol<-"#000000"
   if (is.element(showType,c("p","e1p","e2p","e1d","e2d"))) lineCol<-"green"
@@ -1434,7 +1436,6 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
           pts<-data.frame(x=shvals*0+xoff[i],y1=shvals,sig=resSig,notNull=resNotNull,n=nvals)
       }
       
-      sequence<-analysis$sequence
       g<-simulations_plot(g,pts,showType,analysis$hypothesis$effect$world$worldOn,analysis$design,
                           i,orientation=orientation,
                        ylim=ylim,histGain=histGain,histGainrange=histGainrange,

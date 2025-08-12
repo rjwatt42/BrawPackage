@@ -3,21 +3,18 @@ stepMS<-function(doing) substr(doing,5,5)
 partMS<-function(doing) substr(doing,6,6)
 singleMS<-function(doing) substr(doing,7,7)!='m'
 
+
 #' @export
-doMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
-                          sN=42,sMethod="Convenience",sBudget=320,sSplits=16,sCheating="grow",
-                          sReplicationPower=0.9,sReplicationSigOriginal=TRUE,
-                          differenceSource="Interaction",
-                          nreps=200) {
+prepareMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
+                        sN=42,sMethod="Convenience",sBudget=320,sSplits=16,sCheating="Grow",
+                        sReplicationPower=0.9,sReplicationSigOriginal=TRUE,
+                        differenceSource="Interaction"
+                        ) {
   if (nchar(doingInvestg)<7) doingInvestg<-paste0(doingInvestg,'s')
   
-  setHTML()
-  rootInv<-rootMS(doingInvestg)
   stepInv<-stepMS(doingInvestg)
   partInv<-partMS(doingInvestg)
-  steppartInv<-paste0(stepInv,partInv)
-  single<-singleMS(doingInvestg)
-  
+
   switch(stepInv,
          "0"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld("Plain")))
@@ -109,6 +106,29 @@ doMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
   setBrawDef("evidence",evidence)
   
   
+}
+
+#' @export
+doMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
+                        sN=42,sMethod="Convenience",sBudget=320,sSplits=16,sCheating="Grow",
+                        sReplicationPower=0.9,sReplicationSigOriginal=TRUE,
+                        differenceSource="Interaction",
+                        nreps=200) {
+  
+  if (nchar(doingInvestg)<7) doingInvestg<-paste0(doingInvestg,'s')
+  
+  setHTML()
+  rootInv<-rootMS(doingInvestg)
+  stepInv<-stepMS(doingInvestg)
+  partInv<-partMS(doingInvestg)
+  steppartInv<-paste0(stepInv,partInv)
+  single<-singleMS(doingInvestg)
+  
+  prepareMetaScience(doingInvestg,world=world,rp=rp,pNull=pNull,
+                   sN=sN,sMethod=sMethod,sBudget=sBudget,sSplits=sSplits,sCheating=sCheating,
+                   sReplicationPower=sReplicationPower,sReplicationSigOriginal=sReplicationSigOriginal,
+                   differenceSource=differenceSource)
+  
   if (single) {
     doSingle()
     outputNow<-"Description"
@@ -141,7 +161,7 @@ doMetaScience<-function(doingInvestg,world="Binary",rp=0.3,pNull=0.5,
   svgBox(height=350,aspect=1.5,fontScale=1.2)
   setBrawEnv("graphicsType","HTML")
   
-  if (steppartInv=="0") setBrawEnv("fullOutput",0)
+  if (stepInv=="0") setBrawEnv("fullOutput",0)
   else setBrawEnv("fullOutput",1)
   if (steppartInv=="2B") setBrawEnv("reportCounts",TRUE)
   else setBrawEnv("reportCounts",FALSE)
