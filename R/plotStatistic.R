@@ -826,6 +826,7 @@ simulations_hist<-function(pts,valType,ylim,histGain,histGainrange){
 simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
                         i=1,scale=1,width=1,col="white",alpha=1,useSignificanceCols=braw.env$useSignificanceCols,
                         histStyle="width",orientation="vert",ylim,histGain=NA,histGainrange=NA,
+                        polygonArea=0.5,
                         npointsMax=braw.env$npointsMax,sequence=FALSE){
   se_size<-0.25
   
@@ -909,9 +910,14 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
     pts<-pts[use,]
     }
     xr<-makeFiddle(pts$y1,2/40/braw.env$plotArea[4],orientation)
+    
+    pa<-chull(pts$y1,xr)
+    p1<-abs(polyarea(pts$y1[pa],xr[pa]))
+
     switch(orientation,
            "horz"={
-             hgain<-0.9
+             if (sequence) hgain<-0.8
+             else hgain<-abs(polygonArea/p1)
              hoff<-0.025
              },
            "vert"={
@@ -920,7 +926,9 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
            })
     dotSize<-min(4,braw.env$dotSize*sqrt(min(1,100/length(pts$y1))))
     # if (max(abs(xr))>0) xr<-xr*hgain/max(abs(xr))
-    xr<-xr*hgain+hoff
+    xr<-xr*hgain
+    if (max(xr)<0.5) xr<-xr/max(xr)*0.5
+    xr<-xr+hoff
     
     pts$x<-pts$x+xr*sum(width)*0.3/0.35
     if (sequence)  {
@@ -1392,10 +1400,11 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       theoryVals<-theory$theoryVals
       theoryDens_all<-theory$theoryDens_all
       theoryDens_sig<-theory$theoryDens_sig
+      p<-abs(polyarea(theoryVals,theoryDens_all))
       
       if (theoryFirst)
       g<-theoryPlot(g,theory,orientation,baseColour,theoryAlpha,xoff[i])
-      
+
       histGainrange<-sort(c(theoryVals[1],theoryVals[length(theoryVals)]))
       if (is.element(showType,c("wp","ws")))   histGainrange<-c(0.06,0.99)
       use<-theoryVals>=histGainrange[1] & theoryVals<=histGainrange[2]
@@ -1439,6 +1448,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       g<-simulations_plot(g,pts,showType,analysis$hypothesis$effect$world$worldOn,analysis$design,
                           i,orientation=orientation,
                        ylim=ylim,histGain=histGain,histGainrange=histGainrange,
+                       polygonArea=p,
                        sequence=sequence)
 
       ns<-c()

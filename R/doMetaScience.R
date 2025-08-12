@@ -105,7 +105,9 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
 }
 
 #' @export
-doMetaScience<-function(doingMetaScience,metaScience=prepareMetaScience(),nreps=200) {
+doMetaScience<-function(doingMetaScience,metaScience=NULL,nreps=200) {
+  
+  if (is.null(metaScience)) metaScience<-prepareMetaScience(doingMetaScience)
   
   setBrawDef("hypothesis",metaScience$hypothesis)
   setBrawDef("design",metaScience$design)
