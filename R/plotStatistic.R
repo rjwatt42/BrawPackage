@@ -15,7 +15,8 @@ theoryPlot<-function(g,theory,orientation,baseColour,theoryAlpha,xoff) {
          })
   if (is.null(theoryDens_sig)) baseColour<-"white"
   g<-addG(g,dataPolygon(data=theory_all,colour=NA,fill=baseColour,alpha=theoryAlpha))
-
+    g<-addG(g,dataPath(data=theory_all,colour="#000000",linewidth=0.2))
+  
   if (!is.null(theoryDens_sig)) {
     i2<-0
     while (i2<length(theoryDens_sig)) {
@@ -31,15 +32,15 @@ theoryPlot<-function(g,theory,orientation,baseColour,theoryAlpha,xoff) {
                theory_sig<-data.frame(y=c(theoryVals[use],rev(theoryVals[use])),x=c(theoryDens_sig[use],-rev(theoryDens_sig[use]))+xoff)
              })
       g<-addG(g,dataPolygon(data=theory_sig,colour=NA,fill=braw.env$plotColours$infer_sigC,alpha=theoryAlpha))
-      if (showAll) 
+      # if (showAll) 
         g<-addG(g,dataPath(data=theory_sig,colour="black",linewidth=0.1))
-      else
-        g<-addG(g,dataPath(data=theory_sig,colour="white",linewidth=0.1))
+      # else
+        # g<-addG(g,dataPath(data=theory_sig,colour="white",linewidth=0.1))
     }
   }
   
-  if (!showAll) 
-    g<-addG(g,dataPath(data=theory_sig,colour="#000000",linewidth=0.2))
+  # if (!showAll) 
+  #   g<-addG(g,dataPath(data=theory_sig,colour="#000000",linewidth=0.2))
   
   return(g)
 }
@@ -818,8 +819,8 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
                         i=1,scale=1,width=1,col="white",alpha=1,useSignificanceCols=braw.env$useSignificanceCols,
                         histStyle="width",orientation="vert",ylim,histGain=NA,histGainrange=NA,
                         npointsMax=braw.env$npointsMax,sequence=FALSE){
+
   se_size<-0.25
-  
   c1=col
   c2=col
   c3=col
@@ -1021,14 +1022,12 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
     dx<-diff(hists$x[1:2])
 
     if (length(width)==1) width=c(width,width)
-    
     dens<-cbind(hists$h1,hists$h2,hists$h3,hists$h4)
     cols<-c(c1,c2,c3,c4)
     if (doingDLLR) {
       dens<-cbind(hists$h2,hists$h5,hists$h1,hists$h3,hists$h4,hists$h6)
       cols<-c(c1,c5,c4,c3,c2,c6)
     }
-    
     for (i in 1:nrow(dens)) {
       ystart<-0
       for (j in 1:ncol(dens)) {
@@ -1052,7 +1051,7 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
           switch(orientation,
                  "vert"={
                    data<-data.frame(y=c(hists$x[i],hists$x[i],hists$x[i+1],hists$x[i+1]),
-                                    x=(c(-w,0,0,-w)-ystart)*width[1]+xoff)
+                                    x=-(c(w,0,0,w)+ystart)*width[1]+xoff)
                    g<-addG(g,dataPolygon(data=data,
                                          colour=colour, fill = cols[j],alpha=alpha))
                    data<-data.frame(y=c(hists$x[i],hists$x[i],hists$x[i+1],hists$x[i+1]),
@@ -1081,6 +1080,17 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
        y<-c(y,dens1[nrow(dens)],dens1[nrow(dens)],0)
        g<-addG(g,dataLine(data.frame(y=x*width[2]+xoff,x=y),colour="black"))
        g<-addG(g,dataLine(data.frame(y=x*width[1]+xoff,x=-y),colour="black"))
+    } else {
+      dens1<-rowSums(dens)
+      x<-c(hists$x[1],hists$x[1])
+      y<-c(0,dens1[1])
+      for (i in 1:(nrow(dens)-1)) {
+        x<-c(x,hists$x[i],hists$x[i+1],hists$x[i+1])
+        y<-c(y,dens1[i],dens1[i],dens1[i+1])
+      }
+      x<-c(x,hists$x[nrow(dens)],hists$x[nrow(dens)+1],hists$x[nrow(dens)+1]) 
+      y<-c(y,dens1[nrow(dens)],dens1[nrow(dens)],0)
+      g<-addG(g,dataLine(data.frame(x=x*width[2]+xoff,y=y),colour="black"))
     }
     # g<-addG(g,
     #   dataPolygon(data=data.frame(y=hist1$x,x=hist1$y1+xoff),colour=NA, fill = c2,alpha=simAlpha),
@@ -1397,7 +1407,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       if (is.element(showType,c("wp","ws")))   histGainrange<-c(0.06,0.99)
       use<-theoryVals>=histGainrange[1] & theoryVals<=histGainrange[2]
       histGain<-abs(sum(theoryDens_all[use]*c(0,diff(theoryVals[use]))))
-      histGain<-histGain*distGain
+      # histGain<-histGain*distGain
     }
     
     # then the samples
