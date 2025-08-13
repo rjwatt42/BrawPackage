@@ -43,7 +43,7 @@ theoryPlot<-function(g,theory,orientation,baseColour,theoryAlpha,xoff) {
   
   return(g)
 }
-makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,logScale,ylim,labelNSig,labelSig,orientation) {
+makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,logScale,ylim,labelNSig,labelSig,distGain) {
   effect<-hypothesis$effect
   
   effectTheory<-effect
@@ -394,17 +394,9 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
     if (!labelSig) theoryDens_all<-theoryDens_sig
   }
   
-  if (!is.null(theoryDens_all)) {
-    switch(orientation,
-           "horz"={
-             distMax<-0.8
-           },
-           "vert"={
-             distMax<-0.8/2
-           })
-    
+  if (!all(is.na(theoryDens_all))) {
     theoryDens_all[is.na(theoryDens_all)]<-0
-    theoryGain<-1/max(theoryDens_all)*distMax
+    theoryGain<-1/max(theoryDens_all)*distGain
     if (is.infinite(theoryGain)) theoryGain<-0
     theoryDens_all<-theoryDens_all*theoryGain
     
@@ -504,10 +496,9 @@ makeFiddle<-function(y,yd,orientation="horz"){
   xG<-(braw.env$plotArea[3]-braw.env$plotLimits$gap[3]-braw.env$plotLimits$gap[1])/diff(braw.env$plotLimits$xsc)
   rX<-function(x) x*xG
   
-  dotSize<-min(4,braw.env$dotSize*sqrt(min(1,100/length(y))))
-  dotSize<-dotSize/4
+  dotSize<-min(4,braw.env$dotSize*(200/length(y))^2)
   rr<-ceiling(dotSize/4*yG/25/diff(y_vals[c(1,2)]))
-  rj<-1
+  rj<-0.2
   
   dy<-diff(y_vals[c(1,1+rr*2)])
   y_filledp<-y_vals*0
@@ -517,7 +508,7 @@ makeFiddle<-function(y,yd,orientation="horz"){
     for (i in 1:length(y)) {
       use<-which.min(abs(y[i]-y_vals))
       dx<-sqrt(rX(dy)^2-rX(y[i]-y_vals[use])^2)
-      dxr<-dx*runif(1)*rj
+      dxr<-dy*runif(1,-1,1)*rj
       fill<-use+(-rr:rr)
       fill<-fill[fill>=1 & fill<=length(y_vals)]
       x_pos[i]<-y_filledp[use]+dxr
@@ -527,10 +518,9 @@ makeFiddle<-function(y,yd,orientation="horz"){
     for (i in 1:length(y)) {
       use<-which.min(abs(y[i]-y_vals))
       dx<-sqrt(rX(dy)^2-rX(y[i]-y_vals[use])^2)
-      dxr<-dx*runif(1)*rj
+      dxr<-dy*runif(1,-1,1)*rj
       fill<-use+(-rr:rr)
       fill<-fill[fill>=1 & fill<=length(y_vals)]
-      dxr<-dx*runif(1)*rj
       if (y_filledp[use]<y_filledn[use] || (y_filledp[use]==0 && y_filledn[use]==0 && runif(1)>0.5)) {
         x_pos[i]<-y_filledp[use]+dxr
         y_filledp[fill]<-x_pos[i]+dx
@@ -914,19 +904,14 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
     # pa<-chull(pts$y1,xr)
     # p1<-abs(polyarea(pts$y1[pa],xr[pa]))
     # 
+    if (sequence) histGain<-0.8
     switch(orientation,
-           "horz"={
-             if (sequence) hgain<-0.8
-             else hgain<-abs(histGain)*0.8
-             hoff<-0.025
-             },
-           "vert"={
-             hgain<-0.45
-             hoff<-0
-           })
+           "horz"=hoff<-0.025,
+           "vert"=hoff<-0
+           )
     dotSize<-min(4,braw.env$dotSize*sqrt(min(1,100/length(pts$y1))))
     # if (max(abs(xr))>0) xr<-xr*hgain/max(abs(xr))
-    xr<-xr*hgain
+    xr<-xr*histGain
     if (max(xr)<0.5) xr<-xr/max(xr)*0.5
     xr<-xr+hoff
     
@@ -1394,9 +1379,13 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   for (i in 1:length(xoff)){
     histGain<-NA
     histGainrange<-c(NA,NA)
+    switch(orientation,
+           "horz"=distGain<-0.8,
+           "vert"=distGain<-0.45
+    )
     
     if (showTheory) {
-      theory<-makeTheoryMultiple(hypothesis,design,evidence,showType,whichEffect,logScale,ydlim,labelNSig,labelSig,orientation)
+      theory<-makeTheoryMultiple(hypothesis,design,evidence,showType,whichEffect,logScale,ydlim,labelNSig,labelSig,distGain)
       theoryVals<-theory$theoryVals
       theoryDens_all<-theory$theoryDens_all
       theoryDens_sig<-theory$theoryDens_sig
@@ -1408,6 +1397,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       if (is.element(showType,c("wp","ws")))   histGainrange<-c(0.06,0.99)
       use<-theoryVals>=histGainrange[1] & theoryVals<=histGainrange[2]
       histGain<-abs(sum(theoryDens_all[use]*c(0,diff(theoryVals[use]))))
+      histGain<-histGain*distGain
     }
     
     # then the samples
