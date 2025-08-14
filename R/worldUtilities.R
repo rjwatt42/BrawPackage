@@ -26,7 +26,7 @@ nDistrRand<-function(nSamples,design=braw.def$design){
          "Gamma"={
            return(
              round(braw.env$minN+rgamma(nSamples,
-                         shape=design$sN/design$sNRandSD,
+                         shape=(design$sN-braw.env$minN)/design$sNRandSD,
                          scale=design$sNRandSD)
              )
            )
