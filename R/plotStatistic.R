@@ -488,7 +488,7 @@ collectData<-function(analysis,whichEffect) {
 
 makeFiddle<-function(y,yd,orientation="horz"){
   
-  if (length(y)==1) y_vals<- c(-0.1,0,0.1)+y
+  if (min(y)==max(y)) y_vals<- c(-0.1,0,0.1)+y[1]
   else y_vals<-seq(min(y),max(y),length.out=501)
   
   yG<-(braw.env$plotArea[4]-braw.env$plotLimits$gap[4]-braw.env$plotLimits$gap[2])/diff(braw.env$plotLimits$ysc)

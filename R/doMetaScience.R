@@ -81,12 +81,12 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
                   "Interaction"={
                     hypothesis<-makeHypothesis(IV2=makeVariable("IV2","Interval"),
                                                effect=makeEffect(rIV=0.3,rIV2=0,rIVIV2DV=-0.3,world=makeWorld(FALSE)))
-                    design<-makeDesign(sN=1000,sIV2RangeOn=TRUE,sIV2Range=c(1,1),sRangeProb=0.5)
+                    design<-makeDesign(sN=1000,sIV2RangeOn=TRUE,sIV2Range=c(1,1))
                   },
                   "Covariation"={
                     hypothesis<-makeHypothesis(IV2=makeVariable("IV2","Interval"),
                                                effect=makeEffect(rIV=0.3,rIV2=-sqrt(0.3),rIVIV2=sqrt(0.3),world=makeWorld(FALSE)))
-                    design<-makeDesign(sN=1000,sIV2RangeOn=TRUE,sIV2Range=range<-c(0,0),sRangeProb=0.5)
+                    design<-makeDesign(sN=1000,sIV2RangeOn=TRUE,sIV2Range=range<-c(0,0))
                   })
            switch(partMetaSci,
                   "A"={
@@ -132,6 +132,7 @@ doMetaScience<-function(doingMetaScience,metaScience=NULL,nreps=200) {
     outputNow<-"Multiple"
   }
     
+  if (1==2) {
   if (stepMetaSci=="5") {
     if (single) {
       oldSingle<-braw.res$result
@@ -147,7 +148,8 @@ doMetaScience<-function(doingMetaScience,metaScience=NULL,nreps=200) {
       # multiple$hypothesis$effect$world<-makeWorld(TRUE,"Single","r",0.3,populationNullp=0.5)
       # multiple$result$hypothesis$effect$world<-makeWorld(TRUE,"Single","r",0.3,populationNullp=0.5)
       setBrawRes("multiple",multiple)
-    } 
+    }
+  }
   }
   
   # display the results
@@ -173,10 +175,10 @@ doMetaScience<-function(doingMetaScience,metaScience=NULL,nreps=200) {
     else open<-1
   } else {
     if (stepMetaSci=="5") {
-        investgS<-showMultiple(showType="rs",dimension=1,orientation="horz")
-        investgR<-reportMultiple(showType="rs",compact=TRUE)
+        investgS<-showMultiple(showType="rse",dimension=1,orientation="horz",whichEffect = "Main 1",effectType="direct")
+        investgR<-reportMultiple(showType="rs",compact=TRUE,whichEffect = "Main 1",effectType="direct")
       } else {
-        investgS<-showMultiple(showType="rse",dimension=1,orientation="horz")
+        investgS<-showMultiple(showType="rse",dimension=1,orientation="horz",whichEffect = "Main 1",effectType="direct")
         investgR<-reportMultiple(showType="NHST",compact=TRUE)
       }
       open<-2
@@ -217,10 +219,10 @@ doMetaScience<-function(doingMetaScience,metaScience=NULL,nreps=200) {
       open=open
     )
   
-  if (stepMetaSci=="5") {
-    if (single) braw.res$result<-oldSingle
-      else braw.res$multiple<-oldMultiple
-  }
+  # if (stepMetaSci=="5") {
+  #   if (single) braw.res$result<-oldSingle
+  #     else braw.res$multiple<-oldMultiple
+  # }
   
   return(investgResults)
 }

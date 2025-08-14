@@ -4,10 +4,10 @@ makeFormula<-function(IV,IV2,DV,design,evidence,analysis,an_vars){
   assign_string = " <<"  
   times_string1 = "x"
   times_string2 = ""
-  times_string1 = "\u22c5"
+  times_string1 = "&#x22c5"
   times_string1 = "("
   times_string2 = ")"
-  minus_string = " \u2212 "
+  minus_string = " &#x2212 "
   plus_string = " + "
 
   coeffs<-analysis$coefficients
@@ -102,7 +102,7 @@ reportDescription<-function(analysis=braw.res$result){
   
   an_vars<-sub("iv1:",paste(IV$name,":",sep=""),an_vars)
   an_vars<-sub("iv1",paste(IV$name,"=",sep=""),an_vars)
-  if (!is.null(IV2)) {
+  if (!is.null(IV2) || evidence$AnalysisTerms>1) {
     an_vars<-sub("iv2$",IV2$name,an_vars)
     an_vars<-sub("iv2",paste(IV2$name,"=",sep=""),an_vars)
   } 
@@ -132,7 +132,7 @@ reportDescription<-function(analysis=braw.res$result){
           if (evidence$McFaddens && DV$type=="Categorical") McF<-paste0("!j",brawFormat(analysis$rIV^2,digits=braw.env$report_precision))
           outputText<-c(outputText,IV$name,
                                    paste(brawFormat(analysis$rIV,digits=braw.env$report_precision),
-                                                             " \u00B1 ",brawFormat(analysis$rIVse,digits=braw.env$report_precision),
+                                                             " &#x00B1 ",brawFormat(analysis$rIVse,digits=braw.env$report_precision),
                                                              sep=""),
                         McF,
                         rep("",nc-3)

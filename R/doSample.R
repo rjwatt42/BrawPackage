@@ -218,24 +218,26 @@ makeSampleVar<-function(design,effect,n,MV,MV2){
     }
     
     if ((design$sIVRangeOn || design$sIV2RangeOn) && design$sRangeProb>runif(1)) {
+      # sRangeWidth<-max(0.01,rgamma(1,5,scale=1/5)*(1-design$sRangeVary))
+      sRangeWidth<-0.0
+      sIVRange<-design$sIVRange+c(-1,1)*sRangeWidth
+      sIV2Range<-design$sIV2Range+c(-1,1)*sRangeWidth
       if (design$sRangeVary>0) {
-        sRangeWidth<-rgamma(1,5,scale=1/5)*(1-design$sRangeVary)
-        design$sIVRange<-c(-1,1)*sRangeWidth+rnorm(1,0,design$sRangeVary)
-        design$sIV2Range<-c(-1,1)*sRangeWidth+rnorm(1,0,design$sRangeVary)
+        sIVRange<-sIVRange*0+rnorm(1,0,design$sRangeVary)
+        sIV2Range<-sIV2Range*0+rnorm(1,0,design$sRangeVary)
       }
-
       condition<-rep(TRUE,length(ivr1))
       if (design$sIVRangeOn) {
-        if (design$sIVRange[1]==design$sIVRange[2])
+        if (sIVRange[1]==sIVRange[2])
           ivr1<-ivr*0+design$sIVRange[1]
         else
-          condition<-condition & (ivr1>design$sIVRange[1] & ivr1<design$sIVRange[2])
+          condition<-condition & (ivr1>sIVRange[1] & ivr1<sIVRange[2])
       }
       if (!is.null(MV2) && design$sIV2RangeOn) {
-        if (design$sIV2Range[1]==design$sIV2Range[2])
-          ivr21<-ivr21*0+design$sIV2Range[1]
+        if (sIV2Range[1]==sIV2Range[2])
+          ivr21<-ivr21*0+sIV2Range[1]
         else
-          condition<-condition & (ivr21>design$sIV2Range[1] & ivr21<design$sIV2Range[2])
+          condition<-condition & (ivr21>sIV2Range[1] & ivr21<sIV2Range[2])
       }
       ivr<-c(ivr, ivr1[condition])
       # if (!is.null(MV2))

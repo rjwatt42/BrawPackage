@@ -603,7 +603,7 @@ generalAnalysis<-function(allData,AnalysisTerms,withins=FALSE,ssqType="Type3",ca
 #' @export
 doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,autoShow=FALSE){
 
-  if (evidence$AnalysisTerms<2) sample$hypothesis$IV2<-NULL
+  # if (evidence$AnalysisTerms<2) sample$hypothesis$IV2<-NULL
   
   design<-sample$design
   hypothesis<-sample$hypothesis
@@ -762,8 +762,8 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
       analysis$semCHI2<-c(sem0$stats$chisqr,sem1$stats$chisqr,rep(NA,5))
       analysis$semDF<-c(sem0$stats$chi_df,sem1$stats$chi_df,rep(NA,5))
     }
-    rarrow<-'\u2192'
-    barrow<-'\u2190\u2192'
+    rarrow<-'&#x2192'
+    barrow<-'&#x2190&#x2192'
     analysis$sem<-matrix(c(modelSEMs,which.min(modelSEMs)),nrow=1)
     colnames(analysis$sem)<-c("DV",
                               paste0("IV",rarrow,"DV"),
@@ -1162,10 +1162,9 @@ runSimulation<-function(hypothesis,design,evidence,sigOnly=FALSE,onlyAnalysis=FA
       if (ntrials>=design$sNBudget) {
         break
       }
-    } else {
       if (isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) break
-      if (runif(1)>sigOnly) break
     }
+    if (runif(1)>sigOnly) break
   }
   
   # Replication?

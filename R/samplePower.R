@@ -34,7 +34,7 @@ zn2w<-function(z,n,t=2,alpha=NA){
 rn2w<-function(r,n,t=2,alpha=NA){
   if (is.na(alpha)) alpha<-braw.env$alphaSig
   if (!is.numeric(r)) {
-    rL<-getRList(w)
+    rL<-getRList(r)
     wL<-rn2w(rL$pRho,50)
     return(sum(wL*rL$pRhogain)/sum(rL$pRhogain))
   }

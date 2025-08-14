@@ -221,7 +221,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,1
           braw.env$includeGamma<-FALSE
           braw.env$includeGenExp<-FALSE
           
-          braw.env$alphaChar<-'\u03B1'
+          braw.env$alphaChar<-'&#x03B1'
           
           braw.env$showTheoryHQ<-TRUE
           braw.env$showTheory<-TRUE
@@ -235,7 +235,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,1
           braw.env$variables<-makeDefaultVariables()
           
           braw.env$when_string <- "="
-          braw.env$interaction_string <- "\u00D7"
+          braw.env$interaction_string <- "&#x00D7"
           
           
           ##################################
