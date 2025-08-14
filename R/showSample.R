@@ -1,10 +1,11 @@
-plotSample<-function(IV,DV,effect,ivplot,dvplot,g=NULL) {
+plotSample<-function(IV,DV,effect,ivplot,dvplot,fill=braw.env$plotColours$sampleC,dotSize=1,g=NULL) {
 
   # the population
+  if (is.null(g))
   g<-plotPopulation(IV,DV,effect,alpha=1,g)
-  
+
   # the scattered points
-  dotSize<-braw.env$dotSize
+  dotSize<-dotSize*braw.env$dotSize
   if (length(ivplot)>100) {
     dotSize<-dotSize*sqrt(100/length(ivplot))
   }
@@ -12,7 +13,7 @@ plotSample<-function(IV,DV,effect,ivplot,dvplot,g=NULL) {
   x<-ivplot
   y<-dvplot
   pts<-data.frame(x=x,y=y)
-  g<-addG(g,dataPoint(data=pts,shape=braw.env$plotShapes$data, colour = "#000000", fill = braw.env$plotColours$sampleC, size = dotSize))
+  g<-addG(g,dataPoint(data=pts,shape=braw.env$plotShapes$data, colour = "#000000", fill = fill, size = dotSize))
   if (braw.env$showMedians) {
     if (sample$type=="Categorical") {yuse<-0.5} else {yuse<-median(y)}
     g<-addG(g,horizLine(intercept=yuse,col="red"))
@@ -29,7 +30,7 @@ plotSample<-function(IV,DV,effect,ivplot,dvplot,g=NULL) {
 #' @examples
 #' showSample(sample=doSample(),marginals=FALSE)
 #' @export
-showSample<-function(sample=braw.res$result,marginals=FALSE,plotArea=c(0,0,1,1)){
+showSample<-function(sample=braw.res$result,marginals=FALSE,plotArea=c(0,0,1,1),fill=braw.env$plotColours$sampleC,dotSize=1,g=NULL){
   if (is.null(sample)) sample<-doSingle(autoShow=FALSE)
   
   if (marginals) {
@@ -48,14 +49,14 @@ showSample<-function(sample=braw.res$result,marginals=FALSE,plotArea=c(0,0,1,1))
   
   if (is.null(IV2)) {
     braw.env$plotArea<-plotArea
-    g<-plotSample(IV,DV,effect,sample$ivplot,sample$dvplot)
+    g<-plotSample(IV,DV,effect,sample$ivplot,sample$dvplot,fill=fill,dotSize=dotSize,g=g)
   } else {
     braw.env$plotArea<-c(0,0,0.45,0.55)
     g<-plotSample(IV,IV2,effect,sample$ivplot,sample$iv2plot)
     braw.env$plotArea<-c(0.55,0,0.45,0.55)
-    g<-plotSample(IV,DV,effect,sample$ivplot,sample$dvplot,g)
+    g<-plotSample(IV,DV,effect,sample$ivplot,sample$dvplot,g=g)
     braw.env$plotArea<-c(0.55/2,0.5,0.45,0.55)
-    g<-plotSample(IV2,DV,effect,sample$iv2plot,sample$dvplot,g)
+    g<-plotSample(IV2,DV,effect,sample$iv2plot,sample$dvplot,g=g)
   }
   # braw.env$plotArea<-c(0,0,1,1)
   

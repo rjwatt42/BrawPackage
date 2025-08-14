@@ -350,7 +350,10 @@ showDescription<-function(analysis=braw.res$result,plotArea=c(0,0,1,1),g=NULL) {
   if (analysis$hypothesis$DV$type=="Categorical") setBrawEnv("newSampleDisplay",FALSE)
   
   if (braw.env$newSampleDisplay && braw.env$allScatter) {
-    g<-showSample(analysis,marginals=FALSE)
+    g<-NULL
+    if (!is.null(analysis$ResultHistory$original))
+      g<-showSample(analysis$ResultHistory$original,marginals=FALSE,fill=desat(braw.env$plotColours$sampleC,0.5),dotSize=0.5)
+    g<-showSample(analysis,marginals=FALSE,g=g)
   } else {
     if (is.null(g)) {
       g<-getAxisPrediction(analysis$hypothesis) 
