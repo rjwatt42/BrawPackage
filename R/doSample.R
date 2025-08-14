@@ -217,10 +217,11 @@ makeSampleVar<-function(design,effect,n,MV,MV2){
       ivr21<-rep(0,n)
     }
     
-    if ((design$sIVRangeOn || design$sIV2RangeOn) && design$sRangeP>runif(1)) {
-      if (design$sRangeV>0) {
-        design$sIVRange<-design$sIVRange-mean(design$sIVRange)+rnorm(1,0,design$sRangeV)
-        design$sIV2Range<-design$sIV2Range-mean(design$sIV2Range)+rnorm(1,0,design$sRangeV)
+    if ((design$sIVRangeOn || design$sIV2RangeOn) && design$sRangeProb>runif(1)) {
+      if (design$sRangeVary>0) {
+        sRangeWidth<-rgamma(1,5,scale=1/5)*(1-design$sRangeVary)
+        design$sIVRange<-c(-1,1)*sRangeWidth+rnorm(1,0,design$sRangeVary)
+        design$sIV2Range<-c(-1,1)*sRangeWidth+rnorm(1,0,design$sRangeVary)
       }
 
       condition<-rep(TRUE,length(ivr1))

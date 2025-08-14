@@ -40,7 +40,7 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
              "Budget"={ntrials<-ntrials+result$nval}
       )
     }
-    ResultHistory$sequence<-FALSE
+    ResultHistory$sequence<-2
     res$ResultHistory<-ResultHistory
     return(res)
   }

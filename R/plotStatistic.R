@@ -913,7 +913,7 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
     dotSize<-min(4,braw.env$dotSize*sqrt(min(1,100/length(pts$y1))))
     # if (max(abs(xr))>0) xr<-xr*hgain/max(abs(xr))
     xr<-xr*histGain
-    if (max(xr)<0.5) xr<-xr/max(xr)*0.5
+    if (!sequence && max(xr)<0.5) xr<-xr/max(xr)*0.5
     xr<-xr+hoff
     
     pts$x<-pts$x+xr*sum(width)*0.3/0.35
@@ -991,7 +991,7 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
         pts_wsig=pts[pts$y3,]
         g<-addG(g,dataPoint(data=data.frame(x=pts_wsig$x,y=pts_wsig$y1),shape=braw.env$plotShapes$study, colour = co1, alpha=alpha, fill = c3, size = dotSize))
       }
-    if (sequence) {
+    if (sequence==1) {
       if (design$Replication$On && design$Replication$Keep=="MetaAnalysis") {
         if (metaPts$sig && metaPts$notNull) c3<-braw.env$plotColours$infer_sigNonNull
         if (!metaPts$sig && metaPts$notNull) c3<-braw.env$plotColours$infer_nsigNonNull
@@ -1738,7 +1738,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                 colours<-c(braw.env$plotColours$infer_sigC,braw.env$plotColours$infer_sigC,braw.env$plotColours$infer_nsigC)
               }
       )
-      if (!sequence && length(labels)>0) g<-addG(g,dataLegend(data.frame(names=labels,colours=colours),title=title,shape=22))
+      if (!(sequence==1) && length(labels)>0) g<-addG(g,dataLegend(data.frame(names=labels,colours=colours),title=title,shape=22))
     }
     }
     
@@ -1946,7 +1946,7 @@ ps_plot<-function(analysis,disp,showTheory=TRUE,showLegend=FALSE,showData=TRUE,g
         cols<-c(cols,col4,col3)
         nms<-c(nms,lb4,lb3)
       }       
-      if (!analysis$sequence)
+      if (!(analysis$sequence==1))
         g<-addG(g,dataLegend(data.frame(colours=cols,names=nms),title="",shape=22))
 
     }

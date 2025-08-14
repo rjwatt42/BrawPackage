@@ -1,8 +1,10 @@
-rootMS<-function(doing) substr(doing,1,5)
-stepMS<-function(doing) substr(doing,5,5)
-partMS<-function(doing) substr(doing,6,6)
-singleMS<-function(doing) substr(doing,7,7)!='m'
+# stepMS<-function(doing) substr(doing,5,5)
+# partMS<-function(doing) substr(doing,6,6)
+# singleMS<-function(doing) substr(doing,7,7)!='m'
 
+stepMS<-function(doing) gsub('[A-Za-z]*([0-9]*)[A-Ia-i]*','\\1',doing)
+partMS<-function(doing) gsub('[A-Za-z]*[0-9]*([A-Ia-i]*)','\\1',doing)
+singleMS<-function(doing) substr(doing,nchar(doing),nchar(doing))
 
 #' @export
 prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
@@ -79,21 +81,21 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
                   "Interaction"={
                     hypothesis<-makeHypothesis(IV2=makeVariable("IV2","Interval"),
                                                effect=makeEffect(rIV=0.3,rIV2=0,rIVIV2DV=-0.3,world=makeWorld(FALSE)))
-                    design<-makeDesign(sN=1000,sIV2RangeOn=TRUE,sIV2Range=c(1,1),sRangeP=0.5)
+                    design<-makeDesign(sN=1000,sIV2RangeOn=TRUE,sIV2Range=c(1,1),sRangeProb=0.5)
                   },
                   "Covariation"={
                     hypothesis<-makeHypothesis(IV2=makeVariable("IV2","Interval"),
                                                effect=makeEffect(rIV=0.3,rIV2=-sqrt(0.3),rIVIV2=sqrt(0.3),world=makeWorld(FALSE)))
-                    design<-makeDesign(sN=1000,sIV2RangeOn=TRUE,sIV2Range=range<-c(0,0),sRangeP=0.5)
+                    design<-makeDesign(sN=1000,sIV2RangeOn=TRUE,sIV2Range=range<-c(0,0),sRangeProb=0.5)
                   })
            switch(partMetaSci,
                   "A"={
-                    design$sRangeP<-0.5
-                    design$sRangeV<-0
+                    design$sRangeProb<-0.5
+                    design$sRangeVary<-0
                   },
                   "B"={
-                    design$sRangeP<-1
-                    design$sRangeV<-1
+                    design$sRangeProb<-1
+                    design$sRangeVary<-1
                   }
            )
            evidence<-makeEvidence(AnalysisTerms=1)
@@ -113,14 +115,12 @@ doMetaScience<-function(doingMetaScience,metaScience=NULL,nreps=200) {
   setBrawDef("design",metaScience$design)
   setBrawDef("evidence",metaScience$evidence)
   
-  if (nchar(doingMetaScience)<7) doingMetaScience<-paste0(doingMetaScience,'s')
-  
   setHTML()
-  rootMetaSci<-rootMS(doingMetaScience)
   stepMetaSci<-stepMS(doingMetaScience)
   partMetaSci<-partMS(doingMetaScience)
   steppartMetaSci<-paste0(stepMetaSci,partMetaSci)
-  single<-singleMS(doingMetaScience)
+  rootMetaSci<-paste0("Step",stepMetaSci,partMetaSci)
+  single<-singleMS(doingMetaScience)!='m'
   
   if (single) {
     doSingle()
@@ -203,7 +203,7 @@ doMetaScience<-function(doingMetaScience,metaScience=NULL,nreps=200) {
                 '</table>',
                 '</div>'
   )
-  linkLabel<-paste0(rootMetaSci,partMetaSci)
+  linkLabel<-paste0(rootMetaSci)
   investgResults<-
     generate_tab(
       title="MetaScience:",
