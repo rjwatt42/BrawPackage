@@ -10,7 +10,7 @@ singleMS<-function(doing) substr(doing,nchar(doing),nchar(doing))
 prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
                         sN=42,sMethod="Convenience",sBudget=320,sSplits=16,sCheating="Grow",
                         sReplicationPower=0.9,sReplicationSigOriginal=TRUE,
-                        differenceSource="Interaction"
+                        differenceSource="Interaction",range=NULL,rangeVar=NULL,rangeP=NULL,analysisTerms=1
                         ) {
 
   stepMetaSci<-stepMS(doingMetaScience)
@@ -78,44 +78,65 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
          },
          "5"={
            switch(differenceSource,
+                  "None"={
+                    hypothesis<-makeHypothesis(IV2=makeVariable("IV2","Interval"),
+                                               effect=makeEffect(rIV=0.3,rIV2=-sqrt(0.3),rIVIV2=sqrt(0.3),world=makeWorld(FALSE)))
+                    design<-makeDesign(sN=1000,sIV2RangeOn=FALSE)
+                  },
                   "Interaction"={
                     hypothesis<-makeHypothesis(IV2=makeVariable("IV2","Interval"),
                                                effect=makeEffect(rIV=0.3,rIV2=0,rIVIV2DV=-0.3,world=makeWorld(FALSE)))
-                    design<-makeDesign(sN=1000,sIV2RangeOn=TRUE,sIV2Range=c(1,1))
+                    if (is.null(range)) range<-c(0,0)+1
+                    design<-makeDesign(sN=1000,sIV2RangeOn=TRUE,sIV2Range=range)
                   },
                   "Covariation"={
                     hypothesis<-makeHypothesis(IV2=makeVariable("IV2","Interval"),
                                                effect=makeEffect(rIV=0.3,rIV2=-sqrt(0.3),rIVIV2=sqrt(0.3),world=makeWorld(FALSE)))
-                    design<-makeDesign(sN=1000,sIV2RangeOn=TRUE,sIV2Range=range<-c(0,0))
+                    if (is.null(range)) range<-c(0,0)
+                    design<-makeDesign(sN=1000,sIV2RangeOn=TRUE,sIV2Range=range)
                   })
            switch(partMetaSci,
                   "A"={
-                    design$sRangeProb<-0.5
-                    design$sRangeVary<-0
+                    if (is.null(rangeP)) rangeP<-0.5
+                    if (is.null(rangeVar)) rangeVar<-0
                   },
                   "B"={
-                    design$sRangeProb<-1
-                    design$sRangeVary<-1
+                    if (is.null(rangeP)) rangeP<-0.5
+                    if (is.null(rangeVar)) rangeVar<-0.75
                   }
            )
-           evidence<-makeEvidence(AnalysisTerms=1)
+           design$sRangeProb<-rangeP
+           design$sRangeVary<-rangeVar
+           evidence<-makeEvidence(AnalysisTerms=analysisTerms)
          }
   )
   hypothesis$effect$world$populationPDFk<-rp
 
-  return(list(hypothesis=hypothesis,design=design,evidence=evidence))
+  return(list(step=doingMetaScience,hypothesis=hypothesis,design=design,evidence=evidence))
 }
 
 #' @export
-doMetaScience<-function(doingMetaScience,metaScience=NULL,nreps=200) {
+doMetaScience<-function(metaScience,nreps=200,
+                        world="Binary",rp=0.3,pNull=0.5,
+                        sN=42,sMethod="Convenience",sBudget=320,sSplits=16,sCheating="Grow",
+                        sReplicationPower=0.9,sReplicationSigOriginal=TRUE,
+                        differenceSource="Interaction",range=NULL,rangeVar=NULL,rangeP=NULL,analysisTerms=1
+) {
   
-  if (is.null(metaScience)) metaScience<-prepareMetaScience(doingMetaScience)
-  
+  if (is.character(metaScience)) 
+    metaScience<-prepareMetaScience(metaScience,
+                                    world=world,rp=rp,pNull=pNull,
+                                    sN=sN,sMethod=sMethod,sBudget=sBudget,sSplits=sSplits,sCheating=sCheating,
+                                    sReplicationPower=sReplicationPower,sReplicationSigOriginal=sReplicationSigOriginal,
+                                    differenceSource=differenceSource,range=range,rangeVar=rangeVar,rangeP=rangeP,analysisTerms=analysisTerms
+    )
+
   setBrawDef("hypothesis",metaScience$hypothesis)
   setBrawDef("design",metaScience$design)
   setBrawDef("evidence",metaScience$evidence)
   
   setHTML()
+  doingMetaScience<-metaScience$step
   stepMetaSci<-stepMS(doingMetaScience)
   partMetaSci<-partMS(doingMetaScience)
   steppartMetaSci<-paste0(stepMetaSci,partMetaSci)

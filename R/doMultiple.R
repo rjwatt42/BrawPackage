@@ -92,7 +92,7 @@ mergeMultiple<-function(r1,r2) {
     er.kt=rbind(r1$er.kt,r2$er.kt)
   )
   colnames(newResult$sem)<-colnames(r2$sem)
-  if (!is.null(r1$rIV2) && !all(is.na(r1$rIV2))) {
+  # if (!is.null(r1$rIV2) && !all(is.na(r1$rIV2))) {
     newResult<-c(newResult,list(
       rIV2=rbind(r1$rIV2,r2$rIV2),
       pIV2=rbind(r1$pIV2,r2$pIV2),
@@ -108,7 +108,7 @@ mergeMultiple<-function(r1,r2) {
       )
     )
     )
-  }  
+  # }  
   
   return(newResult)
 }

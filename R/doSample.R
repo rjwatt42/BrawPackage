@@ -104,6 +104,8 @@ makeSampleVar<-function(design,effect,n,MV,MV2){
   ivr2=c()
   dvr_s<-c()
   dvr_m<-c()
+  if (design$sRangeProb<runif(1)) design$sIVRangeOn<-design$sIV2RangeOn<-FALSE
+    
   while (length(ivr)<n) {
     switch (design$sMethod$type,
             "Random"={
@@ -217,14 +219,14 @@ makeSampleVar<-function(design,effect,n,MV,MV2){
       ivr21<-rep(0,n)
     }
     
-    if ((design$sIVRangeOn || design$sIV2RangeOn) && design$sRangeProb>runif(1)) {
+    if ((design$sIVRangeOn || design$sIV2RangeOn)) {
       # sRangeWidth<-max(0.01,rgamma(1,5,scale=1/5)*(1-design$sRangeVary))
       sRangeWidth<-0.0
       sIVRange<-design$sIVRange+c(-1,1)*sRangeWidth
       sIV2Range<-design$sIV2Range+c(-1,1)*sRangeWidth
       if (design$sRangeVary>0) {
-        sIVRange<-sIVRange*0+rnorm(1,0,design$sRangeVary)
-        sIV2Range<-sIV2Range*0+rnorm(1,0,design$sRangeVary)
+        sIVRange<-sIVRange+rnorm(1,0,design$sRangeVary)
+        sIV2Range<-sIV2Range+rnorm(1,0,design$sRangeVary)
       }
       condition<-rep(TRUE,length(ivr1))
       if (design$sIVRangeOn) {
@@ -252,6 +254,7 @@ makeSampleVar<-function(design,effect,n,MV,MV2){
       dvr_s<-c(dvr_s,dvr1_s)
     }
   }
+
   data<-list(ivr=ivr[1:n],ivr2=ivr2[1:n],dvr_m=dvr_m[1:n],dvr_s=dvr_s[1:n])
 }
 
