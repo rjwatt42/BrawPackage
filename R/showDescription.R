@@ -351,7 +351,7 @@ showDescription<-function(analysis=braw.res$result,plotArea=c(0,0,1,1),g=NULL) {
   
   if (braw.env$newSampleDisplay && braw.env$allScatter) {
     g<-NULL
-    if (!is.null(analysis$ResultHistory$original))
+    if (!is.null(analysis$ResultHistory$original)) 
       g<-showSample(analysis$ResultHistory$original,marginals=FALSE,fill=desat(braw.env$plotColours$sampleC,0.5),dotSize=0.5)
     g<-showSample(analysis,marginals=FALSE,g=g)
   } else {
@@ -365,11 +365,18 @@ showDescription<-function(analysis=braw.res$result,plotArea=c(0,0,1,1),g=NULL) {
             "Ordinal"=g<-plotParDescription(analysis,g),
             "Categorical"=g<-plotCatDescription(analysis,g)
     )
-    g<-addG(g,dataLegend(data.frame(names=c(paste0("n=",analysis$nval),
-                                            paste0("r[s]=",round(analysis$rIV,3))),
-                                    colours=c(braw.env$plotColours$sampleC,
-                                              braw.env$plotColours$descriptionC)),
-                         title="",shape=c(21,22)))
+    names<-c(paste0("n=",analysis$nval), paste0("r[s]=",round(analysis$rIV,3)))
+    colours<-c(braw.env$plotColours$sampleC,
+               braw.env$plotColours$descriptionC)
+    if (!is.null(analysis$ResultHistory$original)) {
+      if (analysis$ResultHistory$original$pIV>braw.env$alphaSig) title<-"No Replication"
+      else {
+        if (analysis$pIV>braw.env$alphaSig) title<-"Replication Failed"
+        else title<-"Replication Success"
+      }
+    } else title<-""
+    g<-addG(g,dataLegend(data.frame(names=names,colours=colours),
+                         title=title,shape=c(21,22)))
   } else{
     g<-nullPlot()
     if (analysis$evidence$AnalysisTerms==3) {
