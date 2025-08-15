@@ -913,7 +913,7 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
     dotSize<-min(4,braw.env$dotSize*sqrt(min(1,100/length(pts$y1))))
     # if (max(abs(xr))>0) xr<-xr*hgain/max(abs(xr))
     xr<-xr*histGain
-    if (!sequence && max(xr)<0.5) xr<-xr/max(xr)*0.5
+    if (!sequence && max(xr)<0.5 && length(xr)>10) xr<-xr/max(xr)*0.5
     xr<-xr+hoff
     
     pts$x<-pts$x+xr*sum(width)*0.3/0.35
