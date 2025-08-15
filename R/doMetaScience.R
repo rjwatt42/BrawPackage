@@ -2,8 +2,8 @@
 # partMS<-function(doing) substr(doing,6,6)
 # singleMS<-function(doing) substr(doing,7,7)!='m'
 
-stepMS<-function(doing) gsub('[A-Za-z]*([0-9]*)[A-Ia-i]*','\\1',doing)
-partMS<-function(doing) gsub('[A-Za-z]*[0-9]*([A-Ia-i]*)','\\1',doing)
+stepMS<-function(doing) gsub('[A-Za-z]*([0-9]*)[A-Da-d]*','\\1',doing)
+partMS<-function(doing) gsub('[A-Za-z]*[0-9]*([A-Da-d]*)','\\1',doing)
 singleMS<-function(doing) substr(doing,nchar(doing),nchar(doing))
 
 #' @export
@@ -78,38 +78,37 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
            evidence<-makeEvidence(sigOnly=TRUE)
          },
          "5"={
-           switch(partMetaSci,
-                  "A"={
-                    if (is.null(rangeP)) rangeP<-0.5
-                    if (is.null(rangeVar)) rangeVar<-0
-                    if (is.null(rangeWidth)) rangeWidth<-0
-                  },
-                  "B"={
-                    if (is.null(rangeP)) rangeP<-1
-                    if (is.null(rangeVar)) rangeVar<-0.75
-                    if (is.null(rangeWidth)) rangeWidth<-1
-                  }
-           )
+           if (is.element(partMetaSci,c("A","C"))) {
+             if (is.null(rangeP)) rangeP<-0.5
+             if (is.null(rangeVar)) rangeVar<-0
+             if (is.null(rangeWidth)) rangeWidth<-0
+           } else {
+             if (is.null(rangeP)) rangeP<-1
+             if (is.null(rangeVar)) rangeVar<-0.75
+             if (is.null(rangeWidth)) rangeWidth<-1
+           }
+           sN<-100
            switch(differenceSource,
                   "None"={
                     hypothesis<-makeHypothesis(IV2=makeVariable("IV2","Interval"),
                                                effect=makeEffect(rIV=0.3,rIV2=-sqrt(0.3),rIVIV2=sqrt(0.3),world=makeWorld(FALSE)))
-                    design<-makeDesign(sN=1000,sIV2RangeOn=FALSE)
+                    design<-makeDesign(sN=sN,sIV2RangeOn=FALSE)
                   },
                   "Interaction"={
                     hypothesis<-makeHypothesis(IV2=makeVariable("IV2","Interval"),
                                                effect=makeEffect(rIV=0.3,rIV2=0,rIVIV2DV=-0.3,world=makeWorld(FALSE)))
                     if (is.null(range)) range<-c(0,0)+1+c(-1,1)*rangeWidth/2
-                    design<-makeDesign(sN=1000,sIV2RangeOn=TRUE,sIV2Range=range)
+                    design<-makeDesign(sN=sN,sIV2RangeOn=TRUE,sIV2Range=range)
                   },
                   "Covariation"={
                     hypothesis<-makeHypothesis(IV2=makeVariable("IV2","Interval"),
                                                effect=makeEffect(rIV=0.3,rIV2=-sqrt(0.3),rIVIV2=sqrt(0.3),world=makeWorld(FALSE)))
                     if (is.null(range)) range<-c(0,0)+c(-1,1)*rangeWidth/2
-                    design<-makeDesign(sN=1000,sIV2RangeOn=TRUE,sIV2Range=range)
+                    design<-makeDesign(sN=sN,sIV2RangeOn=TRUE,sIV2Range=range)
                   })
            design$sRangeProb<-rangeP
            design$sRangeVary<-rangeVar
+           if (is.element(partMetaSci,c("C","D"))) design$Replication$On=TRUE
            evidence<-makeEvidence(AnalysisTerms=analysisTerms)
          }
   )
@@ -149,7 +148,8 @@ doMetaScience<-function(metaScience,nreps=200,
   single<-singleMS(doingMetaScience)!='m'
   
   if (single) {
-    doSingle()
+    if (is.element(partMetaSci,c("C","D"))) doSingle(onlyReplication=TRUE)    
+    else doSingle()
     if (stepMetaSci=="5") {
       result<-braw.res$result
       result$hypothesis$IV2<-NULL
@@ -163,26 +163,7 @@ doMetaScience<-function(metaScience,nreps=200,
       doMultiple(nreps)
     outputNow<-"Multiple"
   }
-    
-  if (1==2) {
-  if (stepMetaSci=="5") {
-    if (single) {
-      oldSingle<-braw.res$result
-      result<-braw.res$result
-      result$hypothesis$IV2<-NULL
-      result$hypothesis$effect$world<-makeWorld(TRUE,"Single","r",0.3,populationNullp=0.5)
-      setBrawRes("result",result)
-    } else {
-      oldMultiple<-braw.res$multiple
-      multiple<-braw.res$multiple
-      multiple$hypothesis$IV2<-NULL
-      multiple$result$hypothesis$IV2<-NULL
-      # multiple$hypothesis$effect$world<-makeWorld(TRUE,"Single","r",0.3,populationNullp=0.5)
-      # multiple$result$hypothesis$effect$world<-makeWorld(TRUE,"Single","r",0.3,populationNullp=0.5)
-      setBrawRes("multiple",multiple)
-    }
-  }
-  }
+  
   
   # display the results
   svgBox(height=350,aspect=1.5,fontScale=1.2)
@@ -196,9 +177,10 @@ doMetaScience<-function(metaScience,nreps=200,
   investgD<-braw.res$investgD
   investgS<-braw.res$investgS
   investgR<-braw.res$investgR
+  if (stepMetaSci=="5") showTheory=FALSE else showTheory=TRUE
   if (single) {
     investgD<-showDescription()
-    investgS<-showInference(showType="rse",orientation="horz",dimension=1)
+    investgS<-showInference(showType="rse",orientation="horz",dimension=1,showTheory=showTheory)
     if (is.element(steppartMetaSci,c("3B")))
       investgR<-reportMultiple(showType="NHST",compact=TRUE)
     else     investgR<-reportInference(compact=TRUE)
@@ -206,11 +188,10 @@ doMetaScience<-function(metaScience,nreps=200,
       open<-2                   
     else open<-1
   } else {
+    investgS<-showMultiple(showType="rse",dimension=1,orientation="horz",whichEffect = "Main 1",effectType="direct",showTheory=showTheory)
     if (stepMetaSci=="5") {
-        investgS<-showMultiple(showType="rse",dimension=1,orientation="horz",whichEffect = "Main 1",effectType="direct")
         investgR<-reportMultiple(showType="rs",compact=TRUE,whichEffect = "Main 1",effectType="direct")
       } else {
-        investgS<-showMultiple(showType="rse",dimension=1,orientation="horz",whichEffect = "Main 1",effectType="direct")
         investgR<-reportMultiple(showType="NHST",compact=TRUE)
       }
       open<-2
@@ -250,11 +231,6 @@ doMetaScience<-function(metaScience,nreps=200,
       tabLinkLabel=paste0('&#x24D8 ',linkLabel),
       open=open
     )
-  
-  # if (stepMetaSci=="5") {
-  #   if (single) braw.res$result<-oldSingle
-  #     else braw.res$multiple<-oldMultiple
-  # }
   
   return(investgResults)
 }

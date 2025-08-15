@@ -5,7 +5,7 @@
 #' @examples
 #' analysis<-doSingle(hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence(),autoShow=braw.env$autoShow)#' make a multiple samples
 #' @export
-doSingle<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,autoShow=braw.env$autoShow){
+doSingle<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,onlyReplication=FALSE,autoShow=braw.env$autoShow){
   # sample<-doSample(hypothesis=hypothesis,design=design,autoShow=FALSE)
   # result<-doAnalysis(sample,evidence=evidence,autoShow=autoShow)
   if (evidence$metaAnalysis$On) {
@@ -16,7 +16,9 @@ doSingle<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,evidenc
   } 
   
   evidence$shortHand<-FALSE
-  result<-runSimulation(hypothesis=hypothesis,design=design,evidence=evidence,autoShow=FALSE)
+  if (onlyReplication) oldResult<-braw.res$result
+  else oldResult<-NULL
+  result<-runSimulation(hypothesis=hypothesis,design=design,evidence=evidence,oldResult=oldResult,autoShow=FALSE)
   setBrawRes("result",result)
   if (autoShow) print(showSingle(result))
   
@@ -1142,29 +1144,32 @@ runSimulation<-function(hypothesis,design,evidence,sigOnly=FALSE,onlyAnalysis=FA
     return(res)
   }
 
-  ntrials<-0
-  p_min<-1
-  while (1==1) {
-    # if (!evidence$shortHand) {
+  if (!is.null(oldResult) && design$Replication$On) res<-oldResult
+  else {
+    ntrials<-0
+    p_min<-1
+    while (1==1) {
+      # if (!evidence$shortHand) {
       res<-getSample(hypothesis,design,evidence)
-    # } else {
-    #   res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
-    # }
-    res1<-res
-    if (design$sBudgetOn) {
-      if (res$pIV<p_min) {
-        p_min<-res$pIV
-        res1<-res
-      } else {
-        res<-res1
+      # } else {
+      #   res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
+      # }
+      res1<-res
+      if (design$sBudgetOn) {
+        if (res$pIV<p_min) {
+          p_min<-res$pIV
+          res1<-res
+        } else {
+          res<-res1
+        }
+        ntrials<-ntrials+res$nval
+        if (ntrials>=design$sNBudget) {
+          break
+        }
+        if (isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) break
       }
-      ntrials<-ntrials+res$nval
-      if (ntrials>=design$sNBudget) {
-        break
-      }
-      if (isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) break
+      if (runif(1)>sigOnly) break
     }
-    if (runif(1)>sigOnly) break
   }
   
   # Replication?

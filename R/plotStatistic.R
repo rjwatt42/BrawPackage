@@ -905,14 +905,16 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
     # pa<-chull(pts$y1,xr)
     # p1<-abs(polyarea(pts$y1[pa],xr[pa]))
     # 
-    if (sequence) histGain<-0.8
+    if (sequence && !is.na(histGain)) histGain<-0.8
     switch(orientation,
            "horz"=hoff<-0.025,
            "vert"=hoff<-0
            )
     dotSize<-min(4,braw.env$dotSize*sqrt(min(1,100/length(pts$y1))))
     # if (max(abs(xr))>0) xr<-xr*hgain/max(abs(xr))
-    xr<-xr*histGain
+    if (!is.na(histGain))
+        xr<-xr*histGain
+    else xr<-xr/max(xr)*0.8
     if (!sequence && max(xr)<0.5 && length(xr)>10) xr<-xr/max(xr)*0.5
     xr<-xr+hoff
     
