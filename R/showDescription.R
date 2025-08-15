@@ -351,7 +351,7 @@ showDescription<-function(analysis=braw.res$result,plotArea=c(0,0,1,1),g=NULL) {
   
   if (braw.env$newSampleDisplay && braw.env$allScatter) {
     g<-NULL
-    if (!is.null(analysis$ResultHistory$original)) 
+    if (analysis$design$Replication$On && !is.null(analysis$ResultHistory$original)) 
       g<-showSample(analysis$ResultHistory$original,marginals=FALSE,fill=desat(braw.env$plotColours$sampleC,0.5),dotSize=0.5)
     g<-showSample(analysis,marginals=FALSE,g=g)
   } else {
@@ -368,15 +368,22 @@ showDescription<-function(analysis=braw.res$result,plotArea=c(0,0,1,1),g=NULL) {
     names<-c(paste0("n=",analysis$nval), paste0("r[s]=",round(analysis$rIV,3)))
     colours<-c(braw.env$plotColours$sampleC,
                braw.env$plotColours$descriptionC)
-    if (!is.null(analysis$ResultHistory$original)) {
+    title<-""
+    titleCol<-"black"
+    if (analysis$design$Replication$On) {
       if (analysis$ResultHistory$original$pIV>braw.env$alphaSig) title<-"No Replication"
       else {
-        if (analysis$pIV>braw.env$alphaSig) title<-"Replication Failed"
-        else title<-"Replication Success"
+        if (analysis$pIV>braw.env$alphaSig) {
+          title<-"Replication Failed"
+          titleCol<-darken(braw.env$plotColours$infer_nsigC,off=-0.5)
+        } else {
+          title<-"Replication Success"
+          titleCol<-darken(braw.env$plotColours$infer_sigC,off=-0.5)
+        }
       }
-    } else title<-""
+    } 
     g<-addG(g,dataLegend(data.frame(names=names,colours=colours),
-                         title=title,shape=c(21,22)))
+                         title=title,titleCol=titleCol,shape=c(21,22)))
   } else{
     g<-nullPlot()
     if (analysis$evidence$AnalysisTerms==3) {

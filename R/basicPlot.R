@@ -889,7 +889,7 @@ strNChar<-function(str) {
   nother<-nother-(is.mathLabel(str) & grepl("=",str))*1
   return(nother+nsub*0.6)
 }
-dataLegend<-function(data,title="",fontsize=1,shape=21) {
+dataLegend<-function(data,title="",titleCol="black",fontsize=1,shape=21) {
   fontsize=0.6*fontsize*braw.env$fontSize
   dy=0.06*fontsize
   dx=0.022*fontsize/braw.env$plotArea[3] # because rangeX() below
@@ -906,7 +906,7 @@ dataLegend<-function(data,title="",fontsize=1,shape=21) {
                        colour="#000000",linewidth=0.5))
   )
   if (tn>0)
-    g<-c(g,list(axisText(data=data.frame(x=rangeX(1-ncols*dx+2*dx),y=rangeY(1-dy*tn)),label=title,size=fontsize,fontface="bold"))
+    g<-c(g,list(axisText(data=data.frame(x=rangeX(1-ncols*dx+2*dx),y=rangeY(1-dy*tn)),label=title,colour=titleCol,size=fontsize,fontface="bold"))
     )
   
   if (length(shape)<length(data$names)) shape<-rep(shape,length(data$names))
