@@ -32,9 +32,16 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
       result<-doAnalysis(sample,evidence)
       switch(report,
              "first"={
-               if (minP>braw.env$alphaSig && result$pIV<braw.env$alphaSig) {
-                 minP<-result$pIV
-                 res<-result
+               if (result$pIV<braw.env$alphaSig) {
+                 if (minP>braw.env$alphaSig) {
+                   minP<-result$pIV
+                   res<-result
+                 }
+               } else {
+                 if (result$pIV<minP) {
+                   minP<-result$pIV
+                   res<-result
+                 }
                }
                },
                "lowP"={
