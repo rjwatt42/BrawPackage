@@ -41,7 +41,7 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
                   "B"={
                     design$sCheating<-sCheating
                     design$sCheatingLimit<-"Budget"
-                    design$sCheatingBudget<-sN*0.5
+                    design$sCheatingBudget<-sN*0.1
                   }
            )
            evidence<-makeEvidence()
@@ -112,6 +112,7 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
            evidence<-makeEvidence(AnalysisTerms=analysisTerms)
          }
   )
+  if (world=="Exp") rp<-atanh(rp)
   hypothesis$effect$world$populationPDFk<-rp
 
   return(list(step=doingMetaScience,hypothesis=hypothesis,design=design,evidence=evidence))
@@ -171,7 +172,7 @@ doMetaScience<-function(metaScience,nreps=200,
   
   if (stepMetaSci=="0") setBrawEnv("fullOutput",0)
   else setBrawEnv("fullOutput",1)
-  if (steppartMetaSci=="2B") setBrawEnv("reportCounts",TRUE)
+  if (steppartMetaSci=="3B") setBrawEnv("reportCounts",TRUE)
   else setBrawEnv("reportCounts",FALSE)
   
   investgD<-braw.res$investgD
