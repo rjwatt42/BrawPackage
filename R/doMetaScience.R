@@ -41,8 +41,8 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
                   "B"={
                     design$sCheating<-sCheating
                     design$sCheatingLimit<-"Budget"
-                    design$sCheatingBudget<-sN*0.1
-                    design$sCheatingAttempts<-4
+                    design$sCheatingBudget<-floor(sN*0.1)
+                    design$sCheatingAttempts<-floor(sN*0.1)
                   }
            )
            evidence<-makeEvidence()
