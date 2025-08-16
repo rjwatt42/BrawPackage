@@ -20,6 +20,7 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
   ResultHistory<-list(rIV=result$rIV,pIV=result$pIV,rpIV=result$rpIV,nval=result$nval,df1=result$df1,sequence=TRUE,original=result)
   
   if (is.element(design$sCheating,c("Retry"))) {
+    report<-"first"
     ntrials<-0
     minP<-1
     switch(design$sCheatingLimit,
@@ -29,7 +30,16 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
     while (ntrials<limit) {
       sample<-doSample(hypothesis,design)
       result<-doAnalysis(sample,evidence)
-      if (result$pIV<minP) {res<-result; minP<-result$pIV}
+      switch(report,
+             "first"={
+               if (minP>braw.env$alphaSig && result$pIV<braw.env$alphaSig) {
+                 minP<-result$pIV
+                 res<-result
+               },
+               "lowP"={
+                 if (result$pIV<minP) {res<-result; minP<-result$pIV}
+               }
+             })
       ResultHistory$rIV=c(ResultHistory$rIV,result$rIV)
       ResultHistory$pIV=c(ResultHistory$pIV,result$pIV)
       ResultHistory$rpIV=c(ResultHistory$rpIV,result$rpIV)
