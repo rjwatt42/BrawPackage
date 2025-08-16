@@ -8,7 +8,8 @@ singleMS<-function(doing) substr(doing,nchar(doing),nchar(doing))
 
 #' @export
 prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
-                        sN=42,sMethod="Convenience",sBudget=320,sSplits=16,sCheating="Grow",
+                        sN=42,sMethod="Convenience",
+                        sBudget=320,sSplits=16,sCheating="Replace",sCheatingProportion=0.05,
                         sReplicationPower=0.9,sReplicationSigOriginal=TRUE,
                         differenceSource="Interaction",range=NULL,rangeWidth=0,
                         rangeVar=NULL,rangeP=NULL,analysisTerms=1
@@ -41,8 +42,8 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
                   "B"={
                     design$sCheating<-sCheating
                     design$sCheatingLimit<-"Budget"
-                    design$sCheatingBudget<-floor(sN*0.1)
-                    design$sCheatingAttempts<-floor(sN*0.1)
+                    design$sCheatingBudget<-floor(sN*sCheatingProportion)
+                    design$sCheatingAttempts<-floor(sN*sCheatingProportion)
                   }
            )
            evidence<-makeEvidence()
@@ -122,7 +123,8 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
 #' @export
 doMetaScience<-function(metaScience,nreps=200,
                         world="Binary",rp=0.3,pNull=0.5,
-                        sN=42,sMethod="Convenience",sBudget=320,sSplits=16,sCheating="Grow",
+                        sN=42,sMethod="Convenience",sBudget=320,sSplits=16,
+                        sCheating="Grow",sCheatingProportion=0.05,
                         sReplicationPower=0.9,sReplicationSigOriginal=TRUE,
                         differenceSource="Interaction",range=NULL,rangeWidth=0,
                         rangeVar=NULL,rangeP=NULL,analysisTerms=1
@@ -131,7 +133,8 @@ doMetaScience<-function(metaScience,nreps=200,
   if (is.character(metaScience)) 
     metaScience<-prepareMetaScience(metaScience,
                                     world=world,rp=rp,pNull=pNull,
-                                    sN=sN,sMethod=sMethod,sBudget=sBudget,sSplits=sSplits,sCheating=sCheating,
+                                    sN=sN,sMethod=sMethod,sBudget=sBudget,sSplits=sSplits,
+                                    sCheating=sCheating,sCheatingProportion=sCheatingProportion,
                                     sReplicationPower=sReplicationPower,sReplicationSigOriginal=sReplicationSigOriginal,
                                     differenceSource=differenceSource,range=range,rangeWidth=rangeWidth,
                                     rangeVar=rangeVar,rangeP=rangeP,analysisTerms=analysisTerms

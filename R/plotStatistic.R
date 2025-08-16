@@ -915,6 +915,7 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
     if (!is.na(histGain))
         xr<-xr*histGain
     else xr<-xr/max(xr)*0.8
+    if (max(xr)>0.9) xr<-xr/max(xr)*0.9
     if (!sequence && max(xr)<0.5 && length(xr)>10) xr<-xr/max(xr)*0.5
     xr<-xr+hoff
     
