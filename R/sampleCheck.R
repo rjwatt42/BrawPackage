@@ -35,11 +35,15 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
                if (minP>braw.env$alphaSig && result$pIV<braw.env$alphaSig) {
                  minP<-result$pIV
                  res<-result
+               }
                },
                "lowP"={
-                 if (result$pIV<minP) {res<-result; minP<-result$pIV}
+                 if (result$pIV<minP) {
+                   minP<-result$pIV
+                   res<-result
+                 }
                }
-             })
+             )
       ResultHistory$rIV=c(ResultHistory$rIV,result$rIV)
       ResultHistory$pIV=c(ResultHistory$pIV,result$pIV)
       ResultHistory$rpIV=c(ResultHistory$rpIV,result$rpIV)
