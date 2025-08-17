@@ -18,7 +18,8 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
 
   stepMetaSci<-stepMS(doingMetaScience)
   partMetaSci<-partMS(doingMetaScience)
-
+  replicate<-replicateMS(doingMetaScience)
+  
   switch(stepMetaSci,
          "0"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld("Plain")))
@@ -69,13 +70,10 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world)))
            if (world!="Plain") hypothesis$effect$world$populationNullp<-pNull
            design<-makeDesign(sN=sN)
-           if (is.element(partMetaSci,c("A","B"))) {
-             design$Replication<-makeReplication(FALSE)
-           } else {
+           if (replicate) 
              design$Replication<-makeReplication(TRUE,
                                                  forceSigOriginal=TRUE,Power=sReplicationPower)
-           }
-           if (is.element(partMetaSci,c("B","D"))) {
+           if (partMetaSci=="B") {
              switch (sReplicationOriginalAnomaly,
                      "Random"={},
                      "Convenience"={
@@ -95,15 +93,18 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
            evidence<-makeEvidence(sigOnly=TRUE)
          },
          "5"={
-           if (is.element(partMetaSci,c("A","C"))) {
-             if (is.null(rangeP)) rangeP<-0.5
-             if (is.null(rangeVar)) rangeVar<-0
-             if (is.null(rangeWidth)) rangeWidth<-0
-           } else {
-             if (is.null(rangeP)) rangeP<-1
-             if (is.null(rangeVar)) rangeVar<-0.75
-             if (is.null(rangeWidth)) rangeWidth<-1
-           }
+           switch (partMetaSci,
+                   "A"={
+                     if (is.null(rangeP)) rangeP<-0.5
+                     if (is.null(rangeVar)) rangeVar<-0
+                     if (is.null(rangeWidth)) rangeWidth<-0
+                   },
+                   "B"={
+                     if (is.null(rangeP)) rangeP<-1
+                     if (is.null(rangeVar)) rangeVar<-0.75
+                     if (is.null(rangeWidth)) rangeWidth<-1
+                   }
+           )
            sN<-100
            switch(differenceSource,
                   "None"={
@@ -125,7 +126,7 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
                   })
            design$sRangeProb<-rangeP
            design$sRangeVary<-rangeVar
-           if (is.element(partMetaSci,c("C","D"))) design$Replication$On=TRUE
+           if (replicate) design$Replication$On=TRUE
            evidence<-makeEvidence(AnalysisTerms=analysisTerms)
          }
   )
@@ -166,9 +167,10 @@ doMetaScience<-function(metaScience,nreps=200,
   steppartMetaSci<-paste0(stepMetaSci,partMetaSci)
   rootMetaSci<-paste0("Step",stepMetaSci,partMetaSci)
   single<-singleMS(doingMetaScience)
+  replicate<-replicateMS(doingMetaScience)
   
   if (single) {
-    if (is.element(partMetaSci,c("C","D"))) doSingle(onlyReplication=TRUE)    
+    if (replicate) doSingle(onlyReplication=TRUE)    
     else doSingle()
     if (stepMetaSci=="5") {
       result<-braw.res$result
