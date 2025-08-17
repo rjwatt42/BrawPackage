@@ -70,9 +70,6 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world)))
            if (world!="Plain") hypothesis$effect$world$populationNullp<-pNull
            design<-makeDesign(sN=sN)
-           if (replicate) 
-             design$Replication<-makeReplication(TRUE,
-                                                 forceSigOriginal=TRUE,Power=sReplicationPower)
            if (partMetaSci=="B") {
              switch (sReplicationOriginalAnomaly,
                      "Random"={},
@@ -132,7 +129,9 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
   )
   if (world=="Exp") rp<-atanh(rp)
   hypothesis$effect$world$populationPDFk<-rp
-
+  if (replicate) 
+    design$Replication<-makeReplication(TRUE,Power=sReplicationPower)
+  
   return(list(step=doingMetaScience,hypothesis=hypothesis,design=design,evidence=evidence))
 }
 
