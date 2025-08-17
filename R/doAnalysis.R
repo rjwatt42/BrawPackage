@@ -1166,8 +1166,8 @@ runSimulation<-function(hypothesis,design,evidence,sigOnly=FALSE,onlyAnalysis=FA
         if (ntrials>=design$sNBudget) {
           break
         }
-        if (isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) break
       }
+      if (isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) break
       if (runif(1)>sigOnly) break
     }
   }
