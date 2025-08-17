@@ -10,7 +10,7 @@ singleMS<-function(doing) substr(doing,nchar(doing),nchar(doing))
 prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
                         sN=42,sMethod="Convenience",
                         sBudget=320,sSplits=16,sCheating="Replace",sCheatingProportion=0.05,
-                        sReplicationPower=0.9,sReplicationSigOriginal=TRUE,
+                        sReplicationPower=0.9,sReplicationSigOriginal=TRUE,sReplicationOriginalAnomaly="Clean",
                         differenceSource="Interaction",range=NULL,rangeWidth=0,
                         rangeVar=NULL,rangeP=NULL,analysisTerms=1
                         ) {
@@ -68,15 +68,29 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world)))
            if (world!="Plain") hypothesis$effect$world$populationNullp<-pNull
            design<-makeDesign(sN=sN)
-           switch(partMetaSci,
-                  "A"= {
-                    design$Replication<-makeReplication(FALSE)
-                  },
-                  "B"={
-                    design$Replication<-makeReplication(TRUE,
-                                                        forceSigOriginal=TRUE,Power=sReplicationPower)
-                  }
-           )
+           if (is.element(partMetaSci,c("A","B"))) {
+             design$Replication<-makeReplication(FALSE)
+           } else {
+             design$Replication<-makeReplication(TRUE,
+                                                 forceSigOriginal=TRUE,Power=sReplicationPower)
+           }
+           if (is.element(partMetaSci,c("B","D"))) {
+             switch (sReplicationOriginalAnomaly,
+                     "Clean"={},
+                     "Convenience"={
+                       design$sMethod<-makeSampling("Convenience")
+                     },
+                     "Cheating"={
+                       design$sCheating<-"Replace"
+                     },
+                     "Retry"={
+                       design$sCheating<-"Retry"
+                       design$sCheatingLimit="Budget"
+                       design$sCheatingBudget=sN*4-sN
+                       design$sCheatingFixedPop=FALSE
+             
+                     })
+           }
            evidence<-makeEvidence(sigOnly=TRUE)
          },
          "5"={
