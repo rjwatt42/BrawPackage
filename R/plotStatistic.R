@@ -136,7 +136,7 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
                         # carry forward the ns results that don't get replicated
                         theoryDens_ns<-theoryDens_all-theoryDens_sig
                         # if we are forcing significant original, then there are none to carry forward
-                        if (design$Replication$forceSigOriginal) theoryDens_ns<-theoryDens_ns*0
+                        if (design$Replication$forceSigOriginal || evidence$sigOnly) theoryDens_ns<-theoryDens_ns*0
                         # # these are the ones we will replicate: the sig ones
                         theoryFullAll<-theoryFullSig<-0
                         # for each possible population effect size
