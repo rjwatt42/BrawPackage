@@ -10,7 +10,7 @@ singleMS<-function(doing) substr(doing,nchar(doing),nchar(doing))
 prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
                         sN=42,sMethod="Convenience",
                         sBudget=320,sSplits=16,sCheating="Replace",sCheatingProportion=0.05,
-                        sReplicationPower=0.9,sReplicationSigOriginal=TRUE,sReplicationOriginalAnomaly="Clean",
+                        sReplicationPower=0.9,sReplicationSigOriginal=TRUE,sReplicationOriginalAnomaly="Random",
                         differenceSource="Interaction",range=NULL,rangeWidth=0,
                         rangeVar=NULL,rangeP=NULL,analysisTerms=1
                         ) {
@@ -76,7 +76,7 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
            }
            if (is.element(partMetaSci,c("B","D"))) {
              switch (sReplicationOriginalAnomaly,
-                     "Clean"={},
+                     "Random"={},
                      "Convenience"={
                        design$sMethod<-makeSampling("Convenience")
                      },
