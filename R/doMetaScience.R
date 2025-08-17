@@ -4,7 +4,8 @@
 
 stepMS<-function(doing) gsub('[A-Za-z]*([0-9]*)[A-Da-d]*','\\1',doing)
 partMS<-function(doing) gsub('[A-Za-z]*[0-9]*([A-Da-d]*)','\\1',doing)
-singleMS<-function(doing) substr(doing,nchar(doing),nchar(doing))
+singleMS<-function(doing) !grepl('m',gsub('[A-Za-z]*[0-9]*[A-Da-d]*([rm]*)','\\1',doing),fixed=TRUE)
+replicateMS<-function(doing) grepl('r',gsub('[A-Za-z]*[0-9]*[A-Da-d]*([rm]*)','\\1',doing),fixed=TRUE)
 
 #' @export
 prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
@@ -164,7 +165,7 @@ doMetaScience<-function(metaScience,nreps=200,
   partMetaSci<-partMS(doingMetaScience)
   steppartMetaSci<-paste0(stepMetaSci,partMetaSci)
   rootMetaSci<-paste0("Step",stepMetaSci,partMetaSci)
-  single<-singleMS(doingMetaScience)!='m'
+  single<-singleMS(doingMetaScience)
   
   if (single) {
     if (is.element(partMetaSci,c("C","D"))) doSingle(onlyReplication=TRUE)    
