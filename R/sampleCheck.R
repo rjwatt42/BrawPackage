@@ -198,9 +198,14 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
   on.exit(setBrawEnv("alphaSig",oldAlpha),add=TRUE)
 
   oldHypothesis<-hypothesis
+  oldDesign<-design
   oldEvidence<-evidence
   evidence$sigOnly<-FALSE
   setBrawDef('evidence',evidence)
+  
+  design$sCheating<-"none"
+  design$sMethod<-makeSampling("Random")
+  setBrawDef('design',design)
   
   Replication<-design$Replication
   resOriginal<-res
@@ -359,6 +364,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
   res$poIV<-resOriginal$pIV
   
   setBrawDef("evidence",oldEvidence)
+  setBrawDef("design",oldDesign)
   setBrawDef("hypothesis",oldHypothesis)
   return(res)
 }
