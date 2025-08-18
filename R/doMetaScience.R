@@ -48,6 +48,7 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,me
                     design$sCheatingAttempts<-floor(sN*sCheatingProportion)
                   }
            )
+           if (partMetaSci=="B") metaPublicationBias<-FALSE
            evidence<-makeEvidence(sigOnly=metaPublicationBias)
          },
          "3"={
@@ -64,6 +65,7 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,me
                                        sCheatingFixedPop=FALSE)
                   }
            )
+           if (partMetaSci=="B") metaPublicationBias<-FALSE
            evidence<-makeEvidence(sigOnly=metaPublicationBias)
          },
          "4"={
