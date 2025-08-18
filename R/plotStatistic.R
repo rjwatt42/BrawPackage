@@ -499,6 +499,7 @@ makeFiddle<-function(y,yd,orientation="horz"){
   
   dotSize<-min(4,braw.env$dotSize*(200/length(y))^2)
   rr<-ceiling(dotSize/4*yG/25/diff(y_vals[c(1,2)]))
+  rr<-min(rr,floor(length(y_vals)/2))
   rj<-0.2
   
   dy<-diff(y_vals[c(1,1+rr*2)])

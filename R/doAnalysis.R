@@ -16,7 +16,10 @@ doSingle<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,evidenc
   } 
   
   evidence$shortHand<-FALSE
-  if (onlyReplication) oldResult<-braw.res$result
+  if (onlyReplication) {
+    oldResult<-braw.res$result
+    oldResult$design$Replication$On<-TRUE
+  }
   else oldResult<-NULL
   result<-runSimulation(hypothesis=hypothesis,design=design,evidence=evidence,oldResult=oldResult,autoShow=FALSE)
   setBrawRes("result",result)

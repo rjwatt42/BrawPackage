@@ -190,8 +190,9 @@ doMetaScience<-function(metaScience,nreps=200,
   svgBox(height=350,aspect=1.5,fontScale=1.2)
   setBrawEnv("graphicsType","HTML")
   
-  if (stepMetaSci=="0") setBrawEnv("fullOutput",0)
-  else setBrawEnv("fullOutput",1)
+  # if (stepMetaSci=="0") setBrawEnv("fullOutput",0)
+  # else 
+    setBrawEnv("fullOutput",1)
   if (steppartMetaSci=="3B" && single) setBrawEnv("reportCounts",TRUE)
   else setBrawEnv("reportCounts",FALSE)
   

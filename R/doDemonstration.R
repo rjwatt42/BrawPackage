@@ -126,8 +126,9 @@ doDemonstration<-function(doingDemo,world="Binary",pNull=0.5,
   svgBox(height=350,aspect=1.5,fontScale=1.2)
   setBrawEnv("graphicsType","HTML")
   
-  if (rootInv=="Step0") setBrawEnv("fullOutput",0)
-  else setBrawEnv("fullOutput",1)
+  # if (rootInv=="Step0") setBrawEnv("fullOutput",0)
+  # else 
+    setBrawEnv("fullOutput",1)
   if (doingInvestg=="Step2B") setBrawEnv("reportCounts",TRUE)
   else setBrawEnv("reportCounts",FALSE)
   
