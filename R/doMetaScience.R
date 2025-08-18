@@ -11,7 +11,7 @@ replicateMS<-function(doing) grepl('r',gsub('[A-Za-z]*[0-9]*[A-Da-d]*([rm]*)','\
 prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
                         sN=42,sMethod="Convenience",
                         sBudget=320,sSplits=16,sCheating="Replace",sCheatingProportion=0.05,
-                        sReplicationPower=0.9,sReplicationSigOriginal=TRUE,sReplicationOriginalAnomaly="Random",
+                        sReplicationKeep="Cautious",sReplicationPower=0.9,sReplicationSigOriginal=TRUE,sReplicationOriginalAnomaly="Random",
                         differenceSource="Interaction",range=NULL,rangeWidth=0,
                         rangeVar=NULL,rangeP=NULL,analysisTerms=1
                         ) {
@@ -129,8 +129,8 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
   )
   if (world=="Exp") rp<-atanh(rp)
   hypothesis$effect$world$populationPDFk<-rp
-  if (replicate) 
-    design$Replication<-makeReplication(TRUE,Power=sReplicationPower)
+  if (replicate)
+    design$Replication<-makeReplication(TRUE,Keep=sReplicationKeep,Power=sReplicationPower)
   
   return(list(step=doingMetaScience,hypothesis=hypothesis,design=design,evidence=evidence))
 }
@@ -138,9 +138,10 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
 #' @export
 doMetaScience<-function(metaScience,nreps=200,
                         world="Binary",rp=0.3,pNull=0.5,
-                        sN=42,sMethod="Convenience",sBudget=320,sSplits=16,
+                        sN=42,
+                        sMethod="Convenience",sBudget=320,sSplits=16,
                         sCheating="Grow",sCheatingProportion=0.05,
-                        sReplicationPower=0.9,sReplicationSigOriginal=TRUE,
+                        sReplicationKeep="Cautious",sReplicationPower=0.9,sReplicationSigOriginal=TRUE,
                         differenceSource="Interaction",range=NULL,rangeWidth=0,
                         rangeVar=NULL,rangeP=NULL,analysisTerms=1
 ) {
@@ -150,7 +151,7 @@ doMetaScience<-function(metaScience,nreps=200,
                                     world=world,rp=rp,pNull=pNull,
                                     sN=sN,sMethod=sMethod,sBudget=sBudget,sSplits=sSplits,
                                     sCheating=sCheating,sCheatingProportion=sCheatingProportion,
-                                    sReplicationPower=sReplicationPower,sReplicationSigOriginal=sReplicationSigOriginal,
+                                    sReplicationKeep=sReplicationKeep,sReplicationPower=sReplicationPower,sReplicationSigOriginal=sReplicationSigOriginal,
                                     differenceSource=differenceSource,range=range,rangeWidth=rangeWidth,
                                     rangeVar=rangeVar,rangeP=rangeP,analysisTerms=analysisTerms
     )

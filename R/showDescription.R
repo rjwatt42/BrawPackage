@@ -371,7 +371,7 @@ showDescription<-function(analysis=braw.res$result,plotArea=c(0,0,1,1),g=NULL) {
     title<-""
     titleCol<-"black"
     if (analysis$design$Replication$On) {
-      if (analysis$ResultHistory$original$pIV>braw.env$alphaSig) title<-"No Replication"
+      if (length(analysis$ResultHistory$rIV)<2) title<-"No Replication"
       else {
         if (analysis$pIV>braw.env$alphaSig) {
           title<-"Replication Failed"
