@@ -8,7 +8,7 @@ singleMS<-function(doing) !grepl('m',gsub('[A-Za-z]*[0-9]*[A-Da-d]*([rm]*)','\\1
 replicateMS<-function(doing) grepl('r',gsub('[A-Za-z]*[0-9]*[A-Da-d]*([rm]*)','\\1',doing),fixed=TRUE)
 
 #' @export
-prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
+prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,metaPublicationBias=FALSE,
                         sN=42,sMethod="Convenience",
                         sBudget=320,sSplits=16,sCheating="Replace",sCheatingProportion=0.05,
                         sReplicationKeep="Cautious",sReplicationPower=0.9,sReplicationSigOriginal=TRUE,sReplicationOriginalAnomaly="Random",
@@ -24,7 +24,7 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
          "0"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld("Plain")))
            design<-makeDesign(sN=42)
-           evidence<-makeEvidence()
+           evidence<-makeEvidence(sigOnly=FALSE)
          },
          "1"={
            switch(partMetaSci,
@@ -33,7 +33,7 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
                   "B"=hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld("Psych50")))
            )
            design<-makeDesign(sN=42)
-           evidence<-makeEvidence()
+           evidence<-makeEvidence(sigOnly=metaPublicationBias)
          },
          "2"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world)))
@@ -48,7 +48,7 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
                     design$sCheatingAttempts<-floor(sN*sCheatingProportion)
                   }
            )
-           evidence<-makeEvidence()
+           evidence<-makeEvidence(sigOnly=metaPublicationBias)
          },
          "3"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world)))
@@ -64,7 +64,7 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
                                        sCheatingFixedPop=FALSE)
                   }
            )
-           evidence<-makeEvidence()
+           evidence<-makeEvidence(sigOnly=metaPublicationBias)
          },
          "4"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world)))
@@ -124,7 +124,7 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
            design$sRangeProb<-rangeP
            design$sRangeVary<-rangeVar
            if (replicate) design$Replication$On=TRUE
-           evidence<-makeEvidence(AnalysisTerms=analysisTerms)
+           evidence<-makeEvidence(AnalysisTerms=analysisTerms,sigOnly=FALSE)
          }
   )
   if (world=="Exp") rp<-atanh(rp)
@@ -137,7 +137,7 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,
 
 #' @export
 doMetaScience<-function(metaScience,nreps=200,
-                        world="Binary",rp=0.3,pNull=0.5,
+                        world="Binary",rp=0.3,pNull=0.5,metaPublicationBias=FALSE,
                         sN=42,
                         sMethod="Convenience",sBudget=320,sSplits=16,
                         sCheating="Grow",sCheatingProportion=0.05,
@@ -148,7 +148,7 @@ doMetaScience<-function(metaScience,nreps=200,
   
   if (is.character(metaScience)) 
     metaScience<-prepareMetaScience(metaScience,
-                                    world=world,rp=rp,pNull=pNull,
+                                    world=world,rp=rp,pNull=pNull,metaPublicationBias=metaPublicationBias,
                                     sN=sN,sMethod=sMethod,sBudget=sBudget,sSplits=sSplits,
                                     sCheating=sCheating,sCheatingProportion=sCheatingProportion,
                                     sReplicationKeep=sReplicationKeep,sReplicationPower=sReplicationPower,sReplicationSigOriginal=sReplicationSigOriginal,
