@@ -17,7 +17,10 @@ doSingle<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,evidenc
   
   evidence$shortHand<-FALSE
   if (onlyReplication) {
-    oldResult<-braw.res$result$ResultHistory$original
+    if (!is.null(braw.res$result$ResultHistory$original)) oldResult<-braw.res$result$ResultHistory$original
+    else {
+      if (!is.null(braw.res$result) oldResult<-braw.res$result
+    }
     oldResult$design$Replication$On<-TRUE
   }
   else oldResult<-NULL
