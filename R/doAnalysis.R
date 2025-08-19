@@ -19,7 +19,7 @@ doSingle<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,evidenc
   if (onlyReplication) {
     if (!is.null(braw.res$result$ResultHistory$original)) oldResult<-braw.res$result$ResultHistory$original
     else {
-      if (!is.null(braw.res$result) oldResult<-braw.res$result
+      if (!is.null(braw.res$result)) oldResult<-braw.res$result
     }
     oldResult$design$Replication$On<-TRUE
   }
