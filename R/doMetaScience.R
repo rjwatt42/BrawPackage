@@ -172,7 +172,7 @@ doMetaScience<-function(metaScience,nreps=200,
   
   if (single) {
     if (replicate) {
-      doSingle(onlyReplication=TRUE)    
+      doSingle()    
     }
     else 
       doSingle()
