@@ -631,7 +631,7 @@ drawText<-function(data,label, hjust=0, vjust=0, colour="#000000",fill="white",s
              thisLabel<-gsub("'","",thisLabel)
              thisLabel<-gsub('\\[([^ ]*?)\\]',
                              paste0('</tspan><tspan baseline-shift="sub" font-size="',
-                                    reSizeFont(size)*0.8,'">\\1</tspan><tspan>'),
+                                    reSizeFont(size)*0.8,'">\\1</tspan><tspan text-anchor="start" dominant-baseline="middle" dx=0px dy=0px>'),
                              thisLabel)
              thisLabel<-gsub('\\^([^ ]*?) ',
                              paste0('</tspan><tspan baseline-shift="super" font-size="',
@@ -913,7 +913,7 @@ dataLegend<-function(data,title="",titleCol="black",fontsize=1,shape=21) {
   for (i in 1:length(data$names)) {
     if (!is.na(data$colours[i]))
       g<-c(g,
-           list(axisPoint(data=data.frame(x=rangeX(1-ncols*dx+dx*1.5),y=rangeY(1-dy*(i+tn))),
+           list(axisPoint(data=data.frame(x=rangeX(1-ncols*dx+dx*1.5),y=rangeY(1-dy*(i+tn-0.05))),
                           fill=data$colours[i],shape=shape[i]))
       )
     g<-c(g,

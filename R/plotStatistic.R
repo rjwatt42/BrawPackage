@@ -1574,27 +1574,29 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                     labels<-c(labels,paste0(braw.env$nonNull," '",reportNumber(inse,n,braw.env$reportCounts),"'"," error"))
                     colours<-c(colours,braw.env$plotColours$infer_isigNonNull)
                   }
-                if (!evidence$sigOnly && !is.null(nse) && any(resNotNull)) {
-                  labels<-c(labels,paste0(braw.env$nonNull," '",reportNumber(nse,n,braw.env$reportCounts),"'",nsLabel))
+                # if (!evidence$sigOnly && !is.null(nse) && any(resNotNull)) {
+                if (!evidence$sigOnly) {
+                    labels<-c(labels,paste0(braw.env$nonNull," '",reportNumber(nse,n,braw.env$reportCounts),"'",nsLabel))
                   colours<-c(colours,braw.env$plotColours$infer_nsigNonNull)
                 }
-                if (!is.null(sc) && any(resNotNull)) {
+                # if (!is.null(sc) && any(resNotNull)) {
                   labels<-c(labels,paste0(braw.env$nonNull," '",reportNumber(sc,n,braw.env$reportCounts),"'"," correct"))
                   colours<-c(colours,braw.env$plotColours$infer_sigNonNull)
-                }
+                # }
                 if (braw.env$STMethod=="dLLR") 
                   if (!is.null(isc) && any(!resNotNull)) {
                     labels<-c(labels,paste0(braw.env$Null," '",reportNumber(isc,n,braw.env$reportCounts),"'"," correct"))
                     colours<-c(colours,braw.env$plotColours$infer_isigNull)
                   }
-                if (!evidence$sigOnly && !is.null(nsc) && any(!resNotNull)) {
-                  labels<-c(labels,paste0(nlab," '",reportNumber(nsc,n,braw.env$reportCounts),"'",sLabel))
+                  # if (!evidence$sigOnly && !is.null(nsc) && any(!resNotNull)) {
+                  if (!evidence$sigOnly) {
+                      labels<-c(labels,paste0(nlab," '",reportNumber(nsc,n,braw.env$reportCounts),"'",sLabel))
                   colours<-c(colours,braw.env$plotColours$infer_nsigNull)
                 }
-                if (!is.null(se) && any(!resNotNull)) {
+                # if (!is.null(se) && any(!resNotNull)) {
                   labels<-c(labels,paste0(nlab," '",reportNumber(se,n,braw.env$reportCounts),"'"," error"))
                   colours<-c(colours,braw.env$plotColours$infer_sigNull)
-                }
+                # }
               },
               "sig"={
                 title<-"Hits"
