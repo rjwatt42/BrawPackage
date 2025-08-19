@@ -3,9 +3,9 @@
 # singleMS<-function(doing) substr(doing,7,7)!='m'
 
 stepMS<-function(doing) gsub('[A-Za-z]*([0-9]*)[A-Da-d]*','\\1',doing)
-partMS<-function(doing) gsub('[A-Za-z]*[0-9]*([A-Da-d]*)','\\1',doing)
-singleMS<-function(doing) !grepl('m',gsub('[A-Za-z]*[0-9]*[A-Da-d]*([rm]*)','\\1',doing),fixed=TRUE)
-replicateMS<-function(doing) grepl('r',gsub('[A-Za-z]*[0-9]*[A-Da-d]*([rm]*)','\\1',doing),fixed=TRUE)
+partMS<-function(doing) toupper(gsub('[A-Za-z]*[0-9]*([A-Da-d]*)','\\1',doing))
+singleMS<-function(doing) !grepl('m',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-d]*([rm]*)','\\1',doing)),fixed=TRUE)
+replicateMS<-function(doing) grepl('r',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-d]*([rm]*)','\\1',doing)),fixed=TRUE)
 
 #' @export
 prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,metaPublicationBias=FALSE,
@@ -143,7 +143,7 @@ doMetaScience<-function(metaScience,nreps=200,
                         sN=42,
                         sMethod="Convenience",sBudget=320,sSplits=16,
                         sCheating="Grow",sCheatingProportion=0.05,
-                        sReplicationKeep="Cautious",sReplicationPower=0.9,sReplicationSigOriginal=TRUE,
+                        sReplicationKeep="Cautious",sReplicationPower=0.9,sReplicationSigOriginal=TRUE,sReplicationOriginalAnomaly="Random",
                         differenceSource="Interaction",range=NULL,rangeWidth=0,
                         rangeVar=NULL,rangeP=NULL,analysisTerms=1
 ) {
@@ -153,7 +153,7 @@ doMetaScience<-function(metaScience,nreps=200,
                                     world=world,rp=rp,pNull=pNull,metaPublicationBias=metaPublicationBias,
                                     sN=sN,sMethod=sMethod,sBudget=sBudget,sSplits=sSplits,
                                     sCheating=sCheating,sCheatingProportion=sCheatingProportion,
-                                    sReplicationKeep=sReplicationKeep,sReplicationPower=sReplicationPower,sReplicationSigOriginal=sReplicationSigOriginal,
+                                    sReplicationKeep=sReplicationKeep,sReplicationPower=sReplicationPower,sReplicationSigOriginal=sReplicationSigOriginal,sReplicationOriginalAnomaly=sReplicationOriginalAnomaly,
                                     differenceSource=differenceSource,range=range,rangeWidth=rangeWidth,
                                     rangeVar=rangeVar,rangeP=rangeP,analysisTerms=analysisTerms
     )
@@ -172,8 +172,11 @@ doMetaScience<-function(metaScience,nreps=200,
   replicate<-replicateMS(doingMetaScience)
   
   if (single) {
-    if (replicate) doSingle(onlyReplication=TRUE)    
-    else doSingle()
+    if (replicate) {
+      doSingle(onlyReplication=TRUE)    
+    }
+    else 
+      doSingle()
     if (stepMetaSci=="5") {
       result<-braw.res$result
       result$hypothesis$IV2<-NULL

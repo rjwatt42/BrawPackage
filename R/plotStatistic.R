@@ -1212,6 +1212,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   effect<-hypothesis$effect
   design<-analysis$design
   evidence<-analysis$evidence
+  if (design$Replication$On) evidence$sigOnly<-analysis$ResultHistory$original$evidence$sigOnly
   
   sequence<-analysis$sequence
   

@@ -203,7 +203,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
   evidence$sigOnly<-FALSE
   setBrawDef('evidence',evidence)
   
-  design$sCheating<-"none"
+  design$sCheating<-"None"
   design$sMethod<-makeSampling("Random")
   setBrawDef('design',design)
   
