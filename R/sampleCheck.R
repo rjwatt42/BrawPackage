@@ -250,9 +250,10 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
     
     if (Replication$Repeats>0)
     for (i in 1:Replication$Repeats) {
-      if (!(Replication$replicateAll && i==1))
-      if (Replication$Keep=="Cautious" && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
-        break
+      if (!(Replication$replicateAll && i==1)) {
+        if (Replication$Keep=="Cautious" && !isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {
+          break
+        }
       }
       # get the relevant sample effect size for the power calc
       design1$sN<-replicationNewN(res$rIV,res$nval,hypothesis,design)

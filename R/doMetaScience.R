@@ -125,7 +125,6 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,me
                   })
            design$sRangeProb<-rangeP
            design$sRangeVary<-rangeVar
-           if (replicate) design$Replication$On=TRUE
            evidence<-makeEvidence(AnalysisTerms=analysisTerms,sigOnly=FALSE)
          }
   )
@@ -142,7 +141,7 @@ doMetaScience<-function(metaScience,nreps=200,
                         world="Binary",rp=0.3,pNull=0.5,metaPublicationBias=FALSE,
                         sN=42,
                         sMethod="Convenience",sBudget=320,sSplits=16,
-                        sCheating="Grow",sCheatingProportion=0.05,
+                        sCheating="Replace",sCheatingProportion=0.05,
                         sReplicationKeep="Cautious",sReplicationPower=0.9,sReplicationSigOriginal=TRUE,sReplicationOriginalAnomaly="Random",
                         differenceSource="Interaction",range=NULL,rangeWidth=0,
                         rangeVar=NULL,rangeP=NULL,analysisTerms=1

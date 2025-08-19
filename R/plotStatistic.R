@@ -839,7 +839,7 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
         c6<-braw.env$plotColours$infer_isigNull
         doingDLLR<-TRUE
       }
-      if (simWorld && is.element(showType,c("rse","sig","ns","nonnulls","nulls"))) {
+      if (is.element(showType,c("rse","sig","ns","nonnulls","nulls"))) {
         c1<-braw.env$plotColours$infer_sigNonNull
         c2<-braw.env$plotColours$infer_nsigNonNull
         c3<-braw.env$plotColours$infer_nsigNull
@@ -1212,7 +1212,8 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   effect<-hypothesis$effect
   design<-analysis$design
   evidence<-analysis$evidence
-  if (design$Replication$On) evidence$sigOnly<-analysis$ResultHistory$original$evidence$sigOnly
+  if (design$Replication$On && !is.null(analysis$ResultHistory$original$evidence$sigOnly)) 
+    evidence$sigOnly<-analysis$ResultHistory$original$evidence$sigOnly
   
   sequence<-analysis$sequence
   
