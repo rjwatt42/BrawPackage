@@ -8,7 +8,7 @@ singleMS<-function(doing) !grepl('m',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-d]*([rm]
 replicateMS<-function(doing) grepl('r',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-d]*([rm]*)','\\1',doing)),fixed=TRUE)
 
 #' @export
-prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,metaPublicationBias=FALSE,
+prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pNull=0.5,metaPublicationBias=FALSE,
                         sN=42,sMethod="Convenience",
                         sBudget=320,sSplits=16,sCheating="Replace",sCheatingProportion=0.05,
                         sReplicationKeep="Cautious",sReplicationPower=0.9,sReplicationSigOriginal=TRUE,sReplicationOriginalAnomaly="Random",
@@ -28,15 +28,15 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,me
          },
          "1"={
            switch(partMetaSci,
-                  "I"=hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld("Plain"))),
-                  "A"=hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld("Binary"))),
-                  "B"=hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld("Psych50")))
+                  "I"=hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld("Plain",rp=rp))),
+                  "A"=hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld("Binary",rp=rp))),
+                  "B"=hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld("Psych50",rp=rp)))
            )
            design<-makeDesign(sN=42)
            evidence<-makeEvidence(sigOnly=metaPublicationBias)
          },
          "2"={
-           hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world)))
+           hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world,rp=rp)))
            if (world!="Plain") hypothesis$effect$world$populationNullp<-pNull
            design<-makeDesign(sN=sN)
            switch(partMetaSci,
@@ -52,7 +52,7 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,me
            evidence<-makeEvidence(sigOnly=metaPublicationBias)
          },
          "3"={
-           hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world)))
+           hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world,rp=rp)))
            if (world!="Plain") hypothesis$effect$world$populationNullp<-pNull
            
            switch(partMetaSci,
@@ -69,7 +69,7 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,me
            evidence<-makeEvidence(sigOnly=metaPublicationBias)
          },
          "4"={
-           hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world)))
+           hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world,rp=rp)))
            if (world!="Plain") hypothesis$effect$world$populationNullp<-pNull
            design<-makeDesign(sN=sN)
            if (partMetaSci=="B") {
@@ -128,8 +128,6 @@ prepareMetaScience<-function(doingMetaScience,world="Binary",rp=0.3,pNull=0.5,me
            evidence<-makeEvidence(AnalysisTerms=analysisTerms,sigOnly=FALSE)
          }
   )
-  if (world=="Exp") rp<-atanh(rp)
-  hypothesis$effect$world$populationPDFk<-rp
   if (replicate)
     design$Replication<-makeReplication(TRUE,Keep=sReplicationKeep,Power=sReplicationPower)
   
