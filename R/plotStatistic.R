@@ -1589,6 +1589,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                     colours<-c(colours,braw.env$plotColours$infer_isigNull)
                   }
                   # if (!evidence$sigOnly && !is.null(nsc) && (nsc>0)) {
+                  if (hypothesis$effect$world$worldOn && hypothesis$effect$world$populationNullp>0) {
                   if (!evidence$sigOnly || design$Replication$On) {
                       labels<-c(labels,paste0(nlab," '",reportNumber(nsc,n,braw.env$reportCounts),"'",sLabel))
                   colours<-c(colours,braw.env$plotColours$infer_nsigNull)
@@ -1597,6 +1598,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                   labels<-c(labels,paste0(nlab," '",reportNumber(se,n,braw.env$reportCounts),"'"," error"))
                   colours<-c(colours,braw.env$plotColours$infer_sigNull)
                 # }
+                  }
               },
               "sig"={
                 title<-"Hits"
