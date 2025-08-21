@@ -202,7 +202,8 @@ doMetaScience<-function(metaScience,nreps=200,
   investgD<-braw.res$investgD
   investgS<-braw.res$investgS
   investgR<-braw.res$investgR
-  if (stepMetaSci=="5") showTheory=FALSE else showTheory=TRUE
+  showTheory=TRUE
+  # if (stepMetaSci=="5") showTheory=FALSE
   if (single) {
     investgD<-showDescription()
     investgS<-showInference(showType="rse",orientation="horz",dimension=1,showTheory=showTheory)
