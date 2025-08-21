@@ -649,7 +649,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
   analysis$rpIV<-sample$effectRho
   ri<-2
 
-  if (any(evidence$AnalysisTerms[2:3])) {
+  if (!is.null(IV2) && any(evidence$AnalysisTerms[2:3])) {
     if (evidence$AnalysisTerms[2]) {
       analysis$rIV2<-r_use[ri]
       analysis$pIV2<-p_use[ri]
