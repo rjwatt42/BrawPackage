@@ -375,11 +375,11 @@ multipleAnalysis<-function(nsims=1,hypothesis,design,evidence,newResult=c()){
           newResult$pIV2[j]<-NA
         }
         if (evidence$AnalysisTerms[3]) {
-          newResult$rIV2[j]<-res$rIVIV2DV
-          newResult$pIV2[j]<-res$pIVIV2DV
+          newResult$rIVIV2DV[j]<-res$rIVIV2DV
+          newResult$pIVIV2DV[j]<-res$pIVIV2DV
         } else {
-          newResult$rIV2[j]<-NA
-          newResult$pIV2[j]<-NA
+          newResult$rIVIV2DV[j]<-NA
+          newResult$pIVIV2DV[j]<-NA
         }
 
         nrep<-length(newResult$r$direct[j,])-length(res$r$direct)
@@ -471,9 +471,9 @@ generalAnalysis<-function(allData,AnalysisTerms,withins=FALSE,ssqType="Type3",ca
   
   # CREATE FORMULA
   formula<-"dv~iv1"
-  if (no_ivs>1 && any(AnalysisTerms[2:3]))
+  if (no_ivs>1)
     for (i in 2:no_ivs) {
-      formula<-paste(formula,"+iv",i,sep="")
+      if (AnalysisTerms[2]) formula<-paste(formula,"+iv",i,sep="")
       if (AnalysisTerms[3]) formula<-paste(formula,"+iv1:iv",i,sep="")
     }
   if (any(withins)){
@@ -647,21 +647,25 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
   if (analysis$rIV>0 && analysis$rIVCI[1]<0 && analysis$rIVCI[2]>0) analysis$pIVCI[1]<-1
   if (analysis$rIV<0 && analysis$rIVCI[1]<0 && analysis$rIVCI[2]>0) analysis$pIVCI[2]<-1
   analysis$rpIV<-sample$effectRho
+  ri<-2
 
-  if (length(r_use)>1) {
-    analysis$rIV2<-r_use[2]
-    analysis$pIV2<-p_use[2]
-    analysis$rIV2CI<-r2ci(analysis$rIV2,n)
-    analysis$pIV2CI<-r2p(analysis$rIV2CI,n,anResult$df[2])
-    if (analysis$rIV2>0 && analysis$rIV2CI[1]<0 && analysis$rIV2CI[2]>0) analysis$pIV2CI[1]<-1
-    if (analysis$rIV2<0 && analysis$rIV2CI[1]<0 && analysis$rIV2CI[2]>0) analysis$pIV2CI[2]<-1
+  if (any(evidence$AnalysisTerms[2:3])) {
+    if (evidence$AnalysisTerms[2]) {
+      analysis$rIV2<-r_use[ri]
+      analysis$pIV2<-p_use[ri]
+      analysis$rIV2CI<-r2ci(analysis$rIV2,n)
+      analysis$pIV2CI<-r2p(analysis$rIV2CI,n,anResult$df[ri])
+      if (analysis$rIV2>0 && analysis$rIV2CI[1]<0 && analysis$rIV2CI[2]>0) analysis$pIV2CI[1]<-1
+      if (analysis$rIV2<0 && analysis$rIV2CI[1]<0 && analysis$rIV2CI[2]>0) analysis$pIV2CI[2]<-1
+      ri<-3
+    }
     
     #  interaction term
     if (evidence$AnalysisTerms[3]) {
-      analysis$rIVIV2DV<-r_use[3]
-      analysis$pIVIV2DV<-p_use[3]
+      analysis$rIVIV2DV<-r_use[ri]
+      analysis$pIVIV2DV<-p_use[ri]
       analysis$rIVIV2CI<-r2ci(analysis$rIVIV2DV,n)
-      analysis$pIVIV2CI<-r2p(analysis$rIVIV2CI,n,anResult$df[3])
+      analysis$pIVIV2CI<-r2p(analysis$rIVIV2CI,n,anResult$df[ri])
       if (analysis$rIVIV2DV>0 && analysis$rIVIV2CI[1]<0 && analysis$rIVIV2CI[2]>0) analysis$pIVIV2CI[1]<-1
       if (analysis$rIVIV2DV<0 && analysis$rIVIV2CI[1]<0 && analysis$rIVIV2CI[2]>0) analysis$pIVIV2CI[2]<-1
     } else {
@@ -670,8 +674,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
       analysis$rIVIV2CI<-NA
       analysis$pIVIV2CI<-NA
     }
-  }
-  else hypothesis$IV2<-NULL
+  }  else hypothesis$IV2<-NULL
   analysis$rIVIV2<-0
   
   if (evidence$doSEM) {
