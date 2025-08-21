@@ -115,7 +115,7 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pNull=0.5,m
                   "Interaction"={
                     hypothesis<-makeHypothesis(IV2=makeVariable("IV2","Interval"),
                                                effect=makeEffect(rIV=0.3,rIV2=0,rIVIV2DV=-0.3,world=makeWorld(FALSE)))
-                    if (is.null(range)) range<-1+c(-1,1)*rangeWidth/2
+                    if (is.null(range)) range<-c(0,2)
                     design<-makeDesign(sN=sN,sIV2RangeOn=TRUE,sIV2Range=range)
                   },
                   "Covariation"={
