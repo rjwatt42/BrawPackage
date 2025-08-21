@@ -102,7 +102,7 @@ reportDescription<-function(analysis=braw.res$result){
   
   an_vars<-sub("iv1:",paste(IV$name,":",sep=""),an_vars)
   an_vars<-sub("iv1",paste(IV$name,"=",sep=""),an_vars)
-  if (!is.null(IV2) || evidence$AnalysisTerms>1) {
+  if (!is.null(IV2) || sum(evidence$AnalysisTerms)>1) {
     an_vars<-sub("iv2$",IV2$name,an_vars)
     an_vars<-sub("iv2",paste(IV2$name,"=",sep=""),an_vars)
   } 
@@ -150,14 +150,14 @@ reportDescription<-function(analysis=braw.res$result){
                           paste0("!j",brawFormat(analysis$r$unique[1],digits=braw.env$report_precision)),
                           paste0("!j",brawFormat(analysis$r$total[1],digits=braw.env$report_precision)),
                           rep("",nc-4))
-            if (evidence$AnalysisTerms>=2) {
+            if (evidence$AnalysisTerms[2]) {
               outputText<-c(outputText,IV2$name,
                           paste0("!j",brawFormat(analysis$r$direct[2],digits=braw.env$report_precision)),
                           paste0("!j",brawFormat(analysis$r$unique[2],digits=braw.env$report_precision)),
                           paste0("!j",brawFormat(analysis$r$total[2],digits=braw.env$report_precision)),
                           rep("",nc-4))
             }
-            if (evidence$AnalysisTerms==3) {
+            if (evidence$AnalysisTerms[3]) {
               outputText<-c(outputText,paste0(IV$name,braw.env$interaction_string,IV2$name),
                             paste0("!j",brawFormat(analysis$r$direct[3],digits=braw.env$report_precision)),
                             paste0("!j",brawFormat(analysis$r$unique[3],digits=braw.env$report_precision)),

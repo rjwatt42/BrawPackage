@@ -140,7 +140,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     )
 
   if (showType[1]=="SEM") whichEffect<-"Main 1"
-  if (whichEffect=="All" && evidence$AnalysisTerms<3) whichEffect<-"Mains"
+  if (whichEffect=="All" && sum(evidence$AnalysisTerms)<3) whichEffect<-"Mains"
   if ((whichEffect=="All" || whichEffect=="Mains") && is.null(hypothesis$IV2)) whichEffect<-"Main 1"
   
 # dimensions & position of graph area  

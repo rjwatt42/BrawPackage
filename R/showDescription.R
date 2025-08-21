@@ -386,7 +386,7 @@ showDescription<-function(analysis=braw.res$result,plotArea=c(0,0,1,1),g=NULL) {
                          title=title,titleCol=titleCol,shape=c(21,22)))
   } else{
     g<-nullPlot()
-    if (analysis$evidence$AnalysisTerms==3) {
+    if (analysis$evidence$AnalysisTerms[3]) {
       if (analysis$evidence$rInteractionOnly) 
         braw.env$plotArea<-c(0,0,1,1)*plotArea[c(3,4,3,4)]+c(plotArea[c(1,2)],0,0)
       else
@@ -401,7 +401,7 @@ showDescription<-function(analysis=braw.res$result,plotArea=c(0,0,1,1),g=NULL) {
       yoff<-0
     } else yoff<-0.25
     
-    if (analysis$evidence$AnalysisTerms==2 || !analysis$evidence$rInteractionOnly) {
+    if (sum(analysis$evidence$AnalysisTerms)==2 || !analysis$evidence$rInteractionOnly) {
       analysis1<-analysis
       analysis1$hypothesis$IV2<-NULL
       analysis2<-analysis

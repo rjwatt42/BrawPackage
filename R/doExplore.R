@@ -493,7 +493,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
           "Alpha"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "minRp"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Transform"={vals<-c("None","Log","Exp")},
-          "InteractionOn"={vals<-c(2,3)},
+          "InteractionOn"={vals<-c(FALSE,TRUE)},
           "EqualVar"={vals<-c(FALSE,TRUE)},
           
           "Keep"={vals<-c("Cautious", "MetaAnalysis", "LargeN")},
@@ -874,7 +874,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
                   evidence$Welch<-!vals[vi]
                 },
                 "Transform"={evidence$Transform<-vals[vi]},
-                "InteractionOn"={evidence$AnalysisTerms<-vals[vi]},
+                "InteractionOn"={evidence$AnalysisTerms[3]<-vals[vi]},
                 
                 "Keep"={
                   design$Replication$Keep<-vals[vi]

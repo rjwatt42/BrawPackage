@@ -142,7 +142,7 @@ doMetaScience<-function(metaScience,nreps=200,
                         sCheating="Replace",sCheatingProportion=0.05,
                         sReplicationKeep="Cautious",sReplicationPower=0.9,sReplicationSigOriginal=TRUE,sReplicationOriginalAnomaly="Random",
                         differenceSource="Interaction",range=NULL,rangeWidth=0,
-                        rangeVar=NULL,rangeP=NULL,analysisTerms=1
+                        rangeVar=NULL,rangeP=NULL,analysisTerms=c(TRUE,FALSE,FALSE)
 ) {
   
   if (is.character(metaScience)) 

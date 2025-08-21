@@ -427,7 +427,7 @@ showPrediction <- function(hypothesis=braw.def$hypothesis,design=braw.def$design
             # g<-addG(g,plotTitle(paste0("r[p]=",brawFormat(effect$rIV)),position="centre",size=1,fontface="plain"))
           },
           {
-            if (!evidence$AnalysisTerms){
+            if (sum(evidence$AnalysisTerms)==1){
               effect1<-effect
               effect2<-effect
               effect2$rIV<-effect2$rIV2

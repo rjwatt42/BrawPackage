@@ -46,10 +46,12 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
       nullresult<-r$nullanalysis
     }
     
-    if (is.null(IV2) || showType=="SEM")    whichEffects<-"Main 1"
-    else {
+    if (is.null(IV2) || showType=="SEM" || sum(evidence$AnalysisTerms)==1) {
+      whichEffects<-"Main 1"
+      effectType<-"direct"
+    }  else {
       whichEffects<-whichEffect
-      if (whichEffect=="All" && evidence$AnalysisTerms==2) whichEffect<-"Mains"
+      if (whichEffect=="All" && sum(evidence$AnalysisTerms)==2) whichEffect<-"Mains"
       if (whichEffect=="All")   {whichEffects<-c("Main 1","Main 2","Interaction")}
       if (whichEffect=="Mains") {whichEffects<-c("Main 1","Main 2")}
       if (whichEffect=="rIV") {whichEffects<-"Main 1"}

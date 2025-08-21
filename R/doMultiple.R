@@ -117,10 +117,10 @@ resetMultiple<-function(nsims=0,evidence,multipleResult=NULL){
   
   if (nsims>0) {
     b<-matrix(NA,nsims,1)
-      bm<-matrix(NA,nsims,evidence$AnalysisTerms)
+      bm<-matrix(NA,nsims,sum(evidence$AnalysisTerms))
   } else {
     b<-matrix(NA,1,1)
-    bm<-matrix(NA,1,evidence$AnalysisTerms)
+    bm<-matrix(NA,1,sum(evidence$AnalysisTerms))
   }
   newResult<-list(
     rIV=b,pIV=b,rpIV=b,roIV=b,poIV=b,nval=b,noval=b,df1=b,

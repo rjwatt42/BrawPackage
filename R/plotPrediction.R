@@ -392,7 +392,7 @@ plotPrediction<-function(IV=braw.def$hypothesis$IV,IV2=braw.def$hypothesis$IV2,D
   if (correction && design$sMethod$type=="Cluster") n<-c(n,n/2.65)
   hypothesisType=paste(IV$type,DV$type,sep=" ")
   
-  if (is.null(IV2) || evidence$AnalysisTerms<2){
+  if (is.null(IV2) || sum(evidence$AnalysisTerms)<2){
     if (DV$type=="Categorical" && (is.null(braw.env$CatCatCols) || length(braw.env$CatCatCols)<DV$ncats)) {
       braw.env$CatCatCols <- c()
       cols<-c()

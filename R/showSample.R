@@ -47,7 +47,7 @@ showSample<-function(sample=braw.res$result,marginals=FALSE,plotArea=c(0,0,1,1),
   effect<-sample$hypothesis$effect
   if (!is.null(sample$rIV)) effect$rIV<-sample$rIV
   
-  if (is.null(IV2) || evidence$AnalysisTerms<2) {
+  if (is.null(IV2) || sum(evidence$AnalysisTerms)<2) {
     braw.env$plotArea<-plotArea
     g<-plotSample(IV,DV,effect,sample$ivplot,sample$dvplot,fill=fill,dotSize=dotSize,g=g)
   } else {

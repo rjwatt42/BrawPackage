@@ -87,7 +87,7 @@ doDemonstration<-function(doingDemo,world="Binary",pNull=0.5,
                     
                   }
            )
-           evidence<-makeEvidence(AnalysisTerms=1)
+           evidence<-makeEvidence(AnalysisTerms=c(TRUE,FALSE,FALSE))
            setBrawDef("evidence",evidence)
            
          }

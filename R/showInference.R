@@ -160,9 +160,9 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
     area.x<-0
     area.y<-1
     if (!is.null(analysis$hypothesis$IV2)) {
-      if (analysis$evidence$AnalysisTerms<2) effectType<-"direct"
-      if (whichEffect=="All" && analysis$evidence$AnalysisTerms<2) whichEffect<-"Main 1"
-      if (whichEffect=="All" && analysis$evidence$AnalysisTerms<3) whichEffect<-"Mains"
+      if (sum(analysis$evidence$AnalysisTerms)<2) effectType<-"direct"
+      if (whichEffect=="All" && sum(analysis$evidence$AnalysisTerms)<2) whichEffect<-"Main 1"
+      if (whichEffect=="All" && sum(analysis$evidence$AnalysisTerms)<3) whichEffect<-"Mains"
       if (whichEffect=="All") {
         whichEffect<-c("Main 1","Main 2","Interaction")
         area.y<-c(1,1,1)*0.32

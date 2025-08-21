@@ -367,14 +367,14 @@ multipleAnalysis<-function(nsims=1,hypothesis,design,evidence,newResult=c()){
       newResult$AIC[j]<-res$AIC
       newResult$AICnull[j]<-res$AICnull
       if (!is.null(hypothesis$IV2)) {
-        if (evidence$AnalysisTerms>1) {
+        if (evidence$AnalysisTerms[2]) {
           newResult$rIV2[j]<-res$rIV2
           newResult$pIV2[j]<-res$pIV2
         } else {
           newResult$rIV2[j]<-NA
           newResult$pIV2[j]<-NA
         }
-        if (evidence$AnalysisTerms>2) {
+        if (evidence$AnalysisTerms[3]) {
           newResult$rIV2[j]<-res$rIVIV2DV
           newResult$pIV2[j]<-res$pIVIV2DV
         } else {
@@ -471,10 +471,10 @@ generalAnalysis<-function(allData,AnalysisTerms,withins=FALSE,ssqType="Type3",ca
   
   # CREATE FORMULA
   formula<-"dv~iv1"
-  if (no_ivs>1 && AnalysisTerms>1)
+  if (no_ivs>1 && any(AnalysisTerms[2:3]))
     for (i in 2:no_ivs) {
       formula<-paste(formula,"+iv",i,sep="")
-      if (AnalysisTerms>2) formula<-paste(formula,"+iv1:iv",i,sep="")
+      if (AnalysisTerms[3]) formula<-paste(formula,"+iv1:iv",i,sep="")
     }
   if (any(withins)){
     doingWithin<-TRUE
@@ -657,7 +657,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
     if (analysis$rIV2<0 && analysis$rIV2CI[1]<0 && analysis$rIV2CI[2]>0) analysis$pIV2CI[2]<-1
     
     #  interaction term
-    if (evidence$AnalysisTerms==3) {
+    if (evidence$AnalysisTerms[3]) {
       analysis$rIVIV2DV<-r_use[3]
       analysis$pIVIV2DV<-p_use[3]
       analysis$rIVIV2CI<-r2ci(analysis$rIVIV2DV,n)

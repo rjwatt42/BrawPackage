@@ -1252,7 +1252,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   iUse<-1
   if (!is.null(hypothesis$IV2) && effectType=="all") {
     xoff=c(0,1,2)*1.2
-    iUse<-1:evidence$AnalysisTerms
+    iUse<-1:sum(evidence$AnalysisTerms)
   }
   if (!is.null(hypothesis$IV2) && effectType!="all"){
     if (effectType=="direct") iUse<-1
