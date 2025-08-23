@@ -172,9 +172,10 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
   if (braw.env$fullOutput>0) {
     table3<-c("!TPower",rep("",nc-1))
     nrep<-length(analysis$ResultHistory$rIV)
+    if (!is.null(analysis$ResultHistory$Smax)) Smax<-"S[max]" else Smax<-""
     if (design$Replication$On && 1==2)
       table3<-c(table3,"!H","r[s]","n","p", "r[p]", "w[p]", "p(e)",rep("",nc-7))
-    else table3<-c(table3,"!H","r[s]","n","p", "r[p]", "w[p]", "w[s]", rep("",nc-7))
+    else table3<-c(table3,"!H","r[s]","n","p", "r[p]", "w[p]", "w[s]",Smax, rep("",nc-8))
     if (nrep>1) labels<-c("original",rep(" ",nrep-2),"final")
     else        labels<-""
     for (i in 1:nrep) {
@@ -204,6 +205,9 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
         if (!is.null(p_error)) table3<-c(table3,paste0("!j",p_error),rep("",nc-7))
         else table3<-c(table3,rep("",nc-6))
       } else {
+        if (!is.null(analysis$ResultHistory$Smax[i]) && !is.na(analysis$ResultHistory$Smax[i])) 
+             Smax<-brawFormat(analysis$ResultHistory$Smax[i],digits=2)
+        else Smax<-""
         table3<-c(table3,
                   labels[i],
                   paste0("!j",brawFormat(analysis$ResultHistory$rIV[i],digits=3)),
@@ -212,7 +216,9 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
                   paste0("!j",brawFormat(analysis$ResultHistory$rpIV[i],digits=3)),
                   paste0("!j",brawFormat(rn2w(analysis$ResultHistory$rpIV[i],analysis$ResultHistory$nval[i]),digits=3)),
                   paste0("!j",brawFormat(rn2w(analysis$ResultHistory$rIV[i],analysis$ResultHistory$nval[i]),digits=3)),
-                  rep("",nc-7))
+                  Smax,
+                  rep("",nc-8)
+                  )
       }
     }
   }

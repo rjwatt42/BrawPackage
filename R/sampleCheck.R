@@ -227,8 +227,10 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
   if (Replication$On) {
     
     if (Replication$Keep=="MetaAnalysis" && length(ResultHistory$rIV)>1) {
-      studies<-list(rIV=ResultHistory$rIV,nval=ResultHistory$nval,df1=ResultHistory$df1,
-                    rpIV=ResultHistory$rpIV,original=resOriginal)
+      use<-is.na(ResultHistory$Smax)
+      if (is.null(use)) use<-!is.na(ResultHistory$rIV)
+      studies<-list(rIV=ResultHistory$rIV[use],nval=ResultHistory$nval[use],df1=ResultHistory$df1[use],
+                    rpIV=ResultHistory$rpIV[use],original=resOriginal)
       metaAnalysis<-makeMetaAnalysis(TRUE,analysisType="fixed",
                                      method="MLE",
                                      modelNulls=FALSE,
@@ -242,11 +244,14 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
       res$df1<-ResultHistory$df1[1]
       res$pIV<-rn2p(res$rIV,res$nval)
       
-      res$ResultHistory$nval<-c(res$ResultHistory$nval,res$nval)
-      res$ResultHistory$rIV<-c(res$ResultHistory$rIV,res$rIV)
-      res$ResultHistory$rpIV<-c(res$ResultHistory$rpIV,res$rpIV)
-      res$ResultHistory$df1<-c(res$ResultHistory$df1,res$df1)
-      res$ResultHistory$pIV<-c(res$ResultHistory$pIV,res$pIV)
+      if (is.null(res$ResultHistory$Smax)) res$ResultHistory$Smax<-rep(NA,length(res$ResultHistory$rIV))
+      
+      res$ResultHistory$nval<-c(res$ResultHistory$nval[use],res$nval)
+      res$ResultHistory$rIV<-c(res$ResultHistory$rIV[use],res$rIV)
+      res$ResultHistory$rpIV<-c(res$ResultHistory$rpIV[use],res$rpIV)
+      res$ResultHistory$df1<-c(res$ResultHistory$df1[use],res$df1)
+      res$ResultHistory$pIV<-c(res$ResultHistory$pIV[use],res$pIV)
+      res$ResultHistory$Smax<-c(res$ResultHistory$Smax[use],metaResult$fixed$Smax)
       setBrawDef("evidence",oldEvidence)
       setBrawDef("design",oldDesign)
       setBrawDef("hypothesis",oldHypothesis)
@@ -352,11 +357,15 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
       res$rpIV<-ResultHistory$rpIV[1]
       res$df1<-ResultHistory$df1[1]
       res$pIV<-rn2p(res$rIV,res$nval)
+      
+      if (is.null(ResultHistory$Smax)) ResultHistory$Smax<-rep(NA,length(ResultHistory$rIV))
+      
       ResultHistory$nval<-c(ResultHistory$nval,res$nval)
       ResultHistory$df1<-c(ResultHistory$df1,res$df1)
       ResultHistory$rIV<-c(ResultHistory$rIV,res$rIV)
       ResultHistory$rpIV<-c(ResultHistory$rpIV,res$rpIV)
       ResultHistory$pIV<-c(ResultHistory$pIV,res$pIV)
+      ResultHistory$Smax<-c(ResultHistory$Smax,metaResult$fixed$Smax)
     } else {
     switch(Replication$Keep,
            "Median"={
