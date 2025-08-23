@@ -3,12 +3,12 @@
 # singleMS<-function(doing) substr(doing,7,7)!='m'
 
 stepMS<-function(doing) gsub('[A-Za-z]*([0-9]*)[A-Da-d]*','\\1',doing)
-partMS<-function(doing) toupper(gsub('[A-Za-z]*[0-9]*([A-Da-d]*)','\\1',doing))
-singleMS<-function(doing) !grepl('m',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-d]*([rm]*)','\\1',doing)),fixed=TRUE)
-replicateMS<-function(doing) grepl('r',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-d]*([rm]*)','\\1',doing)),fixed=TRUE)
-replicateFirstMS<-function(doing) grepl('rm',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-d]*([rm]*)','\\1',doing)),fixed=TRUE)
-combineMS<-function(doing) grepl('c',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-d]*([rm]*)','\\1',doing)),fixed=TRUE)
-combineFirstMS<-function(doing) grepl('cm',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-d]*([rm]*)','\\1',doing)),fixed=TRUE)
+partMS<-function(doing) toupper(gsub('[A-Za-z]*[0-9]*([A-Da-b]*)','\\1',doing))
+singleMS<-function(doing) !grepl('m',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-b]*([crm]*)','\\1',doing)),fixed=TRUE)
+replicateMS<-function(doing) grepl('r',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-b]*([crm]*)','\\1',doing)),fixed=TRUE)
+replicateFirstMS<-function(doing) grepl('rm',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-b]*([crm]*)','\\1',doing)),fixed=TRUE)
+combineMS<-function(doing) grepl('c',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-b]*([crm]*)','\\1',doing)),fixed=TRUE)
+combineFirstMS<-function(doing) grepl('cm',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-b]*([crm]*)','\\1',doing)),fixed=TRUE)
 
 #' @export
 prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pNull=0.5,metaPublicationBias=FALSE,
@@ -192,10 +192,12 @@ doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,
   rootMetaSci<-paste0("Step",stepMetaSci,partMetaSci)
   single<-singleMS(doingMetaScience)
   replicate<-replicateMS(doingMetaScience)
+  combine<-combineMS(doingMetaScience)
   
   if (single) {
-    if (replicate) doSingle(onlyReplication=TRUE)    
-    else           doSingle()
+    if (replicate || combine) 
+            doSingle(onlyReplication=TRUE)    
+    else    doSingle()
     if (stepMetaSci=="5") {
       result<-braw.res$result
       result$hypothesis$IV2<-NULL
