@@ -225,6 +225,35 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
   ResultHistory$original<-resOriginal
   
   if (Replication$On) {
+    
+    if (Replication$Keep=="MetaAnalysis" && length(ResultHistory$rIV)>1) {
+      studies<-list(rIV=ResultHistory$rIV,nval=ResultHistory$nval,df1=ResultHistory$df1,
+                    rpIV=ResultHistory$rpIV,original=resOriginal)
+      metaAnalysis<-makeMetaAnalysis(TRUE,analysisType="fixed",
+                                     method="MLE",
+                                     modelNulls=FALSE,
+                                     sourceBias=FALSE,
+                                     analyseBias=1/length(studies$rIV))
+      metaResult<-runMetaAnalysis(metaAnalysis,studies,hypothesis,metaResult=NULL)
+      res$nval<-sum(ResultHistory$nval)
+      res$rIV<-sum(ResultHistory$rIV*ResultHistory$nval)/res$nval
+      res$rIV<-metaResult$fixed$param1
+      res$rpIV<-ResultHistory$rpIV[1]
+      res$df1<-ResultHistory$df1[1]
+      res$pIV<-rn2p(res$rIV,res$nval)
+      
+      res$ResultHistory$nval<-c(res$ResultHistory$nval,res$nval)
+      res$ResultHistory$rIV<-c(res$ResultHistory$rIV,res$rIV)
+      res$ResultHistory$rpIV<-c(res$ResultHistory$rpIV,res$rpIV)
+      res$ResultHistory$df1<-c(res$ResultHistory$df1,res$df1)
+      res$ResultHistory$pIV<-c(res$ResultHistory$pIV,res$pIV)
+      setBrawDef("evidence",oldEvidence)
+      setBrawDef("design",oldDesign)
+      setBrawDef("hypothesis",oldHypothesis)
+      return(res)
+      
+    }
+    
     # are we asked to start with a significant first result?
     if (Replication$forceSigOriginal) {
       while (!isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) {

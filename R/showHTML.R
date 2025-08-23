@@ -1,6 +1,12 @@
-showHTML<-function(data) {
+showHTML<-function(data,new=FALSE) {
   if (is.character(data)) {
-    htmlFile <- file.path(".", "index.html")
+    if (new) {
+      for (i in 1:100) {
+      htmlFile <- file.path(".", paste0("index",i,".html"))
+      if (!file.exists(htmlFile)) break;
+      }
+    } else
+      htmlFile <- file.path(".", "index.html")
     writeLines(data, con = htmlFile)
     rstudioapi::viewer(htmlFile)
   } else {

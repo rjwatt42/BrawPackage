@@ -18,8 +18,11 @@ doSingle<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,evidenc
   evidence$shortHand<-FALSE
   oldResult<-NULL
   if (onlyReplication) {
+    if (design$Replication$Keep=="MetaAnalysis") oldResult<-braw.res$result
+    else {
     if (!is.null(braw.res$result$ResultHistory$original)) oldResult<-braw.res$result$ResultHistory$original
     else oldResult<-braw.res$result
+    }
     if (is.null(oldResult)) {
       design$Replication$On<-FALSE
       oldResult<-doSingle(hypothesis=hypothesis,design=design,evidence=evidence)
