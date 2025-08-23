@@ -7,6 +7,8 @@ partMS<-function(doing) toupper(gsub('[A-Za-z]*[0-9]*([A-Da-d]*)','\\1',doing))
 singleMS<-function(doing) !grepl('m',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-d]*([rm]*)','\\1',doing)),fixed=TRUE)
 replicateMS<-function(doing) grepl('r',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-d]*([rm]*)','\\1',doing)),fixed=TRUE)
 replicateFirstMS<-function(doing) grepl('rm',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-d]*([rm]*)','\\1',doing)),fixed=TRUE)
+combineMS<-function(doing) grepl('c',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-d]*([rm]*)','\\1',doing)),fixed=TRUE)
+combineFirstMS<-function(doing) grepl('cm',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-d]*([rm]*)','\\1',doing)),fixed=TRUE)
 
 #' @export
 prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pNull=0.5,metaPublicationBias=FALSE,
@@ -24,6 +26,7 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pNull=0.5,m
   partMetaSci<-partMS(doingMetaScience)
   steppartMetaSci<-paste0(stepMetaSci,partMetaSci)
   replicate<-replicateMS(doingMetaScience)
+  combine<-combineMS(doingMetaScience)
   
   switch(stepMetaSci,
          "0"={
@@ -141,6 +144,12 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pNull=0.5,m
                                         replicateAll=sReplicationAll,
                                         UseLikelihood=sReplicationUseLikelihood)
     if (alt4B && steppartMetaSci=="4B") design$Replication$Keep<-"MetaAnalysis"
+  }
+  if (combine) {
+    design$Replication<-makeReplication(TRUE,Keep="MetaAnalysis",
+                                        Power=sReplicationPower,
+                                        replicateAll=sReplicationAll,
+                                        UseLikelihood=sReplicationUseLikelihood)
   }
   
   return(list(step=doingMetaScience,hypothesis=hypothesis,design=design,evidence=evidence))
