@@ -164,7 +164,7 @@ resetMultiple<-function(nsims=0,evidence,multipleResult=NULL){
 #' @seealso showMultiple() and reportMultiple())
 #' @export
 doMultiple <- function(nsims=10,multipleResult=NA,hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,
-                         doingNull=FALSE,inSteps=FALSE,autoShow=braw.env$autoShow,showType="Basic") {
+                         doingNull=FALSE,inSteps=FALSE,autoShow=braw.env$autoShow,showType="Basic",onlyReplication=FALSE) {
 
   if (length(multipleResult)==1 && is.na(multipleResult)) {
       if (identical(hypothesis,braw.res$multiple$hypothesis) &&
@@ -194,13 +194,22 @@ doMultiple <- function(nsims=10,multipleResult=NA,hypothesis=braw.def$hypothesis
                            evidence=evidence)
     )
   #
+    
+    oldResult<-NULL
+    if (onlyReplication) {
+      if (!is.null(braw.res$result$ResultHistory$original)) oldResult<-braw.res$result$ResultHistory$original
+      else oldResult<-braw.res$result
+      oldResult$design$Replication$On<-TRUE
+    }
+    else 
+
   if (doingNull && !hypothesis$effect$world$worldOn) {
     hypothesisNull<-hypothesis
     hypothesisNull$effect$rIV<-0
     # catch up - make enough null results to match results
     if (multipleResult$nullcount<multipleResult$count) {
       ns<-multipleResult$count-multipleResult$nullcount
-      multipleResult$nullresult<-multipleAnalysis(ns,hypothesisNull,design,evidence,multipleResult$nullresult)
+      multipleResult$nullresult<-multipleAnalysis(ns,hypothesisNull,design,evidence,multipleResult$nullresult,onlyReplication=onlyReplication)
       multipleResult$nullcount<-multipleResult$nullcount+ns
     }
   }
@@ -216,10 +225,10 @@ doMultiple <- function(nsims=10,multipleResult=NA,hypothesis=braw.def$hypothesis
   while (multipleResult$count<nsims) {
     if (multipleResult$count/ns>=10) ns<-ns*10
     if (multipleResult$count+ns>nsims) ns<-nsims-multipleResult$count
-    multipleResult$result<-multipleAnalysis(ns,hypothesis,design,evidence,multipleResult$result)
+    multipleResult$result<-multipleAnalysis(ns,hypothesis,design,evidence,multipleResult$result,onlyReplication=onlyReplication,oldResult=oldResult)
     multipleResult$count<-multipleResult$count+ns
     if (doingNull && !hypothesis$effect$world$worldOn) {
-      multipleResult$nullresult<-multipleAnalysis(ns,hypothesisNull,design,evidence,multipleResult$nullresult)
+      multipleResult$nullresult<-multipleAnalysis(ns,hypothesisNull,design,evidence,multipleResult$nullresult,onlyReplication=onlyReplication,oldResult=oldResult)
       multipleResult$nullcount<-multipleResult$nullcount+ns
     }
     if (autoShow) print(showMultiple(multipleResult,showType=showType))

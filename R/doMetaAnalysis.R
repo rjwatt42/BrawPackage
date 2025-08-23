@@ -135,11 +135,11 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
   
   switch(dist,
          "fixed"={
-           param1Use<-seq(-1,1,length.out=np1points)
+           param1Use<-seq(-1,1,length.out=np1points)*4
            param2Use<-0
          },
          "random"={
-           param1Use<-seq(-1,1,length.out=np1points)
+           param1Use<-seq(-1,1,length.out=np1points)*4
            if (metaAnalysis$analysisVar=="sd") 
              param2Use<-seq(0,0.5,length.out=np2points)^2
            else param2Use<-seq(-0.1,1,length.out=np2points)*(0.5^2)

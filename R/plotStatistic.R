@@ -145,7 +145,7 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
                           samp1Dens<-fullRSamplingDist(rvals,makeWorld(TRUE,"Single","r",rSourceVals[i],populationNullp = 0),
                                                        design=design,rOff,logScale=logScale,
                                                        sigOnlyOutput=TRUE,HQ=braw.env$showTheoryHQ)
-                          n2<-replicationNewN(rvals,design$sN,hypothesis,design)
+                          n2<-replicationNewN(rvals,design$sN,hypothesis,design,evidence)
                           # now get sampling distribution for this population and all sample sizes
                           theoryPartAll<-theoryPartSig<-0
                           nUse<-unique(n2)

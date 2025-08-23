@@ -270,7 +270,7 @@ rPopulationDist<-function(rvals,world) {
   if (world$populationPDFsample) {
     mn<-world$populationSamplemn
     sd<-world$populationSamplesd
-    rdens1<-rSamplingDistr(mn,rvals,sd,sigOnly=world$populationSamplebias)
+    rdens1<-rSamplingDistr(mn,rvals,1/sd^2+3,sigOnly=world$populationSamplebias)
   } else rdens1<-1
   k<-world$populationPDFk
   mu<-world$populationPDFmu

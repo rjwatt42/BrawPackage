@@ -22,7 +22,7 @@ zn2w<-function(z,n,t=2,alpha=NA){
       w<-pnorm(qnorm(alpha)+z*sqrt(n-3))
     } else {
       # two-tailed
-      pw1<-pnorm(qnorm(alpha/2)+z*sqrt(n-3))
+      pw1<- pnorm(qnorm(alpha/2)+z*sqrt(n-3))
       pw2<-pnorm(qnorm(alpha/2)-z*sqrt(n-3))
       w<-pw1+pw2
     }
@@ -35,8 +35,12 @@ rn2w<-function(r,n,t=2,alpha=NA){
   if (is.na(alpha)) alpha<-braw.env$alphaSig
   if (!is.numeric(r)) {
     rL<-getRList(r)
-    wL<-rn2w(rL$pRho,50)
-    return(sum(wL*rL$pRhogain)/sum(rL$pRhogain))
+    w<-n*0
+    for (i in 1:length(n)) {
+      wL<-rn2w(rL$pRho,n[i])
+      w[i]<-sum(wL*rL$pRhogain)/sum(rL$pRhogain)
+    }
+    return(w)
   }
   if (any(abs(r)>1)) {
     print(paste0("rn2w exception: ",format(max(abs(r)),digits=3)))
@@ -83,6 +87,14 @@ wn2r<-function(w,n,t=2,alpha=NA){
 
 rw2n<-function(r,w,t=2,alpha=NA,doRound=TRUE){
   if (is.na(alpha)) alpha<-braw.env$alphaSig
+  if (!is.numeric(r)) {
+    n_poss<-10^seq(log10(5),log10(5000),length.out=21)
+    e<-abs(rn2w(r,n_poss,t)-w)
+    use<-c(-1,1)+which.min(e)
+    gs<-function(n,r,w,t) {abs(rn2w(r,n,t)-w)}
+    n<-optimize(gs,n_poss[use],r=r,w=w,t=t,maximum=FALSE)$minimum
+    return(n)
+  }
   if (any(abs(r)>1)) {
     print("rw2n exception")
     r[r>1]<-1

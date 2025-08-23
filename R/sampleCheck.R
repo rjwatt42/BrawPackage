@@ -177,14 +177,24 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
   
 }
 
-replicationNewN<-function(rs,n,hypothesis,design) {
+replicationNewN<-function(rs,n,hypothesis,design,evidence) {
   Replication<-design$Replication
   if (Replication$PowerOn && (Replication$Power>0)) {
     switch(Replication$PowerPrior,
-           "None"={r<-rs},
-           "World"={r<-rSamp2Pop(rs,n,hypothesis$effect$world)},
-           "Prior"={r<-rSamp2Pop(rs,n,evidence$prior)}
+           "None"={rw<-NULL},
+           "World"={rw<-hypothesis$effect$world},
+           "Prior"={rw<-evidence$prior}
     ) 
+    if (Replication$UseLikelihood) {
+      r<-rw
+      if (is.null(r)) r<-hypothesis$effect$world
+      r$populationPDFsample=TRUE
+      r$populationSamplemn<-rs
+      r$populationSamplesd<-1/sqrt(n-3)
+    } else {
+      if (is.null(rw)) r<-rs
+      else r<-rSamp2Pop(rs,n,rw)
+    }
     # get the new sample size
     nrep<-rw2n(r,Replication$Power,Replication$Tails)
   } else nrep<-n
@@ -256,7 +266,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
         }
       }
       # get the relevant sample effect size for the power calc
-      design1$sN<-replicationNewN(res$rIV,res$nval,hypothesis,design)
+      design1$sN<-replicationNewN(res$rIV,res$nval,hypothesis,design,evidence)
       if (Replication$BudgetType=="Fixed") {
         design1$sN<-min(design1$sN,Replication$Budget-budgetUse)
       }

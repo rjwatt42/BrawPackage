@@ -252,7 +252,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,1
           # notation for world
           #
           
-          useLabels<-list(hypLabel="H",psig="psig",UD="D",P="0")
+          useLabels<-list(hypLabel="R",psig="psig",UD="D",P="0")
           
           Pchar<-"\u03c6"
           HypChar<-useLabels$hypLabel
@@ -330,7 +330,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,1
           braw.env$pPlusLabel<-paste0("P(",Ptypechar,")")
           
           braw.env$posChar<-"+"
-          braw.env$nullChar<-"0"
+          braw.env$nullChar<-nullChar
           
           braw.env$Plabel<-Plabel
           braw.env$Llabel<-Llabel
@@ -343,15 +343,15 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,1
           braw.env$nullPositive<-nullPositive
           braw.env$nullNS<-nullNS
           braw.env$nullNegative<-nullNegative
-          braw.env$nonNullSig<-"H[+]~sig"
+          braw.env$nonNullSig<-paste0(HypChar,"[",posChar,"]~sig")
           braw.env$nonNullPositive<-nonNullPositive
-          braw.env$nonNullNS<-"H[+]~ns"
+          braw.env$nonNullNS<-paste0(HypChar,"[",posChar,"]~ns")
           braw.env$nonNullNegative<-nonNullNegative
-          braw.env$nullSig<-"H[0]~sig"
-          braw.env$inactiveSig<-"H[n]~sig"
+          braw.env$nullSig<-paste0(HypChar,"[",nullChar,"]~sig")
+          braw.env$inactiveSig<-paste0(HypChar,"[n]~sig")
           braw.env$nullPositive<-nullPositive
-          braw.env$nullNS<-"H[0]~ns"
-          braw.env$inactiveNS<-"H[n]~ns"
+          braw.env$nullNS<-paste0(HypChar,"[",nullChar,"]~ns")
+          braw.env$inactiveNS<-paste0(HypChar,"[n]~ns")
           braw.env$nullNegative<-nullNegative
           
           braw.env$allPositive<-paste0(HypChar,"+ve")
@@ -362,8 +362,8 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,1
           
           braw.env$nonnullTitle<-"Non Null"
           braw.env$nullTitle<-"Null"
-          braw.env$nonnullTitle<-"H[+]"
-          braw.env$nullTitle<-"H[0]"
+          braw.env$nonnullTitle<-paste0(HypChar,"[",posChar,"]")
+          braw.env$nullTitle<-paste0(HypChar,"[",nullChar,"]")
           
           braw.env$timeLimit<-timeLimit # seconds
           

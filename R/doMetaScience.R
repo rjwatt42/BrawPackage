@@ -6,18 +6,23 @@ stepMS<-function(doing) gsub('[A-Za-z]*([0-9]*)[A-Da-d]*','\\1',doing)
 partMS<-function(doing) toupper(gsub('[A-Za-z]*[0-9]*([A-Da-d]*)','\\1',doing))
 singleMS<-function(doing) !grepl('m',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-d]*([rm]*)','\\1',doing)),fixed=TRUE)
 replicateMS<-function(doing) grepl('r',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-d]*([rm]*)','\\1',doing)),fixed=TRUE)
+replicateFirstMS<-function(doing) grepl('rm',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-d]*([rm]*)','\\1',doing)),fixed=TRUE)
 
 #' @export
 prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pNull=0.5,metaPublicationBias=FALSE,
-                        sN=42,sMethod="Convenience",
-                        sBudget=320,sSplits=16,sCheating="Replace",sCheatingProportion=0.05,
-                        sReplicationKeep="Cautious",sReplicationPower=0.9,sReplicationSigOriginal=TRUE,sReplicationOriginalAnomaly="Random",
-                        differenceSource="Interaction",range=NULL,rangeWidth=0,
-                        rangeVar=NULL,rangeP=NULL,analysisTerms=c(TRUE,FALSE,FALSE)
+                             alt4B=FALSE,
+                          sN=42,sMethod="Convenience",
+                          sBudget=320,sSplits=16,sCheating="Replace",sCheatingProportion=0.05,
+                          sReplicationKeep="Cautious",sReplicationPower=0.9,
+                          sReplicationAll=FALSE,sReplicationSigOriginal=TRUE,
+                          sReplicationOriginalAnomaly="Random",sReplicationUseLikelihood=FALSE,
+                          differenceSource="Interaction",range=NULL,rangeWidth=0,
+                          rangeVar=NULL,rangeP=NULL,analysisTerms=c(TRUE,FALSE,FALSE)
                         ) {
 
   stepMetaSci<-stepMS(doingMetaScience)
   partMetaSci<-partMS(doingMetaScience)
+  steppartMetaSci<-paste0(stepMetaSci,partMetaSci)
   replicate<-replicateMS(doingMetaScience)
   
   switch(stepMetaSci,
@@ -73,24 +78,25 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pNull=0.5,m
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world,rp=rp)))
            if (world!="Plain") hypothesis$effect$world$populationNullp<-pNull
            design<-makeDesign(sN=sN)
-           if (partMetaSci=="B") {
-             switch (sReplicationOriginalAnomaly,
-                     "Random"={},
-                     "Convenience"={
-                       design$sMethod<-makeSampling("Convenience")
-                     },
-                     "Cheating"={
-                       design$sCheating<-"Replace"
-                     },
-                     "Retry"={
-                       design$sCheating<-"Retry"
-                       design$sCheatingLimit="Budget"
-                       design$sCheatingBudget=sN*4-sN
-                       design$sCheatingFixedPop=FALSE
-             
-                     })
-           }
-           evidence<-makeEvidence(sigOnly=TRUE)
+           if (!alt4B)
+             if (partMetaSci=="B") {
+               switch (sReplicationOriginalAnomaly,
+                       "Random"={},
+                       "Convenience"={
+                         design$sMethod<-makeSampling("Convenience")
+                       },
+                       "Cheating"={
+                         design$sCheating<-"Replace"
+                       },
+                       "Retry"={
+                         design$sCheating<-"Retry"
+                         design$sCheatingLimit="Budget"
+                         design$sCheatingBudget=sN*4-sN
+                         design$sCheatingFixedPop=FALSE
+  
+                       })
+             }
+           evidence<-makeEvidence(sigOnly=sReplicationSigOriginal)
          },
          "5"={
            switch (partMetaSci,
@@ -129,29 +135,38 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pNull=0.5,m
            evidence<-makeEvidence(AnalysisTerms=analysisTerms,sigOnly=FALSE)
          }
   )
-  if (replicate)
-    design$Replication<-makeReplication(TRUE,Keep=sReplicationKeep,Power=sReplicationPower)
+  if (replicate) {
+    design$Replication<-makeReplication(TRUE,Keep=sReplicationKeep,
+                                        Power=sReplicationPower,
+                                        replicateAll=sReplicationAll,
+                                        UseLikelihood=sReplicationUseLikelihood)
+    if (alt4B && steppartMetaSci=="4B") design$Replication$Keep<-"MetaAnalysis"
+  }
   
   return(list(step=doingMetaScience,hypothesis=hypothesis,design=design,evidence=evidence))
 }
 
 #' @export
-doMetaScience<-function(metaScience,nreps=200,
-                        world="Binary",rp=0.3,pNull=0.5,metaPublicationBias=FALSE,
+doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,
+                        world="Psych50",rp=0.3,pNull=0.5,metaPublicationBias=FALSE,
                         sN=42,
                         sMethod="Convenience",sBudget=320,sSplits=16,
                         sCheating="Replace",sCheatingProportion=0.05,
-                        sReplicationKeep="Cautious",sReplicationPower=0.9,sReplicationSigOriginal=TRUE,sReplicationOriginalAnomaly="Random",
+                        sReplicationKeep="Cautious",sReplicationPower=0.9,
+                        sReplicationAll=FALSE,sReplicationSigOriginal=TRUE,
+                        sReplicationOriginalAnomaly="Random",sReplicationUseLikelihood=FALSE,
                         differenceSource="Interaction",range=NULL,rangeWidth=0,
                         rangeVar=NULL,rangeP=NULL,analysisTerms=c(TRUE,FALSE,FALSE)
 ) {
   
   if (is.character(metaScience)) 
-    metaScience<-prepareMetaScience(metaScience,
+    metaScience<-prepareMetaScience(metaScience,alt4B=alt4B,
                                     world=world,rp=rp,pNull=pNull,metaPublicationBias=metaPublicationBias,
                                     sN=sN,sMethod=sMethod,sBudget=sBudget,sSplits=sSplits,
                                     sCheating=sCheating,sCheatingProportion=sCheatingProportion,
-                                    sReplicationKeep=sReplicationKeep,sReplicationPower=sReplicationPower,sReplicationSigOriginal=sReplicationSigOriginal,sReplicationOriginalAnomaly=sReplicationOriginalAnomaly,
+                                    sReplicationKeep=sReplicationKeep,sReplicationPower=sReplicationPower,
+                                    sReplicationAll=sReplicationAll,sReplicationSigOriginal=sReplicationSigOriginal,
+                                    sReplicationOriginalAnomaly=sReplicationOriginalAnomaly,sReplicationUseLikelihood=sReplicationUseLikelihood,
                                     differenceSource=differenceSource,range=range,rangeWidth=rangeWidth,
                                     rangeVar=rangeVar,rangeP=rangeP,analysisTerms=analysisTerms
     )
@@ -170,11 +185,8 @@ doMetaScience<-function(metaScience,nreps=200,
   replicate<-replicateMS(doingMetaScience)
   
   if (single) {
-    if (replicate) {
-      doSingle(onlyReplication=TRUE)    
-    }
-    else 
-      doSingle()
+    if (replicate) doSingle(onlyReplication=TRUE)    
+    else           doSingle()
     if (stepMetaSci=="5") {
       result<-braw.res$result
       result$hypothesis$IV2<-NULL
@@ -185,7 +197,7 @@ doMetaScience<-function(metaScience,nreps=200,
     if (steppartMetaSci=="3B")   setBrawRes("multiple",braw.res$result)
   } else {
     if (steppartMetaSci=="2B" && single) nreps<-nreps/4
-      doMultiple(nreps)
+    doMultiple(nreps,onlyReplication=replicateFirstMS(doingMetaScience))
     outputNow<-"Multiple"
   }
   

@@ -85,7 +85,7 @@ reportWorld<-function(hypothesis=braw.def$hypothesis,plain=FALSE){
   outputText<-c()
   outputText<-c(outputText,
                 "!TWorld:",rep("",nc-1),
-                "!H ","Amount","Formula",rep("",nc-3)
+                "!HPart"," ","Formula",rep("",nc-3)
   )
   
   if (world$populationPDF=="Uniform") pdf<-paste0(world$populationPDF,"(",world$populationRZ,")")

@@ -16,14 +16,17 @@ doSingle<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,evidenc
   } 
   
   evidence$shortHand<-FALSE
+  oldResult<-NULL
   if (onlyReplication) {
     if (!is.null(braw.res$result$ResultHistory$original)) oldResult<-braw.res$result$ResultHistory$original
-    else {
-      if (!is.null(braw.res$result)) oldResult<-braw.res$result
+    else oldResult<-braw.res$result
+    if (is.null(oldResult)) {
+      design$Replication$On<-FALSE
+      oldResult<-doSingle(hypothesis=hypothesis,design=design,evidence=evidence)
+      design$Replication$On<-TRUE
     }
     oldResult$design$Replication$On<-TRUE
   }
-  else oldResult<-NULL
   result<-runSimulation(hypothesis=hypothesis,design=design,evidence=evidence,oldResult=oldResult,autoShow=FALSE)
   setBrawRes("result",result)
   if (autoShow) print(showSingle(result))
@@ -330,8 +333,7 @@ appendList <- function (x1, x2)
   x1
 }
 
-multipleAnalysis<-function(nsims=1,hypothesis,design,evidence,newResult=c()){
-  
+multipleAnalysis<-function(nsims=1,hypothesis,design,evidence,newResult=c(),onlyReplication=NULL,oldResult=NULL){
   rho<-hypothesis$effect$rIV
   rho2<-hypothesis$effect$rIV2
   
@@ -345,7 +347,7 @@ multipleAnalysis<-function(nsims=1,hypothesis,design,evidence,newResult=c()){
     hypothesis$effect$rIV<-rho[i]
     if (!is.null(hypothesis$IV2)) {hypothesis$effect$rIV2<-rho2[i]}
     
-    res<-runSimulation(hypothesis,design,evidence,evidence$sigOnly)
+    res<-runSimulation(hypothesis,design,evidence,evidence$sigOnly,oldResult=oldResult)
     
     if (is.na(res$rIV)) {
       res$rIV<-0
