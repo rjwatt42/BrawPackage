@@ -40,6 +40,7 @@ newBrawDev<-function(fontScale=1,height=1000,aspect=1) {
 #' @export
 BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,10),
                    reportHTML=FALSE, graphicsType="ggplot", reportFontSize=0.85, 
+                   colBlind=TRUE,
                    newDev=FALSE,height=400,aspect=1.3,autoShow=FALSE,autoPrint=FALSE,timeLimit=Inf,fullGraphSize=1,
                    npointsMax=1000,
                    fullOutput=0) {
@@ -72,6 +73,13 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,1
   
   sigCol<-"#44EE11"
   nsCol<-"#FF4400"
+  
+  if (colBlind) {
+    # sigCol<-"#4FB"
+    nsCol<-"#F82"
+    nsCol<-"#FC0"
+    nsCol<-"#BBB"
+  }
   sigNullCol<-darken(sigCol,gain=0.7)
   nsNonNullCol<-darken(nsCol,gain=0.7)
   isigNullCol<-darken(sigCol,off=0.5)
