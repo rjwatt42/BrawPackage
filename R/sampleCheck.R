@@ -227,31 +227,30 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
   if (Replication$On) {
     
     if (Replication$Keep=="MetaAnalysis" && length(ResultHistory$rIV)>1) {
+      if (is.null(ResultHistory$Smax)) ResultHistory$Smax<-rep(NA,length(ResultHistory$rIV))
       use<-is.na(ResultHistory$Smax)
       if (is.null(use)) use<-!is.na(ResultHistory$rIV)
       studies<-list(rIV=ResultHistory$rIV[use],nval=ResultHistory$nval[use],df1=ResultHistory$df1[use],
-                    rpIV=ResultHistory$rpIV[use],original=resOriginal)
+                    rpIV=ResultHistory$rpIV[use])
       metaAnalysis<-makeMetaAnalysis(TRUE,analysisType="fixed",
                                      method="MLE",
                                      modelNulls=FALSE,
                                      sourceBias=FALSE,
                                      analyseBias=1/length(studies$rIV))
       metaResult<-runMetaAnalysis(metaAnalysis,studies,hypothesis,metaResult=NULL)
-      res$nval<-sum(ResultHistory$nval)
-      res$rIV<-sum(ResultHistory$rIV*ResultHistory$nval)/res$nval
+      res$nval<-sum(studies$nval)
+      res$rIV<-sum(studies$rIV*studies$nval)/res$nval
       res$rIV<-metaResult$fixed$param1
-      res$rpIV<-ResultHistory$rpIV[1]
-      res$df1<-ResultHistory$df1[1]
+      res$rpIV<-studies$rpIV[1]
+      res$df1<-studies$df1[1]
       res$pIV<-rn2p(res$rIV,res$nval)
       
-      if (is.null(res$ResultHistory$Smax)) res$ResultHistory$Smax<-rep(NA,length(res$ResultHistory$rIV))
-      
-      res$ResultHistory$nval<-c(res$ResultHistory$nval[use],res$nval)
-      res$ResultHistory$rIV<-c(res$ResultHistory$rIV[use],res$rIV)
-      res$ResultHistory$rpIV<-c(res$ResultHistory$rpIV[use],res$rpIV)
-      res$ResultHistory$df1<-c(res$ResultHistory$df1[use],res$df1)
-      res$ResultHistory$pIV<-c(res$ResultHistory$pIV[use],res$pIV)
-      res$ResultHistory$Smax<-c(res$ResultHistory$Smax[use],metaResult$fixed$Smax)
+      res$ResultHistory$nval<-c(ResultHistory$nval[use],res$nval)
+      res$ResultHistory$rIV<-c(ResultHistory$rIV[use],res$rIV)
+      res$ResultHistory$rpIV<-c(ResultHistory$rpIV[use],res$rpIV)
+      res$ResultHistory$df1<-c(ResultHistory$df1[use],res$df1)
+      res$ResultHistory$pIV<-c(ResultHistory$pIV[use],res$pIV)
+      res$ResultHistory$Smax<-c(ResultHistory$Smax[use],metaResult$fixed$Smax)
       setBrawDef("evidence",oldEvidence)
       setBrawDef("design",oldDesign)
       setBrawDef("hypothesis",oldHypothesis)
