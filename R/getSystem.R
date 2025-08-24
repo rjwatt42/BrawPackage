@@ -101,7 +101,7 @@ getWorld<-function(name,rp=0.3,result=braw.res$result) {
            world<-list(worldOn=TRUE,
                        populationPDF="Exp",
                        populationRZ="z",
-                       populationPDFk=rp,
+                       populationPDFk=atanh(rp),
                        populationPDFmu=0,
                        populationNullp=0.5,
                        populationPDFsample=FALSE)
@@ -110,7 +110,7 @@ getWorld<-function(name,rp=0.3,result=braw.res$result) {
            world<-list(worldOn=TRUE,
                        populationPDF="Exp",
                        populationRZ="z",
-                       populationPDFk=rp,
+                       populationPDFk=atanh(rp),
                        populationPDFmu=0,
                        populationNullp=0.0,
                        populationPDFsample=FALSE)

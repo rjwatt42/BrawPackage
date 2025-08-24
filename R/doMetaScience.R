@@ -47,22 +47,6 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pNull=0.5,m
          "2"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world,rp=rp)))
            if (world!="Plain") hypothesis$effect$world$populationNullp<-pNull
-           design<-makeDesign(sN=sN)
-           switch(partMetaSci,
-                  "A"=design$sMethod<-makeSampling(sMethod),
-                  "B"={
-                    design$sCheating<-sCheating
-                    design$sCheatingLimit<-"Budget"
-                    design$sCheatingBudget<-floor(sN*sCheatingProportion)
-                    design$sCheatingAttempts<-floor(sN*sCheatingProportion)
-                  }
-           )
-           # if (partMetaSci=="B") metaPublicationBias<-FALSE
-           evidence<-makeEvidence(sigOnly=metaPublicationBias)
-         },
-         "3"={
-           hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world,rp=rp)))
-           if (world!="Plain") hypothesis$effect$world$populationNullp<-pNull
            
            switch(partMetaSci,
                   "A"=design<-makeDesign(sN=sN),
@@ -72,6 +56,22 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pNull=0.5,m
                                        sCheating="Retry",
                                        sCheatingLimit="Budget",sCheatingBudget=sBudget-n,
                                        sCheatingFixedPop=FALSE)
+                  }
+           )
+           # if (partMetaSci=="B") metaPublicationBias<-FALSE
+           evidence<-makeEvidence(sigOnly=metaPublicationBias)
+         },
+         "3"={
+           hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world,rp=rp)))
+           if (world!="Plain") hypothesis$effect$world$populationNullp<-pNull
+           design<-makeDesign(sN=sN)
+           switch(partMetaSci,
+                  "A"=design$sMethod<-makeSampling(sMethod),
+                  "B"={
+                    design$sCheating<-sCheating
+                    design$sCheatingLimit<-"Budget"
+                    design$sCheatingBudget<-floor(sN*sCheatingProportion)
+                    design$sCheatingAttempts<-floor(sN*sCheatingProportion)
                   }
            )
            # if (partMetaSci=="B") metaPublicationBias<-FALSE
@@ -205,9 +205,9 @@ doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,
       setBrawRes("result",result)
       }
     outputNow<-"Description"
-    if (steppartMetaSci=="3B")   setBrawRes("multiple",braw.res$result)
+    if (steppartMetaSci=="2B")   setBrawRes("multiple",braw.res$result)
   } else {
-    if (steppartMetaSci=="2B" && single) nreps<-nreps/4
+    if (steppartMetaSci=="3B" && single) nreps<-nreps/4
     doMultiple(nreps,onlyReplication=replicateFirstMS(doingMetaScience))
     outputNow<-"Multiple"
   }
@@ -220,7 +220,7 @@ doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,
   # if (stepMetaSci=="0") setBrawEnv("fullOutput",0)
   # else 
     setBrawEnv("fullOutput",1)
-  if (steppartMetaSci=="3B" && single) setBrawEnv("reportCounts",TRUE)
+  if (steppartMetaSci=="2B" && single) setBrawEnv("reportCounts",TRUE)
   else setBrawEnv("reportCounts",FALSE)
   
   investgD<-braw.res$investgD
@@ -231,7 +231,7 @@ doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,
   if (single) {
     investgD<-showDescription()
     investgS<-showInference(showType="rse",orientation="horz",dimension=1,showTheory=showTheory)
-    if (is.element(steppartMetaSci,c("3B")))
+    if (is.element(steppartMetaSci,c("2B")))
       investgR<-reportMultiple(showType="NHST",compact=TRUE)
     else     investgR<-reportInference(compact=TRUE)
     if (is.element(steppartMetaSci,c("2B","3B","4A","4B")))
