@@ -208,26 +208,43 @@ generate_tab = function(title="Tab",tabs=c("1","2","3"),tabContents=c("a","b","c
       '" onclick="historyGoTo(event,\'','Block',format(block),'\')">',
       '>>','</button>'
     )
+    nextButtonDisabled<-paste0(
+      '<button class="historyButton" disabled',
+      ' style="float:right;border-radius:4px;"',
+      '" onclick="historyGoTo(event,\'','Block',format(block),'\')">',
+      '>>','</button>'
+    )
     previousButton<-paste0(
-      '<button class="historyButton"'
+      '<button class="historyButton" disabled'
     )
     if (block>0) {
       # back
       if (nchar(history)>0) plain<-TRUE
+      historyButtons<-paste0(historyButtons,
+                             '<button class="historyButton" disabled',
+                             ' style="float:right;border-radius:4px;"',
+                             '" onclick="historyGoTo(event,\'','Block',format(block+1),'\')">',
+                             '>>','</button>'
+      )
       historyButtons<-paste0(historyButtons,
                              '<button class="historyButton"',
                              ' style="float:right;border-radius:4px;"',
                              '" onclick="historyGoTo(event,\'','Block',format(block-1),'\')">',
                              '<<','</button>'
       )
-      history<-sub(previousButton,
-                   paste0(nextButton,
-                          previousButton),
+      history<-sub('<button class="historyButton" disabled',
+                   '<button class="historyButton" ',
                    history)
     } else {
       historyButtons<-paste0(historyButtons,
-                             '<button class="historyButton"',
-                             ' style="float:right;border-radius:4px;display:none;"',
+                             '<button class="historyButton" disabled',
+                             ' style="float:right;border-radius:4px;"',
+                             '" onclick="historyGoTo(event,\'','Block',format(1),'\')">',
+                             '>>','</button>'
+      )
+      historyButtons<-paste0(historyButtons,
+                             '<button class="historyButton" disabled',
+                             ' style="float:right;border-radius:4px;"',
                              '" onclick="historyGoTo(event,\'','Block',format(0),'\')">',
                              '<<','</button>'
       )
