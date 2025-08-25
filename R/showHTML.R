@@ -1,3 +1,4 @@
+#' @export
 showHTML<-function(data,new=FALSE) {
   if (is.character(data)) {
     if (new) {

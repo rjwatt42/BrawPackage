@@ -8,6 +8,7 @@ doSingle(
   hypothesis = braw.def$hypothesis,
   design = braw.def$design,
   evidence = braw.def$evidence,
+  onlyReplication = FALSE,
   autoShow = braw.env$autoShow
 )
 }

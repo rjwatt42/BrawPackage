@@ -13,7 +13,8 @@ doMultiple(
   doingNull = FALSE,
   inSteps = FALSE,
   autoShow = braw.env$autoShow,
-  showType = "Basic"
+  showType = "Basic",
+  onlyReplication = FALSE
 )
 }
 \value{

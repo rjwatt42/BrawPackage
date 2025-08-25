@@ -7,7 +7,7 @@
 makeEvidence(
   shortHand = FALSE,
   sigOnly = FALSE,
-  AnalysisTerms = 2,
+  AnalysisTerms = c(TRUE, TRUE, FALSE),
   rInteractionOnly = TRUE,
   ssqType = "Type3",
   caseOrder = "AsStated",

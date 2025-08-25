@@ -7,7 +7,10 @@
 showSample(
   sample = braw.res$result,
   marginals = FALSE,
-  plotArea = c(0, 0, 1, 1)
+  plotArea = c(0, 0, 1, 1),
+  fill = braw.env$plotColours$sampleC,
+  dotSize = 1,
+  g = NULL
 )
 }
 \value{
