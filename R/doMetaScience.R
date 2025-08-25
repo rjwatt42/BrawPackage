@@ -296,10 +296,11 @@ doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,showOutput=TRUE,doHist
       open=open
     )
   
-  if (doHistory) history$content<-investgResults
-  history$place<-length(history$content)
-  setBrawRes("investgHistory",history)
-  
+  if (doHistory) {
+    history$content<-investgResults
+    history$place<-length(history$content)
+    setBrawRes("investgHistory",history)
+  }
   if (showOutput) {
     showHTML(investgResults)
     return(invisible(NULL))
