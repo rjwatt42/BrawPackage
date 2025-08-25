@@ -156,7 +156,7 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pNull=0.5,m
 }
 
 #' @export
-doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,
+doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,showOutput=TRUE,
                         world="Psych50",rp=0.3,pNull=0.5,metaPublicationBias=FALSE,
                         sN=42,
                         sMethod="Convenience",sBudget=320,sSplits=16,
@@ -292,5 +292,9 @@ doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,
   history$place<-length(history$content)
   setBrawRes("investgHistory",history)
   
-  return(investgResults)
+  if (showOutput) {
+    showHTML(investgResults)
+    return(invisible(NULL))
+  }
+  return(invisible(investgResults))
 }

@@ -19,5 +19,5 @@ showHTML<-function(data,new=FALSE) {
     
     assign("graphHTML",FALSE,braw.env)
   }
-  return(NULL)
+  return(invisible(NULL))
 }
