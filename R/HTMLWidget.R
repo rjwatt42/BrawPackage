@@ -53,6 +53,23 @@ generate_tab = function(title="Tab",tabs=c("1","2","3"),tabContents=c("a","b","c
     '      }',
     '    }',
     '}',
+    'function historyGoTo(evt, blockName) {',
+    '  var found, historyBlocks;',
+    '    historyBlocks = document.getElementsByClassName("history");',
+    '    found = false;',
+    '    for (i = 0; i < historyBlocks.length; i++) {',
+    '        if (historyBlocks[i].id==blockName) { found = true;}',
+    '    }',
+    '    if (found) {',
+    '    for (i = 0; i < historyBlocks.length; i++) {',
+    '        if (historyBlocks[i].id==blockName) {',
+    '        historyBlocks[i].style.display = "block";',
+    '       } else {',
+    '        historyBlocks[i].style.display = "none";',
+    '       }',
+    '    }',
+    '  }',
+    '}',
     # openCode,
     '</script>'
   )
@@ -122,10 +139,16 @@ generate_tab = function(title="Tab",tabs=c("1","2","3"),tabContents=c("a","b","c
   
   buttons<-''
   panels<-''
+  block<-0
+  if (!is.null(history)) 
+    block<-sum(gregexpr('ID="Block[0-9]{1,2}"',history)[[1]]>0)
+    
   if (titleWidth==0) titleShow<-''
   else titleShow<-paste0('<b>',title,'</b>')
+  
+  titleID<-paste0(title,block)
   buttons <- paste0(buttons,
-                    '  <button id="tabtitle',title,'" class="tablinks" onclick="closeTabs(event,\'',title,'\')"',
+                    '  <button id="tabtitle',titleID,'" class="tablinks" onclick="closeTabs(event,\'',titleID,'\')"',
                     ' style="background-color:rgba(0,0,0,0);color:black;cursor:default;',
                     'font-weight: 500;font-size:13px;width:',titleWidth,'px;text-align: right;',
                     'margin:0px;padding: 0px;">',
@@ -133,18 +156,19 @@ generate_tab = function(title="Tab",tabs=c("1","2","3"),tabContents=c("a","b","c
                     '</button>')
   if (nchar(titleTab)>0)
     panels <- paste0(panels,
-                     '  <div id="',title,'" class="tabcontent" style="display:block">',
+                     '  <div id="',titleID,'" class="tabcontent" style="display:block">',
                      titleTab,
                      '</div>')
   else
     panels <- paste0(panels,
-                     '  <div id="',title,'" class="tabcontent" style="display:none;"','width:',width-indent,'px;','>',
+                     '  <div id="',titleID,'" class="tabcontent" style="display:none;"','width:',width-indent,'px;','>',
                      '</div>')
   for (itab in 1:length(tabs)) {
-    panelID<-paste0(title,'||',tabs[itab])
+    panelID<-paste0(titleID,'||',tabs[itab])
     if (itab==open) {
       buttons <- paste0(buttons,
-                        '  <button class="tablinks active" onclick="openTab(event,\'',panelID,'\')" id="',paste0(panelID,"button"),'">',
+                        '  <button class="tablinks active" onclick="openTab(event,\'',panelID,'\')" id="',paste0(panelID,"button"),
+                        'maargin:0px;padding:0px;">',
                         tabs[itab],
                         '</button>')
       panels <- paste0(panels,
@@ -168,17 +192,52 @@ generate_tab = function(title="Tab",tabs=c("1","2","3"),tabContents=c("a","b","c
   if (!is.null(tabLink))
     link<-paste0(
       '<div style="text-align:right;padding:0px;margin:0px;padding-right:20px;float:right;">',
-      '<a href=','"',tabLink,'"',
+      '<a href=','"',tabLink,'"',' style="padding:0px;margin:0px;"',
       ' target="_blank">',
       tabLinkLabel,
       '</a>',
       '</div>'
     )
   else link<-''
+  
+  if (!is.null(history)) {
+    historyButtons<-''
+    nextButton<-paste0(
+      '<button class="historyButton"',
+      ' style="float:right;border-radius:4px;"',
+      '" onclick="historyGoTo(event,\'','Block',format(block),'\')">',
+      '>>','</button>'
+    )
+    previousButton<-paste0(
+      '<button class="historyButton"'
+    )
+    if (block>0) {
+      # back
+      if (nchar(history)>0) plain<-TRUE
+      historyButtons<-paste0(historyButtons,
+                             '<button class="historyButton"',
+                             ' style="float:right;border-radius:4px;"',
+                             '" onclick="historyGoTo(event,\'','Block',format(block-1),'\')">',
+                             '<<','</button>'
+      )
+      history<-sub(previousButton,
+                   paste0(nextButton,
+                          previousButton),
+                   history)
+    } else {
+      historyButtons<-paste0(historyButtons,
+                             '<button class="historyButton"',
+                             ' style="float:right;border-radius:4px;display:none;"',
+                             '" onclick="historyGoTo(event,\'','Block',format(0),'\')">',
+                             '<<','</button>'
+      )
+    }
+  } else historyButtons<-''
   buttons<-paste0('<div class="tab" style="','width:',width-indent+2,'px;',
                   'padding:0px;margin:0px;','margin-left:',indent,'px;','padding-top:',topMargin,'px;',
                   # 'border:solid;',
                   '">',buttons,
+                  historyButtons,
                   link,
                   '</div>')
   if (plain)
@@ -198,6 +257,15 @@ generate_tab = function(title="Tab",tabs=c("1","2","3"),tabContents=c("a","b","c
       '<div style="height:',outerHeight,'px;">',
       html_content,
       '</div>'
+    )
+  }
+  if (!is.null(history)) {
+    history<-gsub('class="history"','class="history" style="display:none"',history)
+    html_content<-paste0(
+      '<div class="history" ID="Block',format(block),'" >',
+      html_content,
+      '</div>',
+      history
     )
   }
   return(html_content)

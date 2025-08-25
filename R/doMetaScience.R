@@ -271,6 +271,7 @@ doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,
   linkLabel<-paste0(rootMetaSci)
   
   history<-braw.res$investgHistory
+  if (is.null(history)) history<-list(content='')
   
   investgResults<-
     generate_tab(
@@ -281,7 +282,8 @@ doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,
       tabs=c("Data","Schematic"),
       tabContents=c(show1,show2),
       tabLink=paste0('https://doingpsychstats.wordpress.com/metascience-',stepMetaSci,'#','Part',stepMetaSci,partMetaSci),
-      tabLinkLabel=paste0('&#x24D8 ',linkLabel),
+      # tabLinkLabel=paste0('&#x24D8 ',linkLabel),
+      tabLinkLabel=paste0(linkLabel),
       history=history$content,
       open=open
     )
