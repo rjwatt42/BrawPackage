@@ -283,13 +283,13 @@ doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,showOutput=TRUE,doHist
       tabs=c("Data","Schematic"),
       tabContents=c(show1,show2),
       tabLink=paste0('https://doingpsychstats.wordpress.com/metascience-',stepMetaSci,'#','Part',stepMetaSci,partMetaSci),
-      # tabLinkLabel=paste0('&#x24D8 ',linkLabel),
-      tabLinkLabel=paste0(linkLabel),
+      tabLinkLabel=paste0('&#x24D8 ',linkLabel),
+      # tabLinkLabel=paste0(linkLabel),
       history=history$content,
       open=open
     )
   
-  history$content<-investgResults
+  if (doHistory) history$content<-investgResults
   history$place<-length(history$content)
   setBrawRes("investgHistory",history)
   

@@ -191,10 +191,10 @@ generate_tab = function(title="Tab",tabs=c("1","2","3"),tabContents=c("a","b","c
   
   if (!is.null(tabLink))
     link<-paste0(
-      '<div style="text-align:right;padding:0px;margin:0px;padding-right:20px;float:right;">',
+      '<div style="text-align:right;padding:0px;margin:0px;padding-right:20px;float:right;font-size:12px;">',
       '<a href=','"',tabLink,'"',' style="padding:0px;margin:0px;"',
       ' target="_blank">',
-      tabLinkLabel,
+      '<text ">',tabLinkLabel,'</text>',
       '</a>',
       '</div>'
     )
