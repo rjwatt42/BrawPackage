@@ -7,6 +7,7 @@
 #' @export
 generate_tab = function(title="Tab",tabs=c("1","2","3"),tabContents=c("a","b","c"),
                         titleTab="",titleWidth=135,
+                        history=NULL,
                         tabLink=NULL,tabLinkLabel='here',
                         plainTabs=FALSE,indent=0,topMargin=5,
                         colours=c("#3498db","#888","#888"),fontSize="12px",
@@ -166,7 +167,7 @@ generate_tab = function(title="Tab",tabs=c("1","2","3"),tabContents=c("a","b","c
   
   if (!is.null(tabLink))
     link<-paste0(
-      '<div style="text-align:right;padding-right:100px;">',
+      '<div style="text-align:right;padding:0px;margin:0px;padding-right:20px;float:right;">',
       '<a href=','"',tabLink,'"',
       ' target="_blank">',
       tabLinkLabel,

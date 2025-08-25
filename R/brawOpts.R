@@ -80,6 +80,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,1
     nsCol<-"#FC0"
     nsCol<-"#BBB"
   }
+  
   sigNullCol<-darken(sigCol,gain=0.7)
   nsNonNullCol<-darken(nsCol,gain=0.7)
   isigNullCol<-darken(sigCol,off=0.5)
