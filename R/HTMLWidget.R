@@ -195,18 +195,18 @@ generate_tab = function(title="Tab",tabs=c("1","2","3"),tabContents=c("a","b","c
   buttonFormat<-' style="float:right;border-radius:4px;padding:0px;padding-left:4px;padding-right:4px;margin:0px;margin-right:2px;margin-left:2px;"'
   if (!is.null(tabLink)) {
     link<-paste0(
-      '<div style="padding:0px;margin:0px;float:right;">',
+      '<div style="text-align:right;padding-right:100px;">',
       '<a href=','"',tabLink,'" target="_blank">',
-      '<text>',tabLinkLabel,'</text>',
+      tabLinkLabel,
       '</a>',
       '</div>'
     )
-  link<-paste0(
-    '<button class="linkButton"',
-    sub(';"',';color:#0000FF;"',buttonFormat),
-    '" onclick="linkGoTo(event,\'',tabLink,'\')">',
-    tabLinkLabel,'</button>'
-  )
+  # link<-paste0(
+  #   '<button class="linkButton"',
+  #   sub(';"',';color:#0000FF;"',buttonFormat),
+  #   '" onclick="linkGoTo(event,\'',tabLink,'\')">',
+  #   tabLinkLabel,'</button>'
+  # )
   } else link<-''
   
   if (!is.null(history)) {
