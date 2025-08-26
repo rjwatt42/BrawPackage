@@ -279,7 +279,7 @@ doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,showOutput=TRUE,doHist
   
   history<-braw.res$investgHistory
   if (is.null(history)) history<-list(content='')
-  if (!doHistory) history<-NULL
+  if (!doHistory) history$content<-NULL
   
   investgResults<-
     generate_tab(
