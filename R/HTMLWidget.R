@@ -70,6 +70,9 @@ generate_tab = function(title="Tab",tabs=c("1","2","3"),tabContents=c("a","b","c
     '    }',
     '  }',
     '}',
+    'function linkGoTo(evt, linkName) {',
+    '    open(linkName);',
+    '}',
     # openCode,
     '</script>'
   )
@@ -189,7 +192,7 @@ generate_tab = function(title="Tab",tabs=c("1","2","3"),tabContents=c("a","b","c
     }
   }
   
-  if (!is.null(tabLink))
+  if (!is.null(tabLink)) {
     link<-paste0(
       '<div style="text-align:left;padding:0px;margin:0px;">',
       '<a href=','"',tabLink,'"',
@@ -198,7 +201,13 @@ generate_tab = function(title="Tab",tabs=c("1","2","3"),tabContents=c("a","b","c
       '</a>',
       '</div>'
     )
-  else link<-''
+  link<-paste0(
+    '<button class="linkButton"',
+    ' style="float:right;border-radius:4px;"',
+    '" onclick="linkGoTo(event,\'',tabLink,'\')">',
+    tabLinkLabel,'</button>'
+  )
+  } else link<-''
   
   if (!is.null(history)) {
     historyButtons<-''
