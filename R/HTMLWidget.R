@@ -192,12 +192,11 @@ generate_tab = function(title="Tab",tabs=c("1","2","3"),tabContents=c("a","b","c
     }
   }
   
-  buttonFormat<-' style="float:right;border-radius:4px;padding:1px;padding-left:4px;padding-right:4px;margin:0px;margin-right:2px;margin-left:2px;"'
+  buttonFormat<-' style="float:right;border-radius:4px;padding:0px;padding-left:4px;padding-right:4px;margin:0px;margin-right:2px;margin-left:2px;"'
   if (!is.null(tabLink)) {
     link<-paste0(
-      '<div style="text-align:left;padding:0px;margin:0px;">',
-      '<a href=','"',tabLink,'"',
-      ' target="_blank">',
+      '<div style="padding:0px;margin:0px;float:right;">',
+      '<a href=','"',tabLink,'" target="_blank">',
       '<text>',tabLinkLabel,'</text>',
       '</a>',
       '</div>'
