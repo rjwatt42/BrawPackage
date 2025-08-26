@@ -1,4 +1,4 @@
-theoryPlot<-function(g,theory,orientation,baseColour,theoryAlpha,xoff) {
+theoryPlot<-function(g,theory,orientation,baseColour,theoryAlpha,xoff,lineOnly=FALSE) {
   theoryVals<-theory$theoryVals
   theoryDens_all<-theory$theoryDens_all
   theoryDens_sig<-theory$theoryDens_sig
@@ -14,8 +14,9 @@ theoryPlot<-function(g,theory,orientation,baseColour,theoryAlpha,xoff) {
            theory_all<-data.frame(y=c(theoryVals,rev(theoryVals)),x=c(theoryDens_all,-rev(theoryDens_all))+xoff)
          })
   if (is.null(theoryDens_sig)) baseColour<-"white"
-  g<-addG(g,dataPolygon(data=theory_all,colour=NA,fill=baseColour,alpha=theoryAlpha))
-    g<-addG(g,dataPath(data=theory_all,colour="#000000",linewidth=0.2))
+  if (!lineOnly)
+    g<-addG(g,dataPolygon(data=theory_all,colour=NA,fill=baseColour,alpha=theoryAlpha))
+  g<-addG(g,dataPath(data=theory_all,colour="#000000",linewidth=0.2))
   
   if (!is.null(theoryDens_sig)) {
     i2<-0
@@ -31,9 +32,10 @@ theoryPlot<-function(g,theory,orientation,baseColour,theoryAlpha,xoff) {
              "vert"={
                theory_sig<-data.frame(y=c(theoryVals[use],rev(theoryVals[use])),x=c(theoryDens_sig[use],-rev(theoryDens_sig[use]))+xoff)
              })
-      g<-addG(g,dataPolygon(data=theory_sig,colour=NA,fill=braw.env$plotColours$infer_sigC,alpha=theoryAlpha))
+      if (!lineOnly)
+        g<-addG(g,dataPolygon(data=theory_sig,colour=NA,fill=braw.env$plotColours$infer_sigC,alpha=theoryAlpha))
       # if (showAll) 
-        g<-addG(g,dataPath(data=theory_sig,colour="black",linewidth=0.1))
+      g<-addG(g,dataPath(data=theory_sig,colour="black",linewidth=0.1))
       # else
         # g<-addG(g,dataPath(data=theory_sig,colour="white",linewidth=0.1))
     }
@@ -817,7 +819,7 @@ simulations_hist<-function(pts,valType,ylim,histGain,histGainrange){
 }
 
 simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
-                        i=1,scale=1,width=1,col="white",alpha=1,useSignificanceCols=braw.env$useSignificanceCols,
+                        i=1,scale=1,width=1,col="white",alpha=0.6,useSignificanceCols=braw.env$useSignificanceCols,
                         histStyle="width",orientation="vert",ylim,histGain=NA,histGainrange=NA,
                         npointsMax=braw.env$npointsMax,sequence=FALSE){
 
@@ -1118,7 +1120,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                  g=NULL){
 
   baseColour<-braw.env$plotColours$infer_nsigC
-  theoryFirst<-TRUE
+  theoryFirst<-FALSE
   npct<-0
   showSig<-TRUE
   labelSig<-TRUE
@@ -1386,7 +1388,6 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       sampleVals[sampleVals<(-10)]<--10
     }  
     if (nrow(sampleVals)<=1000) theoryFirst<-TRUE
-    else theoryFirst<-FALSE
   } 
   sigOnly<-evidence$sigOnly
   
@@ -1540,6 +1541,8 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
     }
     if (!theoryFirst)
       g<-theoryPlot(g,theory,orientation,baseColour,theoryAlpha/2,xoff[i])
+    else
+      g<-theoryPlot(g,theory,orientation,baseColour,theoryAlpha/2,xoff[i],lineOnly=TRUE)
     
     if (is.element(showType,c("rse","sig","ns","nonnulls","nulls","rss","p","e1r","e2r","e1+","e2+","e1-","e2-",
                               "e1p","e2p","e1d","e2d"))) showLegend<-TRUE
