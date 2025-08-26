@@ -203,7 +203,7 @@ generate_tab = function(title="Tab",tabs=c("1","2","3"),tabContents=c("a","b","c
     )
   link<-paste0(
     '<button class="linkButton"',
-    ' style="float:right;border-radius:4px;"',
+    ' style="float:right;border-radius:4px;padding:0px;margin:0px;"',
     '" onclick="linkGoTo(event,\'',tabLink,'\')">',
     tabLinkLabel,'</button>'
   )
