@@ -8,7 +8,7 @@
 generate_tab = function(title="Tab",tabs=c("1","2","3"),tabContents=c("a","b","c"),
                         titleTab="",titleWidth=135,
                         history=NULL,
-                        tabLink=NULL,tabLinkLabel='here',
+                        tabLink=NULL,tabLinkLabel='here',tabLinkStyle='button',
                         plainTabs=FALSE,indent=0,topMargin=5,
                         colours=c("#3498db","#888","#888"),fontSize="12px",
                         plain=FALSE,width=550,height=NULL,outerHeight=NULL,open=0) {
@@ -195,7 +195,7 @@ generate_tab = function(title="Tab",tabs=c("1","2","3"),tabContents=c("a","b","c
   buttonFormat<-' style="float:right;border-radius:4px;padding:0px;padding-left:4px;padding-right:4px;margin:0px;margin-right:2px;margin-left:2px;"'
   if (!is.null(tabLink)) {
     link<-paste0(
-      '<div style="float:right;padding-left:4px;padding-right:4px;">',
+      '<div style="float:right;padding-left:4px;padding-right:4px;font-size:12px;">',
       '<a href=','"',tabLink,'" target="_blank">',
       tabLinkLabel,
       '</a>',
