@@ -285,11 +285,11 @@ doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,showOutput=TRUE,doHist
   if (is.null(history)) history<-list(content='')
   if (!doHistory) history$content<-NULL
   
-  if (doingMore && !is.null(history$content)) {
-    h<-unlist(strsplit(history$content,'<div class=\"history\"',fixed=TRUE))
-    h<-paste0('<div class=\"history\"',paste0(h[3:length(h)]))
-    history$content<-h
-  }
+  # if (doingMore && !is.null(history$content)) {
+  #   h<-unlist(strsplit(history$content,'<div class=\"history\"',fixed=TRUE))
+  #   h<-paste0('<div class=\"history\"',paste0(h[3:length(h)]))
+  #   history$content<-h
+  # }
   investgResults<-
     generate_tab(
       title="MetaScience:",
