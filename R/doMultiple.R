@@ -220,10 +220,12 @@ doMultiple <- function(nsims=10,multipleResult=NA,hypothesis=braw.def$hypothesis
     ns<-10^min_ns
   } else
     ns<-nsims
-
+  if (braw.env$timeLimit<Inf) ns<-1
+    
   nsims<-nsims+multipleResult$count
-  while (multipleResult$count<nsims) {
-    if (multipleResult$count/ns>=10) ns<-ns*10
+  time.at.start<-Sys.time()
+  while (multipleResult$count<nsims && (Sys.time()-time.at.start)<braw.env$timeLimit) {
+    # if (multipleResult$count/ns>=10 && ) ns<-ns*10
     if (multipleResult$count+ns>nsims) ns<-nsims-multipleResult$count
     multipleResult$result<-multipleAnalysis(ns,hypothesis,design,evidence,multipleResult$result,onlyReplication=onlyReplication,oldResult=oldResult)
     multipleResult$count<-multipleResult$count+ns

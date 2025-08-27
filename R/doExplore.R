@@ -521,7 +521,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
   else   nsims<-exploreResult$count+nsims
   
   time.at.start<-Sys.time()
-  while (((doingNonNull && exploreResult$count<nsims) || (doingNull && exploreResult$nullcount<nsims)) && Sys.time()-time.at.start<braw.env$timeLimit){
+  while (((doingNonNull && exploreResult$count<nsims) || (doingNull && exploreResult$nullcount<nsims)) && (Sys.time()-time.at.start)<braw.env$timeLimit){
     if (!autoShow) ns<-nsims
     else {
       if (exploreResult$count==0) ns<-1
