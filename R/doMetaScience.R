@@ -48,7 +48,7 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pNull=0.5,m
                   "B"=hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld("Psych50",rp=rp)))
            )
            if (world!="Plain") hypothesis$effect$world$populationNullp<-pNull
-           design<-makeDesign(sN=42)
+           design<-makeDesign(sN=sN)
            evidence<-makeEvidence(sigOnly=metaPublicationBias)
          },
          "2"={
