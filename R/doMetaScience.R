@@ -201,6 +201,10 @@ doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,showOutput=TRUE,doHist
   replicate<-replicateMS(doingMetaScience)
   combine<-combineMS(doingMetaScience)
   
+  doingMore<-identical(braw.def$hypothesis,braw.res$multiple$hypothesis) &&
+    identical(braw.def$design,braw.res$multiple$design) &&
+    identical(braw.def$evidence,braw.res$multiple$evidence) && !single
+  
   if (single) {
     if (replicate || combine) 
             doSingle(onlyReplication=TRUE)    
@@ -281,6 +285,11 @@ doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,showOutput=TRUE,doHist
   if (is.null(history)) history<-list(content='')
   if (!doHistory) history$content<-NULL
   
+  if (doingMore) {
+    h<-unlist(strsplit(history$content,'<div class=\"history\"',fixed=TRUE))
+    h<-paste0('<div class=\"history\"',paste0(h[3:length(h)]))
+    history$content<-h
+  }
   investgResults<-
     generate_tab(
       title="MetaScience:",
