@@ -89,7 +89,7 @@ reportWorld<-function(hypothesis=braw.def$hypothesis,plain=FALSE){
   )
   
   if (world$populationPDF=="Uniform") pdf<-paste0(world$populationPDF,"(",world$populationRZ,")")
-  else pdf<-paste0(world$populationPDF,"(",world$populationRZ,"=",world$populationPDFk,")")
+  else pdf<-paste0(world$populationPDF,"(",world$populationRZ,"=",brawFormat(world$populationPDFk,digits=2),")")
   outputText<-c(outputText,
                 paste0(braw.env$nonnullTitle),
                 paste0("!j",reportNumber(1-world$populationNullp,1,FALSE)),
