@@ -18,7 +18,7 @@ combineMS<-function(doing) grepl('c',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-b]*([crm
 combineFirstMS<-function(doing) grepl('cm',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-b]*([crm]*)','\\1',doing)),fixed=TRUE)
 
 #' @export
-prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pNull=0.5,metaPublicationBias=FALSE,
+prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pRPlus=0.5,metaPublicationBias=FALSE,
                              alt4B=FALSE,
                           sN=50,sMethod="Convenience",
                           sBudget=100,sSplits=5,sCheating="Replace",sCheatingProportion=0.05,
@@ -47,13 +47,13 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pNull=0.5,m
                   "A"=hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld("Binary",rp=rp))),
                   "B"=hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld("Psych50",rp=rp)))
            )
-           if (world!="Plain") hypothesis$effect$world$populationNullp<-pNull
+           if (world!="Plain") hypothesis$effect$world$populationNullp<-1-pRPlus
            design<-makeDesign(sN=sN)
            evidence<-makeEvidence(sigOnly=metaPublicationBias)
          },
          "2"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world,rp=rp)))
-           if (world!="Plain") hypothesis$effect$world$populationNullp<-pNull
+           if (world!="Plain") hypothesis$effect$world$populationNullp<-1-pRPlus
            
            switch(partMetaSci,
                   "A"=design<-makeDesign(sN=sN),
@@ -70,7 +70,7 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pNull=0.5,m
          },
          "3"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world,rp=rp)))
-           if (world!="Plain") hypothesis$effect$world$populationNullp<-pNull
+           if (world!="Plain") hypothesis$effect$world$populationNullp<-1-pRPlus
            design<-makeDesign(sN=sN)
            switch(partMetaSci,
                   "A"=design$sMethod<-makeSampling(sMethod),
@@ -86,7 +86,7 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pNull=0.5,m
          },
          "4"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world,rp=rp)))
-           if (world!="Plain") hypothesis$effect$world$populationNullp<-pNull
+           if (world!="Plain") hypothesis$effect$world$populationNullp<-1-pRPlus
            design<-makeDesign(sN=sN)
            if (!alt4B)
              if (partMetaSci=="B") {
@@ -165,7 +165,7 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pNull=0.5,m
 
 #' @export
 doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,showOutput=TRUE,doHistory=TRUE,
-                        world="Psych50",rp=0.3,pNull=0.5,metaPublicationBias=FALSE,
+                        world="Psych50",rp=0.3,pRPlus=0.5,metaPublicationBias=FALSE,
                         sN=50,
                         sMethod="Convenience",sBudget=100,sSplits=5,
                         sCheating="Replace",sCheatingProportion=0.05,
@@ -178,7 +178,7 @@ doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,showOutput=TRUE,doHist
   
   if (is.character(metaScience)) 
     metaScience<-prepareMetaScience(metaScience,alt4B=alt4B,
-                                    world=world,rp=rp,pNull=pNull,metaPublicationBias=metaPublicationBias,
+                                    world=world,rp=rp,pRPlus=pRPlus,metaPublicationBias=metaPublicationBias,
                                     sN=sN,sMethod=sMethod,sBudget=sBudget,sSplits=sSplits,
                                     sCheating=sCheating,sCheatingProportion=sCheatingProportion,
                                     sReplicationKeep=sReplicationKeep,sReplicationPower=sReplicationPower,
