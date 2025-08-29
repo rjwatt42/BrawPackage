@@ -600,7 +600,7 @@ getBins<-function(vals,nsvals,target,minVal,maxVal,fixed=FALSE) {
     bins<-min(vals)+min(vals)/10*c(-1.5,-0.5,0.5,1.5)
     return(bins)
   }
-  maxBins<-251
+  maxBins<-braw.env$maxBins
   
   nv=max(length(nsvals),length(vals))
   nb<-min(round(sqrt(nv)*0.75),maxBins)
@@ -678,7 +678,7 @@ getBins<-function(vals,nsvals,target,minVal,maxVal,fixed=FALSE) {
   return(bins)
 }
 
-simulations_hist<-function(pts,valType,ylim,histGain,histGainrange){
+simulations_hist<-function(pts,valType,ylim,histGain,histGainrange,orientation){
   
   vals<-pts$y1
   svals<-pts$y1[pts$sig>0]
@@ -803,7 +803,10 @@ simulations_hist<-function(pts,valType,ylim,histGain,histGainrange){
   }
   
   if (is.na(histGain)) {
-    scale<-0.35/max(dens0)
+    switch(orientation,
+           "horz"={scale<-0.8/max(dens0)},
+           "vert"={scale<-0.35/max(dens0)}
+           )
   } else {
     use<- (bins>=histGainrange[1]) & (bins<=histGainrange[2])
     gain<-sum(dens0[use]*c(0,diff(bins[use])),na.rm=TRUE)
@@ -1011,7 +1014,7 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
       g<-addG(g,dataPath(makeData(pts$y1,pts$x,orientation),arrow=TRUE,linewidth=0.75,colour="white"))
     }
   } else { # more than 250 points
-    hists<-simulations_hist(pts,showType,ylim,histGain,histGainrange)
+    hists<-simulations_hist(pts,showType,ylim,histGain,histGainrange,orientation)
     gh<-max(hists$h1+hists$h2+hists$h3+hists$h4)
     if (gh>0.8) {
       hists$h1<-hists$h1/gh*0.8
@@ -1105,7 +1108,7 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
     if (!is.null(showType))
       if (is.element(showType,c("e1d","e2d"))) {
         if (is.logical(pts$y3)) {
-          hist1<-simulations_hist(pts,showType,ylim)
+          hist1<-simulations_hist(pts,showType,ylim,orientation=orientation)
         }
         g<-addG(g,
           dataPolygon(data=data.frame(y=hist1$x,x=hist1$sig+xoff),colour=NA, fill = c3,alpha=simAlpha))
@@ -1415,7 +1418,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       use<-theoryVals>=histGainrange[1] & theoryVals<=histGainrange[2]
       histGain<-abs(sum(theoryDens_all[use]*c(0,diff(theoryVals[use]))))
       # histGain<-histGain*distGain
-    }
+    } else theory<-NULL
     
     # then the samples
     if (showData) {
@@ -1539,10 +1542,12 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
               }
       )
     }
+    if (showTheory) {
     if (!theoryFirst)
       g<-theoryPlot(g,theory,orientation,baseColour,theoryAlpha/2,xoff[i])
     else
       g<-theoryPlot(g,theory,orientation,baseColour,theoryAlpha/2,xoff[i],lineOnly=TRUE)
+    }
     
     if (is.element(showType,c("rse","sig","ns","nonnulls","nulls","rss","p","e1r","e2r","e1+","e2+","e1-","e2-",
                               "e1p","e2p","e1d","e2d"))) showLegend<-TRUE

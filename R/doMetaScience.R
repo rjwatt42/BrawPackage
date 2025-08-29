@@ -20,8 +20,8 @@ combineFirstMS<-function(doing) grepl('cm',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-b]
 #' @export
 prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pNull=0.5,metaPublicationBias=FALSE,
                              alt4B=FALSE,
-                          sN=42,sMethod="Convenience",
-                          sBudget=320,sSplits=16,sCheating="Replace",sCheatingProportion=0.05,
+                          sN=50,sMethod="Convenience",
+                          sBudget=100,sSplits=5,sCheating="Replace",sCheatingProportion=0.05,
                           sReplicationKeep="Cautious",sReplicationPower=0.9,
                           sReplicationAll=FALSE,sReplicationSigOriginal=TRUE,
                           sReplicationOriginalAnomaly="Random",sReplicationUseLikelihood=FALSE,
@@ -143,6 +143,7 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pNull=0.5,m
            design$sRangeProb<-rangeP
            design$sRangeVary<-rangeVar
            evidence<-makeEvidence(AnalysisTerms=analysisTerms,sigOnly=FALSE)
+           if (replicateMS(doingMetaScience))  evidence$sigOnly<-sReplicationSigOriginal
          }
   )
   if (replicate) {
@@ -165,8 +166,8 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pNull=0.5,m
 #' @export
 doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,showOutput=TRUE,doHistory=TRUE,
                         world="Psych50",rp=0.3,pNull=0.5,metaPublicationBias=FALSE,
-                        sN=42,
-                        sMethod="Convenience",sBudget=320,sSplits=16,
+                        sN=50,
+                        sMethod="Convenience",sBudget=100,sSplits=5,
                         sCheating="Replace",sCheatingProportion=0.05,
                         sReplicationKeep="Cautious",sReplicationPower=0.9,
                         sReplicationAll=FALSE,sReplicationSigOriginal=TRUE,

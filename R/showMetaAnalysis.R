@@ -56,12 +56,14 @@ worldLabel<-function(metaResult,whichMeta=NULL,modelPDF=NULL) {
 #' @examples
 #' showMetaSingle(metaResult=doMetaAnalysis(),showType="n",showTheory=FALSE)
 #' @export
-showMetaSingle<-function(metaResult=braw.res$metaSingle,showType="n",showTheory=FALSE,autoYlim=TRUE) {
+showMetaSingle<-function(metaResult=braw.res$metaSingle,showType="n",
+                         showTheory=TRUE,xRange="full",autoYlim=TRUE,
+                         fill=NULL,alpha=NULL) {
   if (is.null(metaResult)) metaResult<-doMetaAnalysis()
   
   oldminN<-braw.env$minN
   oldmaxN<-braw.env$maxN
-  on.exit({setBrawEnv("minN",oldminN);setBrawEnv("maxN",oldmaxN)})
+  # on.exit({setBrawEnv("minN",oldminN);setBrawEnv("maxN",oldmaxN)})
   
   showSval<-FALSE
   showSig<-TRUE
@@ -83,6 +85,10 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showType="n",showTheory=
   d1n<-(abs(metaResult$result$rpIV)<=evidence$minRp & hypothesis$effect$world$worldOn)
   x<-plotAxis("rs",hypothesis)
   xlim<-x$lim
+  if (xRange!="full") {
+    xlim[1]<-0
+    x$ticks<-seq(0,1,0.1)
+  }
   disp1<-x$label
   
   if (showType=="n") {
@@ -105,7 +111,9 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showType="n",showTheory=
         braw.env$minN<-10^ylim[1]
         braw.env$maxN<-10^ylim[2]
       }
-      yticks<-makeTicks(10^yticks,logScale=TRUE)
+      # yticks<-makeTicks(10^yticks,logScale=TRUE)
+      ytick<-c(1,2,5,10,20,50,100,200,500,1000)
+      yticks<-makeTicks(ytick[log10(ytick)>ylim[1] & log10(ytick)<ylim[2]],logScale=TRUE)
     }
   } else {
     disp2<-"1/se"
@@ -124,8 +132,10 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showType="n",showTheory=
                yticks=yticks,
                ylabel=makeLabel(disp2),
                top=1,g=NULL)
-  g<-addG(g,plotTitle(paste0("Method=",metaResult$metaAnalysis$method),size=0.75))
+  if (showTheory) 
+    g<-addG(g,plotTitle(paste0("Method=",metaResult$metaAnalysis$method),size=0.75))
   
+  if (showTheory)
   g<-drawWorld(hypothesis,design,metaResult,showType,g,
                braw.env$plotColours$metaAnalysisTheory,
                # sigOnly=metaAnalysis$analyseBias,
@@ -150,10 +160,10 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showType="n",showTheory=
   }
   
   # show individual studies
-  # if (length(d1)<1200) {
+  if (length(d1)<1200) {
   colgain<-1-min(1,sqrt(max(0,(length(d1)-50))/200))
-  alpha<-1/(max(1,sqrt(length(d1)/100)))
-  dotSize<-braw.env$dotSize*alpha*0.66
+  alphaUse<-1/(max(1,sqrt(length(d1)/100)))
+  dotSize<-min(4,braw.env$dotSize*alphaUse*4)
   fill1<-rep(braw.env$plotColours$metaAnalysis,length(ptsAll$x))
   fill2<-braw.env$plotColours$infer_nsigC
   if (showSval) {
@@ -164,19 +174,39 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showType="n",showTheory=
     fill1<-hsv(0.9*round((b-min(b))/(max(b)-min(b))*4)/4)
     fill1<-hsv(0.9*round((b/max(b))^svalExponent*10)/10)
   }
-  col1<-hsv(1,0,1-alpha)
+  col1<-hsv(1,0,1-alphaUse)
   col2<-fill2
-  g<-addG(g,dataPoint(data=ptsAll, shape=braw.env$plotShapes$study, colour = col1, fill = fill1, alpha=alpha, size = dotSize))
+  if (!is.null(alpha)) alphaUse<-alpha
+  if (!is.null(fill)) fill1<-fill
+  g<-addG(g,dataPoint(data=ptsAll, shape=braw.env$plotShapes$study, colour = col1, fill = fill1, alpha=alphaUse, size = dotSize))
   if (nrow(ptsNull)>0)
-    g<-addG(g,dataPoint(data=ptsNull,shape=braw.env$plotShapes$study, colour = col2, fill = fill2, alpha=alpha, size = dotSize))
-  # }
+    g<-addG(g,dataPoint(data=ptsNull,shape=braw.env$plotShapes$study, colour = col2, fill = fill2, alpha=alphaUse, size = dotSize))
+  } else {
+    rBins<-seq(0,1,length.out=31)
+    nBins<-seq(log10(5),log10(500),length.out=21)
+    z<-matrix(0,length(nBins)-1,length(rBins)-1)
+    for (ir in 1:(length(rBins)-1)) {
+      for (inv in 1:(length(nBins)-1)) {
+        z[inv,ir]<-sum(metaResult$result$nval>10^nBins[inv] & metaResult$result$nval<=10^nBins[inv+1] &
+                         metaResult$result$rIV>rBins[ir] & metaResult$result$rIV<=rBins[ir+1] ,
+                       na.rm=TRUE)
+      }
+    }
+    if (is.null(fill)) fill<-braw.env$plotColours$metaAnalysis
+    g<-addG(g,dataContour(data=list(x=rBins[1:(length(rBins)-1)],
+                                          y=nBins[1:(length(nBins)-1)],
+                                          z=z),
+                          fill=fill))
+  }
   
+  if (showTheory) {
   if (metaAnalysis$modelPDF=="All") metaAnalysis$modelPDF<-metaResult$best$dist
   lb<-worldLabel(metaResult,metaAnalysis$analysisType,metaAnalysis$modelPDF)
   names=strsplit(lb,"\n")[[1]]
   if (length(names)==1) colours=braw.env$plotColours$metaAnalysis else colours=c(braw.env$plotColours$metaAnalysis,rep(NA,length(names)-1))
   g<-addG(g,dataLegend(data.frame(names=names,colours=colours),title="",shape=22))
   # g<-addG(g,plotTitle(lb,"left",size=1))
+  }
   
   if (braw.env$graphicsType=="HTML" && braw.env$autoShow) {
     showHTML(g)
@@ -186,7 +216,7 @@ showMetaSingle<-function(metaResult=braw.res$metaSingle,showType="n",showTheory=
     print(g)
     return(invisible(g))
   }
-  
+  return(g)
 }
 
 #' show a multiple meta-analyses

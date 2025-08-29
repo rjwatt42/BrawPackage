@@ -88,6 +88,15 @@ getWorld<-function(name,rp=0.3,result=braw.res$result) {
                        populationNullp=0,
                        populationPDFsample=FALSE)
          },
+         "Gaussian"={
+           world<-list(worldOn=TRUE,
+                       populationPDF="Gauss",
+                       populationRZ="z",
+                       populationPDFk=atanh(rp),
+                       populationPDFmu=0,
+                       populationNullp=0.5,
+                       populationPDFsample=FALSE)
+         },
          "Psych"={
            world<-list(worldOn=TRUE,
                        populationPDF="Exp",

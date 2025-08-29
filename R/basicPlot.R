@@ -1,12 +1,10 @@
 addGraphElement<-function(element) {
   if (braw.env$addHistory) {
+    if (is.null(braw.env$history)) 
+      braw.env$history<-list(list(list(type="Null",args=list())))
     if (is.null(element)) {
-      if (is.null(braw.env$history)) {
-        braw.env$history<-list(list(list(type="Null",args=list())))
-      } else {
         braw.env$history[[length(braw.env$history)+1]]<-list(list(type="Null",args=list()))
-      }
-    } else {
+      } else {
       b<-braw.env$history[[length(braw.env$history)]]
       b[[length(b)+1]]<-element
       braw.env$history[[length(braw.env$history)]]<-b
@@ -945,9 +943,12 @@ dataContour<-function(data,colour="#000000",fill=NA,breaks=seq(0.1,0.9,0.2),line
       }
     }
   } else {
-    for (i in 1:length(c1)) {
-      cdata<-data.frame(x=c1[[i]]$y,y=c1[[i]]$x)
-      ct<-c(ct,list(axisPolygon(cdata,colour=colour,fill=fill,alpha=i/length(breaks),linewidth=linewidth)))
+    for (i in 1:length(c)) {
+      if (length(c[[i]]$x)>4) {
+        cdata<-data.frame(x=c[[i]]$y,y=c[[i]]$x)
+        fill1<-darken(desat(fill,i/length(c)),off=i/length(c))
+      ct<-c(ct,list(axisPolygon(cdata,colour=colour,fill=fill1,alpha=1,linewidth=linewidth)))
+      }
     }
   }
   return(ct)

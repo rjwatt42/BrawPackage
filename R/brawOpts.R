@@ -43,6 +43,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,1
                    colBlind=TRUE,
                    newDev=FALSE,height=400,aspect=1.3,autoShow=FALSE,autoPrint=FALSE,timeLimit=Inf,fullGraphSize=1,
                    npointsMax=1000,
+                   maxBins=251,
                    fullOutput=0) {
   if (graphC=="white") graphC<-"#FFFFFF"
   if (graphC=="normal") graphC<-"#BFECFF"
@@ -123,6 +124,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,1
   LGplotTheme<-ggplot2::theme(plot.title=ggplot2::element_text(size=21,face="bold"),axis.title=ggplot2::element_text(size=24,face="bold"),
                      axis.text.x=ggplot2::element_text(size=18),axis.text.y=ggplot2::element_text(size=18))
   
+  
   alphaSig<-0.05
   
   #################################
@@ -196,6 +198,8 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,1
           braw.env$varNPoints<-201
           braw.env$nscaleLog<-FALSE
           braw.env$maxnPlot<-200
+          
+          braw.env$maxBins<-maxBins
           
           braw.env$min_p<-0.0001
           braw.env$truncate_p<-FALSE

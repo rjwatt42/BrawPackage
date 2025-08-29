@@ -156,7 +156,7 @@ getMaxLikelihood<-function(zs,ns,df1,dist,metaAnalysis,hypothesis) {
     if (is.element(dist,c("fixed","random"))) {
       param3Use<-seq(0,1,length.out=np2points)
     } else param3Use<-1
-  } else param3Use<-0
+  } else param3Use<-metaAnalysis$sourceBias
   
   prior<-metaAnalysis$analysisPrior
   prior_z<-seq(min(param1Use),max(param1Use),length.out=101)
