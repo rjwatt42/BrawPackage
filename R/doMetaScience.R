@@ -20,7 +20,7 @@ combineFirstMS<-function(doing) grepl('cm',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-b]
 #' @export
 prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pRPlus=0.5,metaPublicationBias=FALSE,
                              alt4B=FALSE,
-                          sN=50,sMethod="Convenience",
+                          sN=50,sMethod="Convenience",sMethodSeverity=0.1,
                           sBudget=100,sSplits=5,sCheating="Replace",sCheatingProportion=0.05,
                           sReplicationKeep="Cautious",sReplicationPower=0.9,
                           sReplicationAll=FALSE,sReplicationSigOriginal=TRUE,
@@ -73,7 +73,10 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pRPlus=0.5,
            if (world!="Plain") hypothesis$effect$world$populationNullp<-1-pRPlus
            design<-makeDesign(sN=sN)
            switch(partMetaSci,
-                  "A"=design$sMethod<-makeSampling(sMethod),
+                  "A"={
+                    design$sMethod<-makeSampling(sMethod)
+                    design$sMethodSeverity<-sMethodSeverity
+                    },
                   "B"={
                     design$sCheating<-sCheating
                     design$sCheatingLimit<-"Budget"
@@ -94,6 +97,7 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pRPlus=0.5,
                        "Random"={},
                        "Convenience"={
                          design$sMethod<-makeSampling("Convenience")
+                         design$sMethodSeverity<-sMethodSeverity
                        },
                        "Cheating"={
                          design$sCheating<-"Replace"
@@ -167,7 +171,7 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pRPlus=0.5,
 doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,showOutput=TRUE,doHistory=TRUE,
                         world="Psych50",rp=0.3,pRPlus=0.5,metaPublicationBias=FALSE,
                         sN=50,
-                        sMethod="Convenience",sBudget=100,sSplits=5,
+                        sMethod="Convenience",sMethodSeverity=0.1,sBudget=100,sSplits=5,
                         sCheating="Replace",sCheatingProportion=0.05,
                         sReplicationKeep="Cautious",sReplicationPower=0.9,
                         sReplicationAll=FALSE,sReplicationSigOriginal=TRUE,
@@ -179,7 +183,7 @@ doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,showOutput=TRUE,doHist
   if (is.character(metaScience)) 
     metaScience<-prepareMetaScience(metaScience,alt4B=alt4B,
                                     world=world,rp=rp,pRPlus=pRPlus,metaPublicationBias=metaPublicationBias,
-                                    sN=sN,sMethod=sMethod,sBudget=sBudget,sSplits=sSplits,
+                                    sN=sN,sMethod=sMethod,sMethodSeverity=sMethodSeverity,sBudget=sBudget,sSplits=sSplits,
                                     sCheating=sCheating,sCheatingProportion=sCheatingProportion,
                                     sReplicationKeep=sReplicationKeep,sReplicationPower=sReplicationPower,
                                     sReplicationAll=sReplicationAll,sReplicationSigOriginal=sReplicationSigOriginal,
