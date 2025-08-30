@@ -121,7 +121,7 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pRPlus=0.5,
                      if (is.null(rangeWidth)) rangeWidth<-1
                    }
            )
-           sN<-100
+           sN<-200
            switch(differenceSource,
                   "None"={
                     hypothesis<-makeHypothesis(IV2=makeVariable("IV2","Interval"),
