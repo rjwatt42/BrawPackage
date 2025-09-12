@@ -23,7 +23,7 @@ showMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
   if (is.null(multipleResult)) multipleResult=doMultiple(autoShow=FALSE)
   if (is.numeric(multipleResult)) multipleResult=doMultiple(multipleResult,autoShow=FALSE)
 
-    if (!multipleResult$hypothesis$effect$world$worldOn && multipleResult$hypothesis$effect$rIV!=0 && is.element(showType[1],c("NHST","Hits","Misses"))) {
+    if (!multipleResult$hypothesis$effect$world$On && multipleResult$hypothesis$effect$rIV!=0 && is.element(showType[1],c("NHST","Hits","Misses"))) {
       if (multipleResult$nullcount<multipleResult$count) {
         multipleResult<-doMultiple(multipleResult$count-multipleResult$nullcount,multipleResult,doingNull=TRUE)
       }
@@ -38,7 +38,7 @@ showMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     sequence<-TRUE
   }
   if (is.element(showType[1],c("NHST","Hits","Misses","Source","Inference","p(sig)","SEM")) &&
-      !multipleResult$hypothesis$effect$world$worldOn && 
+      !multipleResult$hypothesis$effect$world$On && 
       !all(is.na(multipleResult$nullresult$rIV))) {
       if (all(multipleResult$result$rpIV==0)) multipleResult$result$rpIV<-multipleResult$result$rpIV+0.0000000001
       fullResult<-mergeMultiple(multipleResult$result,multipleResult$nullresult)

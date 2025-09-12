@@ -206,7 +206,7 @@ plotAxis<-function(showType,hypothesis,design=NULL,result=NULL) {
             ylabel<-'Outcomes'
             use_cols<-c(rep("white",7))
             if (is.null(hypothesis$IV2)) {
-              if (effect$world$worldOn) {
+              if (effect$world$On) {
                 use_cols[1]<-braw.env$plotColours$infer_nsigNull
                 use_cols[2]<-braw.env$plotColours$infer_sigNull
                 use_cols[3]<-braw.env$plotColours$infer_sigNonNull
@@ -217,7 +217,7 @@ plotAxis<-function(showType,hypothesis,design=NULL,result=NULL) {
               }
             }
             if (!is.null(hypothesis$IV2)) {
-              if (effect$world$worldOn) {
+              if (effect$world$On) {
                 use_cols[1]<-braw.env$plotColours$infer_nsigNull
                 use_cols[2:7]<-braw.env$plotColours$infer_sigNull
                 use_cols[8:13]<-braw.env$plotColours$infer_sigNonNull
@@ -263,7 +263,7 @@ plotAxis<-function(showType,hypothesis,design=NULL,result=NULL) {
             ylabel<-'AIC[1]'
             use_cols<-c(rep("white",7))
             if (is.null(hypothesis$IV2)) {
-              if (effect$world$worldOn) {
+              if (effect$world$On) {
                 use_cols[1]<-braw.env$plotColours$infer_nsigNull
                 use_cols[2]<-braw.env$plotColours$infer_sigNull
                 use_cols[3]<-braw.env$plotColours$infer_sigNonNull
@@ -279,7 +279,7 @@ plotAxis<-function(showType,hypothesis,design=NULL,result=NULL) {
               }
               }
             if (!is.null(hypothesis$IV2)) {
-              if (effect$world$worldOn) {
+              if (effect$world$On) {
                 use_cols[1]<-braw.env$plotColours$infer_nsigNull
                 use_cols[2:7]<-braw.env$plotColours$infer_sigNull
                 use_cols[8:13]<-braw.env$plotColours$infer_sigNonNull
@@ -569,11 +569,18 @@ plotAxis<-function(showType,hypothesis,design=NULL,result=NULL) {
             ylabel<-braw.env$Llabel
             use_cols<-braw.env$plotColours$metaMultiple
           },
-          "pNull"={
+          "p(R+)"={
             ylim<-c(-0.01,1.01)
             yticks<-seq(0,1,0.2)
             ymins<-seq(0,1,0.1)
             ylabel<-braw.env$Plabel
+            use_cols<-braw.env$plotColours$metaMultiple
+          },
+          "mean(R+)"={
+            ylim<-c(-0.01,1.01)
+            yticks<-seq(0,1,0.2)
+            ymins<-seq(0,1,0.1)
+            ylabel<-braw.env$Llabel
             use_cols<-braw.env$plotColours$metaMultiple
           },
           "PDF"={

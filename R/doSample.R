@@ -40,8 +40,8 @@ sampleLK<-function(nsamp,world) {
 }
 
 getWorldEffect<-function(nsamples=1,effect=braw.def$hypothesis$effect) {
-  if (effect$world$worldOn) {
-    if (effect$world$populationPDFsample) {
+  if (effect$world$On) {
+    if (effect$world$PDFsample) {
       rho<-sampleLK(nsamples,effect$world)
     } else {
       rho<-rRandomValue(effect$world,1)$use
@@ -302,7 +302,7 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
   
   n<-design$sN
   if (n<1) {
-    if (effect$world$worldOn && rho==0) {
+    if (effect$world$On && rho==0) {
       n<-rw2n(rhoOld,n)
     } else {
     n<-rw2n(rho,n)

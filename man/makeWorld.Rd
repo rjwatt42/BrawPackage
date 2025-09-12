@@ -6,25 +6,25 @@
  an object that specifies the distribution of effect sizes}
 \usage{
 makeWorld(
-  worldOn = TRUE,
-  populationPDF = "Uniform",
-  populationRZ = "r",
-  populationPDFk = 0,
-  populationPDFs = 2,
-  populationPDFmu = 0,
-  populationNullp = 0,
-  populationPDFsample = FALSE,
-  populationSamplemn = 0,
-  populationSamplesd = 0,
-  populationSamplebias = FALSE,
+  On = TRUE,
+  PDF = "Uniform",
+  RZ = "r",
+  PDFk = 0,
+  PDFs = 2,
+  PDFmu = 0,
+  pRPlus = 0,
+  PDFsample = FALSE,
+  PDFsamplemn = 0,
+  PDFsamplesd = 0,
+  PDFsamplebias = FALSE,
   sigOnly = FALSE,
   worldAbs = FALSE
 )
 }
 \arguments{
-\item{populationPDF}{"Single","Double","Uniform","Gauss","Exp","Gamma","GenExp"}
+\item{PDF}{"Single","Double","Uniform","Gauss","Exp","Gamma","GenExp"}
 
-\item{populationRZ}{"r","z"}
+\item{RZ}{"r","z"}
 }
 \value{
 a world object
@@ -34,8 +34,8 @@ make a world
  an object that specifies the distribution of effect sizes
 }
 \examples{
-makeWorld<-function(worldOn=FALSE,populationPDF="Single",populationRZ="r",
-                    populationPDFk=0.2,populationNullp=0,worldAbs=FALSE
+makeWorld<-function(On=FALSE,PDF="Single",RZ="r",
+                    PDFk=0.2,pRPlus=0,worldAbs=FALSE
 )
 }
 \seealso{

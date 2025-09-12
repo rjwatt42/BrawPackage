@@ -88,17 +88,17 @@ reportWorld<-function(hypothesis=braw.def$hypothesis,plain=FALSE){
                 "!HPart"," ","Formula",rep("",nc-3)
   )
   
-  if (world$populationPDF=="Uniform") pdf<-paste0(world$populationPDF,"(",world$populationRZ,")")
-  else pdf<-paste0(world$populationPDF,"(",world$populationRZ,"=",brawFormat(world$populationPDFk,digits=2),")")
+  if (world$PDF=="Uniform") pdf<-paste0(world$PDF,"(",world$RZ,")")
+  else pdf<-paste0(world$PDF,"(",world$RZ,"=",brawFormat(world$PDFk,digits=2),")")
   outputText<-c(outputText,
                 paste0(braw.env$nonnullTitle),
-                paste0("!j",reportNumber(1-world$populationNullp,1,FALSE)),
+                paste0("!j",reportNumber(world$pRPlus,1,FALSE)),
                 paste0("r[p]"," ~ ",tolower(pdf)),
                 rep("",nc-3)
                 )
   outputText<-c(outputText,
                 paste0(braw.env$nullTitle),
-                paste0("!j",reportNumber(world$populationNullp,1,FALSE)),
+                paste0("!j",reportNumber(1-world$pRPlus,1,FALSE)),
                 paste0("r[p]"," = ",0),
                 rep("",nc-3)
   )

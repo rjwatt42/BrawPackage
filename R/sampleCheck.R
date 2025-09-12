@@ -13,7 +13,7 @@ cheatSample<-function(hypothesis,design,evidence,sample,result) {
 
   # fix the hypothesis 
   if (!(is.element(design$sCheating,c("Retry")) || design$sCheatingFixedPop)) {
-  hypothesis$effect$world$worldOn<-FALSE
+  hypothesis$effect$world$On<-FALSE
   hypothesis$effect$rIV<-result$rpIV
   }
   
@@ -188,9 +188,9 @@ replicationNewN<-function(rs,n,hypothesis,design,evidence) {
     if (Replication$UseLikelihood) {
       r<-rw
       if (is.null(r)) r<-hypothesis$effect$world
-      r$populationPDFsample=TRUE
-      r$populationSamplemn<-rs
-      r$populationSamplesd<-1/sqrt(n-3)
+      r$PDFsample=TRUE
+      r$PDFsamplemn<-rs
+      r$PDFsamplesd<-1/sqrt(n-3)
     } else {
       if (is.null(rw)) r<-rs
       else r<-rSamp2Pop(rs,n,rw)
@@ -210,7 +210,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
   oldHypothesis<-hypothesis
   oldDesign<-design
   oldEvidence<-evidence
-  evidence$sigOnly<-FALSE
+  evidence$sigOnly<-0
   setBrawDef('evidence',evidence)
   
   design$sCheating<-"None"
@@ -278,7 +278,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
         
     # now we freeze the population effect size
     hypothesis$effect$rIV<-res$rpIV
-    hypothesis$effect$world$worldOn<-FALSE
+    hypothesis$effect$world$On<-FALSE
     # and make the new design
     design1<-design
     design1$sNRand<-FALSE
@@ -344,18 +344,36 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
     if (Replication$Keep=="MetaAnalysis") {
       studies<-list(rIV=ResultHistory$rIV,nval=ResultHistory$nval,df1=ResultHistory$df1,
                     rpIV=ResultHistory$rpIV,original=resOriginal)
-      metaAnalysis<-makeMetaAnalysis(TRUE,analysisType="fixed",
-                                     method="MLE",
-                                     modelNulls=FALSE,
-                                     sourceBias=FALSE,
-                                     analyseBias=1/length(studies$rIV))
-      metaResult<-runMetaAnalysis(metaAnalysis,studies,hypothesis,metaResult=NULL)
-      res$nval<-sum(ResultHistory$nval)
-      res$rIV<-sum(ResultHistory$rIV*ResultHistory$nval)/res$nval
-      res$rIV<-metaResult$fixed$param1
+      ns<-length(studies$rIV)
+      
+      use<-c(-5,5)
+      for (i in 1:5) {
+        zs<-seq(use[1],use[2],length.out=501)
+        lk1<-SingleSamplingPDF(studies$rIV[1],zs,1/sqrt(studies$nval[1]),bias=oldEvidence$sigOnly)
+        lk<-lk1$pdf
+        for (j in 2:ns) {
+          lk2<-SingleSamplingPDF(studies$rIV[j],zs,1/sqrt(studies$nval[j]),bias=FALSE)
+          lk<-lk*lk2$pdf
+        }
+        use<-zs[which.max(lk)+c(-1,1)]
+      }
+      ze<-zs[which.max(lk)]
+      res$nval<-sum(studies$nval)
       res$rpIV<-ResultHistory$rpIV[1]
       res$df1<-ResultHistory$df1[1]
+      res$rIV<-ze
       res$pIV<-rn2p(res$rIV,res$nval)
+      res$Smax<-max(lk)
+      
+      # metaAnalysis<-makeMetaAnalysis(TRUE,analysisType="fixed",
+      #                                method="MLE",
+      #                                modelNulls=FALSE,
+      #                                sourceBias=FALSE,
+      #                                analyseBias=1/length(studies$rIV))
+      # metaResult<-runMetaAnalysis(metaAnalysis,studies,hypothesis,metaResult=NULL)
+      # res$rIV<-metaResult$fixed$param1
+      # res$pIV<-rn2p(res$rIV,res$nval)
+      # res$Smax<-metaResult$fixed$Smax
       
       if (is.null(ResultHistory$Smax)) ResultHistory$Smax<-rep(NA,length(ResultHistory$rIV))
       
@@ -364,7 +382,7 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
       ResultHistory$rIV<-c(ResultHistory$rIV,res$rIV)
       ResultHistory$rpIV<-c(ResultHistory$rpIV,res$rpIV)
       ResultHistory$pIV<-c(ResultHistory$pIV,res$pIV)
-      ResultHistory$Smax<-c(ResultHistory$Smax,metaResult$fixed$Smax)
+      ResultHistory$Smax<-c(ResultHistory$Smax,res$Smax)
     } else {
     switch(Replication$Keep,
            "Median"={

@@ -5,17 +5,17 @@
 \title{set default world}
 \usage{
 setWorld(
-  worldOn = braw.def$hypothesis$effect$world$worldOn,
-  populationPDF = braw.def$hypothesis$effect$world$populationPDF,
-  populationRZ = braw.def$hypothesis$effect$world$populationRZ,
-  populationPDFk = braw.def$hypothesis$effect$world$populationPDFk,
-  populationPDFs = braw.def$hypothesis$effect$world$populationPDFs,
-  populationPDFmu = braw.def$hypothesis$effect$world$populationPDFmu,
-  populationNullp = braw.def$hypothesis$effect$world$populationNullp,
-  populationPDFsample = braw.def$hypothesis$effect$world$populationPDFsample,
-  populationSamplemn = braw.def$hypothesis$effect$world$populationSamplemn,
-  populationSamplesd = braw.def$hypothesis$effect$world$populationSamplesd,
-  populationSamplebias = braw.def$hypothesis$effect$world$populationSamplebias,
+  On = braw.def$hypothesis$effect$world$On,
+  PDF = braw.def$hypothesis$effect$world$PDF,
+  RZ = braw.def$hypothesis$effect$world$RZ,
+  PDFk = braw.def$hypothesis$effect$world$PDFk,
+  PDFs = braw.def$hypothesis$effect$world$PDFs,
+  PDFmu = braw.def$hypothesis$effect$world$PDFmu,
+  pRPlus = braw.def$hypothesis$effect$world$pRPlus,
+  PDFsample = braw.def$hypothesis$effect$world$PDFsample,
+  PDFsamplemn = braw.def$hypothesis$effect$world$PDFsamplemn,
+  PDFsamplesd = braw.def$hypothesis$effect$world$PDFsamplesd,
+  PDFsamplebias = braw.def$hypothesis$effect$world$PDFsamplebias,
   sigOnly = braw.def$hypothesis$effect$world$sigOnly,
   worldAbs = braw.def$hypothesis$effect$world$worldAbs
 )

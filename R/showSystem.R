@@ -23,7 +23,7 @@ showSystem<-function(whichShow="all",hypothesis=braw.def$hypothesis,design=braw.
              g<-showHypothesis(hypothesis=hypothesis,evidence=evidence,doWorld=TRUE,plotArea=c(0.0,0.05,0.33,0.8),autoShow=FALSE,g=g)
            g<-showDesign(hypothesis=hypothesis,design=design,plotArea=c(0.3,0.3,0.28,0.33),autoShow=FALSE,g=g)
            g<-showPrediction(hypothesis=hypothesis,design=design,evidence=evidence,plotArea=c(0.65,0.55,0.33,0.4),autoShow=FALSE,g=g)
-           g<-showWorldSampling(hypothesis=hypothesis,design=design,sigOnly=FALSE,plotArea=c(0.7,0.05,0.28,0.4),autoShow=FALSE,g=g)
+           g<-showWorldSampling(hypothesis=hypothesis,design=design,evidence=evidence,plotArea=c(0.7,0.05,0.28,0.4),autoShow=FALSE,g=g)
            
            braw.env$plotArea<-c(0,0,1,1)
            g<-addG(g,axisText(data=data.frame(x=0.02,y=1),"Hypothesis",vjust=1,size=1.2,fontface="bold"))
@@ -78,7 +78,7 @@ showHypothesis<-function(hypothesis=braw.def$hypothesis,evidence=braw.def$eviden
     if (no_ivs==1) plotArea<-c(0.15,0.0,0.7,1)
     else           plotArea<-c(0.1,0.0,0.8,1)
   }
-  doWorld<-doWorld && effect$world$worldOn
+  doWorld<-doWorld && effect$world$On
   if (doWorld) {effect$rIV<-NULL; showValue=FALSE}
   ygain<-plotArea[4]
   yoff<-plotArea[2]
@@ -158,36 +158,36 @@ showHypothesis<-function(hypothesis=braw.def$hypothesis,evidence=braw.def$eviden
 #' @export
 showFullWorld<-function(hypothesis=braw.def$hypothesis,plotArea=c(0,0,1,1),fontScale=1,autoShow=FALSE,g=NULL) {
   g<-showWorld(hypothesis=hypothesis,joinNulls=FALSE,plotArea=c(0.05,0.35,0.45,0.55),fontScale=1,g=g)
-  s<-hypothesis$effect$world$populationNullp
+  s<-hypothesis$effect$world$pRPlus
   
   wd<-0.25
-  if ((1-s)>0) {
+  if ((1-s)<1) {
   braw.env$plotArea<-c(0.1,0.1,0.45,0.3)
   g<-startPlot(xlim=c(-1,1),ylim=c(0,1),back="transparent",box="none",g=g)
   g<-addG(g,drawArrow(c(0,0.9),1,45,"last",col="#000000",
                       fill=braw.env$plotColours$populationC,alpha=1, 
-                      width=wd*(1-s),position="end",finAngle=45),
+                      width=wd*(s),position="end",finAngle=45),
             dataText(data.frame(x=0,y=0.5),brawFormat(1-s,digits=3),size=0.75))
   }
   
-  # g<-showEffect(1-hypothesis$effect$world$populationNullp,showValue=TRUE,
+  # g<-showEffect(1-hypothesis$effect$world$pRPlus,showValue=TRUE,
   #               plotArea=c(0.0,0.15,0.6,0.4),2,g)
   
   hypothesis1<-hypothesis
   hypothesis1$effect$world<-makeWorld(TRUE,"Single","r",0)
   g<-showWorld(hypothesis=hypothesis1,plotArea=c(0.55,0.35,0.45,0.55),fontScale=1,g=g)
   
-  if (s>0) {
+  if (s<1) {
   braw.env$plotArea<-c(0.45,0.1,0.45,0.3)
   g<-startPlot(xlim=c(-1,1),ylim=c(0,1),back="transparent",box="none",g=g)
   g<-addG(g,drawArrow(c(0,0.9),1,-45,"last",col="#000000",
                       fill=braw.env$plotColours$populationC,alpha=1, 
                       width=wd*s,position="end",finAngle=45),
-          dataText(data.frame(x=0,y=0.5),brawFormat(s,digits=3),hjust=1,size=0.75)
+          dataText(data.frame(x=0,y=0.5),brawFormat(1-s,digits=3),hjust=1,size=0.75)
   )
   }
   
-  # g<-showEffect(hypothesis$effect$world$populationNullp,showValue=TRUE,
+  # g<-showEffect(hypothesis$effect$world$pRPlus,showValue=TRUE,
   #               plotArea=c(0.4,0.15,0.6,0.4),3,g)
   
   
@@ -205,9 +205,9 @@ showWorld<-function(hypothesis=braw.def$hypothesis,joinNulls=TRUE,
 # world diagram
 
   world<-hypothesis$effect$world
-  if (!world$worldOn) {
-    world<-makeWorld(worldOn=TRUE,populationPDF="Single",populationRZ="r",
-                     populationPDFk=hypothesis$effect$rIV,populationNullp=0)
+  if (!world$On) {
+    world<-makeWorld(On=TRUE,PDF="Single",RZ="r",
+                     PDFk=hypothesis$effect$rIV,pRPlus=1)
   }
     
   braw.env$plotArea<-plotArea
@@ -239,25 +239,25 @@ showWorld<-function(hypothesis=braw.def$hypothesis,joinNulls=TRUE,
     rx<-atanh(rx)
          }
   )
-  if (is.element(world$populationPDF,c("Single","Double"))) {
+  if (is.element(world$PDF,c("Single","Double"))) {
     width<-0.02
-    rx<-world$populationPDFk+c(-1,-1,1,1)*width
-    rdens<-c(0,1,1,0)*(1-world$populationNullp)
-    if (world$populationPDF=="Double") {
+    rx<-world$PDFk+c(-1,-1,1,1)*width
+    rdens<-c(0,1,1,0)*(world$pRPlus)
+    if (world$PDF=="Double") {
       rx<-c(-rx,rx)
       rdens<-c(rdens,rdens)/2
     }
     if (joinNulls)
-    if (world$populationNullp>0) {
+    if (world$pRPlus<1) {
       rdens<-rdens/sum(rdens)
       rx<-c(rx,c(-1,-1,1,1)*width)
-      rdens<-c(rdens,c(0,1,1,0)*world$populationNullp)
+      rdens<-c(rdens,c(0,1,1,0)*(1-world$pRPlus))
     }
     
-    # rdens[rx==0]<-rdens[rx==0]+world$populationNullp
+    # rdens[rx==0]<-rdens[rx==0]+world$pRPlus
   } 
-  if (!is.element(world$populationPDF,c("sample","biasedsample"))) {
-    rdens<-rdens*(1-world$populationNullp)
+  if (!is.element(world$PDF,c("sample","biasedsample"))) {
+    rdens<-rdens*(world$pRPlus)
   }
   rdens<-rdens/max(rdens)
   rx<-c(rx[1],rx,rx[length(rx)])
@@ -337,14 +337,14 @@ showDesign<-function(design=braw.def$design,hypothesis=braw.def$hypothesis,plotA
   }
   
   if (design$Replication$On) {
-    if (!hypothesis$effect$world$worldOn) {
-      hypothesis$effect$world$worldOn<-TRUE
-      hypothesis$effect$world$populationPDF<-"Single"
-      hypothesis$effect$world$populationPDFk<-hypothesis$effect$rIV
-      hypothesis$effect$world$populationRZ<-"r"
-      hypothesis$effect$world$populationNullp<-0
+    if (!hypothesis$effect$world$On) {
+      hypothesis$effect$world$On<-TRUE
+      hypothesis$effect$world$PDF<-"Single"
+      hypothesis$effect$world$PDFk<-hypothesis$effect$rIV
+      hypothesis$effect$world$RZ<-"r"
+      hypothesis$effect$world$pRPlus<-1
     }
-    nRepDens<-fullRSamplingDist(nbin,hypothesis$effect$world,design,"nw",logScale=(braw.env$nPlotScale=="log10"),sigOnlyOutput=FALSE)
+    nRepDens<-fullRSamplingDist(nbin,hypothesis$effect$world,design,"nw",logScale=(braw.env$nPlotScale=="log10"),sigOnly=0)
     y<-c(0,nRepDens,0)/max(nRepDens)*0.4
     x<-nbin[c(1,1:length(nbin),length(nbin))]
     pts=data.frame(x=log10(x),y=y)
@@ -475,16 +475,16 @@ showPrediction <- function(hypothesis=braw.def$hypothesis,design=braw.def$design
 #' 
 #' @return ggplot2 object - and printed
 #' @examples
-#' showWorldSampling(hypothesis=makeHypothesis(),design=makeDesign(),sigOnly=FALSE)
+#' showWorldSampling(hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence())
 #' @export
-showWorldSampling<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,sigOnly=FALSE,plotArea=c(0,0,1,1),autoShow=braw.env$autoShow,g=NULL) {
+showWorldSampling<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,evidence=braw.def$evidence,plotArea=c(0,0,1,1),autoShow=braw.env$autoShow,g=NULL) {
   world<-hypothesis$effect$world
-  if (!world$worldOn) 
-    world<-list(worldOn=TRUE,
-                populationPDF="Single",
-                populationPDFk=hypothesis$effect$rIV,
-                populationRZ="r",
-                populationNullp=0)
+  if (!world$On) 
+    world<-list(On=TRUE,
+                PDF="Single",
+                PDFk=hypothesis$effect$rIV,
+                RZ="r",
+                pRPlus=1)
   
   np<-braw.env$worldNPoints
   # if (world$worldAbs) np<-braw.env$worldNPoints*2+1
@@ -500,7 +500,7 @@ showWorldSampling<-function(hypothesis=braw.def$hypothesis,design=braw.def$desig
   design1<-design
   design$Replication$On<-FALSE
   
-  dens<-fullRSamplingDist(vals,world,design,sigOnlyOutput=sigOnly) 
+  dens<-fullRSamplingDist(vals,world,design,sigOnly=evidence$sigOnly) 
   switch(braw.env$RZ,
          "r"={},
          "z"={
@@ -513,7 +513,7 @@ showWorldSampling<-function(hypothesis=braw.def$hypothesis,design=braw.def$desig
   )
   dens<-dens/sum(dens)
   if (design1$Replication$On) {
-    dens1<-fullRSamplingDist(vals,world,design1,sigOnlyOutput=sigOnly) 
+    dens1<-fullRSamplingDist(vals,world,design1,sigOnly=evidence$sigOnly) 
     dens1<-dens1/sum(dens1)
   } else dens1<-NA
   gain<-max(max(dens),max(dens1),na.rm=TRUE)

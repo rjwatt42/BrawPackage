@@ -1,6 +1,6 @@
 
 #' @export
-doDemonstration<-function(doingDemo,world="Binary",pNull=0.5,
+doDemonstration<-function(doingDemo,world="Binary",pRPlus=0.5,
                           sN=42,sMethod="Convenience",sBudget=320,sSplits=16,sCheating="grow",
                           sReplicationPower=0.9,sReplicationSigOriginal=TRUE,
                           group="a",
@@ -28,7 +28,7 @@ doDemonstration<-function(doingDemo,world="Binary",pNull=0.5,
          },
          "Inv2"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world)))
-           if (world!="Plain") hypothesis$effect$world$populationNullp<-pNull
+           if (world!="Plain") hypothesis$effect$world$pRPlus<-pRPlus
            
            switch(partInv,
                   "A"=design<-makeDesign(sN=sN),
@@ -44,7 +44,7 @@ doDemonstration<-function(doingDemo,world="Binary",pNull=0.5,
          },
          "Inv3"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world)))
-           if (world!="Plain") hypothesis$effect$world$populationNullp<-pNull
+           if (world!="Plain") hypothesis$effect$world$pRPlus<-pRPlus
            design<-makeDesign(sN=sN)
            switch(partInv,
                   "A"=design$sMethod<-makeSampling(sMethod),
@@ -58,7 +58,7 @@ doDemonstration<-function(doingDemo,world="Binary",pNull=0.5,
          },
          "Inv4"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world)))
-           if (world!="Plain") hypothesis$effect$world$populationNullp<-pNull
+           if (world!="Plain") hypothesis$effect$world$pRPlus<-pRPlus
            design<-makeDesign(sN=sN)
            switch(partInv,
                   "A"= {

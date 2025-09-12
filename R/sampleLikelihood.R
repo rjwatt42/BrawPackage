@@ -41,7 +41,7 @@ GaussSamplingPDF<-function(z,lambda,sigma,offset=0,shape=NA,bias=FALSE,df1=1) {
   if (bias>0) {
     zcrit<-atanh(p2r(braw.env$alphaSig,1/sigma^2+3,df1))
     d1[abs(z)<zcrit]<-d1[abs(z)<zcrit]*(1-bias)
-    d0<-GaussSamplingCDF(zcrit,lambda,sigma)*bias
+    d0<-1-GaussSamplingCDF(zcrit,lambda,sigma)*bias
   } else {
     d0<-1
   }
@@ -49,13 +49,13 @@ GaussSamplingPDF<-function(z,lambda,sigma,offset=0,shape=NA,bias=FALSE,df1=1) {
 }
 GaussSamplingCDF<-function(zcrit,lambda,sigma,offset=0) {
   sigma<-sqrt(lambda^2+sigma^2)
-  1-(pnorm(zcrit,offset,sigma)-pnorm(-zcrit,offset,sigma))
+  (pnorm(zcrit,offset,sigma)-pnorm(-zcrit,offset,sigma))
 }
 
 
 ExpSamplingPDF<-function(z,lambda,sigma,shape=NA,bias=FALSE,df1=1) {
   if (lambda==0) return(GaussSamplingPDF(z,lambda,sigma,offset=0,shape=NA,bias=FALSE,df1=1))
-  lambda1<-1/lambda
+  # lambda1<-1/lambda
   # d1a<-0.25*(lambda1*exp(-lambda1*(z-sigma^2*lambda1/2))*(1+erf((z-sigma^2*lambda1)/sqrt(2)/sigma)) +
   #             lambda1*exp(-lambda1*(-z-sigma^2*lambda1/2))*(1+erf((-z-sigma^2*lambda1)/sqrt(2)/sigma)))
 
@@ -83,7 +83,7 @@ ExpSamplingPDF<-function(z,lambda,sigma,shape=NA,bias=FALSE,df1=1) {
   if (bias>0) {
     zcrit<-atanh(p2r(braw.env$alphaSig,1/sigma^2+3,df1))
     d1[abs(z)<zcrit]<-d1[abs(z)<zcrit]*(1-bias)
-    d0<-ExpSamplingCDF(zcrit,lambda,sigma)*bias
+    d0<-1-ExpSamplingCDF(zcrit,lambda,sigma)*bias
   } else {
     d0<-1
   }
@@ -103,7 +103,7 @@ ExpSamplingCDF<-function(zcrit,lambda,sigma) {
     - exp((lambda*sigma/sqrt(2))^2)/exp(z*lambda) * erfc(lambda*sigma/sqrt(2) - z/sigma/sqrt(2))
     + 2*erf(z/sigma/sqrt(2))
   )
-  1-(p1-p2)
+  (p1-p2)
 }
 
 
@@ -244,14 +244,14 @@ getLogLikelihood<-function(z,n,df1,distribution,location,spread=0,shape=1,bias=F
   } 
   
   # get nulls ready first
-  nulls<-spread
-  if (any(nulls>0)) {
+  pRPluss<-spread
+  if (any(pRPluss<1)) {
     nullPDF<-SingleSamplingPDF(z,0,sigma,0,bias,df1)
   } else {
     nullPDF<-list(pdf=0,sig_pdf=1)
     zcrit<-0
   } 
-  res<-matrix(-Inf,nrow=length(location),ncol=length(nulls))
+  res<-matrix(-Inf,nrow=length(location),ncol=length(pRPluss))
   switch(distribution,
          "Uniform"={
            PDF<-UniformSamplingPDF
@@ -275,14 +275,14 @@ getLogLikelihood<-function(z,n,df1,distribution,location,spread=0,shape=1,bias=F
   for (i in 1:length(location)) {
     lambda<-location[i]
     mainPDF<-PDF(z,lambda,sigma,shape=shape,bias=bias,df1=df1)
-    for (j in 1:length(nulls)) {
-      nullP<-nulls[j]
+    for (j in 1:length(pRPluss)) {
+      pRPlus<-pRPluss[j]
       # make the whole source first
-      sourcePDF<-mainPDF$pdf*(1-nullP)+nullPDF$pdf*nullP
+      likelihoods<-mainPDF$pdf*pRPlus+nullPDF$pdf*(1-pRPlus)
       # now normalize for the non-sig
-      likelihoods<-sourcePDF/(mainPDF$sig_pdf*(1-nullP)+nullPDF$sig_pdf*nullP)
+      likelihoods<-likelihoods/(mainPDF$sig_pdf*pRPlus+nullPDF$sig_pdf*(1-pRPlus))
       likelihoods[(likelihoods<1e-300)]<- 1e-300
-      res[i,j]<-sum(log(likelihoods[likelihoods>1e-300]),na.rm=TRUE)
+      res[i,j]<-sum(log(likelihoods),na.rm=TRUE)
       if (res[i,j]==max(res,na.rm=TRUE)) lksHold<-log(likelihoods)
     }
   }

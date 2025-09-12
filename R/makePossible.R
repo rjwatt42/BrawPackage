@@ -16,7 +16,7 @@
 #' @export
 makePossible<-function(targetSample=NULL,targetSampleN=NULL,UseSource="world",
                        targetPopulation=NULL,UsePrior="none",prior=getWorld("Psych"),
-                       sigOnly=FALSE,sigOnlyCompensate=FALSE,
+                       sigOnly=0,sigOnlyCompensate=FALSE,
                        axisType=braw.env$RZ,
                        sims=NULL,
                        hypothesis=braw.def$hypothesis,design=braw.def$design,
@@ -68,12 +68,12 @@ makePossible<-function(targetSample=NULL,targetSampleN=NULL,UseSource="world",
   # if (is.null(sims)) {
   #     sims<-braw.res$multiple$result
   # }
-  if (hypothesis$effect$world$worldOn==FALSE) {
-    hypothesis$effect$world$populationPDF<-"Single"
-    hypothesis$effect$world$populationRZ<-"r"
-    hypothesis$effect$world$populationPDFk<-hypothesis$effect$rIV
-    hypothesis$effect$world$populationNullp<-0
-    hypothesis$effect$world$populationPDFsample<-FALSE
+  if (hypothesis$effect$world$On==FALSE) {
+    hypothesis$effect$world$PDF<-"Single"
+    hypothesis$effect$world$RZ<-"r"
+    hypothesis$effect$world$PDFk<-hypothesis$effect$rIV
+    hypothesis$effect$world$pRPlus<-1
+    hypothesis$effect$world$PDFsample<-FALSE
   }
   
   possible<-

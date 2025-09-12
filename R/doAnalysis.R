@@ -151,14 +151,14 @@ r2llr<-function(r,n,df1,method=braw.env$STMethod,llr=list(e1=c(),e2=0),world=NUL
     if (!is.matrix(n)) {
       n<-matrix(n,ncol=1)
     }
-    if (is.null(world) || is.null(world$worldOn) || !world$worldOn) {
-      world$populationPDF<-"Single"
-      world$populationNullp<-0.5
+    if (is.null(world) || is.null(world$On) || !world$On) {
+      world$PDF<-"Single"
+      world$pRPlus<-0.5
     }
-    lk1<-getLogLikelihood(z,n,df1,world$populationPDF,world$populationPDFk,spread=0,bias=FALSE,returnVals=TRUE)
-    lk2<-getLogLikelihood(z,n,df1,world$populationPDF,world$populationPDFk,spread=1,bias=FALSE,returnVals=TRUE)
-    lk1<-lk1+log(1-world$populationNullp)
-    lk2<-lk2+log(world$populationNullp)
+    lk1<-getLogLikelihood(z,n,df1,world$PDF,world$PDFk,spread=0,bias=FALSE,returnVals=TRUE)
+    lk2<-getLogLikelihood(z,n,df1,world$PDF,world$PDFk,spread=1,bias=FALSE,returnVals=TRUE)
+    lk1<-lk1+log(world$pRPlus)
+    lk2<-lk2+log(1-world$pRPlus)
     llk<-lk1-lk2
   } else {
     if (isempty(llr$e1) || is.na(llr$e1)) { llr1=z }
@@ -350,7 +350,7 @@ multipleAnalysis<-function(nsims=1,hypothesis,design,evidence,newResult=c(),only
     hypothesis$effect$rIV<-rho[i]
     if (!is.null(hypothesis$IV2)) {hypothesis$effect$rIV2<-rho2[i]}
     
-    res<-runSimulation(hypothesis,design,evidence,evidence$sigOnly,oldResult=oldResult)
+    res<-runSimulation(hypothesis,design,evidence,oldResult=oldResult)
     
     if (is.na(res$rIV)) {
       res$rIV<-0
@@ -1152,7 +1152,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
   
 }
 
-runSimulation<-function(hypothesis,design,evidence,sigOnly=FALSE,onlyAnalysis=FALSE,oldResult=NULL,autoShow=FALSE) {
+runSimulation<-function(hypothesis,design,evidence,onlyAnalysis=FALSE,oldResult=NULL,autoShow=FALSE) {
     if (onlyAnalysis && !is.null(oldResult)) {
     res<-doAnalysis(oldResult,evidence,autoShow=FALSE)
     return(res)
@@ -1163,11 +1163,7 @@ runSimulation<-function(hypothesis,design,evidence,sigOnly=FALSE,onlyAnalysis=FA
     ntrials<-0
     p_min<-1
     while (1==1) {
-      # if (!evidence$shortHand) {
       res<-getSample(hypothesis,design,evidence)
-      # } else {
-      #   res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
-      # }
       res1<-res
       if (design$sBudgetOn) {
         if (res$pIV<p_min) {
@@ -1182,7 +1178,7 @@ runSimulation<-function(hypothesis,design,evidence,sigOnly=FALSE,onlyAnalysis=FA
         }
       }
       if (isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) break
-      if (runif(1)>sigOnly) break
+      if (runif(1)>evidence$sigOnly) break
     }
   }
   
@@ -1193,16 +1189,14 @@ runSimulation<-function(hypothesis,design,evidence,sigOnly=FALSE,onlyAnalysis=FA
 }
 
 getSample<-function(hypothesis,design,evidence) {
-  while (1==1) {
+  
     if (!evidence$shortHand) {
       sample<-doSample(hypothesis,design,autoShow=FALSE)
       res<-doAnalysis(sample,evidence,autoShow=FALSE)
     } else {
       res<-sampleShortCut(hypothesis,design,evidence,1,FALSE)
     }
-    if (!evidence$sigOnly || isSignificant(braw.env$STMethod,res$pIV,res$rIV,res$nval,res$df1,evidence)) break
-  }
-  
+
   res$ResultHistory<-list(nval=res$nval,df1=res$df1,rIV=res$rIV,rpIV=res$rpIV,pIV=res$pIV,sequence=FALSE)
   # Cheating ?
   res<-cheatSample(hypothesis,design,evidence,sample,res)

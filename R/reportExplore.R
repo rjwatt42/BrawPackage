@@ -28,7 +28,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
              if (exploreResult$metaAnalysis$analyseBias) showType<-paste0(showType,";metaBias")
            },
            "random"={showType<-"metaRiv;metaRsd"},
-           {showType<-"Lambda;pNull"})
+           {showType<-"Lambda;pRPlus"})
   
   showType<-strsplit(showType,";")[[1]]
   if (length(showType)==1) {
@@ -55,7 +55,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
   max_cols<-10
   
   vals<-exploreResult$vals
-  if (explore$exploreType=="pNull" && braw.env$pPlus) vals<-1-vals
+  if (explore$exploreType=="p(R+)") vals<-1-vals
   
   if (length(vals)>max_cols)  {
     useVals<-seq(1,length(vals),2)
@@ -234,7 +234,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                 "Hits"={
                   if (explore$exploreType=="minRp") evidence$minRp<-exploreResult$vals
                   else evidence$minRp<-rep(evidence$minRp,length(exploreResult$vals))
-                  if (effect$world$worldOn) {
+                  if (effect$world$On) {
                     for (i in 1:length(exploreResult$vals)){
                       if (explore$exploreType=="Alpha") {
                         braw.env$alphaSig<-exploreResult$vals[i]
@@ -270,7 +270,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                 "Misses"={
                   if (explore$exploreType=="minRp") evidence$minRp<-exploreResult$vals
                   else evidence$minRp<-rep(evidence$minRp,length(exploreResult$vals))
-                  if (effect$world$worldOn) {
+                  if (effect$world$On) {
                     for (i in 1:length(exploreResult$vals)){
                       if (explore$exploreType=="Alpha") {
                         braw.env$alphaSig<-exploreResult$vals[i]
@@ -306,7 +306,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                 "Inference"={
                   if (explore$exploreType=="minRp") evidence$minRp<-exploreResult$vals
                   else evidence$minRp<-rep(evidence$minRp,length(exploreResult$vals))
-                  if (effect$world$worldOn) {
+                  if (effect$world$On) {
                     for (i in 1:length(exploreResult$vals)){
                       if (explore$exploreType=="Alpha") {
                         braw.env$alphaSig<-exploreResult$vals[i]
@@ -356,7 +356,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                 "Source"={
                   if (explore$exploreType=="minRp") evidence$minRp<-exploreResult$vals
                   else evidence$minRp<-rep(evidence$minRp,length(exploreResult$vals))
-                  if (effect$world$worldOn) {
+                  if (effect$world$On) {
                     for (i in 1:length(exploreResult$vals)){
                       if (explore$exploreType=="Alpha") {
                         braw.env$alphaSig<-exploreResult$vals[i]
@@ -453,11 +453,11 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                 "Lambda"={
                   showVals<-exploreResult$result$param1
                 },
-                "pNull"={
+                "p(R+)"={
                   showVals<-exploreResult$result$param2
                 },
                 "PDF"={
-                  showVals<-exploreResult$result$dist==effect$world$populationPDF
+                  showVals<-exploreResult$result$dist==effect$world$PDF
                   for (i in 1:length(exploreResult$vals)){
                     p<-mean(showVals[,i],na.rm=TRUE)
                     p_se<-sqrt(p*(1-p)/length(showVals[,i]))
@@ -508,7 +508,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                 }
         )
         if (is.element(showType,c("rs","p","ws","n","AIC","log(lrs)","log(lrd)",
-                                  "metaBias","metaRiv","metaRsd","Lambda","pNull","metaS",
+                                  "metaBias","metaRiv","metaRsd","Lambda","p(R+)","metaS",
                                   "iv.mn","iv.sd","iv.sk","iv.kt","dv.mn","dv.sd","dv.sk","dv.kt",
                                   "er.mn","er.sd","er.sk","er.kt"))) {
           quants=(1-quantileShow)/2

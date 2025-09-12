@@ -203,7 +203,7 @@ doMultiple <- function(nsims=10,multipleResult=NA,hypothesis=braw.def$hypothesis
     }
     else 
 
-  if (doingNull && !hypothesis$effect$world$worldOn) {
+  if (doingNull && !hypothesis$effect$world$On) {
     hypothesisNull<-hypothesis
     hypothesisNull$effect$rIV<-0
     # catch up - make enough null results to match results
@@ -229,7 +229,7 @@ doMultiple <- function(nsims=10,multipleResult=NA,hypothesis=braw.def$hypothesis
     if (multipleResult$count+ns>nsims) ns<-nsims-multipleResult$count
     multipleResult$result<-multipleAnalysis(ns,hypothesis,design,evidence,multipleResult$result,onlyReplication=onlyReplication,oldResult=oldResult)
     multipleResult$count<-multipleResult$count+ns
-    if (doingNull && !hypothesis$effect$world$worldOn) {
+    if (doingNull && !hypothesis$effect$world$On) {
       multipleResult$nullresult<-multipleAnalysis(ns,hypothesisNull,design,evidence,multipleResult$nullresult,onlyReplication=onlyReplication,oldResult=oldResult)
       multipleResult$nullcount<-multipleResult$nullcount+ns
     }

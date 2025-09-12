@@ -42,17 +42,17 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
 
   # get the source population distribution
   switch(possible$UseSource,
-         "null"={source<-list(worldOn=FALSE,
-                              populationPDF="Single",
-                              populationPDFk=0,
-                              populationRZ="r",
-                              populationNullp=0
+         "null"={source<-list(On=FALSE,
+                              PDF="Single",
+                              PDFk=0,
+                              RZ="r",
+                              pRPlus=1
          )},
-         "hypothesis"={source<-list(worldOn=FALSE,
-                                    populationPDF="Single",
-                                    populationPDFk=hypothesis$effect$rIV,
-                                    populationRZ="r",
-                                    populationNullp=0.5
+         "hypothesis"={source<-list(On=FALSE,
+                                    PDF="Single",
+                                    PDFk=hypothesis$effect$rIV,
+                                    RZ="r",
+                                    pRPlus=0.5
          )},
          "world"={source<-world},
          "prior"={source<-possible$prior}
@@ -60,25 +60,25 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
   sourcePopDens_r<-rPopulationDist(rp,source)
   sourcePopDens_r<-sourcePopDens_r/max(sourcePopDens_r)
   # we add in the nulls for display, but only when displaying them makes sense
-  if (source$populationPDF=="Single" || source$populationPDF=="Double") {
-    sourcePopDens_r<-sourcePopDens_r*(1-source$populationNullp)
-    sourcePopDens_r[rp==0]<-sourcePopDens_r[rp==0]+source$populationNullp
+  if (source$PDF=="Single" || source$PDF=="Double") {
+    sourcePopDens_r<-sourcePopDens_r*(source$pRPlus)
+    sourcePopDens_r[rp==0]<-sourcePopDens_r[rp==0]+(1-source$pRPlus)
   }
   
   # get the prior population distribution
   switch(possible$UsePrior,
-         "none"={ prior<-list(worldOn=TRUE,
-                              populationPDF="Uniform",
-                              populationPDFk=1,
-                              populationRZ="r",
-                              populationNullp=0.0,
-                              populationPDFsample=FALSE) },
-         "hypothesis"={prior<-list(worldOn=FALSE,
-                                    populationPDF="Single",
-                                    populationPDFk=hypothesis$effect$rIV,
-                                    populationRZ="r",
-                                    populationNullp=0.5,
-                                   populationPDFsample=FALSE) },
+         "none"={ prior<-list(On=TRUE,
+                              PDF="Uniform",
+                              PDFk=1,
+                              RZ="r",
+                              pRPlus=1,
+                              PDFsample=FALSE) },
+         "hypothesis"={prior<-list(On=FALSE,
+                                    PDF="Single",
+                                    PDFk=hypothesis$effect$rIV,
+                                    RZ="r",
+                                    pRPlus=0.5,
+                                   PDFsample=FALSE) },
          "world"={ prior<-world },
          "prior"={ prior<-possible$prior }
   )
@@ -87,9 +87,9 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
   priorPopDens_r<-rPopulationDist(rp,prior)
   priorPopDens_r<-priorPopDens_r/mean(priorPopDens_r)/2
   if (max(priorPopDens_r)>0.9) priorPopDens_r<-priorPopDens_r/max(priorPopDens_r)*0.9
-  priorPopDens_r_full<-priorPopDens_r*(1-prior$populationNullp)
-  priorPopDens_r_full[rp==0]<-priorPopDens_r_full[rp==0]+prior$populationNullp
-  if (prior$populationPDF=="Single" || prior$populationPDF=="Double") {
+  priorPopDens_r_full<-priorPopDens_r*(prior$pRPlus)
+  priorPopDens_r_full[rp==0]<-priorPopDens_r_full[rp==0]+(1-prior$pRPlus)$pRPlus
+  if (prior$PDF=="Single" || prior$PDF=="Double") {
     priorPopDens_r_show<-priorPopDens_r_full/max(priorPopDens_r_full)
   } else {
     priorPopDens_r_show<-priorPopDens_r/max(priorPopDens_r)
@@ -97,13 +97,13 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
   
   # enumerate the source populations
   sD<-fullRSamplingDist(rs,source,design,separate=TRUE,
-                        sigOnlyOutput=possible$sigOnly,sigOnlyCompensate=possible$sigOnlyCompensate,
+                        sigOnly=possible$sigOnly,sigOnlyCompensate=possible$sigOnlyCompensate,
                         HQ=possible$HQ)
   sourceRVals<-sD$vals
   sourceSampDens_r_total<-sD$dens
   sourceSampDens_r_plus<-rbind(sD$densPlus)
   sourceSampDens_r_null<-sD$densNull
-  if (is.element(source$populationPDF,c("Single","Double")) && source$populationNullp>0) {
+  if (is.element(source$PDF,c("Single","Double")) && source$pRPlus<1) {
     sourceRVals<-c(sourceRVals,0)
     sourceSampDens_r_plus<-rbind(sourceSampDens_r_plus,sourceSampDens_r_null)
   }
@@ -206,15 +206,15 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
       priorSampDens_r<-priorSampDens_r/dr_gain
     }
     
-    if (prior$worldOn && prior$populationNullp>0) {
-      sampleLikelihood_r<-sampleLikelihood_r*(1-prior$populationNullp)
-      priorPopDens_r<-priorPopDens_r*(1-prior$populationNullp)
-      sourcePopDens_r<-sourcePopDens_r*(1-source$populationNullp)
+    if (prior$On && prior$pRPlus<1) {
+      sampleLikelihood_r<-sampleLikelihood_r*(prior$pRPlus)
+      priorPopDens_r<-priorPopDens_r*(prior$pRPlus)
+      sourcePopDens_r<-sourcePopDens_r*(source$pRPlus)
       for (i in 1:length(sRho)) {
         sampleLikelihood_r<-sampleLikelihood_r*dnorm(atanh(sRho[i]),0,1/sqrt(n[i]-3))
       }
-      priorSampDens_r_plus<-priorSampDens_r_plus/sum(priorSampDens_r_plus)*(1-prior$populationNullp)
-      priorSampDens_r_null<-priorSampDens_r_null/sum(priorSampDens_r_null)*(prior$populationNullp)
+      priorSampDens_r_plus<-priorSampDens_r_plus/sum(priorSampDens_r_plus)*(prior$pRPlus)
+      priorSampDens_r_null<-priorSampDens_r_null/sum(priorSampDens_r_null)*(1-prior$pRPlus)
     }
     sampleLikelihood_r<-sampleLikelihood_r/max(sampleLikelihood_r,na.rm=TRUE)
   } else {

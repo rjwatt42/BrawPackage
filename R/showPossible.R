@@ -149,7 +149,7 @@ describePossiblePopulations<-function(possibleResult,possible) {
            }
     )
     
-    if (possible$prior$populationPDF=="Single" || possible$prior$populationPDF=="Double") {
+    if (possible$prior$PDF=="Single" || possible$prior$PDF=="Double") {
       binWidth<-0.05
     } else {
       binWidth<-max(0.05,2*IQR(use_effectRP_slice,na.rm=TRUE)/length(use_effectRP_slice)^(1/3))
@@ -307,10 +307,10 @@ showPossible <- function(possibleResult=NULL,
   zlim<-c(0,1)
   
   switch (possible$UseSource,
-          "hypothesis"={possible$source<-list(worldOn=TRUE,populationPDF="Single",populationPDFk=effect$rIV,populationRZ="r",populationNullp=0)},
+          "hypothesis"={possible$source<-list(On=TRUE,PDF="Single",PDFk=effect$rIV,RZ="r",pRPlus=1)},
           "world"={possible$source<-world},
           "prior"={possible$source<-possible$prior},
-          "null"={possible$source<-list(worldOn=TRUE,populationPDF="Single",populationPDFk=0,populationRZ="r",populationNullp=0)}
+          "null"={possible$source<-list(On=TRUE,PDF="Single",PDFk=0,RZ="r",pRPlus=1)}
   )
   if (showType=="Samples") possible$UsePrior<-"hypothesis"
   # make the distribution        
@@ -388,7 +388,7 @@ showPossible <- function(possibleResult=NULL,
   if (!is.null(nrow(rsw_dens_plus)))
   rsw_dens_plus<-colSums(rsw_dens_plus)
   rsw_dens_null<-possibleResult$Theory$sourceSampDens_r_null
-  if (is.element(world$populationPDF,c("Single","Double"))) rsw_dens_plus<-rsw_dens_plus-rsw_dens_null
+  if (is.element(world$PDF,c("Single","Double"))) rsw_dens_plus<-rsw_dens_plus-rsw_dens_null
   rsw_dens<-rsw_dens_plus+rsw_dens_null
   
   switch(braw.env$RZ,
@@ -697,7 +697,7 @@ showPossible <- function(possibleResult=NULL,
                 }
               }
               # show rp==rs on floor
-              # if (world$populationPDF!="Single"){
+              # if (world$PDF!="Single"){
                 # lines(trans3d(x=c(sRho[1],sRho[1]),y=ylim,z=c(0,0),pmat=mapping),col=colPdark,lwd=1,lty=3)
               # }
             }
@@ -792,7 +792,7 @@ showPossible <- function(possibleResult=NULL,
               }
               g<-drawDistribution(x,y,ztotal,xlim,ylim,zlim,mapping,colSsum,"#000000",1,draw_lower_limit=0,g)
                 # split into 2 parts  
-                if (possible$source$worldOn && possible$source$populationNullp>0){
+                if (possible$source$On && possible$source$pRPlus<1){
                   if (!any(is.na(sampleBackwall$rsw_dens_null))) {
                     znull <- sampleBackwall$rsw_dens_null
                   } else {
@@ -811,7 +811,7 @@ showPossible <- function(possibleResult=NULL,
                     zplus<-log10(zplus)
                     zplus[zplus<zlim[1]]<-zlim[1]
                   }
-                  if (possible$source$populationNullp>0 ) {
+                  if (possible$source$pRPlus<1) {
                     g<-drawDistribution(x,y,znull*wallHeight,xlim,ylim,zlim,mapping,NA,colNullS,1,draw_lower_limit,g)
                   }
                   g<-drawDistribution(x,y,zplus*wallHeight,xlim,ylim,zlim,mapping,NA,colDistS,1,draw_lower_limit,g)
@@ -885,12 +885,12 @@ showPossible <- function(possibleResult=NULL,
                         theoryAlpha<-theoryAlpha*0.6
                         simAlpha<-0.95
                       }
-                      if (is.element(world$populationPDF,c("Single","Double"))) {
+                      if (is.element(world$PDF,c("Single","Double"))) {
                         pgain<-1
                       } else {
-                      pgain<-(1-possible$source$populationNullp)
+                      pgain<-possible$source$pRPlus
                       if (length(sourceRVals)==2) {
-                        pgain<-max(c(1-possible$source$populationNullp,possible$source$populationNullp))
+                        pgain<-max(c(possible$source$pRPlus,1-possible$source$pRPlus))
                       } 
                       }
                       # prepare simulations first
@@ -1175,7 +1175,7 @@ showPossible <- function(possibleResult=NULL,
                                                             mapping),colour=colPop,linetype="dotted")
                                   )
                                 }
-                                if (doSampleLine && world$populationPDF!="Single"){
+                                if (doSampleLine && world$PDF!="Single"){
                                   g<-addG(g,
                                           dataPath(rotate3D(data.frame(x=c(sRho[si],sRho[si]),y=c(sRho[si],sRho[si]),z=c(zlim[1],approx(rp,rd[si,],sRho[si])$y-0.01)),
                                                             mapping),colour=colP,linewidth=0.5,linetype="dotted")
@@ -1253,14 +1253,14 @@ showPossible <- function(possibleResult=NULL,
               #     if (possible$UsePrior!="none") {
               #       zoff<-zoff-diff(zlim)*0.085
               #       # lb<-"prior: "
-              #       # switch(possibleResult$prior$populationPDF,
-              #       #        "Uniform"=lb<-paste0(lb,"Uniform(",possibleResult$prior$populationRZ,")"),
-              #       #        "Single"=lb<-paste0(lb,"Single(",possibleResult$prior$populationRZ,"=",brawFormat(possibleResult$prior$populationPDFk),")"),
-              #       #        "Double"=lb<-paste0(lb,"Double(",possibleResult$prior$populationRZ,"=",brawFormat(possibleResult$prior$populationPDFk),")"),
-              #       #        "Exp"=lb<-paste0(lb,"Exp(",possibleResult$prior$populationRZ,"/",brawFormat(possibleResult$prior$populationPDFk),")"),
-              #       #        "Gauss"=lb<-paste0(lb,"Gauss(",possibleResult$prior$populationRZ,"/",brawFormat(possibleResult$prior$populationPDFk),")")
+              #       # switch(possibleResult$prior$PDF,
+              #       #        "Uniform"=lb<-paste0(lb,"Uniform(",possibleResult$prior$RZ,")"),
+              #       #        "Single"=lb<-paste0(lb,"Single(",possibleResult$prior$RZ,"=",brawFormat(possibleResult$prior$PDFk),")"),
+              #       #        "Double"=lb<-paste0(lb,"Double(",possibleResult$prior$RZ,"=",brawFormat(possibleResult$prior$PDFk),")"),
+              #       #        "Exp"=lb<-paste0(lb,"Exp(",possibleResult$prior$RZ,"/",brawFormat(possibleResult$prior$PDFk),")"),
+              #       #        "Gauss"=lb<-paste0(lb,"Gauss(",possibleResult$prior$RZ,"/",brawFormat(possibleResult$prior$PDFk),")")
               #       # )
-              #       # lb<-paste0(lb,";p(null)=",brawFormat(possibleResult$prior$populationNullp,digits=3))
+              #       # lb<-paste0(lb,";p(null)=",brawFormat(possibleResult$prior$pRPlus,digits=3))
               #       # zoff<-zoff-diff(zlim)*0.06*2
               #       # text(trans3d(x=xlim[2],y=ylim[2],z=zlim[1]+zoff,pmat=mapping),
               #       #      labels=lb,
@@ -1375,8 +1375,8 @@ showPossible <- function(possibleResult=NULL,
                           g<-addG(g,dataPolygon(data.frame(x=rs[c(1,1:length(rs),length(rs))],
                                                            y=c(0,rsd,0)*zgain),fill=colSsum,alpha=0.8))
                           g<-addG(g,dataPath(data.frame(x=rs,y=rsd*zgain),colour="#000000",linewidth=0.35))
-                          if (world$worldOn) {
-                            if (world$populationNullp>0) {
+                          if (world$On) {
+                            if (world$pRPlus<1) {
                               g<-addG(g,dataPath(data.frame(x=rs,y=sampleBackwall$rsw_dens_null*zgain),colour=colNullS,linewidth=0.5))
                               g<-addG(g,dataPath(data.frame(x=rs,y=sampleBackwall$rsw_dens_plus*zgain),colour=colDistS,linewidth=0.5))
                             }
@@ -1406,7 +1406,7 @@ showPossible <- function(possibleResult=NULL,
                           dens_at_sample<-approx(rp,sampleLikelihoodTotal_r,sRho[1])$y
                           dens_at_ci<-approx(rp,sampleLikelihoodTotal_r,rp_ci)$y
                           # lines(x=c(sRho[1],sRho[1]),y=c(0,dens_at_sample-0.01),col="#000000",lwd=1.5)
-                          if (world$populationPDF!="Uniform_r" && !is.null(rp_peak)){
+                          if (world$PDF!="Uniform_r" && !is.null(rp_peak)){
                             lines(x=c(0,0),y=c(0,dens_at_zero-0.01),col="#000000",lwd=1.5)
                             lines(x=c(rp_peak,rp_peak),y=c(0,dens_at_peak-0.01),col="#000000",lwd=1.5)
                             # lines(x=c(rp_peak,rp_peak),y=c(0,dens_at_peak-0.01),col="#000000",lwd=2.5)
@@ -1425,7 +1425,7 @@ showPossible <- function(possibleResult=NULL,
                           text(x=rp_peak,1.15,labels=paste0("llr(",braw.env$RZ,"[mle]/",braw.env$RZ,"[0])=",format(log(1/dens_at_zero),digits=3)),
                                col=colPdark,adj=(sign(rp_peak)+1)/2,cex=0.9)
                           
-                          if (possible$prior$worldOn && possible$prior$populationNullp>0) {
+                          if (possible$prior$On && possible$prior$pRPlus<1) {
                             ln_at_sample<-approx(rs,priorSampDens_r_null,sRho[1])$y
                             ld_at_sample<-approx(rs,colMeans(priorSampDens_r_plus),sRho[1])$y
                             llrNull<-log(ln_at_sample/ld_at_sample)

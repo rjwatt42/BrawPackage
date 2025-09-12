@@ -61,7 +61,7 @@ zSamplingDistr<-function(zvals,Z,n){
   1/s/sqrt(2*pi)*exp(-0.5*((zvals-Z)/s)^2)
 }
 
-rSamplingDistr<-function(rvals,R,n,sigOnly=FALSE){
+rSamplingDistr<-function(rvals,R,n,sigOnly=0){
   # map to Fisher-z
   zvals<-atanh(rvals)
   Z<-atanh(R)
@@ -102,11 +102,11 @@ wSamplingDistr<-function(wvals,R,n,alpha=braw.env$alphaSig) {
 }
 
 rSamp2Pop<-function(r_s,n,world=NULL) {
-  if (is.null(world)) {world<-list(populationPDF="Uniform",populationRZ="r",populationPDFk<-0)}
-  k<-world$populationPDFk
+  if (is.null(world)) {world<-list(PDF="Uniform",RZ="r",PDFk<-0)}
+  k<-world$PDFk
   z_s<-atanh(r_s)
   if (all(is.na(z_s))) {return(NA)}
-  switch(world$populationPDF,
+  switch(world$PDF,
          "Uniform"={mlEst<-z_s},
          "Single"={mlEst<-z_s},
          "Gauss"={mlEst<-z_s*k^2*(n-3)/(k^2*(n-3) + 1)},
@@ -136,25 +136,25 @@ getRList<-function(world,addNulls=FALSE,HQ=FALSE) {
   if (is.null(world)) {
     return(list(pRho=0,pRhogain=1)  )
   }
-  if (!world$worldOn) {
-    world$populationPDF="Single"
-    world$populationRZ="r"
+  if (!world$On) {
+    world$PDF="Single"
+    world$RZ="r"
   }
   
-  switch (world$populationPDF,
+  switch (world$PDF,
           "Single"={
-            if (world$populationRZ=="r") {
-              pRho<-world$populationPDFk
+            if (world$RZ=="r") {
+              pRho<-world$PDFk
             } else {
-              pRho<-tanh(world$populationPDFk)
+              pRho<-tanh(world$PDFk)
             }
             pRhogain<-1
           },
           "Double"={
-            if (world$populationRZ=="r") {
-              pRho<-c(-1,1)*world$populationPDFk
+            if (world$RZ=="r") {
+              pRho<-c(-1,1)*world$PDFk
             } else {
-              pRho<-c(-1,1)*tanh(world$populationPDFk)
+              pRho<-c(-1,1)*tanh(world$PDFk)
             }
             pRhogain<-c(0.5,0.5)
           },
@@ -168,9 +168,9 @@ getRList<-function(world,addNulls=FALSE,HQ=FALSE) {
   )
   
   if (addNulls)
-  if (world$populationNullp>0) {
+  if (world$pRPlus<1) {
     pRho<-c(0,pRho)
-    pRhogain<-c(world$populationNullp,pRhogain/sum(pRhogain)*(1-world$populationNullp))
+    pRhogain<-c(1-world$pRPlus,pRhogain/sum(pRhogain)*world$pRPlus)
   } else {
     pRho<-c(pRho,0)
     pRhogain<-c(pRhogain/sum(pRhogain),0)
@@ -179,7 +179,7 @@ getRList<-function(world,addNulls=FALSE,HQ=FALSE) {
   list(pRho=pRho,pRhogain=pRhogain)  
 }
 
-getNDist<-function(design,world=NULL,logScale=FALSE,sigOnly=FALSE,HQ=FALSE) {
+getNDist<-function(design,world=NULL,logScale=FALSE,sigOnly=0,HQ=FALSE) {
   if (HQ) npt<-1001 else npt=21
   nmax<-5
   if (logScale) {
@@ -215,29 +215,20 @@ getNDist<-function(design,world=NULL,logScale=FALSE,sigOnly=FALSE,HQ=FALSE) {
 }
 
 getNList<-function(design,world,HQ=FALSE) {
-  # if (design$Replication$On) {
-  #   if (HQ) npt<-201 else npt=21
-  #   nmax<-5
-  #   nvals<-braw.env$minN+seq(0,nmax*design$sN,length.out=npt)
-  #   design$Replication$On<-FALSE
-  #   ndens<-fullRSamplingDist(nvals,world=world,design=design,"nw",logScale=FALSE,sigOnlyOutput=FALSE)
-  #   return(list(nvals=nvals,ndens=ndens,ndensSig=ndens))
-  # } else {
     if (!design$sNRand) {
       return(list(nvals=design$sN,ndens=1,ndensSig=1))
     }
-    return(getNDist(design,world=NULL,logScale=FALSE,sigOnly=FALSE,HQ=HQ))
-  # }
+    return(getNDist(design,world=NULL,logScale=FALSE,sigOnly=0,HQ=HQ))
 }
 
 rRandomValue<-function(world=braw.def$hypothesis$effect$world,ns) {
-  k<-world$populationPDFk
-  mu<-world$populationPDFmu
-  sh<-world$populationPDFs
+  k<-world$PDFk
+  mu<-world$PDFmu
+  sh<-world$PDFs
   rangeMax<-braw.env$r_range
   rangeMax<-0.9999999
-  if (world$populationRZ=="z") rangeMax<-atanh(rangeMax)
-  switch (world$populationPDF,
+  if (world$RZ=="z") rangeMax<-atanh(rangeMax)
+  switch (world$PDF,
           "Single"={pops<-rep(k,ns)},
           "Double"={pops<-rep(k,ns)},
           "Uniform"={pops<-runif(ns,min=0,max=rangeMax)},
@@ -251,33 +242,33 @@ rRandomValue<-function(world=braw.def$hypothesis$effect$world,ns) {
             pops<-approx(zd,zi,runif(ns,0,1))$y
             }
   )
-  if (world$populationRZ=="z") pops<-tanh(pops)
-  if (world$populationPDF!="Single") pops<-pops*sign(rnorm(length(pops)))
+  if (world$RZ=="z") pops<-tanh(pops)
+  if (world$PDF!="Single") pops<-pops*sign(rnorm(length(pops)))
   pops<-pops[abs(pops)<1]
   if (length(pops)>ns) {
     pops<-pops[1:ns]
   }
   
   popsOld<-pops
-  if (world$populationNullp>0) {
-    change<-rand(length(pops),1)<=world$populationNullp
+  if (world$pRPlus<1) {
+    change<-rand(length(pops),1)>=world$pRPlus
     pops[change]<-0
   }
   return(list(old=popsOld,use=pops))
 }
 
 rPopulationDist<-function(rvals,world) {
-  if (world$populationPDFsample) {
-    mn<-world$populationSamplemn
-    sd<-world$populationSamplesd
-    rdens1<-rSamplingDistr(mn,rvals,1/sd^2+3,sigOnly=world$populationSamplebias)
+  if (world$PDFsample) {
+    mn<-world$PDFsamplemn
+    sd<-world$PDFsamplesd
+    rdens1<-rSamplingDistr(mn,rvals,1/sd^2+3,sigOnly=world$PDFsamplebias)
   } else rdens1<-1
-  k<-world$populationPDFk
-  mu<-world$populationPDFmu
-  sh<-world$populationPDFs
-  if (world$populationRZ=="z") rvals<-atanh(rvals)
+  k<-world$PDFk
+  mu<-world$PDFmu
+  sh<-world$PDFs
+  if (world$RZ=="z") rvals<-atanh(rvals)
   rdens<-rvals*0
-  switch (world$populationPDF,
+  switch (world$PDF,
           "Single"={rdens[which.min(abs(k-rvals))]<-1 },
           "Double"={ rdens[c(which.min(abs(k-rvals)),which.min(abs(k+rvals)))]<-1/2},
           "Uniform"={rdens<-rdens+0.5},
@@ -286,7 +277,7 @@ rPopulationDist<-function(rvals,world) {
           "Gamma"={rdens<-dgamma(abs(rvals),shape=sh,rate=sh/k)},
           "GenExp"={rdens<-GenExpSamplingPDF(rvals,k,sigma=0,sh)}
   )
-if (world$populationRZ=="z") rdens<-zdens2rdens(rdens,tanh(rvals))
+if (world$RZ=="z") rdens<-zdens2rdens(rdens,tanh(rvals))
 return(rdens*rdens1)
 }
 
@@ -299,9 +290,9 @@ fullPSig<-function(world,design,HQ=FALSE,alpha=braw.env$alphaSig) {
   if (length(rvals)>1) rdens<-rdens*diff(rvals[1:2])
   # next line is precautionary
   rdens<-rdens/sum(rdens)
-  if (world$worldOn && world$populationNullp>0) {
+  if (world$On && world$pRPlus<1) {
     rvals<-c(rvals,0)
-    rdens<-c(rdens*(1-world$populationNullp),world$populationNullp)
+    rdens<-c(rdens*(world$pRPlus),1-world$pRPlus)
   }
   
   # distribution of sample sizes
@@ -323,21 +314,21 @@ fullPSig<-function(world,design,HQ=FALSE,alpha=braw.env$alphaSig) {
   return(pSig)
 }
 
-fullRSamplingDist<-function(vals,world,design,doStat="rs",logScale=FALSE,sigOnlyOutput=FALSE,sigOnlyCompensate=FALSE,HQ=FALSE,separate=FALSE,quantiles=NULL) {
+fullRSamplingDist<-function(vals,world,design,doStat="rs",logScale=FALSE,sigOnly=0,sigOnlyCompensate=FALSE,HQ=FALSE,separate=FALSE,quantiles=NULL) {
   # sampling distribution from specified populations (pRho)
   if (is.null(vals)) 
     vals<-seq(-1,1,length=braw.env$worldNPoints)*braw.env$r_range
 
   # distribution of population effect sizes
-  if (!is.null(world$worldOn)) pR<-getRList(world,HQ=HQ)
+  if (!is.null(world$On)) pR<-getRList(world,HQ=HQ)
   else pR<-world
   rvals<-pR$pRho
   rPopdens<-pR$pRhogain
   if (length(rvals)>1) rPopdens<-rPopdens*diff(rvals[1:2])
-  if (!world$worldOn) world$populationNullp<-0
-  if (!is.element(world$populationPDF,c("sample"))) {
+  if (!world$On) world$pRPlus<-1
+  if (!is.element(world$PDF,c("sample"))) {
   rvals<-c(rvals,0)
-  rPopdens<-c(rPopdens/sum(rPopdens)*(1-world$populationNullp),world$populationNullp)
+  rPopdens<-c(rPopdens/sum(rPopdens)*(world$pRPlus),1-world$pRPlus)
   }
 
   # distribution of sample sizes
@@ -419,9 +410,9 @@ fullRSamplingDist<-function(vals,world,design,doStat="rs",logScale=FALSE,sigOnly
         if (logScale) addition<-addition*vals
         addition<-addition*ndens[ni]
         d1<-d1+addition
-        if (sigOnlyOutput>0) {
+        if (sigOnly>0) {
           critR<-tanh(qnorm(1-braw.env$alphaSig/2,0,1/sqrt(nvals[ni]-3)))
-          addition[abs(rp)<critR]<-addition[abs(rp)<critR]*(1-sigOnlyOutput)
+          addition[abs(rp)<critR]<-addition[abs(rp)<critR]*(1-sigOnly)
           if (sigOnlyCompensate) addition<-addition/sum(addition)
         }
         d<-d+addition

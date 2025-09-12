@@ -4,16 +4,16 @@ doMultipleTheory<-function(showType,logScale,hypothesis=braw.def$hypothesis,desi
   effect<-hypothesis$effect
   
   effectTheory<-effect
-  if (!effectTheory$world$worldOn) {
-    effectTheory$world$worldOn<-TRUE
-    effectTheory$world$populationPDF<-"Single"
-    effectTheory$world$populationRZ<-"r"
+  if (!effectTheory$world$On) {
+    effectTheory$world$On<-TRUE
+    effectTheory$world$PDF<-"Single"
+    effectTheory$world$RZ<-"r"
     switch(i,
-           effectTheory$world$populationPDFk<-effect$rIV,
-           effectTheory$world$populationPDFk<-effect$rIV2,
-           effectTheory$world$populationPDFk<-effect$rIVIV2DV
+           effectTheory$world$PDFk<-effect$rIV,
+           effectTheory$world$PDFk<-effect$rIV2,
+           effectTheory$world$PDFk<-effect$rIVIV2DV
     )
-    effectTheory$world$populationNullp<-0
+    effectTheory$world$pRPlus<-1
   }
   
   xdsig<-NULL
@@ -29,30 +29,30 @@ doMultipleTheory<-function(showType,logScale,hypothesis=braw.def$hypothesis,desi
       yvUse<-yv
     }
     oldEffect<-effectTheory
-    if (showType=="e1p") effectTheory$world$populationNullp<-1
-    if (showType=="e2p") effectTheory$world$populationNullp<-0
-    xd<-fullRSamplingDist(yvUse,effectTheory$world,design,"p",logScale=logScale,sigOnlyOutput=FALSE,HQ=braw.env$showTheoryHQ)
-    xdsig<-fullRSamplingDist(yvUse,effectTheory$world,design,"p",logScale=logScale,sigOnlyOutput=TRUE,HQ=braw.env$showTheoryHQ)
+    if (showType=="e1p") effectTheory$world$pRPlus<-0
+    if (showType=="e2p") effectTheory$world$pRPlus<-1
+    xd<-fullRSamplingDist(yvUse,effectTheory$world,design,"p",logScale=logScale,sigOnly=0,HQ=braw.env$showTheoryHQ)
+    xdsig<-fullRSamplingDist(yvUse,effectTheory$world,design,"p",logScale=logScale,sigOnly=1,HQ=braw.env$showTheoryHQ)
     effectTheory<-oldEffect
   }
   
   if (is.element(showType,c("rs","ro","ci1","ci2","e1r","e2r"))) {
     npt<-101
-    if (showType=="e1r") effectTheory$world$populationNullp<-1
-    if (showType=="e2r") effectTheory$world$populationNullp<-0
+    if (showType=="e1r") effectTheory$world$pRPlus<-0
+    if (showType=="e2r") effectTheory$world$pRPlus<-1
     switch(braw.env$RZ,
            "r"={
              rvals<-seq(-1,1,length.out=npt)*0.99
-             xd<-fullRSamplingDist(rvals,effectTheory$world,design,"rs",logScale=logScale,sigOnlyOutput=FALSE,HQ=braw.env$showTheoryHQ)
-             xdsig<-fullRSamplingDist(rvals,effectTheory$world,design,"rs",logScale=logScale,sigOnlyOutput=TRUE,HQ=braw.env$showTheoryHQ)
+             xd<-fullRSamplingDist(rvals,effectTheory$world,design,"rs",logScale=logScale,sigOnly=0,HQ=braw.env$showTheoryHQ)
+             xdsig<-fullRSamplingDist(rvals,effectTheory$world,design,"rs",logScale=logScale,sigOnly=1,HQ=braw.env$showTheoryHQ)
              yv<-rvals
            },
            "z"={
              zvals<-seq(-1,1,length.out=npt*2)*braw.env$z_range*2
              rvals<-tanh(zvals)
              # rvals<-seq(-1,1,length.out=npt)*0.99
-             xd<-fullRSamplingDist(rvals,effectTheory$world,design,"rs",logScale=logScale,sigOnlyOutput=FALSE,HQ=braw.env$showTheoryHQ)
-             xdsig<-fullRSamplingDist(rvals,effectTheory$world,design,"rs",logScale=logScale,sigOnlyOutput=TRUE,HQ=braw.env$showTheoryHQ)
+             xd<-fullRSamplingDist(rvals,effectTheory$world,design,"rs",logScale=logScale,sigOnly=0,HQ=braw.env$showTheoryHQ)
+             xdsig<-fullRSamplingDist(rvals,effectTheory$world,design,"rs",logScale=logScale,sigOnly=1,HQ=braw.env$showTheoryHQ)
              xd<-rdens2zdens(xd,rvals)
              xdsig<-rdens2zdens(xdsig,rvals)
              yv<-atanh(rvals)
@@ -79,30 +79,30 @@ doMultipleTheory<-function(showType,logScale,hypothesis=braw.def$hypothesis,desi
                   })
          },
          "n"={
-           ndist<-getNDist(analysis$design,effectTheory$world,logScale=logScale,sigOnly=TRUE)
+           ndist<-getNDist(analysis$design,effectTheory$world,logScale=logScale,sigOnly=1)
            yv<-ndist$nvals
            xd<-ndist$ndens
            xdsig<-ndist$ndensSig
          },
          "ws"={
            yv<-seq(braw.env$alphaSig*1.01,1/1.01,length.out=npt)
-           xd<-fullRSamplingDist(yv,effectTheory$world,design,"ws",logScale=logScale,sigOnlyOutput=sigOnly)
+           xd<-fullRSamplingDist(yv,effectTheory$world,design,"ws",logScale=logScale,sigOnly=sigOnly)
          },
          "log(lrs)"={
            yv<-seq(0,braw.env$lrRange,length.out=npt)
-           xd<-fullRSamplingDist(yv,effectTheory$world,design,"log(lrs)",logScale=logScale,sigOnlyOutput=sigOnly)
+           xd<-fullRSamplingDist(yv,effectTheory$world,design,"log(lrs)",logScale=logScale,sigOnly=sigOnly)
          },
          "log(lrd)"={
            yv<-seq(-braw.env$lrRange,braw.env$lrRange,length.out=npt)
-           xd<-fullRSamplingDist(yv,effectTheory$world,design,"log(lrd)",logScale=logScale,sigOnlyOutput=sigOnly)
+           xd<-fullRSamplingDist(yv,effectTheory$world,design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
          },
          "e1d"={
            yv<-seq(-braw.env$lrRange,braw.env$lrRange,length.out=npt)
-           xd<-fullRSamplingDist(yv,effectTheory$world,design,"log(lrd)",logScale=logScale,sigOnlyOutput=sigOnly)
+           xd<-fullRSamplingDist(yv,effectTheory$world,design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
          },
          "e2d"={
            yv<-seq(-braw.env$lrRange,braw.env$lrRange,length.out=npt)
-           xd<-fullRSamplingDist(yv,effectTheory$world,design,"log(lrd)",logScale=logScale,sigOnlyOutput=sigOnly)
+           xd<-fullRSamplingDist(yv,effectTheory$world,design,"log(lrd)",logScale=logScale,sigOnly=sigOnly)
          },
          "nw"={
            if (logScale) {
@@ -112,12 +112,12 @@ doMultipleTheory<-function(showType,logScale,hypothesis=braw.def$hypothesis,desi
              yv<-5+seq(0,braw.env$max_nw,length.out=npt)
              yvUse<-yv
            }
-           xd<-fullRSamplingDist(yvUse,effectTheory$world,design,"nw",logScale=logScale,sigOnlyOutput=sigOnly)
+           xd<-fullRSamplingDist(yvUse,effectTheory$world,design,"nw",logScale=logScale,sigOnly=sigOnly)
            xd<-abs(xd)
          },
          "wp"={
            yv<-seq(braw.env$alphaSig,1/1.01,length.out=npt)
-           xd<-fullRSamplingDist(yv,effectTheory$world,design,"wp",logScale=logScale,sigOnlyOutput=sigOnly)
+           xd<-fullRSamplingDist(yv,effectTheory$world,design,"wp",logScale=logScale,sigOnly=sigOnly)
          },
          { } # do nothing
   )

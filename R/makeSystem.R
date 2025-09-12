@@ -49,24 +49,24 @@ doDLLR<-function() {
 #' make a world
 #'  an object that specifies the distribution of effect sizes
 #' 
-#' @param populationPDF    "Single","Double","Uniform","Gauss","Exp","Gamma","GenExp"
-#' @param populationRZ     "r","z"
+#' @param PDF    "Single","Double","Uniform","Gauss","Exp","Gamma","GenExp"
+#' @param RZ     "r","z"
 #' @returns a world object
 #' @seealso showWorld(world=makeWorld())
 #' @examples
-#' makeWorld<-function(worldOn=FALSE,populationPDF="Single",populationRZ="r",
-#'                     populationPDFk=0.2,populationNullp=0,worldAbs=FALSE
+#' makeWorld<-function(On=FALSE,PDF="Single",RZ="r",
+#'                     PDFk=0.2,pRPlus=1,worldAbs=FALSE
 #' )
 #' @export
-makeWorld<-function(worldOn=TRUE,populationPDF="Uniform",populationRZ="r",
-                    populationPDFk=0.0,populationPDFs=2,populationPDFmu=0.0,populationNullp=0,
-                    populationPDFsample=FALSE,populationSamplemn=0.0,populationSamplesd=0.0,populationSamplebias=FALSE,
-                    sigOnly=FALSE,worldAbs=FALSE) {
- world<-list(worldOn=worldOn,
-             populationPDF=populationPDF,populationRZ=populationRZ,
-             populationPDFk=populationPDFk,populationPDFs=populationPDFs,populationPDFmu=populationPDFmu,populationNullp=populationNullp,
-             populationPDFsample=populationPDFsample,populationSamplemn=populationSamplemn,populationSamplesd=populationSamplesd,populationSamplebias=populationSamplebias,
-             sigOnly=sigOnly,worldAbs=worldAbs)
+makeWorld<-function(On=TRUE,PDF="Uniform",RZ="r",
+                    PDFk=0.0,PDFs=2,PDFmu=0.0,pRPlus=1,
+                    PDFsample=FALSE,PDFsamplemn=0.0,PDFsamplesd=0.0,PDFsamplebias=FALSE,
+                    worldAbs=FALSE) {
+ world<-list(On=On,
+             PDF=PDF,RZ=RZ,
+             PDFk=PDFk,PDFs=PDFs,PDFmu=PDFmu,pRPlus=pRPlus,
+             PDFsample=PDFsample,PDFsamplemn=PDFsamplemn,PDFsamplesd=PDFsamplesd,PDFsamplebias=PDFsamplebias,
+             worldAbs=worldAbs)
  world  
 }
 
@@ -198,7 +198,7 @@ makeSampling<-function(type="Random") {
 #' @examples
 #' makeReplication(On=TRUE,Repeats=1,Keep="Cautious",RepAlpha=0.05,
 #'                 PowerOn=TRUE,Power=0.8,Tails=2,PowerPrior="None",
-#'                 forceSigOriginal="No",forceSign=TRUE,
+#'                 forceSigOriginal=FALSE,forceSign=TRUE,
 #'                 BudgetType="Unlimited",Budget=1000
 #'                 )
 #' @export
@@ -287,7 +287,7 @@ makeDesign<-function(sN=42, sMethod=makeSampling("Random"),sMethodSeverity=0.1,
 #' @param caseOrder   "Alphabetic","AsFound","Frequency"
 #' @param Transform   "None","Log","Exp"
 #' @examples
-#' makeEvidence(shortHand=FALSE,sigOnly=FALSE,
+#' makeEvidence(shortHand=FALSE,sigOnly=0,
 #'              AnalysisTerms=TRUE,rInteractionOnly=TRUE,ssqType="Type3",
 #'              caseOrder="Alphabetic",
 #'              llr=list(e1=c(),e2=0),
@@ -298,7 +298,7 @@ makeDesign<-function(sN=42, sMethod=makeSampling("Random"),sMethodSeverity=0.1,
 #'              metaAnalysis=makeMetaAnalysis()
 #'              )
 #' @export
-makeEvidence<-function(shortHand=FALSE,sigOnly=FALSE,
+makeEvidence<-function(shortHand=FALSE,sigOnly=0,
                        AnalysisTerms=c(TRUE,TRUE,FALSE),rInteractionOnly=TRUE,ssqType="Type3",
                        caseOrder="AsStated",
                        llr=list(e1=c(),e2=0),
@@ -363,21 +363,21 @@ setEffect<-function(rIV=braw.def$hypothesis$effect$rIV,rIV2=braw.def$hypothesis$
 
 #' set default world
 #' @export
-setWorld<-function(worldOn=braw.def$hypothesis$effect$world$worldOn,
-                   populationPDF=braw.def$hypothesis$effect$world$populationPDF,populationRZ=braw.def$hypothesis$effect$world$populationRZ,
-                   populationPDFk=braw.def$hypothesis$effect$world$populationPDFk,populationPDFs=braw.def$hypothesis$effect$world$populationPDFs,
-                   populationPDFmu=braw.def$hypothesis$effect$world$populationPDFmu,populationNullp=braw.def$hypothesis$effect$world$populationNullp,
-                   populationPDFsample=braw.def$hypothesis$effect$world$populationPDFsample,populationSamplemn=braw.def$hypothesis$effect$world$populationSamplemn,populationSamplesd=braw.def$hypothesis$effect$world$populationSamplesd,populationSamplebias=braw.def$hypothesis$effect$world$populationSamplebias,
-                   sigOnly=braw.def$hypothesis$effect$world$sigOnly,worldAbs=braw.def$hypothesis$effect$world$worldAbs) {
-  if (is.character(worldOn)) e<-getWorld(worldOn)
+setWorld<-function(On=braw.def$hypothesis$effect$world$On,
+                   PDF=braw.def$hypothesis$effect$world$PDF,RZ=braw.def$hypothesis$effect$world$RZ,
+                   PDFk=braw.def$hypothesis$effect$world$PDFk,PDFs=braw.def$hypothesis$effect$world$PDFs,
+                   PDFmu=braw.def$hypothesis$effect$world$PDFmu,pRPlus=braw.def$hypothesis$effect$world$pRPlus,
+                   PDFsample=braw.def$hypothesis$effect$world$PDFsample,PDFsamplemn=braw.def$hypothesis$effect$world$PDFsamplemn,PDFsamplesd=braw.def$hypothesis$effect$world$PDFsamplesd,PDFsamplebias=braw.def$hypothesis$effect$world$PDFsamplebias,
+                   worldAbs=braw.def$hypothesis$effect$world$worldAbs) {
+  if (is.character(On)) e<-getWorld(On)
   else {
-    if (is.list(worldOn)) e<-worldOn
+    if (is.list(On)) e<-On
     else
-      e<-makeWorld(worldOn=worldOn,
-                   populationPDF=populationPDF,populationRZ=populationRZ,
-                   populationPDFk=populationPDFk,populationPDFs=populationPDFs,populationPDFmu=populationPDFmu,populationNullp=populationNullp,
-                   populationPDFsample=populationPDFsample,populationSamplemn=populationSamplemn,populationSamplesd=populationSamplesd,populationSamplebias=populationSamplebias,
-                   sigOnly=sigOnly,worldAbs=worldAbs)
+      e<-makeWorld(On=On,
+                   PDF=PDF,RZ=RZ,
+                   PDFk=PDFk,PDFs=PDFs,PDFmu=PDFmu,pRPlus=pRPlus,
+                   PDFsample=PDFsample,PDFsamplemn=PDFsamplemn,PDFsamplesd=PDFsamplesd,PDFsamplebias=PDFsamplebias,
+                   worldAbs=worldAbs)
   }
   h<-braw.def$hypothesis
   h$effect$world<-e

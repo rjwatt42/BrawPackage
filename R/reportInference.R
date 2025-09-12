@@ -57,8 +57,8 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
         f2<-paste("s=",brawFormat(analysis$sIV,digits=braw.env$report_precision),sep="")
       }
       if (braw.env$STMethod=="dLLR") {
-        if (!analysis$evidence$prior$worldOn) {
-          analysis$evidence$prior<-list(worldOn=TRUE,populationPDF="Single",populationPDFk=analysis$rIV,populationRZ="r",populationNullp=0.5)
+        if (!analysis$evidence$prior$On) {
+          analysis$evidence$prior<-list(On=TRUE,PDF="Single",PDFk=analysis$rIV,RZ="r",pRPlus=0.5)
         }
         analysis$dIV<-res2llr(analysis,"dLLR")
         f1<-"\bllr"
@@ -183,10 +183,10 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
         if (design$Replication$On) {
           sig<-analysis$ResultHistory$pIV[i]<0.05
           if (sig) 
-            p_error<-effect$world$populationNullp*
+            p_error<-(1-effect$world$pRPlus)*
               analysis$ResultHistory$pIV[i]
           else
-            p_error<-(1-effect$world$populationNullp)*
+            p_error<-(effect$world$pRPlus)*
               (1-rn2w(analysis$ResultHistory$rpIV[i],analysis$ResultHistory$nval[i]))
           p_error<-brawFormat(p_error,digits=3)
           if (sig) p_error<-paste0("e[I]=",p_error)

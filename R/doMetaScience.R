@@ -20,7 +20,7 @@ combineFirstMS<-function(doing) grepl('cm',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-b]
 #' @export
 prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pRPlus=0.5,metaPublicationBias=FALSE,
                              alt4B=FALSE,
-                          sN=50,sMethod="Convenience",sMethodSeverity=0.1,
+                          sN=NULL,sMethod="Convenience",sMethodSeverity=0.1,
                           sBudget=100,sSplits=5,sCheating="Replace",sCheatingProportion=0.05,
                           sReplicationKeep="Cautious",sReplicationPower=0.9,
                           sReplicationAll=FALSE,sReplicationSigOriginal=TRUE,
@@ -35,11 +35,16 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pRPlus=0.5,
   replicate<-replicateMS(doingMetaScience)
   combine<-combineMS(doingMetaScience)
   
+  if (is.null(sN)) {
+    if (stepMetaSci=="2") sN<-100
+    else sN<-50
+  }
+  
   switch(stepMetaSci,
          "0"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld("Plain")))
            design<-makeDesign(sN=42)
-           evidence<-makeEvidence(sigOnly=FALSE)
+           evidence<-makeEvidence(sigOnly=0)
          },
          "1"={
            switch(partMetaSci,
@@ -47,13 +52,13 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pRPlus=0.5,
                   "A"=hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld("Binary",rp=rp))),
                   "B"=hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld("Psych50",rp=rp)))
            )
-           if (world!="Plain") hypothesis$effect$world$populationNullp<-1-pRPlus
+           if (world!="Plain") hypothesis$effect$world$pRPlus<-pRPlus
            design<-makeDesign(sN=sN)
            evidence<-makeEvidence(sigOnly=metaPublicationBias)
          },
          "2"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world,rp=rp)))
-           if (world!="Plain") hypothesis$effect$world$populationNullp<-1-pRPlus
+           if (world!="Plain") hypothesis$effect$world$pRPlus<-pRPlus
            
            switch(partMetaSci,
                   "A"=design<-makeDesign(sN=sN),
@@ -70,7 +75,7 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pRPlus=0.5,
          },
          "3"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world,rp=rp)))
-           if (world!="Plain") hypothesis$effect$world$populationNullp<-1-pRPlus
+           if (world!="Plain") hypothesis$effect$world$pRPlus<-pRPlus
            design<-makeDesign(sN=sN)
            switch(partMetaSci,
                   "A"={
@@ -89,7 +94,7 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pRPlus=0.5,
          },
          "4"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world,rp=rp)))
-           if (world!="Plain") hypothesis$effect$world$populationNullp<-1-pRPlus
+           if (world!="Plain") hypothesis$effect$world$pRPlus<-pRPlus
            design<-makeDesign(sN=sN)
            if (!alt4B)
              if (partMetaSci=="B") {
@@ -146,7 +151,7 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pRPlus=0.5,
                   })
            design$sRangeProb<-rangeP
            design$sRangeVary<-rangeVar
-           evidence<-makeEvidence(AnalysisTerms=analysisTerms,sigOnly=FALSE)
+           evidence<-makeEvidence(AnalysisTerms=analysisTerms,sigOnly=0)
            if (replicateMS(doingMetaScience))  evidence$sigOnly<-sReplicationSigOriginal
          }
   )
@@ -170,7 +175,7 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pRPlus=0.5,
 #' @export
 doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,showOutput=TRUE,doHistory=TRUE,
                         world="Psych50",rp=0.3,pRPlus=0.5,metaPublicationBias=FALSE,
-                        sN=50,
+                        sN=NULL,
                         sMethod="Convenience",sMethodSeverity=0.1,sBudget=100,sSplits=5,
                         sCheating="Replace",sCheatingProportion=0.05,
                         sReplicationKeep="Cautious",sReplicationPower=0.9,

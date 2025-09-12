@@ -19,7 +19,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
                          whichEffect="All",effectType="all",reportStats="Medians",compact=FALSE){
   
   if (is.null(multipleResult)) multipleResult=doMultiple(autoShow=FALSE)
-  if (!multipleResult$hypothesis$effect$world$worldOn && is.element(showType[1],c("NHST","Inference","Source","Hits","Misses"))) {
+  if (!multipleResult$hypothesis$effect$world$On && is.element(showType[1],c("NHST","Inference","Source","Hits","Misses"))) {
     if (multipleResult$nullcount<multipleResult$count) {
       multipleResult<-doMultiple(0,multipleResult,doingNull=TRUE)
     }
@@ -40,7 +40,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     result<-multipleResult$result
     nullresult<-multipleResult$nullresult
     
-    if (effect$world$worldOn) {
+    if (effect$world$On) {
       r<-getNulls(result,evidence)
       result<-r$analysis
       nullresult<-r$nullanalysis
@@ -199,7 +199,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
         nsig<-sum(sigs!=0)
         nnull<-sum(nulls)
 
-        if (effect$world$worldOn) {
+        if (effect$world$On) {
           outputText<-c(outputText,"!TSources",rep("",nc-1))
           e1c<-reportNumber(sum(nulls),nr,braw.env$reportCounts)
           e2c<-reportNumber(sum(!nulls),nr,braw.env$reportCounts)

@@ -281,17 +281,14 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,1
           switch(useLabels$P,
                  "+"={
                    nullChar<-"0"
-                   pPlus<-TRUE
                    Ptypechar<-posChar 
                  },
                  "0"={
                    nullChar<-"0"
-                   pPlus<-FALSE
                    Ptypechar<-nullChar
                  },
                  "-"={
                    nullChar<-'\u2013'
-                   pPlus<-FALSE
                    Ptypechar<-nullChar
                  }
           )
@@ -333,7 +330,6 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,1
                   }
           )
           
-          braw.env$pPlus<-pPlus 
           braw.env$Pchar<-Pchar 
           braw.env$HypChar<-HypChar
           braw.env$Lchar<-Lchar

@@ -122,8 +122,9 @@ rn2p<-function(r,n,t=2) {
     r[r < -1]<- -1
   }
   r<-abs(r)
-  z<-atanh(r)
-  p<-1-pnorm(z,sd=1/sqrt(n-3))
+  z<-atanh(r)*sqrt(n-3)
+  z<-min(z,8.2)
+  p<-1-pnorm(z)
   return(p*t)
 }
 

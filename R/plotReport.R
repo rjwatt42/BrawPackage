@@ -293,7 +293,7 @@ reportPlot<-function(outputText,nc,nr,fontSize=braw.env$reportFontSize,maxRows=1
     parse<-FALSE
     switch(label,
            "Alpha"={label<-braw.env$alphaChar},
-           "pNull"={label<-deparse(braw.env$Plabel)},
+           "p(R+)"={label<-deparse(braw.env$Plabel)},
            "Lambda"={label<-deparse(braw.env$Llabel)},
            "p(sig)"={label<-deparse(braw.env$pSigLabel)}
            )

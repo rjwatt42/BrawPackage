@@ -1,7 +1,7 @@
 #' make multiple samples whilst varying a parameter
 #' 
 #' @param exploreType "rIV","Heteroscedasticity","rIV2","rIVIV2","rIVIV2DV" \cr
-#'                    "pNull","Lambda" \cr
+#'                    "p(R+)","Lambda" \cr
 #'                    "n","Method","Usage","WithinCorr","ClusterRad","SampleSD" \cr
 #'                     "Dependence","Outliers","NonResponse","IVRange","IVRangeC","IVRangeE","DVRange" \cr
 #'                     "Cheating","CheatingAmount" \cr
@@ -19,6 +19,9 @@ makeExplore<-function(exploreType="n",exploreNPoints=11,
                       vals=NULL,minVal=NA,maxVal=NA,xlog=FALSE
 ) {
   if (exploreType=="alpha") exploreType<-"Alpha"
+  if (exploreType=="pRPlus") exploreType<-"p(R+)"
+  if (exploreType=="meanRPlus") exploreType<-"mean(R+)"
+  
   explore<-list(exploreType=exploreType,
                 exploreNPoints=exploreNPoints,
                 minVal=minVal,maxVal=maxVal,xlog=xlog
@@ -65,8 +68,8 @@ getExploreRange<-function(explore) {
          "minRp"=range<-list(minVal=0.0,maxVal=0.5,logScale=FALSE,np=13),
          "Power"=range<-list(minVal=0.1,maxVal=0.9,logScale=FALSE,np=13),
          "Repeats"=range<-list(minVal=0,maxVal=8,logScale=FALSE,np=9),
-         "pNull"=range<-list(minVal=0,maxVal=1,logScale=FALSE,np=13),
-         "Lambda"=range<-list(minVal=0.1,maxVal=1,logScale=FALSE,np=13),
+         "p(R+)"=range<-list(minVal=0,maxVal=1,logScale=FALSE,np=13),
+         "mean(R+)"=range<-list(minVal=0.1,maxVal=1,logScale=FALSE,np=13),
          "PoorSamplingAmount"=range<-list(minVal=0, maxVal=0.2,logScale=FALSE,np=13),
          "CheatingAmount"=range<-list(minVal=0, maxVal=0.8,logScale=FALSE,np=13),
          "ClusterRad"=range<-list(minVal=0, maxVal=1,logScale=FALSE,np=13),
@@ -307,7 +310,7 @@ mergeExploreResult<-function(res1,res2) {
 #' make multiple samples whilst varying a parameter
 #' 
 #' @param exploreType "rIV","Heteroscedasticity","rIV2","rIVIV2","rIVIV2DV" \cr
-#'                    "pNull","Lambda" \cr
+#'                    "p(R+)","Lambda" \cr
 #'                    "n","Method","Usage","WithinCorr","ClusterRad","SampleSD" \cr
 #'                     "Dependence","Outliers","NonResponse","IVRange","IVRangeC","IVRangeE","DVRange" \cr
 #'                     "Cheating","CheatingAmount" \cr
@@ -369,7 +372,7 @@ doExplore<-function(nsims=10,exploreResult=NA,explore=braw.def$explore,
   }
   explore<-exploreResult$explore
   
-  if (doingNull && !hypothesis$effect$world$worldOn) {
+  if (doingNull && !hypothesis$effect$world$On) {
     hypothesisNull<-hypothesis
     hypothesisNull$effect$rIV<-0
     # catch up - make enough null results to match results
@@ -404,7 +407,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
   
   design$sNReps<-1
   
-  if (hypothesis$effect$world$worldOn && hypothesis$effect$world$populationNullp>0) 
+  if (hypothesis$effect$world$On && hypothesis$effect$world$pRPlus<1) 
     doingNull<-FALSE
   
   if (nsims==0) doingNonNull<-FALSE
@@ -468,9 +471,9 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
           "sourceBias"={vals<-seq(0,1,length.out=npoints)},
           
           "PDF"={vals<-c("Single","Double","Uniform","Gauss","Exp","Gamma","GenExp")},
-          "Lambda"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "mean(R+)"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "no"={vals<-seq(10,250,length.out=npoints)},
-          "pNull"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "p(R+)"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "n"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "NoSplits"={design$sNBudget<-design$sN
                      vals<-seq(minVal,maxVal,length.out=npoints)},
@@ -776,8 +779,8 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
                   effect$rSD<-vals[vi]
                 },
                 "rIV"={
-                  if (effect$world$worldOn) {
-                    effect$world$populationPDFk<-vals[vi]
+                  if (effect$world$On) {
+                    effect$world$PDFk<-vals[vi]
                   } else {
                     effect$rIV<-vals[vi]
                   }
@@ -787,20 +790,20 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
                 "rIVIV2DV"={effect$rIVIV2DV<-vals[vi]},
                 
                 "PDF"={
-                  effect$world$worldOn<-TRUE
-                  effect$world$populationPDF<-vals[vi]
+                  effect$world$On<-TRUE
+                  effect$world$PDF<-vals[vi]
                 },
-                "Lambda"={
-                  effect$world$worldOn<-TRUE
-                  effect$world$populationPDFk<-vals[vi]
+                "mean(R+)"={
+                  effect$world$On<-TRUE
+                  effect$world$PDFk<-vals[vi]
                 },
                 "no"={
-                  effect$world$worldOn<-TRUE
-                  effect$world$populationPDFk<-1/sqrt(vals[vi]-3)
+                  effect$world$On<-TRUE
+                  effect$world$PDFk<-1/sqrt(vals[vi]-3)
                 },
-                "pNull"={
-                  effect$world$worldOn<-TRUE
-                  effect$world$populationNullp<-vals[vi]
+                "p(R+)"={
+                  effect$world$On<-TRUE
+                  effect$world$pRPlus<-vals[vi]
                   # metaAnalysis$modelNulls<-TRUE
                 },
                 
