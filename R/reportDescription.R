@@ -86,7 +86,7 @@ reportDescription<-function(analysis=braw.res$result){
     } else {
       an_vars<-c(an_vars,IV$name)
     }
-    if (!is.null(IV2$name)) {
+    if (!is.null(IV2)) {
       if (IV2$type=="Categorical") {
         for (i in 2:IV2$ncats) {
           an_vars<-c(an_vars,paste0("iv2",IV2$cases[i]))
@@ -102,7 +102,7 @@ reportDescription<-function(analysis=braw.res$result){
   
   an_vars<-sub("iv1:",paste(IV$name,":",sep=""),an_vars)
   an_vars<-sub("iv1",paste(IV$name,"=",sep=""),an_vars)
-  if (!is.null(IV2) || sum(evidence$AnalysisTerms)>1) {
+  if (!is.null(IV2) && sum(evidence$AnalysisTerms)>1) {
     an_vars<-sub("iv2$",IV2$name,an_vars)
     an_vars<-sub("iv2",paste(IV2$name,"=",sep=""),an_vars)
   } 
