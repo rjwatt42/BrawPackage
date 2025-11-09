@@ -239,6 +239,7 @@ plotCatInterDescription<-function(analysis,g=NULL){
   Dvals<-analysis$dv
   rho<-analysis$rIV+seq(-1,1,length.out=hypothesis$IV2$ncats)*analysis$rIVIV2DV
   
+  for (j in 1:2)
   for (i in 1:hypothesis$IV2$ncats){
     use<-analysis$iv2==hypothesis$IV2$cases[i]
     
@@ -265,11 +266,15 @@ plotCatInterDescription<-function(analysis,g=NULL){
     analysis1$hypothesis$DV$vals<-Dvals[use] 
     
     if (analysis1$hypothesis$DV$type=="Categorical") {
-      g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,2+(i-1)/(hypothesis$IV2$ncats-1),evidence=analysis1$evidence,g=g)
+      switch(j,
+      g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,2+(i-1)/(hypothesis$IV2$ncats-1),evidence=analysis1$evidence,g=g),
       g<-plotPoints(g,analysis1$hypothesis$IV,analysis1$hypothesis$DV,analysis1,i+1,hypothesis$IV2$ncats)
+      )
     } else {
-      g<-plotPoints(g,analysis1$hypothesis$IV,analysis1$hypothesis$DV,analysis1,i+1,hypothesis$IV2$ncats)
+      switch(j,
+             g<-plotPoints(g,analysis1$hypothesis$IV,analysis1$hypothesis$DV,analysis1,i+1,hypothesis$IV2$ncats),
       g<-plotPrediction(analysis1$hypothesis$IV,NULL,analysis1$hypothesis$DV,analysis1,analysis$design,2+(i-1)/(hypothesis$IV2$ncats-1),evidence=analysis1$evidence,g=g)
+      )
     }
   }
   g<-addG(g,dataLegend(data.frame(names=names,colours=cols),title=analysis$hypothesis$IV2$name))
