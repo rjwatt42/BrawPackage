@@ -19,8 +19,8 @@ makeExplore<-function(exploreType="n",exploreNPoints=11,
                       vals=NULL,minVal=NA,maxVal=NA,xlog=FALSE
 ) {
   if (exploreType=="alpha") exploreType<-"Alpha"
-  if (exploreType=="pRPlus") exploreType<-"p(R+)"
-  if (exploreType=="meanRPlus") exploreType<-"mean(R+)"
+  if (exploreType=="pRplus") exploreType<-"p(R+)"
+  if (exploreType=="meanRplus") exploreType<-"mean(R+)"
   
   explore<-list(exploreType=exploreType,
                 exploreNPoints=exploreNPoints,
@@ -70,6 +70,8 @@ getExploreRange<-function(explore) {
          "Repeats"=range<-list(minVal=0,maxVal=8,logScale=FALSE,np=9),
          "p(R+)"=range<-list(minVal=0,maxVal=1,logScale=FALSE,np=13),
          "mean(R+)"=range<-list(minVal=0.1,maxVal=1,logScale=FALSE,np=13),
+         "PDFk"=range<-list(minVal=0.1,maxVal=1,logScale=FALSE,np=13),
+         "PDFshape"=range<-list(minVal=NA,maxVal=NA,logScale=FALSE,np=13),
          "PoorSamplingAmount"=range<-list(minVal=0, maxVal=0.2,logScale=FALSE,np=13),
          "CheatingAmount"=range<-list(minVal=0, maxVal=0.8,logScale=FALSE,np=13),
          "ClusterRad"=range<-list(minVal=0, maxVal=1,logScale=FALSE,np=13),
@@ -131,14 +133,17 @@ summariseResult<-function(result) {
       result$p$total<-result$p$total
     }
   } else {
-    param1<-max(c(result$fixed$param1,result$random$param1,result$single$param1,result$gauss$param1,result$exp$param1),na.rm=TRUE)
-    param2<-max(c(result$fixed$param2,result$random$param2,result$single$param2,result$gauss$param2,result$exp$param2),na.rm=TRUE)
-    param3<-max(c(result$fixed$param3,result$random$param3,result$single$param3,result$gauss$param3,result$exp$param3),na.rm=TRUE)
-    S<-max(c(result$fixed$Smax,result$random$Smax,result$single$Smax,result$gauss$Smax,result$exp$Smax),na.rm=TRUE)
-    result$param1<-param1
-    result$param2<-param2
-    result$param3<-param3
-    result$S<-S
+    use<-which.max(c(res$fixed$Smax,res$random$Smax,res$single$Smax,res$gauss$Smax,res$exp$Smax,res$genexp$Smax,res$gamma$Smax))
+    PDFk<-c(res$fixed$PDFk,res$random$PDFk,res$single$PDFk,res$gauss$PDFk,res$exp$PDFk,res$genexp$PDFk,res$gamma$PDFk)[use]
+    PDFshape<-c(res$fixed$PDFshape,res$random$PDFshape,res$single$PDFshape,res$gauss$PDFshape,res$exp$PDFshape,res$genexp$PDFshape,res$gamma$PDFshape)[use]
+    pRplus<-c(res$fixed$pRplus,res$random$pRplus,res$single$pRplus,res$gauss$pRplus,res$exp$pRplus,res$genexp$pRplus,res$gamma$pRplus)[use]
+    sigOnly<-c(res$fixed$sigOnly,res$random$sigOnly,res$single$sigOnly,res$gauss$sigOnly,res$exp$sigOnly,res$genexp$sigOnly,res$gamma$sigOnly)[use]
+    Smax<-c(res$fixed$Smax,res$random$Smax,res$single$Smax,res$gauss$Smax,res$exp$Smax,res$genexp$Smax,res$gamma$Smax)[use]
+    result$PDFk<-PDFk
+    result$PDFshape<-PDFshape
+    result$pRplus<-pRplus
+    result$sigOnly<-sigOnly
+    result$Smax<-Smax
     sigs<-isSignificant(braw.env$STMethod,result$result$pIV,result$result$rIV,result$result$nval,result$result$df1,result$result$evidence)
     nSig<-sum(sigs)
     result$nSig<-nSig
@@ -154,7 +159,7 @@ summariseResult<-function(result) {
                rIV2=b,rIVIV2DV=b,pIV2=b,pIVIV2DV=b,
                r=list(direct=bm,unique=bm,total=bm),
                p=list(direct=bm,unique=bm,total=bm),
-               param1=b,param2=b,param3=b,S=b
+               PDFk=b,PDFshape=b,pRplus=b,sigOnly=b,Smax=b
   )
   return(result)
 }
@@ -178,7 +183,7 @@ resetExploreResult<-function(nsims,n_vals,oldResult=NULL) {
                rIV2=b,rIVIV2DV=b,pIV2=b,pIVIV2DV=b,
                r=list(direct=bm,unique=bm,total=bm),
                p=list(direct=bm,unique=bm,total=bm),
-               param1=b,param2=b,param3=b,S=b
+               PDFk=b,PDFshape=b,pRplus=b,sigOnly=b,Smax=b
   )
   if (!is.null(oldResult)) {
     result<-mergeExploreResult(oldResult,result)
@@ -235,16 +240,19 @@ storeExploreResult<-function(result,res,ri,vi) {
       result$p$total[ri,vi,1:n]<-res$p$total
     }
   } else {
-    param1<-max(c(res$fixed$param1,res$random$param1,res$single$param1,res$gauss$param1,res$exp$param1),na.rm=TRUE)
-    param2<-max(c(res$fixed$param2,res$random$param2,res$single$param2,res$gauss$param2,res$exp$param2),na.rm=TRUE)
-    param3<-max(c(res$fixed$param3,res$random$param3,res$single$param3,res$gauss$param3,res$exp$param3),na.rm=TRUE)
-    S<-max(c(res$fixed$Smax,res$random$Smax,res$single$Smax,res$gauss$Smax,res$exp$Smax),na.rm=TRUE)
+    use<-which.max(c(res$fixed$Smax,res$random$Smax,res$single$Smax,res$gauss$Smax,res$exp$Smax,res$genexp$Smax,res$gamma$Smax))
+    PDFk<-c(res$fixed$PDFk,res$random$PDFk,res$single$PDFk,res$gauss$PDFk,res$exp$PDFk,res$genexp$PDFk,res$gamma$PDFk)[use]
+    PDFshape<-c(res$fixed$PDFshape,res$random$PDFshape,res$single$PDFshape,res$gauss$PDFshape,res$exp$PDFshape,res$genexp$PDFshape,res$gamma$PDFshape)[use]
+    pRplus<-c(res$fixed$pRplus,res$random$pRplus,res$single$pRplus,res$gauss$pRplus,res$exp$pRplus,res$genexp$pRplus,res$gamma$pRplus)[use]
+    sigOnly<-c(res$fixed$sigOnly,res$random$sigOnly,res$single$sigOnly,res$gauss$sigOnly,res$exp$sigOnly,res$genexp$sigOnly,res$gamma$sigOnly)[use]
+    Smax<-c(res$fixed$Smax,res$random$Smax,res$single$Smax,res$gauss$Smax,res$exp$Smax,res$genexp$Smax,res$gamma$Smax)[use]
     sigs<-isSignificant(braw.env$STMethod,res$result$pIV,res$result$rIV,res$result$nval,res$result$df1,res$result$evidence)
     nSig<-sum(sigs)
-    result$param1[ri,vi]<-param1
-    result$param2[ri,vi]<-param2
-    result$param3[ri,vi]<-param3
-    result$S[ri,vi]<-S
+    result$PDFk[ri,vi]<-PDFk
+    result$PDFshape[ri,vi]<-PDFshape
+    result$pRplus[ri,vi]<-pRplus
+    result$sigOnly[ri,vi]<-sigOnly
+    result$Smax[ri,vi]<-Smax
     result$nSig[ri,vi]<-nSig
   }
   return(result)
@@ -297,10 +305,11 @@ mergeExploreResult<-function(res1,res2) {
     result$pIVIV2DV<-rbind(res1$pIVIV2DV,res2$pIVIV2DV)
   }
   
-  result$param1<-rbind(res1$param1,res2$param1)
-  result$param2<-rbind(res1$param2,res2$param2)
-  result$param3<-rbind(res1$param3,res2$param3)
-  result$S<-rbind(res1$S,res2$S)
+  result$PDFk<-rbind(res1$PDFk,res2$PDFk)
+  result$PDFshape<-rbind(res1$PDFshape,res2$PDFshape)
+  result$pRplus<-rbind(res1$pRplus,res2$pRplus)
+  result$sigOnly<-rbind(res1$sigOnly,res2$sigOnly)
+  result$Smax<-rbind(res1$Smax,res2$Smax)
   result$nSig<-rbind(res1$nSig,res2$nSig)
   result$nFP<-rbind(res1$nFP,res2$nFP)
   
@@ -407,7 +416,7 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
   
   design$sNReps<-1
   
-  if (hypothesis$effect$world$On && hypothesis$effect$world$pRPlus<1) 
+  if (hypothesis$effect$world$On && hypothesis$effect$world$pRplus<1) 
     doingNull<-FALSE
   
   if (nsims==0) doingNonNull<-FALSE
@@ -471,6 +480,13 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
           "sourceBias"={vals<-seq(0,1,length.out=npoints)},
           
           "PDF"={vals<-c("Single","Double","Uniform","Gauss","Exp","Gamma","GenExp")},
+          "PDFshape"={
+            if (hypothesis$effect$world$PDF=="GenExp")
+            vals<-seq(0,4,length.out=npoints)
+            else
+              vals<-seq(1,5,length.out=npoints)
+            },
+          "PDFk"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "mean(R+)"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "no"={vals<-seq(10,250,length.out=npoints)},
           "p(R+)"={vals<-seq(minVal,maxVal,length.out=npoints)},
@@ -793,6 +809,14 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
                   effect$world$On<-TRUE
                   effect$world$PDF<-vals[vi]
                 },
+                "PDFk"={
+                  effect$world$On<-TRUE
+                  effect$world$PDFk<-vals[vi]
+                },
+                "PDFshape"={
+                  effect$world$On<-TRUE
+                  effect$world$PDFshape<-vals[vi]
+                },
                 "mean(R+)"={
                   effect$world$On<-TRUE
                   effect$world$PDFk<-vals[vi]
@@ -803,8 +827,8 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
                 },
                 "p(R+)"={
                   effect$world$On<-TRUE
-                  effect$world$pRPlus<-vals[vi]
-                  # metaAnalysis$modelNulls<-TRUE
+                  effect$world$pRplus<-vals[vi]
+                  # metaAnalysis$analyseNulls<-TRUE
                 },
                 
                 "Heteroscedasticity"={effect$Heteroscedasticity<-vals[vi]},
@@ -899,13 +923,13 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,doingMetaAnalysis=FAL
                 },
                 "MetaType"={
                   switch(vals[vi],
-                         "FF"={metaAnalysis$modelNulls<-FALSE
+                         "FF"={metaAnalysis$analyseNulls<-FALSE
                          metaAnalysis$analyseBias<-FALSE},
-                         "FT"={metaAnalysis$modelNulls<-TRUE
+                         "FT"={metaAnalysis$analyseNulls<-TRUE
                          metaAnalysis$analyseBias<-FALSE},
-                         "TF"={metaAnalysis$modelNulls<-FALSE
+                         "TF"={metaAnalysis$analyseNulls<-FALSE
                          metaAnalysis$analyseBias<-TRUE},
-                         "TT"={metaAnalysis$modelNulls<-TRUE
+                         "TT"={metaAnalysis$analyseNulls<-TRUE
                          metaAnalysis$analyseBias<-TRUE},
                   )
                   doingMetaAnalysis<-TRUE

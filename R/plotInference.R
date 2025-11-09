@@ -31,27 +31,32 @@ trimanalysis<-function(analysis) {
 plotInference<-function(analysis,otheranalysis=NULL,disp="rs",orientation="vert",
                         whichEffect="Main 1",effectType="all",
                         showTheory=braw.env$showTheory,showData=TRUE,showLegend=FALSE,
+                        showYaxis=TRUE,
                         g=NULL){
   if (length(disp)==2) {
     return(plot2Inference(analysis,disp[1],disp[2]))
   } 
   analysis<-trimanalysis(analysis)
   switch (disp,
-          "rs"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "rp"={g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "re"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "ro"={g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "ci1"={g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "ci2"={g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
+          "rs"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "rp"={g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "re"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "ro"={g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "ci1"={g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "ci2"={g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
 
-          "p"= {g<-p_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
+          "p"= {g<-p_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
           "ps"= {g<-ps_plot(analysis,disp,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "po"= {g<-p_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
+          "po"= {g<-p_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
           
           "metaRiv"={g<-r_plot(analysis,disp,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
           "metaRsd"={g<-r_plot(analysis,disp,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
+          "metaK"={g<-r_plot(analysis,disp,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
+          "metaShape"={g<-r_plot(analysis,disp,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
+          "metaSpread"={g<-r_plot(analysis,disp,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
+          "metaPRplus"={g<-r_plot(analysis,disp,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
           "metaBias"={g<-r_plot(analysis,disp,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "metaS"={g<-r_plot(analysis,disp,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
+          "metaSmax"={g<-r_plot(analysis,disp,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
           
           "llknull"={g<-r_plot(analysis,disp,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
           "AIC"={g<-aic_plot(analysis,disp,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
@@ -60,46 +65,46 @@ plotInference<-function(analysis,otheranalysis=NULL,disp="rs",orientation="vert"
           "log(lrs)"={g<-l_plot(analysis,disp,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
           "log(lrd)"={g<-l_plot(analysis,disp,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
           
-          "ws"= {g<-w_plot(analysis,disp,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "wp"={g<-w_plot(analysis,disp,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
+          "ws"= {g<-w_plot(analysis,disp,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "wp"={g<-w_plot(analysis,disp,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
           
-          "nw"={g<-n_plot(analysis,disp,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "n"= {g<-n_plot(analysis,disp,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
+          "nw"={g<-n_plot(analysis,disp,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "n"= {g<-n_plot(analysis,disp,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
           
-          "rse"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,g=g)},
-          "sig"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,g=g)},
-          "ns"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,g=g)},
-          "nonnulls"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,g=g)},
-          "nulls"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,g=g)},
-          "rss"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,g=g)},
-          "e1r"={g<-e1_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "e2r"={g<-e2_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "e1+"={g<-e1_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "e2+"={g<-e2_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "e1-"={g<-e1_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "e2-"={g<-e2_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "ps1"= {g<-ps_plot(analysis,disp,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "e1p"={g<-e1_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "e2p"={g<-e2_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "e1a"={g<-e1_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "e2a"={g<-e2_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "e1b"={g<-e1_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "e2b"={g<-e2_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
+          "rse"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showYaxis=showYaxis,g=g)},
+          "sig"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showYaxis=showYaxis,g=g)},
+          "ns"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showYaxis=showYaxis,g=g)},
+          "nonnulls"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showYaxis=showYaxis,g=g)},
+          "nulls"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showYaxis=showYaxis,g=g)},
+          "rss"= {g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showYaxis=showYaxis,g=g)},
+          "e1r"={g<-e1_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "e2r"={g<-e2_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "e1+"={g<-e1_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "e2+"={g<-e2_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "e1-"={g<-e1_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "e2-"={g<-e2_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "ps1"= {g<-ps_plot(analysis,disp,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "e1p"={g<-e1_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "e2p"={g<-e2_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "e1a"={g<-e1_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "e2a"={g<-e2_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "e1b"={g<-e1_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "e2b"={g<-e2_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
           
-          "iv.mn"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "iv.sd"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "iv.sk"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "iv.kt"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
+          "iv.mn"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "iv.sd"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "iv.sk"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "iv.kt"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
           
-          "dv.mn"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "dv.sd"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "dv.sk"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "dv.kt"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
+          "dv.mn"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "dv.sd"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "dv.sk"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "dv.kt"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
           
-          "er.mn"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "er.sd"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "er.sk"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
-          "er.kt"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)}
+          "er.mn"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "er.sd"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "er.sk"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "er.kt"={g<-var_plot(analysis,disp,otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)}
   )
   return(g)
 }
@@ -127,9 +132,10 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
     nvals<-analysis$nval
     df1vals<-analysis$df1
   # }
-  
-  xaxis<-plotAxis(disp1,analysis$hypothesis,analysis$design,result=analysis)
-  yaxis<-plotAxis(disp2,analysis$hypothesis,analysis$design,result=analysis)
+  if (metaPlot) result<-result$best$Smax
+    else result<-NULL
+  xaxis<-plotAxis(disp1,analysis$hypothesis,analysis$design,result=result)
+  yaxis<-plotAxis(disp2,analysis$hypothesis,analysis$design,result=result)
   switch (disp1,
           "rs"={
             d1<-rvals
@@ -160,16 +166,28 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
             if (braw.env$nPlotScale=="log10") d1<-log10(d1)
           },
           "metaRiv"={
-            d1<-analysis$best$param1
+            d1<-analysis$best$PDFk
           },
           "metaRsd"={
-            d1<-analysis$best$param2
+            d1<-analysis$best$PDFspread
+          },
+          "metaK"={
+            d1<-analysis$best$PDFk
+          },
+          "metaShape"={
+            d1<-analysis$best$PDFshape
+          },
+          "metaSpread"={
+            d1<-analysis$best$PDFspread
+          },
+          "metaPRplus"={
+            d1<-analysis$best$pRplus
           },
           "metaBias"={
-            d1<-analysis$best$param3
+            d1<-analysis$best$sigOnly
           },
-          "metaS"={
-            d1<-analysis$best$S
+          "metaSmax"={
+            d1<-analysis$best$Smax
           },
           "llknull"=d1<-(-0.5*(analysis$AIC-analysis$AICnull)),
           "sLLR"=d1<-res2llr(analysis,"sLLR"),
@@ -224,16 +242,28 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
             if (braw.env$nPlotScale=="log10") d2<-log10(d2)
           },
           "metaRiv"={
-            d2<-analysis$best$param1
+            d2<-analysis$best$PDFk
           },
           "metaRsd"={
-            d2<-analysis$best$param2
+            d2<-analysis$best$PDFspread
+          },
+          "metaK"={
+            d2<-analysis$best$PDFk
+          },
+          "metaShape"={
+            d2<-analysis$best$PDFshape
+          },
+          "metaSpread"={
+            d2<-analysis$best$PDFspread
+          },
+          "metaPRplus"={
+            d2<-analysis$best$pRplus
           },
           "metaBias"={
-            d2<-analysis$best$param3
+            d2<-analysis$best$sigOnly
           },
-          "metaS"={
-            d2<-analysis$best$S
+          "metaSmax"={
+            d2<-analysis$best$Smax
           },
           "llknull"=d2<-(-0.5*(analysis$AIC-analysis$AICnull)),
           "sLLR"=d2<-res2llr(analysis,"sLLR"),
@@ -307,8 +337,9 @@ plot2Inference<-function(analysis,disp1,disp2,metaPlot=FALSE){
   }
   np<-nrow(pts)
   if (np>1) dotSize<-dotSize*0.65
+  if (np>300) dotSize<-dotSize*300/np
   alpha<-max(0.5,min(1,50/np))
-  if (np>50) {b1<-c1;b2<-c2} else {b1<-b2<-"#000000"}
+  if (np>1) {b1<-c1;b2<-c2} else {b1<-b2<-"#000000"}
   last<-length(pts$x)
   if (!use[last]) colour<-c(b1,c1) else colour<-c(b2,c2)
   pts1<-pts

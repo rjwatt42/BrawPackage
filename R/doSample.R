@@ -5,8 +5,8 @@ discreteVals<-function(ivr,ng,pp,type="continuous",cases=NULL) {
   proportions<-c(0,pp)
   breaks<-qnorm(cumsum(proportions)/sum(proportions))
   # not sure we should do this.
-  while (all(ivr<breaks[2])) breaks[2]<-breaks[2]-0.1
-  while (all(ivr>breaks[ng])) breaks[ng]<-breaks[ng]+0.1
+  # while (all(ivr<breaks[2])) breaks[2]<-breaks[2]-0.1
+  # while (all(ivr>breaks[ng])) breaks[ng]<-breaks[ng]+0.1
   ivDiscrete=ivr*0
   for (i in 1:ng) {ivDiscrete=ivDiscrete+(ivr>breaks[i])}
   if (type=="continuous") ivDiscrete<-(ivDiscrete-mean(1:ng))*ng
@@ -458,7 +458,6 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
       dvr_m<-data$dvr_m
       dvr_s<-data$dvr_s
       
-      # make the interaction term
       switch(IV$type,
              "Interval"={
                ivDiscrete<-ivr
@@ -469,7 +468,7 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
              "Ordinal"={
                ivDiscrete<-discreteVals(ivr,IV$nlevs,OrdProportions(IV))
              })
-
+      
       if (!is.null(IV2)) {
         switch(IV2$type,
                "Interval"={
@@ -483,9 +482,6 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
                })
       }
       
-      if (!is.null(IV2)) iv12r<-ivDiscrete*iv2Discrete
-      else               iv12r<-ivr*0
-
       if (!is.null(effect$rM1) && !effect$rM1) rho<-0
       if (!is.null(effect$rM2) && !effect$rM2) rho2<-0
       
@@ -508,30 +504,30 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
         }
       }
       
-      switch(IV$type,
-             "Interval"={
-             },
-             "Ordinal"={
-             },
-             "Categorical"={
-               if (IV$catSource=="discrete") {
-                 ivr<-discreteVals(ivr,IV$ncats,IV$proportions)
-               }
-             }
-      )
-      if (!is.null(IV2)){
-        switch(IV2$type,
-               "Interval"={
-               },
-               "Ordinal"={
-               },
-               "Categorical"={
-                 if (IV2$catSource=="discrete") {
-                   iv2<-discreteVals(iv2r,IV$ncats,IV$proportions)
-                 }
-               }
-        )
-      }
+      # switch(IV$type,
+      #        "Interval"={
+      #        },
+      #        "Ordinal"={
+      #        },
+      #        "Categorical"={
+      #          if (IV$catSource=="discrete") {
+      #            ivr<-discreteVals(ivr,IV$ncats,IV$proportions,"discrete",IV$cases)
+      #          }
+      #        }
+      # )
+      # if (!is.null(IV2)){
+      #   switch(IV2$type,
+      #          "Interval"={
+      #          },
+      #          "Ordinal"={
+      #          },
+      #          "Categorical"={
+      #            if (IV2$catSource=="discrete") {
+      #              iv2<-discreteVals(iv2r,IV$ncats,IV$proportions)
+      #            }
+      #          }
+      #   )
+      # }
       
       # do within design
       if (IV$type=="Categorical" && design$sIV1Use=="Within") {
@@ -540,14 +536,20 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
         rsd<-residual
 
         ivr_new<-c()
+        ivDiscrete_new<-c()
         residual<-c()
         for (i in 1:IV$ncats) {
           ivr_new<-c(ivr_new,rep(b[i],n))
-          residual<-c(residual,rsd*design$sWithinCor+sqrt(1-design$sWithinCor^2)*rnorm(n,0,sqrt(1-rho^2)))
+          ivDiscrete_new<-c(ivDiscrete_new,rep(b[i],n))
+          residual<-c(residual,rsd*sqrt(design$sWithinCor)^2+sqrt(1-design$sWithinCor^2)*rnorm(n))
         }
         ivr<-ivr_new
-        ivDiscrete<-ivr
+        ivDiscrete<-ivDiscrete_new
         id<-rep(id,IV$ncats)
+        if (!is.null(IV2) && IV2$type=="Categorical") {
+          iv2r<-rep(iv2r,IV$ncats)
+          iv2Discrete<-rep(iv2Discrete,IV$ncats)
+        }
         
         n<-n*IV$ncats
       } 
@@ -557,20 +559,26 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
         b<-b/(sd(b)*sqrt((IV2$ncats-1)/IV2$ncats))
         rsd<-residual
         
-        ivr_new<-c()
         iv2r_new<-c()
+        iv2Discrete_new<-c()
         residual<-c()
         for (i in 1:IV2$ncats) {
           iv2r_new<-c(iv2r_new,rep(b[i],n))
-          ivr_new<-c(ivr_new,ivr)
-          residual<-c(residual,rsd*design$sWithinCor+sqrt(1-design$sWithinCor^2)*rnorm(n,0,sqrt(1-rho^2)))
+          iv2Discrete_new<-c(iv2Discrete_new,rep(b[i],n))
+          residual<-c(residual,rsd*sqrt(design$sWithinCor)^2+sqrt(1-design$sWithinCor^2)*rnorm(n))
         }
-        ivr<-ivr_new
         iv2r<-iv2r_new
+        iv2Discrete<-iv2Discrete_new
+        ivDiscrete<-rep(ivDiscrete,IV2$ncats)
+        ivr<-rep(ivr,IV2$ncats)
         id<-rep(id,IV2$ncats)
         
         n<-n*IV2$ncats
       } 
+      
+      # make the interaction term
+      if (!is.null(IV2)) iv12r<-ivr*iv2r
+      else               iv12r<-ivr*0
       
       if (effect$Heteroscedasticity!=0){
         localVar<- abs(ivr/3) * sign(ivr)
@@ -804,5 +812,6 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
                sampleRho=sampleRho,samplePval=samplePval,effectRho=rho,nval=design$sN,
                hypothesis=hypothesis, design=design)
   if (autoShow) print(showSample(sample))
+  setBrawRes("result",sample)
   sample
 }

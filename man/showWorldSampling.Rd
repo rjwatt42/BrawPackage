@@ -7,8 +7,13 @@
 showWorldSampling(
   hypothesis = braw.def$hypothesis,
   design = braw.def$design,
-  sigOnly = FALSE,
+  evidence = braw.def$evidence,
+  showSinglePopulation = NULL,
+  showSingleSample = NULL,
+  HQ = TRUE,
+  totalArea = 1,
   plotArea = c(0, 0, 1, 1),
+  fontScale = 1,
   autoShow = braw.env$autoShow,
   g = NULL
 )
@@ -20,5 +25,5 @@ ggplot2 object - and printed
 show the prediction corresponding to a hypothesis & design
 }
 \examples{
-showWorldSampling(hypothesis=makeHypothesis(),design=makeDesign(),sigOnly=FALSE)
+showWorldSampling(hypothesis=makeHypothesis(),design=makeDesign(),evidence=makeEvidence())
 }

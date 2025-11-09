@@ -22,7 +22,7 @@ sampleShortCut<-function(hypothesis,design,evidence,nsims,appendData,oldanalysis
       effect$world$PDF<-"Single"
       effect$world$RZ<-"r"
       effect$world$PDFk<-tanh(atanh(effect$rIV)+rnorm(1,0,atanh(effect$rSD)))
-      effect$world$pRPlus<-1
+      effect$world$pRplus<-1
     }
     pops<-rRandomValue(effect$world,sample_increase)
     popsOld<-pops$old
@@ -47,7 +47,7 @@ sampleShortCut<-function(hypothesis,design,evidence,nsims,appendData,oldanalysis
     
     if (evidence$sigOnly>0) {
       keep1<-isSignificant(braw.env$STMethod,ps,rs,ns,df1,evidence)
-      keep0<-runif(length(keep))>evidence$sigOnly
+      keep0<-runif(length(keep1))>evidence$sigOnly
       keep<-keep1 | keep0
       pops<-pops[keep]
       rs<-rs[keep]

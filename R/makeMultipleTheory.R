@@ -13,7 +13,7 @@ doMultipleTheory<-function(showType,logScale,hypothesis=braw.def$hypothesis,desi
            effectTheory$world$PDFk<-effect$rIV2,
            effectTheory$world$PDFk<-effect$rIVIV2DV
     )
-    effectTheory$world$pRPlus<-1
+    effectTheory$world$pRplus<-1
   }
   
   xdsig<-NULL
@@ -29,8 +29,8 @@ doMultipleTheory<-function(showType,logScale,hypothesis=braw.def$hypothesis,desi
       yvUse<-yv
     }
     oldEffect<-effectTheory
-    if (showType=="e1p") effectTheory$world$pRPlus<-0
-    if (showType=="e2p") effectTheory$world$pRPlus<-1
+    if (showType=="e1p") effectTheory$world$pRplus<-0
+    if (showType=="e2p") effectTheory$world$pRplus<-1
     xd<-fullRSamplingDist(yvUse,effectTheory$world,design,"p",logScale=logScale,sigOnly=0,HQ=braw.env$showTheoryHQ)
     xdsig<-fullRSamplingDist(yvUse,effectTheory$world,design,"p",logScale=logScale,sigOnly=1,HQ=braw.env$showTheoryHQ)
     effectTheory<-oldEffect
@@ -38,8 +38,8 @@ doMultipleTheory<-function(showType,logScale,hypothesis=braw.def$hypothesis,desi
   
   if (is.element(showType,c("rs","ro","ci1","ci2","e1r","e2r"))) {
     npt<-101
-    if (showType=="e1r") effectTheory$world$pRPlus<-0
-    if (showType=="e2r") effectTheory$world$pRPlus<-1
+    if (showType=="e1r") effectTheory$world$pRplus<-0
+    if (showType=="e2r") effectTheory$world$pRplus<-1
     switch(braw.env$RZ,
            "r"={
              rvals<-seq(-1,1,length.out=npt)*0.99

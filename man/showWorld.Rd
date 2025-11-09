@@ -7,6 +7,8 @@
 showWorld(
   hypothesis = braw.def$hypothesis,
   joinNulls = TRUE,
+  showSingle = NULL,
+  totalArea = 1,
   plotArea = c(0, 0, 1, 1),
   fontScale = 1,
   autoShow = FALSE,

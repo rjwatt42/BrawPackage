@@ -38,7 +38,16 @@ fit_sem_model<-function(pathmodel,model_data,fixedCoeffs=NULL,doinglavaan=TRUE) 
 
   pathLocalModel<-matrix(0,n_stages,m_stages)
   sem<-path2sem(pathmodel,model_data,doinglavaan)
-
+  if (!is.null(fixedCoeffs)) {
+    for (i in 1:length(fixedCoeffs$v1)) {
+      if (is.element(fixedCoeffs$v2[i],rownames(sem$Ldesign)) &&
+          is.element(fixedCoeffs$v1[i],colnames(sem$Ldesign)))
+        sem$Ldesign[fixedCoeffs$v2[i],fixedCoeffs$v1[i]]<-0
+      else 
+        sem$Bdesign[fixedCoeffs$v2[i],fixedCoeffs$v1[i]]<-0
+    }
+  }
+  
   edges<-cbind(sem$Ldesign,sem$Bdesign)
   path<-""
   for (idv in 1:nrow(edges)) {

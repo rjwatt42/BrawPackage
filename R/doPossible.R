@@ -46,13 +46,13 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
                               PDF="Single",
                               PDFk=0,
                               RZ="r",
-                              pRPlus=1
+                              pRplus=1
          )},
          "hypothesis"={source<-list(On=FALSE,
                                     PDF="Single",
                                     PDFk=hypothesis$effect$rIV,
                                     RZ="r",
-                                    pRPlus=0.5
+                                    pRplus=0.5
          )},
          "world"={source<-world},
          "prior"={source<-possible$prior}
@@ -61,8 +61,8 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
   sourcePopDens_r<-sourcePopDens_r/max(sourcePopDens_r)
   # we add in the nulls for display, but only when displaying them makes sense
   if (source$PDF=="Single" || source$PDF=="Double") {
-    sourcePopDens_r<-sourcePopDens_r*(source$pRPlus)
-    sourcePopDens_r[rp==0]<-sourcePopDens_r[rp==0]+(1-source$pRPlus)
+    sourcePopDens_r<-sourcePopDens_r*(source$pRplus)
+    sourcePopDens_r[rp==0]<-sourcePopDens_r[rp==0]+(1-source$pRplus)
   }
   
   # get the prior population distribution
@@ -71,13 +71,13 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
                               PDF="Uniform",
                               PDFk=1,
                               RZ="r",
-                              pRPlus=1,
+                              pRplus=1,
                               PDFsample=FALSE) },
          "hypothesis"={prior<-list(On=FALSE,
                                     PDF="Single",
                                     PDFk=hypothesis$effect$rIV,
                                     RZ="r",
-                                    pRPlus=0.5,
+                                    pRplus=0.5,
                                    PDFsample=FALSE) },
          "world"={ prior<-world },
          "prior"={ prior<-possible$prior }
@@ -87,8 +87,8 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
   priorPopDens_r<-rPopulationDist(rp,prior)
   priorPopDens_r<-priorPopDens_r/mean(priorPopDens_r)/2
   if (max(priorPopDens_r)>0.9) priorPopDens_r<-priorPopDens_r/max(priorPopDens_r)*0.9
-  priorPopDens_r_full<-priorPopDens_r*(prior$pRPlus)
-  priorPopDens_r_full[rp==0]<-priorPopDens_r_full[rp==0]+(1-prior$pRPlus)$pRPlus
+  priorPopDens_r_full<-priorPopDens_r*(prior$pRplus)
+  priorPopDens_r_full[rp==0]<-priorPopDens_r_full[rp==0]+(1-prior$pRplus)
   if (prior$PDF=="Single" || prior$PDF=="Double") {
     priorPopDens_r_show<-priorPopDens_r_full/max(priorPopDens_r_full)
   } else {
@@ -103,7 +103,7 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
   sourceSampDens_r_total<-sD$dens
   sourceSampDens_r_plus<-rbind(sD$densPlus)
   sourceSampDens_r_null<-sD$densNull
-  if (is.element(source$PDF,c("Single","Double")) && source$pRPlus<1) {
+  if (is.element(source$PDF,c("Single","Double")) && source$pRplus<1) {
     sourceRVals<-c(sourceRVals,0)
     sourceSampDens_r_plus<-rbind(sourceSampDens_r_plus,sourceSampDens_r_null)
   }
@@ -206,15 +206,15 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
       priorSampDens_r<-priorSampDens_r/dr_gain
     }
     
-    if (prior$On && prior$pRPlus<1) {
-      sampleLikelihood_r<-sampleLikelihood_r*(prior$pRPlus)
-      priorPopDens_r<-priorPopDens_r*(prior$pRPlus)
-      sourcePopDens_r<-sourcePopDens_r*(source$pRPlus)
+    if (prior$On && prior$pRplus<1) {
+      sampleLikelihood_r<-sampleLikelihood_r*(prior$pRplus)
+      priorPopDens_r<-priorPopDens_r*(prior$pRplus)
+      sourcePopDens_r<-sourcePopDens_r*(source$pRplus)
       for (i in 1:length(sRho)) {
         sampleLikelihood_r<-sampleLikelihood_r*dnorm(atanh(sRho[i]),0,1/sqrt(n[i]-3))
       }
-      priorSampDens_r_plus<-priorSampDens_r_plus/sum(priorSampDens_r_plus)*(prior$pRPlus)
-      priorSampDens_r_null<-priorSampDens_r_null/sum(priorSampDens_r_null)*(1-prior$pRPlus)
+      priorSampDens_r_plus<-priorSampDens_r_plus/sum(priorSampDens_r_plus)*(prior$pRplus)
+      priorSampDens_r_null<-priorSampDens_r_null/sum(priorSampDens_r_null)*(1-prior$pRplus)
     }
     sampleLikelihood_r<-sampleLikelihood_r/max(sampleLikelihood_r,na.rm=TRUE)
   } else {

@@ -58,7 +58,7 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
       }
       if (braw.env$STMethod=="dLLR") {
         if (!analysis$evidence$prior$On) {
-          analysis$evidence$prior<-list(On=TRUE,PDF="Single",PDFk=analysis$rIV,RZ="r",pRPlus=0.5)
+          analysis$evidence$prior<-list(On=TRUE,PDF="Single",PDFk=analysis$rIV,RZ="r",pRplus=0.5)
         }
         analysis$dIV<-res2llr(analysis,"dLLR")
         f1<-"\bllr"
@@ -93,7 +93,7 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
     }
     if (!is.null(IV2)) {
       nc1<-length(colnames(anova))+1
-      table1<-c(table1,"!H!C ","r",paste0(sub("Pr\\(","p\\(",sub("^","",colnames(anova)))),rep("",nc-1-nc1))
+      table1<-c(table1,"!H!C ","r[s]",paste0(sub("Pr\\(","p\\(",sub("^","",colnames(anova)))),rep("",nc-1-nc1))
       total_done<-FALSE
       
       for (i in 1:nrow(anova)){
@@ -138,7 +138,7 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
         table1<-c(table1,"Total "," ",ssq,df,rep(" ",nc-4))
       }
       table1<-c(table1,rep("",nc))
-      table1<-c(table1,paste0("Full model:"),paste0("r=",brawFormat(analysis$rFull)),paste0("p=",brawFormat(analysis$pFull)),rep("",nc-3))
+      table1<-c(table1,paste0("Full model:"),paste0("r[s]=",brawFormat(analysis$rFull)),paste0("p=",brawFormat(analysis$pFull)),rep("",nc-3))
       table1<-c(table1,rep("",nc))
     }
     
@@ -183,10 +183,10 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
         if (design$Replication$On) {
           sig<-analysis$ResultHistory$pIV[i]<0.05
           if (sig) 
-            p_error<-(1-effect$world$pRPlus)*
+            p_error<-(1-effect$world$pRplus)*
               analysis$ResultHistory$pIV[i]
           else
-            p_error<-(effect$world$pRPlus)*
+            p_error<-(effect$world$pRplus)*
               (1-rn2w(analysis$ResultHistory$rpIV[i],analysis$ResultHistory$nval[i]))
           p_error<-brawFormat(p_error,digits=3)
           if (sig) p_error<-paste0("e[I]=",p_error)

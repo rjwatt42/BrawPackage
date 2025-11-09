@@ -12,8 +12,8 @@ showExplore(
   effectType = "unique",
   whichEffect = "All",
   quantileShow = 0.5,
-  autoYlim = TRUE,
-  showHist = TRUE,
+  fixedYlim = braw.env$fixedYlim,
+  showHist = FALSE,
   fixNulls = TRUE
 )
 }
@@ -31,5 +31,5 @@ show the estimated population characteristics from varying parameter
 showExplore(exploreResult=doExplore(),
                        showType="Basic",dimension="1D",
                        effectType="unique",whichEffect="All",
-                       quantileShow=0.5,autoYlim=TRUE,showHist=TRUE)
+                       quantileShow=0.5,fixedYlim=TRUE,showHist=TRUE)
 }

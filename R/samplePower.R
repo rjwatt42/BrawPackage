@@ -123,7 +123,7 @@ rn2p<-function(r,n,t=2) {
   }
   r<-abs(r)
   z<-atanh(r)*sqrt(n-3)
-  z<-min(z,8.2)
+  z[z>8.2]<-8.2
   p<-1-pnorm(z)
   return(p*t)
 }

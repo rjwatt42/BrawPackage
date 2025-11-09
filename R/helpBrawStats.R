@@ -1,3 +1,25 @@
+
+#' @export
+BrawHelp<-function(open=0,indent=0,titleWidth=100) {
+  return(
+  generate_tab(
+    title="  ",
+    indent=indent,
+    titleWidth=titleWidth,
+    # titleTab="Click on the tabs for specific help.",
+    tabs=c("Start","Plan","Single Sample","Multiple Samples","Explore"),
+    tabContents = c(
+      BrawInstructions("Overview"),
+      BrawInstructions("Plan"),
+      BrawInstructions("Single"),
+      BrawInstructions("Multiple"),
+      BrawInstructions("Explore")
+    ),
+    open=open
+  )
+  )
+}
+
 BrawInstructions <- function(HelpType="Plan") {
   
 
@@ -57,7 +79,7 @@ BrawInstructions <- function(HelpType="Plan") {
            ' </li>',
            '</ol>')
            
-           extras<-c("Effect size types","Worlds")
+           extras<-c(">Effect size types","Worlds")
            extrasContent<-c(
              paste('Effects are transmitted from a source variable to a destination.',
                    '<ul style=margin:0px;>',
@@ -273,7 +295,7 @@ BrawInstructions <- function(HelpType="Plan") {
       id<-paste0(HelpType,extras[i])
       output<-c(output,
                 '<style> button.here {font-size:12px;margin:0px;border:none;cursor:pointer;background-color:#3498db;color:white;} </style>',
-                '<button class="here" onclick="showExtra(event,\'',id,'\')">',extras[i],':','</button>',
+                '<button class="here" onclick="showExtra(event,\'',id,'\')">','+',extras[i],':','</button>',
                 '<div ID="',id,'" style=display:none>', extrasContent[i],'</div><br>'
       )
     }
@@ -283,10 +305,14 @@ BrawInstructions <- function(HelpType="Plan") {
     'function showExtra(evt, extraID) {',
     '  var tabState;',
     '    tabState = document.getElementById(extraID).style.display;',
+    '    var label;',
+    '    label=evt.currentTarget.innerHTML;',
     '    if (tabState!="block") {',
+    '      evt.currentTarget.innerHTML=label.replace("+","-");',
     '      document.getElementById(extraID).style.display = "block";',
     '    }',
     '    else {',
+    '      evt.currentTarget.innerHTML=label.replace("-","+");',
     '      document.getElementById(extraID).style.display = "none";',
     '    }',
     '}',

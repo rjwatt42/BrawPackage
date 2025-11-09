@@ -60,7 +60,8 @@ getNulls<-function(analysisOld,evidence,useSig=FALSE,useNSig=FALSE) {
 #'               showTheory=TRUE)
 #' @export
 showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D",orientation="vert",
-                        whichEffect="All",effectType="all",showTheory=braw.env$showTheory,showData=TRUE,showLegend=FALSE,sequence=FALSE
+                        whichEffect="All",effectType="all",showTheory=braw.env$showTheory,showData=TRUE,showLegend=FALSE,sequence=FALSE,
+                        showYaxis=TRUE
 ) {
   if (is.null(analysis)) analysis<-doSingle(autoShow=FALSE)
   if (length(analysis$rIV)==1 && length(analysis$ResultHistory$rIV)>1) {
@@ -158,20 +159,28 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
     g1<-plot2Inference(analysis,showType[1],showType[2])
   } else {
     area.x<-0
-    area.y<-1
+    area.y<-0
+    area.w<-1
+    area.h<-1
     if (!is.null(analysis$hypothesis$IV2)) {
       if (sum(analysis$evidence$AnalysisTerms)<2) effectType<-"direct"
       if (whichEffect=="All" && sum(analysis$evidence$AnalysisTerms)<2) whichEffect<-"Main 1"
       if (whichEffect=="All" && sum(analysis$evidence$AnalysisTerms)<3) whichEffect<-"Mains"
       if (whichEffect=="All") {
-        whichEffect<-c("Main 1","Main 2","Interaction")
-        area.y<-c(1,1,1)*0.32
-        area.x<-c(0,0.333,0.666)
+        if (analysis$evidence$AnalysisTerms[4])
+          whichEffect<-c("Main 1","Main 2","Covariation")
+          else whichEffect<-c("Main 1","Main 2","Interaction")
+        area.y<-c(0,0,0)
+        area.x<-c(0,0.485,0.745)
+        area.w<-c(0.48,0.255,0.255)
+        area.h<-c(1,1,1)
       } else
       if (whichEffect=="Mains") {
         whichEffect<-c("Main 1","Main 2")
-        area.y<-c(1,1,1)*0.47
-        area.x<-c(0,0.5)
+        area.y<-c(0,0)
+        area.x<-c(0,0.61)
+        area.w<-c(0.6,0.38)
+        area.h<-c(1,1)
       } 
     } else whichEffect<-"Main 1"
   
@@ -183,36 +192,50 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
         braw.env$plotArea<-c(0.0,0.5,0.45,0.5)
         g1<-plotInference(analysis1,otheranalysis=other1,disp=showType[1],
                           whichEffect=whichEffect[fi],effectType=effectType,
-                          orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g1)
+                          orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,
+                          showYaxis=showYaxis,
+                          g=g1)
           braw.env$plotArea<-c(0.0,0,0.45,0.5)
           g1<-plotInference(analysis2,otheranalysis=other2,disp=showType[2],
                             whichEffect=whichEffect[fi],effectType=effectType,
-                            orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g1)
+                            orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,
+                            showYaxis=showYaxis,
+                            g=g1)
           if (showType[3]=="SEM") braw.env$plotArea<-c(0.55,0,0.45,1)
           else                    braw.env$plotArea<-c(0.55,0.5,0.45,0.5)
         g1<-plotInference(analysis1,otheranalysis=other1,disp=showType[3],
                           whichEffect=whichEffect[fi],effectType=effectType,
-                          orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g1)
+                          orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,
+                          showYaxis=showYaxis,
+                          g=g1)
         if (showType[4]!="SEM") {
           braw.env$plotArea<-c(0.55,0,0.45,0.5)
           g1<-plotInference(analysis2,otheranalysis=other2,disp=showType[4],
                             whichEffect=whichEffect[fi],effectType=effectType,
-                            orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g1)
+                            orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,
+                            showYaxis=showYaxis,
+                            g=g1)
         }
       }
     } 
     if (nplots<=2) {
       if (orientation=="horz") minWidth<-1 else minWidth<-0.6
       for (fi in 1:length(whichEffect)) {
-          braw.env$plotArea<-c((1-1)/nplots+0.05,area.x[fi],min(minWidth,0.9/nplots),area.y[fi])
+        braw.env$plotArea<-c(area.x[fi]/nplots,area.y[fi],area.w[fi]/nplots,area.h[fi])
+          # braw.env$plotArea<-c((1-1)/nplots+0.05,area.x[fi],min(minWidth,0.9/nplots/length(whichEffect)),area.y[fi])
           g1<-plotInference(analysis1,otheranalysis=other1,disp=showType[1],
                             whichEffect=whichEffect[fi],effectType=effectType,
-                            orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g1)
+                            orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,
+                            showYaxis=(fi==1),
+                            g=g1)
           if (nplots==2) {
-          braw.env$plotArea<-c((2-1)/nplots+0.05,area.x[fi],min(minWidth,0.9/nplots),area.y[fi])
+            braw.env$plotArea<-c(area.x[fi]/nplots+0.5,area.y[fi],area.w[fi]/nplots,area.h[fi])
+            # braw.env$plotArea<-c((2-1)/nplots+0.05,area.x[fi],min(minWidth,0.9/nplots/length(whichEffect)),area.y[fi])
           g1<-plotInference(analysis2,otheranalysis=other2,disp=showType[2],
                             whichEffect=whichEffect[fi],effectType=effectType,
-                            orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g1)
+                            orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,
+                            showYaxis=(fi==1),
+                            g=g1)
           }
       }
     }

@@ -234,13 +234,13 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
                     rpIV=ResultHistory$rpIV[use])
       metaAnalysis<-makeMetaAnalysis(TRUE,analysisType="fixed",
                                      method="MLE",
-                                     modelNulls=FALSE,
-                                     sourceBias=FALSE,
-                                     analyseBias=1/length(studies$rIV))
+                                     analyseNulls=FALSE,
+                                     sourceBias=0,
+                                     analyseBias=FALSE)
       metaResult<-runMetaAnalysis(metaAnalysis,studies,hypothesis,metaResult=NULL)
       res$nval<-sum(studies$nval)
       res$rIV<-sum(studies$rIV*studies$nval)/res$nval
-      res$rIV<-metaResult$fixed$param1
+      res$rIV<-metaResult$fixed$PDFk
       res$rpIV<-studies$rpIV[1]
       res$df1<-studies$df1[1]
       res$pIV<-rn2p(res$rIV,res$nval)
@@ -367,11 +367,11 @@ replicateSample<-function(hypothesis,design,evidence,sample,res) {
       
       # metaAnalysis<-makeMetaAnalysis(TRUE,analysisType="fixed",
       #                                method="MLE",
-      #                                modelNulls=FALSE,
+      #                                analyseNulls=FALSE,
       #                                sourceBias=FALSE,
       #                                analyseBias=1/length(studies$rIV))
       # metaResult<-runMetaAnalysis(metaAnalysis,studies,hypothesis,metaResult=NULL)
-      # res$rIV<-metaResult$fixed$param1
+      # res$rIV<-metaResult$fixed$PDFk
       # res$pIV<-rn2p(res$rIV,res$nval)
       # res$Smax<-metaResult$fixed$Smax
       

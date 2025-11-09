@@ -35,6 +35,7 @@ getAxisPrediction<-function(hypothesis,g=NULL) {
             ylim = c(-0.5,1.5)
             yticks<-seq(0,1,0.2)
             ylabels=c(DV$cases[1],rep(" ",4),DV$cases[2])
+            ylabels<-c("0",rep(" ",4),"1")
           }
   )
   
@@ -156,8 +157,8 @@ plotCatParPrediction<-function(g,IV,DV,rho,n,offset=1, within=FALSE){
   if (within) {
     se1_pts<-data.frame(x=b+xoff,y=d-se/2)
     se2_pts<-data.frame(x=b+xoff,y=d+se/2)
-    g<-addG(g,dataLine(data=se1_pts,colour="white",linewidth=2, linetype = "dotted"))
-    g<-addG(g,dataLine(data=se2_pts,colour="white",linewidth=2, linetype = "dotted"))
+    g<-addG(g,dataLine(data=se1_pts,colour=col,linewidth=1, linetype = "dotted"))
+    g<-addG(g,dataLine(data=se2_pts,colour=col,linewidth=1, linetype = "dotted"))
   } else
     g<-addG(g,dataLine(data=mn_pts))
   
@@ -296,7 +297,12 @@ plotParCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
   b<-(1:ncats)-1
   
   x<-seq(-braw.env$fullRange,braw.env$fullRange,length.out=braw.env$varNPoints)
-  yv<-get_logistic_r(rho,ncats,x)
+  if (IV$type=="Ordinal") {
+    w<-as.numeric(unlist(strsplit(IV$ordProportions,',')))
+    v<-1:IV$nlevs
+    logoffset<-mean(v)-sum(w*v)/sum(w)
+  } else logoffset<-0
+  yv<-get_logistic_r(rho,ncats,x+logoffset)
   x1<-x*IV$sd+IV$mu
   xv<-c(x1,rev(x1))
   
@@ -349,23 +355,31 @@ plotCatCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
     yv<-as.numeric(DV$vals)
     for (i1 in 1:ncats1) {
       for (i2 in 1:ncats2) {
-        pp[i2,i1]<-sum(yv[IV$vals==IV$cases[i1]]==i2)/length(IV$vals)
+        pp[i2,i1]<-sum(yv[IV$vals==IV$cases[i1]]==i2)
       }
     }
+    pp<-pp/matrix(colSums(pp),nrow(pp),ncol(pp),byrow=TRUE)
   } else {
     pp<-r2CatProportions(rho,ncats1,ncats2,IV$proportions,DV$proportions)
   }
-  
+  stacked<-braw.env$barStacked
   full_x<-c()
   full_y<-c()
   full_f<-c()
   full_c<-c()
   for (i2 in ncats2:1){
-    full_x<-c(full_x,b1+xoff+((i2-1)/(ncats2-1)-0.5)*barwidth/2)
-    full_y<-c(full_y,pp[i2,])
+    if (stacked) xoffset<-0
+    else         xoffset<-((i2-1)/(ncats2-1)-0.5)
+    full_x<-c(full_x,b1+xoff+xoffset*barwidth/2)
+    if (stacked && i2>1) 
+      if (i2>2) yoffset<-colSums(pp[1:(i2-1),])
+      else yoffset<-pp[1,]
+    else         yoffset<-0
+    full_y<-c(full_y,yoffset+pp[i2,])
     full_f<-c(full_f,rep(i2,length(pp[i2,])))
-    if (i2==1) col<-darken(col,0.25,off=0.75)
-    full_c<-c(full_c,rep(col,length(pp[i2,])))
+    if (i2==1) col1<-darken(col,0.25,off=0.75)
+    else col1<-col
+    full_c<-c(full_c,rep(col1,length(pp[i2,])))
   }
 
   pts<-data.frame(x=full_x,y=full_y,fill=factor(full_f))
@@ -379,7 +393,7 @@ plotCatCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
 
 
 plotPrediction<-function(IV=braw.def$hypothesis$IV,IV2=braw.def$hypothesis$IV2,DV=braw.def$hypothesis$DV,
-                         effect=braw.def$hypothesis$effect,design=braw.def$design,
+                         effect=braw.def$hypothesis$effect,design=braw.def$design,evidence=braw.def$evidence,
                          offset=1,range=NULL,correction=FALSE,
                          g=NULL){
   if (is.null(g)) {
@@ -438,7 +452,7 @@ plotPrediction<-function(IV=braw.def$hypothesis$IV,IV2=braw.def$hypothesis$IV2,D
             }
     )
     if (DV$type=="Categorical") {
-      cols<-c(braw.env$plotColours$descriptionC,darken(braw.env$plotColours$descriptionC,0.25,0.75))
+      cols<-c(darken(braw.env$plotColours$descriptionC,0.25,off=0.75),braw.env$plotColours$descriptionC)
       g<-addG(g,dataLegend(data.frame(names<-DV$cases,colours=cols),title=DV$name))
     }
   } else {

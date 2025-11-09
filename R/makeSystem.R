@@ -18,6 +18,9 @@ undoShortHand<-function() {
   setBrawDef("evidence",evidence)
 }
 
+setZ<-function(which=TRUE) {
+  if (which) setBrawEnv("RZ","z") else setBrawEnv("RZ","r")
+}
 
 #' switch Replication on
 #' @export
@@ -55,16 +58,16 @@ doDLLR<-function() {
 #' @seealso showWorld(world=makeWorld())
 #' @examples
 #' makeWorld<-function(On=FALSE,PDF="Single",RZ="r",
-#'                     PDFk=0.2,pRPlus=1,worldAbs=FALSE
+#'                     PDFk=0.2,pRplus=1,worldAbs=FALSE
 #' )
 #' @export
 makeWorld<-function(On=TRUE,PDF="Uniform",RZ="r",
-                    PDFk=0.0,PDFs=2,PDFmu=0.0,pRPlus=1,
+                    PDFk=0.0,PDFshape=2,PDFspread=0,PDFoffset=0.0,pRplus=1,
                     PDFsample=FALSE,PDFsamplemn=0.0,PDFsamplesd=0.0,PDFsamplebias=FALSE,
                     worldAbs=FALSE) {
  world<-list(On=On,
              PDF=PDF,RZ=RZ,
-             PDFk=PDFk,PDFs=PDFs,PDFmu=PDFmu,pRPlus=pRPlus,
+             PDFk=PDFk,PDFshape=PDFshape,PDFspread=PDFspread,PDFoffset=PDFoffset,pRplus=pRplus,
              PDFsample=PDFsample,PDFsamplemn=PDFsamplemn,PDFsamplesd=PDFsamplesd,PDFsamplebias=PDFsamplebias,
              worldAbs=worldAbs)
  world  
@@ -86,6 +89,10 @@ makeEffect<-function(rIV=0,rIV2=0,rIVIV2=0,rIVIV2DV=0,rSD=0,
                      world=makeWorld(FALSE)){
 
   # check effect sizes before going any further
+  if (is.null(rIV)) rIV<-0
+  if (is.null(rIV2)) rIV2<-0
+  if (is.null(rIVIV2)) rIVIV2<-0
+  if (is.null(rIVIV2DV)) rIVIV2DV<-0
   fullES<-rIV^2+rIV2^2+2*rIV*rIV2*rIVIV2+rIVIV2DV^2
   while (fullES>=1) {
     rIV<-rIV*0.9
@@ -298,8 +305,8 @@ makeDesign<-function(sN=42, sMethod=makeSampling("Random"),sMethodSeverity=0.1,
 #'              metaAnalysis=makeMetaAnalysis()
 #'              )
 #' @export
-makeEvidence<-function(shortHand=FALSE,sigOnly=0,
-                       AnalysisTerms=c(TRUE,TRUE,FALSE),rInteractionOnly=TRUE,ssqType="Type3",
+makeEvidence<-function(shortHand=FALSE,sigOnly=0,absOnly=FALSE,
+                       AnalysisTerms=c(TRUE,TRUE,FALSE,FALSE),rInteractionOnly=TRUE,ssqType="Type3",
                        caseOrder="AsStated",
                        llr=list(e1=c(),e2=0),
                        useAIC="AIC",
@@ -312,7 +319,7 @@ makeEvidence<-function(shortHand=FALSE,sigOnly=0,
                        ){
   
   evidence<-list(AnalysisTerms=AnalysisTerms,rInteractionOnly=rInteractionOnly,ssqType=ssqType,
-                 caseOrder=caseOrder,shortHand=shortHand,sigOnly=sigOnly,
+                 caseOrder=caseOrder,shortHand=shortHand,sigOnly=sigOnly,absOnly=absOnly,
                  llr=llr,useAIC=useAIC,doSEM=doSEM,
                  Welch=Welch,Transform=Transform,McFaddens=McFaddens,
                  minRp=minRp,
@@ -365,8 +372,8 @@ setEffect<-function(rIV=braw.def$hypothesis$effect$rIV,rIV2=braw.def$hypothesis$
 #' @export
 setWorld<-function(On=braw.def$hypothesis$effect$world$On,
                    PDF=braw.def$hypothesis$effect$world$PDF,RZ=braw.def$hypothesis$effect$world$RZ,
-                   PDFk=braw.def$hypothesis$effect$world$PDFk,PDFs=braw.def$hypothesis$effect$world$PDFs,
-                   PDFmu=braw.def$hypothesis$effect$world$PDFmu,pRPlus=braw.def$hypothesis$effect$world$pRPlus,
+                   PDFk=braw.def$hypothesis$effect$world$PDFk,PDFshape=braw.def$hypothesis$effect$world$PDFshape,PDFspread=braw.def$hypothesis$effect$world$PDFspread,
+                   PDFoffset=braw.def$hypothesis$effect$world$PDFoffset,pRplus=braw.def$hypothesis$effect$world$pRplus,
                    PDFsample=braw.def$hypothesis$effect$world$PDFsample,PDFsamplemn=braw.def$hypothesis$effect$world$PDFsamplemn,PDFsamplesd=braw.def$hypothesis$effect$world$PDFsamplesd,PDFsamplebias=braw.def$hypothesis$effect$world$PDFsamplebias,
                    worldAbs=braw.def$hypothesis$effect$world$worldAbs) {
   if (is.character(On)) e<-getWorld(On)
@@ -375,7 +382,7 @@ setWorld<-function(On=braw.def$hypothesis$effect$world$On,
     else
       e<-makeWorld(On=On,
                    PDF=PDF,RZ=RZ,
-                   PDFk=PDFk,PDFs=PDFs,PDFmu=PDFmu,pRPlus=pRPlus,
+                   PDFk=PDFk,PDFshape=PDFshape,PDFspread=PDFspread,PDFoffset=PDFoffset,pRplus=pRplus,
                    PDFsample=PDFsample,PDFsamplemn=PDFsamplemn,PDFsamplesd=PDFsamplesd,PDFsamplebias=PDFsamplebias,
                    worldAbs=worldAbs)
   }
@@ -414,7 +421,7 @@ setDesign<-function(sN=braw.def$design$sN, sMethod=braw.def$design$sMethod, sMet
 
 #' set default evidence
 #' @export
-setEvidence<-function(shortHand=braw.def$evidence$shortHand,sigOnly=braw.def$evidence$sigOnly,
+setEvidence<-function(shortHand=braw.def$evidence$shortHand,sigOnly=braw.def$evidence$sigOnly,absOnly=braw.def$evidence$absOnly,
                       AnalysisTerms=braw.def$evidence$AnalysisTerms,rInteractionOnly=braw.def$evidence$rInteractionOnly,ssqType=braw.def$evidence$ssqType,
                       caseOrder=braw.def$evidence$caseOrder,
                       llr=braw.def$evidence$llr,useAIC=braw.def$evidence$useAIC,doSEM=braw.def$evidence$doSEM,
@@ -422,7 +429,7 @@ setEvidence<-function(shortHand=braw.def$evidence$shortHand,sigOnly=braw.def$evi
                       minRp=braw.def$evidence$minRp,
                       prior=braw.def$evidence$prior,
                       metaAnalysis=braw.def$evidence$metaAnalysis) {
-  e<-makeEvidence(shortHand=shortHand,sigOnly=sigOnly,
+  e<-makeEvidence(shortHand=shortHand,sigOnly=sigOnly,absOnly=absOnly,
                   AnalysisTerms=AnalysisTerms,rInteractionOnly=rInteractionOnly,ssqType=ssqType,
                   caseOrder=caseOrder,
                   llr=llr,useAIC=useAIC,doSEM=doSEM,

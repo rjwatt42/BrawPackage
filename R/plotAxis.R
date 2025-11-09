@@ -540,6 +540,20 @@ plotAxis<-function(showType,hypothesis,design=NULL,result=NULL) {
             ylabel<-"r[sd]"
             use_cols<-braw.env$plotColours$metaMultiple
           },
+          "metaSpread"={
+            ylim<-c(-0.01,0.5)
+            yticks<-seq(0,0.5,0.1)
+            ymins<-seq(0,0.5,0.05)
+            ylabel<-"r[sd]"
+            use_cols<-braw.env$plotColours$metaMultiple
+          },
+          "metaShape"={
+            ylim<-c(-0.01,5)
+            yticks<-seq(0,5,1)
+            ymins<-seq(0,0.5,0.05)
+            ylabel<-"PDF[sh]"
+            use_cols<-braw.env$plotColours$metaMultiple
+          },
           "metaRvar"={
             ylim<-c(-0.05,0.2)
             yticks<-seq(-0.05,0.2,0.05)
@@ -562,6 +576,28 @@ plotAxis<-function(showType,hypothesis,design=NULL,result=NULL) {
             ylabel<-braw.env$Llabel
             use_cols<-braw.env$plotColours$metaMultiple
           },
+          "metaPRplus"={
+            ylim<-c(-0.01,1.01)
+            yticks<-seq(0,1,0.2)
+            ymins<-seq(0,1,0.1)
+            ylabel<-braw.env$Plabel
+            if (braw.env$RZ=="z") ylabel<-sub("R","Z",ylabel)
+            use_cols<-braw.env$plotColours$metaMultiple
+          },
+          "PDFk"={
+            ylim<-c(-0.01,1.01)
+            yticks<-seq(0,1,0.2)
+            ymins<-seq(0,1,0.1)
+            ylabel<-"PDF[k]"
+            use_cols<-braw.env$plotColours$metaMultiple
+          },
+          "PDFshape"={
+            ylim<-c(-0.01,6)
+            yticks<-seq(0,5,1)
+            ymins<-seq(0,0.5,0.05)
+            ylabel<-"PDF[shape]"
+            use_cols<-braw.env$plotColours$metaMultiple
+          },
           "Lambda"={
             ylim<-c(-0.01,1.01)
             yticks<-seq(0,1,0.2)
@@ -574,6 +610,7 @@ plotAxis<-function(showType,hypothesis,design=NULL,result=NULL) {
             yticks<-seq(0,1,0.2)
             ymins<-seq(0,1,0.1)
             ylabel<-braw.env$Plabel
+            if (braw.env$RZ=="z") ylabel<-sub("R","Z",ylabel)
             use_cols<-braw.env$plotColours$metaMultiple
           },
           "mean(R+)"={
@@ -581,6 +618,9 @@ plotAxis<-function(showType,hypothesis,design=NULL,result=NULL) {
             yticks<-seq(0,1,0.2)
             ymins<-seq(0,1,0.1)
             ylabel<-braw.env$Llabel
+            # if (braw.env$graphicsType=="ggplot")
+            #   ylabel<-sub("[+]","[+]",ylabel)
+            if (braw.env$RZ=="z") ylabel<-sub("R","Z",ylabel)
             use_cols<-braw.env$plotColours$metaMultiple
           },
           "PDF"={
@@ -589,10 +629,13 @@ plotAxis<-function(showType,hypothesis,design=NULL,result=NULL) {
             ymins<-seq(0,1,0.1)
             ylabel<-"p(PDF)"
           },
-          "metaS"={
-            ylim<-c(min(result$best$S),max(result$best$S))
-            ylabel<-"llk"
-            yticks<-seq(ceil(min(result$best$S)),ceil(max(result$best$S)),1)
+          "metaSmax"={
+            ylabel<-"S[max]"
+            if (!is.null(result)) 
+              ylim<-c(min(result),max(result))
+            else ylim<-c(0,1)
+            if (diff(ylim)==0) ylim<-ylim+c(-1,1)
+            yticks<-seq(ceil(ylim[1]),ceil(ylim[2]),1)
             use_cols<-braw.env$plotColours$metaMultiple
           },
           "iv.mn"={

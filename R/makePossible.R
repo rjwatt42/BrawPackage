@@ -72,7 +72,7 @@ makePossible<-function(targetSample=NULL,targetSampleN=NULL,UseSource="world",
     hypothesis$effect$world$PDF<-"Single"
     hypothesis$effect$world$RZ<-"r"
     hypothesis$effect$world$PDFk<-hypothesis$effect$rIV
-    hypothesis$effect$world$pRPlus<-1
+    hypothesis$effect$world$pRplus<-1
     hypothesis$effect$world$PDFsample<-FALSE
   }
   

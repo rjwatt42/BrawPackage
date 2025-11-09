@@ -11,7 +11,7 @@ makePossible(
   targetPopulation = NULL,
   UsePrior = "none",
   prior = getWorld("Psych"),
-  sigOnly = FALSE,
+  sigOnly = 0,
   sigOnlyCompensate = FALSE,
   axisType = braw.env$RZ,
   sims = NULL,

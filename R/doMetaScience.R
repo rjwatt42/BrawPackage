@@ -18,7 +18,7 @@ combineMS<-function(doing) grepl('c',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-b]*([crm
 combineFirstMS<-function(doing) grepl('cm',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-b]*([crm]*)','\\1',doing)),fixed=TRUE)
 
 #' @export
-prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pRPlus=0.5,metaPublicationBias=FALSE,
+prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pRplus=0.5,metaPublicationBias=FALSE,
                              alt4B=FALSE,
                           sN=NULL,sMethod="Convenience",sMethodSeverity=0.1,
                           sBudget=100,sSplits=5,sCheating="Replace",sCheatingProportion=0.05,
@@ -52,13 +52,13 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pRPlus=0.5,
                   "A"=hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld("Binary",rp=rp))),
                   "B"=hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld("Psych50",rp=rp)))
            )
-           if (world!="Plain") hypothesis$effect$world$pRPlus<-pRPlus
+           if (world!="Plain") hypothesis$effect$world$pRplus<-pRplus
            design<-makeDesign(sN=sN)
            evidence<-makeEvidence(sigOnly=metaPublicationBias)
          },
          "2"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world,rp=rp)))
-           if (world!="Plain") hypothesis$effect$world$pRPlus<-pRPlus
+           if (world!="Plain") hypothesis$effect$world$pRplus<-pRplus
            
            switch(partMetaSci,
                   "A"=design<-makeDesign(sN=sN),
@@ -75,7 +75,7 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pRPlus=0.5,
          },
          "3"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world,rp=rp)))
-           if (world!="Plain") hypothesis$effect$world$pRPlus<-pRPlus
+           if (world!="Plain") hypothesis$effect$world$pRplus<-pRplus
            design<-makeDesign(sN=sN)
            switch(partMetaSci,
                   "A"={
@@ -94,7 +94,7 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pRPlus=0.5,
          },
          "4"={
            hypothesis<-makeHypothesis(effect=makeEffect(world=getWorld(world,rp=rp)))
-           if (world!="Plain") hypothesis$effect$world$pRPlus<-pRPlus
+           if (world!="Plain") hypothesis$effect$world$pRplus<-pRplus
            design<-makeDesign(sN=sN)
            if (!alt4B)
              if (partMetaSci=="B") {
@@ -174,7 +174,7 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pRPlus=0.5,
 
 #' @export
 doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,showOutput=TRUE,doHistory=TRUE,
-                        world="Psych50",rp=0.3,pRPlus=0.5,metaPublicationBias=FALSE,
+                        world="Psych50",rp=0.3,pRplus=0.5,metaPublicationBias=FALSE,
                         sN=NULL,
                         sMethod="Convenience",sMethodSeverity=0.1,sBudget=100,sSplits=5,
                         sCheating="Replace",sCheatingProportion=0.05,
@@ -182,12 +182,14 @@ doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,showOutput=TRUE,doHist
                         sReplicationAll=FALSE,sReplicationSigOriginal=TRUE,
                         sReplicationOriginalAnomaly="Random",sReplicationUseLikelihood=FALSE,
                         differenceSource="Interaction",range=NULL,rangeWidth=0,
-                        rangeVar=NULL,rangeP=NULL,analysisTerms=c(TRUE,FALSE,FALSE)
+                        rangeVar=NULL,rangeP=NULL,analysisTerms=c(TRUE,FALSE,FALSE,FALSE)
 ) {
   
+  pC<-braw.env$plotColours
+  setColours("meta")
   if (is.character(metaScience)) 
     metaScience<-prepareMetaScience(metaScience,alt4B=alt4B,
-                                    world=world,rp=rp,pRPlus=pRPlus,metaPublicationBias=metaPublicationBias,
+                                    world=world,rp=rp,pRplus=pRplus,metaPublicationBias=metaPublicationBias,
                                     sN=sN,sMethod=sMethod,sMethodSeverity=sMethodSeverity,sBudget=sBudget,sSplits=sSplits,
                                     sCheating=sCheating,sCheatingProportion=sCheatingProportion,
                                     sReplicationKeep=sReplicationKeep,sReplicationPower=sReplicationPower,
@@ -275,8 +277,6 @@ doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,showOutput=TRUE,doHist
                 '<table>',
                 '<tr><td>', braw.res$investgD, '</td></tr>',
                 '<tr><td>', braw.res$investgR, '</td></tr>',
-                '<tr style="height:10px;"></tr>',
-                '<tr><td>', moreHTML(reportWorldDesign(),title="see Plan",ID="p1"), '</td></tr>',
                 '</table>',
                 '</div>'
   )
@@ -284,11 +284,10 @@ doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,showOutput=TRUE,doHist
                 '<table>',
                 '<tr><td>', braw.res$investgS, '</td></tr>',
                 '<tr><td>', braw.res$investgR, '</td></tr>',
-                '<tr style="height:10px;"></tr>',
-                '<tr><td>', moreHTML(reportWorldDesign(),title="see Plan",ID="p2"), '</td></tr>',
                 '</table>',
                 '</div>'
   )
+  showPlan<-reportWorldDesign()
   linkLabel<-paste0(rootMetaSci)
   
   history<-braw.res$investgHistory
@@ -306,13 +305,13 @@ doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,showOutput=TRUE,doHist
       plainTabs=FALSE,
       titleWidth=100,
       width=550,
-      tabs=c("Data","Schematic"),
-      tabContents=c(show1,show2),
+      tabs=c("Plan","Data","Schematic"),
+      tabContents=c(showPlan,show1,show2),
       tabLink=paste0('https://doingpsychstats.wordpress.com/metascience-',stepMetaSci,'#','Part',stepMetaSci,partMetaSci),
       tabLinkLabel=paste0('&#x24D8 ',linkLabel),
       # tabLinkLabel=paste0(linkLabel),
       history=history$content,
-      open=open
+      open=open+1
     )
   
   if (doHistory) {
@@ -324,5 +323,7 @@ doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,showOutput=TRUE,doHist
     showHTML(investgResults)
     return(invisible(NULL))
   }
+  
+  setBrawEnv("plotColours",pC)
   return(invisible(investgResults))
 }

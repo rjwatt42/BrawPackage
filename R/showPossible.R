@@ -307,10 +307,10 @@ showPossible <- function(possibleResult=NULL,
   zlim<-c(0,1)
   
   switch (possible$UseSource,
-          "hypothesis"={possible$source<-list(On=TRUE,PDF="Single",PDFk=effect$rIV,RZ="r",pRPlus=1)},
+          "hypothesis"={possible$source<-list(On=TRUE,PDF="Single",PDFk=effect$rIV,RZ="r",pRplus=1)},
           "world"={possible$source<-world},
           "prior"={possible$source<-possible$prior},
-          "null"={possible$source<-list(On=TRUE,PDF="Single",PDFk=0,RZ="r",pRPlus=1)}
+          "null"={possible$source<-list(On=TRUE,PDF="Single",PDFk=0,RZ="r",pRplus=1)}
   )
   if (showType=="Samples") possible$UsePrior<-"hypothesis"
   # make the distribution        
@@ -792,7 +792,7 @@ showPossible <- function(possibleResult=NULL,
               }
               g<-drawDistribution(x,y,ztotal,xlim,ylim,zlim,mapping,colSsum,"#000000",1,draw_lower_limit=0,g)
                 # split into 2 parts  
-                if (possible$source$On && possible$source$pRPlus<1){
+                if (possible$source$On && possible$source$pRplus<1){
                   if (!any(is.na(sampleBackwall$rsw_dens_null))) {
                     znull <- sampleBackwall$rsw_dens_null
                   } else {
@@ -811,7 +811,7 @@ showPossible <- function(possibleResult=NULL,
                     zplus<-log10(zplus)
                     zplus[zplus<zlim[1]]<-zlim[1]
                   }
-                  if (possible$source$pRPlus<1) {
+                  if (possible$source$pRplus<1) {
                     g<-drawDistribution(x,y,znull*wallHeight,xlim,ylim,zlim,mapping,NA,colNullS,1,draw_lower_limit,g)
                   }
                   g<-drawDistribution(x,y,zplus*wallHeight,xlim,ylim,zlim,mapping,NA,colDistS,1,draw_lower_limit,g)
@@ -888,9 +888,9 @@ showPossible <- function(possibleResult=NULL,
                       if (is.element(world$PDF,c("Single","Double"))) {
                         pgain<-1
                       } else {
-                      pgain<-possible$source$pRPlus
+                      pgain<-possible$source$pRplus
                       if (length(sourceRVals)==2) {
-                        pgain<-max(c(possible$source$pRPlus,1-possible$source$pRPlus))
+                        pgain<-max(c(possible$source$pRplus,1-possible$source$pRplus))
                       } 
                       }
                       # prepare simulations first
@@ -1260,7 +1260,7 @@ showPossible <- function(possibleResult=NULL,
               #       #        "Exp"=lb<-paste0(lb,"Exp(",possibleResult$prior$RZ,"/",brawFormat(possibleResult$prior$PDFk),")"),
               #       #        "Gauss"=lb<-paste0(lb,"Gauss(",possibleResult$prior$RZ,"/",brawFormat(possibleResult$prior$PDFk),")")
               #       # )
-              #       # lb<-paste0(lb,";p(null)=",brawFormat(possibleResult$prior$pRPlus,digits=3))
+              #       # lb<-paste0(lb,";p(null)=",brawFormat(possibleResult$prior$pRplus,digits=3))
               #       # zoff<-zoff-diff(zlim)*0.06*2
               #       # text(trans3d(x=xlim[2],y=ylim[2],z=zlim[1]+zoff,pmat=mapping),
               #       #      labels=lb,
@@ -1376,7 +1376,7 @@ showPossible <- function(possibleResult=NULL,
                                                            y=c(0,rsd,0)*zgain),fill=colSsum,alpha=0.8))
                           g<-addG(g,dataPath(data.frame(x=rs,y=rsd*zgain),colour="#000000",linewidth=0.35))
                           if (world$On) {
-                            if (world$pRPlus<1) {
+                            if (world$pRplus<1) {
                               g<-addG(g,dataPath(data.frame(x=rs,y=sampleBackwall$rsw_dens_null*zgain),colour=colNullS,linewidth=0.5))
                               g<-addG(g,dataPath(data.frame(x=rs,y=sampleBackwall$rsw_dens_plus*zgain),colour=colDistS,linewidth=0.5))
                             }
@@ -1425,7 +1425,7 @@ showPossible <- function(possibleResult=NULL,
                           text(x=rp_peak,1.15,labels=paste0("llr(",braw.env$RZ,"[mle]/",braw.env$RZ,"[0])=",format(log(1/dens_at_zero),digits=3)),
                                col=colPdark,adj=(sign(rp_peak)+1)/2,cex=0.9)
                           
-                          if (possible$prior$On && possible$prior$pRPlus<1) {
+                          if (possible$prior$On && possible$prior$pRplus<1) {
                             ln_at_sample<-approx(rs,priorSampDens_r_null,sRho[1])$y
                             ld_at_sample<-approx(rs,colMeans(priorSampDens_r_plus),sRho[1])$y
                             llrNull<-log(ln_at_sample/ld_at_sample)

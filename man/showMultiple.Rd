@@ -13,7 +13,8 @@ showMultiple(
   effectType = "all",
   showTheory = braw.env$showTheory,
   showData = TRUE,
-  showLegend = TRUE
+  showLegend = TRUE,
+  showYaxis = TRUE
 )
 }
 \arguments{

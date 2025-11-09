@@ -14,7 +14,8 @@ showInference(
   showTheory = braw.env$showTheory,
   showData = TRUE,
   showLegend = FALSE,
-  sequence = FALSE
+  sequence = FALSE,
+  showYaxis = TRUE
 )
 }
 \arguments{

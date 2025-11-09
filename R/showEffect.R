@@ -177,12 +177,52 @@ showEffect<-function(r,moderator=NULL,type=1,useCols=c(TRUE,TRUE,TRUE),showValue
           ends="last"
           fill=braw.env$plotColours$maineffectES
           size=0.7
+          },
+          # 12
+          {start=c(0,0.92)
+          len=sqrt(0.9^2+0.55^2)-0.2
+          direction=0
+          labelpts<-data.frame(x=0.0,y=0.7)
+          hjust<- 0.35
+          ends="last"
+          fill=braw.env$plotColours$interactionES
+          size=0.7
+          },
+          # 13
+          {start=c(-0.25,0.5)
+          direction=90+360
+          len=0.9
+          labelpts<-data.frame(x=0.25,y=1)
+          hjust<-1
+          ends="last"
+          fill=braw.env$plotColours$maineffectES
+          size=0.7
+          },
+          # 14
+          {start=c(-0.25,0.5)
+          len=sqrt(0.9^2+0.55^2)
+          direction=65
+          labelpts<-data.frame(x=0.6,y=0.4)
+          hjust<- 0.35
+          ends="last"
+          fill=braw.env$plotColours$maineffectES
+          size=0.7
+          },
+          # 15
+          {start=c(-0.5,0.1)
+          len=sqrt(0.9^2+0.55^2)
+          direction=180-65
+          labelpts<-data.frame(x=0.6,y=0.7)
+          hjust<- 0.35
+          ends="last"
+          fill=braw.env$plotColours$maineffectES
+          size=0.7
           }
   )
   col<-"#000000"
   alpha<-1
-  if ((is.element(type,c(3,4,5,6,7,8)) && !is.null(r) && r==0) || (!is.null(moderator) && moderator==FALSE)) {
-    fill<-darken(desat(fill,0.5),off=0.8)
+  if ((is.element(type,c(4,5,6,7,8)) && !is.null(r) && r==0) || (!is.null(moderator) && moderator==FALSE)) {
+      fill<-darken(desat(fill,0.5),off=0.8)
     # alpha<-0.2
     col<-darken(col,off=0.8)
   }
@@ -210,7 +250,11 @@ showEffect<-function(r,moderator=NULL,type=1,useCols=c(TRUE,TRUE,TRUE),showValue
     }
     if (direction<0) {off<-c(0.15,0); hjust<-0}
     if (direction>=0) {off<-c(-0.15,0); hjust<-1}
+    if (direction>45) {off<-c(0,0.15); hjust<-0}
     if (direction<=-90) {off<-c(0,0.15); hjust<-0.5}
+    if (direction>=90) {off<-c(0,0.15); hjust<-0.5}
+    if (direction>100) {off<-c(0,0.15); hjust<-1}
+    if (direction>=90+360) {off<-c(0,-0.2); hjust<-0.5}
     labelpts<-start+len*0.5*c(sin(direction/57.296),-cos(direction/57.296))+off
     g<-addG(g,dataText(data=data.frame(x=labelpts[1],y=labelpts[2]), label = lbl, size=size*1, 
                        hjust=hjust, vjust=0.5, colour=col, fontface="bold"))

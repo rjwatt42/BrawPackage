@@ -28,16 +28,19 @@ makeSEMPath<-function(data=NULL,stages=NULL,
                   within_stages=0,
                   add=NULL,remove=NULL) {
   
-  if (is.null(stages) && !is.null(data)) {
+  if (is.null(stages)) stages<-"flat"
+  if (!is.null(data) && length(stages)==1 && is.element(stages,c("flat","sequence"))) {
     dataNames<-data$varnames
     nvar<-length(dataNames)
-    stages<-c(list(dataNames[2:nvar]),
-              list(dataNames[1])
-    )
+    if (length(stages)<2) {
+      switch(stages,
+             "flat"={ stages<-c(list(dataNames[1:(nvar-1)]),list(dataNames[nvar])) },
+             "sequence"={ stages<-sapply(dataNames,list) }
+      )
+    }
   }
-  
   path<-list(stages=stages,
-             depth=1,
+             depth=depth,
              only_ivs=only_ivs,only_dvs=only_dvs,
              within_stages=within_stages,
              add=add,remove=remove
@@ -52,9 +55,11 @@ makeSEMPath<-function(data=NULL,stages=NULL,
 #' readDataSEM<-function(filename)
 #' @export
 readDataSEM<-function(filename) {
+  if (!is.character(filename)) d<-filename
+  else {
   if (grepl(".csv",filename)) d<-read.csv(filename)
   if (grepl(".dat",filename)) d<-read.table(filename,header=TRUE)
-  if (!is.character(filename)) d<-filename
+  }
   
   dataFull<-prepareSample(d)
   liveData<-dataFull$data[,2:ncol(dataFull$data)]

@@ -15,7 +15,7 @@ makeExplore(
 }
 \arguments{
 \item{exploreType}{"rIV","Heteroscedasticity","rIV2","rIVIV2","rIVIV2DV" \cr
-"pNull","Lambda" \cr
+"p(R+)","Lambda" \cr
 "n","Method","Usage","WithinCorr","ClusterRad","SampleSD" \cr
  "Dependence","Outliers","NonResponse","IVRange","IVRangeC","IVRangeE","DVRange" \cr
  "Cheating","CheatingAmount" \cr

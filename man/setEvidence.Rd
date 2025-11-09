@@ -7,6 +7,7 @@
 setEvidence(
   shortHand = braw.def$evidence$shortHand,
   sigOnly = braw.def$evidence$sigOnly,
+  absOnly = braw.def$evidence$absOnly,
   AnalysisTerms = braw.def$evidence$AnalysisTerms,
   rInteractionOnly = braw.def$evidence$rInteractionOnly,
   ssqType = braw.def$evidence$ssqType,

@@ -39,7 +39,7 @@ make a replication object
 \examples{
 makeReplication(On=TRUE,Repeats=1,Keep="Cautious",RepAlpha=0.05,
                 PowerOn=TRUE,Power=0.8,Tails=2,PowerPrior="None",
-                forceSigOriginal="No",forceSign=TRUE,
+                forceSigOriginal=FALSE,forceSign=TRUE,
                 BudgetType="Unlimited",Budget=1000
                 )
 }

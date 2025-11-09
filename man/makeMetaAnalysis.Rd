@@ -9,12 +9,14 @@ makeMetaAnalysis(
   nstudies = 10,
   analysisType = "random",
   analysisVar = "sd",
+  modelPDF = "All",
   method = "MLE",
   analysisPrior = "none",
-  modelNulls = FALSE,
-  modelPDF = "All",
-  sourceBias = FALSE,
-  analyseBias = FALSE
+  sourceNulls = 0,
+  analyseNulls = FALSE,
+  sourceBias = 0,
+  analyseBias = FALSE,
+  sourceAbs = FALSE
 )
 }
 \value{
@@ -27,7 +29,7 @@ set up for a meta-analysis
 makeMetaAnalysis<-function(On=TRUE,nstudies=100,
 analysisType="random",analysisVar="sd",
 method="MLE",analysisPrior="none",
-modelNulls=FALSE,modelPDF="All",
+analyseNulls=FALSE,modelPDF="All",
 sourceBias=FALSE,
 analyseBias=FALSE)
 }

@@ -67,7 +67,7 @@ reportLikelihood<-function(possibleResult=braw.res$possibleResult){
   outputText[1+nc*row]<-"sLLR(r[s]/r[0] | r[s])"
   outputText[2+nc*row]<-paste0("!j",brawFormat(log(llrA/llr0)))
 
-  if (possibleResult$possible$UsePrior!="none" && possibleResult$prior$pRPlus<1) {
+  if (possibleResult$possible$UsePrior!="none" && possibleResult$prior$pRplus<1) {
   row<-row+1
   outputText[1+nc*row]<-"Prior(r[+]/r[0] | r[s])"
   outputText[2+nc*row]<-paste0("!j",brawFormat((log(llrAP)-log(llrA))-(log(llr0P)-log(llr0))))

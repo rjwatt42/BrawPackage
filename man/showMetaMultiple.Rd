@@ -7,7 +7,8 @@
 showMetaMultiple(
   metaResult = braw.res$metaMultiple,
   showType = NULL,
-  dimension = "1D"
+  dimension = "1D",
+  orientation = "vert"
 )
 }
 \value{
@@ -17,5 +18,5 @@ ggplot2 object - and printed
 show a multiple meta-analyses
 }
 \examples{
-showMetaMultiple<-function(metaResult=doMetaAnalysis(),showType=NULL,dimension="2D")
+showMetaMultiple<-function(metaResult=doMetaAnalysis(),showType=NULL,dimension="1D",orientation="vert")
 }

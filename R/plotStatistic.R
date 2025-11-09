@@ -58,9 +58,10 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
            "Model"=effectTheory$world$PDFk<-sqrt(effect$rIV^2+effect$rIV2^2+effect$rIVIV2DV^2+effect$rIV*effect$rIV2*effect$rIVIV2),
            "Main 1"=effectTheory$world$PDFk<-effect$rIV,
            "Main 2"=effectTheory$world$PDFk<-effect$rIV2,
-           "Interaction"=effectTheory$world$PDFk<-effect$rIVIV2DV
+           "Interaction"=effectTheory$world$PDFk<-effect$rIVIV2DV,
+           "Covariation"=effectTheory$world$PDFk<-effect$rIVIV2
     )
-    effectTheory$world$pRPlus<-1
+    effectTheory$world$pRplus<-1
   }
   
   theoryDens_sig<-NULL
@@ -77,8 +78,8 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
       yvUse<-theoryVals
     }
     oldEffect<-effectTheory
-    if (showType=="e1p") effectTheory$world$pRPlus<-0
-    if (showType=="e2p") effectTheory$world$pRPlus<-1
+    if (showType=="e1p") effectTheory$world$pRplus<-0
+    if (showType=="e2p") effectTheory$world$pRplus<-1
     theoryDens_all<-fullRSamplingDist(yvUse,effectTheory$world,design,"p",logScale=logScale,sigOnly=0,HQ=braw.env$showTheoryHQ)
     theoryDens_sig<-fullRSamplingDist(yvUse,effectTheory$world,design,"p",logScale=logScale,sigOnly=1,HQ=braw.env$showTheoryHQ)
     effectTheory<-oldEffect
@@ -86,8 +87,8 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
   
   if (is.element(showType,c("rs","rse","sig","ns","nonnulls","nulls","rss","re","ro","ci1","ci2","e1r","e2r","e1+","e2+","e1-","e2-"))) {
     npt<-braw.env$npoints
-    if (is.element(showType,c("e1r","e1+","e1-"))) effectTheory$world$pRPlus<-0
-    if (is.element(showType,c("e2r","e2+","e2-"))) effectTheory$world$pRPlus<-1
+    if (is.element(showType,c("e1r","e1+","e1-"))) effectTheory$world$pRplus<-0
+    if (is.element(showType,c("e2r","e2+","e2-"))) effectTheory$world$pRplus<-1
     if (showType=="re") rOff<-"re"
     else rOff<-"rs"
     switch(braw.env$RZ,
@@ -112,13 +113,13 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
                     },
                     "nonnulls"={
                       ew<-effectTheory$world
-                      ew$pRPlus<-1
+                      ew$pRplus<-1
                       theoryDens_all<-fullRSamplingDist(rvals,ew,design,rOff,logScale=logScale,sigOnly=0,HQ=braw.env$showTheoryHQ)
                       theoryDens_sig<-fullRSamplingDist(rvals,ew,design,rOff,logScale=logScale,sigOnly=1,HQ=braw.env$showTheoryHQ)
                     },
                     "nulls"={
                       ew<-effectTheory$world
-                      ew$pRPlus<-0
+                      ew$pRplus<-0
                       theoryDens_all<-fullRSamplingDist(rvals,ew,design,rOff,logScale=logScale,sigOnly=0,HQ=braw.env$showTheoryHQ)
                       theoryDens_sig<-fullRSamplingDist(rvals,ew,design,rOff,logScale=logScale,sigOnly=1,HQ=braw.env$showTheoryHQ)
                     },
@@ -144,7 +145,7 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
                         # for each possible population effect size
                         for (i in 1:length(rSourceVals)) {
                           # make original sample & get replication sample size
-                          samp1Dens<-fullRSamplingDist(rvals,makeWorld(TRUE,"Single","r",rSourceVals[i],pRPlus = 1),
+                          samp1Dens<-fullRSamplingDist(rvals,makeWorld(TRUE,"Single","r",rSourceVals[i],pRplus = 1),
                                                        design=design,rOff,logScale=logScale,
                                                        sigOnly=1,HQ=braw.env$showTheoryHQ)
                           n2<-replicationNewN(rvals,design$sN,hypothesis,design,evidence)
@@ -195,8 +196,6 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
   npt<-braw.env$npoints
   switch(showType,
          "rp"={
-           switch(braw.env$RZ,
-                  "r"={
                     theoryVals<-seq(-1,1,length.out=npt)*0.99
                     theoryDens_all<-rPopulationDist(theoryVals,effectTheory$world)
                     theoryDens_sig<-theoryDens_all
@@ -234,13 +233,12 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
                         else 
                           theoryDens_sig[ri1]<-theoryDens_all[ri1]*psig
                       }
-                    }
-                  },
-                  "z"={
-                    theoryVals<-seq(-1,1,length.out=npt)*braw.env$z_range
-                    theoryDens_all<-rPopulationDist(tanh(theoryVals),effectTheory$world)
-                    theoryDens_all<-rdens2zdens(theoryDens_all,tanh(theoryVals))
-                  })
+                  }
+                  if (braw.env$RZ=="z") {
+                    theoryDens_all<-rdens2zdens(theoryDens_all,theoryVals)
+                    theoryDens_sig<-rdens2zdens(theoryDens_sig,theoryVals)
+                    theoryVals<-atanh(theoryVals)
+                  }
          },
          "n"={
            ndist<-getNDist(design,effectTheory$world,logScale=logScale,sigOnly=1)
@@ -460,6 +458,11 @@ collectData<-function(analysis,whichEffect) {
               rs<-rbind(cbind(analysis$r$direct[use,column],analysis$r$unique[use,column],analysis$r$total[use,column]))
               ps<-rbind(cbind(analysis$p$direct[use,column],analysis$p$unique[use,column],analysis$p$total[use,column]))
             },
+            "Covariation"={
+              column<-4
+              rs<-rbind(cbind(analysis$r$direct[use,column],analysis$r$unique[use,column],analysis$r$total[use,column]))
+              ps<-rbind(cbind(analysis$p$direct[use,column],analysis$p$unique[use,column],analysis$p$total[use,column]))
+            },
             "All"={
               rs<-c()
               ps<-c()
@@ -500,10 +503,13 @@ makeFiddle<-function(y,yd,orientation="horz"){
   rX<-function(x) x*xG
   
   dotSize<-min(4,braw.env$dotSize*(200/length(y))^2)
-  rr<-ceiling(dotSize/4*yG/25/diff(y_vals[c(1,2)]))
+  dotSize<-0.5
+  # dotSize<-braw.env$dS
+  rr<-8*ceiling(dotSize/4*yG/25/diff(y_vals[c(1,2)]))
   rr<-min(rr,floor(length(y_vals)/2))
-  rj<-0.2
-  
+  rj<-0.075
+  # rj<-braw.env$rJ
+
   dy<-diff(y_vals[c(1,1+rr*2)])
   y_filledp<-y_vals*0
   y_filledn<-y_vals*0
@@ -512,7 +518,8 @@ makeFiddle<-function(y,yd,orientation="horz"){
     for (i in 1:length(y)) {
       use<-which.min(abs(y[i]-y_vals))
       dx<-sqrt(rX(dy)^2-rX(y[i]-y_vals[use])^2)
-      dxr<-dy*runif(1,-1,1)*rj
+      if (dx==0) dxr<-0
+      else       dxr<-runif(1,-1,1)*rj*dy
       fill<-use+(-rr:rr)
       fill<-fill[fill>=1 & fill<=length(y_vals)]
       x_pos[i]<-y_filledp[use]+dxr
@@ -522,7 +529,7 @@ makeFiddle<-function(y,yd,orientation="horz"){
     for (i in 1:length(y)) {
       use<-which.min(abs(y[i]-y_vals))
       dx<-sqrt(rX(dy)^2-rX(y[i]-y_vals[use])^2)
-      dxr<-dy*runif(1,-1,1)*rj
+      dxr<-runif(1,-1,1)*rj*dy
       fill<-use+(-rr:rr)
       fill<-fill[fill>=1 & fill<=length(y_vals)]
       if (y_filledp[use]<y_filledn[use] || (y_filledp[use]==0 && y_filledn[use]==0 && runif(1)>0.5)) {
@@ -918,11 +925,13 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
            )
     dotSize<-min(4,braw.env$dotSize*sqrt(min(1,100/length(pts$y1))))
     # if (max(abs(xr))>0) xr<-xr*hgain/max(abs(xr))
-    if (!is.na(histGain))
-        xr<-xr*histGain
-    else xr<-xr/max(xr)*0.8
-    if (max(xr)>0.9) xr<-xr/max(xr)*0.9
-    if (!sequence && max(xr)<0.5 && length(xr)>10) xr<-xr/max(xr)*0.5
+    if (!is.na(histGain)) {
+      xr<-xr*histGain
+      if (!sequence && max(xr)<0.5 && length(xr)>10) xr<-xr/max(abs(xr))*0.5
+    }
+    else xr<-xr/max(abs(xr))*0.25
+    if (max(xr)>0.5) xr<-xr/max(abs(xr))*0.5
+    xr<-xr*min(1,length(xr)/100)
     xr<-xr+hoff
     
     pts$x<-pts$x+xr*sum(width)*0.3/0.35
@@ -948,7 +957,7 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
     co1<-darken(c1,off=-colgain)
     co2<-darken(c2,off=-colgain)
     shape<-braw.env$plotShapes$study
-    if (is.element(showType,c("metaRiv","metaRsd","metaBias","metaS"))) { # metaAnalysis
+    if (is.element(showType,c("metaRiv","metaRsd","metaK","metaSpread","metaShape","metaBias","metaSmax"))) { # metaAnalysis
       shape<-braw.env$plotShapes$meta
       c1<-c2<-c3<-c4<-braw.env$plotColours$metaMultiple
     }
@@ -1119,7 +1128,8 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
 
 r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                  orientation="vert",whichEffect="Main 1",effectType="all",
-                 showTheory=TRUE,showData=TRUE,showLegend=FALSE,
+                 showTheory=TRUE,showData=TRUE,showLegend=FALSE,showNsims=FALSE,
+                 showYaxis=TRUE,
                  g=NULL){
 
   baseColour<-braw.env$plotColours$infer_nsigC
@@ -1199,14 +1209,14 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
     # top<-TRUE
   }
   
-  if (is.element(showType,c("metaRiv","metaRsd","metaBias","metaS"))){
+  if (is.element(showType,c("metaRiv","metaK","metaSpread","metaShape","metaBias","metaSmax"))){
     # showType<-"rs"
     labelSig<-FALSE
     labelNSig<-FALSE
     showSig<-FALSE
     doingMetaAnalysis<-TRUE
     showTheory<-FALSE
-    ydata<-analysis$best$S
+    ydata<-analysis$best$Smax
     # top<-TRUE
   } else {
     doingMetaAnalysis<-FALSE
@@ -1221,6 +1231,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
     evidence$sigOnly<-analysis$ResultHistory$original$evidence$sigOnly
   
   sequence<-analysis$sequence
+  if (is.null(sequence)) sequence<-FALSE
   
   r<-effect$rIV
   if (!is.null(hypothesis$IV2)){
@@ -1237,18 +1248,23 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
          })
 
   xlabel<-NULL
-  yaxis<-plotAxis(showType,hypothesis,design,result=analysis)
+  if (doingMetaAnalysis) result<-analysis$best$Smax
+  else result<-NULL
+  
+  yaxis<-plotAxis(showType,hypothesis,design,result=result)
   ylim<-yaxis$lim
   ylabel<-yaxis$label
   ylines<-yaxis$lines
   logScale<-yaxis$logScale
   if (is.element(showType,c("rs","rse","sig","ns","nonnulls","nulls","rss")) && (!is.null(hypothesis$IV2))) 
-    switch(whichEffect,"Model"={ylabel<-"Model";ylines<-c(0)},
-                       "Main 1"={ylabel<-hypothesis$IV$name;ylines<-c(0,hypothesis$effect$rIV)},
-                       "Main 2"={ylabel<-hypothesis$IV2$name;ylines<-c(0,hypothesis$effect$rIV2)},
-                       "Interaction"={ylabel<-paste0(hypothesis$IV$name,"x",hypothesis$IV2$name);ylines<-c(0,hypothesis$effect$rIVIV2DV)}
+    switch(whichEffect,"Model"={mTitle<-"Model";ylines<-c(0)},
+                       "Main 1"={mTitle<-hypothesis$IV$name;ylines<-c(0,hypothesis$effect$rIV)},
+                       "Main 2"={mTitle<-hypothesis$IV2$name;ylines<-c(0,hypothesis$effect$rIV2)},
+                       "Interaction"={mTitle<-paste0(hypothesis$IV$name,braw.env$interaction_string,hypothesis$IV2$name);ylines<-c(0,hypothesis$effect$rIVIV2DV)},
+                       "Covariation"={mTitle<-paste0(hypothesis$IV$name,braw.env$covariation_string,hypothesis$IV2$name)}
            )
-  
+  else mTitle<-""
+  if (!showYaxis) ylabel<-NULL
   
   if (showType=="p" && braw.env$pPlotScale=="log10" && any(is.numeric(analysis$pIV)) && any(analysis$pIV>0)) 
     while (mean(log10(analysis$pIV)>ylim[1])<0.75) ylim[1]<-ylim[1]-1
@@ -1272,9 +1288,14 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
            ylim<-c(0,1)
            orient<-"horz"
            box<-"X" 
-           xlabel<-makeLabel(ylabel)
+           if (is.null(ylabel)) {
+             xlabel<-NULL
+             xticks<-NULL
+           } else {
+             xlabel<-makeLabel(ylabel)
+             xticks<-makeTicks(logScale=yaxis$logScale)
+           }
            ylabel<-NULL
-           xticks<-makeTicks(logScale=yaxis$logScale)
            yticks<-NULL
            xmax<-FALSE
            ymax<-TRUE
@@ -1284,9 +1305,14 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
            ylim<-ylim+c(-1,1)*diff(ylim)/25
            orient<-"horz"
            box<-"Y" 
-           ylabel<-makeLabel(ylabel)
-           yticks<-makeTicks(logScale=yaxis$logScale)
-           xlabel<-NULL
+           if (is.null(ylabel)) {
+             ylabel<-NULL
+             yticks<-NULL
+           } else{
+             ylabel<-makeLabel(ylabel)
+             yticks<-makeTicks(logScale=yaxis$logScale)
+           }
+           xlabel<-whichEffect
            xticks<-NULL
            xmax<-TRUE
            ymax<-FALSE
@@ -1299,9 +1325,10 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   g<-startPlot(xlim,ylim,
                xticks=xticks,xlabel=xlabel,xmax=xmax,
                yticks=yticks,ylabel=ylabel,ymax=ymax,
-               box=box,top=top,orientation=orient,g=g)
+               box="both",top=top,orientation=orient,g=g)
   
   nr<-sum(!is.na(analysis$rIV))
+  if (showNsims) {
   if (is.element(showType[1],c("NHST","Hits","Misses","Inference","SEM")) && sum(!is.na(analysis$nullresult$rIV))>0) {
     n1<-brawFormat(sum(analysis$rpIV!=0))
     n2<-brawFormat(sum(!is.na(analysis$rpIV==0)))
@@ -1310,8 +1337,9 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
     n1<-brawFormat(nr)
     title<-paste("nsims = ",n1,sep="")
   }
+    if (nr>1 && !sequence)   g<-addG(g,plotTitle(title,size=0.65,fontface="normal"))
+  }
   
-  if (nr>1 && !sequence)   g<-addG(g,plotTitle(title,size=0.65,fontface="normal"))
   
   lineCol<-"#000000"
   if (is.element(showType,c("p","e1p","e2p","e1d","e2d"))) lineCol<-"green"
@@ -1349,10 +1377,15 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
             "re"={sampleVals<-data$rs-data$rp},
             "p"={sampleVals<-data$ps},
             "po"={sampleVals<-data$po},
-            "metaRiv"={sampleVals<-cbind(analysis$best$param1)},
-            "metaRsd"={sampleVals<-cbind(analysis$best$param2)},
-            "metaBias"={sampleVals<-cbind(analysis$best$param3)},
-            "metaS"={sampleVals<-cbind(analysis$best$S)},
+            "metaRiv"={sampleVals<-cbind(analysis$best$PDFk)},
+            "metaRsd"={sampleVals<-cbind(analysis$best$PDFspread)},
+            "metaK"={sampleVals<-cbind(analysis$best$PDFk)},
+            "metaSpread"={sampleVals<-cbind(analysis$best$PDFspread)},
+            "metaShape"={sampleVals<-cbind(analysis$best$PDFshape)},
+            "metaPDFk"={sampleVals<-cbind(analysis$best$PDFk)},
+            "metaPRplus"={sampleVals<-cbind(analysis$best$pRplus)},
+            "metaBias"={sampleVals<-cbind(analysis$best$sigOnly)},
+            "metaSmax"={sampleVals<-cbind(analysis$best$Smax)},
             "llknull"={sampleVals<-exp(cbind(-0.5*(analysis$AIC-analysis$AICnull)))},
             "sLLR"={sampleVals<-cbind(res2llr(analysis,"sLLR"))},
             "log(lrs)"={sampleVals<-cbind(res2llr(analysis,"sLLR"))},
@@ -1404,7 +1437,28 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
     )
     
     if (showTheory) {
-      theory<-makeTheoryMultiple(hypothesis,design,evidence,showType,whichEffect,logScale,ydlim,labelNSig,labelSig,distGain)
+      # because the theory can be slow...
+      possibleTheory<-braw.res[[paste0("theoryMultiple",showType)]]
+      if (!is.null(possibleTheory) 
+          && identical(hypothesis,possibleTheory$hypothesis)
+          && identical(design,possibleTheory$design)
+          && identical(evidence,possibleTheory$evidence)
+          && showType==possibleTheory$showType
+          && whichEffect==possibleTheory$whichEffect
+          && logScale==possibleTheory$logScale
+          && identical(ydlim,possibleTheory$ydlim)
+          && labelNSig==possibleTheory$labelNSig
+          && labelSig==possibleTheory$labelSig
+          && distGain==possibleTheory$distGain
+      ) theory<-possibleTheory$theory
+      else {
+        theory<-makeTheoryMultiple(hypothesis,design,evidence,showType,whichEffect,logScale,ydlim,labelNSig,labelSig,distGain)
+        setBrawRes(paste0("theoryMultiple",showType),
+                   list(theory=theory,hypothesis=hypothesis,design=design,evidence=evidence,
+                        showType=showType,whichEffect=whichEffect,logScale=logScale,ydlim=ydlim,
+                        labelNSig=labelNSig,labelSig=labelSig,distGain=distGain)
+                   )
+      }
       theoryVals<-theory$theoryVals
       theoryDens_all<-theory$theoryDens_all
       theoryDens_sig<-theory$theoryDens_sig
@@ -1500,14 +1554,14 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                 ns<-1-s
               },
               "e1p"={
-                pRPlus<-hypothesis$effect$world$pRPlus
-                hypothesis$effect$world$pRPlus<-0
+                pRplus<-hypothesis$effect$world$pRplus
+                hypothesis$effect$world$pRplus<-0
                 s<-fullPSig(hypothesis$effect$world,design)
-                hypothesis$effect$world$pRPlus<-pRPlus
+                hypothesis$effect$world$pRplus<-pRplus
                 ns<-1-s
                 if (hypothesis$effect$world$On) {
-                  s<-s*hypothesis$effect$world$pRPlus
-                  ns<-ns*hypothesis$effect$world$pRPlus
+                  s<-s*hypothesis$effect$world$pRplus
+                  ns<-ns*hypothesis$effect$world$pRplus
                 }
                 if (labelSig != labelNSig) {
                   s<-s/fullPSig(hypothesis$effect$world,design)
@@ -1515,14 +1569,14 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                 }
               },
               "e2p"={
-                pRPlus<-hypothesis$effect$world$pRPlus
-                hypothesis$effect$world$pRPlus<-1
+                pRplus<-hypothesis$effect$world$pRplus
+                hypothesis$effect$world$pRplus<-1
                 s<-fullPSig(hypothesis$effect$world,design)
-                hypothesis$effect$world$pRPlus<-pRPlus
+                hypothesis$effect$world$pRplus<-pRplus
                 ns<-1-s
                 if (hypothesis$effect$world$On) {
-                  s<-s*(hypothesis$effect$world$pRPlus)
-                  ns<-ns*(hypothesis$effect$world$pRPlus)
+                  s<-s*(hypothesis$effect$world$pRplus)
+                  ns<-ns*(hypothesis$effect$world$pRplus)
                 }
                 if (labelSig != labelNSig) {
                   s<-s/fullPSig(hypothesis$effect$world,design)
@@ -1555,6 +1609,8 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       lb2<-") = "
       lb1<-"("
       lb2<-")="
+      lb1<-""
+      lb2<-"="
       labels<-c()
       colours<-c()
       title<-""
@@ -1592,7 +1648,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                     labels<-c(labels,paste0(braw.env$Null," '",reportNumber(isc,n,braw.env$reportCounts),"'"," correct"))
                     colours<-c(colours,braw.env$plotColours$infer_isigNull)
                   }
-                  if (hypothesis$effect$world$On && hypothesis$effect$world$pRPlus<1) {
+                  if (hypothesis$effect$world$On && hypothesis$effect$world$pRplus<1) {
                   if (evidence$sigOnly<1 || design$Replication$On) {
                       labels<-c(labels,paste0(nlab," '",reportNumber(nsc,n,braw.env$reportCounts),"'",sLabel))
                   colours<-c(colours,braw.env$plotColours$infer_nsigNull)
@@ -1694,57 +1750,57 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
                   }
                 },
               "p"={
-                labels<-c(paste0(lb1,"sig",lb2,reportNumber(s,n,braw.env$reportCounts)," "),
-                          paste0(lb1,"ns",lb2,reportNumber(ns,n,braw.env$reportCounts)," "))
+                labels<-c(paste0(lb1,"sig",lb2,reportNumber(s,n,braw.env$reportCounts),""),
+                          paste0(lb1,"ns",lb2,reportNumber(ns,n,braw.env$reportCounts),""))
                 colours<-c(braw.env$plotColours$infer_sigC,braw.env$plotColours$infer_nsigC)
               },
               "e1r"={
-                labels<-c(paste0(lb1,"sig error",lb2,reportNumber(s,n,braw.env$reportCounts)," "),
-                          paste0(lb1,"ns correct",lb2,reportNumber(ns,n,braw.env$reportCounts)," "))
+                labels<-c(paste0(lb1,"sig error",lb2,reportNumber(s,n,braw.env$reportCounts),""),
+                          paste0(lb1,"ns correct",lb2,reportNumber(ns,n,braw.env$reportCounts),""))
                 colours<-c(braw.env$plotColours$infer_sigC,braw.env$plotColours$infer_nsigC)
               },
               "e2r"={
-                labels<-c(paste0(lb1,"sig correct",lb2,reportNumber(s,n,braw.env$reportCounts)," "),
-                          paste0(lb1,"ns error",lb2,reportNumber(ns,n,braw.env$reportCounts)," "))
+                labels<-c(paste0(lb1,"sig correct",lb2,reportNumber(s,n,braw.env$reportCounts),""),
+                          paste0(lb1,"ns error",lb2,reportNumber(ns,n,braw.env$reportCounts),""))
                 colours<-c(braw.env$plotColours$infer_sigC,braw.env$plotColours$infer_nsigC)
               },
               "e1+"={
-                labels<-paste0(lb1,"sig error",lb2,reportNumber(s1,n,braw.env$reportCounts)," ")
+                labels<-paste0(lb1,"sig error",lb2,reportNumber(s1,n,braw.env$reportCounts),"")
                 colours<-braw.env$plotColours$infer_sigC
               },
               "e2+"={
-                labels<-paste0(lb1,"sig correct",lb2,reportNumber(s2,n,braw.env$reportCounts)," ")
+                labels<-paste0(lb1,"sig correct",lb2,reportNumber(s2,n,braw.env$reportCounts),"")
                 colours<-braw.env$plotColours$infer_sigC
               },
               "e1-"={
-                labels<-paste0(lb1,"ns correct",lb2,reportNumber(s1,n,braw.env$reportCounts)," ")
+                labels<-paste0(lb1,"ns correct",lb2,reportNumber(s1,n,braw.env$reportCounts),"")
                 colours<-braw.env$plotColours$infer_nsigC
               },
               "e2-"={
-                labels<-paste0(lb1,"ns error",lb2,reportNumber(s2,n,braw.env$reportCounts)," ")
+                labels<-paste0(lb1,"ns error",lb2,reportNumber(s2,n,braw.env$reportCounts),"")
                 colours<-braw.env$plotColours$infer_nsigC
               },
               "e1p"={
-                labels<-c(paste0(lb1,"sig error",lb2,reportNumber(s,n,braw.env$reportCounts)," "),
-                          paste0(lb1,"ns correct",lb2,reportNumber(ns,n,braw.env$reportCounts)," "))
+                labels<-c(paste0(lb1,"sig error",lb2,reportNumber(s,n,braw.env$reportCounts),""),
+                          paste0(lb1,"ns correct",lb2,reportNumber(ns,n,braw.env$reportCounts),""))
                 colours<-c(braw.env$plotColours$infer_sigC,braw.env$plotColours$infer_nsigC)
               },
               "e2p"={
-                labels<-c(paste0(lb1,"sig correct",lb2,reportNumber(s,n,braw.env$reportCounts)," "),
-                          paste0(lb1,"ns error",lb2,reportNumber(ns,n,braw.env$reportCounts)," "))
+                labels<-c(paste0(lb1,"sig correct",lb2,reportNumber(s,n,braw.env$reportCounts),""),
+                          paste0(lb1,"ns error",lb2,reportNumber(ns,n,braw.env$reportCounts),""))
                 colours<-c(braw.env$plotColours$infer_sigC,braw.env$plotColours$infer_nsigC)
               },
               "e1d"={
-                labels<-c(paste0(lb1,"sig error",lb2,reportNumber(s1,n,braw.env$reportCounts)," "),
+                labels<-c(paste0(lb1,"sig error",lb2,reportNumber(s1,n,braw.env$reportCounts),""),
                           paste0(lb1,"sig correct",lb2,reportNumber(s2,n,braw.env$reportCounts),""),
-                          paste0(lb1,"ns",lb2,reportNumber(ns,n,braw.env$reportCounts)," ")
+                          paste0(lb1,"ns",lb2,reportNumber(ns,n,braw.env$reportCounts),"")
                           )
                 colours<-c(braw.env$plotColours$infer_sigC,braw.env$plotColours$infer_sigC,braw.env$plotColours$infer_nsigC)
               },
               "e2d"={
-                labels<-c(paste0(lb1,"sig correct",lb2,reportNumber(s1,n,braw.env$reportCounts)," "),
+                labels<-c(paste0(lb1,"sig correct",lb2,reportNumber(s1,n,braw.env$reportCounts),""),
                           paste0(lb1,"sig error",lb2,reportNumber(s2,n,braw.env$reportCounts),""),
-                          paste0(lb1,"ns",lb2,reportNumber(ns,n,braw.env$reportCounts)," ")
+                          paste0(lb1,"ns",lb2,reportNumber(ns,n,braw.env$reportCounts),"")
                 )
                 colours<-c(braw.env$plotColours$infer_sigC,braw.env$plotColours$infer_sigC,braw.env$plotColours$infer_nsigC)
               }
@@ -1767,28 +1823,28 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   g
 }
 
-l_plot<-function(analysis,ptype=NULL,otheranalysis=NULL,orientation="vert",showTheory=TRUE,showData=TRUE,showLegend=FALSE,g=NULL){
-  g<-r_plot(analysis,ptype,orientation=orientation,showTheory=showTheory,showData=showData)
+l_plot<-function(analysis,ptype=NULL,otheranalysis=NULL,orientation="vert",showTheory=TRUE,showData=TRUE,showLegend=FALSE,showYaxis=TRUE,g=NULL){
+  g<-r_plot(analysis,ptype,orientation=orientation,showTheory=showTheory,showData=showData,showYaxis=showYaxis,g=g)
   g
 }
 
 p_plot<-function(analysis,ptype="p",otheranalysis=NULL,PlotScale=braw.env$pPlotScale,orientation="vert",
-                 whichEffect="Main 1",effectType="all",showTheory=TRUE,showData=TRUE,showLegend=FALSE,g=NULL){
+                 whichEffect="Main 1",effectType="all",showTheory=TRUE,showData=TRUE,showLegend=FALSE,showYaxis=TRUE,g=NULL){
   g<-r_plot(analysis,ptype,PlotScale=="log10",otheranalysis,orientation=orientation,
-            whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,g=g)
+            whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showYaxis=showYaxis,g=g)
   g
 }
 
-w_plot<-function(analysis,wtype,orientation="vert",showTheory=TRUE,showData=TRUE,showLegend=FALSE,g=NULL){
-  g<-r_plot(analysis,wtype,braw.env$wPlotScale=="log10",orientation=orientation,showTheory=showTheory,showData=showData,g=g)
+w_plot<-function(analysis,wtype,orientation="vert",showTheory=TRUE,showData=TRUE,showLegend=FALSE,showYaxis=TRUE,g=NULL){
+  g<-r_plot(analysis,wtype,braw.env$wPlotScale=="log10",orientation=orientation,showTheory=showTheory,showData=showData,showYaxis=showYaxis,g=g)
   g
 }
 
-n_plot<-function(analysis,ntype,orientation="vert",showTheory=TRUE,showData=TRUE,showLegend=FALSE,g=NULL){
-  r_plot(analysis,ntype,braw.env$nPlotScale=="log10",orientation=orientation,showTheory=showTheory,showData=showData,g=g)
+n_plot<-function(analysis,ntype,orientation="vert",showTheory=TRUE,showData=TRUE,showLegend=FALSE,showYaxis=TRUE,g=NULL){
+  r_plot(analysis,ntype,braw.env$nPlotScale=="log10",orientation=orientation,showTheory=showTheory,showData=showData,showYaxis=showYaxis,g=g)
 }
 
-e2_plot<-function(analysis,disp,otheranalysis=NULL,orientation="vert",showTheory=TRUE,showData=TRUE,showLegend=FALSE,g=NULL){
+e2_plot<-function(analysis,disp,otheranalysis=NULL,orientation="vert",showTheory=TRUE,showData=TRUE,showLegend=FALSE,showYaxis=TRUE,g=NULL){
   if (!analysis$hypothesis$effect$world$On) {
     lambda<-brawFormat(analysis$hypothesis$effect$rIV,digits=3)
     switch (braw.env$RZ,
@@ -1817,36 +1873,36 @@ e2_plot<-function(analysis,disp,otheranalysis=NULL,orientation="vert",showTheory
   
   switch (braw.env$STMethod,
           "NHST"={
-            analysis$hypothesis$effect$world$pRPlus<-1
+            analysis$hypothesis$effect$world$pRplus<-1
             switch(disp,
                    "e2r"={
-                     g<-r_plot(analysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,g=g)
+                     g<-r_plot(analysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showYaxis=showYaxis,g=g)
                    },
                    "e2+"={
-                     g<-r_plot(analysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,g=g)
+                     g<-r_plot(analysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showYaxis=showYaxis,g=g)
                    },
                    "e2-"={
-                     g<-r_plot(analysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,g=g)
+                     g<-r_plot(analysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showYaxis=showYaxis,g=g)
                    },
                    "e2p"={
-                     g<-p_plot(analysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,g=g)
+                     g<-p_plot(analysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showYaxis=showYaxis,g=g)
                    }
             )
             g<-addG(g,plotTitle(lab))
           },
           "sLLR"={
-            g<-p_plot(analysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,g=g)
+            g<-p_plot(analysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showYaxis=showYaxis,g=g)
             g<-addG(g,plotTitle(lab))
           },
           "dLLR"={
-            g<-p_plot(analysis,"e2d",otheranalysis=otheranalysis,PlotScale="linear",orientation=orientation,showTheory=showTheory,showData=showData,g=g)
+            g<-p_plot(analysis,"e2d",otheranalysis=otheranalysis,PlotScale="linear",orientation=orientation,showTheory=showTheory,showData=showData,showYaxis=showYaxis,g=g)
             g<-addG(g,plotTitle(lab))
           }
   )
   return(g)
 }
 
-e1_plot<-function(nullanalysis,disp,otheranalysis=NULL,orientation="vert",showTheory=TRUE,showData=TRUE,showLegend=FALSE,g=NULL){
+e1_plot<-function(nullanalysis,disp,otheranalysis=NULL,orientation="vert",showTheory=TRUE,showData=TRUE,showLegend=FALSE,showYaxis=TRUE,g=NULL){
   switch (braw.env$RZ,
           "r"={
             lab<-"Null: r[p]= 0"
@@ -1858,37 +1914,37 @@ e1_plot<-function(nullanalysis,disp,otheranalysis=NULL,orientation="vert",showTh
   lab<-"Null"
   switch (braw.env$STMethod,
           "NHST"={
-            nullanalysis$hypothesis$effect$world$pRPlus<-0
+            nullanalysis$hypothesis$effect$world$pRplus<-0
             # g<-r_plot(nullanalysis,"rs_e1",otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,g=g)
             switch(disp,
                    "e1r"={
-                     g<-r_plot(nullanalysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,g=g)
+                     g<-r_plot(nullanalysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showYaxis=showYaxis,g=g)
                    },
                    "e1+"={
-                     g<-r_plot(nullanalysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,g=g)
+                     g<-r_plot(nullanalysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showYaxis=showYaxis,g=g)
                    },
                    "e1-"={
-                     g<-r_plot(nullanalysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,g=g)
+                     g<-r_plot(nullanalysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showYaxis=showYaxis,g=g)
                    },
                    "e1a"={
-                     g<-p_plot(nullanalysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,g=g)
+                     g<-p_plot(nullanalysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showYaxis=showYaxis,g=g)
                    }
             )
             g<-addG(g,plotTitle(lab))
           },
           "sLLR"={
-            g<-p_plot(nullanalysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,g=g)+
+            g<-p_plot(nullanalysis,disp,otheranalysis=otheranalysis,orientation=orientation,showTheory=showTheory,showData=showData,showYaxis=showYaxis,g=g)
               g<-addG(g,plotTitle(lab))
           },
           "dLLR"={
-            g<-p_plot(nullanalysis,"e1d",otheranalysis=otheranalysis,PlotScale="linear",orientation=orientation,showTheory=showTheory,showData=showData,g=g)
+            g<-p_plot(nullanalysis,"e1d",otheranalysis=otheranalysis,PlotScale="linear",orientation=orientation,showTheory=showTheory,showData=showData,showYaxis=showYaxis,g=g)
             g<-addG(g,plotTitle(lab))
           }
   )
   return(g)
 }
 
-ps_plot<-function(analysis,disp,showTheory=TRUE,showLegend=FALSE,showData=TRUE,g=NULL){
+ps_plot<-function(analysis,disp,showTheory=TRUE,showLegend=FALSE,showData=TRUE,showYaxis=TRUE,g=NULL){
   
   if (is.null(analysis$hypothesis$IV2)) {
     sigs<-isSignificant(braw.env$STMethod,analysis$pIV,analysis$rIV,analysis$nval,analysis$df1,analysis$evidence)
@@ -1980,7 +2036,7 @@ ps_plot<-function(analysis,disp,showTheory=TRUE,showLegend=FALSE,showData=TRUE,g
   return(g)
 }
 
-aic_plot<-function(analysis,disp,showTheory=TRUE,showData=TRUE,showLegend=FALSE,g=NULL) {
+aic_plot<-function(analysis,disp,showTheory=TRUE,showData=TRUE,showLegend=FALSE,showYaxis=TRUE,g=NULL) {
   # plotting a single result:
   
   hypothesis<-analysis$hypothesis
@@ -2056,7 +2112,7 @@ aic_plot<-function(analysis,disp,showTheory=TRUE,showData=TRUE,showLegend=FALSE,
   return(g)
 }
 
-sem_plot<-function(analysis,disp,showTheory=TRUE,showData=TRUE,showLegend=FALSE,g=NULL){
+sem_plot<-function(analysis,disp,showTheory=TRUE,showData=TRUE,showLegend=FALSE,showYaxis=TRUE,g=NULL){
   
   hypothesis<-analysis$hypothesis
   effect<-hypothesis$effect
@@ -2110,6 +2166,6 @@ sem_plot<-function(analysis,disp,showTheory=TRUE,showData=TRUE,showLegend=FALSE,
   return(g)
 }
 
-var_plot<-function(analysis,disp,otheranalysis=NULL,orientation="vert",showTheory=TRUE,showData=TRUE,showLegend=FALSE,g=NULL){
-  g<-r_plot(analysis,showType=disp,showTheory=showTheory,showData=showData,showLegend=FALSE,g=g)
+var_plot<-function(analysis,disp,otheranalysis=NULL,orientation="vert",showTheory=TRUE,showData=TRUE,showLegend=FALSE,showYaxis=TRUE,g=NULL){
+  g<-r_plot(analysis,showType=disp,showTheory=showTheory,showData=showData,showLegend=FALSE,showYaxis=showYaxis,g=g)
 }

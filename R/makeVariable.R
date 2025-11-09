@@ -189,13 +189,21 @@ makeDefaultVariables<-function() {
     ExamGrade=makeVariable(name="ExamGrade",type="Interval",mu=65,sd=10,skew=-0.6),
     ExamPass=makeVariable(name="ExamPass?",type="Categorical",ncats=2,cases="no,yes",proportions="1,3"),
     "ExamPass?"=makeVariable(name="ExamPass?",type="Categorical",ncats=2,cases="no,yes",proportions="1,3"),
-    RiskTaking=makeVariable(name="RiskTaking",type="Interval",mu=30,sd=6),
+    RiskTaking=makeVariable(name="RiskTaking",type="Interval",mu=30,sd=6,skew=0.5),
     Interesting=makeVariable(name="Interesting",type="Interval",mu=10,sd=2),
     
     "Coffee?"=makeVariable(name="Coffee?",type="Categorical",ncats=2,cases="no,yes",proportions="1,1"),
     "Smoker?"=makeVariable(name="Smoker?",type="Categorical",ncats=2,cases="no,yes",proportions="2,1"),
     "RiskTaker?"=makeVariable(name="RiskTaker?",type="Categorical",ncats=2,cases="no,yes"),
     "Musician?"=makeVariable(name="Musician?",type="Categorical",ncats=2,cases="no,yes"),
+    TrialOutcome=makeVariable(name="TrialOutcome",type="Categorical",ncats=2,cases="-ve,+ve",proportions="1.2,1"),
+    Sessions=makeVariable(name="Sessions",'Ordinal',nlevs=6,ordSource="discrete",ordProportions="0.1,0.2,0.4,0.4,0.6,0.8"),
+    SessionsI=makeVariable(name="Sessions",'Interval',mu=4,sd=1,skew=-0.75),
+    TrialPhase=makeVariable(name="TrialPhase",type="Categorical",ncats=2,cases="pre,post",proportions="1.1,1"),
+      
+    Condition=makeVariable(name="Condition",type="Categorical",ncats=2,cases="A,B",proportions="1,1"),
+    Group=makeVariable(name="Group",type="Categorical",ncats=2,cases="C1,C2",proportions="1,1"),
+    Response=makeVariable(name="Response",type="Interval",mu=50,sd=20),
     
     StudySubject=makeVariable(name="StudySubject",type="Categorical",ncats=3,cases="psych,phil,sports",proportions="1.5,1,2"),
     BirthOrder=makeVariable(name="BirthOrder",type="Categorical",ncats=4,cases="first,middle,last,only",proportions="1,0.4,0.6,0.2")

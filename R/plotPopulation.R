@@ -74,7 +74,6 @@ plotOrdParPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha,g){
   # pts$y<-pts$y*pts$value+pts$yoff
   pts$y<-pts$y+pts$yoff
   
-  #aes(x=y,y=x*DV$sd+DV$mu,group=ids,alpha=alpha*value),
   g<-addG(g,dataPolygon(data=pts,fill=braw.env$plotColours$sampleC,colour=NA))
   return(g)
 }

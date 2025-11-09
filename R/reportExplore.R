@@ -21,14 +21,23 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
   reportMeans<-(reportStats=="Means")
   reportQuants<-FALSE
   
-  if (exploreResult$doingMetaAnalysis) 
+  if (exploreResult$doingMetaAnalysis) {
     switch(exploreResult$metaAnalysis$analysisType,
            "fixed"={
              showType<-"metaRiv"
              if (exploreResult$metaAnalysis$analyseBias) showType<-paste0(showType,";metaBias")
            },
            "random"={showType<-"metaRiv;metaRsd"},
-           {showType<-"Lambda;pRPlus"})
+           {
+             if (is.element(exploreResult$hypothesis$effect$world$PDF,c("GenExp","Gamma")))
+             showType<-"PDFk;PDFshape"
+             else showType<-"PDFk"
+             if (exploreResult$metaAnalysis$analyseNulls) showType<-paste0(showType,";metaNulls")
+             if (exploreResult$metaAnalysis$analyseBias) showType<-paste0(showType,";metaBias")
+           }
+           )
+    showType<-paste0(showType,";metaSmax")
+  }
   
   showType<-strsplit(showType,";")[[1]]
   if (length(showType)==1) {
@@ -129,7 +138,7 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
       else y_label2<-effectType
       
       for (showType in showTypes) {
-        y_label<-plotAxis(showType,hypothesis,design)$label
+        y_label<-plotAxis(showType,hypothesis,design,result=exploreResult$result$Smax)$label
         extra_y_label<-NULL
         if (is.null(hypothesis$IV2)){
           rVals<-exploreResult$result$rval
@@ -442,19 +451,25 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                   showVals<-r2llr(rVals,ns,df1,"dLLR",exploreResult$evidence$llr,exploreResult$evidence$prior)
                 },
                 "metaBias"={
-                  showVals<-exploreResult$result$param3
+                  showVals<-exploreResult$result$sigOnly
                 },
                 "metaRiv"={
-                  showVals<-exploreResult$result$param1
+                  showVals<-exploreResult$result$PDFk
                 },
                 "metaRsd"={
-                  showVals<-exploreResult$result$param2
+                  showVals<-exploreResult$result$pRplus
                 },
-                "Lambda"={
-                  showVals<-exploreResult$result$param1
+                "mean(R+)"={
+                  showVals<-exploreResult$result$PDFk
+                },
+                "PDFk"={
+                  showVals<-exploreResult$result$PDFk
+                },
+                "PDFshape"={
+                  showVals<-exploreResult$result$PDFshape
                 },
                 "p(R+)"={
-                  showVals<-exploreResult$result$param2
+                  showVals<-exploreResult$result$pRplus
                 },
                 "PDF"={
                   showVals<-exploreResult$result$dist==effect$world$PDF
@@ -467,8 +482,8 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                     yiqr[i]<-p_se
                   }
                 },
-                "metaS"={
-                  showVals<-exploreResult$result$S
+                "metaSmax"={
+                  showVals<-exploreResult$result$Smax
                 },
                 "iv.mn"={
                   showVals<-exploreResult$result$iv$mn
@@ -508,7 +523,8 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                 }
         )
         if (is.element(showType,c("rs","p","ws","n","AIC","log(lrs)","log(lrd)",
-                                  "metaBias","metaRiv","metaRsd","Lambda","p(R+)","metaS",
+                                  "metaBias","metaRiv","metaRsd","Lambda","p(R+)","metaSmax",
+                                  "metaK","metaShape","PDFk","PDFshape",
                                   "iv.mn","iv.sd","iv.sk","iv.kt","dv.mn","dv.sd","dv.sk","dv.kt",
                                   "er.mn","er.sd","er.sk","er.kt"))) {
           quants=(1-quantileShow)/2

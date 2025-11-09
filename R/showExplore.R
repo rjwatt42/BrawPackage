@@ -64,10 +64,11 @@ trimExploreResult<-function(result,nullresult) {
 #' showExplore(exploreResult=doExplore(),
 #'                        showType="Basic",dimension="1D",
 #'                        effectType="unique",whichEffect="All",
-#'                        quantileShow=0.5,autoYlim=TRUE,showHist=TRUE)
+#'                        quantileShow=0.5,fixedYlim=TRUE,showHist=TRUE)
 #' @export
 showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension="1D",showTheory=FALSE,
-                      effectType="unique",whichEffect="All",quantileShow=0.5,autoYlim=TRUE,showHist=TRUE,fixNulls=TRUE){
+                      effectType="unique",whichEffect="All",quantileShow=0.5,
+                      fixedYlim=braw.env$fixedYlim,showHist=FALSE,fixNulls=TRUE){
 
 # do we need more simulations  
   if (is.null(exploreResult)) exploreResult=doExplore()
@@ -106,14 +107,25 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
              showHist<-FALSE
            },
            "fixed"={
-             showType<-c("metaRiv")
+             if (is.null(showType))
+               showType<-c("metaRiv")
              if (exploreResult$metaAnalysis$analyseBias) showType<-c(showType,"metaBias")
              },
            "random"={
-             showType<-c("metaRiv","metaRsd")
+             if (is.null(showType))
+               showType<-c("metaRiv","metaRsd")
              if (exploreResult$metaAnalysis$analysisVar=="var") showType[2]<-"LambdaRn"
                },
-           {showType<-c("Lambda")}
+           {
+             if (is.null(showType)) {
+               if (exploreResult$metaAnalysis$analyseNulls) 
+                 showType<-c("mean(R+)","p(R+)")
+               else showType<-c("mean(R+)")
+             }
+            if (exploreResult$hypothesis$effect$world$On)
+              if (is.element(exploreResult$hypothesis$effect$world$PDF,c("GenExp","Gamma")))
+                showType<-c("PDFk","PDFshape")
+               }
            )
   }
   
@@ -125,7 +137,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     return(g)
   }
   
-  quants<-(1-quantileShow)/2
+  quants<-quantileShow/2
   showPower<-TRUE # show power calculations?
   showPowerR<-FALSE # show power calculations?
   
@@ -245,7 +257,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   
   for (si in 1:length(showType)) {
     
-  yaxis<-plotAxis(showType[si],hypothesis,design)
+  yaxis<-plotAxis(showType[si],hypothesis,design,result=exploreResult$result$Smax)
   ylim<-yaxis$lim
   ylabel<-yaxis$label
   ycols<-yaxis$cols
@@ -261,7 +273,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
   if (showType[si]=="p" && braw.env$pPlotScale=="log10" && any(exploreResult$result$pval>0)) {
     ylim<-c(-4,0)  
     while (mean(log10(exploreResult$result$pval)>ylim[1])<0.75) ylim[1]<-ylim[1]-1
-    autoYlim<-FALSE
+    fixedYlim<-FALSE
   }
   
   col2<-desat(braw.env$plotColours$infer_nsigNonNull,0.5)
@@ -304,6 +316,10 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     }
   } else {
     if (explore$exploreType=="minRp") exploreTypeShow<-"min(r[p])"
+    if (explore$exploreType=="p(R+)") exploreTypeShow<-braw.env$Plabel
+    if (explore$exploreType=="mean(R+)") exploreTypeShow<-braw.env$Llabel
+    if (explore$exploreType=="PDFk") exploreTypeShow<-"PDF[k]"
+    if (explore$exploreType=="PDFshape") exploreTypeShow<-"PDF[shape]"
   }
     
   for (whichEffect in whichEffects) {
@@ -341,7 +357,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
     theoryVals2<-c()
     if (showTheory) {
       # if (!hypothesis$effect$world$On)
-      #   hypothesis$effect$world<-list(On=TRUE,PDF="Single",RZ="r",PDFk=hypothesis$effect$rIV,pRPlus<-1)
+      #   hypothesis$effect$world<-list(On=TRUE,PDF="Single",RZ="r",PDFk=hypothesis$effect$rIV,pRplus<-1)
       n75=qnorm(0.75)
       newvals<-seq(min(vals),max(vals),length.out=51)
       if (explore$xlog) newvals<-10^newvals
@@ -353,19 +369,19 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                rVals<-newvals
                nVals<-rep(design$sN,length(newvals))
                alphas<-rep(braw.env$alphaSig,length(newvals))
-               rplusPs<-rep(hypothesis$effect$world$pRPlus,length(newvals))
+               rplusPs<-rep(hypothesis$effect$world$pRplus,length(newvals))
              },
              "n"={
                rVals<-rep(rVal,length(newvals))
                nVals<-newvals
                alphas<-rep(braw.env$alphaSig,length(newvals))
-               rplusPs<-rep(hypothesis$effect$world$pRPlus,length(newvals))
+               rplusPs<-rep(hypothesis$effect$world$pRplus,length(newvals))
              },
              "Alpha"={
                rVals<-rep(rVal,length(newvals))
                nVals<-rep(design$sN,length(newvals))
                alphas<-newvals
-               rplusPs<-rep(hypothesis$effect$world$pRPlus,length(newvals))
+               rplusPs<-rep(hypothesis$effect$world$pRplus,length(newvals))
              },
              "p(R+)"={
                rVals<-rep(rVal,length(newvals))
@@ -377,7 +393,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                rVals<-rep(rVal,length(newvals))
                nVals<-rep(design$sN,length(newvals))
                alphas<-rep(braw.env$alphaSig,length(newvals))
-               rplusPs<-rep(hypothesis$effect$world$pRPlus,length(newvals))
+               rplusPs<-rep(hypothesis$effect$world$pRplus,length(newvals))
              }
       )
       basenpts<-51
@@ -419,11 +435,11 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                                         PDF="Single",
                                         RZ="r",
                                         PDFk=hypothesis$effect$rIV,
-                                        pRPlus=1)
+                                        pRplus=1)
         for (i in 1:length(newvals)) {
           hypothesis$effect$world$PDFk<-rVals[i]
           design$sN<-nVals[i]
-          hypothesis$effect$world$pRPlus<-rplusPs[i]
+          hypothesis$effect$world$pRplus<-rplusPs[i]
           r<-fullRSamplingDist(basevals,hypothesis$effect$world,design,
                                doStat=showType[si],logScale=logScale,quantiles=c(quants,0.5,1-quants))
           if (length(r)==1) theoryVals<-c(theoryVals,r)
@@ -443,19 +459,19 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
         for (i in 1:length(newvals)) {
           hypothesis$effect$world$PDFk<-rVals[i]
           design$sN<-nVals[i]
-          hypothesis$effect$world$pRPlus<-rplusPs[i]
+          hypothesis$effect$world$pRplus<-rplusPs[i]
           r<-fullPSig(hypothesis$effect$world,design,alpha=alphas[i])
           theoryVals<-c(theoryVals,r)
         }
       }
       if (is.element(showType[si],c("NHST","Inference","Source","Hits","Misses"))) {
-        pRPlus<-hypothesis$effect$world$pRPlus
-        hypothesis$effect$world$pRPlus<-1
+        pRplus<-hypothesis$effect$world$pRplus
+        hypothesis$effect$world$pRplus<-1
         theoryVals1<-c()
         for (i in 1:length(newvals)) {
           hypothesis$effect$world$PDFk<-rVals[i]
           design$sN<-nVals[i]
-          # hypothesis$effect$world$pRPlus<-rplusPs[i]
+          # hypothesis$effect$world$pRplus<-rplusPs[i]
           r<-fullPSig(hypothesis$effect$world,design,alpha=alphas[i])
           theoryVals1<-c(theoryVals1,r)
         }
@@ -484,7 +500,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                  theoryVals1<-c()
                }
         )
-        hypothesis$effect$world$pRPlus<-pRPlus
+        hypothesis$effect$world$pRplus<-pRplus
       }
       if (explore$xlog) newvals<-log10(newvals)
     }
@@ -613,24 +629,30 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                 showMin<-apply(result$nFP,2,min)
               },
               "metaBias"={
-                showVals<-result$param3
+                showVals<-result$sigOnly
               },
               "metaRiv"={
-                showVals<-result$param1
+                showVals<-result$PDFk
               },
               "metaRsd"={
-                showVals<-result$param2
+                showVals<-result$pRplus
               },
               "LambdaRn"={
-                showVals<-result$param2
+                showVals<-result$pRplus
               },
-              "Lambda"={
-                showVals<-result$param1
+              "PDFk"={
+                showVals<-result$PDFk
+              },
+              "PDFshape"={
+                showVals<-result$PDFshape
+              },
+              "mean(R+)"={
+                showVals<-result$PDFk
               },
               "p(R+)"={
-                showVals<-result$param2
+                showVals<-result$pRplus
               },
-              "metaS"={
+              "metaSmax"={
                 showVals<-result$S
               },
               "p(w80)"={
@@ -750,8 +772,8 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                 }
                 np<-sum(!is.na(pVals[,1]))
                 if (fixNulls) {
-                  adjustNulls<-(1-effect$world$pRPlus)/(colSums(nulls)/np)
-                  adjustNonNulls<-effect$world$pRPlus/(colSums(!nulls)/np)
+                  adjustNulls<-(1-effect$world$pRplus)/(colSums(nulls)/np)
+                  adjustNonNulls<-effect$world$pRplus/(colSums(!nulls)/np)
                 } else {
                   adjustNulls<-1
                   adjustNonNulls<-1
@@ -846,7 +868,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       }
       
       if (!is.element(showType[si],c("NHST","p(sig)")))
-      if (autoYlim) {
+      if (!fixedYlim) {
         if (showHist) {
           use_y<-c(showVals,theoryVals,theoryLower,theoryVals1,theoryVals0,theoryVals2)
         } else {
@@ -964,6 +986,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                                design=exploreResult$design,
                                ylim=ylim,
                                scale=3/(length(vals)+1),
+                               orientation="horz",
                                width=c(left,right),
                                col=col,useSignificanceCols=FALSE,
                                histStyle="dense",
