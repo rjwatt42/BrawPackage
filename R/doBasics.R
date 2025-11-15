@@ -306,6 +306,7 @@ doBasics<-function(doingBasics=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=TRU
     }      
   }
   
+  oldAllScatter<-braw.env$allScatter
   if(!is.null(allScatter)) setBrawEnv("allScatter",allScatter)
   if(!is.null(fullWithinNames)) setBrawEnv("fullWithinNames",fullWithinNames)
   # display the results
@@ -399,6 +400,8 @@ doBasics<-function(doingBasics=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=TRU
   setBrawDef("design",oldDesign)
   setBrawDef("evidence",oldEvidence)
 
+  setBrawEnv("allScatter",oldAllScatter)
+  
   if (showOutput) {
     showHTML(basicsResults)
     return(invisible(NULL))
