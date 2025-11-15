@@ -676,25 +676,35 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
                 }
                 nulls<-abs(result$rpval)<=matrix(evidence$minRp,nrow(result$rpval),ncol(result$rpval),byrow=TRUE)
                 sigs<-isSignificant(braw.env$STMethod,pVals,rVals,nVals,df1Vals,evidence,braw.env$alphaSig)
-                if (any(!nulls)) {
-                  showMeans<-getStat(abs(sigs & !nulls),nVals)
-                  sigs0<-colMeans(abs(sigs & !nulls))
-                  showSE<-sqrt(sigs0*(1-sigs0)/sum(!nulls))
+                if (all(nulls) || all(!nulls)) {
+                  showMeans<-getStat(abs(sigs),nVals)
+                  sigs0<-colMeans(abs(sigs))
+                  showSE<-sqrt(sigs0*(1-sigs0)/length(nulls))
                 } else {
-                  showMeans<-0
-                  showSE<-NULL
+                  if (any(!nulls) || all(nulls)) {
+                    showMeans<-getStat(abs(sigs & !nulls),nVals)
+                    sigs0<-colMeans(abs(sigs & !nulls))
+                    showSE<-sqrt(sigs0*(1-sigs0)/sum(!nulls))
+                  } else {
+                    showMeans<-0
+                    showSE<-NULL
+                  }
                 }
+                  
                 if (any(hypothesis$effect$world$On)) {
                   showMeans2<-getStat(abs(sigs & nulls),nVals)
                   sigs0<-colMeans(abs(sigs & nulls))
                   showSE2<-sqrt(sigs0*(1-sigs0)/sum(nulls))
                   showMeans<-rbind(showMeans+showMeans2,showMeans2)
-                } else showMeans<-rbind(showMeans)
                 showSE<-NULL
                 showVals<-rbind(1-showMeans[1,],showMeans[1,]-showMeans[2,],showMeans[2,])
                 showCols<-c(NA,col0,col5)
                 showLabels<-c(NA,lb0,lb5)
                 showSplit<-0
+                } else {
+                  showVals<-showMeans
+                  showMeans<-rbind(showMeans)
+                }
               },
               "tDR"={
                 showVals<-NULL
@@ -922,7 +932,7 @@ showExplore<-function(exploreResult=braw.res$explore,showType="Basic",dimension=
       }
       
       # plot results
-      if (!is.element(showType[si],c("NHST","SEM","p(sig)"))) {
+      if (!is.element(showType[si],c("NHST","SEM"))) {
         # draw the basic line and point data
         if (!isempty(y50)) {
           y50[y50>ylim[2]]<-ylim[2]
