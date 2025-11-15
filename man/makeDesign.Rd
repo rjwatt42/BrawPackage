@@ -13,6 +13,7 @@ makeDesign(
   sNRandDist = "Gamma",
   sIV1Use = "Between",
   sIV2Use = "Between",
+  sDataFormat = "long",
   sWithinCor = 0.5,
   sBudgetOn = FALSE,
   sNBudget = 1000,

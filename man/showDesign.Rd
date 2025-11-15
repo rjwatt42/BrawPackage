@@ -8,6 +8,7 @@ showDesign(
   design = braw.def$design,
   hypothesis = braw.def$hypothesis,
   plotArea = c(0, 0, 1, 1),
+  showPsych = TRUE,
   autoShow = FALSE,
   g = NULL
 )

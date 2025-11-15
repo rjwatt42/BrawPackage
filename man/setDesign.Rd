@@ -13,6 +13,7 @@ setDesign(
   sNRandDist = braw.def$design$sNRandDist,
   sIV1Use = braw.def$design$sIV1Use,
   sIV2Use = braw.def$design$sIV2Use,
+  sDataFormat = braw.def$design$sDataFormat,
   sWithinCor = braw.def$design$sWithinCor,
   sBudgetOn = braw.def$design$sBudgetOn,
   sNBudget = braw.def$design$sNBudget,
