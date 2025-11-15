@@ -29,6 +29,8 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pRplus=0.5,
                           rangeVar=NULL,rangeP=NULL,analysisTerms=c(TRUE,FALSE,FALSE)
                         ) {
 
+  if (is.null(doingMetaScience)) doingMetaScience<-"0A"
+  
   stepMetaSci<-stepMS(doingMetaScience)
   partMetaSci<-partMS(doingMetaScience)
   steppartMetaSci<-paste0(stepMetaSci,partMetaSci)
@@ -173,7 +175,7 @@ prepareMetaScience<-function(doingMetaScience,world="Psych50",rp=0.3,pRplus=0.5,
 }
 
 #' @export
-doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,showOutput=TRUE,doHistory=TRUE,
+doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,showOutput=TRUE,doHistory=TRUE,showHelp=TRUE,
                         world="Psych50",rp=0.3,pRplus=0.5,metaPublicationBias=FALSE,
                         sN=NULL,
                         sMethod="Convenience",sMethodSeverity=0.1,sBudget=100,sSplits=5,
@@ -187,6 +189,8 @@ doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,showOutput=TRUE,doHist
   
   pC<-braw.env$plotColours
   setColours("meta")
+  if (is.null(metaScience)) metaScience<-"0A"
+  
   if (is.character(metaScience)) 
     metaScience<-prepareMetaScience(metaScience,alt4B=alt4B,
                                     world=world,rp=rp,pRplus=pRplus,metaPublicationBias=metaPublicationBias,
@@ -245,11 +249,16 @@ doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,showOutput=TRUE,doHist
     setBrawEnv("fullOutput",1)
   if (steppartMetaSci=="2B" && single) setBrawEnv("reportCounts",TRUE)
   else setBrawEnv("reportCounts",FALSE)
-  
+
+    if (doingMetaScience=="0A") {
+      showPlan<-show1<-show2<-nullPlot()
+      open<- -1
+    } else {
   investgD<-braw.res$investgD
   investgS<-braw.res$investgS
   investgR<-braw.res$investgR
   showTheory=TRUE
+  
   # if (stepMetaSci=="5") showTheory=FALSE
   if (single) {
     investgD<-showDescription()
@@ -288,25 +297,30 @@ doMetaScience<-function(metaScience,nreps=200,alt4B=FALSE,showOutput=TRUE,doHist
                 '</div>'
   )
   showPlan<-reportWorldDesign()
+  
+    }
+    
+    
   linkLabel<-paste0(rootMetaSci)
   
   history<-braw.res$investgHistory
   if (is.null(history)) history<-list(content='')
   if (!doHistory) history$content<-NULL
   
-  # if (doingMore && !is.null(history$content)) {
-  #   h<-unlist(strsplit(history$content,'<div class=\"history\"',fixed=TRUE))
-  #   h<-paste0('<div class=\"history\"',paste0(h[3:length(h)]))
-  #   history$content<-h
-  # }
+  tabs<-c("Plan","Data","Schematic")
+  tabContents<-c(showPlan,show1,show2)
+  if (showHelp) {
+    tabs<-c(tabs,"Help")
+    tabContents<-c(tabContents,metaSciInstructions(stepMetaSci))
+  }
   investgResults<-
     generate_tab(
       title="MetaScience:",
-      plainTabs=FALSE,
+      plainTabs=TRUE,
       titleWidth=100,
       width=550,
-      tabs=c("Plan","Data","Schematic"),
-      tabContents=c(showPlan,show1,show2),
+      tabs=tabs,
+      tabContents=tabContents,
       tabLink=paste0('https://doingpsychstats.wordpress.com/metascience-',stepMetaSci,'#','Part',stepMetaSci,partMetaSci),
       tabLinkLabel=paste0('&#x24D8 ',linkLabel),
       # tabLinkLabel=paste0(linkLabel),

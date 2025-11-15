@@ -1,7 +1,7 @@
 basicsInstructions <- function(HelpType="1") {
   
 
-  switch(HelpType,
+  switch(tolower(HelpType),
          "start"={
            output<-c(
              '<b>Getting started</b>',
@@ -265,7 +265,8 @@ basicsInstructions <- function(HelpType="1") {
            '<li> Now link IV to DV directly as well and see what happens.',
            '</ul>'
          )
-         }
+         },
+         { output<-'Help not found.'}
          
   )
     extras<-paste0('<br>',

@@ -3,10 +3,13 @@
 stepBS<-function(doing) gsub('[A-Za-z]*([0-9]*)[A-Da-d]*','\\1',doing)
 
 #' @export
-partBS<-function(doing) toupper(gsub('[A-Za-z]*[0-9]*([A-Da-b]*)','\\1',doing))
+partBS<-function(doing) toupper(gsub('[A-Za-z]*[0-9]*([A-Da-d]*)','\\1',doing))
 
 #' @export
-singleBS<-function(doing) !grepl('m',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-b]*([crm]*)','\\1',doing)),fixed=TRUE)
+singleBS<-function(doing) !grepl('m',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-d]*([RMrm]*)','\\1',doing)),fixed=TRUE)
+
+#' @export
+reanalyseBS<-function(doing) grepl('r',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-d]*([RMrm]*)','\\1',doing)),fixed=TRUE)
 
 #' @export
 makePanel<-function(g,r=NULL) {
@@ -22,26 +25,36 @@ makePanel<-function(g,r=NULL) {
 }
 
 #' @export
-doBasics<-function(doingBasics="Step1A",showOutput=TRUE,showJamovi=TRUE,showPlanOnly=FALSE,doHistory=TRUE,
+doBasics<-function(doingBasics=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=TRUE,
+                   showPlanOnly=FALSE,doHistory=TRUE,
                    IV="Perfectionism",IV2=NULL,DV="ExamGrade",
                    rIV=NULL,rIV2=NULL,rIVIV2=NULL,rIVIV2DV=NULL,
-                   sN=NULL,sMethod=NULL,
+                   sN=NULL,sMethod=NULL,sDataFormat=NULL,
                    sOutliers=0, sDependence=0,
                    sIV1Use="Between",sIV2Use="Between",
                    analyse="Main1", 
+                   allScatter=NULL,fullWithinNames=NULL,
                    nreps=200
 ) {
   
   oldHypothesis<-braw.def$hypothesis
   oldDesign<-braw.def$design
   oldEvidence<-braw.def$evidence
-  
   setHTML()
-  stepBS<-stepBS(doingBasics)
-  partBS<-partBS(doingBasics)
-  rootBS<-paste0("Step",stepBS,partBS)
-  if (singleBS(doingBasics)) process<-"single" else process<-"multiple"
   
+  if (is.null(doingBasics)) doingBasics<-"0A"
+
+  if (reanalyseBS(doingBasics)) {
+    stepBS<-braw.res$basicsDone[1]
+    partBS<-braw.res$basicsDone[2]
+    reanalyse<-TRUE
+    process<-"analysis"
+  } else {
+    stepBS<-stepBS(doingBasics)
+    partBS<-partBS(doingBasics)
+    if (singleBS(doingBasics)) process<-"single" else process<-"multiple"
+  }  
+  rootBS<-paste0("Step",stepBS,partBS)
   variables=list(IV=IV,IV2=IV2,DV=DV)
   
   if (is.null(sN)) {
@@ -63,14 +76,18 @@ doBasics<-function(doingBasics="Step1A",showOutput=TRUE,showJamovi=TRUE,showPlan
     if (is.null(sMethod)) sMethod<-"Random"
   }
   
+  marginalsStyle<-"all"
   hideReport<-FALSE
   makeData<-TRUE
   switch(stepBS,
+         "0"={
+           showNow<-"Plan"
+         },
          "1"={ # making samples and analysing them in Jamovi
            switch(partBS,
-                  "A"={showNow<-"Basic"},
+                  "A"={showNow<-"Effect"},
                   "B"={showNow<-"Sample"},
-                  "C"={showNow<-"Basic"}
+                  "C"={showNow<-"Effect"}
            )
          },
          "2"={ # 3 basic tests with Interval DV
@@ -81,7 +98,7 @@ doBasics<-function(doingBasics="Step1A",showOutput=TRUE,showJamovi=TRUE,showPlan
                   "C"={variables$IV<-"BirthOrder"},
                   {}
            )
-           showNow<-"Basic"
+           showNow<-"Effect"
          },
          "3"={ # 2 basic tests with Categorical DV
            variables$DV<-"TrialOutcome"
@@ -91,9 +108,9 @@ doBasics<-function(doingBasics="Step1A",showOutput=TRUE,showJamovi=TRUE,showPlan
                   "C"={variables$IV<-"Diligence"},
                   {}
            )
-           showNow<-"Basic"
+           showNow<-"Effect"
          },
-         "41"={ # Revision of all basic tests with 2 variables
+         "31"={ # Revision of all basic tests with 2 variables
            DVs<-c("ExamGrade","ExamPass?","TrialOutcome","Happiness")
            variables$DV<-DVs[ceiling(runif(1)*length(DVs))]
            
@@ -103,11 +120,10 @@ doBasics<-function(doingBasics="Step1A",showOutput=TRUE,showJamovi=TRUE,showPlan
            variables$IV<-IVs[ceiling(runif(1)*length(IVs))]
 
            switch(partBS,
-                  "A"={hideReport<-TRUE;showJamovi<-FALSE},
-                  "B"={hideReport<-FALSE;makeData<-FALSE},
+                  "A"={hideReport<-TRUE;showJamovi<-FALSE;showNow<-"Sample"},
+                  "B"={hideReport<-FALSE;makeData<-FALSE;showNow<-"Effect"},
                   {}
            )
-           showNow<-"Basic"
            process<-"single"
          },
          "4"={ # Main effects in multiple IVs
@@ -126,8 +142,8 @@ doBasics<-function(doingBasics="Step1A",showOutput=TRUE,showJamovi=TRUE,showPlan
            if (is.null(rIV2)) rIV2<- -0.3
            rIVIV2<- 0
            rIVIV2DV<-0
-           analyse<-"Main12"
-           showNow<-"Basic"
+           if (is.null(analyse)) analyse<-"Main12"
+           showNow<-"Effect"
          },
          "5"={ # Interactions
            variables$DV<-"ExamGrade"
@@ -145,8 +161,8 @@ doBasics<-function(doingBasics="Step1A",showOutput=TRUE,showJamovi=TRUE,showPlan
            if (is.null(rIV2)) rIV2<- -0.3
            if (is.null(rIVIV2DV)) rIVIV2DV<-0.3
            rIVIV2<- 0
-           analyse<-"Main1x2"
-           showNow<-"Basic"
+           if (is.null(analyse)) analyse<-"Main1x2"
+           showNow<-"Effect"
          },
          "6"={ # Covariation
            variables$IV<-"Anxiety"
@@ -172,13 +188,7 @@ doBasics<-function(doingBasics="Step1A",showOutput=TRUE,showJamovi=TRUE,showPlan
                     if (is.null(rIVIV2)) rIVIV2<- 0.7
                   }
            )
-           if (analyse=="Main12" && 
-               braw.res$result$hypothesis$IV$name==variables$IV &&
-               braw.res$result$hypothesis$IV2$name==variables$IV2 &&
-               braw.res$result$hypothesis$DV$name==variables$DV
-           )    process<-"analysis"
-           else process<-"single"
-           showNow<-"Basic"
+           showNow<-"Effect"
          },
          "7"={ # Experimental 1 IV
            variables$IV<-"Condition"
@@ -187,7 +197,7 @@ doBasics<-function(doingBasics="Step1A",showOutput=TRUE,showJamovi=TRUE,showPlan
                   "A"={ sIV1Use<-"Between" },
                   "B"={ sIV1Use<-"Within"  }
                   )
-           showNow<-"Basic"
+           showNow<-"Effect"
          },
          "8"={ # Experimental 2 IV,
            variables$IV<-"Condition"
@@ -201,8 +211,10 @@ doBasics<-function(doingBasics="Step1A",showOutput=TRUE,showJamovi=TRUE,showPlan
            if (is.null(rIVIV2DV)) rIVIV2DV<-0.3
            if (is.null(rIV)) rIV<-rIVIV2DV
            if (is.null(rIV2)) rIV2<-rIVIV2DV
+           if (is.null(sDataFormat)) sDataFormat<-"wide"
+           if (is.null(allScatter)) allScatter<-FALSE
            analyse<-"Main1x2"
-           showNow<-"Basic"
+           showNow<-"Effect"
          },
          "9"={ # Moderation
            variables$IV<-"Anxiety"
@@ -223,7 +235,7 @@ doBasics<-function(doingBasics="Step1A",showOutput=TRUE,showJamovi=TRUE,showPlan
                     }
            )
            analyse<-"Main1x2"
-           showNow<-"Basic"
+           showNow<-"Effect"
          },
          "10"={ # Mediation
            variables$IV<-"Anxiety"
@@ -252,6 +264,7 @@ doBasics<-function(doingBasics="Step1A",showOutput=TRUE,showJamovi=TRUE,showPlan
          }
   )
   
+  if (is.character(analyse))
   switch(analyse,
          "Main1"={analyse<-c(TRUE,FALSE,FALSE,FALSE)},
          "Main2"={analyse<-c(FALSE,TRUE,FALSE,FALSE)},
@@ -273,7 +286,8 @@ doBasics<-function(doingBasics="Step1A",showOutput=TRUE,showJamovi=TRUE,showPlan
   if (stepBS=="9") hypothesis$layout<-"moderation"
   if (stepBS=="10") hypothesis$layout<-"mediation"
   
-  design<-makeDesign(sN=sN,sMethod=makeSampling(sMethod),
+  if (is.null(sDataFormat)) sDataFormat<-"long"
+  design<-makeDesign(sN=sN,sMethod=makeSampling(sMethod),sDataFormat=sDataFormat,
                      sOutliers=sOutliers, sDependence=sDependence,
                      sIV1Use=sIV1Use,sIV2Use=sIV2Use)
   setBrawDef("hypothesis",hypothesis)
@@ -292,6 +306,8 @@ doBasics<-function(doingBasics="Step1A",showOutput=TRUE,showJamovi=TRUE,showPlan
     }      
   }
   
+  if(!is.null(allScatter)) setBrawEnv("allScatter",allScatter)
+  if(!is.null(fullWithinNames)) setBrawEnv("fullWithinNames",fullWithinNames)
   # display the results
   svgBox(height=350,aspect=1.5)
   setBrawEnv("graphicsType","HTML")
@@ -309,23 +325,34 @@ doBasics<-function(doingBasics="Step1A",showOutput=TRUE,showJamovi=TRUE,showPlan
     showNow<-"Schematic"
   }      
   
+  if (showNow=="Plan") {
+    tabs<-c("Plan","Sample","Effect","Schematic")
+    tabContents<-c(
+      makePanel(showPlan()),
+      makePanel(nullPlot(),NULL),
+      makePanel(nullPlot(),NULL),
+      makePanel(nullPlot(),NULL)
+    )
+    
+  } else {
   if (hideReport) {
-    tabs<-c("Plan","Sample","Basic","Schematic")
+    tabs<-c("Plan","Sample","Effect","Schematic")
     tabContents<-c(
       makePanel(showPlan()),
       makePanel(showMarginals(style="all"),NULL),
-      makePanel(showDescription(dataOnly=TRUE),NULL),
+      makePanel(nullPlot(),NULL),
       makePanel(nullPlot(),NULL)
     )
   } else {
-    tabs<-c("Plan","Sample","Basic","Schematic")
+    tabs<-c("Plan","Sample","Effect","Schematic")
     tabContents<-c(
       makePanel(showPlan()),
-      makePanel(showMarginals(style="all"),reportSample()),
+      makePanel(showMarginals(style=marginalsStyle),reportSample()),
       makePanel(showDescription(),
                 paste0(reportInference(),reportDescription(plain=TRUE))),
       schematic
     )
+  }
   }
   if (showJamovi) {
     tabs<-c(tabs,"Jamovi")
@@ -334,17 +361,23 @@ doBasics<-function(doingBasics="Step1A",showOutput=TRUE,showJamovi=TRUE,showPlan
     tabs<-c(tabs,"Jamovi")
     tabContents<-c(tabContents,nullPlot())
   }
+  
+  if (showHelp) {
+    tabs<-c(tabs,"Help")
+    tabContents<-c(tabContents,brawBasicsHelp(open=c(0,0),indent=100,plainTabs=TRUE))
+  }
+
   open<-which(showNow==tabs)
   
-  history<-braw.res$demoHistory
+  history<-braw.res$basicsHistory
   if (is.null(history)) history<-list(content='')
   if (!doHistory) history$content<-NULL
   
   linkLabel<-paste0(rootBS)
-  demoResults<-
+  basicsResults<-
     generate_tab(
       title="Basics:",
-      plainTabs=FALSE,
+      plainTabs=TRUE,
       titleWidth=100,
       width=550,
       tabs=tabs,
@@ -356,19 +389,20 @@ doBasics<-function(doingBasics="Step1A",showOutput=TRUE,showJamovi=TRUE,showPlan
     )
   
   if (doHistory) {
-    history$content<-demoResults
+    history$content<-basicsResults
     history$place<-length(history$content)
-    setBrawRes("demoHistory",history)
+    setBrawRes("basicsHistory",history)
   }
+  setBrawRes("basicsDone",c(stepBS,partBS))
   
   setBrawDef("hypothesis",oldHypothesis)
   setBrawDef("design",oldDesign)
   setBrawDef("evidence",oldEvidence)
 
   if (showOutput) {
-    showHTML(demoResults)
+    showHTML(basicsResults)
     return(invisible(NULL))
   }
   
-  return(demoResults)
+  return(basicsResults)
 }

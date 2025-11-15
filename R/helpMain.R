@@ -32,12 +32,14 @@ brawStartHelp<-function(indent=0) {
       )
 }
 
-brawSimHelp<-function(open=0,indent=0) {
+#' @export
+brawSimHelp<-function(open=0,indent=0,plainTabs=TRUE) {
   return(
     generate_tab(
       title="Simulation",
       indent=indent,
       titleWidth=0,
+      plainTabs=plainTabs,
       # titleTab="Click on the tabs for specific help.",
       tabs=c("Start","Plan","Single Sample","Multiple Samples","Explore"),
       tabContents = c(
@@ -52,30 +54,33 @@ brawSimHelp<-function(open=0,indent=0) {
   )
 }
 
-brawMetaSciHelp<-function(open=0,indent=0) {
+#' @export
+brawMetaSciHelp<-function(open=0,indent=0,plainTabs=TRUE) {
   return(
     generate_tab(
       title="MetaScience",
       indent=indent,
       titleWidth=0,
+      plainTabs=plainTabs,
       # titleTab="Click on the tabs for specific help.",
       tabs=c(
         # "Start",
         "Inferences","SamplingMethod","SampleSize","DoubleChecking","RealDifferences"),
       tabContents = c(
         # metaSciInstructions("Overview"),
-        metaSciInstructions("Inferences"),
-        metaSciInstructions("Sample Size"),
-        metaSciInstructions("Sampling Method"),
-        metaSciInstructions("Double Checking"),
-        metaSciInstructions("Real Differences")
+        metaSciInstructions("1"),
+        metaSciInstructions("2"),
+        metaSciInstructions("3"),
+        metaSciInstructions("4"),
+        metaSciInstructions("5")
       ),
       open=open
     )
   )
 }
 
-brawJamoviHelp<-function(open=0,indent=0,hypothesis=braw.def$hypothesis,design=braw.def$design) {
+#' @export
+brawJamoviHelp<-function(open=0,indent=0,hypothesis=braw.def$hypothesis,design=braw.def$design,plainTabs=TRUE) {
   return(
   generate_tab(
     title="Jamovi",
@@ -93,13 +98,15 @@ brawJamoviHelp<-function(open=0,indent=0,hypothesis=braw.def$hypothesis,design=b
   )
 }
 
-brawBasicsHelp<-function(open=c(0,0),indent=0,titleWidth=100) {
+#' @export
+brawBasicsHelp<-function(open=c(0,0),indent=0,titleWidth=100,plainTabs=TRUE) {
   basicsTabNames<-c("Start","Data","Uncertainty","Design","Linear Models")
   basicsTabs<-c(
     basicsInstructions("start"),
     generate_tab(
       title="Data:",
       tabs=c("Overview","1a","1b","1c"),
+      plainTabs=plainTabs,
       indent=indent,
       width=500,
       titleWidth=0,
@@ -160,7 +167,7 @@ brawBasicsHelp<-function(open=c(0,0),indent=0,titleWidth=100) {
       title="Basics",
       indent=indent,
       titleWidth=0,
-      plainTabs=TRUE,
+      plainTabs=plainTabs,
       plain=1,
       tabs=basicsTabNames,
       tabContents=basicsTabs,

@@ -401,9 +401,9 @@ showDescription<-function(analysis=braw.res$result,plotArea=c(0,0,1,1),dataOnly=
   }
   if (is.null(analysis$hypothesis$IV2)||(!analysis$evidence$AnalysisTerms[2])){
     switch (analysis$hypothesis$DV$type,
-            "Interval"=g<-plotParDescription(analysis,dataOnly=dataOnly,g),
-            "Ordinal"=g<-plotParDescription(analysis,dataOnly=dataOnly,g),
-            "Categorical"=g<-plotCatDescription(analysis,dataOnly=dataOnly,g)
+            "Interval"=g<-plotParDescription(analysis,dataOnly=dataOnly,g=g),
+            "Ordinal"=g<-plotParDescription(analysis,dataOnly=dataOnly,g=g),
+            "Categorical"=g<-plotCatDescription(analysis,dataOnly=dataOnly,g=g)
     )
     names<-c(paste0("n=",analysis$nval), paste0("r[s]=",round(analysis$rIV,3)))
     colours<-c(braw.env$plotColours$sampleC,

@@ -9,6 +9,7 @@ JamoviInstructions <- function(hypothesis=braw.def$hypothesis,
   
   optionsGroup=NULL
   options=c()
+  repeated<-FALSE
   if (is.null(hypothesis$IV2)) {
     switch(hypothesis$DV$type,
            "Interval"={
@@ -69,10 +70,16 @@ JamoviInstructions <- function(hypothesis=braw.def$hypothesis,
            },
            "t-test"={
              ribbon="T-Tests"
-             if (repeated) menu="Paired Samples T-Test"
-             else menu="Independent Samples T-Test"
-             IVgoes="Grouping Variable"
-             DVgoes="Dependent Variables"
+             if (repeated) {
+               menu="Paired Samples T-Test"
+               IVgoes=""
+               DVgoes="Paired Variables"
+               options=paste("<b>Student's</b>",in_char,"<b>Tests</b>")
+             } else {
+               menu="Independent Samples T-Test"
+               IVgoes="Grouping Variable"
+               DVgoes="Dependent Variables"
+             }
              options=paste("<b>Student's</b>",in_char,"<b>Tests</b>")
              graphMenu="Box Plot"
              IVGraph="Split by"
@@ -81,10 +88,15 @@ JamoviInstructions <- function(hypothesis=braw.def$hypothesis,
            },
            "anova"={
              ribbon="ANOVA"
-             if (repeated) menu="Repeated Measures ANOVA"
-             else menu="One-way ANOVA"
-             IVgoes="Grouping Variable"
-             DVgoes="Dependent Variables"
+             if (repeated) {
+               menu="Repeated Measures ANOVA"
+               IVgoes=""
+               DVgoes="Repeated Measures Cells"
+             } else {
+               menu="One-way ANOVA"
+               IVgoes="Grouping Variable"
+               DVgoes="Dependent Variables"
+             }
              if (!repeated) 
                 options=paste("<b>Assume equal (Fisher's)</b>",in_char,"<b>Variances</b>")
              graphMenu="Box Plot"
@@ -150,17 +162,46 @@ JamoviInstructions <- function(hypothesis=braw.def$hypothesis,
            "Ordinal"=test<-"generalLinear",
            "Categorical"=test<-"generalizedLinear"
     )
-    if(hypothesis$IV$type=="Categorical") repeated1<-(design$sIV1Use=="Within")
-    if(hypothesis$IV2$type=="Categorical") repeated2<-(design$sIV2Use=="Within")
+    
+    repeated1<-(hypothesis$IV$type=="Categorical" && design$sIV1Use=="Within")
+    repeated2<-(hypothesis$IV2$type=="Categorical" && design$sIV2Use=="Within")
     switch(test,
            "generalLinear"={
-             ribbon="Regression"
-             menu="Linear Regression"
-             DVgoes="Dependent Variable"
-             if (hypothesis$IV$type=="Categorical") IVgoes="Factors"
-             else                                   IVgoes="Covariates"
-             if (hypothesis$IV2$type=="Categorical") IV2goes="Factors"
-             else                                    IV2goes="Covariates"
+             if (repeated1 || repeated1) {
+               ribbon="ANOVA"
+               menu="Repeated Measures ANOVA"
+               
+             } else {
+             if (hypothesis$IV$type=="Categorical" && hypothesis$IV2$type=="Categorical") {
+               ribbon="ANOVA"
+               menu="ANOVA"
+               DVgoes="Dependent Variable"
+               IVgoes="Fixed Factors"
+               IV2goes="Fixed Factors"
+             }
+             if (hypothesis$IV$type=="Categorical" && hypothesis$IV2$type!="Categorical") {
+               ribbon="ANOVA"
+               menu="ANCOVA"
+               DVgoes="Dependent Variable"
+               IVgoes="Fixed Factors"
+               IV2goes="Covariates"
+             }
+             if (hypothesis$IV2$type=="Categorical" && hypothesis$IV$type!="Categorical") {
+               ribbon="ANOVA"
+               menu="ANCOVA"
+               DVgoes="Dependent Variable"
+               IV2goes="Fixed Factors"
+               IVgoes="Covariates"
+             }
+             if (hypothesis$IV$type!="Categorical" && hypothesis$IV2$type!="Categorical") {
+               ribbon="Regression"
+               menu="Linear Regression"
+               DVgoes="Dependent Variable"
+               IVgoes="Covariates"
+               IV2goes="Factors"
+               IV2goes="Covariates"
+             }
+             }
              graphMenu=NULL
            },
            "generalizedLinear"={
@@ -174,11 +215,6 @@ JamoviInstructions <- function(hypothesis=braw.def$hypothesis,
              graphMenu=NULL
            }
     )
-    DVgoes="Dependent Variable"
-    if (hypothesis$IV$type=="Categorical") IVgoes="Factors"
-    else IVgoes="Covariates"
-    if (hypothesis$IV2$type=="Categorical") IV2goes="Factors"
-    else IV2goes="Covariates"
   }
   
   EffectSizeribbon<-"Regression"
@@ -208,14 +244,70 @@ JamoviInstructions <- function(hypothesis=braw.def$hypothesis,
   menu<-paste0('<span style="color:hsl(205, 100%, 41%)">',menu,'</span>')
   if (HelpType=="All" || HelpType=="Analysis") {
     output<-c(output,'<b>Analysis</b>: choose the menu <span style="color:hsl(205, 100%, 41%);"><b>Analyses</b></span>')
-      output<-c(output,paste0('<ol style="margin-top:0px;"><li>Press the ',ribbon," icon",
-                              "<br> & choose ",menu," from the drop down menu</li>"))
-    list1<-paste0("<ul><li><b style=color:red>",hypothesis$DV$name,"</b> to <b>",DVgoes,"</b></li>")
+    output<-c(output,paste0('<ol style="margin-top:0px;"><li>Press the ',ribbon," icon",
+                            "<br> & choose ",menu," from the drop down menu</li>"))
+    done<-FALSE
+    list1<-paste0("<li>Now<ul>")
+    
+    if (is.null(hypothesis$IV2) && repeated) {
+      names<-paste0('<b style=color:red>',hypothesis$IV$cases,'</b>')
+      names<-paste0(names,collapse = " & ")
+      list1<-paste0(list1,"<li>","Move ",names," data to <b>",DVgoes,"</b></li>")
+      done<-TRUE
+    } 
+    if (!is.null(hypothesis$IV2) && repeated1 && !repeated2) {
+      names<-paste0('<b style=color:red>"',hypothesis$IV$cases,'"</b>')
+      names<-paste0(names,collapse = " & ")
+      list1<-paste0(list1,"<li>","Change text <b>RM Factor 1</b>"," to <b style=color:red>",'"',hypothesis$IV$name,'"',"</b></li>")
+      list1<-paste0(list1,"<li>","Change text <b>Level 1, 2 etc</b>"," to ",names,"</li>")
+      list1<-paste0(list1,"</ul><li>Then<ul>")
+      list1<-paste0(list1,"<li>","Move data ",gsub('\"','',names)," to <b>","Repeated Measures Cells","</b></li>")
+      if (hypothesis$IV2$type=="Categorical")
+        list1<-paste0(list1,"<li>","Move data ","<b style=color:red>",hypothesis$IV2$name,"</b> to <b>","Between Subject Factors","</b></li>")
+      else
+        list1<-paste0(list1,"<li>","Move data ","<b style=color:red>",hypothesis$IV2$name,"</b> to <b>","Covariates","</b></li>")
+      done<-TRUE
+    } 
+    if (!is.null(hypothesis$IV2) && !repeated1 && repeated2) {
+      names<-paste0('<b style=color:red>"',hypothesis$IV2$cases,'"</b>')
+      names<-paste0(names,collapse = " & ")
+      list1<-paste0(list1,"<li>","Change text <b>RM Factor 1</b>"," to <b style=color:red>",'"',hypothesis$IV2$name,'"',"</b></li>")
+      list1<-paste0(list1,"<li>","Change text <b>Level 1, 2 etc</b>"," to ",names,"</li>")
+      list1<-paste0(list1,"</ul><li>Then<ul>")
+      list1<-paste0(list1,"<li>","Move data ",gsub('\"','',names)," to <b>","Repeated Measures Cells","</b></li>")
+      if (hypothesis$IV$type=="Categorical")
+        list1<-paste0(list1,"<li>","Move data ","<b style=color:red>",hypothesis$IV$name,"</b> to <b>","Between Subject Factors","</b></li>")
+      else
+        list1<-paste0(list1,"<li>","Move data ","<b style=color:red>",hypothesis$IV$name,"</b> to <b>","Covariates","</b></li>")
+      done<-TRUE
+    } 
+    if (!is.null(hypothesis$IV2) && repeated1 && repeated2) {
+      names1<-paste0('<b style=color:red>"',hypothesis$IV$cases,'"</b>')
+      names1<-paste0(names1,collapse = " & ")
+      names2<-paste0('<b style=color:red>"',hypothesis$IV2$cases,'"</b>')
+      names2<-paste0(names2,collapse = " & ")
+      names<-c()
+      for (i1 in 1:hypothesis$IV$ncats)
+        for (i2 in 1:hypothesis$IV2$ncats) {
+          names<-c(names,paste0(hypothesis$IV$cases[i1],"&",hypothesis$IV2$cases[i2]))
+        }
+      names<-paste0('<b style=color:red>',names,'</b>')
+      names<-paste0(names,collapse = ", ")
+      list1<-paste0(list1,"<li>","Change text <b>RM Factor 1</b>"," to <b style=color:red>",'"',hypothesis$IV$name,'"',"</b></li>")
+      list1<-paste0(list1,"<li>","Change text <b>Level 1, 2 etc</b>"," to ",names1,"</li>")
+      list1<-paste0(list1,"<li>","Change text <b>RM Factor 2</b>"," to <b style=color:red>",'"',hypothesis$IV2$name,'"',"</b></li>")
+      list1<-paste0(list1,"<li>","Change text <b>Level A, B etc</b>"," to ",names2,"</li>")
+      list1<-paste0(list1,"</ul><li>Then<ul>")
+      list1<-paste0(list1,"<li>","Move data ",gsub('\"','',names)," to <b>","Repeated Measures Cells","</b></li>")
+      done<-TRUE
+    } 
+    if (!done) {
+    list1<-paste0(list1,"<li><b style=color:red>",hypothesis$DV$name,"</b> to <b>",DVgoes,"</b></li>")
     list1<-paste0(list1,"<li><b style=color:red>",hypothesis$IV$name,"</b> to <b>",IVgoes,"</b></li>")
     if (!is.null(hypothesis$IV2))
       list1<-paste0(list1,"<li><b style=color:red>",hypothesis$IV2$name,"</b> to <b>",IV2goes,"</b></li>")
-    list1<-paste0(list1,"</ul>")
-    output<-c(output,paste0("<li>Now move",list1,"</li>"))
+    }
+    output<-c(output,paste0(list1,"</ul></li>"))
     
     if (!is.null(options)) {
       if (!is.null(optionsGroup)) 

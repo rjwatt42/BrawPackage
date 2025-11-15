@@ -1,9 +1,9 @@
-metaSciInstructions <- function(HelpType="Plan") {
+metaSciInstructions <- function(HelpType="0") {
 
   oldEvidence<-braw.def$evidence
   
   switch(HelpType,
-         "Overview"={
+         "0"={
            output<-c(
              '<b>Inferences?</b> inferences using statistical testing are, of course, subject to errors.',
              'How much do these matter?',
@@ -39,7 +39,7 @@ metaSciInstructions <- function(HelpType="Plan") {
              '<br>'
            )
          },
-         "Inferences"={
+         "1"={
            output<-c(
              '<b>Inferences?</b> inferences using statistical testing are, of course, subject to errors.',
              'How much do these matter?',
@@ -79,7 +79,7 @@ metaSciInstructions <- function(HelpType="Plan") {
            )
          },
          
-         "Sample Size"={output<-c(
+         "2"={output<-c(
            '<b>Sample Size?</b> a researcher has to make an important choice about sample size because larger sample sizes are more costly. ',
            '<ul style=margin:0px;>',
            '<li> Should I use the biggest I can afford?',
@@ -109,7 +109,7 @@ metaSciInstructions <- function(HelpType="Plan") {
            '<br>')
          },
          
-         "Sampling Method"={output<-c(
+         "3"={output<-c(
            '<b>Sampling Method?</b> a researcher cannot make a random sample. So we compromise. How much does this matter? ',
            '<ul style=margin:0px;>',
            '<li> Should I use the biggest I can afford?',
@@ -141,7 +141,7 @@ metaSciInstructions <- function(HelpType="Plan") {
            '<br>')
          },
          
-         "Double Checking"={output<-c(
+         "4"={output<-c(
            '<b>Double Checking?</b> what do we do when there are 2 (or more) different results to compare or contrast?',
            '<ul style=margin:0px;>',
            '<li> Replication asks whether the result can be found again and is therefore competitive.',
@@ -179,7 +179,7 @@ metaSciInstructions <- function(HelpType="Plan") {
            '<br>')
          },
          
-         "Real Differences"={output<-c(
+         "5"={output<-c(
            '<b>Real Differences</b> sometimes 2 different results can happen quite properly. Why?',
            'In these cases, replication is highly problematical.',
            '<ul style=margin:0px;>',
@@ -200,13 +200,13 @@ metaSciInstructions <- function(HelpType="Plan") {
          }
          )
   
-  if (HelpType!="Overview") {
+  if (HelpType!="0") {
     switch(HelpType,
-           "Inferences"=HelpNo<-1,
-           "Sample Size"=HelpNo<-2,
-           "Sampling Method"=HelpNo<-3,
-           "Double Checking"=HelpNo<-4,
-           "Real Differences"=HelpNo<-5
+           "1"=HelpNo<-1,
+           "2"=HelpNo<-2,
+           "3"=HelpNo<-3,
+           "4"=HelpNo<-4,
+           "5"=HelpNo<-5
     )
     extras<-paste0('<br>',
                    'More information ',
