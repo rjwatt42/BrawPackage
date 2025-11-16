@@ -72,7 +72,7 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
     npt<-201
     if (logScale) {
       pr<-log10(braw.env$alphaSig)
-      inc<-pr/floor(-pr/(2/npt))
+      inc<-pr/ceiling(-pr/(2/npt))
       theoryVals<-seq(0,ylim[1],inc)
       yvUse<-10^theoryVals
     }else{
