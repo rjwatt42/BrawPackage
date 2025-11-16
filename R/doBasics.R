@@ -65,7 +65,7 @@ doBasics<-function(doingBasics=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=TRU
     if (paste0(stepBS)=="4") sN<-100
     if (paste0(stepBS)=="5") sN<-150
     if (paste0(stepBS)=="6") sN<-150
-    if (paste0(stepBS)=="7") sN<-50
+    if (paste0(stepBS)=="7") sN<-35
     if (paste0(stepBS)=="8") sN<-50
     if (paste0(stepBS)=="9") sN<-500
     if (paste0(stepBS)=="10") sN<-500
