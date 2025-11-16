@@ -202,9 +202,9 @@ reportExplore<-function(exploreResult=braw.res$explore,showType="rs",
                     ps<-colMeans(ps)
                   }
                   yiqr<-sqrt(ps*(1-ps)/nrow(pVals))
-                  y25<-ps-sqrt(ps*(1-ps)/nrow(pVals))
+                  y25<-ps-yiqr
                   y50<-ps
-                  y75<-ps+sqrt(ps*(1-ps)/nrow(pVals))
+                  y75<-ps+yiqr
                 },
                 "n(sig)"={
                   y50<-colMeans(exploreResult$result$nSig)

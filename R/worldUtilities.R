@@ -441,7 +441,7 @@ fullRSamplingDist<-function(vals,world,design,doStat="rs",logScale=FALSE,sigOnly
         addition<-addition*ndens[ni]
         d1<-d1+addition
         if (sigOnly>0) {
-          critR<-tanh(qnorm(1-braw.env$alphaSig/2,0,1/sqrt(nvals[ni]-3)))
+          critR<-tanh(pn2z(braw.env$alphaSig,nvals[ni]))
           if (any(abs(rp)<critR)) {
             addition[abs(rp)<critR]<-addition[abs(rp)<critR]*(1-sigOnly)
             use<-which(rp>critR)[1]

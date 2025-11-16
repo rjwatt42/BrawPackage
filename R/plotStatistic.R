@@ -95,6 +95,7 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
            "r"={
              if (!design$sNRand) {
                cr<-tanh(pn2z(braw.env$alphaSig,design$sN))
+               cr<-tanh(qnorm(1-braw.env$alphaSig/2,0,1/sqrt(design$sN-3)))
                inc<-cr/ceiling(cr/(2/npt))
                rvals<-seq(inc,0.99,inc)
                rvals<-c(-rev(rvals),0,rvals)
