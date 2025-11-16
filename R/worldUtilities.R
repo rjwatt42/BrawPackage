@@ -441,15 +441,15 @@ fullRSamplingDist<-function(vals,world,design,doStat="rs",logScale=FALSE,sigOnly
         addition<-addition*ndens[ni]
         d1<-d1+addition
         if (sigOnly>0) {
-          critR<-tanh(pn2z(braw.env$alphaSig,nvals[ni]))
-          if (any(abs(rp)<critR)) {
-            addition[abs(rp)<critR]<-addition[abs(rp)<critR]*(1-sigOnly)
-            use<-which(rp>critR)[1]
-            addition[use]<-addition[use]*(sigOnly)*(rp[use]-critR)/diff(rp[1:2])
+          critRval<-critR(nvals[ni])
+          if (any(abs(rp)<critRval)) {
+            addition[abs(rp)<critRval]<-addition[abs(rp)<critRval]*(1-sigOnly)
+            use<-which(rp>critRval)[1]
+            addition[use]<-addition[use]*(sigOnly)*(rp[use]-critRval)/diff(rp[1:2])
             if (any(rp<0)) {
-              use<-which(rp<(-critR))
+              use<-which(rp<(-critRval))
               use<-max(use)
-              addition[use]<-addition[use]*(sigOnly)*(-rp[use]-critR)/diff(rp[1:2])
+              addition[use]<-addition[use]*(sigOnly)*(-rp[use]-critRval)/diff(rp[1:2])
             }
             if (sigOnlyCompensate) addition<-addition/sum(addition)
           }

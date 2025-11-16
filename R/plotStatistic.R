@@ -71,10 +71,14 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
   if (is.element(showType,c("p","e1p","e2p","po"))) {
     npt<-201
     if (logScale) {
-      theoryVals<-seq(0,ylim[1],length.out=npt)
+      pr<-log10(braw.env$alphaSig)
+      inc<-pr/floor(-pr/(2/npt))
+      theoryVals<-seq(0,ylim[1],inc)
       yvUse<-10^theoryVals
     }else{
-      theoryVals<-seq(1,0,length.out=npt)
+      pr<-braw.env$alphaSig
+      inc<-pr/ceiling(pr/(2/npt))
+      theoryVals<-seq(1,0,-inc)
       yvUse<-theoryVals
     }
     oldEffect<-effectTheory
@@ -94,8 +98,7 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
     switch(braw.env$RZ,
            "r"={
              if (!design$sNRand) {
-               cr<-tanh(pn2z(braw.env$alphaSig,design$sN))
-               cr<-tanh(qnorm(1-braw.env$alphaSig/2,0,1/sqrt(design$sN-3)))
+               cr<-critR(design$sN)
                inc<-cr/ceiling(cr/(2/npt))
                rvals<-seq(inc,0.99,inc)
                rvals<-c(-rev(rvals),0,rvals)

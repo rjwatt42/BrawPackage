@@ -130,7 +130,7 @@ r2ci<-function(r,n,s=0){
   r<-check_r(r,"r2ci")
   n<-check_n(n,"r2ci")
   z<-atanh(r)
-  zci<-qnorm(1-0.05/2)*sqrt(1/(n-3))
+  zci<-critZ(n,0.05)
   if (s==0){
     cbind(tanh(z-zci),tanh(z+zci))
   } else {
