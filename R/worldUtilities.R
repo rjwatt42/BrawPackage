@@ -260,9 +260,9 @@ rRandomValue<-function(world=braw.def$hypothesis$effect$world,ns) {
 
 rPopulationDist<-function(rvals,world) {
   if (world$PDFsample) {
-    mn<-world$PDFsamplemn
-    sd<-world$PDFsamplesd
-    rdens1<-rSamplingDistr(mn,rvals,1/sd^2+3,sigOnly=world$PDFsamplebias)
+    rs<-world$PDFsampleRs
+    n<-world$PDFsampleN
+    rdens1<-rSamplingDistr(rs,rvals,n,sigOnly=world$PDFsamplebias)
   } else rdens1<-1
   k<-world$PDFk
   mu<-world$PDFoffset
@@ -286,9 +286,9 @@ rPopulationDist<-function(rvals,world) {
 
 zPopulationDist<-function(zvals,world) {
   if (world$PDFsample) {
-    mn<-world$PDFsamplemn
-    sd<-world$PDFsamplesd
-    zdens1<-zSamplingDistr(mn,zvals,1/sd^2+3,sigOnly=world$PDFsamplebias)
+    zs<-atanh(world$PDFsampleRs)
+    n<-world$PDFsampleN
+    zdens1<-zSamplingDistr(zs,zvals,n,sigOnly=world$PDFsamplebias)
   } else zdens1<-1
   k<-world$PDFk
   mu<-world$PDFoffset
@@ -349,6 +349,7 @@ fullRSamplingDist<-function(vals,world,design,doStat="rs",logScale=FALSE,sigOnly
     vals<-seq(-1,1,length=braw.env$worldNPoints)*braw.env$r_range
 
   # distribution of population effect sizes
+  if (is.numeric(world)) world<-makeWorld(TRUE,"Single","r",PDFk=world)
   if (!is.null(world$On)) pR<-getRList(world,HQ=HQ)
   else pR<-world
   rvals<-pR$pRho

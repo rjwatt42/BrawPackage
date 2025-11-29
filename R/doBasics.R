@@ -310,9 +310,9 @@ doBasics<-function(doingBasics=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=TRU
   if(!is.null(allScatter)) setBrawEnv("allScatter",allScatter)
   if(!is.null(fullWithinNames)) setBrawEnv("fullWithinNames",fullWithinNames)
   # display the results
-  svgBox(height=350,aspect=1.5)
+  svgBox(height=350,aspect=1.5,fontScale=1.2)
   setBrawEnv("graphicsType","HTML")
-  setBrawEnv("fontSize",0.75)
+  # setBrawEnv("fontSize",0.75)
 
   if ((process=="single" || process=="analysis") && showNow!="SchematicSEM") {
     schematic<-makePanel(showInference(effectType="direct"),reportInference())
@@ -380,7 +380,7 @@ doBasics<-function(doingBasics=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=TRU
       title="Basics:",
       plainTabs=TRUE,
       titleWidth=100,
-      width=550,
+      width=600,
       tabs=tabs,
       tabContents=tabContents,
       tabLink=paste0('https://doingpsychstats.wordpress.com/basics-',partBS,'#','A'),

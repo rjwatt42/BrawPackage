@@ -2,7 +2,7 @@ theoryPlot<-function(g,theory,orientation,baseColour,theoryAlpha,xoff,lineOnly=F
   theoryVals<-theory$theoryVals
   theoryDens_all<-theory$theoryDens_all
   theoryDens_sig<-theory$theoryDens_sig
-  showAll<-all(theoryDens_all==theoryDens_sig)
+  showAll<-!isempty(theoryDens_sig) && all(theoryDens_all==theoryDens_sig)
   if (showAll) theoryDens_all<-theoryDens_all*0
   
   switch(orientation,
@@ -256,8 +256,9 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
          },
          "ws"={
            dw<-0.01
-           theoryVals<-seq(braw.env$alphaSig*(1+dw),1/(1+dw),length.out=npt)
+           theoryVals<-seq(braw.env$alphaSig*(1+dw),1/(1+dw),length.out=npt*5)
            theoryDens_all<-fullRSamplingDist(theoryVals,effectTheory$world,design,"ws",logScale=logScale,sigOnly=evidence$sigOnly)
+           theoryDens_sig<-theoryDens_all*(theoryVals>=0.5)
          },
          "log(lrs)"={
            theoryVals<-seq(0,braw.env$lrRange,length.out=npt)
@@ -518,16 +519,35 @@ makeFiddle<-function(y,yd,orientation="horz"){
   y_filledp<-y_vals*0
   y_filledn<-y_vals*0
   x_pos<-y*0
-  if (orientation=="horz") 
-    for (i in 1:length(y)) {
-      use<-which.min(abs(y[i]-y_vals))
-      dx<-sqrt(rX(dy)^2-rX(y[i]-y_vals[use])^2)
-      if (dx==0) dxr<-0
-      else       dxr<-runif(1,-1,1)*rj*dy
-      fill<-use+(-rr:rr)
-      fill<-fill[fill>=1 & fill<=length(y_vals)]
-      x_pos[i]<-y_filledp[use]+dxr
-      y_filledp[fill]<-x_pos[i]+dx
+  if (orientation=="horz")
+    if (1==1) {
+      y_vals<-seq(min(y),max(y),length.out=501)
+      x_vals<-seq(0,1,length.out=501)
+      store<-matrix(0,length(y_vals),length(x_vals))
+      for (i in 1:length(y)) {
+        usey<-which.min(abs(y[i]-y_vals))
+        usex<-min(which(store[usey,]==0))
+        x_pos[i]<-x_vals[usex]
+        if (x_pos[i]>0) x_pos[i]<-x_pos[i]+runif(1,-1,1)*diff(x_vals[1:2])*1.5
+        np<-5
+        for (ix in -np:np) 
+          for (iy in -np:np) {
+            if ((ix^2+iy^2)<np^2 && (ix+usex)>0 && (ix+usex)<501 && (iy+usey)>0 && (iy+usey)<501) 
+              store[iy+usey,ix+usex]<-1
+          }
+      }
+      y_filledp<-10
+    } else {
+      for (i in 1:length(y)) {
+        use<-which.min(abs(y[i]-y_vals))
+        dx<-sqrt(rX(dy)^2-rX(y[i]-y_vals[use])^2)
+        if (dx==0) dxr<-0
+        else       dxr<-runif(1,-1,1)*rj*dy
+        fill<-use+(-rr:rr)
+        fill<-fill[fill>=1 & fill<=length(y_vals)]
+        x_pos[i]<-y_filledp[use]+dxr
+        y_filledp[fill]<-x_pos[i]+dx
+      }
     }
   else
     for (i in 1:length(y)) {
@@ -924,16 +944,16 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
     # 
     if (sequence && !is.na(histGain)) histGain<-0.8
     switch(orientation,
-           "horz"=hoff<-0.025,
+           "horz"=hoff<-0.015,
            "vert"=hoff<-0
            )
     dotSize<-min(4,braw.env$dotSize*sqrt(min(1,100/length(pts$y1))))
     # if (max(abs(xr))>0) xr<-xr*hgain/max(abs(xr))
     if (!is.na(histGain)) {
       xr<-xr*histGain
-      if (!sequence && max(xr)<0.5 && length(xr)>10) xr<-xr/max(abs(xr))*0.5
+      # if (!sequence && max(xr)<0.5 && length(xr)>10) xr<-xr/max(abs(xr))*0.5
     }
-    else xr<-xr/max(abs(xr))*0.25
+    # else xr<-xr/max(abs(xr))*0.25
     if (max(xr)>0.5) xr<-xr/max(abs(xr))*0.5
     xr<-xr*min(1,length(xr)/100)
     xr<-xr+hoff
@@ -1431,6 +1451,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   } 
 
   if (doingMetaAnalysis) { theoryAlpha<-0.5} else {theoryAlpha<-0.8}
+  if (is.null(sampleVals)) theoryAlpha<-1
   
   for (i in 1:length(xoff)){
     histGain<-NA
@@ -1600,10 +1621,11 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       )
     }
     if (showTheory) {
+      if (theoryAlpha<1) theoryAlpha<-theoryAlpha/2
     if (!theoryFirst)
-      g<-theoryPlot(g,theory,orientation,baseColour,theoryAlpha/2,xoff[i])
+      g<-theoryPlot(g,theory,orientation,baseColour,theoryAlpha,xoff[i])
     else
-      g<-theoryPlot(g,theory,orientation,baseColour,theoryAlpha/2,xoff[i],lineOnly=TRUE)
+      g<-theoryPlot(g,theory,orientation,baseColour,theoryAlpha,xoff[i],lineOnly=TRUE)
     }
     
     if (is.element(showType,c("rse","sig","ns","nonnulls","nulls","rss","p","e1r","e2r","e1+","e2+","e1-","e2-",

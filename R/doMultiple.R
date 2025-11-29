@@ -214,6 +214,7 @@ doMultiple <- function(nsims=10,multipleResult=NA,hypothesis=braw.def$hypothesis
     }
   }
   
+  if (nsims>0) {
   if (inSteps && autoShow) {
     min_ns<-floor(log10(nsims/100))
     min_ns<-max(0,min_ns)
@@ -221,7 +222,10 @@ doMultiple <- function(nsims=10,multipleResult=NA,hypothesis=braw.def$hypothesis
   } else
     ns<-nsims
   if (braw.env$timeLimit<Inf) ns<-1
-    
+  } else {
+    ns<-0
+  }
+
   nsims<-nsims+multipleResult$count
   time.at.start<-Sys.time()
   while (multipleResult$count<nsims && (Sys.time()-time.at.start)<braw.env$timeLimit) {
@@ -237,7 +241,7 @@ doMultiple <- function(nsims=10,multipleResult=NA,hypothesis=braw.def$hypothesis
   }
 
   multipleResult<-c(list(type="multiple"),multipleResult)
-  if (multipleResult$count>0)
+  # if (multipleResult$count>0)
     setBrawRes("multiple",multipleResult)
   return(multipleResult)
 }

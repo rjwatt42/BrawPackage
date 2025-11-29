@@ -1,3 +1,17 @@
+# 
+#' @export
+initHTML<-function(gsize=400,aspect=1.3,fontScale=1.5,xlim=c(0,1),ylim=c(0,1)) {
+  braw.env <- new.env(parent = emptyenv())
+  braw.env <<- list(graphicsType='HTML',
+                   addHistory=FALSE,
+                   plotSize=c(aspect,1)*gsize,
+                   labelSize=gsize/100*fontScale,
+                   dotSize=gsize/100*fontScale*1.25,
+                   plotArea=c(0,0,1,1)
+  )
+  braw.env$plotLimits<<-plotLimits(xlim,ylim,returnValue=TRUE)
+}
+
 addGraphElement<-function(element) {
   if (braw.env$addHistory) {
     if (is.null(braw.env$history)) 
@@ -198,18 +212,20 @@ reSizeFont<-function(size) {
   else return(size*braw.env$plotLimits$fontScale*1.5)
 }
 
-plotLimits<-function(xlim,ylim,orientation="horz",gaps=c(1,1,0,0),fontScale=1) {
+plotLimits<-function(xlim,ylim,orientation="horz",gaps=c(1,1,0,0),fontScale=1,returnValue=FALSE) {
   gain<-0.3*c(braw.env$plotSize[1],braw.env$plotSize[2],braw.env$plotSize[1],braw.env$plotSize[2])
   gaps<-gaps*fontScale/gain
   
   switch(orientation,
-         "horz"={braw.env$plotLimits<-list(xlim=xlim,ylim=ylim,xsc=xlim,ysc=ylim,
+         "horz"={plotLimits<-list(xlim=xlim,ylim=ylim,xsc=xlim,ysc=ylim,
                                            orientation=orientation,gap=gaps,fontScale=fontScale,
                                            xAxisTickSize=5,yAxisTickSize=5)},
-         "vert"={braw.env$plotLimits<-list(xlim=xlim,ylim=ylim,xsc=ylim,ysc=xlim,
+         "vert"={plotLimits<-list(xlim=xlim,ylim=ylim,xsc=ylim,ysc=xlim,
                                            orientation=orientation,gap=gaps[c(2,1,4,3)],fontScale=fontScale,
                                            xAxisTickSize=5,yAxisTickSize=5)}
   )
+  if (returnValue) return(plotLimits)
+  else braw.env$plotLimits<-plotLimits
 }
 
 #' this is the start of any figure - which may then contain several graphs
@@ -218,19 +234,19 @@ plotLimits<-function(xlim,ylim,orientation="horz",gaps=c(1,1,0,0),fontScale=1) {
 #' @examples
 #' g<-nullPlot()
 #' @export
-nullPlot<-function() {
+nullPlot<-function(background=braw.env$plotColours$graphC) {
   addGraphElement(NULL)
-  drawNullPlot()
+  drawNullPlot(background=background)
 }
 
-drawNullPlot<-function() {  
+drawNullPlot<-function(background=braw.env$plotColours$graphC) {  
   switch(braw.env$graphicsType,
          "ggplot"={
            g<-ggplot()+braw.env$plotRect+braw.env$blankTheme()
          },
          "HTML"={
-           if (braw.env$plotColours$graphC=="#FFFFFF") col<-"rgba(0,0,0,0)"
-           else col<-braw.env$plotColours$graphC
+           if (background=="#FFFFFF") col<-"rgba(0,0,0,0)"
+           else col<-background
            g<-paste0(
              '<svg width=',format(svgBoxX()),' height=',format(svgBoxY()),
              ' padding:0;',

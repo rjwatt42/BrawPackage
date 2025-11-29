@@ -11,16 +11,16 @@ getWorld<-function(name,rp=0.3,result=braw.res$result) {
            world<-makeWorld(On=TRUE,
                        PDFsample=TRUE,
                        RZ="r",
-                       PDFsamplesd=1/sqrt(result$nval-3),
-                       PDFsamplemn=result$rIV
+                       PDFsampleN=result$nval,
+                       PDFsampleRs=result$rIV
                        )
          },
          "SampleB"={
            world<-makeWorld(On=TRUE,
                        PDFsample=TRUE,
                        RZ="r",
-                       PDFsamplesd=1/sqrt(result$nval-3),
-                       PDFsamplemn=result$rIV
+                       PDFsampleN=result$nval,
+                       PDFsampleRs=result$rIV
            )
          },
          "Null"={

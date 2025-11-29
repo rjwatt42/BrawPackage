@@ -28,6 +28,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
     multipleResult$result<-multipleResult$ResultHistory
     multipleResult$count<-length(multipleResult$result$rIV)
   }
+  if (multipleResult$count==0) return()
   
     reportMeans<-(reportStats=="Means")
     reportQuants<-FALSE
@@ -408,7 +409,7 @@ reportMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
                     "log(lrs)"={a<-res2llr(result,"sLLR")},
                     "log(lrd)"={a<-res2llr(result,"dLLR")},
                     "n"={a<-result$nval},
-                    "ws"={a<-rn2w(r,result$nval)},
+                    "ws"={a<-rn2w(result$rval,result$nval)},
                     "nw"={a<-rw2n(r,0.8,result$design$Replication$Tails)},
                     "wp"={a<-rn2w(result$rpIV,result$nval)},
                     "ci1"={a<-r2ci(r,result$nval[1],-1)},

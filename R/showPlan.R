@@ -20,7 +20,7 @@ showPlan<-function(helpOutput="") {
   if (braw.def$hypothesis$effect$world$On) {
     h<-joinHTML(showSystem("world"),reportWorld())
   } else {
-    h<-showSystem("hypothesis")
+    h<-joinHTML(showSystem("hypothesis"),reportSystem(design=NULL))
   }
   svgBox(180*1)
   sd<-showSystem("design")

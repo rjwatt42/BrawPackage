@@ -63,12 +63,12 @@ doDLLR<-function() {
 #' @export
 makeWorld<-function(On=TRUE,PDF="Uniform",RZ="r",
                     PDFk=0.0,PDFshape=2,PDFspread=0,PDFoffset=0.0,pRplus=1,
-                    PDFsample=FALSE,PDFsamplemn=0.0,PDFsamplesd=0.0,PDFsamplebias=FALSE,
+                    PDFsample=FALSE,PDFsampleRs=0.0,PDFsampleN=0.0,PDFsamplebias=FALSE,
                     worldAbs=FALSE) {
  world<-list(On=On,
              PDF=PDF,RZ=RZ,
              PDFk=PDFk,PDFshape=PDFshape,PDFspread=PDFspread,PDFoffset=PDFoffset,pRplus=pRplus,
-             PDFsample=PDFsample,PDFsamplemn=PDFsamplemn,PDFsamplesd=PDFsamplesd,PDFsamplebias=PDFsamplebias,
+             PDFsample=PDFsample,PDFsampleRs=PDFsampleRs,PDFsampleN=PDFsampleN,PDFsamplebias=PDFsamplebias,
              worldAbs=worldAbs)
  world  
 }
@@ -374,7 +374,7 @@ setWorld<-function(On=braw.def$hypothesis$effect$world$On,
                    PDF=braw.def$hypothesis$effect$world$PDF,RZ=braw.def$hypothesis$effect$world$RZ,
                    PDFk=braw.def$hypothesis$effect$world$PDFk,PDFshape=braw.def$hypothesis$effect$world$PDFshape,PDFspread=braw.def$hypothesis$effect$world$PDFspread,
                    PDFoffset=braw.def$hypothesis$effect$world$PDFoffset,pRplus=braw.def$hypothesis$effect$world$pRplus,
-                   PDFsample=braw.def$hypothesis$effect$world$PDFsample,PDFsamplemn=braw.def$hypothesis$effect$world$PDFsamplemn,PDFsamplesd=braw.def$hypothesis$effect$world$PDFsamplesd,PDFsamplebias=braw.def$hypothesis$effect$world$PDFsamplebias,
+                   PDFsample=braw.def$hypothesis$effect$world$PDFsample,PDFsampleRs=braw.def$hypothesis$effect$world$PDFsampleRs,PDFsampleN=braw.def$hypothesis$effect$world$PDFsampleN,PDFsamplebias=braw.def$hypothesis$effect$world$PDFsamplebias,
                    worldAbs=braw.def$hypothesis$effect$world$worldAbs) {
   if (is.character(On)) e<-getWorld(On)
   else {
@@ -383,7 +383,7 @@ setWorld<-function(On=braw.def$hypothesis$effect$world$On,
       e<-makeWorld(On=On,
                    PDF=PDF,RZ=RZ,
                    PDFk=PDFk,PDFshape=PDFshape,PDFspread=PDFspread,PDFoffset=PDFoffset,pRplus=pRplus,
-                   PDFsample=PDFsample,PDFsamplemn=PDFsamplemn,PDFsamplesd=PDFsamplesd,PDFsamplebias=PDFsamplebias,
+                   PDFsample=PDFsample,PDFsampleRs=PDFsampleRs,PDFsampleN=PDFsampleN,PDFsamplebias=PDFsamplebias,
                    worldAbs=worldAbs)
   }
   h<-braw.def$hypothesis

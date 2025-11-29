@@ -189,8 +189,8 @@ replicationNewN<-function(rs,n,hypothesis,design,evidence) {
       r<-rw
       if (is.null(r)) r<-hypothesis$effect$world
       r$PDFsample=TRUE
-      r$PDFsamplemn<-rs
-      r$PDFsamplesd<-1/sqrt(n-3)
+      r$PDFsampleRs<-rs
+      r$PDFsampleN<-n
     } else {
       if (is.null(rw)) r<-rs
       else r<-rSamp2Pop(rs,n,rw)

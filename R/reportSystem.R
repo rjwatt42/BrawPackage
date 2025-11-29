@@ -12,7 +12,7 @@ reportSystem<-function(hypothesis=braw.def$hypothesis,design=braw.def$design){
   
   if (is.null(IV2)) no_ivs<-1 else no_ivs<-2
   
-  nc=7
+  nc=5
   
   outputText<-c("!THypothesis:",rep(" ",nc-1))
   outputText<-c(outputText,
@@ -60,12 +60,14 @@ reportSystem<-function(hypothesis=braw.def$hypothesis,design=braw.def$design){
     )
   }
   outputText<-c(outputText,rep("",nc))
+  if (!is.null(design)) {
   outputText<-c(outputText,
                 "!TDesign:",rep("",nc-1),
                 "!H!C","Sample Size","Method","Usage",rep("",nc-4),
                 "",paste0("!c",design$sN),paste0("!c",design$sMethod$type),paste0("!c",design$sIV1Use),rep("",nc-4)
   )
   outputText<-c(outputText,rep("",nc))
+  }
   
   nr=length(outputText)/nc
   reportPlot(outputText,nc,nr)

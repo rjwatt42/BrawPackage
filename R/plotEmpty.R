@@ -8,7 +8,7 @@ emptyPlot<-function(mode,useHelp=FALSE) {
   if (mode=="Simulation") {
     tabTitle<-"Simulation:"
     tabs<-c("Plan","Single","Multiple","Explore")
-    tabContents<-c(rep(nullPlot(),length(tabs)))
+    tabContents<-c(showPlan(),rep(nullPlot(),length(tabs)-1))
     if (useHelp) {
       tabs<-c(tabs,"Help")
       tabContents<-c(tabContents,brawSimHelp(indent=100))
