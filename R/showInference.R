@@ -219,18 +219,21 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
       }
     } 
     if (nplots<=2) {
+      pA<-braw.env$plotArea
       if (orientation=="horz") minWidth<-1 else minWidth<-0.6
       for (fi in 1:length(whichEffect)) {
-        braw.env$plotArea<-c(area.x[fi]/nplots,area.y[fi],area.w[fi]/nplots,area.h[fi])
-          # braw.env$plotArea<-c((1-1)/nplots+0.05,area.x[fi],min(minWidth,0.9/nplots/length(whichEffect)),area.y[fi])
+        plotArea<-c(area.x[fi]/nplots,area.y[fi],area.w[fi]/nplots,area.h[fi])
+        braw.env$plotArea<-plotArea*pA[c(3,4,3,4)]+c(pA[c(1,2)],0,0)
+        # braw.env$plotArea<-c(area.x[fi]/nplots,area.y[fi],area.w[fi]/nplots,area.h[fi])
           g1<-plotInference(analysis1,otheranalysis=other1,disp=showType[1],
                             whichEffect=whichEffect[fi],effectType=effectType,
                             orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,
                             showYaxis=(fi==1),
                             g=g1)
           if (nplots==2) {
-            braw.env$plotArea<-c(area.x[fi]/nplots+0.5,area.y[fi],area.w[fi]/nplots,area.h[fi])
-            # braw.env$plotArea<-c((2-1)/nplots+0.05,area.x[fi],min(minWidth,0.9/nplots/length(whichEffect)),area.y[fi])
+            plotArea<-c(area.x[fi]/nplots+0.5,area.y[fi],area.w[fi]/nplots,area.h[fi])
+            braw.env$plotArea<-plotArea*pA[c(3,4,3,4)]+c(pA[c(1,2)],0,0)
+            # braw.env$plotArea<-c(area.x[fi]/nplots+0.5,area.y[fi],area.w[fi]/nplots,area.h[fi])
           g1<-plotInference(analysis2,otheranalysis=other2,disp=showType[2],
                             whichEffect=whichEffect[fi],effectType=effectType,
                             orientation=orientation,showTheory=showTheory,showData=showData,showLegend=showLegend,
@@ -238,6 +241,7 @@ showInference<-function(analysis=braw.res$result,showType="Basic",dimension="1D"
                             g=g1)
           }
       }
+      braw.env$plotArea<-pA
     }
   }
 

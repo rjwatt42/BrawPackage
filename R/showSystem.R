@@ -295,8 +295,9 @@ showWorld<-function(hypothesis=braw.def$hypothesis,joinNulls=TRUE,showSingle=NUL
          "z"={ xticks<-makeTicks(seq(-2,2,1));xlabel<-makeLabel(braw.env$zpLabel)}
   )
   g<-startPlot(xlim=xlim,ylim=c(0,1.05),
-               xticks=xticks,xlabel=xlabel,fontScale = fontScale,unitGap=0.45,
-               top=TRUE,box="x",g=g)
+               xticks=xticks,xlabel=xlabel,fontScale = fontScale,
+               unitGap=0.35,top=TRUE,box="x",
+               g=g)
   
   
   x<-c(rx[1],rx,rx[length(rx)])
@@ -339,7 +340,7 @@ showDesign<-function(design=braw.def$design,hypothesis=braw.def$hypothesis,plotA
   braw.env$plotArea<-plotArea
   g<-startPlot(xlim=binRange, ylim=c(0,1),
                xticks=makeTicks(nRange$ticks,10^nRange$ticks),xlabel=makeLabel(nRange$label),
-               box="x",g=g)
+               unitGap=0.35,top=TRUE,box="x",g=g)
   
   nbin<-seq(binRange[1],binRange[2],length.out=braw.env$worldNPoints)
   xpts<-c(-1,-1,1,1)*(max(log10(nbin))-min(log10(nbin)))/50
@@ -548,7 +549,7 @@ showWorldSampling<-function(hypothesis=braw.def$hypothesis,design=braw.def$desig
                 RZ="r",
                 pRplus=1)
   
-  totalArea<-totalArea*30-evidence$sigOnly*10
+  totalArea<-totalArea*60-evidence$sigOnly*10
   if (world$PDF=="Single") totalArea<-totalArea*0.5
   
   np<-braw.env$worldNPoints
@@ -590,11 +591,11 @@ showWorldSampling<-function(hypothesis=braw.def$hypothesis,design=braw.def$desig
          "z"={ xticks<-makeTicks(seq(-2,2,1));xlabel<-makeLabel(braw.env$zsLabel)}
   )
   g<-startPlot(xlim=xlim,ylim=c(0,1.05),
-               xticks=xticks,xlabel=xlabel,fontScale = fontScale,unitGap=0.45,
-               top=TRUE,box="x",g=g)
+               xticks=xticks,xlabel=xlabel,fontScale = fontScale,
+               unitGap=0.35,top=TRUE,box="x",g=g)
   
   fill<-braw.env$plotColours$descriptionC
-  if (!is.null(showSingle)) fill<-darken(desat(fill,0.5),off=0)
+  # if (!is.null(showSingle)) fill<-darken(desat(fill,0.5),off=0)
   g<-addG(g,dataPolygon(data=pts,fill=fill))
   g<-addG(g,dataLine(data=pts))
   

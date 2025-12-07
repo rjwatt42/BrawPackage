@@ -30,7 +30,6 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,maxoff=1){
   }
   # dotSize<-dotSize/2
   col<-darken(col,off=0.2)
-  
   switch (hypothesisType,
           "Interval Interval"={
             pts<-data.frame(x=x,y=y)
@@ -92,9 +91,9 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,maxoff=1){
             full_y<-c()
             full_f<-c()
             full_c<-c()
-            if (braw.env$onesided) i2<-2:1
-            else i2=1:2
-            for (i2 in i2){
+            if (braw.env$onesided) i2use<-2:1
+            else i2use=1:2
+            for (i2 in i2use){
               xv<-c()
               yv<-c()
               dens1<-hist(analysis$iv[analysis$dv==DV$cases[i2]],breaks=bin_breaks,freq=TRUE,plot=FALSE,warn.unused = FALSE)
@@ -111,10 +110,10 @@ plotPoints<-function(g,IV,DV,analysis,colindex=1,maxoff=1){
               full_x<-c(full_x,xv)
               full_y<-c(full_y,yv)
               full_f<-c(full_f,rep(i2,length(xv)))
+              col<-braw.env$plotColours$descriptionC
               if (i2==1) col<-darken(col,0.25,off=0.75)
               full_c<-c(full_c,rep(col,length(xv)))
             }
-
             pts<-data.frame(x=full_x+xoff,y=full_y)
             if (showRawData) {
               if (colindex>=2) {
@@ -346,9 +345,6 @@ plotParInterDescription<-function(analysis,g=NULL){
 
 plotParDescription<-function(analysis,dataOnly=FALSE,g) {
   
-  analysis$hypothesis$IV$vals<-analysis$iv
-  analysis$hypothesis$DV$vals<-analysis$dv
-  
   g<-plotPoints(g,analysis$hypothesis$IV,analysis$hypothesis$DV,analysis,1)
   if (!dataOnly)
   g<-plotPrediction(analysis$hypothesis$IV,analysis$hypothesis$IV2,analysis$hypothesis$DV,analysis,analysis$design,evidence=analysis$evidence,offset=1,g=g)
@@ -389,6 +385,8 @@ showDescription<-function(analysis=braw.res$result,plotArea=c(0,0,1,1),dataOnly=
   if (!is.null(analysis$hypothesis$IV2)) setBrawEnv("newSampleDisplay",FALSE)
   if (analysis$hypothesis$DV$type=="Categorical") setBrawEnv("newSampleDisplay",FALSE)
   
+  analysis$hypothesis$IV$vals<-analysis$iv
+  analysis$hypothesis$DV$vals<-analysis$dv
   if (braw.env$newSampleDisplay && braw.env$allScatter) {
     g<-NULL
     if (analysis$design$Replication$On && !is.null(analysis$ResultHistory$original)) 

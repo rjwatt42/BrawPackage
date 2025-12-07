@@ -168,7 +168,7 @@ inspectMainGraph<-function(varName,result=braw.res$result,inspect=makeInspect(),
     
     # show data points
     g<-addG(g,dataPoint(data=data.frame(x=data,y=y),colour="#000000", 
-                   fill=braw.env$plotColours$sampleC,size=50/sqrt(n))
+                   fill=braw.env$plotColours$sampleC,size=braw.env$dotSize*0.5)
     )
     # for (i in 1:n) {
     #   g<-addG(g,dataPolygon(data=data.frame(x=data[i]+xc,y=y[i]+yc),colour="#000000", fill=braw.env$plotColours$sampleC))

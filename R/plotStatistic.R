@@ -1349,7 +1349,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   g<-startPlot(xlim,ylim,
                xticks=xticks,xlabel=xlabel,xmax=xmax,
                yticks=yticks,ylabel=ylabel,ymax=ymax,
-               box="both",top=top,orientation=orient,g=g)
+               box="x",top=top,orientation=orient,g=g)
   
   nr<-sum(!is.na(analysis$rIV))
   if (showNsims) {
@@ -1531,8 +1531,13 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
       } else {
           pts<-data.frame(x=shvals*0+xoff[i],y1=shvals,sig=resSig,notNull=resNotNull,n=nvals)
       }
-      
-      g<-simulations_plot(g,pts,showType,analysis$hypothesis$effect$world$On,analysis$design,
+      if (showType=="rs" && length(pts$x)==1 && !showTheory && orientation=="horz") {
+        if (pts$sig) col<-braw.env$plotColours$infer_sigC else col<-braw.env$plotColours$infer_nsigC
+        g<-addG(g,dataPolygon(data.frame(x=pts$y1+c(-1,-1,1,1,-1)*0.02,y=c(0,1,1,0,0)*0.75),
+                              fill=col))
+      }
+      else
+        g<-simulations_plot(g,pts,showType,analysis$hypothesis$effect$world$On,analysis$design,
                           i,orientation=orientation,
                        ylim=ylim,histGain=histGain,histGainrange=histGainrange,
                        sequence=sequence)

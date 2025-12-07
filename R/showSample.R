@@ -9,11 +9,12 @@ plotSample<-function(IV,DV,effect,ivplot,dvplot,fill=braw.env$plotColours$sample
   if (length(ivplot)>100) {
     dotSize<-dotSize*sqrt(100/length(ivplot))
   }
+  shrinkDots<-0.5
   
   x<-ivplot
   y<-dvplot
   pts<-data.frame(x=x,y=y)
-  g<-addG(g,dataPoint(data=pts,shape=braw.env$plotShapes$data, colour = "#000000", fill = fill, size = dotSize))
+  g<-addG(g,dataPoint(data=pts,shape=braw.env$plotShapes$data, colour = "#000000", fill = fill, size = dotSize*shrinkDots))
   if (braw.env$showMedians) {
     if (sample$type=="Categorical") {yuse<-0.5} else {yuse<-median(y)}
     g<-addG(g,horizLine(intercept=yuse,col="red"))

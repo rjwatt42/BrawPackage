@@ -87,7 +87,13 @@ plotCatParPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha,g){
   pp<-CatProportions(IV)
   b<-(1:ncats)
 
-  pbreaks<-seq(0,1,1/(ncats))
+  if (!is.null(IV$vals)) {
+    pbreaks<-0
+    for (id in 1:ncats) pbreaks<-c(pbreaks,mean(IV$vals==IV$cases[id]))
+    pbreaks<-cumsum(pbreaks)
+  } else {
+    pbreaks<-seq(0,1,1/(ncats))
+  }
   ebreaks<-qnorm(pbreaks)
   
   y<-seq(-1,1,length.out=braw.env$varNPoints)*braw.env$fullRange
@@ -101,6 +107,7 @@ plotCatParPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha,g){
       sdv[id]<-sd(DV$vals[IV$vals==IV$cases[id]],na.rm=TRUE)
     }
     mu_order<-order(muv)
+    mu_order<-1:ncats
   } else {
     muv<-array(DV$mu,ncats)
     sdv<-array(DV$sd,ncats)

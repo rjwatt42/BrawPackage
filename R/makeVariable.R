@@ -177,7 +177,12 @@ makeDefaultVariables<-function() {
     IV2=makeVariable(name="IV2",type="Interval",mu=0,sd=1,ncats=2,cases="D1,D2"),
     DV=makeVariable(name="DV",type="Interval",mu=0,sd=1,ncats=2,cases="E1,E2"),
     
-    Treatment=makeVariable(name="Treatment",type="Categorical",ncats=2,cases="before,after",proportions="1,1"),
+    IVOrd=makeVariable(name="IV",type="Ordinal"),
+    IVCat=makeVariable(name="IV",type="Categorical",ncats=2,cases="C1,C2"),
+    IV3Cat=makeVariable(name="IV",type="Categorical",ncats=3,cases="C1,C2,C3"),
+    
+    Treatment3=makeVariable(name="Treatment",type="Categorical",ncats=3,cases="active,passive,none",proportions="1,1,1"),
+    Treatment=makeVariable(name="Treatment",type="Categorical",ncats=2,cases="active,control",proportions="1,1"),
     "Treatment?"=makeVariable(name="Treatment?",type="Categorical",ncats=2,cases="no,yes",proportions="1,1"),
     IQ=makeVariable(name="IQ",type="Interval",mu=100,sd=15),
     Diligence=makeVariable(name="Diligence",type="Interval",mu=0,sd=2),
@@ -191,7 +196,10 @@ makeDefaultVariables<-function() {
     "ExamPass?"=makeVariable(name="ExamPass?",type="Categorical",ncats=2,cases="no,yes",proportions="1,3"),
     RiskTaking=makeVariable(name="RiskTaking",type="Interval",mu=30,sd=6,skew=0.5),
     Interesting=makeVariable(name="Interesting",type="Interval",mu=10,sd=2),
+    NeuroType=makeVariable(name="NeuroType",type="Categorical",ncats=2,cases="NT,ND",proportions="2,1"),
     
+    SelfConfidenceOrd=makeVariable(name="SelfConfidenceRating",'Ordinal',nlevs=6),
+    PerfectionismOrd=makeVariable(name="PerfectionismRating",'Ordinal',nlevs=6),
     "Coffee?"=makeVariable(name="Coffee?",type="Categorical",ncats=2,cases="no,yes",proportions="1,1"),
     "Smoker?"=makeVariable(name="Smoker?",type="Categorical",ncats=2,cases="no,yes",proportions="2,1"),
     "RiskTaker?"=makeVariable(name="RiskTaker?",type="Categorical",ncats=2,cases="no,yes"),
@@ -200,11 +208,19 @@ makeDefaultVariables<-function() {
     Sessions=makeVariable(name="Sessions",'Ordinal',nlevs=6,ordSource="discrete",ordProportions="0.1,0.2,0.4,0.4,0.6,0.8"),
     SessionsI=makeVariable(name="Sessions",'Interval',mu=4,sd=1,skew=-0.75),
     TrialPhase=makeVariable(name="TrialPhase",type="Categorical",ncats=2,cases="pre,post",proportions="1.1,1"),
-      
-    Condition=makeVariable(name="Condition",type="Categorical",ncats=2,cases="A,B",proportions="1,1"),
-    Group=makeVariable(name="Group",type="Categorical",ncats=2,cases="C1,C2",proportions="1,1"),
+    TrialPhase3=makeVariable(name="TrialPhase",type="Categorical",ncats=3,cases="before,during,after",proportions="1.2,1.1,1"),
+    
+    Condition=makeVariable(name="Condition",type="Categorical",ncats=2,cases="1,2",proportions="1,1"),
+    MemoryCondition=makeVariable(name="Prompt",type="Categorical",ncats=3,cases="none,implicit,explicit",proportions="1,1,1"),
+    Group=makeVariable(name="Group",type="Categorical",ncats=2,cases="group1,group2",proportions="1,1"),
+    Group3=makeVariable(name="Group",type="Categorical",ncats=3,cases="group1,group2,grop3",proportions="1,1,1"),
     Response=makeVariable(name="Response",type="Interval",mu=50,sd=20),
     
+    InformationLevel=makeVariable(name="InformationLevel",type="Interval",mu=10,sd=2,skew=-0.5),
+    ReactionTime=makeVariable(name="ReactionTime",type="Interval",mu=500,sd=100,skew=0.5),
+    PracticeTrials=makeVariable(name="PracticeTrials",'Ordinal',nlevs=6,ordSource="discrete"),
+    
+    Diagnosis=makeVariable(name="Diagnosis",type="Categorical",ncats=3,cases="BPD,ADHD,Autism",proportions="1,1.5,2"),
     StudySubject=makeVariable(name="StudySubject",type="Categorical",ncats=3,cases="psych,phil,sports",proportions="1.5,1,2"),
     BirthOrder=makeVariable(name="BirthOrder",type="Categorical",ncats=4,cases="first,middle,last,only",proportions="1,0.4,0.6,0.2")
   )

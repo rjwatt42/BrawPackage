@@ -19,10 +19,15 @@ showMultiple<-function(multipleResult=braw.res$multiple,showType="Basic",
                        dimension="1D",orientation="vert",
                        whichEffect="All",effectType="all",
                        showTheory=braw.env$showTheory,showData=TRUE,showLegend=TRUE,
-                       showYaxis=TRUE
+                       showYaxis=TRUE,
+                       plotArea=braw.env$plotArea
+                       
 ) {
+  
+  if (!is.null(plotArea)) setBrawEnv("plotArea",plotArea)
+  
   if (is.null(multipleResult)) multipleResult=doMultiple(autoShow=FALSE)
-  if (is.numeric(multipleResult)) multipleResult=doMultiple(multipleResult,autoShow=FALSE)
+  if (is.numeric(multipleResult)) multipleResult=doMultiple(multipleResult,NULL,autoShow=FALSE)
 
     if (!multipleResult$hypothesis$effect$world$On && multipleResult$hypothesis$effect$rIV!=0 && is.element(showType[1],c("NHST","Hits","Misses"))) {
       if (multipleResult$nullcount<multipleResult$count) {

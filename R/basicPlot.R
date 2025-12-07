@@ -91,7 +91,7 @@ showHistory<-function(back=-1) {
 #' @examples 
 #' svgB0x(height=200)
 #' @export
-svgBox<-function(height=NULL,aspect=1.3,fontScale=1.5) {
+svgBox<-function(height=NULL,aspect=1.3,fontScale=braw.env$fontSize) {
   if (is.null(height) && is.null(aspect)) return(braw.env$plotSize)
   if (is.null(height)) height<-braw.env$plotSize[2]
   setBrawEnv("plotSize",c(aspect,1)*height)
@@ -213,8 +213,8 @@ reSizeFont<-function(size) {
 }
 
 plotLimits<-function(xlim,ylim,orientation="horz",gaps=c(1,1,0,0),fontScale=1,returnValue=FALSE) {
-  gain<-0.3*c(braw.env$plotSize[1],braw.env$plotSize[2],braw.env$plotSize[1],braw.env$plotSize[2])
-  gaps<-gaps*fontScale/gain
+  gain<-4/braw.env$plotSize[c(1,2,1,2)]
+  gaps<-gaps*fontScale*gain
   
   switch(orientation,
          "horz"={plotLimits<-list(xlim=xlim,ylim=ylim,xsc=xlim,ysc=ylim,
@@ -272,7 +272,8 @@ makeLabel<-function(label=NULL) {
 }
 startPlot<-function(xlim=c(0,1),ylim=c(0,1),gaps=NULL,box="both",top=0,
                     xticks=NULL,xlabel=NULL,xmax=FALSE,yticks=NULL,ylabel=NULL,ymax=FALSE,
-                    backC=braw.env$plotColours$graphBack,orientation="horz",fontScale=1,unitGap=0.5,
+                    backC=braw.env$plotColours$graphBack,orientation="horz",fontScale=1,
+                    unitGap=0.4,
                     g=NULL) {
   sz<-braw.env$fullGraphSize
   # if (all(braw.env$plotArea==c(0,0,1,1))) {

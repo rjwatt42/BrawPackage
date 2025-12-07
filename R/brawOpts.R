@@ -156,7 +156,7 @@ BrawOpts<-function(BW=FALSE,graphC="transparent",fontScale=1,graphicsSize=c(16,1
           
           braw.env$graphicsSize<-graphicsSize
           braw.env$labelSize<-height/100*fontScale
-          braw.env$dotSize<-braw.env$labelSize*1.25
+          braw.env$dotSize<-braw.env$labelSize*2
           braw.env$fontSize<-1
           
           braw.env$autoShow<-autoShow
