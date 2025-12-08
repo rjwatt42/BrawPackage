@@ -478,7 +478,7 @@ doBasics<-function(doingBasics=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=TRU
       width=600,
       tabs=tabs,
       tabContents=tabContents,
-      tabLink=paste0('https://doingpsychstats.wordpress.com/basics-',partBS,'#','A'),
+      tabLink=paste0('https://doingpsychstats.wordpress.com/basics-',stepBS,'#',partBS),
       tabLinkLabel=paste0('&#x24D8 ',linkLabel),
       history=history$content,
       open=open
