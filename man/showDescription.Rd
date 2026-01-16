@@ -6,6 +6,7 @@
 \usage{
 showDescription(
   analysis = braw.res$result,
+  whichEffect = NULL,
   plotArea = c(0, 0, 1, 1),
   dataOnly = FALSE,
   g = NULL

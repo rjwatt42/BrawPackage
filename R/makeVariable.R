@@ -73,7 +73,7 @@ r2OrdProportions<-function(rho,ng) {
 #'              )
 #' @export
 makeVariable<-function(name,type="Interval",
-                       mu=0,sd=1,skew=0,kurtosis=0,
+                       mu=0,sd=1,skew=0,kurtosis=0,noDigits=NA,
                        nlevs=7,iqr=3,median=NULL,ordSource="discrete",ordProportions=NA,
                        ncats=2,cases=c("C1","C2"),proportions=c(1,1),catSource="discrete",
                        deploy="Between",targetDeploys="",process="sim"){
@@ -81,7 +81,7 @@ makeVariable<-function(name,type="Interval",
   if (is.null(median)) median<-((1+nlevs)/2)
   
   var<-list(name=name,type=type,
-            mu=mu,sd=sd,skew=skew,kurtosis=kurtosis,
+            mu=mu,sd=sd,skew=skew,kurtosis=kurtosis,noDigits=noDigits,
             nlevs=nlevs,iqr=iqr,median=median,ordSource=ordSource,ordProportions=ordProportions,
             ncats=ncats,cases=cases,proportions=proportions,catSource=catSource,
             deploy=deploy,targetDeploys=targetDeploys,
@@ -191,12 +191,13 @@ makeDefaultVariables<-function() {
     Happiness=makeVariable(name="Happiness",type="Interval",mu=50,sd=12),
     SelfConfidence=makeVariable(name="SelfConfidence",type="Interval",mu=50,sd=12),
     HoursSleep=makeVariable(name="HoursSleep",type="Interval",mu=7,sd=1,skew=-0.7),
-    ExamGrade=makeVariable(name="ExamGrade",type="Interval",mu=65,sd=10,skew=-0.6),
+    ExamGrade=makeVariable(name="ExamGrade",type="Interval",mu=65,sd=10,skew=-0.6,noDigits=0),
     ExamPass=makeVariable(name="ExamPass?",type="Categorical",ncats=2,cases="no,yes",proportions="1,3"),
     "ExamPass?"=makeVariable(name="ExamPass?",type="Categorical",ncats=2,cases="no,yes",proportions="1,3"),
     RiskTaking=makeVariable(name="RiskTaking",type="Interval",mu=30,sd=6,skew=0.5),
     Interesting=makeVariable(name="Interesting",type="Interval",mu=10,sd=2),
     NeuroType=makeVariable(name="NeuroType",type="Categorical",ncats=2,cases="NT,ND",proportions="2,1"),
+    Gender=makeVariable(name="Gender",type="Categorical",ncats=2,cases="F,M",proportions="1,1"),
     
     SelfConfidenceOrd=makeVariable(name="SelfConfidenceRating",'Ordinal',nlevs=6),
     PerfectionismOrd=makeVariable(name="PerfectionismRating",'Ordinal',nlevs=6),
@@ -210,10 +211,11 @@ makeDefaultVariables<-function() {
     TrialPhase=makeVariable(name="TrialPhase",type="Categorical",ncats=2,cases="pre,post",proportions="1.1,1"),
     TrialPhase3=makeVariable(name="TrialPhase",type="Categorical",ncats=3,cases="before,during,after",proportions="1.2,1.1,1"),
     
-    Condition=makeVariable(name="Condition",type="Categorical",ncats=2,cases="1,2",proportions="1,1"),
+    Condition=makeVariable(name="Condition",type="Categorical",ncats=2,cases="A,B",proportions="1,1"),
+    Condition3=makeVariable(name="Condition",type="Categorical",ncats=3,cases="A,B,C",proportions="1,1,1"),
     MemoryCondition=makeVariable(name="Prompt",type="Categorical",ncats=3,cases="none,implicit,explicit",proportions="1,1,1"),
     Group=makeVariable(name="Group",type="Categorical",ncats=2,cases="group1,group2",proportions="1,1"),
-    Group3=makeVariable(name="Group",type="Categorical",ncats=3,cases="group1,group2,grop3",proportions="1,1,1"),
+    Group3=makeVariable(name="Group",type="Categorical",ncats=3,cases="group1,group2,group3",proportions="1,1,1"),
     Response=makeVariable(name="Response",type="Interval",mu=50,sd=20),
     
     InformationLevel=makeVariable(name="InformationLevel",type="Interval",mu=10,sd=2,skew=-0.5),

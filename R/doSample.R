@@ -655,6 +655,10 @@ doSample<-function(hypothesis=braw.def$hypothesis,design=braw.def$design,autoSho
                dv<-discreteVals(dvr,DV$ncats,DV$proportions,"discrete",DV$cases)
              }
       )
+      
+      if (IV$type=="Interval" && !is.na(IV$noDigits)) iv<-round(iv,IV$noDigits)
+      if (!is.null(IV2) && IV2$type=="Interval" && !is.na(IV2$noDigits)) iv2<-round(iv2,IV2$noDigits)
+      if (DV$type=="Interval" && !is.na(DV$noDigits)) dv<-round(dv,DV$noDigits)
       braw.env$lastSample<-list(participant=id, iv=iv, iv2=iv2, dv=dv)
       
     }

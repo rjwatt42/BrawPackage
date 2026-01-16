@@ -72,8 +72,11 @@ reportInference<-function(analysis=braw.res$result,analysisType="Anova",showPowe
       if (IV$type=="Categorical" && IV$ncats==2 && DV$type=="Interval") {
         use1<-analysis$iv==IV$cases[1]
         use2<-analysis$iv==IV$cases[2]
-        dval<-(mean(analysis$dv[use2],na.rm=TRUE)-mean(analysis$dv[use1],na.rm=TRUE))/
-              sqrt(
+        diffMean<-mean(analysis$dv[use2],na.rm=TRUE)-mean(analysis$dv[use1],na.rm=TRUE)
+        if (design$sIV1Use=="Within") {
+          dval<-diffMean/sd(analysis$dv[use1]-analysis$dv[use2],na.rm=TRUE)
+        } else 
+        dval<-diffMean/sqrt(
                 (
                   mean(use2,na.rm=TRUE)*sd(analysis$dv[use2],na.rm=TRUE)^2+
                     mean(use1,na.rm=TRUE)*sd(analysis$dv[use1],na.rm=TRUE)^2

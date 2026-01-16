@@ -2,7 +2,7 @@ plotSample<-function(IV,DV,effect,ivplot,dvplot,fill=braw.env$plotColours$sample
 
   # the population
   if (is.null(g))
-  g<-plotPopulation(IV,DV,effect,alpha=1,g)
+    g<-plotPopulation(IV,DV,effect,alpha=1,g)
 
   # the scattered points
   dotSize<-dotSize*braw.env$dotSize

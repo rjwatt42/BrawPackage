@@ -347,7 +347,7 @@ generate_tab = function(title="Tab",tabs=c("1","2","3"),tabContents=c("a","b","c
                              '<<','</button>'
       )
     }
-  } else historyButtons<-''
+  } else historyButtons<-link
   buttons<-paste0('<div class="tab" style="','width:',width-indent+2,'px;',
                   'padding:0px;margin:0px;','margin-left:',indent,'px;','padding-top:',topMargin,'px;',
                   # 'border:solid;',

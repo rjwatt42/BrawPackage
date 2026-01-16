@@ -15,8 +15,8 @@ makeWorld(
   PDFoffset = 0,
   pRplus = 1,
   PDFsample = FALSE,
-  PDFsamplemn = 0,
-  PDFsamplesd = 0,
+  PDFsampleRs = 0,
+  PDFsampleN = 0,
   PDFsamplebias = FALSE,
   worldAbs = FALSE
 )

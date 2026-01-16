@@ -4,7 +4,7 @@
 \alias{nullPlot}
 \title{this is the start of any figure - which may then contain several graphs}
 \usage{
-nullPlot()
+nullPlot(background = braw.env$plotColours$graphC)
 }
 \value{
 a plot object

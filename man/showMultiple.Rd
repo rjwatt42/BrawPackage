@@ -14,7 +14,8 @@ showMultiple(
   showTheory = braw.env$showTheory,
   showData = TRUE,
   showLegend = TRUE,
-  showYaxis = TRUE
+  showYaxis = TRUE,
+  plotArea = braw.env$plotArea
 )
 }
 \arguments{

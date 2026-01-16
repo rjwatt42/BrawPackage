@@ -3,6 +3,7 @@
 emptyPlot<-function(mode,useHelp=FALSE) {
   
   if (mode=="Basics") return(doBasics(NULL,showOutput=FALSE))
+  if (mode=="Theory") return(doTheory(NULL,showOutput=FALSE))
   if (mode=="MetaScience") return(doMetaScience(NULL,showOutput=FALSE))
   
   if (mode=="Simulation") {
@@ -21,7 +22,7 @@ emptyPlot<-function(mode,useHelp=FALSE) {
       tabContents=tabContents,
       height=450,
       outerHeight=450,
-      open=1
+      open=0
     )
     return(nullResults)
   }

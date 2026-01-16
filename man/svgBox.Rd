@@ -4,7 +4,7 @@
 \alias{svgBox}
 \title{set up for a meta-analysis}
 \usage{
-svgBox(height = NULL, aspect = 1.3, fontScale = 1.5)
+svgBox(height = NULL, aspect = 1.3, fontScale = braw.env$fontSize)
 }
 \value{
 changes plotting environment

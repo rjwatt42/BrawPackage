@@ -975,7 +975,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
                   op <- options(warn = (-1))
                   tv<-friedman(dv~iv1);
                   options(op)
-                  t_name='chi2'
+                  t_name=braw.env$chi2Label
                   tval<-tv$statistic
                   analysis$pIV<-tv$p.value
                 } else {
@@ -983,7 +983,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
                   op <- options(warn = (-1))
                   tv<-kruskal.test(dv~iv1);
                   options(op)
-                  t_name='chi2'
+                  t_name=braw.env$chi2Label
                   tval<-tv$statistic
                   analysis$pIV<-tv$p.value
                 }
@@ -992,7 +992,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
             },
             "Interval Categorical"={
               an_name<-"Logistic Regression"
-              t_name<-"chi2"
+              t_name<-braw.env$chi2Label
               df<-paste("(",format(anRaw$Df[2]),",","n=",format(lmNormC$df.null+1),")",sep="")
               tval<-lmNormC$null.deviance-lmNormC$deviance
               analysis$pIV<-1-pchisq(tval,1) # noCases-1
@@ -1001,7 +1001,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
             },
             "Ordinal Categorical"={
               an_name<-"Logistic Regression"
-              t_name<-"chi2"
+              t_name<-braw.env$chi2Label
               df<-paste("(",format(anRaw$Df[2]),",","n=",format(lmNormC$df.null+1),")",sep="")
               tval<-lmNormC$null.deviance-lmNormC$deviance
               analysis$pIV<-1-pchisq(tval,1) # noCases-1
@@ -1010,7 +1010,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
             },
             "Categorical Categorical"={
               an_name<-"Chi-square test of independence"
-              t_name<-"chi2"
+              t_name<-braw.env$chi2Label
 
               chiResult<-chisq.test(iv1,dv,correct = FALSE)
               df<-paste("(",format(chiResult$parameter),",","n=",format(length(analysis$participant)),")",sep="")
@@ -1046,7 +1046,7 @@ doAnalysis<-function(sample=doSample(autoShow=FALSE),evidence=braw.def$evidence,
             },
             "Categorical"={
               an_name<-"Generalized Linear Model"
-              t_name<-"chi2"
+              t_name<-braw.env$chi2Label
               # df<-anResult$anRaw$Df
               tval<-anResult$anRaw$Deviance
             }

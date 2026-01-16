@@ -221,9 +221,14 @@ reportDescription<-function(analysis=braw.res$result,plain=FALSE){
                          mean(analysis$iv==cases[2])*sd(residuals[analysis$iv==cases[2]])^2)
               outputText<-c(outputText,rep("",nc))
               if (IV$ncats==2){
+                if (design$sIV1Use=="Within") {
+                  use1<-analysis$iv==IV$cases[1]
+                  use2<-analysis$iv==IV$cases[2]
+                  dval<-diff(mn)/sd(analysis$dv[use1]-analysis$dv[use2],na.rm=TRUE)
+                } else dval<-diff(mn)/rsd1
                 outputText<-c(outputText,"Difference(means):",brawFormat(diff(mn),digits=braw.env$report_precision),
                               "sd(residuals):",brawFormat(rsd,digits=braw.env$report_precision),
-                              "Cohen's d:",brawFormat(diff(mn)/rsd1,digits=braw.env$report_precision),
+                              "Cohen's d:",brawFormat(dval,digits=braw.env$report_precision),
                               rep("",nc-2))
               } else {
                 outputText<-c(outputText,"sd(means):",brawFormat(sd(fitted),digits=braw.env$report_precision),"sd(residuals):",brawFormat(rsd,digits=braw.env$report_precision),

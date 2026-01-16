@@ -1,4 +1,4 @@
-getAxisPrediction<-function(hypothesis,g=NULL) {
+getAxisPrediction<-function(hypothesis,data=NULL,g=NULL) {
   IV<-hypothesis$IV
   DV<-hypothesis$DV
   switch (IV$type,
@@ -39,6 +39,9 @@ getAxisPrediction<-function(hypothesis,g=NULL) {
           }
   )
   
+  if (!is.null(data)) {
+    
+  }
   g<-startPlot(xlim,ylim,
                xticks=makeTicks(xticks,xlabels),xlabel=makeLabel(IV$name),
                yticks=makeTicks(yticks,ylabels),ylabel=makeLabel(DV$name),

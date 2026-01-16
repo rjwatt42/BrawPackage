@@ -20,6 +20,7 @@ BrawHelp<-function(open=0,indent=0,titleWidth=100) {
   )
 }
 
+#' @export
 BrawInstructions <- function(HelpType="Plan") {
   
 

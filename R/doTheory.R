@@ -1,131 +1,6 @@
 
 #' @export
-stepBS<-function(doing) gsub('[A-Za-z]*([0-9]*)[A-Da-d]*','\\1',doing)
-
-#' @export
-partBS<-function(doing) toupper(gsub('[A-Za-z]*[0-9]*([A-Da-d]*)','\\1',doing))
-
-#' @export
-singleBS<-function(doing) !grepl('m',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-d]*([RMrm]*)','\\1',doing)),fixed=TRUE)
-
-#' @export
-reanalyseBS<-function(doing) grepl('r',tolower(gsub('[A-Za-z]*[0-9]*[A-Da-d]*([RMrm]*)','\\1',doing)),fixed=TRUE)
-
-#' @export
-randomDV<-function() {
-  if (runif(1)<0.5)   DV<-randomParDV()
-  else                DV<-randomCatDV()
-  return(DV)
-}
-
-#' @export
-randomIV<-function(DV="DV") {
-  if (DV$type=="Interval") {
-    switch(ceiling(runif(1)*3),
-           {IV<-randomParIV(DV)},
-           {IV<-randomCat2IV(DV)},
-           {IV<-randomCat3IV(DV)}
-    )
-  } else {
-      switch(ceiling(runif(1)*3),
-             {IV<-randomParIV(DV)},
-             {IV<-randomOrdIV(DV)},
-             {IV<-randomCat2IV(DV)}
-      )
-  }
-  return(IV)
-}
-
-#' @export
-randomParDV<-function() {
-  all<-c("Happiness","ExamGrade","ReactionTime","RiskTaking"
-  )
-  use<-ceiling(runif(1)*length(all))
-  return(getVariable(all[use]))
-}
-
-#' @export
-randomCatDV<-function() {
-  all<-c("TrialOutcome","ExamPass?","RiskTaker?"
-  )
-  use<-ceiling(runif(1)*length(all))
-  return(getVariable(all[use]))
-}
-
-#' @export
-randomParIV<-function(DV="DV") {
-  switch(DV$name,
-         "DV"={all<-c("IV")},
-         "Happiness"={all<-c("Perfectionism","Diligence","Anxiety")},
-         "ExamGrade"={all<-c("HoursSleep","SelfConfidence","Perfectionism","Diligence","IQ")},
-         "RiskTaking"={all<-c("SelfConfidence","Perfectionism")},
-         "ReactionTime"={all<-c("SelfConfidence","Perfectionism","InformationLevel")},
-         "TrialOutcome"={all<-c("SelfConfidence","Perfectionism","InformationLevel")},
-         "ExamPass?"={all<-c("Perfectionism","Diligence","Anxiety")},
-         "RiskTaker?"={all<-c("SelfConfidence","Perfectionism")}
-  )
-  use<-ceiling(runif(1)*length(all))
-  return(getVariable(all[use]))
-}
-
-#' @export
-randomOrdIV<-function(DV="DV") {
-  # only for Categorical DV
-  switch(DV$name,
-         "DV"={all<-c("IVOrd")},
-         "TrialOutcome"={all<-c("Sessions","PracticeTrials")},
-         "ExamPass?"={all<-c("SelfConfidenceOrd","PerfectionismOrd")},
-         "RiskTaker?"={all<-c("SelfConfidenceOrd","PerfectionismOrd")}
-  )
-  use<-ceiling(runif(1)*length(all))
-  return(getVariable(all[use]))
-}
-
-#' @export
-randomCat2IV<-function(DV="DV") {
-  switch(DV$name,
-         "DV"={all<-c("IVCat")},
-         "Happiness"={all<-c("NeuroType","Gender")},
-         "ExamGrade"={all<-c("NeuroType","Coffee?","RiskTaker?")},
-         "RiskTaking"={all<-c("NeuroType","Gender")},
-         "ReactionTime"={all<-c("Condition","Group")},
-         "TrialOutcome"={all<-c("Treatment?","TrialPhase")},
-         "ExamPass?"={all<-c("NeuroType","Coffee?","RiskTaker?")}
-  )
-  use<-ceiling(runif(1)*length(all))
-  return(getVariable(all[use]))
-}
-
-#' @export
-randomCat3IV<-function(DV="DV") {
-  switch(DV$name,
-         "DV"={all<-c("IV3Cat")},
-         "Happiness"={all<-c("Diagnosis","BirthOrder","StudySubject")},
-         "ExamGrade"={all<-c("Diagnosis","BirthOrder")},
-         "RiskTaking"={all<-c("Diagnosis","BirthOrder")},
-         "ReactionTime"={all<-c("Condition3","Group3","MemoryCondition")},
-         "TrialOutcome"={all<-c("Treatment3","TrialPhase3")},
-         "ExamPass?"={all<-c("Diagnosis","BirthOrder")}
-  )
-  use<-ceiling(runif(1)*length(all))
-  return(getVariable(all[use]))
-}
-
-#' @export
-makePanel<-function(g,r=NULL) {
-  paste0('<div style="display:inline-block;margin-bottom:10px;margin-top:10px;">',
-                '<table>',
-                '<tr><td>', g, '</td></tr>',
-                '<tr><td>', r, '</td></tr>',
-                # '<tr style="height:10px;"></tr>',
-                # '<tr><td>', moreHTML(reportWorldDesign(),"see Plan","p1"), '</td></tr>',
-                '</table>',
-                '</div>'
-  )
-}
-
-#' @export
-doBasics<-function(doingBasics=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FALSE,
+doTheory<-function(doingTheory=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FALSE,
                    showPlanOnly=FALSE,doHistory=TRUE,
                    IV="Perfectionism",IV2=NULL,DV="ExamGrade",
                    skew=0,kurtosis=0,
@@ -137,7 +12,6 @@ doBasics<-function(doingBasics=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FAL
                    allScatter=NULL,fullWithinNames=NULL,
                    nreps=200
 ) {
-  
   
   if (is.logical(analyse) && length(analyse)<4) analyse<-c(analyse,rep(FALSE,4-length(analyse)))
   if (is.logical(sOutliers) && sOutliers) sOutliers<-0.1
@@ -151,13 +25,14 @@ doBasics<-function(doingBasics=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FAL
   
   showNow<-"None"
   
-  if (!is.null(doingBasics)) {
-    stepBS<-stepBS(doingBasics)
-    partBS<-partBS(doingBasics)
-    if (singleBS(doingBasics)) process<-"single" else process<-"multiple"
+  if (!is.null(doingTheory)) {
+    stepBS<-stepBS(doingTheory)
+    partBS<-partBS(doingTheory)
+    if (singleBS(doingTheory)) process<-"single" else process<-"multiple"
     rootBS<-paste0("Step",stepBS,partBS)
     
     variables=list(IV=IV,IV2=IV2,DV=DV)
+    world<-NULL
     
     marginalsStyle<-"all"
     hideReport<-FALSE
@@ -168,23 +43,19 @@ doBasics<-function(doingBasics=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FAL
            "0"={
              showNow<-"Plan"
            },
-           "1"={ # making samples and analysing them in Jamovi
+           "1"={ # sampling error
              switch(partBS,
-                    "A"={showNow<-"Effect"},
-                    "B"={showNow<-"Sample"
-                    if (is.null(sMethod)) sMethod<-"Convenience"
-                    },
-                    "C"={showNow<-"Effect"
-                    if (is.null(sN)) sN<-500
-                    }
+                    "A"={showNow<-"Sample"},
+                    "B"={showNow<-"Effect"}
              )
            },
-           "2"={ # 3 basic tests with Interval DV
-             variables$DV<-randomParDV()
+           "2"={ # NHST
+             if (is.null(rIV)) rIV<-0.3
+             world<-makeWorld(TRUE,"Single","r",rIV)
              switch(partBS,
-                    "A"={variables$IV<-randomParIV(variables$DV)},
-                    "B"={variables$IV<-randomCat2IV(variables$DV)},
-                    "C"={variables$IV<-randomCat3IV(variables$DV)},
+                    "A"={world$pRplus<-1},
+                    "B"={world$pRplus<-0},
+                    "C"={world$pRplus<-0.5},
                     {}
              )
              showNow<-"Effect"
@@ -390,8 +261,10 @@ doBasics<-function(doingBasics=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FAL
     
     if (is.null(rIV)) rIV<-0.3
     hypothesis<-makeHypothesis(IV=variables$IV,IV2=variables$IV2,DV=variables$DV,
-                               effect=makeEffect(rIV,rIV2=rIV2,rIVIV2=rIVIV2,rIVIV2DV=rIVIV2DV)
+                               effect=makeEffect(rIV,rIV2=rIV2,rIVIV2=rIVIV2,rIVIV2DV=rIVIV2DV
+                                                 )
     )
+    if (!is.null(world)) hypothesis$effect$world<-world
     if (stepBS=="1") hypothesis$DV$skew<-skew
     if (stepBS=="1") hypothesis$DV$kurtosis<-kurtosis
     if (stepBS=="4") hypothesis$layout<-"simple"
@@ -401,7 +274,7 @@ doBasics<-function(doingBasics=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FAL
     if (stepBS=="9") hypothesis$layout<-"moderation"
     if (stepBS=="10") hypothesis$layout<-"mediation"
     
-    if (is.null(sN))  sN<-100
+    if (is.null(sN))  sN<-42
     if (is.null(sMethod)) sMethod<-"Random"
     if (is.null(sDataFormat)) sDataFormat<-"long"
     design<-makeDesign(sN=sN,sMethod=makeSampling(sMethod),sDataFormat=sDataFormat,
@@ -430,11 +303,12 @@ doBasics<-function(doingBasics=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FAL
     setBrawEnv("graphicsType","HTML")
     # setBrawEnv("fontSize",0.75)
     
+    if (showNow=="Sample") mType<-"dv.mn;dv.sd" else mType="rs;p"
     if ((process=="single" || process=="analysis") && showNow!="SchematicSEM") {
-      schematic<-makePanel(showInference(effectType="direct"),reportInference())
+      schematic<-makePanel(showInference(showType=mType,effectType="direct"),reportInference())
     } 
     if (process=="multiple") {
-      schematic<-makePanel(showMultiple(effectType="direct"),reportMultiple())
+      schematic<-makePanel(showMultiple(showType=mType,effectType="direct"),reportMultiple())
       showNow<-"Schematic"
     }      
     if (process=="single" && showNow=="SchematicSEM") {
@@ -485,7 +359,7 @@ doBasics<-function(doingBasics=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FAL
         schematic
       )
     }
-    tabLink=paste0('https://doingpsychstats.wordpress.com/basics-',stepBS,'#',partBS)
+    tabLink=paste0('https://doingpsychstats.wordpress.com/theory-',stepBS,'#',partBS)
     tabLinkLabel=paste0('&#x24D8 ',rootBS)
   }
   if (showJamovi) {
@@ -498,21 +372,21 @@ doBasics<-function(doingBasics=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FAL
   
   if (showHelp) {
     tabs<-c(tabs,"Help")
-    tabContents<-c(tabContents,brawBasicsHelp(open=c(0,0),indent=100,plainTabs=TRUE))
+    tabContents<-c(tabContents,brawTheoryHelp(open=c(0,0),indent=100,plainTabs=TRUE))
   }
   
   open<-which(showNow==tabs)
   if (isempty(open)) open<-0
   
-  history<-braw.res$basicsHistory
+  history<-braw.res$theoryHistory
   if (is.null(history)) {
     if (doHistory) history<-list(content='',place=1)
     else history<-list(content=NULL,sequence=c(),place=1)
   }
   
-  basicsResults<-
+  theoryResults<-
     generate_tab(
-      title="Basics:",
+      title="Theory:",
       plainTabs=TRUE,
       titleWidth=100,
       width=600,
@@ -525,14 +399,14 @@ doBasics<-function(doingBasics=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FAL
     )
   
   if (doHistory) {
-    history$content<-basicsResults
+    history$content<-theoryResults
     history$place<-length(history$content)
   } else {
-    history$sequence<-c(history$sequence,basicsResults)
+    history$sequence<-c(history$sequence,theoryResults)
     history$place<-length(history$sequence)
   }
-  setBrawRes("basicsHistory",history)
-  setBrawRes("basicsDone",c(stepBS,partBS))
+  setBrawRes("theoryResults",history)
+  setBrawRes("theoryDone",c(stepBS,partBS))
   
   setBrawDef("hypothesis",oldHypothesis)
   setBrawDef("design",oldDesign)
@@ -541,10 +415,9 @@ doBasics<-function(doingBasics=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FAL
   setBrawEnv("allScatter",oldAllScatter)
   
   if (showOutput) {
-    showHTML(basicsResults)
+    showHTML(theoryResults)
     return(invisible(NULL))
   }
   
-  return(basicsResults)
+  return(theoryResults)
 }
-

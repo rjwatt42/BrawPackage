@@ -11,6 +11,7 @@ makeVariable(
   sd = 1,
   skew = 0,
   kurtosis = 0,
+  noDigits = NA,
   nlevs = 7,
   iqr = 3,
   median = NULL,
