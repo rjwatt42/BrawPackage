@@ -27,11 +27,11 @@ randomIV<-function(DV="DV") {
            {IV<-randomCat3IV(DV)}
     )
   } else {
-      switch(ceiling(runif(1)*3),
-             {IV<-randomParIV(DV)},
-             {IV<-randomOrdIV(DV)},
-             {IV<-randomCat2IV(DV)}
-      )
+    switch(ceiling(runif(1)*3),
+           {IV<-randomParIV(DV)},
+           {IV<-randomOrdIV(DV)},
+           {IV<-randomCat2IV(DV)}
+    )
   }
   return(IV)
 }
@@ -46,8 +46,7 @@ randomParDV<-function() {
 
 #' @export
 randomCatDV<-function() {
-  all<-c("TrialOutcome","ExamPass?","RiskTaker?"
-  )
+  all<-c("TrialOutcome","ExamPass?","RiskTaker?")
   use<-ceiling(runif(1)*length(all))
   return(getVariable(all[use]))
 }
@@ -55,45 +54,46 @@ randomCatDV<-function() {
 #' @export
 randomParIV<-function(DV="DV") {
   switch(DV$name,
-         "DV"={all<-c("IV")},
-         "Happiness"={all<-c("Perfectionism","Diligence","Anxiety")},
-         "ExamGrade"={all<-c("HoursSleep","SelfConfidence","Perfectionism","Diligence","IQ")},
-         "RiskTaking"={all<-c("SelfConfidence","Perfectionism")},
-         "ReactionTime"={all<-c("SelfConfidence","Perfectionism","InformationLevel")},
-         "TrialOutcome"={all<-c("SelfConfidence","Perfectionism","InformationLevel")},
-         "ExamPass?"={all<-c("Perfectionism","Diligence","Anxiety")},
-         "RiskTaker?"={all<-c("SelfConfidence","Perfectionism")}
+         "DV"={allvars<-c("IV")},
+         "Happiness"={allvars<-c("Perfectionism","Diligence","Anxiety")},
+         "ExamGrade"={allvars<-c("HoursSleep","SelfConfidence","Perfectionism","Diligence","IQ")},
+         "RiskTaking"={allvars<-c("SelfConfidence","Perfectionism")},
+         "ReactionTime"={allvars<-c("SelfConfidence","Perfectionism","InformationLevel")},
+         "TrialOutcome"={allvars<-c("SelfConfidence","Perfectionism","InformationLevel")},
+         "ExamPass?"={allvars<-c("Perfectionism","Diligence","Anxiety")},
+         "RiskTaker?"={allvars<-c("SelfConfidence","Perfectionism")}
   )
-  use<-ceiling(runif(1)*length(all))
-  return(getVariable(all[use]))
+  use<-ceiling(runif(1)*length(allvars))
+  return(getVariable(allvars[use]))
 }
 
 #' @export
 randomOrdIV<-function(DV="DV") {
   # only for Categorical DV
   switch(DV$name,
-         "DV"={all<-c("IVOrd")},
-         "TrialOutcome"={all<-c("Sessions","PracticeTrials")},
-         "ExamPass?"={all<-c("SelfConfidenceOrd","PerfectionismOrd")},
-         "RiskTaker?"={all<-c("SelfConfidenceOrd","PerfectionismOrd")}
+         "DV"={allvars<-c("IVOrd")},
+         "TrialOutcome"={allvars<-c("Sessions","PracticeTrials")},
+         "ExamPass?"={allvars<-c("SelfConfidenceOrd","PerfectionismOrd")},
+         "RiskTaker?"={allvars<-c("SelfConfidenceOrd","PerfectionismOrd")}
   )
-  use<-ceiling(runif(1)*length(all))
-  return(getVariable(all[use]))
+  use<-ceiling(runif(1)*length(allvars))
+  return(getVariable(allvars[use]))
 }
 
 #' @export
 randomCat2IV<-function(DV="DV") {
   switch(DV$name,
-         "DV"={all<-c("IVCat")},
-         "Happiness"={all<-c("NeuroType","Gender")},
-         "ExamGrade"={all<-c("NeuroType","Coffee?","RiskTaker?")},
-         "RiskTaking"={all<-c("NeuroType","Gender")},
-         "ReactionTime"={all<-c("Condition","Group")},
-         "TrialOutcome"={all<-c("Treatment?","TrialPhase")},
-         "ExamPass?"={all<-c("NeuroType","Coffee?","RiskTaker?")}
+         "DV"={allvars<-c("IVCat")},
+         "Happiness"={allvars<-c("NeuroType","Gender")},
+         "ExamGrade"={allvars<-c("NeuroType","Coffee?","RiskTaker?")},
+         "RiskTaking"={allvars<-c("NeuroType","Gender")},
+         "ReactionTime"={allvars<-c("Condition","Group")},
+         "TrialOutcome"={allvars<-c("Treatment?","TrialPhase")},
+         "ExamPass?"={allvars<-c("NeuroType","Coffee?","RiskTaker?")},
+         "RiskTaker?"={allvars<-c("NeuroType","Gender")}
   )
-  use<-ceiling(runif(1)*length(all))
-  return(getVariable(all[use]))
+  use<-ceiling(runif(1)*length(allvars))
+  return(getVariable(allvars[use]))
 }
 
 #' @export
@@ -105,7 +105,8 @@ randomCat3IV<-function(DV="DV") {
          "RiskTaking"={all<-c("Diagnosis","BirthOrder")},
          "ReactionTime"={all<-c("Condition3","Group3","MemoryCondition")},
          "TrialOutcome"={all<-c("Treatment3","TrialPhase3")},
-         "ExamPass?"={all<-c("Diagnosis","BirthOrder")}
+         "ExamPass?"={all<-c("Diagnosis","BirthOrder")},
+         "RiskTaker?"={all<-c("Diagnosis","BirthOrder")}
   )
   use<-ceiling(runif(1)*length(all))
   return(getVariable(all[use]))
@@ -114,13 +115,13 @@ randomCat3IV<-function(DV="DV") {
 #' @export
 makePanel<-function(g,r=NULL) {
   paste0('<div style="display:inline-block;margin-bottom:10px;margin-top:10px;">',
-                '<table>',
-                '<tr><td>', g, '</td></tr>',
-                '<tr><td>', r, '</td></tr>',
-                # '<tr style="height:10px;"></tr>',
-                # '<tr><td>', moreHTML(reportWorldDesign(),"see Plan","p1"), '</td></tr>',
-                '</table>',
-                '</div>'
+         '<table>',
+         '<tr><td>', g, '</td></tr>',
+         '<tr><td>', r, '</td></tr>',
+         # '<tr style="height:10px;"></tr>',
+         # '<tr><td>', moreHTML(reportWorldDesign(),"see Plan","p1"), '</td></tr>',
+         '</table>',
+         '</div>'
   )
 }
 
@@ -133,7 +134,7 @@ doBasics<-function(doingBasics=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FAL
                    sN=NULL,sMethod=NULL,sDataFormat=NULL,
                    sOutliers=0, sDependence=0,
                    sIV1Use="Between",sIV2Use="Between",
-                   analyse="Main1", 
+                   analyse="Main12", 
                    allScatter=NULL,fullWithinNames=NULL,
                    nreps=200
 ) {
@@ -162,7 +163,7 @@ doBasics<-function(doingBasics=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FAL
     marginalsStyle<-"all"
     hideReport<-FALSE
     makeData<-TRUE
-    whichEffect="Main1"
+    whichEffect="Main1+2"
     
     switch(stepBS,
            "0"={
@@ -200,14 +201,16 @@ doBasics<-function(doingBasics=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FAL
              showNow<-"Effect"
            },
            "31"={ # Revision of all basic tests with 2 variables
-             variables$DV<-randomDV()
-             variables$IV<-randomIV(variables$DV)
-             
              switch(partBS,
                     "A"={hideReport<-TRUE;showJamovi<-FALSE;showNow<-"Sample"},
                     "B"={hideReport<-FALSE;makeData<-FALSE;showNow<-"Effect"},
                     {}
              )
+             if (makeData) {
+               variables$DV<-randomDV()
+               variables$IV<-randomIV(variables$DV)
+             }
+             
              process<-"single"
            },
            "4"={ # Main effects in multiple IVs
@@ -230,21 +233,24 @@ doBasics<-function(doingBasics=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FAL
              showNow<-"Effect"
            },
            "41"={ # Revision of all basic tests with 3 variables
-             variables$DV<-randomDV()
-             variables$IV<-randomIV(variables$DV)
-             while (1==1) {
-               variables$IV2<-randomIV(variables$DV)
-               if (variables$IV2$name!=variables$IV$name) break;
-             }
              switch(partBS,
                     "A"={hideReport<-TRUE;showJamovi<-FALSE;showNow<-"Sample"},
                     "B"={hideReport<-FALSE;makeData<-FALSE;showNow<-"Effect"},
                     {}
              )
-             if (runif(1)>0.5) rIV<-0.3 else rIV<-0
-             if (runif(1)>0.5) rIV2<-0.3 else rIV2<-0
-             if (runif(1)>0.5) rIVIV2<-0.3 else rIVIVIV2<-0
-             if (runif(1)>0.5) rIVIV2DV<-0.3 else rIVIV2DV<-0
+             
+             if (makeData) {
+               variables$DV<-randomDV()
+               variables$IV<-randomIV(variables$DV)
+               while (1==1) {
+                 variables$IV2<-randomIV(variables$DV)
+                 if (variables$IV2$name!=variables$IV$name) break;
+               }
+               if (runif(1)>0.5) rIV<-0.3 else rIV<-0
+               if (runif(1)>0.5) rIV2<-0.3 else rIV2<-0
+               if (runif(1)>0.5) rIVIV2<-0.3 else rIVIVIV2<-0
+               if (runif(1)>0.5) rIVIV2DV<-0.3 else rIVIV2DV<-0
+             }
              process<-"single"
            },
            "5"={ # Interactions
@@ -265,7 +271,7 @@ doBasics<-function(doingBasics=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FAL
              if (is.null(sN)) sN<-450
              showNow<-"Effect"
              if (analyse=="Main1x2") whichEffect<-"Main1x2"
-             else whichEffect<-"Main1"
+             else whichEffect<-"Main1+2"
            },
            "6"={ # Covariation
              variables$IV<-"Anxiety"
@@ -377,40 +383,40 @@ doBasics<-function(doingBasics=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FAL
            }
     )
     
-    if (is.character(analyse))
-      switch(analyse,
-             "Main1"={analyse<-c(TRUE,FALSE,FALSE,FALSE)},
-             "Main2"={analyse<-c(FALSE,TRUE,FALSE,FALSE)},
-             "Main12"={analyse<-c(TRUE,TRUE,FALSE,FALSE)},
-             "Main1x2"={analyse<-c(TRUE,TRUE,TRUE,FALSE)},
-             "InteractionOnly"={analyse<-c(FALSE,FALSE,TRUE,FALSE)},
-             "Covariation"={analyse<-c(TRUE,TRUE,FALSE,TRUE)}
-      )
-    setEvidence(AnalysisTerms=analyse)
-    
-    if (is.null(rIV)) rIV<-0.3
-    hypothesis<-makeHypothesis(IV=variables$IV,IV2=variables$IV2,DV=variables$DV,
-                               effect=makeEffect(rIV,rIV2=rIV2,rIVIV2=rIVIV2,rIVIV2DV=rIVIV2DV)
-    )
-    if (stepBS=="1") hypothesis$DV$skew<-skew
-    if (stepBS=="1") hypothesis$DV$kurtosis<-kurtosis
-    if (stepBS=="4") hypothesis$layout<-"simple"
-    if (stepBS=="5") hypothesis$layout<-"noCovariation"
-    if (stepBS=="8") hypothesis$layout<-"noCovariation"
-    if (stepBS=="6") hypothesis$layout<-"noInteraction"
-    if (stepBS=="9") hypothesis$layout<-"moderation"
-    if (stepBS=="10") hypothesis$layout<-"mediation"
-    
-    if (is.null(sN))  sN<-100
-    if (is.null(sMethod)) sMethod<-"Random"
-    if (is.null(sDataFormat)) sDataFormat<-"long"
-    design<-makeDesign(sN=sN,sMethod=makeSampling(sMethod),sDataFormat=sDataFormat,
-                       sOutliers=sOutliers, sDependence=sDependence,
-                       sIV1Use=sIV1Use,sIV2Use=sIV2Use)
-    setBrawDef("hypothesis",hypothesis)
-    setBrawDef("design",design)
-    
     if (makeData) {
+      if (is.character(analyse))
+        switch(analyse,
+               "Main1"={analyse<-c(TRUE,FALSE,FALSE,FALSE)},
+               "Main2"={analyse<-c(FALSE,TRUE,FALSE,FALSE)},
+               "Main12"={analyse<-c(TRUE,TRUE,FALSE,FALSE)},
+               "Main1x2"={analyse<-c(TRUE,TRUE,TRUE,FALSE)},
+               "InteractionOnly"={analyse<-c(FALSE,FALSE,TRUE,FALSE)},
+               "Covariation"={analyse<-c(TRUE,TRUE,FALSE,TRUE)}
+        )
+      setEvidence(AnalysisTerms=analyse)
+      
+      if (is.null(rIV)) rIV<-0.3
+      hypothesis<-makeHypothesis(IV=variables$IV,IV2=variables$IV2,DV=variables$DV,
+                                 effect=makeEffect(rIV,rIV2=rIV2,rIVIV2=rIVIV2,rIVIV2DV=rIVIV2DV)
+      )
+      if (stepBS=="1") hypothesis$DV$skew<-skew
+      if (stepBS=="1") hypothesis$DV$kurtosis<-kurtosis
+      if (stepBS=="4") hypothesis$layout<-"simple"
+      if (stepBS=="5") hypothesis$layout<-"noCovariation"
+      if (stepBS=="8") hypothesis$layout<-"noCovariation"
+      if (stepBS=="6") hypothesis$layout<-"noInteraction"
+      if (stepBS=="9") hypothesis$layout<-"moderation"
+      if (stepBS=="10") hypothesis$layout<-"mediation"
+      
+      if (is.null(sN))  sN<-100
+      if (is.null(sMethod)) sMethod<-"Random"
+      if (is.null(sDataFormat)) sDataFormat<-"long"
+      design<-makeDesign(sN=sN,sMethod=makeSampling(sMethod),sDataFormat=sDataFormat,
+                         sOutliers=sOutliers, sDependence=sDependence,
+                         sIV1Use=sIV1Use,sIV2Use=sIV2Use)
+      setBrawDef("hypothesis",hypothesis)
+      setBrawDef("design",design)
+      
       if (process=="single") {
         setBrawRes("result",NULL)
         doSingle()
@@ -471,7 +477,7 @@ doBasics<-function(doingBasics=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FAL
       tabs<-c("Plan","Sample","Effect","Schematic")
       tabContents<-c(
         makePanel(showPlan()),
-        makePanel(showMarginals(style="all"),NULL),
+        makePanel(showMarginals(style=marginalsStyle),NULL),
         makePanel(nullPlot(),NULL),
         makePanel(nullPlot(),NULL)
       )
