@@ -304,7 +304,7 @@ plotParInterDescription<-function(analysis,showFit=TRUE,g=NULL){
         
         analysis1$hypothesis$IV$vals<-Ivals[use1]
         analysis1$hypothesis$DV$vals<-Dvals[use1]
-        analysis1$hypothesis$DV$mu<-mean(analysis$dv[use1],na.rm=TRUE)
+        analysis1$hypothesis$DV$mu<-mean(as.numeric(analysis$dv[use1]),na.rm=TRUE)
         analysis1$hypothesis$IV2<-NULL
         analysis1<-doAnalysis(analysis1)
 
@@ -322,7 +322,7 @@ plotParInterDescription<-function(analysis,showFit=TRUE,g=NULL){
         analysis2$hypothesis$IV$vals<-Ivals[use2]
         analysis2$hypothesis$IV2<-NULL
         analysis2$hypothesis$DV$vals<-Dvals[use2]
-        analysis2$hypothesis$DV$mu<-mean(analysis$dv[use2],na.rm=TRUE)
+        analysis2$hypothesis$DV$mu<-mean(as.numeric(analysis$dv[use2]),na.rm=TRUE)
         analysis2<-doAnalysis(analysis2)
         
         range1<-c(min(analysis1$ivplot),max(analysis1$ivplot))

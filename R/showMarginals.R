@@ -61,6 +61,10 @@ inspectMainGraph<-function(varName,result=braw.res$result,inspect=makeInspect(),
          data<-result$dv,
          data<-result$iv,
          data<-result$iv2)
+  switch(useVar,
+         dataJitter<-as.numeric(result$dv)-result$dvplot,
+         dataJitter<-as.numeric(result$iv)-result$ivplot,
+         dataJitter<-as.numeric(result$iv2)-result$iv2plot)
   data<-as.numeric(data[!is.na(data)])
   inspect$data<-data
   
@@ -104,7 +108,7 @@ inspectMainGraph<-function(varName,result=braw.res$result,inspect=makeInspect(),
              y<-rank(data,ties.method="first")
              },
            "piled"={
-             if (var$type!="Interval") {data<-data+runif(n,-1,1)*0.2}
+             if (var$type!="Interval") {data<-data+dataJitter}
              y<-pile(data,ptSize)*aspect
            }
     )
