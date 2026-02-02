@@ -18,7 +18,7 @@ fit_sem_model<-function(pathmodel,model_data,fixedCoeffs=NULL,doinglavaan=TRUE) 
 #  Stheta is obtained from a given set of possible model coefficients
   
   if (doinglavaan) {
-    pathmodel$path$stages<-sapply(pathmodel$path$stages,function(x) gsub("[^0-9a-zA-Z_.]","",x))
+    pathmodel$path$stages<-lapply(pathmodel$path$stages,function(x) gsub("[^0-9a-zA-Z_.]","",x))
     pathmodel$path$only_ivs<-sapply(pathmodel$path$only_ivs,function(x) gsub("[^0-9a-zA-Z_.]","",x))
     pathmodel$path$only_dvs<-sapply(pathmodel$path$only_dvs,function(x) gsub("[^0-9a-zA-Z_.]","",x))
     pathmodel$path$add<-sapply(pathmodel$path$add,function(x) gsub("[^0-9a-zA-Z_.]","",x))
@@ -166,7 +166,7 @@ path2sem<-function(pathmodel,model_data,doinglavaan=TRUE) {
           nn<-paste0(full_varnames[iv],cases[2:length(cases)])
           colnames(nv)<-nn
           new_data<-cbind(new_data,nv)
-          new_names<-cbind(new_names,nn)
+          new_names<-c(new_names,nn)
           for (is in 1:length(stages)){
             s<-stages[[is]]
             change<-which(full_varnames[iv]==s)
