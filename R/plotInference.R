@@ -46,6 +46,7 @@ plotInference<-function(analysis,otheranalysis=NULL,disp="rs",orientation="vert"
           "ci2"={g<-r_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
 
           "p"= {g<-p_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
+          "pe"= {g<-p_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
           "ps"= {g<-ps_plot(analysis,disp,showTheory=showTheory,showData=showData,showLegend=showLegend,g=g)},
           "po"= {g<-p_plot(analysis,disp,orientation=orientation,whichEffect=whichEffect,effectType=effectType,showTheory=showTheory,showData=showData,showLegend=showLegend,showYaxis=showYaxis,g=g)},
           

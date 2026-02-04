@@ -58,7 +58,9 @@ reportSEMModel<-function(sem,showType="CF",showFit=TRUE) {
          "ES"={showData<-sem$ES_table;title="effect sizes"},
          "cov"={showData<-sem$covariance;title="covariance"}
   )
+  showData[is.na(sem$ES_table)]<-NA
   showData<-t(showData)
+  
   # if (ncol(showData)>1){
   #   keep<-colSums(is.na(showData))<ncol(showData)
   #   showData<-showData[,keep]

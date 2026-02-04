@@ -68,7 +68,7 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
   theoryDens_all<-NULL
   histGain<-NA
   
-  if (is.element(showType,c("p","e1p","e2p","po"))) {
+  if (is.element(showType,c("p","pe","e1p","e2p","po"))) {
     npt<-201
     if (logScale) {
       pr<-log10(braw.env$alphaSig)
@@ -392,7 +392,7 @@ makeTheoryMultiple<-function(hypothesis,design,evidence,showType,whichEffect,log
          },
          { } # do nothing
   )
-  if (is.element(showType,c("p","e1p","e2p","po"))) {
+  if (is.element(showType,c("p","pe","e1p","e2p","po"))) {
     if (!labelNSig) {
       theoryDens_all<-theoryDens_all-theoryDens_sig
       theoryDens_sig<-NA
@@ -744,6 +744,17 @@ simulations_hist<-function(pts,valType,ylim,histGain,histGainrange,orientation){
             }
           },
           
+          "pe"=  { # ns is large
+            if (braw.env$pPlotScale=="log10") {
+              target<-log10(braw.env$alphaSig)
+              bins<-getBins(vals,svals,target,ylim[1],log10(1))
+            } else {
+              target<-braw.env$alphaSig
+              bins<-getBins(vals,svals,target,0,1)
+              bins<-c(0,bins[bins>0])
+            }
+          },
+          
           "rp"=  { # ns is small
             target<-0.3
             bins<-getBins(vals,svals,target,NULL,NULL,fixed=TRUE)
@@ -875,7 +886,7 @@ simulations_plot<-function(g,pts,showType=NULL,simWorld,design,
         c6<-braw.env$plotColours$infer_isigNull
         doingDLLR<-TRUE
       }
-      if (is.element(showType,c("rse","sig","ns","nonnulls","nulls"))) {
+      if (is.element(showType,c("rse","pe","sig","ns","nonnulls","nulls"))) {
         c1<-braw.env$plotColours$infer_sigNonNull
         c2<-braw.env$plotColours$infer_nsigNonNull
         c3<-braw.env$plotColours$infer_nsigNull
@@ -1290,7 +1301,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   else mTitle<-""
   if (!showYaxis) ylabel<-NULL
   
-  if (showType=="p" && braw.env$pPlotScale=="log10" && any(is.numeric(analysis$pIV)) && any(analysis$pIV>0)) 
+  if (is.element(showType,c("p","pe")) && braw.env$pPlotScale=="log10" && any(is.numeric(analysis$pIV)) && any(analysis$pIV>0)) 
     while (mean(log10(analysis$pIV)>ylim[1])<0.75) ylim[1]<-ylim[1]-1
   
   xoff=0
@@ -1366,7 +1377,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
   
   
   lineCol<-"#000000"
-  if (is.element(showType,c("p","e1p","e2p","e1d","e2d"))) lineCol<-"green"
+  if (is.element(showType,c("p","pe","e1p","e2p","e1d","e2d"))) lineCol<-"green"
   switch(orientation,
          "horz"={
            # for (yl in ylines)
@@ -1400,6 +1411,7 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
             "ro"={sampleVals<-data$ro},
             "re"={sampleVals<-data$rs-data$rp},
             "p"={sampleVals<-data$ps},
+            "pe"={sampleVals<-data$ps},
             "po"={sampleVals<-data$po},
             "metaRiv"={sampleVals<-cbind(analysis$best$PDFk)},
             "metaRsd"={sampleVals<-cbind(analysis$best$PDFspread)},
@@ -1544,14 +1556,15 @@ r_plot<-function(analysis,showType="rs",logScale=FALSE,otheranalysis=NULL,
 
       ns<-c()
       s<-c()
-      if (length(rvals)>1 && is.element(showType,c("rs","rse","sig","ns","nonnulls","nulls","rss","p",
+      if (length(rvals)>1 && is.element(showType,c("rs","rse","sig","ns","nonnulls","nulls","rss",
+                                                   "p","pe",
                                                    "e1r","e2r","e1+","e2+","e1-","e2-",
                                                    "e1p","e2p","e1d","e2d"))) {
         n<-length(pvals)
         if (!is.null(otheranalysis) && effect$world$On) n<-n+length(otheranalysis$pIV)
         ns<-sum(resSig==0,na.rm=TRUE)
         s<-sum(resSig>0,na.rm=TRUE)
-        if (is.element(showType,c("rse","sig","ns","rss","nonnulls","nulls"))) {
+        if (is.element(showType,c("rse","sig","ns","rss","nonnulls","nulls","pe"))) {
           sc<-sum((resSig>0)&(resNotNull))
           nse<-sum((resSig==0)&(resNotNull))
           se<-sum((resSig>0)&(!resNotNull))

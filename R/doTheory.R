@@ -2,10 +2,12 @@
 #' @export
 doTheory<-function(doingTheory=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FALSE,
                    showPlanOnly=FALSE,doHistory=TRUE,
-                   IV="Perfectionism",IV2=NULL,DV="ExamGrade",
-                   skew=0,kurtosis=0,
-                   rIV=NULL,rIV2=NULL,rIVIV2=NULL,rIVIV2DV=NULL,
-                   sN=NULL,sMethod=NULL,sDataFormat=NULL,
+                   IVtype="Interval",IV2type=NULL,DVtype="Interval",
+                   DVmean=0,DVsd=1,DVskew=0,DVkurtosis=0,
+                   residuals="normal",
+                   rIV=0.3,rIV2=NULL,rIVIV2=NULL,rIVIV2DV=NULL,
+                   heteroscedasticity=0,
+                   sN=42,sMethod="Random",sDataFormat="long",
                    sOutliers=0, sDependence=0,
                    sIV1Use="Between",sIV2Use="Between",
                    analyse="Main1", 
@@ -31,8 +33,11 @@ doTheory<-function(doingTheory=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FAL
     if (singleBS(doingTheory)) process<-"single" else process<-"multiple"
     rootBS<-paste0("Step",stepBS,partBS)
     
+    IV<-makeVariable("IV",IVtype)
+    if (!is.null(IV2type)) IV2<-makeVariable("IV2",IV2type) else IV2<-NULL
+    DV<-makeVariable("DV",DVtype,mu=DVmean,sd=DVsd,skew=DVskew,kurtosis=DVkurtosis)
     variables=list(IV=IV,IV2=IV2,DV=DV)
-    world<-NULL
+    world<-makeWorld(FALSE)
     
     marginalsStyle<-"all"
     hideReport<-FALSE
@@ -45,8 +50,9 @@ doTheory<-function(doingTheory=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FAL
            },
            "1"={ # sampling error
              switch(partBS,
-                    "A"={showNow<-"Sample"},
-                    "B"={showNow<-"Effect"}
+                    "A"={showNow<-"Mean"},
+                    "B"={showNow<-"Kurt"},
+                    "C"={showNow<-"Effect"}
              )
            },
            "2"={ # NHST
@@ -58,145 +64,16 @@ doTheory<-function(doingTheory=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FAL
                     "C"={world$pRplus<-0.5},
                     {}
              )
-             showNow<-"Effect"
+             showNow<-"NHST"
            },
-           "3"={ # 2 basic tests with Categorical DV
-             variables$DV<-randomCatDV()
-             switch(partBS,
-                    "A"={variables$IV<-randomCat2IV(variables$DV)},
-                    "B"={variables$IV<-randomOrdIV(variables$DV)},
-                    "C"={variables$IV<-randomParIV(variables$DV)},
-                    {}
-             )
-             showNow<-"Effect"
+           "3"={ # 
+             if (is.null(rIV)) rIV<-0.3
+             world<-makeWorld(TRUE,"Single","r",rIV,pRplus=0.5)
+             showNow<-"NHST"
            },
-           "31"={ # Revision of all basic tests with 2 variables
-             variables$DV<-randomDV()
-             variables$IV<-randomIV(variables$DV)
-             
-             switch(partBS,
-                    "A"={hideReport<-TRUE;showJamovi<-FALSE;showNow<-"Sample"},
-                    "B"={hideReport<-FALSE;makeData<-FALSE;showNow<-"Effect"},
-                    {}
-             )
-             process<-"single"
+           "4"={ # 
            },
-           "4"={ # Main effects in multiple IVs
-             variables$DV<-"ExamGrade"
-             switch(partBS,
-                    "A"={variables$IV<-"BirthOrder";variables$IV2<-"Musician?"},
-                    "B"={variables$IV<-"Smoker?";variables$IV2<-"Anxiety"},
-                    "C"={variables$IV<-"Perfectionism";variables$IV2<-"HoursSleep"},
-                    "D"={
-                      IVs<-c("IQ","Musician?","Anxiety","RiskTaker?","SelfConfidence","Diligence","Coffee?")
-                      variables$IV<-IVs[ceiling(runif(1)*length(IVs))]
-                      IVs<-IVs[IVs!=variables$IV]
-                      variables$IV2<-IVs[ceiling(runif(1)*length(IVs))]
-                    }
-             )
-             if (is.null(rIV2)) rIV2<- -0.3
-             rIVIV2<- 0
-             rIVIV2DV<-0
-             if (is.null(analyse)) analyse<-"Main12"
-             showNow<-"Effect"
-           },
-           "41"={ # Revision of all basic tests with 3 variables
-             variables$DV<-randomDV()
-             variables$IV<-randomIV(variables$DV)
-             while (1==1) {
-               variables$IV2<-randomIV(variables$DV)
-               if (variables$IV2$name!=variables$IV$name) break;
-             }
-             switch(partBS,
-                    "A"={hideReport<-TRUE;showJamovi<-FALSE;showNow<-"Sample"},
-                    "B"={hideReport<-FALSE;makeData<-FALSE;showNow<-"Effect"},
-                    {}
-             )
-             if (runif(1)>0.5) rIV<-0.3 else rIV<-0
-             if (runif(1)>0.5) rIV2<-0.3 else rIV2<-0
-             if (runif(1)>0.5) rIVIV2<-0.3 else rIVIVIV2<-0
-             if (runif(1)>0.5) rIVIV2DV<-0.3 else rIVIV2DV<-0
-             process<-"single"
-           },
-           "5"={ # Interactions
-             variables$DV<-"ExamGrade"
-             variables$IV<-"Coffee?";variables$IV2<-"Musician?"
-             if (is.null(rIVIV2DV)) rIVIV2DV<-0.5
-             switch(partBS,
-                    "A"={rIV<-0; rIV2<-0}, # +ve/-ve
-                    "B"={rIV<-rIVIV2DV; rIV2<- rIVIV2DV}, # on/off
-                    "C"={rIV<-0;rIV2<-rIVIV2DV} # diverge
-             )
-             rIVIV2<- 0
-             if (is.null(analyse)) analyse<-"Main1x2"
-             if (length(analyse)>1) {
-               if (analyse[3]) analyse<-"Main1x2"
-               else analyse<-"Main12"
-             }
-             if (is.null(sN)) sN<-450
-             showNow<-"Effect"
-             if (analyse=="Main1x2") whichEffect<-"Main1x2"
-             else whichEffect<-"Main1"
-           },
-           "6"={ # Covariation
-             variables$IV<-"Anxiety"
-             variables$DV<-"ExamGrade"
-             rIVIV2DV<- 0
-             switch(partBS,
-                    "A"={
-                      variables$IV2<-"HoursSleep"
-                      if (is.null(rIV)) rIV<- -0.05
-                      if (is.null(rIV2)) rIV2<- 0.5
-                      if (is.null(rIVIV2)) rIVIV2<- -0.7
-                    },
-                    "B"={
-                      variables$IV2<-"Perfectionism"
-                      if (is.null(rIV)) rIV<- -0.35
-                      if (is.null(rIV2)) rIV2<- 0.5
-                      if (is.null(rIVIV2)) rIVIV2<- 0.7
-                    },
-                    "C"={
-                      variables$IV2<-"Diligence"
-                      if (is.null(rIV)) rIV<- -0.2
-                      if (is.null(rIV2)) rIV2<- 0.57
-                      if (is.null(rIVIV2)) rIVIV2<- 0.7
-                    }
-             )
-             if (length(analyse)>1) {
-               if (analyse[2]) analyse<-"Main12"
-               else analyse<-"Main1"
-             }
-             if (is.null(sN)) sN<-450
-             showNow<-"Effect"
-             whichEffect<-"Main1+2"
-           },
-           "7"={ # Experimental 1 IV
-             variables$IV<-"Condition"
-             variables$DV<-"Response"
-             switch(partBS,
-                    "A"={ sIV1Use<-"Between" },
-                    "B"={ sIV1Use<-"Within"  }
-             )
-             if (is.null(sN))  sN<-50
-             showNow<-"Effect"
-           },
-           "8"={ # Experimental 2 IV,
-             variables$IV<-"Condition"
-             variables$IV2<-"Group"
-             variables$DV<-"Response"
-             switch(partBS,
-                    "A"={ sIV1Use<-sIV2Use<-"Between" },
-                    "B"={ sIV1Use<-"Within" ; sIV2Use<-"Between" },
-                    "C"={ sIV1Use<-sIV2Use<-"Within"  }
-             )
-             if (is.null(rIVIV2DV)) rIVIV2DV<-0.3
-             if (is.null(rIV)) rIV<-rIVIV2DV
-             if (is.null(rIV2)) rIV2<-rIVIV2DV
-             if (is.null(sDataFormat)) sDataFormat<-"wide"
-             if (is.null(allScatter)) allScatter<-FALSE
-             if (is.null(sN))  sN<-50
-             analyse<-"Main1x2"
-             showNow<-"Effect"
+           "5"={ # 
            },
            "9"={ # Moderation
              variables$IV<-"Anxiety"
@@ -259,24 +136,17 @@ doTheory<-function(doingTheory=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FAL
       )
     setEvidence(AnalysisTerms=analyse)
     
-    if (is.null(rIV)) rIV<-0.3
     hypothesis<-makeHypothesis(IV=variables$IV,IV2=variables$IV2,DV=variables$DV,
-                               effect=makeEffect(rIV,rIV2=rIV2,rIVIV2=rIVIV2,rIVIV2DV=rIVIV2DV
+                               effect=makeEffect(rIV,rIV2=rIV2,rIVIV2=rIVIV2,rIVIV2DV=rIVIV2DV,
+                                                 world=world,
+                                                 Heteroscedasticity=heteroscedasticity,ResidDistr=residuals
                                                  )
     )
-    if (!is.null(world)) hypothesis$effect$world<-world
-    if (stepBS=="1") hypothesis$DV$skew<-skew
-    if (stepBS=="1") hypothesis$DV$kurtosis<-kurtosis
-    if (stepBS=="4") hypothesis$layout<-"simple"
-    if (stepBS=="5") hypothesis$layout<-"noCovariation"
-    if (stepBS=="8") hypothesis$layout<-"noCovariation"
+    hypothesis$layout<-"simple"
     if (stepBS=="6") hypothesis$layout<-"noInteraction"
     if (stepBS=="9") hypothesis$layout<-"moderation"
     if (stepBS=="10") hypothesis$layout<-"mediation"
     
-    if (is.null(sN))  sN<-42
-    if (is.null(sMethod)) sMethod<-"Random"
-    if (is.null(sDataFormat)) sDataFormat<-"long"
     design<-makeDesign(sN=sN,sMethod=makeSampling(sMethod),sDataFormat=sDataFormat,
                        sOutliers=sOutliers, sDependence=sDependence,
                        sIV1Use=sIV1Use,sIV2Use=sIV2Use)
@@ -303,12 +173,16 @@ doTheory<-function(doingTheory=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FAL
     setBrawEnv("graphicsType","HTML")
     # setBrawEnv("fontSize",0.75)
     
-    if (showNow=="Sample") mType<-"dv.mn;dv.sd" else mType="rs;p"
+    mType="rs;p"
+    if (showNow=="Mean") {mType<-"dv.mn;dv.sd"; showNow<-"Sample"}
+    if (showNow=="Kurt") {mType<-"dv.sk;dv.kt"; showNow<-"Sample"}
+    mrType<-mType
+    if (showNow=="NHST") {mType<-"rse;pe"; mrType<-"NHST"; showNow<-"Schematic"}
     if ((process=="single" || process=="analysis") && showNow!="SchematicSEM") {
       schematic<-makePanel(showInference(showType=mType,effectType="direct"),reportInference())
     } 
     if (process=="multiple") {
-      schematic<-makePanel(showMultiple(showType=mType,effectType="direct"),reportMultiple())
+      schematic<-makePanel(showMultiple(showType=mType,effectType="direct"),reportMultiple(showType=mrType))
       showNow<-"Schematic"
     }      
     if (process=="single" && showNow=="SchematicSEM") {
@@ -341,15 +215,6 @@ doTheory<-function(doingTheory=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FAL
     tabLinkLabel=NULL
   } 
   if (!is.element(showNow,c("None","Plan"))) {
-    if (hideReport) {
-      tabs<-c("Plan","Sample","Effect","Schematic")
-      tabContents<-c(
-        makePanel(showPlan()),
-        makePanel(showMarginals(style="all"),NULL),
-        makePanel(nullPlot(),NULL),
-        makePanel(nullPlot(),NULL)
-      )
-    } else {
       tabs<-c("Plan","Sample","Effect","Schematic")
       tabContents<-c(
         makePanel(showPlan()),
@@ -358,7 +223,6 @@ doTheory<-function(doingTheory=NULL,showOutput=TRUE,showJamovi=TRUE,showHelp=FAL
                   paste0(reportInference(),reportDescription(plain=TRUE))),
         schematic
       )
-    }
     tabLink=paste0('https://doingpsychstats.wordpress.com/theory-',stepBS,'#',partBS)
     tabLinkLabel=paste0('&#x24D8 ',rootBS)
   }

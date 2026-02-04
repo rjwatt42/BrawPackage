@@ -8,7 +8,7 @@ plotAxis<-function(showType,hypothesis,design=NULL,result=NULL) {
   base_hue_w<-0.65
   hue_diff<-0.03
   
-  logScale<-(is.element(showType,c("p","po","e1p","e2p")) && braw.env$pPlotScale=="log10") ||
+  logScale<-(is.element(showType,c("p","pe","po","e1p","e2p")) && braw.env$pPlotScale=="log10") ||
     (is.element(showType,c("ws","wp")) && braw.env$wPlotScale=="log10") ||
     (is.element(showType,c("n","no")) && braw.env$nPlotScale=="log10") ||
     (is.element(showType,c("nw","llknull")))
@@ -180,6 +180,14 @@ plotAxis<-function(showType,hypothesis,design=NULL,result=NULL) {
             ylines<-c(0,effect$rIV)
           },
           "p"={
+            ylim<-plim
+            yticks<-pticks
+            ymins<-pmins
+            ylabel<-plabel
+            ylines<-plines
+            use_cols<-c(hsv(base_hue_p,1,1),hsv(base_hue_p+hue_diff,1,1),hsv(base_hue_p+hue_diff*2,1,1))
+          },
+          "pe"={
             ylim<-plim
             yticks<-pticks
             ymins<-pmins
