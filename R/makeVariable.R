@@ -153,6 +153,41 @@ makeVariable<-function(name,type="Interval",
 getVariable<-function(name=NULL) {
   
   if (is.null(name)) return(NULL)
+  
+  names<-c()
+  if (name=="?") {
+    for (i in 1:length(braw.env$variables)) {
+        names<-c(names,braw.env$variables[[i]]$name)
+    }
+  }
+  if (name=="?Interval") {
+    for (i in 1:length(braw.env$variables)) {
+      if (braw.env$variables[[i]]$type=="Interval") 
+        names<-c(names,braw.env$variables[[i]]$name)
+    }
+  }
+  if (name=="?Categorical") {
+    for (i in 1:length(braw.env$variables)) {
+      if (braw.env$variables[[i]]$type=="Categorical") 
+        names<-c(names,braw.env$variables[[i]]$name)
+    }
+  }
+  if (name=="?Categorical2") {
+    for (i in 1:length(braw.env$variables)) {
+      if (braw.env$variables[[i]]$type=="Categorical" && braw.env$variables[[i]]$ncats==2) 
+        names<-c(names,braw.env$variables[[i]]$name)
+    }
+  }
+  if (name=="?Categorical3") {
+    for (i in 1:length(braw.env$variables)) {
+      if (braw.env$variables[[i]]$type=="Categorical" && braw.env$variables[[i]]$ncats>2) 
+        names<-c(names,braw.env$variables[[i]]$name)
+    }
+  }
+  if (!is.null(names)) {
+    use<-ceiling(runif(1)*length(names))
+    name<-names[use]
+  } 
   return(braw.env$variables[[name]])
   
 }
@@ -210,6 +245,7 @@ makeDefaultVariables<-function() {
     SessionsI=makeVariable(name="Sessions",'Interval',mu=4,sd=1,skew=-0.75),
     TrialPhase=makeVariable(name="TrialPhase",type="Categorical",ncats=2,cases="pre,post",proportions="1.1,1"),
     TrialPhase3=makeVariable(name="TrialPhase",type="Categorical",ncats=3,cases="before,during,after",proportions="1.2,1.1,1"),
+    Attempt=makeVariable(name="Attempt",type="Categorical",ncats=2,cases="1st,2nd"),
     
     Condition=makeVariable(name="Condition",type="Categorical",ncats=2,cases="A,B",proportions="1,1"),
     Condition3=makeVariable(name="Condition",type="Categorical",ncats=3,cases="A,B,C",proportions="1,1,1"),

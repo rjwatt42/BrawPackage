@@ -8,7 +8,7 @@
 #' @examples
 #' doPossible<-function(possible=makePossible(),possibleResult=NULL)
 #' @export
-doPossible <- function(possible=NULL,possibleResult=NULL){
+doPossible <- function(possible=braw.def$possible,possibleResult=NULL){
   
   if (is.null(possible)) possible<-makePossible()
   oldRZ<-braw.env$RZ
@@ -17,8 +17,10 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
 
   npoints=201
 
-  design<-possible$design
+  design<-possible$design 
+  if (is.null(design)) design<-braw.def$design
   hypothesis<-possible$hypothesis
+  if (is.null(hypothesis)) hypothesis<-braw.def$hypothesis
   world<-hypothesis$effect$world
   n<-design$sN
 
@@ -34,8 +36,8 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
            rp<-seq(-1,1,length=npoints)*braw.env$r_range
          },
          "z"={
-           rs<-tanh(seq(-1,1,length=npoints)*braw.env$z_range)
-           rp<-tanh(seq(-1,1,length=npoints)*braw.env$z_range)
+           rs<-tanh(seq(-1,1,length=npoints+100)*braw.env$z_range*1.5)
+           rp<-tanh(seq(-1,1,length=npoints+100)*braw.env$z_range*1.5)
            if (!is.null(sRho)) sRho<-tanh(sRho)
            if (!is.null(pRho)) pRho<-tanh(pRho)
          })
@@ -67,13 +69,8 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
   
   # get the prior population distribution
   switch(possible$UsePrior,
-         "none"={ prior<-list(On=TRUE,
-                              PDF="Uniform",
-                              PDFk=1,
-                              RZ="r",
-                              pRplus=1,
-                              PDFsample=FALSE) },
-         "hypothesis"={prior<-list(On=FALSE,
+         "none"={ prior<-getWorld("Uniform") },
+         "hypothesis"={prior<-makeWorld(On=FALSE,
                                     PDF="Single",
                                     PDFk=hypothesis$effect$rIV,
                                     RZ="r",
@@ -117,18 +114,25 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
          sourceSampDens_r_plus1<-colSums(sourceSampDens_r_plus)
     else sourceSampDens_r_plus1<-sourceSampDens_r_plus
     
-    switch(braw.env$RZ,
-           "r"={
+    # switch(braw.env$RZ,
+    #        "r"={
              sRho_total<-approx(rs,sourceSampDens_r_total,sRho)$y
              sRho_plus<-approx(rs,sourceSampDens_r_plus1,sRho)$y
              sRho_null<-approx(rs,sourceSampDens_r_null,sRho)$y
-           },
-           "z"={
-             sRho_total<-approx(atanh(rs),rdens2zdens(sourceSampDens_r_total,rs),sRho)$y
-             sRho_plus<-approx(atanh(rs),rdens2zdens(sourceSampDens_r_plus1,rs),sRho)$y
-             sRho_null<-approx(atanh(rs),rdens2zdens(sourceSampDens_r_null,rs),sRho)$y
-           }
-    )
+    #        },
+    #        "z"={
+    #          sourceSampDens_r_total<-rdens2zdens(sourceSampDens_r_total,rs)
+    #          sRho_total<-approx(atanh(rs),sourceSampDens_r_total,sRho)$y
+    #          if (any(!is.na(sourceSampDens_r_plus1))) {
+    #            sourceSampDens_r_plus1<-rdens2zdens(sourceSampDens_r_plus1,rs)
+    #            sRho_plus<-approx(atanh(rs),sourceSampDens_r_plus1,sRho)$y
+    #          } else  sRho_plus<-NA
+    #          if (any(!is.na(sourceSampDens_r_null))) {
+    #            sourceSampDens_r_null<-rdens2zdens(sourceSampDens_r_null,rs)
+    #            sRho_null<-approx(atanh(rs),sourceSampDens_r_null,sRho)$y
+    #          } else   sRho_null<-NA
+    #        }
+    # )
   } else {
     sRho_total<-NA
     sRho_plus<-NA
@@ -141,7 +145,7 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
   priorSampDens_r<-pD$dens
   priorSampDens_r_plus<-pD$densPlus
   priorSampDens_r_null<-pD$densNull
-  
+
   if (possible$correction) {
     nout<-ceil(possible$simSlice*sqrt(design$sN-3))*20+1
     correction<-seq(-1,1,length.out=nout)*possible$simSlice
@@ -222,6 +226,23 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
     sampleLikelihood_r_show<-c()
   }
   
+  switch(braw.env$RZ,
+         "r"={
+           mleNull=approx(rs,sourceSampDens_r_null,sRho)$y/(sum(sourceSampDens_r_total)*diff(rs[1:2]))
+           mlePlus=approx(rs,colSums(sourceSampDens_r_plus),sRho)$y/(sum(sourceSampDens_r_total)*diff(rs[1:2]))
+           mleTotal=approx(rs,sourceSampDens_r_total,sRho)$y/(sum(sourceSampDens_r_total)*diff(rs[1:2]))
+         },
+         "z"={
+           zs<-atanh(rs)
+           zsn<-rdens2zdens(sourceSampDens_r_null,rs)
+           zsp<-rdens2zdens(sourceSampDens_r_plus,rs)
+           zst<-rdens2zdens(sourceSampDens_r_total,rs)
+           mleNull=approx(zs,zsn,atanh(sRho))$y/(sum(zst)*diff(zs[1:2]))
+           mlePlus=approx(zs,colSums(zsp),atanh(sRho))$y/(sum(zst)*diff(zs[1:2]))
+           mleTotal=approx(zs,zst,atanh(sRho))$y/(sum(zst)*diff(zs[1:2]))
+         }
+           )
+  
   possibleResult<-list(possible=possible,
                        sourceRVals=sourceRVals,
                        sRho=sRho,
@@ -242,7 +263,11 @@ doPossible <- function(possible=NULL,possibleResult=NULL){
                          rp=possible$sims$rpIV,
                          n<-possible$sims$nval
                        ),
-                       mle=densityFunctionStats(sampleLikelihoodTotal_r,rp)$peak
+                       mle=densityFunctionStats(sampleLikelihoodTotal_r,rp)$peak,
+                       mleNull=mleNull,
+                       mlePlus=mlePlus,
+                       mleTotal=mleTotal,
+                       design=design,hypothesis=hypothesis
   )
   
   setBrawRes("possibleResult",possibleResult)

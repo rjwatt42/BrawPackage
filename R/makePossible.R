@@ -19,9 +19,18 @@ makePossible<-function(targetSample=NULL,targetSampleN=NULL,UseSource="world",
                        sigOnly=0,sigOnlyCompensate=FALSE,
                        axisType=braw.env$RZ,
                        sims=NULL,
-                       hypothesis=braw.def$hypothesis,design=braw.def$design,
+                       hypothesis=NULL,design=NULL,
                        simSlice=0.1,correction=TRUE,HQ=FALSE
 ) {
+  if (is.null(design)) {
+    design<-braw.def$design
+    designNull<-TRUE
+  } else designNull<-FALSE
+  if (is.null(hypothesis)) {
+    hypothesis<-braw.def$hypothesis
+    hypothesisNull<-TRUE
+  } else hypothesisNull<-FALSE
+  
   if (is.numeric(targetSample) && is.null(targetSampleN)) {
     targetSampleN<-design$sN
   }
@@ -76,6 +85,9 @@ makePossible<-function(targetSample=NULL,targetSampleN=NULL,UseSource="world",
     hypothesis$effect$world$PDFsample<-FALSE
   }
   
+  if (hypothesisNull) hypothesis<-NULL
+  if (designNull) design<-NULL
+  
   possible<-
   list(targetSample=targetSample,
        targetSampleN=targetSampleN,
@@ -94,4 +106,25 @@ makePossible<-function(targetSample=NULL,targetSampleN=NULL,UseSource="world",
   )
   
   return(possible)
+}
+
+
+#' @export
+setPossible<-function(targetSample=braw.def$possible$targetSample,targetSampleN=braw.def$possible$targetSampleN,UseSource=braw.def$possible$UseSource,
+                      targetPopulation=braw.def$possible$targetPopulation,UsePrior=braw.def$possible$UsePrior,prior=braw.def$possible$prior,
+                      sigOnly=braw.def$possible$sigOnly,sigOnlyCompensate=braw.def$possible$sigOnlyCompensate,
+                      axisType=braw.def$possible$axisType,
+                      sims=braw.def$possible$sims,
+                      hypothesis=braw.def$possible$hypothesis,design=braw.def$possible$design,
+                      simSlice=braw.def$possible$simSlice,correction=braw.def$possible$correction,HQ=braw.def$possible$HQ
+) {
+  possible<-makePossible(targetSample=targetSample,targetSampleN=targetSampleN,UseSource=UseSource,
+                         targetPopulation=targetPopulation,UsePrior=UsePrior,prior=prior,
+                         sigOnly=sigOnly,sigOnlyCompensate=sigOnlyCompensate,
+                         axisType=axisType,
+                         sims=sims,
+                         hypothesis=hypothesis,design=design,
+                         simSlice=simSlice,correction=correction,HQ=HQ
+                         )
+  setBrawDef("possible",possible)
 }

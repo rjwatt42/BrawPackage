@@ -45,11 +45,22 @@ nDistrRand<-function(nSamples,design=braw.def$design){
 }
 
 zdens2rdens<-function(zdens,rvals){
-  zdens/(1-rvals^2)
+  rdens<-zdens/(1-rvals^2)
+  if (ndims(zdens)==1) return(rdens/sum(rdens)*sum(zdens))
+  else  return(rdens/rowSums(rdens)*rowSums(zdens))
 }
 
 rdens2zdens<-function(rdens,rvals){
-  rdens*(1-rvals^2)
+  zdens<-rdens*(1-rvals^2)
+  if (ndims(rdens)==1) {
+    gain<-sum(zdens)
+    if (gain==0) gain<-1
+    return(zdens/gain*sum(rdens))
+  } else {
+    gain<-rowSums(zdens)
+    gain[(gain==0)]<-1
+    return(zdens/gain*rowSums(rdens))
+  }
 }
 
 rdens2ddens<-function(rdens,dvals) {
@@ -162,7 +173,7 @@ getRList<-function(world,addNulls=FALSE,HQ=FALSE) {
           {
             switch(braw.env$RZ,
                    "r"=pRho<-seq(-1,1,length=npops)*braw.env$r_range,
-                   "z"=pRho<-tanh(seq(-1,1,length=npops)*braw.env$z_range)
+                   "z"=pRho<-tanh(seq(-1,1,length=npops*1.5)*braw.env$z_range*1.5)
             )
             pRhogain<-rPopulationDist(pRho,world)
           }
@@ -268,7 +279,7 @@ rPopulationDist<-function(rvals,world) {
   mu<-world$PDFoffset
   sh<-world$PDFshape
   sp<-world$PDFspread
-  if (sp==0) sp<-max(rvals)
+  if (sp==0) sp<-1000
   if (world$RZ=="z") rvals<-atanh(rvals)
   rdens<-rvals*0
   switch (world$PDF,

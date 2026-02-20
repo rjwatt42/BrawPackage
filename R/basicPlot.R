@@ -1019,6 +1019,25 @@ dataContour<-function(data,colour="#000000",fill=NA,breaks=seq(0.1,0.9,0.2),line
   # geom_contour(data=data,aes(x=x1,y=y1,z=z1),colour=colour,breaks=breaks,lwd=linewidth,lty=linetype)
 }
 
+#' @export
+dataGraph<-function(data,xlim=NULL,ylim=NULL,
+                         xlabel=NULL,ylabel=NULL,
+                         xticks=NULL,yticks=NULL) {
+  if (is.null(xlim)) xlim<-c(min(data$x),max(data$x))+c(-1,1)*(max(data$x)-min(data$x))*0.05
+  if (is.null(ylim)) ylim<-c(min(data$y),max(data$y))+c(-1,1)*(max(data$y)-min(data$y))*0.05
+  if (is.null(xticks)) xticks<-seq(xlim[1],xlim[2],length.out=5)
+  if (is.null(yticks)) yticks<-seq(ylim[1],ylim[2],length.out=5)
+  if (is.null(xlabel)) xlabel<-"x"
+  if (is.null(ylabel)) ylabel<-"y"
+  
+  g<-startPlot(xlim=xlim,xticks=xticks,xlabel=xlabel,
+               ylim=ylim,yticks=yticks,ylabel=ylabel,
+               orientation="horz") 
+  g<-addG(g,dataPath(data,linewidth=1))
+  g<-addG(g,dataPoint(data))
+  return(g)
+}
+
 desat <- function(col,gain=1) {
   col<-(col2rgb(col)/255-0.5)*gain+0.5
   col[col<0]<-0
